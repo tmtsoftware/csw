@@ -43,6 +43,8 @@ private[aas] class InstalledAppAuthAdapterImpl(
   }
 
   override def loginCommandLine(): Boolean = {
+    require(keycloakInstalled.getDeployment != null, "keycloak deployment is null")
+    require(keycloakInstalled.getDeployment.getAuthUrl != null, "auth url is not set")
     val bool = keycloakInstalled.loginCommandLine()
     if (bool) updateAuthStore()
     bool

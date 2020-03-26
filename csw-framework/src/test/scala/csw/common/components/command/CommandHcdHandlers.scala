@@ -52,7 +52,7 @@ class CommandHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCon
   }
 
   override def onSubmit(runId: Id, controlCommand: ControlCommand): SubmitResponse = {
-    // Adding passed in parameter to see if data is transferred properly
+    // Adding passed in parameter to see if data is sdtransferred properly
     processCommand(runId, controlCommand)
   }
 

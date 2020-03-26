@@ -26,23 +26,23 @@ class AlarmServiceFactoryTest extends AlarmServiceTestSetup with HTTPLocationSer
 
   override def afterAll(): Unit = super.afterAll()
 
-  test("should create admin alarm service using location service") {
+  test("should create admin alarm service using location service | DEOPSCSW-481") {
     val alarmServiceUsingLS: AlarmAdminService = alarmServiceFactory.makeAdminApi(locationService)
     alarmServiceUsingLS.getMetadata(tromboneAxisHighLimitAlarmKey).await shouldEqual tromboneAxisHighLimitAlarm
   }
 
-  test("should create admin alarm service using host and port") {
+  test("should create admin alarm service using host and port | DEOPSCSW-481") {
     val alarmServiceUsingHostAndPort: AlarmAdminService = alarmServiceFactory.makeAdminApi(hostname, sentinelPort)
     alarmServiceUsingHostAndPort.getMetadata(tromboneAxisHighLimitAlarmKey).await shouldEqual tromboneAxisHighLimitAlarm
   }
 
-  test("should create client alarm service using location service") {
+  test("should create client alarm service using location service | DEOPSCSW-481") {
     val alarmServiceUsingLS: AlarmService = alarmServiceFactory.makeClientApi(locationService)
     alarmServiceUsingLS.setSeverity(tromboneAxisHighLimitAlarmKey, Indeterminate).await
     alarmService.getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldEqual Indeterminate
   }
 
-  test("should create client alarm service using host and port") {
+  test("should create client alarm service using host and port | DEOPSCSW-481") {
     val alarmServiceUsingUsingHostAndPort: AlarmService = alarmServiceFactory.makeClientApi(hostname, sentinelPort)
     alarmServiceUsingUsingHostAndPort.setSeverity(tromboneAxisHighLimitAlarmKey, Indeterminate).await
     alarmService.getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldEqual Indeterminate

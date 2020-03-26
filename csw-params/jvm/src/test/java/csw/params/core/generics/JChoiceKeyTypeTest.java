@@ -21,49 +21,30 @@ public class JChoiceKeyTypeTest extends JUnitSuite {
     private final String keyName = " choiceKey";
     private final Choices choices = Choices.from("A", "B", "C");
 
-    private final GChoiceKey choiceKey = JKeyType.ChoiceKey().make(keyName, choices);
+    private final GChoiceKey choiceKey = JKeyType.ChoiceKey().make(keyName, kilometer, choices);
 
     @Test
-    public void choicesAPIShouldBeAccessible() {
+    public void choicesAPIShouldBeAccessible__DEOPSCSW_183_DEOPSCSW_190() {
         Assert.assertTrue(choices.contains(new Choice("B")));
         List<Choice> expectedChoiceList = Arrays.asList(new Choice("A"), new Choice("B"), new Choice("C"));
         Assert.assertEquals(expectedChoiceList, choices.jValues());
     }
 
     @Test
-    public void choiceKeyShouldHaveNameTypeAndChoices() {
+    public void choiceKeyShouldHaveNameTypeAndChoices__DEOPSCSW_183_DEOPSCSW_190() {
         Assert.assertEquals(choices, choiceKey.choices());
         Assert.assertEquals(keyName, choiceKey.keyName());
         Assert.assertEquals(choices, choiceKey.choices());
     }
 
     @Test
-    public void shouldAbleToCreateChoiceParameterWithoutUnits() {
+    public void shouldAbleToCreateChoiceParameterWithoutUnits__DEOPSCSW_183_DEOPSCSW_190() {
         Choice choice1 = new Choice("A");
         Choice choice2 = new Choice("B");
         Choice[] choicesArr = {choice1, choice2};
 
         // set with varargs
         Parameter<Choice> choiceParameter = choiceKey.set(choice1, choice2);
-        Assert.assertEquals(NoUnits, choiceParameter.units());
-        Assert.assertEquals(choice1, choiceParameter.jGet(0).orElseThrow());
-        Assert.assertEquals(choice2, choiceParameter.jGet(1).orElseThrow());
-        Assert.assertEquals(choice1, choiceParameter.head());
-        Assert.assertEquals(choice1, choiceParameter.value(0));
-        Assert.assertEquals(choice2, choiceParameter.value(1));
-        Assert.assertEquals(2, choiceParameter.size());
-        Assert.assertArrayEquals(choicesArr, (Choice[])choiceParameter.values());
-        Assert.assertEquals(Arrays.asList(choicesArr), choiceParameter.jValues());
-    }
-
-    @Test
-    public void shouldAbleToCreateChoiceParameterWithUnits() {
-        Choice choice1 = new Choice("A");
-        Choice choice2 = new Choice("B");
-        Choice[] choicesArr = {choice1, choice2};
-
-        // set with Array and Units
-        Parameter<Choice> choiceParameter = choiceKey.set(choicesArr, kilometer);
         Assert.assertEquals(kilometer, choiceParameter.units());
         Assert.assertEquals(choice1, choiceParameter.jGet(0).orElseThrow());
         Assert.assertEquals(choice2, choiceParameter.jGet(1).orElseThrow());
@@ -71,7 +52,26 @@ public class JChoiceKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(choice1, choiceParameter.value(0));
         Assert.assertEquals(choice2, choiceParameter.value(1));
         Assert.assertEquals(2, choiceParameter.size());
-        Assert.assertArrayEquals(choicesArr, (Choice[])choiceParameter.values());
+        Assert.assertArrayEquals(choicesArr, (Choice[]) choiceParameter.values());
+        Assert.assertEquals(Arrays.asList(choicesArr), choiceParameter.jValues());
+    }
+
+    @Test
+    public void shouldAbleToCreateChoiceParameterWithUnits__DEOPSCSW_183_DEOPSCSW_190() {   ///  REVISIT: remove?
+        Choice choice1 = new Choice("A");
+        Choice choice2 = new Choice("B");
+        Choice[] choicesArr = {choice1, choice2};
+
+        // set with Array and Units
+        Parameter<Choice> choiceParameter = choiceKey.setAll(choicesArr);
+        Assert.assertEquals(kilometer, choiceParameter.units());
+        Assert.assertEquals(choice1, choiceParameter.jGet(0).orElseThrow());
+        Assert.assertEquals(choice2, choiceParameter.jGet(1).orElseThrow());
+        Assert.assertEquals(choice1, choiceParameter.head());
+        Assert.assertEquals(choice1, choiceParameter.value(0));
+        Assert.assertEquals(choice2, choiceParameter.value(1));
+        Assert.assertEquals(2, choiceParameter.size());
+        Assert.assertArrayEquals(choicesArr, (Choice[]) choiceParameter.values());
         Assert.assertEquals(Arrays.asList(choicesArr), choiceParameter.jValues());
     }
 
@@ -79,7 +79,7 @@ public class JChoiceKeyTypeTest extends JUnitSuite {
     public final ExpectedException exception = ExpectedException.none();
 
     @Test
-    public void shouldThrowExceptionForInvalidChoice() {
+    public void shouldThrowExceptionForInvalidChoice__DEOPSCSW_183_DEOPSCSW_190() {
         Choice invalidChoice = new Choice("D");
         exception.expect(AssertionError.class);
         choiceKey.set(invalidChoice);

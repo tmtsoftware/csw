@@ -1,7 +1,7 @@
 package example.teskit
 
 import com.typesafe.config.ConfigFactory
-import csw.location.api.models
+import csw.location.api.models.ComponentId
 import csw.location.api.models.ComponentType.Assembly
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.scaladsl.LocationService
@@ -48,7 +48,7 @@ class TestKitsExampleTest extends AnyFunSuiteLike with BeforeAndAfterAll with Ma
 
     //#spawn-using-testkit
 
-    val connection       = AkkaConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "SampleAssembly"), Assembly))
+    val connection       = AkkaConnection(ComponentId(Prefix(Subsystem.CSW, "sample"), Assembly))
     val assemblyLocation = Await.result(locationService.resolve(connection, 5.seconds), 10.seconds)
     assemblyLocation.value.connection shouldBe connection
   }

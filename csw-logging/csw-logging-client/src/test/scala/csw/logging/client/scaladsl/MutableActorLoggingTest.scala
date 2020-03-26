@@ -53,7 +53,9 @@ class MutableActorLoggingTest extends LoggingTestSuite {
   // DEOPSCSW-119: Associate source with each log message
   // DEOPSCSW-121: Define structured tags for log messages
   // CSW-86: Subsystem should be case-insensitive
-  test("messages logged from actor should contain component name, file name, class name, line number and actor path") {
+  test(
+    "messages logged from actor should contain component name, file name, class name, line number and actor path | DEOPSCSW-280, DEOPSCSW-121, DEOPSCSW-117, DEOPSCSW-116, DEOPSCSW-119"
+  ) {
 
     sendMessagesToActor()
 
@@ -70,7 +72,7 @@ class MutableActorLoggingTest extends LoggingTestSuite {
   }
 
   // DEOPSCSW-126 : Configurability of logging characteristics for component / log instance
-  test("should load default filter provided in configuration file and applied to actor messages") {
+  test("should load default filter provided in configuration file and applied to actor messages | DEOPSCSW-280, DEOPSCSW-126") {
 
     sendMessagesToActor()
     //  TromboneHcd component is logging 7 messages

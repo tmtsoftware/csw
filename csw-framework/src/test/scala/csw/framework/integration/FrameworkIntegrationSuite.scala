@@ -17,7 +17,7 @@ trait FrameworkIntegrationSuite
     with OptionValues
     with MockitoSugar {
 
-  private val locationWiring = new ServerWiring
+  private val locationWiring = new ServerWiring(enableAuth = false)
   val testWiring             = new FrameworkTestWiring()
 
   override protected def beforeAll(): Unit = locationWiring.locationHttpService.start()

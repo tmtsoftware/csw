@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 import static csw.logging.client.utils.Eventually.eventually;
 
+// DEOPSCSW-316: Improve Logger accessibility for component developers
 public class JGenericLoggerTest extends JUnitSuite {
     private static ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.create(), "base-system");
     private static LoggingSystem loggingSystem;
@@ -72,7 +73,7 @@ public class JGenericLoggerTest extends JUnitSuite {
 
     // DEOPSCSW-277: Java nested class name is not logged correctly in log messages.
     @Test
-    public void testGenericLoggerWithoutComponentName() throws InterruptedException {
+    public void testGenericLoggerWithoutComponentName__DEOPSCSW_277_DEOPSCSW_316() throws InterruptedException {
         String className = JGenericLoggerTest.JGenericLoggerUtil.class.getName();
         new JGenericLoggerTest.JGenericLoggerUtil().start();
 
@@ -90,7 +91,7 @@ public class JGenericLoggerTest extends JUnitSuite {
     }
 
     @Test
-    public void testGenericLoggerActorWithoutComponentName() throws InterruptedException {
+    public void testGenericLoggerActorWithoutComponentName_DEOPSCSW_316() throws InterruptedException {
 
         AkkaTypedExtension.UserActorFactory userActorFactory = AkkaTypedExtension.UserActorFactory(actorSystem);
 

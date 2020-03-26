@@ -62,7 +62,7 @@ class ConfigClientApiTest extends ConfigClientBaseSuite {
       |""".stripMargin
 
   // DEOPSCSW-88: Config service API implementation details need to be hidden from component developer
-  test("should able to get, set and reset the active version of config file") {
+  test("should able to get, set and reset the active version of config file | DEOPSCSW-138, DEOPSCSW-80, DEOPSCSW-88") {
     // create file
     val file = Paths.get("/tmt/test/setactive/getactive/resetactive/active.conf")
     configAdminService.create(file, ConfigData.fromString(configValue1), annex = false, "First commit").await

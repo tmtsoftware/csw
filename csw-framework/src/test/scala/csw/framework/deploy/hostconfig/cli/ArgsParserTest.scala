@@ -29,7 +29,7 @@ class ArgsParserTest extends scalatest.funsuite.AnyFunSuite with Matchers with B
       }
     }
 
-  test("should able to parse when all arguments are provided") {
+  test("should able to parse when all arguments are provided | DEOPSCSW-174, DEOPSCSW-175") {
     val args                     = Array("--local", inputFilePath, "--container-script", containerCmdAppScript)
     val options: Option[Options] = silentParse(args)
     options should contain(
@@ -37,7 +37,9 @@ class ArgsParserTest extends scalatest.funsuite.AnyFunSuite with Matchers with B
     )
   }
 
-  test("should able to parse arguments with default value of false when local option is not provided") {
+  test(
+    "should able to parse arguments with default value of false when local option is not provided | DEOPSCSW-174, DEOPSCSW-175"
+  ) {
     val args                     = Array(inputFilePath, "-s", containerCmdAppScript)
     val options: Option[Options] = silentParse(args)
     options should contain(
@@ -45,13 +47,13 @@ class ArgsParserTest extends scalatest.funsuite.AnyFunSuite with Matchers with B
     )
   }
 
-  test("should not parse if inputFilePath is not provided") {
+  test("should not parse if inputFilePath is not provided | DEOPSCSW-174, DEOPSCSW-175") {
     val args                     = Array("--local", "--container-script", containerCmdAppScript)
     val options: Option[Options] = silentParse(args)
     options shouldBe None
   }
 
-  test("should not parse if no arguments provided") {
+  test("should not parse if no arguments provided | DEOPSCSW-174, DEOPSCSW-175") {
     val args                     = Array[String]()
     val options: Option[Options] = silentParse(args)
     options shouldBe None

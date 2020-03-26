@@ -35,10 +35,10 @@ started in the superclass's `beforeAll` method. In the Java version, we must cre
 services we want to start passed into the constructor of this object.
 
 Scala
-:   @@snip [SampleAssemblyTest.scala](../../../../examples/src/test/scala/org/tmt/nfiraos/sampleassembly/SampleAssemblyTest.scala) { #intro }
+:   @@snip [AssemblyTest.scala](../../../../examples/src/test/scala/org/tmt/csw/sample/SampleTest.scala) { #intro }
 
 Java
-:   @@snip [JSampleAssemblyTest.java](../../../../examples/src/test/java/org/tmt/nfiraos/sampleassembly/JSampleAssemblyTest.java) { #intro }
+:   @@snip [JSampleAssemblyTest.java](../../../../examples/src/test/java/org/tmt/csw/sample/JSampleTest.java) { #intro }
 
 For our tests, we will want to run the Assembly first.  We will do this in the `beforeAll` method in Scala, and
 in a method with a `@BeforeClass` annotation in Java, so that it is run only once, before any of the tests are run.
@@ -47,15 +47,15 @@ Note that for Scala, we must call the superclass's `beforeAll` method to ensure 
 
 @@@ note
 
-This code has been provided as part of the giter8 template, so the relevant line only needs to be uncommented.
+This code has been provided as part of the giter8 template.
 
 @@@
 
 Scala
-:   @@snip [SampleAssemblyTest.scala](../../../../examples/src/test/scala/org/tmt/nfiraos/sampleassembly/SampleAssemblyTest.scala) { #setup }
+:   @@snip [AssemblyTest.scala](../../../../examples/src/test/scala/org/tmt/csw/sample/SampleTest.scala) { #setup }
 
 Java
-:   @@snip [JSampleAssemblyTest.java](../../../../examples/src/test/java/org/tmt/nfiraos/sampleassembly/JSampleAssemblyTest.java) { #setup }
+:   @@snip [JSampleAssemblyTest.java](../../../../examples/src/test/java/org/tmt/csw/sample/JSampleTest.java) { #setup }
 
 Next, let's add a test.  We will add a simple test that uses the Location Service to make sure the Assembly is
 running and resolve the registration information for it.  
@@ -67,14 +67,14 @@ This test has been provided as part of the giter8 template as an example.
 @@@
 
 Scala
-:   @@snip [SampleAssemblyTest.scala](../../../../examples/src/test/scala/org/tmt/nfiraos/sampleassembly/SampleAssemblyTest.scala) { #locate }
+:   @@snip [AssemblyTest.scala](../../../../examples/src/test/scala/org/tmt/csw/sample/SampleTest.scala) { #locate }
 
 Java
-:   @@snip [JSampleAssemblyTest.java](../../../../examples/src/test/java/org/tmt/nfiraos/sampleassembly/JSampleAssemblyTest.java) { #locate }
+:   @@snip [JSampleAssemblyTest.java](../../../../examples/src/test/java/org/tmt/csw/sample/JSampleTest.java) { #locate }
 
 You can try running the test either using sbt (`sbt test` from the project root directory) or directly in the
 IDE.  If you are using IntelliJ, you can run the test by right-clicking on the file in the project explorer
-and clicking on `Run 'SampleAssemblyTest'` or `Run 'JSampleAssemblyTest'`.  You can also right-click in the class body
+and clicking on `Run 'SampleTest'` or `Run 'JSampleTest'`.  You can also right-click in the class body
 or the specific test body, if you want to run a single test.
 
 The Assembly we have written does not have much of a public API, so we'll turn to the HCD now, which has a few
@@ -85,15 +85,15 @@ the component registers itself with the Location Service on startup.
 
 @@@ note
 
-This also has been provided in the giter8 template.  Uncomment the line that launches the HCD before tests are run.
+This also has been provided in the giter8 template.
 
 @@@
 
 Scala
-:   @@snip [SampleHcdTest.scala](../../../../examples/src/test/scala/org/tmt/nfiraos/samplehcd/SampleHcdTest.scala) { #setup }
+:   @@snip [SampleHcdTest.scala](../../../../examples/src/test/scala/org/tmt/csw/samplehcd/SampleHcdTest.scala) { #setup }
 
 Java
-:   @@snip [JSampleHcdTest.java](../../../../examples/src/test/java/org/tmt/nfiraos/samplehcd/JSampleHcdTest.java) { #setup }
+:   @@snip [JSampleHcdTest.java](../../../../examples/src/test/java/org/tmt/csw/samplehcd/JSampleHcdTest.java) { #setup }
 
 Now let's add a test to verify our component is publishing.  We will set up a test subscriber to the
 `counterEvent` Events published by the HCD.  Since we cannot guarantee the order in which the
@@ -105,10 +105,10 @@ publish two additional Events plus the one we receive when the subscription star
 value of the first `counterEvent` to determine what the set of counter values we expect to get in our subscription.
 
 Scala
-:   @@snip [SampleHcdTest.scala](../../../../examples/src/test/scala/org/tmt/nfiraos/samplehcd/SampleHcdTest.scala) { #subscribe }
+:   @@snip [BasicSampleHcdTest.scala](../../../../examples/src/test/scala/example/tutorial/basic/BasicSampleHcdTest.scala) { #subscribe }
 
 Java
-:   @@snip [JSampleHcdTest.java](../../../../examples/src/test/java/org/tmt/nfiraos/samplehcd/JSampleHcdTest.java) { #subscribe }
+:   @@snip [JSampleHcdTest.java](../../../../examples/src/test/java/example/tutorial/basic/JSampleHcdTest.java) { #subscribe }
 
 Next, we'll add a test for command handling in the HCD.  The HCD supports a "sleep" command, which sleeps
 some amount of seconds as specified in the command payload, and then returns a `CommandResponse.Completed`.
@@ -117,10 +117,10 @@ obtaining a `CommandService` reference requires an Akka Typed Actor System, so o
 using the Actor System provided by the Test Kit.
 
 Scala
-:   @@snip [SampleHcdTest.scala](../../../../examples/src/test/scala/org/tmt/nfiraos/samplehcd/SampleHcdTest.scala) { #submit }
+:   @@snip [BasicSampleHcdTest.scala](../../../../examples/src/test/scala/example/tutorial/basic/BasicSampleHcdTest.scala) { #submit }
 
 Java
-:   @@snip [JSampleHcdTest.java](../../../../examples/src/test/java/org/tmt/nfiraos/samplehcd/JSampleHcdTest.java) { #submitAndWait }
+:   @@snip [JSampleHcdTest.java](../../../../examples/src/test/java/example/tutorial/basic/JSampleHcdTest.java) { #submitAndWait }
 
 Finally, we will show an example of tests that check that exceptions are thrown when expected.  We will do this
 by using the "sleep" command, but failing to wait long enough for the sleep to complete.  This causes a 
@@ -128,10 +128,10 @@ by using the "sleep" command, but failing to wait long enough for the sleep to c
 are in fact thrown.
 
 Scala
-:   @@snip [SampleHcdTest.scala](../../../../examples/src/test/scala/org/tmt/nfiraos/samplehcd/SampleHcdTest.scala) { #exception }
+:   @@snip [BasicSampleHcdTest.scala](../../../../examples/src/test/scala/example/tutorial/basic/BasicSampleHcdTest.scala) { #exception }
 
 Java
-:   @@snip [JSampleHcdTest.java](../../../../examples/src/test/java/org/tmt/nfiraos/samplehcd/JSampleHcdTest.java) { #exception }
+:   @@snip [JSampleHcdTest.java](../../../../examples/src/test/java/example/tutorial/basic/JSampleHcdTest.java) { #exception }
 
 
 

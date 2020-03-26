@@ -30,7 +30,7 @@ class UniqueKeyVerificationTest extends AnyFunSpec with Matchers {
 
   describe("Test Commands") {
 
-    it("Setup command is able to remove duplicate keys") {
+    it("Setup command is able to remove duplicate keys | DEOPSCSW-184") {
 
       //parameters with duplicate key via constructor
       val setup =
@@ -52,7 +52,7 @@ class UniqueKeyVerificationTest extends AnyFunSpec with Matchers {
         .map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName, miscKey.keyName)
     }
 
-    it("Observe command is able to remove duplicate keys") {
+    it("Observe command is able to remove duplicate keys | DEOPSCSW-184") {
 
       //parameters with duplicate key via constructor
       val observe =
@@ -74,7 +74,7 @@ class UniqueKeyVerificationTest extends AnyFunSpec with Matchers {
         .map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName, miscKey.keyName)
     }
 
-    it("Wait command is able to remove duplicate keys") {
+    it("Wait command is able to remove duplicate keys | DEOPSCSW-184") {
 
       //parameters with duplicate key via constructor
       val wait =
@@ -99,7 +99,7 @@ class UniqueKeyVerificationTest extends AnyFunSpec with Matchers {
 
   describe("Test Result") {
 
-    it("is able to remove duplicate keys") {
+    it("is able to remove duplicate keys | DEOPSCSW-184") {
 
       //parameters with duplicate key via constructor
       val result =
@@ -119,7 +119,7 @@ class UniqueKeyVerificationTest extends AnyFunSpec with Matchers {
 
   describe("Test Struct") {
 
-    it("is able to remove duplicate keys") {
+    it("is able to remove duplicate keys | DEOPSCSW-184") {
 
       //parameters with duplicate key via constructor
       val result = Struct(Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
@@ -138,7 +138,7 @@ class UniqueKeyVerificationTest extends AnyFunSpec with Matchers {
 
   describe("Test StateVariables") {
 
-    it("DemandState is able to remove duplicate keys") {
+    it("DemandState is able to remove duplicate keys | DEOPSCSW-184") {
 
       //parameters with duplicate key via constructor
       val state = DemandState(
@@ -158,7 +158,7 @@ class UniqueKeyVerificationTest extends AnyFunSpec with Matchers {
         .map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName, miscKey.keyName)
     }
 
-    it("CurrentState is able to remove duplicate keys") {
+    it("CurrentState is able to remove duplicate keys | DEOPSCSW-184") {
 
       //parameters with duplicate key via constructor
       val state =
@@ -182,7 +182,7 @@ class UniqueKeyVerificationTest extends AnyFunSpec with Matchers {
 
   describe("Test Events") {
 
-    it("ObserveEvent command is able to remove duplicate keys") {
+    it("ObserveEvent command is able to remove duplicate keys | DEOPSCSW-184") {
 
       //parameters with duplicate key via constructor
       val event =
@@ -203,7 +203,7 @@ class UniqueKeyVerificationTest extends AnyFunSpec with Matchers {
         .map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName, miscKey.keyName)
     }
 
-    it("SystemEvent command is able to remove duplicate keys") {
+    it("SystemEvent command is able to remove duplicate keys | DEOPSCSW-184") {
 
       //parameters with duplicate key via constructor
       val event =

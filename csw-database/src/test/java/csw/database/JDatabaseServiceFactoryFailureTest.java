@@ -45,7 +45,7 @@ public class JDatabaseServiceFactoryFailureTest extends JUnitSuite {
     public final ExpectedException exception = ExpectedException.none();
 
     @Test
-    public void shouldThrowDatabaseConnectionWhileConnectingWithIncorrectPort() throws InterruptedException, ExecutionException {
+    public void shouldThrowDatabaseConnectionWhileConnectingWithIncorrectPort__DEOPSCSW_615() throws InterruptedException, ExecutionException {
         exception.expectCause(isA(DatabaseException.class));
         dbFactory.jMakeDsl().get();
     }

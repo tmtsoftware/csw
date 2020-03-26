@@ -56,7 +56,9 @@ class CommandHttpIntegrationTests extends FrameworkIntegrationSuite {
     super.afterAll()
   }
 
-  test("should start multiple components within a single container and exercise features of Command Service using http") {
+  test(
+    "should start multiple components within a single container and exercise features of Command Service using http | DEOPSCSW-372"
+  ) {
 
     val wiring = FrameworkWiring.make(containerActorSystem, mock[RedisClient])
     // start a container and verify it moves to running lifecycle state

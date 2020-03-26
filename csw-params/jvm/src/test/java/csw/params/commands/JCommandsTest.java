@@ -5,6 +5,7 @@ import csw.params.core.generics.Parameter;
 import csw.params.core.generics.ParameterSetType;
 import csw.params.core.models.ObsId;
 import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JUnits;
 import csw.prefix.models.Prefix;
 import org.junit.Assert;
 import org.junit.Test;
@@ -22,10 +23,10 @@ import csw.prefix.javadsl.JSubsystem;
 // DEOPSCSW-320: Add command type in Setup, observe and wait
 public class JCommandsTest extends JUnitSuite {
 
-    private final Key<Integer> encoderIntKey = JKeyType.IntKey().make("encoder");
-    private final Key<String> epochStringKey = JKeyType.StringKey().make("epoch");
-    private final Key<Integer> epochIntKey = JKeyType.IntKey().make("epoch");
-    private final Key<Integer> notUsedKey = JKeyType.IntKey().make("notUsed");
+    private final Key<Integer> encoderIntKey = JKeyType.IntKey().make("encoder", JUnits.encoder);
+    private final Key<String> epochStringKey = JKeyType.StringKey().make("epoch", JUnits.year);
+    private final Key<Integer> epochIntKey = JKeyType.IntKey().make("epoch", JUnits.year);
+    private final Key<Integer> notUsedKey = JKeyType.IntKey().make("notUsed", JUnits.NoUnits);
 
     private final Parameter<Integer> encoderParam = encoderIntKey.set(22, 33);
     private final Parameter<String> epochStringParam = epochStringKey.set("A", "B");
@@ -80,7 +81,7 @@ public class JCommandsTest extends JUnitSuite {
     // DEOPSCSW-315: Make ObsID optional in commands
     // DEOPSCSW-369: Unique runId for commands
     @Test
-    public void shouldAbleToCreateAndAccessSetupCommand() {
+    public void shouldAbleToCreateAndAccessSetupCommand__DEOPSCSW_320_DEOPSCSW_369_DEOPSCSW_185_DEOPSCSW_183_DEOPSCSW_315() {
         Setup setup = new Setup(prefix, commandName, Optional.of(obsId)).add(encoderParam).add(epochStringParam);
 
         // runId, obsId, prefix, subsystem
@@ -110,7 +111,7 @@ public class JCommandsTest extends JUnitSuite {
     // DEOPSCSW-315: Make ObsID optional in commands
     // DEOPSCSW-369: Unique runId for commands
     @Test
-    public void shouldAbleToCreateAndAccessObserveCommand() {
+    public void shouldAbleToCreateAndAccessObserveCommand__DEOPSCSW_320_DEOPSCSW_369_DEOPSCSW_185_DEOPSCSW_183_DEOPSCSW_315() {
         Observe observe = new Observe(prefix, commandName, Optional.empty()).add(encoderParam).add(epochStringParam);
 
         // runId, prefix, obsId, subsystem
@@ -139,7 +140,7 @@ public class JCommandsTest extends JUnitSuite {
 
     // DEOPSCSW-369: Unique runId for commands
     @Test
-    public void shouldAbleToCreateAndAccessWaitCommand() {
+    public void shouldAbleToCreateAndAccessWaitCommand__DEOPSCSW_183_DEOPSCSW_185_DEOPSCSW_320_DEOPSCSW_369() {
         Wait wait = new Wait(prefix, commandName, Optional.of(obsId)).add(encoderParam).add(epochStringParam);
 
         // runId, obsId, prefix, subsystem
@@ -168,7 +169,7 @@ public class JCommandsTest extends JUnitSuite {
 
     /*
     @Test
-    public void shoulRdAbleToCloneAnExistingCommand() {
+    public void shoulRdAbleToCloneAnExistingCommand__DEOPSCSW_183_DEOPSCSW_185_DEOPSCSW_320() {
         Setup setup = new Setup(prefix, commandName, Optional.of(obsId)).add(encoderParam).add(epochStringParam);
         Setup setup2 = setup.cloneCommand();
         Assert.assertNotEquals(setup.runId(), setup2.runId());

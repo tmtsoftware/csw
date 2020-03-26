@@ -128,6 +128,31 @@ Let us go through each action step by step as shown in diagram:
 At any point in time, `Assembly` can choose to cancel tracking. On cancellation, this persistent connection will be released.
 @@@
 
+
+### Location Service with Authentication and Authorization
+
+Note : `Outside` below means any machine not present in this Akka cluster.
+
+Below diagram illustrate how Akka cluster will look when authentication and authorization is enabled in `Location Server`. 
+By default when you start `Location Server`, it will start in local-only mode (Authentication and authorization
+ Disabled) and bind to `127.0.0.1`.
+To start `Location Server` in public mode (Authentication and authorization enabled) and bind to `0.0.0.0`, use
+ `--publicNetwork` command line
+ option when @ref:[starting location server](../../apps/cswlocationserver.md)
+ 
+![Location Authentication and Authorization](../../images/locationservice/location-service-auth.png)
+
+Why is this needed ?
+
+1. As `Location Server` is by default bind to `127.0.0.1`, no application can establish Http connection from
+ `Outside`.
+2. In production environment, you may need a capability to access protected resources of `Location Server` and provide
+ Authentication and Authorization for such resources. E.g. ability to register/unregister components(which has to
+  undergo maintenance) from a system operator machine present `Outside`. 
+3. To enable this we need to bind few instances of `Location Server` to `0.0.0.0`, so that `Outside` Http connections
+ can be made and applications with valid token, can access its protected resources.
+   
+
 ## Internals
 
 The [Main]($github.base_url$/csw-location/csw-location-server/src/main/scala/csw/location/server/Main.scala) class delegates the job of creating the cluster actor and HTTP server instance to the [ServerWiring]($github.base_url$/csw-location/csw-location-server/src/main/scala/csw/location/server/internal/ServerWiring.scala) class.
@@ -158,4 +183,4 @@ There are numerous tests for the location server, including multi-jvm tests. The
 
 - Unit/Component Tests: `sbt csw-location-server/test:test`
 
-- Multi-Jvm Tests: `sbt csw-location-server/multi-jvm:test`
+- Multi-Jvm Tests: `sbt integration/multi-jvm:testOnly csw.location*`

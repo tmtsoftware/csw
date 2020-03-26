@@ -20,6 +20,7 @@ import csw.params.commands.CommandResponse.*;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.Id;
+import csw.params.javadsl.JUnits;
 import csw.prefix.models.Prefix;
 import csw.params.core.states.CurrentState;
 import csw.params.core.states.StateName;
@@ -35,6 +36,7 @@ import java.util.concurrent.*;
 
 import static csw.common.components.command.ComponentStateForCommand.*;
 
+@SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "unused"})
 public class JSampleComponentHandlers extends JComponentHandlers {
 
     // Demonstrating logger accessibility in Java Component handlers
@@ -144,15 +146,10 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         return new CommandResponse.Completed(runId);
     }
 
-    //#addOrUpdateCommand
+    //#updateCommand
     private CommandResponse.SubmitResponse crmAddOrUpdate(Setup setup, Id runId) {
         // This simulates some worker task doing something that finishes after onSubmit returns
-        Runnable task = new Runnable() {
-            @Override
-            public void run() {
-                commandResponseManager.updateCommand(new Completed(runId));
-            }
-        };
+        Runnable task = () -> commandResponseManager.updateCommand(new Completed(runId));
 
         // Wait a bit and then set CRM to Completed
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
@@ -161,11 +158,11 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         // Return Started from onSubmit
         return new Started(runId);
     }
-    //#addOrUpdateCommand
+    //#updateCommand
 
     private void processCurrentStateOnewayCommand(Setup setup) {
         //#subscribeCurrentState
-        Key<Integer> encoder = JKeyType.IntKey().make("encoder");
+        Key<Integer> encoder = JKeyType.IntKey().make("encoder", JUnits.encoder);
         int expectedEncoderValue = setup.jGet(encoder).orElseThrow().head();
 
         CurrentState currentState = new CurrentState(prefix(), new StateName("HCDState")).add(encoder().set(expectedEncoderValue));
@@ -185,7 +182,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     private void processCommandWithMatcher(ControlCommand controlCommand) {
         Source.range(1, 10)
                 .map(i -> {
-                    currentStatePublisher.publish(new CurrentState(controlCommand.source(), new StateName("testStateName")).add(JKeyType.IntKey().make("encoder").set(i * 10)));
+                    currentStatePublisher.publish(new CurrentState(controlCommand.source(), new StateName("testStateName")).add(JKeyType.IntKey().make("encoder", JUnits.encoder).set(i * 10)));
                     return i;
                 })
                 .throttle(1, Duration.ofMillis(100), 1, (ThrottleMode) ThrottleMode.shaping())
@@ -197,28 +194,25 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         if (controlCommand.commandName().equals(failureAfterValidationCmd())) {
             // Set CRM to Error after 1 second
             sendCRM(1, new CommandResponse.Error(runId, "Unknown Error occurred"));
-            return new CommandResponse.Started(runId);
         } else {
-            Parameter<Integer> parameter = JKeyType.IntKey().make("encoder").set(20);
+            Parameter<Integer> parameter = JKeyType.IntKey().make("encoder", JUnits.encoder).set(20);
             Result result = new Result().add(parameter);
 
             // Returns Started and completes through CRM after 1 second
             sendCRM(1, new CommandResponse.Completed(runId, result));
-            return new Started(runId);
         }
+        return new Started(runId);
     }
 
     private void parameterDelay(Id runId, Setup setup) {
-        Key<Integer> encoder = JKeyType.IntKey().make("delay");
+        Key<Integer> encoder = JKeyType.IntKey().make("delay", JUnits.second);
         int delay = setup.jGet(encoder).orElseThrow().head();
         sendCRM(delay, new CommandResponse.Completed(runId));
     }
 
     // This test routine just delays before updating CRM - delay is always in seconds
     private void sendCRM(long delay, CommandResponse.SubmitResponse response) {
-        Runnable task = () -> {
-            commandResponseManager.updateCommand(response);
-        };
+        Runnable task = () -> commandResponseManager.updateCommand(response);
         // Wait a bit and then set CRM to response
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         executor.schedule(task, delay, TimeUnit.SECONDS);
@@ -262,7 +256,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     public void onDiagnosticMode(UTCTime startTime, String hint) {
         if (hint.equals("engineering")) {
             var event = new SystemEvent(Prefix.apply(JSubsystem.TCS, "prefix"), new EventName("eventName"))
-                    .add(JKeyType.IntKey().make("diagnostic-data").set(1));
+                    .add(JKeyType.IntKey().make("diagnostic-data", JUnits.NoUnits).set(1));
             diagModeCancellable.map(Cancellable::cancel); // cancel previous diagnostic publishing
             diagModeCancellable = Optional.of(
                     eventService.defaultPublisher().publish(

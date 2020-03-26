@@ -32,7 +32,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
     ("UTCTime", () => UTCTime(UTCTime.now().value.plusSeconds(1)))
   ).foreach {
     case (name, idealScheduleTime) =>
-      test(s"[$name] should schedule task at start time") {
+      test(s"[$name] should schedule task at start time | DEOPSCSW-542") {
         val testProbe = TestProbe()(system.toClassic)
         val probeMsg  = "echo"
 
@@ -49,7 +49,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
   // DEOPSCSW-544: Schedule a task to be executed repeatedly
   // DEOPSCSW-547: Cancel scheduled timers for periodic tasks
   // DEOPSCSW-549: Time service api
-  test("[TAITime] should schedule a task periodically at given interval") {
+  test("[TAITime] should schedule a task periodically at given interval | DEOPSCSW-544, DEOPSCSW-547, DEOPSCSW-549") {
     val buffer: ArrayBuffer[Int] = ArrayBuffer.empty
     val atomicInt                = new AtomicInteger(0)
     val cancellable: Cancellable = timeService.schedulePeriodically(Duration.ofMillis(100)) {
@@ -63,7 +63,9 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
   // DEOPSCSW-545: Start a repeating task with initial offset
   // DEOPSCSW-547: Cancel scheduled timers for periodic tasks
   // DEOPSCSW-549: Time service api
-  test("[TAITime] should schedule a task periodically at given interval after start time") {
+  test(
+    "[TAITime] should schedule a task periodically at given interval after start time | DEOPSCSW-545, DEOPSCSW-547, DEOPSCSW-549"
+  ) {
     val buffer: ArrayBuffer[Int] = ArrayBuffer.empty
     val atomicInt                = new AtomicInteger(0)
     val startTime: TAITime       = new TAITime(TAITime.now().value.plusSeconds(1))
@@ -80,7 +82,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
 
   // DEOPSCSW-542: Schedule a task to execute in future
   // DEOPSCSW-549: Time service api
-  test("should schedule multiple tasks at same start time") {
+  test("should schedule multiple tasks at same start time | DEOPSCSW-542, DEOPSCSW-549") {
     // we do not want manual config in this test to compare start time with task execution time
     // hence separate instance of actor typedSystem is created here which does not use ManualConfig
     val system: ActorSystem[SpawnProtocol.Command] = typed.ActorSystem(SpawnProtocol(), "test1")
@@ -109,7 +111,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
 
   // DEOPSCSW-544: Schedule a task to execute in future with actual times
   // DEOPSCSW-549: Time service api
-  test("repeating task that also saves time") {
+  test("repeating task that also saves time | DEOPSCSW-544, DEOPSCSW-549") {
     // we do not want manual config in this test to compare start time with task execution time
     // hence separate instance of actor typedSystem is created here which does not use ManualConfig
     val system: ActorSystem[SpawnProtocol.Command] = typed.ActorSystem(SpawnProtocol(), "test1")
@@ -150,7 +152,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
   // DEOPSCSW-544: Schedule a task to execute in future with actual times
   // DEOPSCSW-545: Start a repeating task with an initial offset
   // DEOPSCSW-549: Time service api
-  test("repeating task that also saves time but with an offset") {
+  test("repeating task that also saves time but with an offset | DEOPSCSW-544, DEOPSCSW-545, DEOPSCSW-549") {
     // we do not want manual config in this test to compare start time with task execution time
     // hence separate instance of actor typedSystem is created here which does not use ManualConfig
     val system: ActorSystem[SpawnProtocol.Command] = typed.ActorSystem(SpawnProtocol(), "test1")

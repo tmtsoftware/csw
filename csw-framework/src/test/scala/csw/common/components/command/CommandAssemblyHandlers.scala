@@ -86,6 +86,7 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
     command.commandName match {
       case `immediateCmd` =>
         Completed(runId)
+
       case `longRunningCmd` =>
         // A local assembly command that takes some time returning Started
         timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plusSeconds(2))) {
@@ -94,16 +95,21 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
         }
         // Starts long-runing and returns started
         Started(runId)
+
+      //#longRunning
       case `longRunningCmdToAsm` =>
-        hcdComponent.submitAndWait(longRunning).map {
-          case r: Completed =>
+        hcdComponent.submitAndWait(longRunning).foreach {
+          case _: Completed =>
             commandResponseManager.updateCommand(Completed(runId))
-          case x =>
-          //println("Some other response in asm: " + x)
+          case other =>
+            // Handle some other response besides Completed
+            commandResponseManager.updateCommand(other.withRunId(runId))
         }
         // Assembly starts long-running and returns started
         Started(runId)
 
+      //#longRunning
+      //#queryFinalAll
       case `longRunningCmdToAsmComp` =>
         // In this case, assembly does not need to do anything until both commands complete
         // Could wait and return directly if commands are fast, but this is better
@@ -122,6 +128,7 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
             commandResponseManager.updateCommand(Error(runId, ex.toString))
         }
         Started(runId)
+      //#queryFinalAll
 
       case `longRunningCmdToAsmInvalid` =>
         val long    = hcdComponent.submitAndWait(longRunning)

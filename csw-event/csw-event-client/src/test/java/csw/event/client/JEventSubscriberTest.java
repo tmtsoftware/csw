@@ -81,7 +81,7 @@ public class JEventSubscriberTest extends TestNGSuite {
 
     //DEOPSCSW-346: Subscribe to event irrespective of Publisher's existence
     @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_subscribe_an_event(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
+    public void should_be_able_to_subscribe_an_event__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_346(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         Event event1 = Utils.makeDistinctJavaEvent(new Random().nextInt());
         EventKey eventKey = event1.eventKey();
 
@@ -108,7 +108,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     //DEOPSCSW-338: Provide callback for Event alerts
     //DEOPSCSW-343: Unsubscribe based on prefix and event name
     @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_subscribe_with_async_callback(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
+    public void should_be_able_to_subscribe_with_async_callback__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_338_DEOPSCSW_343(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         Event event1 = Utils.makeDistinctJavaEvent(new Random().nextInt());
 
         TestProbe probe = TestProbe.create(baseProperties.actorSystem());
@@ -131,7 +131,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     //DEOPSCSW-338: Provide callback for Event alerts
     //DEOPSCSW-342: Subscription with consumption frequency
     @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_subscribe_with_async_callback_with_duration(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
+    public void should_be_able_to_subscribe_with_async_callback_with_duration__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_338_DEOPSCSW_342(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         Event event1 = Utils.makeEvent(1);
         List<Event> queue = new ArrayList<>();
         List<Event> queue2 = new ArrayList<>();
@@ -160,7 +160,7 @@ public class JEventSubscriberTest extends TestNGSuite {
 
     //DEOPSCSW-338: Provide callback for Event alerts
     @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_subscribe_with_callback(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
+    public void should_be_able_to_subscribe_with_callback__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_338(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
 
         TestProbe probe = TestProbe.create(baseProperties.actorSystem());
 
@@ -184,7 +184,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     //DEOPSCSW-338: Provide callback for Event alerts
     //DEOPSCSW-342: Subscription with consumption frequency
     @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_subscribe_with_callback_with_duration(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
+    public void should_be_able_to_subscribe_with_callback_with_duration__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_338_DEOPSCSW_342(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         Event event1 = Utils.makeEvent(1);
         List<Event> queue = new ArrayList<>();
         List<Event> queue2 = new ArrayList<>();
@@ -207,7 +207,7 @@ public class JEventSubscriberTest extends TestNGSuite {
 
     //DEOPSCSW-339: Provide actor ref to alert about Event arrival
     @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_subscribe_with_an_ActorRef(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
+    public void should_be_able_to_subscribe_with_an_ActorRef__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_339(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         Event event1 = Utils.makeDistinctJavaEvent(new Random().nextInt());
 
         TestProbe probe = TestProbe.create(baseProperties.actorSystem());
@@ -226,7 +226,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     //DEOPSCSW-339: Provide actor ref to alert about Event arrival
     //DEOPSCSW-342: Subscription with consumption frequency
     @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_subscribe_with_an_ActorRef_with_duration(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
+    public void should_be_able_to_subscribe_with_an_ActorRef_with_duration__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_339_DEOPSCSW_342(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         Event event1 = Utils.makeDistinctJavaEvent(new Random().nextInt());
 
         TestInbox<Event> inbox = TestInbox.create();
@@ -242,7 +242,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     // DEOPSCSW-420: Implement Pattern based subscription
     // Pattern subscription doesn't work with embedded kafka hence not running it with the suite
     @Test(dataProvider = "redis-provider")
-    public void should_be_able_to_subscribe_an_event_with_pattern_from_different_subsystem(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
+    public void should_be_able_to_subscribe_an_event_with_pattern_from_different_subsystem__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_420(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         Event testEvent1 = Utils.makeEventWithPrefix(1, Prefix.apply(JSubsystem.CSW, "prefix"));
         Event testEvent2 = Utils.makeEventWithPrefix(2, Prefix.apply(JSubsystem.CSW, "prefix"));
         Event tcsEvent1 = Utils.makeEventWithPrefix(1, Prefix.apply(JSubsystem.TCS, "prefix"));
@@ -268,7 +268,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     // DEOPSCSW-420: Implement Pattern based subscription
     // Pattern subscription doesn't work with embedded kafka hence not running it with the suite
     @Test(dataProvider = "redis-provider")
-    public void should_be_able_to_subscribe_an_event_with_pattern_from_same_subsystem(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
+    public void should_be_able_to_subscribe_an_event_with_pattern_from_same_subsystem__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_420(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         Event testEvent1 = Utils.makeEventForKeyName(new EventName("movement.linear"), 1);
         Event testEvent2 = Utils.makeEventForKeyName(new EventName("movement.angular"), 2);
         Event testEvent3 = Utils.makeEventForKeyName(new EventName("temperature"), 3);
@@ -332,7 +332,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     }
 
     @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_make_independent_subscriptions(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
+    public void should_be_able_to_make_independent_subscriptions__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         Prefix prefix = Prefix.apply(JSubsystem.CSW, "prefix");
         EventName eventName1 = new EventName("system1");
         EventName eventName2 = new EventName("system2");
@@ -360,7 +360,7 @@ public class JEventSubscriberTest extends TestNGSuite {
 
     //DEOPSCSW-340: Provide most recently published event for subscribed prefix and name
     @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_retrieve_recently_published_event_on_subscription(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
+    public void should_be_able_to_retrieve_recently_published_event_on_subscription__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_340(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         Event event1 = Utils.makeEvent(1);
         Event event2 = Utils.makeEvent(2);
         Event event3 = Utils.makeEvent(3);
@@ -383,7 +383,7 @@ public class JEventSubscriberTest extends TestNGSuite {
 
     //DEOPSCSW-340: Provide most recently published event for subscribed prefix and name
     @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_retrieve_InvalidEvent(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
+    public void should_be_able_to_retrieve_InvalidEvent__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_340(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         EventKey eventKey = EventKey.apply(Prefix.apply("csw.invalid"), EventName.apply("test"));
 
         Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(Set.of(eventKey)).take(1).toMat(Sink.seq(), Keep.both()).withAttributes(baseProperties.attributes()).run(baseProperties.actorSystem());
@@ -393,7 +393,7 @@ public class JEventSubscriberTest extends TestNGSuite {
 
     //DEOPSCSW-340: Provide most recently published event for subscribed prefix and name
     @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_retrieve_valid_as_well_as_invalid_event_when_events_are_published_for_some_and_not_for_other_keys(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
+    public void should_be_able_to_retrieve_valid_as_well_as_invalid_event_when_events_are_published_for_some_and_not_for_other_keys__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_340(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         Event distinctEvent1 = Utils.makeDistinctJavaEvent(new Random().nextInt());
         Event distinctEvent2 = Utils.makeDistinctJavaEvent(new Random().nextInt());
 
@@ -416,7 +416,7 @@ public class JEventSubscriberTest extends TestNGSuite {
 
     //DEOPSCSW-344: Retrieve recently published event using prefix and eventname
     @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_get_an_event_without_subscribing_for_it(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
+    public void should_be_able_to_get_an_event_without_subscribing_for_it__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_344(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         Event event1 = Utils.makeDistinctJavaEvent(new Random().nextInt());
         EventKey eventKey = event1.eventKey();
 
@@ -429,7 +429,7 @@ public class JEventSubscriberTest extends TestNGSuite {
 
     //DEOPSCSW-344: Retrieve recently published event using prefix and eventname
     @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_get_InvalidEvent(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
+    public void should_be_able_to_get_InvalidEvent__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_344(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         EventKey eventKey = EventKey.apply(Prefix.apply("csw.invalid"), EventName.apply("test"));
         Event event = baseProperties.jSubscriber().get(eventKey).get(10, TimeUnit.SECONDS);
 
@@ -439,7 +439,7 @@ public class JEventSubscriberTest extends TestNGSuite {
 
     //DEOPSCSW-344: Retrieve recently published event using prefix and eventname
     @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_get_events_for_multiple_event_keys(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
+    public void should_be_able_to_get_events_for_multiple_event_keys__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_344(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         Event event1 = Utils.makeDistinctJavaEvent(new Random().nextInt());
         EventKey eventKey1 = event1.eventKey();
 

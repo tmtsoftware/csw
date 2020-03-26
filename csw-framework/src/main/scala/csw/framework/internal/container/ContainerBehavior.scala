@@ -34,6 +34,7 @@ import scala.util.{Failure, Success}
  * @param eventServiceFactory   the factory to create instance of event service to be used by components to use and/or create publishers and subscribers
  * @param locationService       the single instance of Location service created for a running application
  * @param loggerFactory         factory to create suitable logger instance
+ * @param actorRefResolver      created using ctx.system
  */
 private[framework] final class ContainerBehavior(
     ctx: ActorContext[ContainerActorMessage],
@@ -43,7 +44,8 @@ private[framework] final class ContainerBehavior(
     locationService: LocationService,
     eventServiceFactory: EventServiceFactory,
     alarmServiceFactory: AlarmServiceFactory,
-    loggerFactory: LoggerFactory
+    loggerFactory: LoggerFactory,
+    actorRefResolver: ActorRefResolver
 ) extends AbstractBehavior[ContainerActorMessage](ctx) {
 
   import ctx.executionContext
@@ -170,7 +172,7 @@ private[framework] final class ContainerBehavior(
     // use Supervisor ActorSystem to Serialize
     val refStr = ActorRefResolver(info.system).toSerializationFormat(info.component.supervisor)
     // use Container ActorSystem to Deserialize
-    val ref = ActorRefResolver(ctx.system).resolveActorRef(refStr)
+    val ref: ActorRef[ComponentMessage] = actorRefResolver.resolveActorRef(refStr)
 
     // Above (de)serialization is need as actorRefs shouldn't be shared across actorSystem by Reference,
     // they should be shared as via messages, or should be treated as Remote. Above (de)serialization treats ActorRef as remote.

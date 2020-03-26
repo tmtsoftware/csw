@@ -20,7 +20,7 @@ class RPTTest extends AnyFunSuite with MockitoSugar with Matchers with ScalaFutu
 
   implicit override val patienceConfig: PatienceConfig = PatienceConfig(Span(1, Seconds), Span(1, Seconds))
 
-  test("should create accessToken") {
+  test("should create accessToken | DEOPSCSW-558, DEOPSCSW-578") {
     val authzClient           = mock[AuthzClient]
     val authorizationResource = mock[AuthorizationResource]
     val authorizationResponse = mock[AuthorizationResponse]
@@ -53,7 +53,7 @@ class RPTTest extends AnyFunSuite with MockitoSugar with Matchers with ScalaFutu
     rpt.create(token).futureValue shouldEqual Right(expectedToken)
   }
 
-  test("should create RPT") {
+  test("should create RPT | DEOPSCSW-558, DEOPSCSW-578") {
     val authzClient           = mock[AuthzClient]
     val authorizationResource = mock[AuthorizationResource]
     val authorizationResponse = mock[AuthorizationResponse]
@@ -98,7 +98,7 @@ class RPTTest extends AnyFunSuite with MockitoSugar with Matchers with ScalaFutu
     rpt.create(tokenStr).futureValue shouldEqual Right(expectedPRT)
   }
 
-  test("should fail for creating accessToken") {
+  test("should fail for creating accessToken | DEOPSCSW-558, DEOPSCSW-578") {
     val authzClient           = mock[AuthzClient]
     val authorizationResource = mock[AuthorizationResource]
     val token                 = "asd.adsasd.asd.qwe"

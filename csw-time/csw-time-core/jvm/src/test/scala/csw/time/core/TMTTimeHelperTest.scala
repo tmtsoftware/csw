@@ -19,7 +19,7 @@ class TMTTimeHelperTest extends AnyFunSuite with Matchers {
   // This test is sufficient to show code works in both Scala and Java
   // since UTCTime.toZonedDateTime is used in both languages.
 
-  test("should access parts of UTC time") {
+  test("should access parts of UTC time | DEOPSCSW-533, DEOPSCSW-549") {
     val utcTime       = UTCTime(instant)
     val zonedDateTime = TMTTimeHelper.toZonedDateTime(utcTime)
 
@@ -36,7 +36,7 @@ class TMTTimeHelperTest extends AnyFunSuite with Matchers {
   // This test is sufficient to show code works in both Scala and Java
   // since TaiTime.value.atZone is used in both languages.
 
-  test("should access parts of TAI time") {
+  test("should access parts of TAI time | DEOPSCSW-533, DEOPSCSW-549") {
     val taiTime       = TAITime(instant)
     val zonedDateTime = TMTTimeHelper.atZone(taiTime, ZoneOffset.UTC)
 
@@ -52,7 +52,7 @@ class TMTTimeHelperTest extends AnyFunSuite with Matchers {
   // DEOPSCSW-549: Time service api
   // This test is sufficient to show code works in both Scala and Java
   // since UTCTime.atZone is used in both languages.
-  test("should access parts of a remote time") {
+  test("should access parts of a remote time | DEOPSCSW-540, DEOPSCSW-549") {
     val utcTime       = UTCTime(instant)
     val zonedDateTime = TMTTimeHelper.atZone(utcTime, ZoneId.of("Asia/Kolkata"))
 

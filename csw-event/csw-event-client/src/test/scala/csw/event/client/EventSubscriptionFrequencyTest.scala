@@ -67,7 +67,7 @@ class EventSubscriptionFrequencyTest extends TestNGSuite with Matchers with Even
 
   //DEOPSCSW-342: Subscription with consumption frequency
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_subscribe_with_duration_with_rate_adapter_mode_for_slow_publisher(
+  def should_be_able_to_subscribe_with_duration_with_rate_adapter_mode_for_slow_publisher__DEOPSCSW_331_DEOPSCSW_342(
       baseProperties: BaseProperties
   ): Unit = {
     import baseProperties._
@@ -95,7 +95,7 @@ class EventSubscriptionFrequencyTest extends TestNGSuite with Matchers with Even
   //DEOPSCSW-346: Subscribe to event irrespective of Publisher's existence
   //DEOPSCSW-342: Subscription with consumption frequency
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_subscribe_an_event_with_duration_with_rate_adapter_for_fast_publisher(
+  def should_be_able_to_subscribe_an_event_with_duration_with_rate_adapter_for_fast_publisher__DEOPSCSW_331_DEOPSCSW_342_DEOPSCSW_346(
       baseProperties: BaseProperties
   ): Unit = {
     import baseProperties._
@@ -141,7 +141,7 @@ class EventSubscriptionFrequencyTest extends TestNGSuite with Matchers with Even
 
   //DEOPSCSW-342: Subscription with consumption frequency
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_subscribe_with_duration_with_rate_limiter_mode_for_slow_publisher(
+  def should_be_able_to_subscribe_with_duration_with_rate_limiter_mode_for_slow_publisher__DEOPSCSW_331_DEOPSCSW_342(
       baseProperties: BaseProperties
   ): Unit = {
     import baseProperties._
@@ -167,7 +167,7 @@ class EventSubscriptionFrequencyTest extends TestNGSuite with Matchers with Even
 
   //DEOPSCSW-342: Subscription with consumption frequency
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_subscribe_with_duration_with_rate_limiter_mode_for_fast_publisher(
+  def should_be_able_to_subscribe_with_duration_with_rate_limiter_mode_for_fast_publisher__DEOPSCSW_331_DEOPSCSW_342(
       baseProperties: BaseProperties
   ): Unit = {
     import baseProperties._

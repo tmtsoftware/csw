@@ -24,7 +24,7 @@ public class JAlarmRefreshActorTest extends JUnitSuite {
 
     // DEOPSCSW-507: Auto-refresh utility for component developers
     @Test
-    public void should_refresh_severity() {
+    public void should_refresh_severity__DEOPSCSW_507() {
         AlarmKey alarmKey = new AlarmKey(Prefix.apply(JSubsystem.NFIRAOS, "trombone"), "tromboneAxisHighLimitAlarm");
         TestProbe<String> probe = TestProbe.create(typedSystem);
         String refreshMsg = "severity refreshed";

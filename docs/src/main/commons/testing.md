@@ -120,7 +120,7 @@ This is especially useful for integration testing where multiple systems communi
 
 You can find more details on multi-JVM tests [here](https://doc.akka.io/docs/akka/current/multi-jvm-testing.html).
 
-You can also refer to some examples in [CSW](https://github.com/tmtsoftware/csw) for writing your own multi-JVM tests. For example: [CommandServiceTest.scala]($github.base_url$/csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala)  
+You can also refer to some examples in [CSW](https://github.com/tmtsoftware/csw) for writing your own multi-JVM tests. For example: [CommandServiceTest.scala]($github.base_url$/integration/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala)  
 
 In case you want to run your multi-JVM tests across machines, refer to this multi-node testing guide [here](https://doc.akka.io/docs/akka/current/multi-node-testing.html). 
 

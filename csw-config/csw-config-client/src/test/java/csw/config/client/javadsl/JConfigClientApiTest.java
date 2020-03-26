@@ -53,7 +53,7 @@ public class JConfigClientApiTest extends JUnitSuite {
 
     // DEOPSCSW-88: Config service API implementation details need to be hidden from component developer
     @Test
-    public void testConfigClientApi() throws ExecutionException, InterruptedException {
+    public void testConfigClientApi__DEOPSCSW_138_DEOPSCSW_103_DEOPSCSW_88() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/text-files/trombone_hcd/application.conf");
 
         configService.create(path, ConfigData.fromString(configValue1), false, "first commit").get();

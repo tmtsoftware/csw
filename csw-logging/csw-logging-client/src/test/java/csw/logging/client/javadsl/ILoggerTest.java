@@ -127,7 +127,7 @@ public class ILoggerTest extends JUnitSuite {
     }
 
     @Test
-    public void testDefaultLogConfigurationAndDefaultComponentLogLevel() throws InterruptedException {
+    public void testDefaultLogConfigurationAndDefaultComponentLogLevel__DEOPSCSW_316() throws InterruptedException {
         JTromboneHCDTLA jTromboneHCD = new JTromboneHCDTLA(new JLoggerFactory(Prefix.apply("csw.tromboneHcd")));
         String tromboneHcdClassName = jTromboneHCD.getClass().getName();
 
@@ -154,7 +154,7 @@ public class ILoggerTest extends JUnitSuite {
     // DEOPSCSW-117: Provide unique name for each logging instance of components
     // DEOPSCSW-127: Runtime update for logging characteristics
     @Test
-    public void testLogLevelOfMultipleComponentsInSingleContainer() throws InterruptedException {
+    public void testLogLevelOfMultipleComponentsInSingleContainer__DEOPSCSW_316_DEOPSCSW_117_DEOPSCSW_127() throws InterruptedException {
 
         allComponentsStartLogging();
         eventually(java.time.Duration.ofSeconds(10), () -> Assert.assertEquals(20, logBuffer.size()));

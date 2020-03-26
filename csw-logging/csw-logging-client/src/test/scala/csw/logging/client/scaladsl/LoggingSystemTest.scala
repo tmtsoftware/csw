@@ -27,7 +27,7 @@ class LoggingSystemTest extends AnyFunSuite with Matchers with BeforeAndAfterAll
     Await.result(loggingSystem.system.whenTerminated, 20.seconds)
   }
 
-  test("should load default log level provided in configuration file") {
+  test("should load default log level provided in configuration file | ") {
     loggingSystem.getDefaultLogLevel.default.name shouldBe config
       .getString("logLevel")
       .toUpperCase
@@ -39,7 +39,7 @@ class LoggingSystemTest extends AnyFunSuite with Matchers with BeforeAndAfterAll
       .toUpperCase
   }
 
-  test("should be able to set log level for default logger, slf4j and akka") {
+  test("should be able to set log level for default logger, slf4j and akka | ") {
     val logLevel      = "debug"
     val akkaLogLevel  = "Error"
     val slf4jLogLevel = "INFO"
@@ -54,12 +54,12 @@ class LoggingSystemTest extends AnyFunSuite with Matchers with BeforeAndAfterAll
   }
 
   // DEOPSCSW-142: Flexibility of logging approaches
-  test("should be able to parse appenders from configuration file") {
+  test("should be able to parse appenders from configuration file | DEOPSCSW-142") {
     loggingSystem.getAppenders.toSet shouldBe Set(StdOutAppender, FileAppender)
   }
 
   // DEOPSCSW-142: Flexibility of logging approaches
-  test("should throw AppenderNotFoundException for an invalid appender configured") {
+  test("should throw AppenderNotFoundException for an invalid appender configured | DEOPSCSW-142") {
     val config      = ConfigFactory.parseString("""
         |csw-logging {
         | appenders = ["abcd"]

@@ -43,6 +43,27 @@ Make sure you set all necessary @ref[environment variables](../deployment/env-va
 
 Switch to application directory and run this command on **machine1 and machine2** - `./bin/csw-location-server --clusterPort=3552`
 
+Note : `Outside` below means any machine not present in this Akka cluster.
+
+In production environment, you may need a capability to access protected resources of Location Server and provide
+ Authentication and Authorization for such resources. E.g. ability to register/unregister components(which has to undergo maintenance) from a system operator machine present
+ `Outside`.
+
+1. To enable this, an additional command line argument is available when starting Location Server
+    1. Default is local-only mode and such location server will not be accessible from `Outside`
+    2. Other option is `--publicNetwork`, it means start location server in public mode with auth enabled
+2. Switch to application directory and run this command on all machines where you want Location Server in local-only
+ mode (authentication and authorization disabled) - `./bin/csw-location-server --clusterPort=3552` 
+3. Switch to application directory and run this command on all machines where you want Location Server in public
+ mode (authentication and authorization enabled) - `./bin/csw-location-server --clusterPort=3552 --publicNetwork`  
+4. Once Akka cluster is up, start @ref:[Authentication and Authorization Service](../services/aas.md) on one of the
+ node where Location Server is running in local-only mode, so that it can register itself to this Location Server
+  without the need of authentication and authorization. 
+5. Other Location Server instances including public mode instances will get location of Authentication and
+ Authorization Service automatically.
+6. When any application(E.g. Dashboard application used by Operator to monitor System health) wants to access protected
+ resource of Location Server, it can connect to any public mode Location Server, pass a valid token and access it.
+
 ### Help
 Use the following command to get help on the options available with this app.
   

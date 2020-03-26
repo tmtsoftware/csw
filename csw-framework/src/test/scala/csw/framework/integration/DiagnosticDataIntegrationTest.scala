@@ -44,7 +44,7 @@ class DiagnosticDataIntegrationTest extends FrameworkIntegrationSuite {
     super.afterAll()
   }
 
-  test("component should be able to handle diagnostic data request") {
+  test("component should be able to handle diagnostic data request | DEOPSCSW-37") {
     import SampleComponentState._
     import wiring._
     LoggingSystemFactory.start("", "", "", actorSystem)

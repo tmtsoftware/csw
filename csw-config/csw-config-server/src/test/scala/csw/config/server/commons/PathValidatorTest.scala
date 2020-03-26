@@ -7,7 +7,7 @@ import org.scalatest.matchers.should.Matchers
 // DEOPSCSW-135: Validation of suffix for active and sha files
 class PathValidatorTest extends AnyFunSuite with Matchers {
 
-  test("should return false for invalid path") {
+  test("should return false for invalid path | DEOPSCSW-47, DEOPSCSW-135") {
 
     val paths = List(
       "/invalidpath!/sample.txt",
@@ -32,7 +32,7 @@ class PathValidatorTest extends AnyFunSuite with Matchers {
     }
   }
 
-  test("should return true for valid file path") {
+  test("should return true for valid file path | DEOPSCSW-47, DEOPSCSW-135") {
     PathValidator.isValid("/validpath/sample.txt") shouldBe true
   }
 }

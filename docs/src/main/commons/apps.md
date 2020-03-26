@@ -40,14 +40,15 @@ This shell script will start `csw-location-server` as the first step regardless 
 
 @@@
 
-The execution of the script is such that it starts `csw-location-server`, then start all of the CSW services, unless
+The execution of the script is such that it starts `csw-location-server`, then start all the CSW services, unless
 one or more of the following options are specified.
 
-* `--auth` if provided, starts authentication service.
-* `--config` if provided, starts configuration service.
-* `--event` if provided, starts event service. 
-* `--alarm` if provided, starts alarm service.
-* `--database` if provided, starts database service.
+* `--all` | `-a` if provide, starts all the services mentioned below
+* `--config` | `-c` if provided, starts configuration service.
+* `--event` | `-e` if provided, starts event service. 
+* `--alarm` | `-r` if provided, starts alarm service.
+* `--database` | `-d` if provided, starts database service.
+* `--auth` | `-k` if provided, starts authentication service.
 
 @@@ note
 
@@ -55,12 +56,27 @@ While starting the Database Service, make sure that
  
  * The `PGDATA` environment variable is set to the Postgres data directory where Postgres is installed e.g. for mac: "/usr/local/var/postgres" and
  * there is a password set for the valid Postgres user. If not, go to the Postgres shell via `psql` and run `ALTER USER <username> WITH PASSWORD '<mypassword>';`.
-If there is any problem entering the Postgres shell, go to the `conf` folder -> `database_service` -> `pg_hba.conf` and change `password` to `trust`. Try entering
-the Postgres shell again and set the password. Once set successfully, revert `trust` to `password` in `pg_hba.conf` and run the Database Service via `csw-services.sh`.   
 
 @@@
 
+To start all the CSW services, run `./csw-services.sh start --all` command. 
+
 With this, the component code is now ready to connect to the provided services via `csw-services.sh`.   
+
+`csw-services.sh` script additionally support custom CSW version as a command line argument along with others mentioned above.
+Let's say you want to start all the services for CSW version of `2.0.0`, then you can run following command:
+
+```
+./csw-services.sh start --all -v 2.0.0
+```
+
+@@@ note
+
+By default `csw-services.sh` script runs services in the foreground, you can press `ctr+c` to stop all the services.
+If you start services in background by running `./csw-services.sh start &` command, then you can stop these services using `csw-services.sh stop` command.
+
+@@@
+
 
 ## Starting Elastic Logging Aggregator for Development
 
@@ -83,7 +99,7 @@ apply the proper context:
 ```console
 $ chcon -R system_u:object_r:admin_home_t:s0 docker-elk/
 ```
-To know more about running Docker for Mac please refer to this [link](https://docs.docker.com/v17.12/docker-for-mac/). For Windows, ensure that the
+To know more about running Docker for Mac please refer to this [link](https://docs.docker.com/docker-for-mac/). For Windows, ensure that the
 "Shared Drives" feature is enabled for the `C:` drive (Docker for Windows > Settings > Shared Drives).
 See [Configuring Docker for Windows Shared Drives](https://docs.microsoft.com/en-us/archive/blogs/stevelasker/configuring-docker-for-windows-volumes) (MSDN Blog).
 

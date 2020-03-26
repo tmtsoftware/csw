@@ -52,7 +52,7 @@ public class JCommandsTest extends JUnitSuite {
     public void showUsageOfSetupCommand() {
         //#setup
         //keys
-        Key<Integer> k1 = JKeyType.IntKey().make("encoder");
+        Key<Integer> k1 = JKeyType.IntKey().make("encoder", JUnits.encoder);
         Key<String> k2 = JKeyType.StringKey().make("stringThing");
         Key<Integer> k2bad = JKeyType.IntKey().make("missingKey");
         Key<Integer> k3 = JKeyType.IntKey().make("filter");
@@ -85,8 +85,8 @@ public class JCommandsTest extends JUnitSuite {
         Byte[] bytes1 = {10, 20};
         Byte[] bytes2 = {30, 40};
 
-        Parameter<Byte> b1 = byteKey1.set(bytes1);
-        Parameter<Byte> b2 = byteKey2.set(bytes2);
+        Parameter<Byte> b1 = byteKey1.setAll(bytes1);
+        Parameter<Byte> b2 = byteKey2.setAll(bytes2);
 
         Setup sc3 = new Setup(prefix, new CommandName("move"), Optional.of(obsId)).add(b1).add(b2);
 
@@ -112,7 +112,7 @@ public class JCommandsTest extends JUnitSuite {
         //#observe
         //keys
         Key<Boolean> k1 = JKeyType.BooleanKey().make("repeat");
-        Key<Integer> k2 = JKeyType.IntKey().make("expTime");
+        Key<Integer> k2 = JKeyType.IntKey().make("expTime", JUnits.second);
         Key<Integer> k2bad = JKeyType.IntKey().make("missingKey");
         Key<Integer> k3 = JKeyType.IntKey().make("filter");
         Key<UTCTime> k4 = JKeyType.UTCTimeKey().make("creation-time");
@@ -122,7 +122,7 @@ public class JCommandsTest extends JUnitSuite {
 
         //parameters
         Boolean[] boolArray = {true, false, true, false};
-        Parameter<Boolean> i1 = k1.set(boolArray);
+        Parameter<Boolean> i1 = k1.setAll(boolArray);
         Parameter<Integer> i2 = k2.set(1, 2, 3, 4);
 
         //create Observe, add sequentially using add
@@ -141,7 +141,7 @@ public class JCommandsTest extends JUnitSuite {
 
         //update existing key with set
         Integer[] intArray = {5, 6, 7, 8};
-        Observe oc3 = oc1.add(k2.set(intArray));
+        Observe oc3 = oc1.add(k2.setAll(intArray));
 
         //remove a key
         Observe oc4 = oc2.remove(k4);
@@ -164,7 +164,7 @@ public class JCommandsTest extends JUnitSuite {
         //#wait
         //keys
         Key<Boolean> k1 = JKeyType.BooleanKey().make("repeat");
-        Key<Integer> k2 = JKeyType.IntKey().make("expTime");
+        Key<Integer> k2 = JKeyType.IntKey().make("expTime", JUnits.second);
         Key<Integer> k2bad = JKeyType.IntKey().make("missingKey");
         Key<Integer> k3 = JKeyType.IntKey().make("filter");
         Key<UTCTime> k4 = JKeyType.UTCTimeKey().make("creation-time");
@@ -174,7 +174,7 @@ public class JCommandsTest extends JUnitSuite {
 
         //parameters
         Boolean[] boolArray = {true, false, true, false};
-        Parameter<Boolean> i1 = k1.set(boolArray);
+        Parameter<Boolean> i1 = k1.setAll(boolArray);
         Parameter<Integer> i2 = k2.set(1, 2, 3, 4);
 
         //create Wait, add sequentially using add
@@ -193,7 +193,7 @@ public class JCommandsTest extends JUnitSuite {
 
         //update existing key with set
         Integer[] intArray = {5, 6, 7, 8};
-        Wait wc3 = wc1.add(k2.set(intArray));
+        Wait wc3 = wc1.add(k2.setAll(intArray));
 
         //remove a key
         Wait wc4 = wc2.remove(k4);
@@ -254,7 +254,7 @@ public class JCommandsTest extends JUnitSuite {
     public void showUniqueKeyConstraintExample() {
         //#unique-key
         //keys
-        Key<Integer> encoderKey = JKeyType.IntKey().make("encoder");
+        Key<Integer> encoderKey = JKeyType.IntKey().make("encoder", JUnits.encoder);
         Key<Integer> filterKey = JKeyType.IntKey().make("filter");
         Key<Integer> miscKey = JKeyType.IntKey().make("misc.");
 
