@@ -27,10 +27,13 @@ pipeline {
         stage('Unit and Component Tests') {
             steps {
                 // Run all tests except csw-time tests
-                sh "sbt -DenableCoverage=true -DdisableTimeTests ';set every enableFatalWarnings := true; test:test'"
+                sh "sbt -DenableCoverage=true -DgenerateStoryReport=true -DdisableTimeTests ';set every enableFatalWarnings := true; test:test'"
 
                 // Run csw-time module tests
-                sh "sbt -DenableCoverage=true ';set every enableFatalWarnings := true; csw-time/test:test'"
+                sh "sbt -DenableCoverage=true -DgenerateStoryReport=true ';set every enableFatalWarnings := true; csw-time/test:test'"
+
+                // story requirement mapping report
+                // sh "./scripts/coursier launch -r jitpack -r https://jcenter.bintray.com com.github.tmtsoftware:rtm_2.13:47b635b289 -M tmt.test.reporter.TestRequirementMapper -- ./target/RTM/testStoryMapping.txt ./tools/RTM/storyRequirementMapping.csv ./target/RTM/testRequirementsMapping.txt"
             }
             post {
                 always {
