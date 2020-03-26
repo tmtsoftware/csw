@@ -15,6 +15,7 @@ import org.scalatest.time.Span
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
+import scala.util.control.NonFatal
 
 class LocationServiceMultipleNICTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with ScalaFutures with Eventually {
 
@@ -34,7 +35,14 @@ class LocationServiceMultipleNICTest extends AnyFunSuite with Matchers with Befo
     val componentId = ComponentId(Prefix(Subsystem.NFIRAOS, "assembly"), ComponentType.Assembly)
     val connection  = AkkaConnection(componentId)
 
-    eventually(locationService.list.await.size shouldBe 1)
-    locationService.find(connection).await.get shouldBe a[AkkaLocation]
+    try {
+      eventually(locationService.list.await.size shouldBe 1)
+      locationService.find(connection).await.get shouldBe a[AkkaLocation]
+    }
+    catch {
+      case NonFatal(e) => // this is required so that docker understands when test fails
+        e.printStackTrace()
+        sys.exit(1)
+    }
   }
 }

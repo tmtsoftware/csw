@@ -54,6 +54,7 @@ sleep 10
 printc "Executing test in network : tmt_net_2" "${YELLOW}"
 docker exec Test-App bash -c 'cd /source/csw && ./target/universal/stage/bin/test-multiple-nic-app -DCLUSTER_SEEDS=172.17.0.2:3553 -DINTERFACE_NAME=eth1'
 exit_code=$?
+printc "Tests exited with code: $exit_code" "${YELLOW}"
 
 #printc "------ [Debug] Inspecting docker bridge ------" "${ORANGE}"
 #brctl show
@@ -65,4 +66,4 @@ docker stop Assembly Test-App
 docker rm Assembly Test-App
 docker network rm tmt_net_1 tmt_net_2
 
-exit $exit_code
+exit "$exit_code"
