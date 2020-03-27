@@ -1,6 +1,7 @@
 TMT Common Software (CSW)
 =========================
-[![Build Status](http://ec2-35-154-215-191.ap-south-1.compute.amazonaws.com:8080/job/csw-dev/badge/icon)](http://ec2-35-154-215-191.ap-south-1.compute.amazonaws.com:8080/job/csw-dev/)
+![dev](https://github.com/tmtsoftware/csw/workflows/dev/badge.svg)
+![nightly](https://github.com/tmtsoftware/csw/workflows/nightly/badge.svg)
 
 Common Software is the package of services and infrastructure software that integrates the [TMT](http://www.tmt.org) software systems.
 
