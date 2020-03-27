@@ -450,6 +450,7 @@ lazy val `csw-alarm` = project
     `csw-alarm-cli`
   )
 
+val value = testOptions in Test := Seq(Tests.Argument("-oDF"))
 lazy val `csw-alarm-models` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
   .in(file("csw-alarm/csw-alarm-models"))
@@ -457,6 +458,7 @@ lazy val `csw-alarm-models` = crossProject(JSPlatform, JVMPlatform)
   .enablePlugins(PublishBintray)
   .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
   .jvmConfigure(_.enablePlugins(MaybeCoverage))
+  .jsSettings(value)
   .settings(fork := false)
   .settings(libraryDependencies ++= Dependencies.AlarmModels.value)
 
