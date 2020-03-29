@@ -5,6 +5,8 @@ import sbtcrossproject.CrossPlugin.autoImport.{CrossType, crossProject}
 val enableCoverage         = sys.props.get("enableCoverage").contains("true")
 val MaybeCoverage: Plugins = if (enableCoverage) Coverage else Plugins.empty
 
+val value = testOptions in Test := Seq(Tests.Argument("-oDF"))
+
 docsRepo in ThisBuild := "git@github.com:tmtsoftware/tmtsoftware.github.io.git"
 docsParentDir in ThisBuild := "csw"
 gitCurrentRepo in ThisBuild := "https://github.com/tmtsoftware/csw"
@@ -110,6 +112,7 @@ lazy val `csw-prefix` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .enablePlugins(PublishBintray)
   .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
+  .jsSettings(value)
   .settings(fork := false)
   .settings(libraryDependencies ++= Dependencies.Prefix.value)
 
@@ -145,6 +148,7 @@ lazy val `csw-admin-api` = crossProject(JSPlatform, JVMPlatform)
   .enablePlugins(PublishBintray)
   //  the following setting was required by IntelliJ as it can not handle cross-compiled Akka types
   .jsSettings(SettingKey[Boolean]("ide-skip-project") := true)
+  .jsSettings(value)
   .jvmConfigure(_.enablePlugins(MaybeCoverage, GenJavadocPlugin))
   .settings(fork := false)
 
@@ -169,6 +173,7 @@ lazy val `csw-location-api` = crossProject(JSPlatform, JVMPlatform)
   .jvmConfigure(_.dependsOn(`csw-logging-client`).enablePlugins(MaybeCoverage))
   //  the following setting was required by IntelliJ as it can not handle cross-compiled Akka types
   .jsSettings(SettingKey[Boolean]("ide-skip-project") := true)
+  .jsSettings(value)
   .settings(libraryDependencies ++= Dependencies.LocationApi.value)
   .settings(fork := false)
 
@@ -227,6 +232,7 @@ lazy val `csw-config-models` = crossProject(JSPlatform, JVMPlatform)
   .in(file("csw-config/csw-config-models"))
   .enablePlugins(PublishBintray)
   .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
+  .jsSettings(value)
   .dependsOn(`csw-params`)
   .settings(fork := false)
   .settings(libraryDependencies ++= Dependencies.ConfigModels.value)
@@ -303,6 +309,7 @@ lazy val `csw-logging-models` = crossProject(JSPlatform, JVMPlatform)
   .in(file("csw-logging/csw-logging-models"))
   .enablePlugins(PublishBintray)
   .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
+  .jsSettings(value)
   .settings(fork := false)
   .settings(libraryDependencies ++= Dependencies.LoggingModels.value)
 
@@ -332,6 +339,7 @@ lazy val `csw-params` = crossProject(JSPlatform, JVMPlatform)
   .jvmConfigure(_.dependsOn(`csw-commons` % "test->test"))
   .enablePlugins(PublishBintray)
   .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
+  .jsSettings(value)
   .settings(
     libraryDependencies ++= Dependencies.Params.value,
     fork := false
@@ -384,6 +392,7 @@ lazy val `csw-command-api` = crossProject(JSPlatform, JVMPlatform)
   .settings(libraryDependencies ++= Dependencies.CommandApi.value)
   //  the following setting was required by IntelliJ as it can not handle cross-compiled Akka types
   .jsSettings(SettingKey[Boolean]("ide-skip-project") := true)
+  .jsSettings(value)
   .settings(fork := false)
 
 lazy val `csw-command-client` = project
@@ -450,7 +459,6 @@ lazy val `csw-alarm` = project
     `csw-alarm-cli`
   )
 
-val value = testOptions in Test := Seq(Tests.Argument("-oDF"))
 lazy val `csw-alarm-models` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
   .in(file("csw-alarm/csw-alarm-models"))
@@ -516,6 +524,7 @@ lazy val `csw-time-clock` = crossProject(JSPlatform, JVMPlatform)
   .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
   .jvmSettings(libraryDependencies ++= Dependencies.TimeClockJvm.value)
   .jsSettings(libraryDependencies += Libs.`scalajs-java-time`.value)
+  .jsSettings(value)
   .settings(fork := false)
 
 lazy val `csw-time-core` = crossProject(JSPlatform, JVMPlatform)
@@ -524,6 +533,7 @@ lazy val `csw-time-core` = crossProject(JSPlatform, JVMPlatform)
   .dependsOn(`csw-time-clock`)
   .enablePlugins(PublishBintray)
   .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
+  .jsSettings(value)
   .settings(
     libraryDependencies ++= Dependencies.TimeCore.value,
     fork := false
