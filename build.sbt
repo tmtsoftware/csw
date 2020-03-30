@@ -534,8 +534,9 @@ lazy val `csw-time-core` = crossProject(JSPlatform, JVMPlatform)
   .enablePlugins(PublishBintray)
   .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
   .jsSettings(value)
+  .jvmSettings(libraryDependencies += Libs.`junit-4-12` % Test)
   .settings(
-    libraryDependencies ++= Dependencies.TimeCore.value,
+    libraryDependencies += Libs.`scalatest`.value % Test,
     fork := false
   )
 
