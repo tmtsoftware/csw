@@ -11,20 +11,20 @@ object Libs {
   val `scopt`              = "com.github.scopt"       %% "scopt"              % "3.7.1" //MIT License
   val `silencer-plugin`    = "com.github.ghik"        % "silencer-plugin"     % silencerVersion cross CrossVersion.full
   val `silencer-lib`       = "com.github.ghik"        % "silencer-lib"        % silencerVersion cross CrossVersion.full
-  val `mockito-scala`      = "org.mockito"            %% "mockito-scala"      % "1.13.0"
+  val `mockito-scala`      = "org.mockito"            %% "mockito-scala"      % "1.13.1"
 
   val `embedded-keycloak`            = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak"            % "0.1.7" //Apache 2.0
   val `logback-classic`              = "ch.qos.logback"                           % "logback-classic"               % "1.2.3" //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
   val `akka-management-cluster-http` = "com.lightbend.akka.management"            %% "akka-management-cluster-http" % "1.0.6"
   val `svnkit`                       = "org.tmatesoft.svnkit"                     % "svnkit"                        % "1.10.1" //TMate Open Source License
-  val `commons-codec`                = "commons-codec"                            % "commons-codec"                 % "1.10" //Apache 2.0
+  val `commons-codec`                = "commons-codec"                            % "commons-codec"                 % "1.10" //Apache 2.0š
   val `scala-reflect`                = "org.scala-lang"                           % "scala-reflect"                 % ScalaVersion //BSD-3
   val `gson`                         = "com.google.code.gson"                     % "gson"                          % "2.8.6" //Apache 2.0
+  val `play-json`                    = "com.typesafe.play"                        %% "play-json"                    % "2.8.1" //Apache 2.0
 
-  val `play-json`         = dep("com.typesafe.play" %%% "play-json"         % "2.8.1") //Apache 2.0
-  val `enumeratum`        = dep("com.beachape"      %%% "enumeratum"        % "1.5.15") //MIT License
-  val `scalajs-java-time` = dep("org.scala-js"      %%% "scalajs-java-time" % "0.2.6")
-  val `scalatest`         = dep("org.scalatest"     %%% "scalatest"         % "3.1.1") //Apache License 2.0
+  val `enumeratum`        = dep("com.github.mushtaq.enumeratum" %%% "enumeratum"        % "1.6.0") //MIT License
+  val `scalajs-java-time` = dep("org.scala-js"                  %%% "scalajs-java-time" % "1.0.0")
+  val `scalatest`         = dep("org.scalatest"                 %%% "scalatest"         % "3.1.1") //Apache License 2.0
 
   val `jwt-core`          = "com.pauldijou"           %% "jwt-core"          % "4.3.0"
   val `lettuce`           = "io.lettuce"              % "lettuce-core"       % "5.2.2.RELEASE"
@@ -36,7 +36,7 @@ object Libs {
   val `scala-compiler`    = "org.scala-lang"          % "scala-compiler"     % ScalaVersion
   val `HdrHistogram`      = "org.hdrhistogram"        % "HdrHistogram"       % "2.1.12"
   val `testng`            = "org.testng"              % "testng"             % "6.14.3"
-  val `junit-4-12`        = "org.scalatestplus"       %% "junit-4-12"        % "3.1.0.0"
+  val `junit-4-12`        = "org.scalatestplus"       %% "junit-4-12"        % "3.1.1.0"
   val `testng-6-7`        = "org.scalatestplus"       %% "testng-6-7"        % "3.1.1.0"
 
   val `scala-csv`             = "com.github.tototoshi" %% "scala-csv"            % "1.3.6"
@@ -57,7 +57,7 @@ object Libs {
 }
 
 object Borer {
-  val Version = "1.4.0"
+  val Version = "1.5.0"
   val Org     = "io.bullet"
 
   val `borer-core`        = dep(Org %%% "borer-core" % Version)
@@ -103,7 +103,7 @@ object AkkaHttp {
 }
 
 object Keycloak {
-  val Version = "9.0.0"
+  val Version = "9.0.2"
 
   val `keycloak-adapter-core` = "org.keycloak" % "keycloak-adapter-core"      % Version
   val `keycloak-core`         = "org.keycloak" % "keycloak-core"              % Version
@@ -121,7 +121,7 @@ object Jooq {
 }
 
 object MSocket {
-  val Version = "6fc1306"
+  val Version = "7de6e57"
 
   val `msocket-api`      = dep("com.github.tmtsoftware.msocket" %%% "msocket-api" % Version)
   val `msocket-impl-jvm` = "com.github.tmtsoftware.msocket" %% "msocket-impl" % Version

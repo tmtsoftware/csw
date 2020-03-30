@@ -1,4 +1,4 @@
-import sbt.{Def, _}
+import sbt._
 
 object Dependencies {
 
@@ -22,7 +22,6 @@ object Dependencies {
   val LocationApi = Def.setting(
     Seq(
       Libs.`enumeratum`.value,
-      Libs.`play-json`.value,
       MSocket.`msocket-api`.value,
       Libs.`scalatest`.value % Test
     )
@@ -166,7 +165,7 @@ object Dependencies {
     Seq(
       Libs.`config`,
       Libs.`logback-classic`,
-      Libs.`play-json`.value,
+      Libs.`play-json`,
       Libs.`scala-java8-compat`,
       Libs.`enumeratum`.value,
       Akka.`akka-actor`,
@@ -198,6 +197,7 @@ object Dependencies {
 
   val ParamsJvm = Def.setting(
     Seq(
+      Libs.`play-json`,
       Libs.`junit-4-12` % Test
     )
   )
@@ -211,7 +211,7 @@ object Dependencies {
       Akka.`akka-stream-typed`,
       Libs.`scala-async`,
       Libs.`scala-java8-compat`,
-      Libs.`play-json`.value,
+      Libs.`play-json`,
       Akka.`akka-actor-typed`,
       Libs.`scopt`,
       Akka.`akka-actor-testkit-typed` % Test,
@@ -227,7 +227,7 @@ object Dependencies {
       MSocket.`msocket-impl-jvm`,
       Libs.`enumeratum`.value,
       Libs.`config`,
-      Libs.`play-json`.value,
+      Libs.`play-json`,
       Libs.`scala-java8-compat`,
       Akka.`akka-stream`,
       Akka.`akka-stream-typed`,
@@ -293,7 +293,7 @@ object Dependencies {
       Akka.`akka-stream`,
       Akka.`akka-stream-typed`,
       Akka.`akka-actor`,
-      Libs.`play-json`.value,
+      Libs.`play-json`,
       Libs.`scopt`,
       Libs.`scala-csv`,
       Libs.`scala-async`,
@@ -306,7 +306,6 @@ object Dependencies {
     Seq(
       Libs.`enumeratum`.value,
       Libs.`config`,
-      Libs.`play-json`.value,
       Libs.`scalatest`.value % Test
     )
   )
@@ -326,7 +325,7 @@ object Dependencies {
       Libs.`lettuce`,
       Libs.`reactor-core`,
       Libs.`config`,
-      Libs.`play-json`.value,
+      Libs.`play-json`,
       Libs.`scala-async`,
       Libs.`json-schema-validator`,
       Libs.`scala-java8-compat`,
@@ -383,14 +382,6 @@ object Dependencies {
     )
   )
 
-  val TimeCore = Def.setting(
-    Seq(
-      Libs.`play-json`.value,
-      Libs.`scalatest`.value % Test,
-      Libs.`junit-4-12`      % Test
-    )
-  )
-
   val TimeScheduler = Def.setting(
     Seq(
       Akka.`akka-actor`,
@@ -432,7 +423,7 @@ object Dependencies {
   val CswAasCore = Def.setting(
     Seq(
       Libs.`jwt-core`,
-      Libs.`play-json`.value,
+      Libs.`play-json`,
       Libs.`config`,
       Keycloak.`keycloak-core`,
       Keycloak.`keycloak-adapter-core`,
@@ -451,7 +442,7 @@ object Dependencies {
     Seq(
       Libs.`config`,
       AkkaHttp.`akka-http`,
-      Libs.`play-json`.value,
+      Libs.`play-json`,
       Libs.`scalatest`.value          % Test,
       Akka.`akka-actor-testkit-typed` % Test,
       AkkaHttp.`akka-http-testkit`    % Test,
@@ -518,7 +509,7 @@ object Dependencies {
       Akka.`akka-stream-typed`,
       Akka.`akka-actor-typed`,
       AkkaHttp.`akka-http`,
-      Libs.`play-json`.value,
+      Libs.`play-json`,
       Libs.`gson`,
       Jackson.`jackson-core`,
       Jackson.`jackson-databind`,
@@ -549,7 +540,7 @@ object Dependencies {
   val Contract = Def.setting(
     Seq(
       Borer.`borer-core`.value,
-      Libs.`play-json`.value,
+      Libs.`play-json`,
       Libs.`scalatest`.value % Test
     )
   )
