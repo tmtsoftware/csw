@@ -91,15 +91,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Build Status
-        id: build_status
+        id: status
         run: |
           if [[ ${{job.status}} == Success ]]
           then
-          echo ::set-output name=status_icon::'white_check_mark'
-          echo ::set-output name=build_status::'SUCCESS'
+          echo ::set-output name=title::'SUCCESS'
+          echo ::set-output name=color::'#00FF00'
           else
-          echo ::set-output name=status_icon::'x'
-          echo ::set-output name=build_status::'FAILURE'
+          echo ::set-output name=title::'FAILURE'
+          echo ::set-output name=color::'#FF0000'
           fi
 
       - name: Notify slack
@@ -107,4 +107,4 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         uses: pullreminders/slack-action@master
         with:
-          args: '{\"channel\":\"#csw-build\",\"text\":\":${{ steps.build_status.outputs.status_icon }}: ${{ steps.build_status.outputs.build_status }}:Job ${{ github.event.repository.name }}:${{github.workflow}} \n https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}\"}'
+          args: '{\"channel\":\"#csw-build\", \"attachments\": [ { \"title\":\"${{ steps.status.outputs.title }}\", \"text\": \"[ ${{ github.event.repository.name }} ] : [ ${{ github.workflow }} ] : [ ${{ github.ref }} ] \n https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\", \"color\": \"${{ steps.status.outputs.color }}\" } ]}'
