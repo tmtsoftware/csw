@@ -85,26 +85,35 @@ jobs:
       - name: Multi-Jvm Tests
         run: sbt ';set every enableFatalWarnings := true; integration/multi-jvm:test'
 
-  slack-notify:
+  slack-success:
     needs: [unit-tests, multi-jvm-tests]
-    if: always()
+    if: success()
     runs-on: ubuntu-latest
     steps:
-      - name: Build Status
-        id: status
-        run: |
-          if [[ ${{job.status}} == Success ]]
-          then
-          echo ::set-output name=title::'SUCCESS'
-          echo ::set-output name=color::'#00FF00'
-          else
-          echo ::set-output name=title::'FAILURE'
-          echo ::set-output name=color::'#FF0000'
-          fi
-
-      - name: Notify slack
+      - uses: pullreminders/slack-action@master
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-        uses: pullreminders/slack-action@master
         with:
-          args: '{\"channel\":\"#csw-build\", \"attachments\": [ { \"title\":\"${{ steps.status.outputs.title }}\", \"text\": \"[ ${{ github.event.repository.name }} ] : [ ${{ github.workflow }} ] : [ ${{ github.ref }} ] \n https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\", \"color\": \"${{ steps.status.outputs.color }}\" } ]}'
+          args: '{\"channel\":\"#csw-build\", \"attachments\": [ { \"title\":\"SUCCESS\", \"text\": \"[ ${{ github.event.repository.name }} ] : [ ${{ github.workflow }} ] : [ ${{ github.ref }} ] \n https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\", \"color\": \"#00FF00\" } ]}'
+
+  slack-failure:
+    needs: [unit-tests, multi-jvm-tests]
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: pullreminders/slack-action@master
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        with:
+          args: '{\"channel\":\"#csw-build\", \"attachments\": [ { \"title\":\"FAILURE\", \"text\": \"[ ${{ github.event.repository.name }} ] : [ ${{ github.workflow }} ] : [ ${{ github.ref }} ] \n https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\", \"color\": \"#FF0000\" } ]}'
+
+  slack-cancelled:
+    needs: [unit-tests, multi-jvm-tests]
+    if: cancelled()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: pullreminders/slack-action@master
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        with:
+          args: '{\"channel\":\"#csw-build\", \"attachments\": [ { \"title\":\"CANCELLED\", \"text\": \"[ ${{ github.event.repository.name }} ] : [ ${{ github.workflow }} ] : [ ${{ github.ref }} ] \n https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\", \"color\": \"#EE6F47\" } ]}'
