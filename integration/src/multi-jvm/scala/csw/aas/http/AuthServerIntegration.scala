@@ -10,7 +10,7 @@ import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.prefix.models.{Prefix, Subsystem}
 import org.scalatest.BeforeAndAfterEach
 import org.tmt.embedded_keycloak.KeycloakData.{ApplicationUser, Client, Realm}
-import org.tmt.embedded_keycloak.utils.{BearerToken, Ports}
+import org.tmt.embedded_keycloak.utils.BearerToken
 import org.tmt.embedded_keycloak.{EmbeddedKeycloak, KeycloakData, Settings}
 
 import scala.concurrent.Await
@@ -233,12 +233,10 @@ class AuthIntegrationTest
   }
 
   override def beforeEach(): Unit = {
-    Ports.stop(keycloakPort)
     super.beforeEach()
   }
 
   override def afterEach(): Unit = {
     super.afterEach()
-    Ports.stop(keycloakPort)
   }
 }
