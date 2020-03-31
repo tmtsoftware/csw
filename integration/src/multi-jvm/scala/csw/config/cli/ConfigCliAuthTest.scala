@@ -50,8 +50,6 @@ class ConfigCliAuthTest(ignore: Int)
   private val defaultTimeout: FiniteDuration = 10.seconds
   private val serverTimeout: FiniteDuration  = 30.minutes
 
-  private val keycloakPort = 8081
-
   override def afterAll(): Unit = {
     super.afterAll()
     testFileUtils.deleteServerFiles()
