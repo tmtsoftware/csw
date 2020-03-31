@@ -1,8 +1,10 @@
 name: dev
 
 on:
+  pull_request:
+    branches: [master]
   push:
-    branches: '**'
+    branches: [master]
 
 jobs:
   unit-tests:
