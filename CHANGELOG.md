@@ -49,7 +49,7 @@ To start all the CSW services, run `csw-services.sh start` command.
 - SBT version upgrade to 1.3.7
 - Akka version upgrade to 2.6.3
 - Kafka version upgrade to 2.4.0
-- Borer version upgrade to 1.4.0
+- Borer version upgrade to 1.5.0
 
 ### Documentation
 - Reference paradox documentation: https://tmtsoftware.github.io/csw/2.0.0/
@@ -106,7 +106,7 @@ See [here](https://tmtsoftware.github.io/csw/2.0.0-RC1/) for a detailed document
 - SBT version upgrade to 1.3.7
 - Akka version upgrade to 2.6.3
 - Kafka version upgrade to 2.4.0
-- Borer version upgrade to 1.4.0
+- Borer version upgrade to 1.5.0
 
 ### Documentation
 - Reference paradox documentation: https://tmtsoftware.github.io/csw/2.0.0-RC1/
@@ -135,7 +135,7 @@ See [here](https://tmtsoftware.github.io/csw/1.1.0-RC1/) for a detailed document
 - SBT version upgrade to 1.3.7
 - Akka version upgrade to 2.6.3
 - Kafka version upgrade to 2.4.0
-- Borer version upgrade to 1.4.0
+- Borer version upgrade to 1.5.0
 
 ### Documentation
 - Reference paradox documentation: https://tmtsoftware.github.io/csw/1.1.0-RC1/
