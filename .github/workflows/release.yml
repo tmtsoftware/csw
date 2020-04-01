@@ -1,0 +1,90 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - uses: olafurpg/setup-scala@v5
+        with:
+          java-version: adopt@1.11
+
+      - run: npm install -g junit-merge
+      - run: npm install -g junit-viewer
+
+      - name: Configure ntp time
+        run: |
+          sudo apt-get install ntp -y
+          sudo ntptime -T 37
+
+      - name: Build
+        run: |
+          sbt test:compile multi-jvm:compile
+          sbt makeSite
+
+      - name: Unit and Component Tests
+        run: |
+          sbt -DenableCoverage=true csw-time/test:test
+          sbt -DenableCoverage=true -DdisableTimeTests test:test
+
+      - name: Coverage Report
+        run: |
+          sbt -DenableCoverage=true coverageReport
+          sbt coverageAggregate
+
+      - uses: actions/upload-artifact@v1
+        with:
+          name: Coverage Report
+          path: target/*/scoverage-report
+
+      - name: Delete js targets
+        continue-on-error: true
+        run: |
+          rm -rf **/js/target
+          rm -rf **/.js/target
+
+      - name: Multi-Jvm Tests
+        run: sbt integration/multi-jvm:test
+
+      - name: Github Release
+        run: sbt -Dprod.publish=true githubRelease
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+
+      - name: Docs Publish
+        run: |
+          echo 'echo $RELEASE_TOKEN' > /tmp/.git-askpass
+          chmod +x /tmp/.git-askpass
+          git config --global user.email "actions@github.com"
+          git config --global user.name "Github Action"
+          sbt -Dprod.publish=true clean ghpagesPushSite
+        env:
+          RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          GIT_ASKPASS: /tmp/.git-askpass
+
+      - name: Build Status
+        if: always()
+        id: status
+        run: |
+          if [[ ${{job.status}} == Success ]]
+          then
+          echo ::set-output name=title::'SUCCESS'
+          echo ::set-output name=color::'#00FF00'
+          else
+          echo ::set-output name=title::'FAILURE'
+          echo ::set-output name=color::'#FF0000'
+          fi
+
+      - name: Notify slack
+        if: always()
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        uses: pullreminders/slack-action@master
+        with:
+          args: '{\"channel\":\"#csw-prod-release\", \"attachments\": [ { \"title\":\"${{ steps.status.outputs.title }}\", \"text\": \"[ ${{ github.event.repository.name }} ] : [ ${{ github.workflow }} ] : [ ${{ github.ref }} ] \n https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\", \"color\": \"${{ steps.status.outputs.color }}\" } ]}'

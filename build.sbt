@@ -7,7 +7,7 @@ val MaybeCoverage: Plugins = if (enableCoverage) Coverage else Plugins.empty
 
 val jsTestArg = testOptions in Test := Seq(Tests.Argument("-oDF"))
 
-docsRepo in ThisBuild := "git@github.com:tmtsoftware/tmtsoftware.github.io.git"
+docsRepo in ThisBuild := "https://github.com/tmtsoftware/tmtsoftware.github.io.git"
 docsParentDir in ThisBuild := "csw"
 gitCurrentRepo in ThisBuild := "https://github.com/tmtsoftware/csw"
 
