@@ -74,7 +74,7 @@ public class JSampleHcdTest extends JUnitSuite {
         subscriber.subscribeCallback(Set.of(counterEventKey), subscriptionEventList::add);
 
         // Sleep for 5 seconds, to allow HCD to publish events
-        Thread.sleep(5000);
+        Thread.sleep(6000);
 
         // Event publishing period is 2 seconds.
         // Expecting 4 events: first event on subscription (-1)
