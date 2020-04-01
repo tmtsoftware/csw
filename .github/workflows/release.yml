@@ -50,9 +50,7 @@ jobs:
 
       - name: Delete js targets
         continue-on-error: true
-        run: |
-          rm -rf **/js/target
-          rm -rf **/.js/target
+        run: find . -type d -regex ".*js/target.*" | xargs rm -rf
 
       - name: Multi-Jvm Tests
         run: sbt integration/multi-jvm:test

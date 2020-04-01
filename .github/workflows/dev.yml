@@ -91,6 +91,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: pullreminders/slack-action@master
+        continue-on-error: true
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         with:
@@ -102,6 +103,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: pullreminders/slack-action@master
+        continue-on-error: true
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         with:
@@ -113,6 +115,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: pullreminders/slack-action@master
+        continue-on-error: true
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         with:
