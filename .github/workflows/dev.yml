@@ -50,7 +50,7 @@ jobs:
       - uses: actions/upload-artifact@v1
         with:
           name: Coverage Report
-          path: target/*/scoverage-report
+          path: target/scala-2.13/scoverage-report
 
   multi-jvm-tests:
     runs-on: ubuntu-latest

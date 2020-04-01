@@ -6,7 +6,7 @@ on:
       - "v*"
 
 jobs:
-  unit-tests:
+  release:
     runs-on: ubuntu-latest
 
     steps:
@@ -46,7 +46,7 @@ jobs:
       - uses: actions/upload-artifact@v1
         with:
           name: Coverage Report
-          path: target/*/scoverage-report
+          path: target/scala-2.13/scoverage-report
 
       - name: Delete js targets
         continue-on-error: true
