@@ -1,13 +1,8 @@
 # Releasing
 
-## Prerequisites
+## Prerequisites (This is configured in `release.yml`)
 
-### Git
-
-* Make sure git authentication works on jenkins agent by running cmd: `ssh -vT git@github.com`
-
-### Node
-
+* Git authentication works by running cmd: `ssh -vT git@github.com`
 * Node is installed
 * npm module `junit-merge` is installed (for merging multiple xml test reports into one)
 * npm module `junit-viewer` is installed (for generating html test report from merged xml)
@@ -22,13 +17,13 @@
 ### csw
 
 1. Update release notes (`notes/<version>.markdown`) in `csw` repo and link the migration guide
- **Note** - The version in `notes` should be of format `v1.0.0` but while triggering the pipeline build parameter should be of format `1.0.0`
+ **Note** - The version in `notes` should be of format `v1.0.0`
 1. Update top-level `CHANGELOG.md`
 1. Update top-level `README.md`
 1. Bump up the `csw-contract` version (if needed)
 1. Exclude projects from `build.sbt` which you do not want to release
-1. Remove targets of newly added js projects in jenkins prod file (if needed)
-1. Run `csw-prod` pipeline by providing `VERSION` number
+1. Run `release.sh $VERSION$` script by providing version number argument (This triggers release workflow)
+    **Note:** `PROD=true` environment varibale needs to be set before running `release.sh`
 
 ### csw.g8
 
@@ -45,5 +40,3 @@ Refer to **RELEASING.md** in `esw` repo.
 ### Release csw-shell
 
 Refer **RELEASING.md** of `csw-shell` repo.
-
-#### Note - `VERSION` tag is version number with 'v' as prefix. For eg. `v0.0.0`
