@@ -17,7 +17,6 @@ import csw.location.helpers.{LSNodeSpec, NMembersAndSeed}
 import csw.location.server.http.MultiNodeHTTPLocationService
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.tmt.embedded_keycloak.KeycloakData._
-import org.tmt.embedded_keycloak.utils.Ports
 import org.tmt.embedded_keycloak.{EmbeddedKeycloak, KeycloakData, Settings => KeycloakSettings}
 
 import scala.concurrent.Await
@@ -51,14 +50,9 @@ class ConfigCliAuthTest(ignore: Int)
   private val defaultTimeout: FiniteDuration = 10.seconds
   private val serverTimeout: FiniteDuration  = 30.minutes
 
-  private val keycloakPort = 8081
-
   override def afterAll(): Unit = {
     super.afterAll()
     testFileUtils.deleteServerFiles()
-
-    //this will ensure that keycloak does not continue to run after a test failure due to any exception
-    Ports.stop(keycloakPort)
   }
 
   test("should upload, update, get and set active version of configuration files | DEOPSCSW-43") {
@@ -134,8 +128,7 @@ class ConfigCliAuthTest(ignore: Int)
       try {
         System.setIn(stream)
         runner.login(Options(console = true))
-      }
-      finally {
+      } finally {
         System.setIn(stdIn)
       }
 
