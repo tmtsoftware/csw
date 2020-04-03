@@ -131,20 +131,3 @@ Mocks are used so that unit tests can be written independent of dependencies.
 ScalaTest comes with the [MockitoSugar](http://www.scalatest.org/user_guide/testing_with_mock_objects#mockito) trait which provides some basic syntax sugar for Mockito.
 
 For example: [ContainerBehaviorTest.scala]($github.base_url$/csw-framework/src/test/scala/csw/framework/internal/container/ContainerBehaviorTest.scala)
-
-@@@ note { title=Note }
-
-The [csw-prod](http://ec2-35-154-215-191.ap-south-1.compute.amazonaws.com:8080/job/csw-prod/) pipeline is responsible for following tasks:
-
-- build and run `csw` tests
-- publish binaries to bintray
-- publish paradox documentation
-- publish apps and release notes to Github releases
-
-@@@
-
-```
-curl -G '$REMOTE_JENKINS_URL/job/$JOB_NAME/buildWithParameters' \
-    --data-urlencode token=$RELEASE_TOKEN \
-    --data-urlencode CSW_VERSION=$CSW_VERSION
-```

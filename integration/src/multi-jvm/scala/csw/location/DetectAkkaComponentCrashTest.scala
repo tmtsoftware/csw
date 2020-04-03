@@ -23,7 +23,6 @@ class DetectAkkaComponentCrashTestMultiJvmNode2 extends DetectAkkaComponentCrash
 class DetectAkkaComponentCrashTestMultiJvmNode3 extends DetectAkkaComponentCrashTest(0, "cluster")
 
 /**
- * This test is running as a part of jenkins master-slave setup forming three nodes cluster. (seed: running on jenkins master, member1: running on jenkins slave, member2: running on jenkins slave)
  * This test exercises below steps :
  * 1. Registering akka connection on member1 node
  * 2. seed(master) and member2 is tracking a akka connection which is registered on slave (member1)
