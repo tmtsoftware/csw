@@ -113,7 +113,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: kpritam/slack-job-status-action@v1
-          with:
-            job-status: Cancelled
-            slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
-            channel: csw-build
+        with:
+          job-status: Cancelled
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+          channel: csw-build
