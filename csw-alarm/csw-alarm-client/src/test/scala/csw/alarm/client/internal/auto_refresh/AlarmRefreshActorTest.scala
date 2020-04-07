@@ -87,7 +87,7 @@ class AlarmRefreshActorTest
 
     val actor = spawn(
       Behaviors.withTimers[AutoRefreshSeverityMessage](t =>
-        AlarmRefreshActor.behavior(t, (key, _) => Future { queue.enqueue(key); Done }, 5.seconds)
+        AlarmRefreshActor.behavior(t, (key, _) => { queue.enqueue(key); Future.successful(Done) }, 5.seconds)
       )
     )
 
