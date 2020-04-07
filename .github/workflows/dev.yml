@@ -90,33 +90,30 @@ jobs:
     if: success()
     runs-on: ubuntu-latest
     steps:
-      - uses: pullreminders/slack-action@master
-        continue-on-error: true
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      - uses: kpritam/slack-job-status-action@v1
         with:
-          args: '{\"channel\":\"#csw-build\", \"attachments\": [ { \"title\":\"SUCCESS\", \"text\": \"[ ${{ github.event.repository.name }} ] : [ ${{ github.workflow }} ] : [ ${{ github.ref }} ] \n https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\", \"color\": \"#00FF00\" } ]}'
+          job-status: Success
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+          channel: csw-build
 
   slack-failure:
     needs: [unit-tests, multi-jvm-tests]
     if: failure()
     runs-on: ubuntu-latest
     steps:
-      - uses: pullreminders/slack-action@master
-        continue-on-error: true
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      - uses: kpritam/slack-job-status-action@v1
         with:
-          args: '{\"channel\":\"#csw-build\", \"attachments\": [ { \"title\":\"FAILURE\", \"text\": \"[ ${{ github.event.repository.name }} ] : [ ${{ github.workflow }} ] : [ ${{ github.ref }} ] \n https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\", \"color\": \"#FF0000\" } ]}'
+          job-status: Failure
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+          channel: csw-build
 
   slack-cancelled:
     needs: [unit-tests, multi-jvm-tests]
     if: cancelled()
     runs-on: ubuntu-latest
     steps:
-      - uses: pullreminders/slack-action@master
-        continue-on-error: true
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-        with:
-          args: '{\"channel\":\"#csw-build\", \"attachments\": [ { \"title\":\"CANCELLED\", \"text\": \"[ ${{ github.event.repository.name }} ] : [ ${{ github.workflow }} ] : [ ${{ github.ref }} ] \n https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\", \"color\": \"#EE6F47\" } ]}'
+      - uses: kpritam/slack-job-status-action@v1
+          with:
+            job-status: Cancelled
+            slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+            channel: csw-build

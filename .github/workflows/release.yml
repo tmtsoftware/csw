@@ -71,23 +71,11 @@ jobs:
           RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
           GIT_ASKPASS: /tmp/.git-askpass
 
-      - name: Build Status
-        if: always()
-        id: status
-        run: |
-          if [[ ${{job.status}} == Success ]]
-          then
-          echo ::set-output name=title::'SUCCESS'
-          echo ::set-output name=color::'#00FF00'
-          else
-          echo ::set-output name=title::'FAILURE'
-          echo ::set-output name=color::'#FF0000'
-          fi
-
       - name: Notify slack
         if: always()
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-        uses: pullreminders/slack-action@master
+        continue-on-error: true
+        uses: kpritam/slack-job-status-action@v1
         with:
-          args: '{\"channel\":\"#csw-prod-release\", \"attachments\": [ { \"title\":\"${{ steps.status.outputs.title }}\", \"text\": \"[ ${{ github.event.repository.name }} ] : [ ${{ github.workflow }} ] : [ ${{ github.ref }} ] \n https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\", \"color\": \"${{ steps.status.outputs.color }}\" } ]}'
+          job-status: ${{ job.status }}
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+          channel: csw-prod-release
