@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-* The CSW software is build using [sbt](https://www.scala-sbt.org). 
+* The CSW software is build using [sbt](https://www.scala-sbt.org).
 Be sure to install the latest version and add it to your shell path.
 
 * This version of CSW also requires [Java-11](https://openjdk.java.net/projects/jdk/11/).
@@ -29,5 +29,3 @@ This puts the documentation under `target/site` with the entry point at `target/
 For more details on the sbt tasks, see the [online documentation](https://tmtsoftware.github.io/csw/1.0.0/commons/sbt-tasks.html).
 
 For information about making a CSW release, see [here](RELEASING.md).
-
-
