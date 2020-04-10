@@ -1,6 +1,5 @@
 # TMT Common Software (CSW)
 
-=========================
 ![dev](https://github.com/tmtsoftware/csw/workflows/dev/badge.svg)
 ![nightly](https://github.com/tmtsoftware/csw/workflows/nightly/badge.svg)
 
@@ -9,8 +8,6 @@ Common Software is the package of services and infrastructure software that inte
 See [here](https://tmtsoftware.github.io/csw/) for a detailed description of the CSW software.
 
 ## Public Release History
-
-----------------------
 
 | Date | Tag | Docs | Source | Download |
 |-----|-----|--------|-----|-----|
@@ -25,8 +22,6 @@ See [here](https://tmtsoftware.github.io/csw/) for a detailed description of the
 | 2015-11-18 | v0.2-PDR | [API](https://cdn.rawgit.com/tmtsoftware/csw/CSW-API-0.2-PDR/index.html) | [csw-0.2](https://github.com/tmtsoftware/csw/tree/v0.2-PDR)| Source: [tar.gz](https://github.com/tmtsoftware/csw/archive/v0.2-PDR.tar.gz), [zip](https://github.com/tmtsoftware/csw/archive/v0.2-PDR.zip), API Docs: [tar.gz](https://github.com/tmtsoftware/csw/archive/CSW-API-0.2-PDR.tar.gz), [zip](https://github.com/tmtsoftware/csw/archive/CSW-API-0.2-PDR.zip) |
 
 ## Pre-Release History
-
-----------------------
 
 | Date | Tag | Docs | Source | Download |
 |-----|-----|--------|-----|-----|
@@ -54,8 +49,6 @@ You can find the Scala API documentation for CSW [here](https://tmtsoftware.gith
 The Java API docs are [here](https://tmtsoftware.github.io/csw/api/java/?/index.html).
 
 ## Build Instructions
-
-----------------------
 
 To build everything, including the documentation, run:
 
