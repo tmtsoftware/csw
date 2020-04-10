@@ -29,3 +29,8 @@ This puts the documentation under `target/site` with the entry point at `target/
 For more details on the sbt tasks, see the [online documentation](https://tmtsoftware.github.io/csw/1.0.0/commons/sbt-tasks.html).
 
 For information about making a CSW release, see [here](RELEASING.md).
+
+**Important Note:**
+Make sure you do not have spaces in the directory name or parent path where you are cloning `csw` repo.
+
+There is a known [issue](https://github.com/lightbend/paradox/issues/387) in `paradox` plugin when you have spaces in the path, plugin fails with illegal character in path exception.

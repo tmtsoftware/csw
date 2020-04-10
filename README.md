@@ -2,6 +2,7 @@
 
 ![dev](https://github.com/tmtsoftware/csw/workflows/dev/badge.svg)
 ![nightly](https://github.com/tmtsoftware/csw/workflows/nightly/badge.svg)
+![release](https://github.com/tmtsoftware/csw/workflows/release/badge.svg)
 
 Common Software is the package of services and infrastructure software that integrates the [TMT](http://www.tmt.org) software systems.
 
