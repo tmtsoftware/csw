@@ -2,19 +2,30 @@ package csw.location.server.http
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.server.Directives.handleRejections
+import akka.http.scaladsl.server.{RejectionHandler, Route}
+import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 import csw.location.server.internal.{ActorRuntime, Settings}
 
 import scala.concurrent.Future
-import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 
 class LocationHttpService(locationRoutes: Route, actorRuntime: ActorRuntime, settings: Settings) {
 
   implicit val classicSystem: ActorSystem = actorRuntime.classicSystem
 
+  private def applicationRoute: Route = {
+    val rejectionHandler = corsRejectionHandler.withFallback(RejectionHandler.default)
+    cors() {
+      handleRejections(rejectionHandler) {
+        locationRoutes
+      }
+    }
+  }
+
   def start(httpBindHost: String = "127.0.0.1"): Future[Http.ServerBinding] = {
+
     Http().bindAndHandle(
-      handler = cors()(locationRoutes),
+      handler = applicationRoute,
       interface = httpBindHost,
       port = settings.httpPort
     )
