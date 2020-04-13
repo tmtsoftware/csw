@@ -7,6 +7,7 @@ import csw.command.api.javadsl.ICommandService;
 import csw.command.client.CommandServiceFactory;
 import csw.event.api.javadsl.IEventService;
 import csw.event.api.javadsl.IEventSubscriber;
+import csw.event.api.javadsl.IEventSubscription;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.api.javadsl.JComponentType;
 import csw.location.api.models.AkkaLocation;
@@ -64,22 +65,27 @@ public class JSampleHcdTest extends JUnitSuite {
 
     //#subscribe
     @Test
-    public void testShouldBeAbleToSubscribeToHCDEvents() throws InterruptedException {
+    public void testShouldBeAbleToSubscribeToHCDEvents() throws InterruptedException, ExecutionException {
         EventKey counterEventKey = new EventKey(Prefix.apply("csw.samplehcd"), new EventName("HcdCounter"));
         Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter", JUnits.NoUnits);
         IEventService eventService = testKit.jEventService();
         IEventSubscriber subscriber = eventService.defaultSubscriber();
 
         ArrayList<Event> subscriptionEventList = new ArrayList<>();
-        subscriber.subscribeCallback(Set.of(counterEventKey), subscriptionEventList::add);
+        IEventSubscription subscription = subscriber.subscribeCallback(Set.of(counterEventKey), event -> {
+            // discard invalid event
+            if (!event.isInvalid()) {
+                subscriptionEventList.add(event);
+            }
+        });
+        subscription.ready().get();
 
         // Sleep for 5 seconds, to allow HCD to publish events
-        Thread.sleep(6000);
+        Thread.sleep(5000);
 
         // Event publishing period is 2 seconds.
-        // Expecting 4 events: first event on subscription (-1)
-        // and 3 more events 1, 2, and 3.
-        Assert.assertEquals(4, subscriptionEventList.size());
+        // Expecting 3 events
+        Assert.assertEquals(3, subscriptionEventList.size());
 
         // extract counter values to a List for comparison
         List<Integer> counterList = subscriptionEventList.stream()
@@ -97,14 +103,14 @@ public class JSampleHcdTest extends JUnitSuite {
         // so we don't know what the first value will be,
         // but we know we should get three consecutive numbers
         int counter0 = counterList.get(0);
-        List<Integer> expectedCounterList = Arrays.asList(counter0, 1, 2, 3);
+        List<Integer> expectedCounterList = Arrays.asList(counter0, counter0 + 1, counter0 + 2);
 
         Assert.assertEquals(expectedCounterList, counterList);
     }
     //#subscribe
 
     //#submitAndWait
-    private ActorSystem<SpawnProtocol.Command> typedActorSystem = testKit.actorSystem();
+    private final ActorSystem<SpawnProtocol.Command> typedActorSystem = testKit.actorSystem();
 
     // DEOPSCSW-39: examples of Location Service
     @Test
@@ -112,19 +118,19 @@ public class JSampleHcdTest extends JUnitSuite {
 
         // Construct Setup command
         Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime", JUnits.millisecond);
-        Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L);
+        Parameter<Long> sleepTimeParam = sleepTimeKey.set(1000L);
 
         Setup setupCommand = new Setup(Prefix.apply(JSubsystem.CSW, "move"), new CommandName(("sleep")), Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
 
-        Timeout commandResponseTimeout = new Timeout(10, TimeUnit.SECONDS);
+        Timeout commandResponseTimeout = new Timeout(5, TimeUnit.SECONDS);
 
         AkkaConnection connection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.CSW, "samplehcd"), JComponentType.HCD));
         ILocationService locationService = testKit.jLocationService();
-        AkkaLocation location = locationService.resolve(connection, Duration.ofSeconds(10)).get().orElseThrow();
+        AkkaLocation location = locationService.resolve(connection, Duration.ofSeconds(5)).get().orElseThrow();
 
         ICommandService hcd = CommandServiceFactory.jMake(location, typedActorSystem);
 
-        CommandResponse.SubmitResponse result = hcd.submitAndWait(setupCommand, commandResponseTimeout).get(10, TimeUnit.SECONDS);
+        CommandResponse.SubmitResponse result = hcd.submitAndWait(setupCommand, commandResponseTimeout).get(5, TimeUnit.SECONDS);
         Assert.assertTrue(result instanceof CommandResponse.Completed);
     }
     //#submitAndWait

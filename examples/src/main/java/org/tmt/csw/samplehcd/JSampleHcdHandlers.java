@@ -36,10 +36,10 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
  */
 public class JSampleHcdHandlers extends JComponentHandlers {
 
-    private JCswContext cswCtx;
-    private ILogger log;
-    private ActorContext<TopLevelActorMessage> actorContext;
-    private ActorRef<WorkerCommand> workerActor;
+    private final JCswContext cswCtx;
+    private final ILogger log;
+    private final ActorContext<TopLevelActorMessage> actorContext;
+    private final ActorRef<WorkerCommand> workerActor;
 
 
     JSampleHcdHandlers(ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
