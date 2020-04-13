@@ -84,7 +84,7 @@ lazy val multiJvmProjects: Seq[ProjectReference] = Seq(
 /* ================= Root Project ============== */
 lazy val `csw` = project
   .in(file("."))
-  .enablePlugins(NoPublish, UnidocSitePlugin, GithubPublishPlugin, GitBranchPrompt, GithubRelease, CoursierPlugin, ContractPlugin)
+  .enablePlugins(NoPublish, UnidocSitePlugin, GithubPublishPlugin, GitBranchPrompt, GithubRelease, ContractPlugin)
   .disablePlugins(BintrayPlugin)
   .aggregate(aggregatedProjects: _*)
   .settings(DocSettings.makeSiteMappings(docs))
@@ -93,7 +93,6 @@ lazy val `csw` = project
   .settings(Settings.multiJvmTestTask(multiJvmProjects))
   .settings(GithubRelease.githubReleases(githubReleases))
   .settings(
-    bootstrap in Coursier := CoursierPlugin.bootstrapTask(githubReleases).value,
     generateContract := ContractPlugin.generate(`csw-contract`).value
   )
 

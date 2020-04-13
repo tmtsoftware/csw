@@ -2,7 +2,6 @@ package csw.alarm.client.internal.configparser
 import com.typesafe.config.ConfigFactory
 import csw.alarm.api.exceptions.ConfigParseException
 import csw.alarm.client.internal.helpers.AlarmTestData
-import csw.commons.tagobjects.FileSystemSensitive
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 
@@ -20,10 +19,7 @@ class ConfigParserTest extends AnyFunSuite with Matchers with AlarmTestData {
     actualAlarmMetadataSet.alarms shouldEqual expectedAlarmMetadataSet
   }
 
-  test(
-    "should throw Exception while parsing invalid alarms metadata config file | DEOPSCSW-451, DEOPSCSW-452",
-    FileSystemSensitive
-  ) {
+  test("should throw Exception while parsing invalid alarms metadata config file | DEOPSCSW-451, DEOPSCSW-452") {
     val config = ConfigFactory.parseResources("test-alarms/invalid-alarms.conf")
 
     val parseException = the[ConfigParseException] thrownBy ConfigParser.parseAlarmMetadataSet(config)
