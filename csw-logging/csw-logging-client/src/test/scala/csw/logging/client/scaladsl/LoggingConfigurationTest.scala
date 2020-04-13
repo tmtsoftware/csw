@@ -98,7 +98,7 @@ class LoggingConfigurationTest extends AnyFunSuite with Matchers with BeforeAndA
 
   }
 
-  def doLogging() = {
+  private def doLogging(): Unit = {
     log.info(sampleLogMessage)
     log.debug(sampleLogMessage)
   }
@@ -135,7 +135,7 @@ class LoggingConfigurationTest extends AnyFunSuite with Matchers with BeforeAndA
     // Reading common logger file
     val fileLogBuffer = FileUtils.read(testLogFilePathWithServiceName)
 
-    testLogConfiguration(fileLogBuffer, true, expectedTimestamp)
+    testLogConfiguration(fileLogBuffer, headersEnabled = true, expectedTimestamp)
 
     // clean up
     Await.result(loggingSystem.stop, 5.seconds)
@@ -366,7 +366,7 @@ class LoggingConfigurationTest extends AnyFunSuite with Matchers with BeforeAndA
     }
     loggingSystem.getAppenders shouldBe List(StdOutAppender)
 
-    val expectedOneLineLog = " INFO   (LoggingConfigurationTest.scala 104) - Sample log message"
+    val expectedOneLineLog = " INFO   (LoggingConfigurationTest.scala 102) - Sample log message"
 
     val (timestamp, message) = os.toString.trim.splitAt(24)
 

@@ -6,19 +6,18 @@ import org.keycloak.authorization.client.{AuthorizationDeniedException, AuthzCli
 import org.keycloak.representations.idm.authorization.AuthorizationResponse
 import org.mockito.MockitoSugar
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.time.{Seconds, Span}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationDouble
-import org.scalatest.funsuite.AnyFunSuite
-import org.scalatest.matchers.should.Matchers
 
 // DEOPSCSW-558: SPIKE: Token containing user info and roles
 // DEOPSCSW-578: Programming Interface for accessing userinfo
 class RPTTest extends AnyFunSuite with MockitoSugar with Matchers with ScalaFutures {
 
-  implicit override val patienceConfig: PatienceConfig = PatienceConfig(Span(1, Seconds), Span(1, Seconds))
+  implicit override val patienceConfig: PatienceConfig = PatienceConfig(5.seconds, 100.millis)
 
   test("should create accessToken | DEOPSCSW-558, DEOPSCSW-578") {
     val authzClient           = mock[AuthzClient]
@@ -63,7 +62,7 @@ class RPTTest extends AnyFunSuite with MockitoSugar with Matchers with ScalaFutu
     val rptStr =
       "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJudHRFLUFaRGxhTThYdWt6QlhXWnJKYkFPNDRwM1pSSUFWWDVWQXpOQlMwIn0.eyJqdGkiOiJmNDkzZmMzOC03MzVhLTRjM2QtYTJlNy01OTI4ZThhOGUwYzEiLCJleHAiOjE1NDM0NzU1MDcsIm5iZiI6MCwiaWF0IjoxNTQzNDc0OTA3LCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvYXV0aC9yZWFsbXMvZXhhbXBsZSIsImF1ZCI6WyJleGFtcGxlLWFwcCIsImV4YW1wbGUtc2VydmVyIl0sInN1YiI6IjI0YzBhZTc4LWQyZDMtNDk1NS1iNzFmLWY2ZTZjZjdkZWE3OCIsInR5cCI6IkJlYXJlciIsImF6cCI6ImV4YW1wbGUtYXBwIiwiYXV0aF90aW1lIjowLCJzZXNzaW9uX3N0YXRlIjoiY2YwM2Y4MDUtMWEwMy00NWRlLWE5NmEtYTY4Nzk2MDJjODkzIiwiYWNyIjoiMSIsImFsbG93ZWQtb3JpZ2lucyI6W10sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJvZmZsaW5lX2FjY2VzcyIsInVtYV9hdXRob3JpemF0aW9uIiwiZXhhbXBsZS1hZG1pbi1yb2xlIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiZXhhbXBsZS1zZXJ2ZXIiOnsicm9sZXMiOlsicGVyc29uLXJvbGUiXX0sImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sImF1dGhvcml6YXRpb24iOnsicGVybWlzc2lvbnMiOlt7InNjb3BlcyI6WyJkZWxldGUiXSwicnNpZCI6ImYxZDQ1MTRkLTRiZmItNDhlMi05NDQ4LWY5MmE5NGZmY2E0ZCIsInJzbmFtZSI6InBlcnNvbiJ9LHsicnNpZCI6ImU3MGNjMDhiLTVlYWQtNDIyOC1hZmIzLWE3NTUwM2MxYmYzNyIsInJzbmFtZSI6IkRlZmF1bHQgUmVzb3VyY2UifV19LCJzY29wZSI6InByb2ZpbGUgZW1haWwiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsIm5hbWUiOiJ0ZXN0LXVzZXIiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJ0ZXN0LXVzZXIiLCJnaXZlbl9uYW1lIjoidGVzdC11c2VyIn0.hJHMycSHTGNoSREX3yhw0akxM59j4yCUN_gLfdkwWyvvpWoPoSL4zrkKk7xwO6C9NeyfjZKYTlBvVG7hV-XQnQhT9Oq7zTQrniv0vDSkna8ldkevgNnVFIJ-dMEL0VfFd0PrPSzHRWJHR_3yOE-nZ3UvJde2m0E-OpQAx_qjHZN66A6O2KkURP2hB4lg_N0AyizjVpLwAGDKksBGsn0SPeohFE8r6R7xbcu8__4OJTA_WKHppJeO4WtY0f9zGyZXi6wtNO0lHCerfLtBNJJFdrVkIpRGjNgsQHBe_gJJ0Cm-wxf_8A6CFP7qqKIpVlVEClScBJHLIWq-mieQxbT7hw"
 
-    val expectedPRT = AccessToken(
+    val expectedRPT = AccessToken(
       value = rptStr,
       sub = Option("24c0ae78-d2d3-4955-b71f-f6e6cf7dea78"),
       iat = Option(1543474907),
@@ -95,7 +94,7 @@ class RPTTest extends AnyFunSuite with MockitoSugar with Matchers with ScalaFutu
     when(authorizationResource.authorize()).thenReturn(authorizationResponse)
     when(authorizationResponse.getToken).thenReturn(rptStr)
 
-    rpt.create(tokenStr).futureValue shouldEqual Right(expectedPRT)
+    rpt.create(tokenStr).futureValue shouldBe Right(expectedRPT)
   }
 
   test("should fail for creating accessToken | DEOPSCSW-558, DEOPSCSW-578") {
