@@ -27,9 +27,7 @@ class PathValidatorTest extends AnyFunSuite with Matchers {
       "/invalidpath/sample>.txt"
     )
 
-    paths.foreach { path =>
-      PathValidator.isValid(path) shouldBe false
-    }
+    paths.foreach { path => PathValidator.isValid(path) shouldBe false }
   }
 
   test("should return true for valid file path | DEOPSCSW-47, DEOPSCSW-135") {

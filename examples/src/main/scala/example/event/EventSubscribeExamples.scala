@@ -65,8 +65,7 @@ class EventSubscribeExamples(eventService: EventService, hcd: AkkaLocation)(impl
 
       subscriber
         .subscribe(Set(EventKey(hcd.prefix, EventName("filter_wheel"))))
-        .to(Sink.foreach { event => /*do something*/
-        })
+        .to(Sink.foreach { event => /*do something*/ })
         .run()
     }
   //#with-source

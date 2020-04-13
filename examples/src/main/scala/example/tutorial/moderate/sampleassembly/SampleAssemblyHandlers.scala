@@ -187,9 +187,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
   private def commandHCD(runId: Id, setup: Setup): Unit = {
     hcdCS match {
       case Some(cs) =>
-        cs.submitAndWait(setup).foreach { sr =>
-          commandResponseManager.updateCommand(sr.withRunId(runId))
-        }
+        cs.submitAndWait(setup).foreach { sr => commandResponseManager.updateCommand(sr.withRunId(runId)) }
       case None =>
         commandResponseManager.updateCommand(Error(runId, s"A needed HCD is not available: ${hcdConnection.componentId}"))
     }
@@ -202,9 +200,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
         cs.submit(s).map {
           case started: Started =>
             // Could do some work between started and queryFinal here
-            cs.queryFinal(started.runId).foreach { sr =>
-              commandResponseManager.updateCommand(sr.withRunId(runId))
-            }
+            cs.queryFinal(started.runId).foreach { sr => commandResponseManager.updateCommand(sr.withRunId(runId)) }
           case other =>
             commandResponseManager.updateCommand(other.withRunId(runId))
         }

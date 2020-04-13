@@ -153,7 +153,8 @@ class HealthServiceModuleTest
     testProbe.expectMessage(Ill)
     setSeverity(tromboneAxisLowLimitAlarmKey, Indeterminate).await
     testProbe.expectMessage(Bad)
-    testProbe.expectNoMessage(2.seconds) // on severity expire event, you should not receive health = Bad event as it is already in Bad status
+    // on severity expire event, you should not receive health = Bad event as it is already in Bad status
+    testProbe.expectNoMessage(2.seconds)
 
     setSeverity(tromboneAxisHighLimitAlarmKey, Warning).await
     testProbe.expectNoMessage(200.millis)
@@ -178,7 +179,8 @@ class HealthServiceModuleTest
     testProbe.expectMessage(Bad) // on subscription, current aggregated health will be calculated
 
     setSeverity(cpuExceededAlarmKey, Major).await
-    testProbe.expectNoMessage(100.millis) // outOfRangeOffloadAlarmKey is still disconnected, hence aggregated heath = Bad which means no change
+    // outOfRangeOffloadAlarmKey is still disconnected, hence aggregated heath = Bad which means no change
+    testProbe.expectNoMessage(100.millis)
 
     setSeverity(outOfRangeOffloadAlarmKey, Warning).await
     testProbe.expectMessage(Ill) // outOfRangeOffloadAlarmKey=Warning and cpuExceededAlarmKey=Major, hence aggregated heath = Ill
@@ -204,7 +206,8 @@ class HealthServiceModuleTest
     testProbe.expectMessage(Bad) // on subscription, current aggregated health will be calculated
 
     setSeverity(tromboneAxisLowLimitAlarmKey, Major).await
-    testProbe.expectNoMessage(100.millis) // tromboneAxisHighLimitAlarmKey is still disconnected, hence aggregated heath = Bad which means no change
+    // tromboneAxisHighLimitAlarmKey is still disconnected, hence aggregated heath = Bad which means no change
+    testProbe.expectNoMessage(100.millis)
 
     setSeverity(tromboneAxisHighLimitAlarmKey, Warning).await
     testProbe.expectMessage(Ill) //tromboneAxisHighLimitAlarmKey=Warning & tromboneAxisLowLimitAlarmKey=Major
@@ -274,7 +277,8 @@ class HealthServiceModuleTest
     testProbe.expectMessage(Bad) // on subscription, current aggregated health will be calculated
 
     setSeverity(cpuExceededAlarmKey, Okay).await
-    testProbe.expectNoMessage(100.millis) // outOfRangeOffloadAlarmKey is still disconnected, hence aggregated heath = Bad which means no change
+    // outOfRangeOffloadAlarmKey is still disconnected, hence aggregated heath = Bad which means no change
+    testProbe.expectNoMessage(100.millis)
 
     setSeverity(outOfRangeOffloadAlarmKey, Okay).await
     testProbe.expectMessage(Good)
@@ -300,7 +304,8 @@ class HealthServiceModuleTest
     getStatus(cpuExceededAlarmKey).await.shelveStatus shouldBe Shelved
 
     setSeverity(cpuExceededAlarmKey, Okay).await
-    testProbe.expectNoMessage(100.millis) // outOfRangeOffloadAlarmKey is still disconnected, hence aggregated heath = Bad which means no change
+    // outOfRangeOffloadAlarmKey is still disconnected, hence aggregated heath = Bad which means no change
+    testProbe.expectNoMessage(100.millis)
 
     setSeverity(outOfRangeOffloadAlarmKey, Okay).await
     testProbe.expectMessage(Good)

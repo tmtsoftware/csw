@@ -53,9 +53,7 @@ class ClusterSettingsTest extends AnyFunSuite with Matchers with BeforeAndAfterA
       ClusterSettings().onPort(port).joinLocal(portList(0), portList(1), portList(2), portList(3))
 
     clusterSettings.port shouldBe port
-    clusterSettings.seedNodes shouldBe portList.map { port =>
-      s"akka://${clusterSettings.clusterName}@$hostname:$port"
-    }
+    clusterSettings.seedNodes shouldBe portList.map { port => s"akka://${clusterSettings.clusterName}@$hostname:$port" }
   }
 
   test("cluster settings with custom values") {
@@ -66,9 +64,7 @@ class ClusterSettingsTest extends AnyFunSuite with Matchers with BeforeAndAfterA
 
     clusterSettings.interfaceName shouldBe Some("en0")
     clusterSettings.port shouldBe port
-    clusterSettings.seedNodes shouldBe ipList.map { hostname =>
-      s"akka://${clusterSettings.clusterName}@$hostname"
-    }
+    clusterSettings.seedNodes shouldBe ipList.map { hostname => s"akka://${clusterSettings.clusterName}@$hostname" }
   }
 
   test("cluster settings with system properties") {

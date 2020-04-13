@@ -57,9 +57,7 @@ private[event] class EventPublisherUtil(implicit actorSystem: ActorSystem[_]) {
       maybeOnError: Option[PublishFailure => Unit]
   ): Mat =
     source
-      .mapAsync(parallelism) { event =>
-        publishWithRecovery(event, publish, maybeOnError)
-      }
+      .mapAsync(parallelism) { event => publishWithRecovery(event, publish, maybeOnError) }
       .withAttributes(attributes)
       .to(Sink.ignore)
       .run()

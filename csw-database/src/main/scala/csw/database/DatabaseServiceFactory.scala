@@ -193,9 +193,7 @@ class DatabaseServiceFactory private[database] (actorSystem: ActorSystem[_], val
 
   private def toProperties(config: Config): Properties = {
     val properties = new Properties()
-    config.entrySet.forEach { e =>
-      properties.setProperty(e.getKey, config.getString(e.getKey))
-    }
+    config.entrySet.forEach { e => properties.setProperty(e.getKey, config.getString(e.getKey)) }
     properties
   }
 }

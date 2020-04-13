@@ -207,9 +207,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
         case _                               => throw HcdNotFoundException()
       }
 
-    eventualCommandService.foreach { commandService =>
-      hcd = commandService
-    }
+    eventualCommandService.foreach { commandService => hcd = commandService }
     // #resolve-hcd-and-create-commandservice
   }
 }

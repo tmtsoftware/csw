@@ -60,9 +60,7 @@ class LoggingConfigurationTest extends AnyFunSuite with Matchers with BeforeAndA
   override protected def afterAll(): Unit = outStream.close()
 
   def parse(str: String): Unit = {
-    str.split("\n").foreach { log =>
-      stdOutLogBuffer += Json.parse(log).as[JsObject]
-    }
+    str.split("\n").foreach { log => stdOutLogBuffer += Json.parse(log).as[JsObject] }
   }
 
   def testLogConfiguration(

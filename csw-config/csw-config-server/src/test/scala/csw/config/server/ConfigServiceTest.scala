@@ -373,7 +373,8 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
 
     val configFileHistories = configService.history(file).await
 
-    val expectedRecordedTimeSpread = now.toEpochMilli +- 100 //recorded time on server is within 100ms which is assumed to be worst case clock skew
+    // recorded time on server is within 100ms which is assumed to be worst case clock skew
+    val expectedRecordedTimeSpread = now.toEpochMilli +- 100
     configFileHistories.map(_.time.toEpochMilli).head shouldBe expectedRecordedTimeSpread
   }
 
@@ -389,7 +390,8 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
 
     val configFileHistories = configService.history(file).await
 
-    val expectedRecordedTimeSpread = now.toEpochMilli +- 100 //recorded time on server is within 100ms which is assumed to be worst case clock skew
+    // recorded time on server is within 100ms which is assumed to be worst case clock skew
+    val expectedRecordedTimeSpread = now.toEpochMilli +- 100
     configFileHistories.map(_.time.toEpochMilli).head shouldBe expectedRecordedTimeSpread
   }
 

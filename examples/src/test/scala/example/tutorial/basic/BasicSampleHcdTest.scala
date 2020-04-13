@@ -53,9 +53,7 @@ class BasicSampleHcdTest
     Thread.sleep(2000)
 
     val subscriptionEventList = mutable.ListBuffer[Event]()
-    subscriber.subscribeCallback(Set(counterEventKey), { ev =>
-      subscriptionEventList.append(ev)
-    })
+    subscriber.subscribeCallback(Set(counterEventKey), { ev => subscriptionEventList.append(ev) })
 
     // Sleep for 5 seconds, to allow HCD to publish events
     Thread.sleep(5000)

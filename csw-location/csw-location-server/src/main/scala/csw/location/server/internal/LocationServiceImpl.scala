@@ -199,8 +199,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
       )
       .mapMaterializedValue {
         //Subscribe materialized actorRef to the changes in connection so that above stream starts emitting messages
-        actorRef =>
-          replicator ! Replicator.Subscribe(service.Key, actorRef)
+        actorRef => replicator ! Replicator.Subscribe(service.Key, actorRef)
       }
 
     //Collect only the Changed events for this connection and transform it to location events.

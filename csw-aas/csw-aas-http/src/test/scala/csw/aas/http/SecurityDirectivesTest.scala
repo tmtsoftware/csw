@@ -43,9 +43,7 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
     when(authentication.authenticator).thenReturn(authenticator)
 
     val route: Route = post {
-      secure(CustomPolicy(_ => true)) { _ =>
-        complete("OK")
-      }
+      secure(CustomPolicy(_ => true)) { _ => complete("OK") }
     }
 
     Post("/").addHeader(validTokenWithPolicyMatchHeader) ~> route ~> check {
@@ -59,9 +57,7 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
     import securityDirectives._
 
     val route: Route = post {
-      secure(CustomPolicy(_ => false)) { _ =>
-        complete("OK")
-      }
+      secure(CustomPolicy(_ => false)) { _ => complete("OK") }
     }
 
     Post("/") ~> route ~> check {
@@ -86,9 +82,7 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = sGet(CustomPolicy(_ => true)) { _ =>
-      complete("OK")
-    }
+    val route: Route = sGet(CustomPolicy(_ => true)) { _ => complete("OK") }
 
     Get("/").addHeader(validTokenWithPolicyMatchHeader) ~> route ~> check {
       status shouldBe StatusCodes.OK
@@ -113,9 +107,7 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = sPost(RealmRolePolicy("admin")) { _ =>
-      complete("OK")
-    }
+    val route: Route = sPost(RealmRolePolicy("admin")) { _ => complete("OK") }
 
     Post("/").addHeader(validTokenWithRealmRoleHeader) ~> route ~> check {
       status shouldBe StatusCodes.OK
@@ -142,9 +134,7 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = sPut(PermissionPolicy("read")) { _ =>
-      complete("OK")
-    }
+    val route: Route = sPut(PermissionPolicy("read")) { _ => complete("OK") }
 
     Put("/").addHeader(validTokenWithPermissionHeader) ~> route ~> check {
       status shouldBe StatusCodes.OK
@@ -169,9 +159,7 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = sDelete(ClientRolePolicy("admin")) { _ =>
-      complete("OK")
-    }
+    val route: Route = sDelete(ClientRolePolicy("admin")) { _ => complete("OK") }
 
     Delete("/").addHeader(validTokenWithClientRoleHeader) ~> route ~> check {
       status shouldBe StatusCodes.OK
@@ -196,9 +184,7 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = sHead(ClientRolePolicy("admin")) { _ =>
-      complete("OK")
-    }
+    val route: Route = sHead(ClientRolePolicy("admin")) { _ => complete("OK") }
 
     Head("/").addHeader(validTokenWithClientRoleHeader) ~> route ~> check {
       status shouldBe StatusCodes.OK
@@ -214,9 +200,7 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = sPatch(CustomPolicy(_ => false)) { _ =>
-      complete("OK")
-    }
+    val route: Route = sPatch(CustomPolicy(_ => false)) { _ => complete("OK") }
 
     Patch("/") ~> route ~> check {
       rejection shouldBe a[AuthenticationFailedRejection]

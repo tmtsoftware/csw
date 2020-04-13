@@ -150,11 +150,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
 
   // ************************************************************************************************************
 
-  def behavior(): Behavior[String] = Behaviors.setup { ctx =>
-    Behaviors.receiveMessage { msg =>
-      Behaviors.same
-    }
-  }
+  def behavior(): Behavior[String]    = Behaviors.setup { ctx => Behaviors.receiveMessage { msg => Behaviors.same } }
   val typedActorRef: ActorRef[String] = context.system.spawn(behavior(), "typed-actor-ref")
 
   val assemblyConnection = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "assembly1"), ComponentType.Assembly))

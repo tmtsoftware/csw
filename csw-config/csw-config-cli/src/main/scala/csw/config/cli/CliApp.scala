@@ -7,9 +7,7 @@ import csw.config.cli.args.{ArgsParser, Options}
 // $COVERAGE-OFF$
 class CliApp(commandLineRunner: CommandLineRunner) {
   def start(name: String, args: Array[String]): Unit =
-    new ArgsParser(name).parse(args.toList).foreach { options =>
-      start(options)
-    }
+    new ArgsParser(name).parse(args.toList).foreach { options => start(options) }
 
   def start(options: Options): Any = {
     options.op match {

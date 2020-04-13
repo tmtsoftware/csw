@@ -51,9 +51,7 @@ class ConfigServiceRoute(
             head { // check if file exists - http://{{hostname}}:{{port}}/config/{{path}}
               idParam { id =>
                 complete {
-                  configService().exists(filePath, id).map { found =>
-                    if (found) StatusCodes.OK else StatusCodes.NotFound
-                  }
+                  configService().exists(filePath, id).map { found => if (found) StatusCodes.OK else StatusCodes.NotFound }
                 }
               }
             } ~
@@ -70,9 +68,7 @@ class ConfigServiceRoute(
               }
             } ~
             sDelete(ClientRolePolicy(AdminRole)) { token => // delete file - http://{{hostname}}:{{port}}/config/{{path}}?comment=abcd
-              commentParam { comment =>
-                complete(configService(token.userOrClientName).delete(filePath, comment).map(_ => Done))
-              }
+              commentParam { comment => complete(configService(token.userOrClientName).delete(filePath, comment).map(_ => Done)) }
             }
           } ~
           (prefix("active-config") & get & rejectEmptyResponse) { filePath =>
@@ -107,9 +103,7 @@ class ConfigServiceRoute(
             }
           } ~
           (path("list") & get) { // list all files based on file type i.e.'Normal' or 'Annex' and/or pattern if provided - http://{{hostname}}:{{port}}/list
-            (typeParam & patternParam) { (fileType, pattern) =>
-              complete(configService().list(fileType, pattern))
-            }
+            (typeParam & patternParam) { (fileType, pattern) => complete(configService().list(fileType, pattern)) }
           } ~
           (path("metadata") & get) { // fetch the metadata of config server - http://{{hostname}}:{{port}}/metadata
             complete(configService().getMetadata)

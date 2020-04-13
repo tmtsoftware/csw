@@ -40,9 +40,7 @@ class ConfigData private (val source: Source[ByteString, Any], val length: Long)
    */
   def toConfigObject(implicit system: ActorSystem[_]): Future[Config] = {
     import system.executionContext
-    toStringF.map { s =>
-      ConfigFactory.parseString(s)
-    }
+    toStringF.map { s => ConfigFactory.parseString(s) }
   }
 
   /**
@@ -75,9 +73,7 @@ class ConfigData private (val source: Source[ByteString, Any], val length: Long)
     import system.executionContext
     source
       .toMat(FileIO.toPath(path))(Keep.right)
-      .mapMaterializedValue { resultF =>
-        resultF.map(_ => path)
-      }
+      .mapMaterializedValue { resultF => resultF.map(_ => path) }
       .run()
   }
 

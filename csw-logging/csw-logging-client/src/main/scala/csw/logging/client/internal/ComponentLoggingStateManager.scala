@@ -25,9 +25,7 @@ private[logging] object ComponentLoggingStateManager {
         .getConfig("component-log-levels")
         .entrySet()
         .asScala
-        .map { entry =>
-          (entry.getKey, ComponentLoggingState(Level(entry.getValue.unwrapped().toString)))
-        }
+        .map { entry => (entry.getKey, ComponentLoggingState(Level(entry.getValue.unwrapped().toString))) }
         .toMap
         .map[Prefix, ComponentLoggingState] {
           case (k, v) => (Prefix(k), v)

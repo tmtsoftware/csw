@@ -16,24 +16,19 @@ class RomaineFactory(redisClient: RedisClient)(implicit val ec: ExecutionContext
   def redisAsyncApi[K: RomaineCodec, V: RomaineCodec](redisURIF: Future[RedisURI]): RedisAsyncApi[K, V] =
     new RedisAsyncApi(
       Async.async {
-        val redisURI = await(redisURIF)
-        val connectionF = init { () =>
-          redisClient.connectAsync(new RomaineRedisCodec[K, V], redisURI).toScala
-        }
+        val redisURI    = await(redisURIF)
+        val connectionF = init { () => redisClient.connectAsync(new RomaineRedisCodec[K, V], redisURI).toScala }
         await(connectionF).async()
       }
     )
 
   def redisSubscriptionApi[K: RomaineCodec, V: RomaineCodec](redisURIF: Future[RedisURI]): RedisSubscriptionApi[K, V] =
-    new RedisSubscriptionApi(
-      () =>
-        Async.async {
-          val redisURI = await(redisURIF)
-          val connectionF = init { () =>
-            redisClient.connectPubSubAsync(new RomaineRedisCodec[K, V], redisURI).toScala
-          }
-          await(connectionF).reactive()
-        }
+    new RedisSubscriptionApi(() =>
+      Async.async {
+        val redisURI    = await(redisURIF)
+        val connectionF = init { () => redisClient.connectPubSubAsync(new RomaineRedisCodec[K, V], redisURI).toScala }
+        await(connectionF).reactive()
+      }
     )
 
   private def init[T](conn: () => Future[T]): Future[T] = Future.unit.flatMap(_ => conn()).recover {

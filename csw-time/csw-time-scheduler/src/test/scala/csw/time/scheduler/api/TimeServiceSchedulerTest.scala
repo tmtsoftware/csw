@@ -131,9 +131,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
       testProbe.ref ! UTCTime.now()
     }
 
-    val times = testProbe.receiveMessages(6, 590.milli).map { t: UTCTime =>
-      t
-    }
+    val times = testProbe.receiveMessages(6, 590.milli).map { t: UTCTime => t }
 
     cancellable.cancel()
 
@@ -141,9 +139,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
     buffer shouldBe ArrayBuffer(0, 1, 2, 3, 4, 5)
 
     times.size shouldBe 6
-    buffer.foreach { i =>
-      times(i).value.toEpochMilli shouldBe (startTime.value.toEpochMilli + offset * i) +- jitter
-    }
+    buffer.foreach { i => times(i).value.toEpochMilli shouldBe (startTime.value.toEpochMilli + offset * i) +- jitter }
 
     system.terminate()
     Await.result(system.whenTerminated, 5.seconds)
@@ -178,9 +174,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
     buffer shouldBe ArrayBuffer(0, 1, 2, 3, 4, 5)
 
     times.size shouldBe 6
-    buffer.foreach { i =>
-      times(i).value.toEpochMilli shouldBe (startTime.value.toEpochMilli + offset * i) +- jitter
-    }
+    buffer.foreach { i => times(i).value.toEpochMilli shouldBe (startTime.value.toEpochMilli + offset * i) +- jitter }
 
     system.terminate()
     Await.result(system.whenTerminated, 5.seconds)
