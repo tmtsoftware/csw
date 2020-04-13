@@ -3,6 +3,7 @@ package example.tutorial.basic;
 import akka.util.Timeout;
 import csw.command.api.javadsl.ICommandService;
 import csw.command.client.CommandServiceFactory;
+import csw.logging.client.utils.Eventually;
 import csw.event.api.javadsl.IEventSubscriber;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.api.javadsl.JComponentType;

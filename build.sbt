@@ -181,7 +181,7 @@ lazy val `csw-location-server` = project
   .in(file("csw-location/csw-location-server"))
   .dependsOn(
     `csw-location-api`.jvm,
-    `csw-logging-client`,
+    `csw-logging-client` % "compile->compile;test->test",
     `csw-aas-http`,
     `csw-network-utils`,
     `csw-location-client` % Test,
@@ -618,7 +618,7 @@ lazy val examples = project
     `csw-location-server`,
     `csw-config-client`,
     `csw-aas-http`,
-    `csw-logging-client`,
+    `csw-logging-client` % "compile->compile;test->test",
     `csw-params`.jvm,
     `csw-database`,
     `csw-framework`,

@@ -1,10 +1,10 @@
 package csw.location.server.scaladsl
 
 import akka.actor.testkit.typed.scaladsl
-import akka.actor.typed.SpawnProtocol
+import akka.actor.typed
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.{PoisonPill, typed}
+import akka.actor.typed.{Behavior, SpawnProtocol}
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.testkit.TestProbe
 import csw.location.api.AkkaRegistrationFactory.make
@@ -198,7 +198,13 @@ class LocationServiceCompTest(mode: String)
   ) {
     val componentId = models.ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), HCD)
     val connection  = AkkaConnection(componentId)
-    val actorRef    = typedSystem.spawn(Behaviors.empty[Any], "my-actor-to-die")
+
+    val emptyBeh: Behavior[String] = Behaviors.receiveMessage {
+      case "Kill" => Behaviors.stopped
+      case _      => Behaviors.same
+    }
+
+    val actorRef = typedSystem.spawn(emptyBeh, "my-actor-to-die")
 
     locationService
       .register(make(connection, actorRef.toURI))
@@ -206,13 +212,9 @@ class LocationServiceCompTest(mode: String)
       .location
       .connection shouldBe connection
 
-    Thread.sleep(10)
+    locationService.list.await shouldBe List(make(connection, actorRef.toURI).location(Networks().hostname))
 
-    locationService.list.await shouldBe List(
-      make(connection, actorRef.toURI).location(Networks().hostname)
-    )
-
-    actorRef ! PoisonPill
+    actorRef ! "Kill"
 
     eventually(locationService.list.await shouldBe List.empty)
   }
