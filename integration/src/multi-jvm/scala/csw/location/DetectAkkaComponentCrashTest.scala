@@ -12,6 +12,8 @@ import csw.location.api.models._
 import csw.location.client.ActorSystemFactory
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.prefix.models.{Prefix, Subsystem}
+import org.scalatest.OptionValues
+import org.scalatest.concurrent.Eventually
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -34,17 +36,23 @@ class DetectAkkaComponentCrashTestMultiJvmNode3 extends DetectAkkaComponentCrash
 **/
 // CSW-81: Graceful removal of component
 class DetectAkkaComponentCrashTest(ignore: Int, mode: String)
-    extends helpers.LSNodeSpec(config = new helpers.TwoMembersAndSeed, mode) {
+    extends helpers.LSNodeSpec(config = new helpers.TwoMembersAndSeed, mode)
+    with Eventually
+    with OptionValues {
 
   import config._
+
+  implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 100.millis)
 
   // DEOPSCSW-15: Spike jmDNS/CRDT perf
   // DEOPSCSW-35: CRDT detects comp/service crash
   // DEOPSCSW-36: Track a crashed service/comp
-  test("akka component running on one node should detect if other component running on another node crashes | DEOPSCSW-15, DEOPSCSW-35, DEOPSCSW-36, DEOPSCSW-429") {
+  test(
+    "akka component running on one node should detect if other component running on another node crashes | DEOPSCSW-15, DEOPSCSW-35, DEOPSCSW-36, DEOPSCSW-429"
+  ) {
 
     val akkaConnection = AkkaConnection(ComponentId(Prefix(Subsystem.Container, "Container1"), ComponentType.Container))
-    val httpConnection = HttpConnection(models.ComponentId(Prefix(Subsystem.Container, "Container1"), ComponentType.Container))
+    val httpConnection = HttpConnection(ComponentId(Prefix(Subsystem.Container, "Container1"), ComponentType.Container))
 
     runOn(seed) {
 
@@ -57,7 +65,7 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String)
       Thread.sleep(2000)
 
       Await.result(testConductor.exit(member1, 0), 5.seconds)
-      locationService.find(httpConnection).await.isDefined shouldBe true
+      locationService.find(httpConnection).await.value.connection shouldBe httpConnection
       enterBarrier("after-crash")
 
       // Story CSW-15 requires crash detection within 10 seconds with a goal of 5 seconds.
@@ -69,8 +77,12 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String)
         }
       }
 
-      locationService.list.await.size shouldBe 1
-      locationService.find(httpConnection).await.isDefined shouldBe false
+      // at this stage, probe has received LocationRemoved event but clusters local cache might not have updated by this time
+      // hence asserting in eventually block
+      eventually {
+        locationService.list.await.size shouldBe 1
+        locationService.find(httpConnection).await shouldBe None
+      }
 
       // clean up
       switch.cancel()
