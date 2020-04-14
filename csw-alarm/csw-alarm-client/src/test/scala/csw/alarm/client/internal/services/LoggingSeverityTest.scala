@@ -1,12 +1,15 @@
 package csw.alarm.client.internal.services
+
 import com.typesafe.config.ConfigFactory
 import csw.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
 import csw.alarm.models.AlarmSeverity
-import csw.logging.models.Level.DEBUG
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.utils.TestAppender
+import csw.logging.models.Level.DEBUG
+import org.scalatest.concurrent.Eventually
+import org.scalatest.time.SpanSugar.convertDoubleToGrainOfTime
 import play.api.libs.json.{JsObject, Json}
 
 import scala.collection.mutable
@@ -16,11 +19,14 @@ class LoggingSeverityTest
     extends AlarmServiceTestSetup
     with SeverityServiceModule
     with MetadataServiceModule
-    with StatusServiceModule {
+    with StatusServiceModule
+    with Eventually {
 
   private val logBuffer                    = mutable.Buffer.empty[JsObject]
   private val testAppender                 = new TestAppender(x => logBuffer += Json.parse(x.toString).as[JsObject])
   private val loggingSystem: LoggingSystem = new LoggingSystem("logging", "version", "hostName", actorSystem)
+
+  implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 100.millis)
 
   override protected def beforeEach(): Unit = {
     val validAlarmsConfig = ConfigFactory.parseResources("test-alarms/more-alarms.conf")
@@ -37,9 +43,9 @@ class LoggingSeverityTest
 
     setCurrentSeverity(tromboneAxisLowLimitAlarmKey, AlarmSeverity.Critical).await
 
-    Thread.sleep(100)
-
-    val messages = logBuffer.map(log => log.getString("message")).toSet
-    messages should contain allElementsOf Set(expectedMessage1, expectedMessage2)
+    eventually {
+      val messages = logBuffer.map(_.getString("message")).toSet
+      messages should contain allElementsOf Set(expectedMessage1, expectedMessage2)
+    }
   }
 }
