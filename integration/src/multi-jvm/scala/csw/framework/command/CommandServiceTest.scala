@@ -25,6 +25,7 @@ import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.prefix.models.{Prefix, Subsystem}
 import io.lettuce.core.RedisClient
 import org.mockito.MockitoSugar
+import org.scalatest.concurrent.Eventually
 
 import scala.async.Async._
 import scala.concurrent.duration.DurationDouble
@@ -82,7 +83,8 @@ class CommandServiceTestMultiJvm3 extends CommandServiceTest(0)
 class CommandServiceTest(ignore: Int)
     extends LSNodeSpec(config = new TwoMembersAndSeed, mode = "http")
     with MultiNodeHTTPLocationService
-    with MockitoSugar {
+    with MockitoSugar
+    with Eventually {
 
   import config._
   import csw.common.components.command.ComponentStateForCommand._
@@ -90,7 +92,11 @@ class CommandServiceTest(ignore: Int)
   private implicit val ec: ExecutionContext = typedSystem.executionContext
   private implicit val timeout: Timeout     = 5.seconds
 
-  test("sender of command should receive appropriate responses | DEOPSCSW-207, DEOPSCSW-234, DEOPSCSW-222, DEOPSCSW-228, DEOPSCSW-217, DEOPSCSW-201, DEOPSCSW-212, DEOPSCSW-202, DEOPSCSW-313, DEOPSCSW-623, DEOPSCSW-208, DEOPSCSW-225, DEOPSCSW-224, DEOPSCSW-321, DEOPSCSW-233, DEOPSCSW-317, DEOPSCSW-229") {
+  implicit private val patience: PatienceConfig = PatienceConfig(5.seconds, 100.millis)
+
+  test(
+    "sender of command should receive appropriate responses | DEOPSCSW-207, DEOPSCSW-234, DEOPSCSW-222, DEOPSCSW-228, DEOPSCSW-217, DEOPSCSW-201, DEOPSCSW-212, DEOPSCSW-202, DEOPSCSW-313, DEOPSCSW-623, DEOPSCSW-208, DEOPSCSW-225, DEOPSCSW-224, DEOPSCSW-321, DEOPSCSW-233, DEOPSCSW-317, DEOPSCSW-229"
+  ) {
 
     runOn(seed) {
       // cluster seed is running on jvm-1
@@ -151,9 +157,9 @@ class CommandServiceTest(ignore: Int)
       async {
         await(invalidCommandF) match {
           case Completed(_, _) =>
-            // Do Completed thing
+          // Do Completed thing
           case Invalid(_, _) =>
-            //issue shouldBe a[Invalid]
+          //issue shouldBe a[Invalid]
           case other =>
             // Unexpected result
             log.error(s"Some other response: $other")
@@ -211,10 +217,10 @@ class CommandServiceTest(ignore: Int)
         await(assemblyCmdService.query(longRunningRunId)) match {
           case Started(runId) =>
             runId shouldEqual longRunningRunId
-            // happy case - no action needed
-            // Do some other work
+          // happy case - no action needed
+          // Do some other work
           case a =>
-            // log.error. This indicates that the command probably failed to start.
+          // log.error. This indicates that the command probably failed to start.
         }
 
         // Now wait for completion and result
@@ -250,7 +256,7 @@ class CommandServiceTest(ignore: Int)
       // #queryFinal
 
       // #queryFinalWithSubmitAndWait
-      val encoderValue:Future[Option[Int]] = async {
+      val encoderValue: Future[Option[Int]] = async {
         // The following submit is made without saving the Future!
         val runId = await(assemblyCmdService.submitAndWait(longRunningSetup)).runId
 
@@ -342,10 +348,9 @@ class CommandServiceTest(ignore: Int)
       // in the command parameter "encoder". Callback will store value into cstate.
       hcdCmdService.oneway(currStateSetup)
 
-      // Wait for a bit for callback
-      Thread.sleep(100)
+      // Eventually current state callback will get invoked when hcd publish its state
       // Test to see if value was received
-      cstate(encoder).head shouldBe expectedEncoderValue
+      eventually(cstate(encoder).head shouldBe expectedEncoderValue)
 
       // Unsubscribe to CurrentState
       subscription.cancel()
