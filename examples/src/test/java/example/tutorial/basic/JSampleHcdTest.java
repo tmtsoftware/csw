@@ -76,7 +76,6 @@ public class JSampleHcdTest extends JUnitSuite {
         // wait for a bit to ensure HCD has started and published an event
         Thread.sleep(5000);
 
-
         ArrayList<Event> subscriptionEventList = new ArrayList<>();
         subscriber.subscribeCallback(Set.of(counterEventKey), subscriptionEventList::add);
 

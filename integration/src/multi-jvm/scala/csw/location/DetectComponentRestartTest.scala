@@ -20,9 +20,7 @@ import scala.concurrent.duration._
 import scala.util.Try
 
 class DetectComponentRestartTestMultiJvmNode1 extends DetectComponentRestartTest(0, "cluster")
-
 class DetectComponentRestartTestMultiJvmNode2 extends DetectComponentRestartTest(0, "cluster")
-
 class DetectComponentRestartTestMultiJvmNode3 extends DetectComponentRestartTest(0, "cluster")
 
 class DetectComponentRestartTest(ignore: Int, mode: String)
@@ -51,7 +49,7 @@ class DetectComponentRestartTest(ignore: Int, mode: String)
       startNewSystem()
 
       val newConfig =
-        if (sys.env.get("CLUSTER_SEEDS").isEmpty)
+        if (!sys.env.contains("CLUSTER_SEEDS"))
           config.settings.joinLocal(3552).config
         else config.settings.config
 

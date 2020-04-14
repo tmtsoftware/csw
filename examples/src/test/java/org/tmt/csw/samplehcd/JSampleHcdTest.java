@@ -71,6 +71,9 @@ public class JSampleHcdTest extends JUnitSuite {
         IEventService eventService = testKit.jEventService();
         IEventSubscriber subscriber = eventService.defaultSubscriber();
 
+        // wait for a bit to ensure HCD has started and published an event
+        Thread.sleep(3000);
+
         ArrayList<Event> subscriptionEventList = new ArrayList<>();
         IEventSubscription subscription = subscriber.subscribeCallback(Set.of(counterEventKey), event -> {
             // discard invalid event
