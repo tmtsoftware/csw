@@ -11,10 +11,12 @@ object Libs {
   val `scopt`              = "com.github.scopt"       %% "scopt"              % "3.7.1" //MIT License
   val `silencer-plugin`    = "com.github.ghik"        % "silencer-plugin"     % silencerVersion cross CrossVersion.full
   val `silencer-lib`       = "com.github.ghik"        % "silencer-lib"        % silencerVersion cross CrossVersion.full
-  val `mockito-scala`      = "org.mockito"            %% "mockito-scala"      % "1.13.8"
+  val `mockito-scala`      = "org.mockito"            %% "mockito-scala"      % "1.13.9"
+
+  //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
+  val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.2.3"
 
   val `embedded-keycloak`            = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak"            % "9374d69" //Apache 2.0
-  val `logback-classic`              = "ch.qos.logback"                           % "logback-classic"               % "1.2.3" //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
   val `akka-management-cluster-http` = "com.lightbend.akka.management"            %% "akka-management-cluster-http" % "1.0.6"
   val `svnkit`                       = "org.tmatesoft.svnkit"                     % "svnkit"                        % "1.10.1" //TMate Open Source License
   val `commons-codec`                = "commons-codec"                            % "commons-codec"                 % "1.10" //Apache 2.0š
