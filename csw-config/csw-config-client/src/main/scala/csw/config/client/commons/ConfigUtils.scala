@@ -15,14 +15,14 @@ class ConfigUtils(configClientService: ConfigClientService)(implicit system: Act
   import system.executionContext
 
   // fetch config file either from config server or local disk
-  private[csw] def getConfig(isLocal: Boolean, inputFilePath: Option[Path], defaultConfig: Option[Config]): Future[Config] =
+  def getConfig(isLocal: Boolean, inputFilePath: Option[Path], defaultConfig: Option[Config]): Future[Config] =
     (inputFilePath, defaultConfig) match {
       case (None, None)         => throw UnableToParseOptions
       case (None, Some(config)) => Future.successful(config)
       case (Some(inputFile), _) => getConfig(inputFile, isLocal)
     }
 
-  private def getConfig(inputFilePath: Path, isLocal: Boolean) =
+  def getConfig(inputFilePath: Path, isLocal: Boolean): Future[Config] =
     if (isLocal) getConfigFromLocalFile(inputFilePath)
     else getConfigFromRemoteFile(inputFilePath)
 
