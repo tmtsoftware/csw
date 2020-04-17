@@ -2,8 +2,8 @@ package csw.command.client.handlers
 
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import csw.aas.http.AuthorizationPolicy.{CustomPolicy, RealmRolePolicy}
-import csw.aas.http.SecurityDirectives
+import csw.aas.http.AuthorizationPolicy.CustomPolicy
+import csw.aas.http.{AuthorizationPolicy, SecurityDirectives}
 import csw.command.api.codecs.CommandServiceCodecs._
 import csw.command.api.messages.CommandServiceHttpMessage
 import csw.command.api.messages.CommandServiceHttpMessage._
@@ -23,23 +23,40 @@ class CommandServiceHttpHandlers(
 
   override def handle(request: CommandServiceHttpMessage): Route = request match {
     case Validate(controlCommand) =>
-      val commandNameWithSubsystem = destinationPrefix.get.subsystem + controlCommand.commandName.name
-      securityDirectives.sPost(commandPolicy(commandNameWithSubsystem))(_ => complete(commandService.validate(controlCommand)))
+      val subsystem   = destinationPrefix.get.subsystem.name
+      val commandName = subsystem + controlCommand.commandName.name
+      securityDirectives.sPost(commandPolicy(subsystem, commandName))(_ =>
+        complete(commandService.validate(controlCommand))
+      )
     case Submit(controlCommand) =>
-      val commandNameWithSubsystem = destinationPrefix.get.subsystem + controlCommand.commandName.name
-      securityDirectives.sPost(commandPolicy(commandNameWithSubsystem))(_ => complete(commandService.submit(controlCommand)))
+      val subsystem   = destinationPrefix.get.subsystem.name
+      val commandName = subsystem + controlCommand.commandName.name
+      securityDirectives.sPost(commandPolicy(subsystem, commandName))(_ =>
+        complete(commandService.submit(controlCommand))
+      )
     case Oneway(controlCommand) =>
-      val commandNameWithSubsystem = destinationPrefix.get.subsystem + controlCommand.commandName.name
-      securityDirectives.sPost(commandPolicy(commandNameWithSubsystem))(_ => complete(commandService.oneway(controlCommand)))
+      val subsystem   = destinationPrefix.get.subsystem.name
+      val commandName = subsystem + controlCommand.commandName.name
+      securityDirectives.sPost(commandPolicy(subsystem, commandName))(_ =>
+        complete(commandService.oneway(controlCommand))
+      )
     case Query(runId) => complete(commandService.query(runId))
   }
 
-  private def commandPolicy(commandName: String): CustomPolicy = {
+  private def commandPolicy(subsystem: String, commandName: Role): AuthorizationPolicy = {
+    commandPolicyUsingConfig(commandName) | subsystemPolicyWithoutRoleCheck(subsystem)
+  }
+
+  private def commandPolicyUsingConfig(commandName: String): CustomPolicy = {
     CustomPolicy { token =>
       commandRoleMapping.map.exists { entry: (Role, AllowedCommands) =>
         token.realm_access.roles.contains(entry._1) && entry._2.contains(commandName)
       }
     }
+  }
+
+  private def subsystemPolicyWithoutRoleCheck(subsystem: String): CustomPolicy = {
+    CustomPolicy { token => token.realm_access.roles.exists { roleFromToken => roleFromToken.contains(subsystem) } }
   }
 
   //  private def commandPermissionForSubsystem(subsystem: String, commandName: String): CustomPolicy = {
@@ -55,5 +72,6 @@ class CommandServiceHttpHandlers(
   //  private def rolePermissionWithoutSubsystemCheck(role: String): CustomPolicy = {
   //    CustomPolicy { token => token.realm_access.roles.exists { roleFromToken => roleFromToken.contains(role) } }
   //  }
+
 
 }
