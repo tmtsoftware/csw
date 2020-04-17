@@ -1,9 +1,9 @@
-package csw.command.client.models
+package csw.command.client.auth
 
 import java.util
 
 import com.typesafe.config.{Config, ConfigValue}
-import csw.command.client.models.CommandRoles.{AllowedRoles, CmdName}
+import csw.command.client.auth.CommandRoles.{AllowedRoles, CmdName}
 import csw.prefix.models.Subsystem
 
 import scala.jdk.CollectionConverters._

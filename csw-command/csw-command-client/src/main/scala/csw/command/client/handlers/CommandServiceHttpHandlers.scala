@@ -2,13 +2,12 @@ package csw.command.client.handlers
 
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import csw.aas.http.AuthorizationPolicy.CustomPolicy
 import csw.aas.http.SecurityDirectives
 import csw.command.api.codecs.CommandServiceCodecs._
 import csw.command.api.messages.CommandServiceHttpMessage
 import csw.command.api.messages.CommandServiceHttpMessage._
 import csw.command.api.scaladsl.CommandService
-import csw.command.client.models.CommandRoles
+import csw.command.client.auth.{CommandPolicy, CommandRoles}
 import csw.params.commands.ControlCommand
 import csw.prefix.models.Prefix
 import msocket.impl.post.{HttpPostHandler, ServerHttpCodecs}
@@ -28,13 +27,9 @@ class CommandServiceHttpHandlers(
     case Oneway(controlCommand)   => sPost(controlCommand)(complete(commandService.oneway(controlCommand)))
     case Query(runId)             => complete(commandService.query(runId))
   }
-  private def sPost(controlCommand: ControlCommand)(route: Route) =
+  private def sPost(controlCommand: ControlCommand)(route: => Route) =
     destinationSubsystem match {
-      case None => route // auth is disabled in this case
-      case Some(subsystem) =>
-        securityDirectives.sPost(
-          CustomPolicy(token => commandRoles.hasAccess(controlCommand.commandName.name, subsystem, token.realm_access.roles))
-        )(_ => route)
+      case Some(subsystem) => securityDirectives.sPost(CommandPolicy(commandRoles, controlCommand, subsystem))(_ => route)
+      case None            => route // auth is disabled in this case
     }
-
 }
