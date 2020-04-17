@@ -399,6 +399,7 @@ lazy val `csw-command-client` = project
   .dependsOn(
     `csw-command-api`.jvm,
     `csw-logging-client`,
+    `csw-aas-http`,
     `csw-location-api`.jvm,
     `csw-location-client` % "test->test",
     `csw-location-server` % "test->test",

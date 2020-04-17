@@ -2,6 +2,7 @@ package csw.framework.internal.supervisor
 
 import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.http.scaladsl.server.Route
+import csw.aas.http.SecurityDirectives
 import csw.command.api.codecs.CommandServiceCodecs
 import csw.command.client.CommandServiceFactory
 import csw.command.client.handlers.{CommandServiceHttpHandlers, CommandServiceWebsocketHandlers}
@@ -17,7 +18,8 @@ object CommandServiceRoutesFactory {
 
   def createRoutes(component: ActorRef[ComponentMessage])(implicit actorSystem: ActorSystem[_]): Route = {
     val commandService                              = CommandServiceFactory.make(component)
-    val httpHandlers                                = new CommandServiceHttpHandlers(commandService)
+    val securityDirectives                          = SecurityDirectives()(actorSystem.executionContext)
+    val httpHandlers                                = new CommandServiceHttpHandlers(commandService, securityDirectives)
     def websocketHandlers(contentType: ContentType) = new CommandServiceWebsocketHandlers(commandService, contentType)
     RouteFactory.combine(metricsEnabled = false)(
       new PostRouteFactory("post-endpoint", httpHandlers),
