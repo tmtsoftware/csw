@@ -1,7 +1,6 @@
-package csw.command.client.models
+package csw.command.client.auth
 
 import com.typesafe.config.ConfigFactory
-import csw.command.client.auth.{CommandKey, CommandRoles, Roles}
 import csw.prefix.models.Subsystem.{IRIS, TCS}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
