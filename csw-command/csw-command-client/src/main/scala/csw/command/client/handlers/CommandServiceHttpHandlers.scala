@@ -19,7 +19,6 @@ class CommandServiceHttpHandlers(
     commandRoles: CommandRoles = CommandRoles.empty
 ) extends HttpPostHandler[CommandServiceHttpMessage]
     with ServerHttpCodecs {
-  private val destinationSubsystem = destinationPrefix.map(_.subsystem)
 
   override def handle(request: CommandServiceHttpMessage): Route = request match {
     case Validate(controlCommand) => sPost(controlCommand)(complete(commandService.validate(controlCommand)))
@@ -28,8 +27,8 @@ class CommandServiceHttpHandlers(
     case Query(runId)             => complete(commandService.query(runId))
   }
   private def sPost(controlCommand: ControlCommand)(route: => Route) =
-    destinationSubsystem match {
-      case Some(subsystem) => securityDirectives.sPost(CommandPolicy(commandRoles, controlCommand, subsystem))(_ => route)
-      case None            => route // auth is disabled in this case
+    destinationPrefix match {
+      case Some(prefix) => securityDirectives.sPost(CommandPolicy(commandRoles, controlCommand, prefix))(_ => route)
+      case None         => route // auth is disabled in this case
     }
 }
