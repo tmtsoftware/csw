@@ -10,7 +10,10 @@ import csw.prefix.models.{Prefix, Subsystem}
 import scala.jdk.CollectionConverters._
 
 // maps to key from command roles config file
-case class CommandKey private (key: String)
+case class CommandKey private (key: String) {
+  private val subsystem = key.split('.').headOption.map(Subsystem.withNameInsensitive)
+  require(subsystem.nonEmpty, s"$key should start with one of the valid subsystem")
+}
 object CommandKey {
   def apply(prefix: Prefix, commandName: CommandName): CommandKey =
     new CommandKey(prefix.toString.toLowerCase + "." + commandName.name.toLowerCase)
