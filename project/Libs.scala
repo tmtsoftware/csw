@@ -100,7 +100,7 @@ object AkkaHttp {
 
   val `akka-http`            = "com.typesafe.akka" %% "akka-http"            % Version //ApacheV2
   val `akka-http-testkit`    = "com.typesafe.akka" %% "akka-http-testkit"    % Version //ApacheV2
-  val `akka-http-cors`       = "ch.megard"         %% "akka-http-cors"       % "0.4.2"
+  val `akka-http-cors`       = "ch.megard"         %% "akka-http-cors"       % "0.4.3"
   val `akka-http-spray-json` = "com.typesafe.akka" %% "akka-http-spray-json" % Version
 }
 
