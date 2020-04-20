@@ -1,84 +1,22 @@
 package example.auth
 
 import akka.actor.typed
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import akka.actor.typed.SpawnProtocol
 import akka.http.scaladsl.server._
-import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 import com.typesafe.config.Config
 import csw.aas.http.AuthorizationPolicy._
 import csw.aas.http.SecurityDirectives
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.client.utils.LocationServerStatus
-import csw.logging.client.scaladsl.LoggingSystemFactory
-import example.auth.AsyncSupport.actorSystem
 
-import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
-import scala.language.implicitConversions
 
-object ExampleServer extends HttpApp with App {
+object AuthDocumentation extends HttpApp {
+  private implicit val actorSystem: typed.ActorSystem[SpawnProtocol.Command] = typed.ActorSystem(SpawnProtocol(), "")
+  private implicit val ec: ExecutionContext                                  = actorSystem.executionContext
 
-  import AsyncSupport._
-
-  val locationService = HttpLocationServiceFactory.makeLocalClient
-  val directives      = SecurityDirectives(config, locationService)
-
-  import directives._
-
-  val HOST = "0.0.0.0"
-  val PORT = 9003
-
-  override protected def routes: Route = cors() {
-    pathPrefix("person") {
-      get {
-        complete("SUCCESS")
-      } ~
-      sPost(RealmRolePolicy("example-admin-role")) {
-        complete("SUCCESS")
-      } ~
-      sPut(ClientRolePolicy("person-role")) {
-        complete("SUCCESS")
-      } ~
-      sPatch(ClientRolePolicy("some-role")) {
-        complete("SUCCESS")
-      } ~
-      sHead(CustomPolicy(at => at.given_name.contains("test-user"))) {
-        complete("SUCCESS")
-      } ~
-      sDelete(PermissionPolicy("delete", "person")) {
-        complete("SUCCESS")
-      } ~
-      sGet(EmptyPolicy) {
-        complete("SUCCESS")
-      }
-    }
-  }
-  startServer(HOST, PORT)
-}
-
-object LoggingSupport {
-  //start logging
-  LoggingSystemFactory.start("example-server", "", "", actorSystem)
-}
-
-object AsyncSupport {
-  implicit val actorSystem: typed.ActorSystem[SpawnProtocol.Command] = typed.ActorSystem(SpawnProtocol(), "")
-  implicit val ec: ExecutionContext                                  = ExecutionContext.global
-  val config: Config                                                 = actorSystem.settings.config
-}
-
-object LocationServiceSupport {
-  //ensure location service is up
-  LocationServerStatus.requireUpLocally(5.seconds)
-}
-
-object Documentation extends HttpApp {
-
-  import AsyncSupport._
-
+  private val config: Config  = actorSystem.settings.config
   private val locationService = HttpLocationServiceFactory.makeLocalClient
-
-  private val directives = SecurityDirectives(config, locationService)
+  private val directives      = SecurityDirectives(config, locationService)
 
   import directives._
 
@@ -179,30 +117,3 @@ object Documentation extends HttpApp {
 
   val routes: Route = ???
 }
-
-// #sample-http-app
-object SampleHttpApp extends HttpApp with App {
-
-  implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = typed.ActorSystem(SpawnProtocol(), "sample-http-app")
-  implicit val ec: ExecutionContext                            = actorSystem.executionContext
-  private val config                                           = actorSystem.settings.config
-
-  val locationService = HttpLocationServiceFactory.makeLocalClient
-  val directives      = SecurityDirectives(config, locationService)
-  import directives._
-
-  override protected def routes: Route = pathPrefix("api") {
-    get {
-      complete("SUCCESS")
-    } ~
-    sPost(RealmRolePolicy("admin")) {
-      complete("SUCCESS")
-    }
-  }
-
-  private val host = "0.0.0.0"
-  private val port = 9003
-
-  startServer(host, port)
-}
-// #sample-http-app
