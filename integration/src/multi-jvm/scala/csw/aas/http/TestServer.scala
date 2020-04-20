@@ -13,8 +13,12 @@ import csw.logging.client.scaladsl.LoggingSystemFactory
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class TestServer(locationService: LocationService)(implicit ec: ExecutionContext) {
-  val securityDirectives = SecurityDirectives(locationService)
+class TestServer(locationService: LocationService) {
+  lazy val system: typed.ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), "test")
+  implicit lazy val untypedSystem: actor.ActorSystem        = system.toClassic
+  implicit lazy val ec: ExecutionContext                    = system.executionContext
+  private lazy val config                                   = system.settings.config
+  private lazy val securityDirectives                       = SecurityDirectives(config, locationService)
   import securityDirectives._
 
   val routes: Route = get {
@@ -24,9 +28,6 @@ class TestServer(locationService: LocationService)(implicit ec: ExecutionContext
   }
 
   def start(testServerPort: Int): Future[Http.ServerBinding] = {
-
-    val system: typed.ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), "test")
-    implicit val untypedSystem: actor.ActorSystem        = system.toClassic
     LoggingSystemFactory.start("test-server", "", "", system)
     Http().bindAndHandle(routes, "0.0.0.0", testServerPort)
   }

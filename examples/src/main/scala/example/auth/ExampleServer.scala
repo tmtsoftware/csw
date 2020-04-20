@@ -4,6 +4,7 @@ import akka.actor.typed
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.http.scaladsl.server._
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
+import com.typesafe.config.Config
 import csw.aas.http.AuthorizationPolicy._
 import csw.aas.http.SecurityDirectives
 import csw.location.client.scaladsl.HttpLocationServiceFactory
@@ -20,8 +21,7 @@ object ExampleServer extends HttpApp with App {
   import AsyncSupport._
 
   val locationService = HttpLocationServiceFactory.makeLocalClient
-
-  val directives = SecurityDirectives(locationService)
+  val directives      = SecurityDirectives(config, locationService)
 
   import directives._
 
@@ -64,6 +64,7 @@ object LoggingSupport {
 object AsyncSupport {
   implicit val actorSystem: typed.ActorSystem[SpawnProtocol.Command] = typed.ActorSystem(SpawnProtocol(), "")
   implicit val ec: ExecutionContext                                  = ExecutionContext.global
+  val config: Config                                                 = actorSystem.settings.config
 }
 
 object LocationServiceSupport {
@@ -77,7 +78,7 @@ object Documentation extends HttpApp {
 
   private val locationService = HttpLocationServiceFactory.makeLocalClient
 
-  private val directives = SecurityDirectives(locationService)
+  private val directives = SecurityDirectives(config, locationService)
 
   import directives._
 
@@ -184,9 +185,10 @@ object SampleHttpApp extends HttpApp with App {
 
   implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = typed.ActorSystem(SpawnProtocol(), "sample-http-app")
   implicit val ec: ExecutionContext                            = actorSystem.executionContext
+  private val config                                           = actorSystem.settings.config
 
   val locationService = HttpLocationServiceFactory.makeLocalClient
-  val directives      = SecurityDirectives(locationService)
+  val directives      = SecurityDirectives(config, locationService)
   import directives._
 
   override protected def routes: Route = pathPrefix("api") {

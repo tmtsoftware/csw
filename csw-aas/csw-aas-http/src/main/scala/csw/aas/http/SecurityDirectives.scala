@@ -19,6 +19,7 @@ import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.implicitConversions
 import scala.util.{Failure, Success, Try}
+import csw.aas.core.utils.ConfigExt._
 
 class SecurityDirectives private[csw] (
     authentication: Authentication,
@@ -159,14 +160,6 @@ class SecurityDirectives private[csw] (
 object SecurityDirectives {
 
   /**
-   * Creates instance of [[csw.aas.http.SecurityDirectives]] using configurations
-   * from application and reference.conf.
-   *
-   * Expects auth-server-url to be present in config.
-   */
-  def apply()(implicit ec: ExecutionContext): SecurityDirectives = apply(ConfigFactory.load)
-
-  /**
    * Creates instance of [[csw.aas.http.SecurityDirectives]] using provided configurations
    *
    * Expects auth-server-url to be present in config.
@@ -175,19 +168,6 @@ object SecurityDirectives {
    */
   def apply(config: Config)(implicit ec: ExecutionContext): SecurityDirectives =
     from(AuthConfig.create(config, None))
-
-  /**
-   * Creates instance of [[csw.aas.http.SecurityDirectives]] using configurations
-   * from application and reference.conf.
-   *
-   * @param locationService LocationService instance used to resolve auth server url (blocking call)
-   * Resolves auth server url using location service (blocking call)
-   */
-  def apply(locationService: LocationService)(implicit ec: ExecutionContext): SecurityDirectives = {
-    val config        = ConfigFactory.load()
-    val maybeLocation = if (disabled(config)) None else Some(authLocation(locationService))
-    from(AuthConfig.create(config, maybeLocation))
-  }
 
   /**
    * Creates instance of [[csw.aas.http.SecurityDirectives]] using provided configurations
@@ -223,10 +203,8 @@ object SecurityDirectives {
     new SecurityDirectives(authentication, keycloakDeployment.getRealm, keycloakDeployment.getResourceName, authConfig.disabled)
   }
 
-  private def disabled(config: Config): Boolean = {
-    val mayBeValue = Try { config.getConfig(AuthConfig.authConfigKey).getBoolean(AuthConfig.disabledKey) }.toOption
-    mayBeValue.nonEmpty && mayBeValue.get
-  }
+  private def disabled(config: Config): Boolean =
+    config.getConfig(AuthConfig.authConfigKey).getBooleanOrFalse(AuthConfig.disabledKey)
 
   private def authLocation(locationService: LocationService)(implicit ec: ExecutionContext): HttpLocation =
     Await.result(AuthServiceLocation(locationService).resolve(5.seconds), 6.seconds)

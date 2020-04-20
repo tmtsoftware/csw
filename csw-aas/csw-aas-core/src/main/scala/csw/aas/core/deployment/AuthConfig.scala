@@ -4,12 +4,12 @@ import java.io.{ByteArrayInputStream, InputStream}
 import com.typesafe.config._
 import csw.aas.core.commons.AuthLogger
 import csw.aas.core.deployment.AuthConfig._
+import csw.aas.core.utils.ConfigExt._
 import csw.location.api.models.HttpLocation
 import org.keycloak.adapters.{KeycloakDeployment, KeycloakDeploymentBuilder}
 import org.keycloak.authorization.client.Configuration
 
 import scala.language.implicitConversions
-import scala.util.Try
 
 /**
  * Represents Authorization configuration
@@ -112,7 +112,4 @@ object AuthConfig {
       deployment.getClient
     )
 
-  implicit class RichConfig(private val underlying: Config) extends AnyVal {
-    def getBooleanOrFalse(key: String): Boolean = Try { underlying.getBoolean(key) }.toOption.getOrElse(false)
-  }
 }
