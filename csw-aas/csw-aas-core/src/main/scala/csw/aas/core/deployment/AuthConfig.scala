@@ -23,9 +23,10 @@ class AuthConfig private (config: Config, authServiceLocation: Option[HttpLocati
   private val enablePermissionsKey = "enable-permissions"
   private val clientIdKey          = "client-id"
 
-  val permissionsEnabled: Boolean = optionalBoolean(config, enablePermissionsKey)
-  val disabled: Boolean           = disabledMaybe.getOrElse(optionalBoolean(config, disabledKey))
-  private val logger              = AuthLogger.getLogger
+  val permissionsEnabled: Boolean = config.getBooleanOrFalse(enablePermissionsKey)
+  val disabled: Boolean           = disabledMaybe.getOrElse(config.getBooleanOrFalse(disabledKey))
+
+  private val logger = AuthLogger.getLogger
 
   import logger._
 
@@ -102,11 +103,6 @@ object AuthConfig {
     new AuthConfig(config.getConfig(authConfigKey), authServerLocation, disabledMaybe)
   }
 
-  private def optionalBoolean(config: Config, key: String) = {
-    val mayBeValue = Try { config.getBoolean(key) }.toOption
-    mayBeValue.nonEmpty && mayBeValue.get
-  }
-
   private[aas] implicit def deploymentToConfig(deployment: KeycloakDeployment): Configuration =
     new Configuration(
       deployment.getAuthServerBaseUrl,
@@ -115,4 +111,8 @@ object AuthConfig {
       deployment.getResourceCredentials,
       deployment.getClient
     )
+
+  implicit class RichConfig(private val underlying: Config) extends AnyVal {
+    def getBooleanOrFalse(key: String): Boolean = Try { underlying.getBoolean(key) }.toOption.getOrElse(false)
+  }
 }

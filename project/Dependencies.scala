@@ -247,7 +247,6 @@ object Dependencies {
   val CommandApi = Def.setting(
     Seq(
       Libs.`scala-async`,
-      Libs.`config`,
       MSocket.`msocket-api`.value
     )
   )
