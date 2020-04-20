@@ -5,11 +5,12 @@ import akka.http.scaladsl.model.HttpMethods._
 import akka.http.scaladsl.server.Directives.{authorize => keycloakAuthorize, authorizeAsync => keycloakAuthorizeAsync, _}
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.directives.AuthenticationDirective
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.Config
 import csw.aas.core.TokenVerifier
 import csw.aas.core.commons.AuthLogger
 import csw.aas.core.deployment.{AuthConfig, AuthServiceLocation}
 import csw.aas.core.token.{AccessToken, TokenFactory}
+import csw.aas.core.utils.ConfigExt._
 import csw.aas.http.AuthorizationPolicy.PolicyExpression.{And, Or}
 import csw.aas.http.AuthorizationPolicy.{EmptyPolicy, _}
 import csw.location.api.models.HttpLocation
@@ -18,8 +19,7 @@ import csw.location.api.scaladsl.LocationService
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.implicitConversions
-import scala.util.{Failure, Success, Try}
-import csw.aas.core.utils.ConfigExt._
+import scala.util.{Failure, Success}
 
 class SecurityDirectives private[csw] (
     authentication: Authentication,
@@ -182,19 +182,24 @@ object SecurityDirectives {
   }
 
   /**
-   * Creates instance of [[csw.aas.http.SecurityDirectives]] using configurations
-   * from application and reference.conf.
+   * Creates instance of [[csw.aas.http.SecurityDirectives]] using proivided configurations
    *
    * @param locationService LocationService instance used to resolve auth server url (blocking call)
    * Resolves auth server url using location service (blocking call)
    * @param disabled if explicitly disabled/enabled, it will ignore `disabled` key from config
    */
-  private[csw] def apply(locationService: LocationService, disabled: Boolean)(
+  private[csw] def apply(config: Config, locationService: LocationService, disabled: Boolean)(
       implicit ec: ExecutionContext
   ): SecurityDirectives = {
     val maybeLocation = if (disabled) None else Some(authLocation(locationService))
-    from(AuthConfig.create(ConfigFactory.load(), maybeLocation, Some(disabled)))
+    from(AuthConfig.create(config, maybeLocation, Some(disabled)))
   }
+
+  /**
+   * Creates instance of [[csw.aas.http.SecurityDirectives]] with auth disabled
+   */
+  private[csw] def authDisabled(config: Config)(implicit ec: ExecutionContext): SecurityDirectives =
+    from(AuthConfig.create(config = config, authServerLocation = None, disabledMaybe = Some(true)))
 
   private def from(authConfig: AuthConfig)(implicit ec: ExecutionContext): SecurityDirectives = {
     val keycloakDeployment = authConfig.getDeployment

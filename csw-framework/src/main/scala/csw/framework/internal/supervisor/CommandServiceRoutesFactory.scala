@@ -18,7 +18,7 @@ object CommandServiceRoutesFactory {
 
   def createRoutes(component: ActorRef[ComponentMessage])(implicit actorSystem: ActorSystem[_]): Route = {
     val commandService                              = CommandServiceFactory.make(component)
-    val securityDirectives                          = SecurityDirectives(actorSystem.settings.config)(actorSystem.executionContext)
+    val securityDirectives                          = SecurityDirectives.authDisabled(actorSystem.settings.config)(actorSystem.executionContext)
     val httpHandlers                                = new CommandServiceHttpHandlers(commandService, securityDirectives)
     def websocketHandlers(contentType: ContentType) = new CommandServiceWebsocketHandlers(commandService, contentType)
     RouteFactory.combine(metricsEnabled = false)(
