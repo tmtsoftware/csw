@@ -198,7 +198,7 @@ object SecurityDirectives {
   /**
    * Creates instance of [[csw.aas.http.SecurityDirectives]] with auth disabled
    */
-  private[csw] def authDisabled(config: Config)(implicit ec: ExecutionContext): SecurityDirectives =
+  def authDisabled(config: Config)(implicit ec: ExecutionContext): SecurityDirectives =
     from(AuthConfig.create(config = config, authServerLocation = None, disabledMaybe = Some(true)))
 
   private def from(authConfig: AuthConfig)(implicit ec: ExecutionContext): SecurityDirectives = {
