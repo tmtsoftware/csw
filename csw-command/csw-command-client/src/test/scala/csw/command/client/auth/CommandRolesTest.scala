@@ -29,28 +29,28 @@ class CommandRolesTest extends AnyFunSuite with Matchers {
     actualRoles shouldBe expectedRoles
   }
 
-  test("CommandRoles.hasAccess should return true when user has correct role") {
+  test("CommandRoles.hasAccess should return true when user has correct role | ESW-95") {
     val roles = CommandRoles.from(testConfig)
     roles.hasAccess(setVoltageCmdKey, IRIS, Roles(Set("IRIS-user"))) shouldBe true
     roles.hasAccess(setVoltageCmdKey, IRIS, Roles(Set("APS-eng"))) shouldBe true
     roles.hasAccess(setVoltageCmdKey, IRIS, Roles(Set("IRIS-user", "APS-eng"))) shouldBe true
   }
 
-  test("CommandRoles.hasAccess should return false when user does not have required role") {
+  test("CommandRoles.hasAccess should return false when user does not have required role | ESW-95") {
     val roles = CommandRoles.from(testConfig)
     roles.hasAccess(setVoltageCmdKey, IRIS, Roles(Set("WFOS-user"))) shouldBe false
     roles.hasAccess(setFirmwareCmdKey, TCS, Roles(Set("TCS-eng"))) shouldBe false
   }
 
   test(
-    "CommandRoles.hasAccess should return true when command name does not exist but has user level access to destination subsystem"
+    "CommandRoles.hasAccess should return true when command name does not exist but has user level access to destination subsystem | ESW-95"
   ) {
     val roles = CommandRoles.from(testConfig)
     roles.hasAccess(CommandKey("IRIS.filter.setExposure"), IRIS, Roles(Set("IRIS-user"))) shouldBe true
   }
 
   test(
-    "CommandRoles.hasAccess should return false when command name does not exist and does not have user level access to destination subsystem"
+    "CommandRoles.hasAccess should return false when command name does not exist and does not have user level access to destination subsystem | ESW-95"
   ) {
     val roles = CommandRoles.from(testConfig)
     roles.hasAccess(CommandKey("IRIS.filter.setExposure"), IRIS, Roles(Set("WFOS-user"))) shouldBe false
