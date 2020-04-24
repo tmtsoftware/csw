@@ -22,6 +22,8 @@ addSbtPlugin("com.dwijnand"                      % "sbt-project-graph"         %
 addSbtPlugin("com.lightbend.paradox"             % "sbt-paradox"               % "0.6.9")
 addSbtPlugin("com.github.tmtsoftware"            % "sbt-docs"                  % "0.1.4")
 
+addSbtCoursier
+
 resolvers += Resolver.bintrayRepo("twtmt", "sbt-plugins")
 
 classpathTypes += "maven-plugin"
