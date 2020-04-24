@@ -21,21 +21,21 @@ jobs:
         with:
           java-version: adopt@1.11
 
-      # - name: Cache ~/.cache
-      #   uses: actions/cache@v1
-      #   with:
-      #     path: ~/.cache
-      #     key: ${{ runner.os }}-coursier-${{ hashFiles('project/Libs.scala') }}-${{ hashFiles('**/*.sbt') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-coursier-
+      - name: Cache ~/.cache
+        uses: actions/cache@v1
+        with:
+          path: ~/.cache
+          key: ${{ runner.os }}-coursier-${{ hashFiles('project/Libs.scala') }}-${{ hashFiles('**/*.sbt') }}
+          restore-keys: |
+            ${{ runner.os }}-coursier-
 
-      # - name: Cache ~/.sbt
-      #   uses: actions/cache@v1
-      #   with:
-      #     path: ~/.sbt
-      #     key: ${{ runner.os }}-sbt-${{ hashFiles('project/build.properties') }}-${{ hashFiles('**/*.sbt') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-sbt-
+      - name: Cache ~/.sbt
+        uses: actions/cache@v1
+        with:
+          path: ~/.sbt
+          key: ${{ runner.os }}-sbt-${{ hashFiles('project/build.properties') }}-${{ hashFiles('**/*.sbt') }}
+          restore-keys: |
+            ${{ runner.os }}-sbt-
 
       - name: Configure ntp time
         run: |
@@ -70,7 +70,7 @@ jobs:
         uses: actions/cache@v1
         with:
           path: ~/.cache
-          key: ${{ runner.os }}-coursier-${{ hashFiles('project/Libs.scala') }}
+          key: ${{ runner.os }}-coursier-${{ hashFiles('project/Libs.scala') }}-${{ hashFiles('**/*.sbt') }}
           restore-keys: |
             ${{ runner.os }}-coursier-
 
@@ -78,7 +78,7 @@ jobs:
         uses: actions/cache@v1
         with:
           path: ~/.sbt
-          key: ${{ runner.os }}-sbt-${{ hashFiles('project/build.properties') }}
+          key: ${{ runner.os }}-sbt-${{ hashFiles('project/build.properties') }}-${{ hashFiles('**/*.sbt') }}
           restore-keys: |
             ${{ runner.os }}-sbt-
 
