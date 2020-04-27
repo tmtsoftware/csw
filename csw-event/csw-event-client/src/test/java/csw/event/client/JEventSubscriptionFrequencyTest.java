@@ -83,13 +83,13 @@ public class JEventSubscriptionFrequencyTest extends TestNGSuite {
     }
 
     @DataProvider(name = "event-service-provider")
-    public Object[] pubsubProvider() {
-        return new Object[]{redisTestProps, kafkaTestProps};
+    public Object[][] pubsubProvider() {
+        return new Object[][]{{redisTestProps}, {kafkaTestProps}};
     }
 
     @DataProvider(name = "redis-provider")
-    public Object[] redisPubSubProvider() {
-        return new Object[]{redisTestProps};
+    public Object[][] redisPubSubProvider() {
+        return new Object[][]{{redisTestProps}};
     }
 
     //DEOPSCSW-342: Subscription with consumption frequency

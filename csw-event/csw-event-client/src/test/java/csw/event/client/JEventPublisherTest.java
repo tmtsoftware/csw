@@ -65,8 +65,8 @@ public class JEventPublisherTest extends TestNGSuite {
     }
 
     @DataProvider(name = "event-service-provider")
-    public Object[] pubsubProvider() {
-        return new Object[]{redisTestProps, kafkaTestProps};
+    public Object[][] pubsubProvider() {
+        return new Object[][]{{redisTestProps}, {kafkaTestProps}};
     }
 
     //DEOPSCSW-345: Publish events irrespective of subscriber existence
