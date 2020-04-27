@@ -30,7 +30,7 @@ object Libs {
 
   val `jwt-core`          = "com.pauldijou"           %% "jwt-core"          % "4.3.0"
   val `lettuce`           = "io.lettuce"              % "lettuce-core"       % "5.2.2.RELEASE"
-  val `reactor-core`      = "io.projectreactor"       % "reactor-core"       % "3.3.4.RELEASE"
+  val `reactor-core`      = "io.projectreactor"       % "reactor-core"       % "3.3.5.RELEASE"
   val `reactive-streams`  = "org.reactivestreams"     % "reactive-streams"   % "1.0.3"
   val `akka-stream-kafka` = "com.typesafe.akka"       %% "akka-stream-kafka" % "2.0.2"
   val `embedded-kafka`    = "io.github.embeddedkafka" %% "embedded-kafka"    % "2.4.1"
