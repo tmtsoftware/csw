@@ -25,7 +25,7 @@ import csw.config.server.mocks.MockedAuthentication
 import csw.config.server.{ServerWiring, Settings}
 import csw.framework.deploy.containercmd.ContainerCmd
 import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
+import csw.location.api.models.{ComponentId, ComponentType}
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandResponse.Invalid
