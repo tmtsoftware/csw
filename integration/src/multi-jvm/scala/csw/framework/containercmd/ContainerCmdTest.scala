@@ -5,7 +5,6 @@ import java.nio.file.{Files, Path, Paths}
 
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.AskPattern._
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
@@ -15,7 +14,6 @@ import csw.command.client.messages.ComponentCommonMessage.{ComponentStateSubscri
 import csw.command.client.messages.ContainerCommonMessage.GetComponents
 import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.Shutdown
-import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.command.client.models.framework.PubSub.Subscribe
 import csw.command.client.models.framework.ToComponentLifecycleMessage.GoOffline
 import csw.command.client.models.framework.{Components, ContainerLifecycleState, SupervisorLifecycleState}
@@ -26,7 +24,6 @@ import csw.config.server.commons.TestFileUtils
 import csw.config.server.mocks.MockedAuthentication
 import csw.config.server.{ServerWiring, Settings}
 import csw.framework.deploy.containercmd.ContainerCmd
-import csw.location.api.models
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
@@ -38,11 +35,13 @@ import csw.params.core.models.ObsId
 import csw.params.core.states.{CurrentState, StateName}
 import csw.prefix.models.Subsystem.{CSW, Container}
 import csw.prefix.models.{Prefix, Subsystem}
+import org.scalatest.OptionValues
+import org.scalatest.concurrent.ScalaFutures
 
 import scala.concurrent.duration.DurationLong
-import scala.concurrent.{Await, ExecutionContextExecutor, Future}
+import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.io.Source
-import scala.util.control.NonFatal
+import scala.util.Try
 
 class ContainerCmdTestMultiJvm1 extends ContainerCmdTest(0)
 class ContainerCmdTestMultiJvm2 extends ContainerCmdTest(0)
@@ -60,15 +59,19 @@ class ContainerCmdTestMultiJvm3 extends ContainerCmdTest(0)
 class ContainerCmdTest(ignore: Int)
     extends LSNodeSpec(config = new TwoMembersAndSeed, mode = "http")
     with MultiNodeHTTPLocationService
-    with MockedAuthentication {
+    with MockedAuthentication
+    with ScalaFutures
+    with OptionValues {
 
   import config._
 
   implicit val ec: ExecutionContextExecutor = typedSystem.executionContext
   implicit val testKit: TestKitSettings     = TestKitSettings(typedSystem)
-  implicit val timeout: Timeout             = 5.seconds
+  private val timeoutDuration               = 10.seconds
+  implicit val timeout: Timeout             = timeoutDuration
 
-  private val testFileUtils = new TestFileUtils(new Settings(ConfigFactory.load()))
+  private val testFileUtils                            = new TestFileUtils(new Settings(ConfigFactory.load()))
+  override implicit def patienceConfig: PatienceConfig = PatienceConfig(timeoutDuration, 50.milli)
 
   override def beforeAll(): Unit = {
     super.beforeAll()
@@ -77,28 +80,16 @@ class ContainerCmdTest(ignore: Int)
 
   override def afterAll(): Unit = {
     runOn(seed) {
-      try {
-        testFileUtils.deleteServerFiles()
-      }
-      catch {
-        case NonFatal(ex) => println(s"Exception in deleting server files - ${ex.printStackTrace()}")
-      }
+      Try(testFileUtils.deleteServerFiles()).recover(_.printStackTrace())
     }
     super.afterAll()
   }
 
-  private def resolveContainer(name: String): ActorRef[ContainerMessage] = {
-    val maybeContainerLocF = locationService.resolve(
-      AkkaConnection(ComponentId(Prefix(Container, name), ComponentType.Container)),
-      5.seconds
-    )
+  private def resolve(prefix: Prefix, compType: ComponentType) =
+    locationService.resolve(AkkaConnection(ComponentId(prefix, compType)), timeoutDuration)
 
-    maybeContainerLocF.await.get.containerRef
-  }
-
-  private def resolveEtonHcd(): Future[Option[AkkaLocation]] = {
-    locationService.resolve(AkkaConnection(models.ComponentId(Prefix(Subsystem.IRIS, "Eton"), ComponentType.HCD)), 2.seconds)
-  }
+  private def resolveLgsfContainer() = resolve(Prefix(Container, "LGSF_Container"), ComponentType.Container)
+  private def resolveEtonHcd()       = resolve(Prefix(Subsystem.IRIS, "Eton"), ComponentType.HCD)
 
   def createStandaloneTmpFile(): Path = {
     val hcdConfiguration       = scala.io.Source.fromResource("eaton_hcd_standalone.conf").mkString
@@ -109,36 +100,30 @@ class ContainerCmdTest(ignore: Int)
     standaloneConfFilePath
   }
 
-  test("should able to start components in container mode and in standalone mode through configuration service | DEOPSCSW-171, DEOPSCSW-168, DEOPSCSW-182, DEOPSCSW-167, DEOPSCSW-43, DEOPSCSW-172, DEOPSCSW-216, DEOPSCSW-203, DEOPSCSW-169, DEOPSCSW-430") {
+  test(
+    "should able to start components in container mode and in standalone mode through configuration service" +
+      " | DEOPSCSW-171, DEOPSCSW-168, DEOPSCSW-182, DEOPSCSW-167, DEOPSCSW-43, DEOPSCSW-172, DEOPSCSW-216, DEOPSCSW-203, DEOPSCSW-169, DEOPSCSW-430"
+  ) {
 
     // start config server and upload laser_container.conf file
     runOn(seed) {
       val serverWiring = ServerWiring.make(locationService, securityDirectives)
       serverWiring.svnRepo.initSvnRepo()
-      serverWiring.httpService.registeredLazyBinding.await
+      serverWiring.httpService.registeredLazyBinding.futureValue
 
       val configService       = ConfigClientFactory.adminApi(typedSystem, locationService, factory)
       val containerConfigData = ConfigData.fromString(Source.fromResource("laser_container.conf").mkString)
 
-      Await.result(
-        configService.create(Paths.get("/laser_container.conf"), containerConfigData, comment = "container"),
-        5.seconds
-      )
+      configService.create(Paths.get("/laser_container.conf"), containerConfigData, comment = "container").futureValue
 
       enterBarrier("config-file-uploaded")
       enterBarrier("container-started")
 
-      val maybeContainerLoc =
-        locationService
-          .resolve(AkkaConnection(ComponentId(Prefix(Subsystem.Container, "LGSF_Container"), ComponentType.Container)), 5.seconds)
-          .await
-
-      maybeContainerLoc.isDefined shouldBe true
+      val maybeContainerLoc = resolveLgsfContainer().futureValue
 
       //DEOPSCSW-430: Update AkkaLocation model to take Prefix model instead of Option[String]
-      maybeContainerLoc.get.prefix shouldBe Prefix(s"${Container.entryName}.LGSF_Container")
-
-      val containerRef = maybeContainerLoc.get.containerRef
+      maybeContainerLoc.map(_.prefix).value shouldBe Prefix(s"${Container.entryName}.LGSF_Container")
+      val containerRef = maybeContainerLoc.value.containerRef
 
       val componentsProbe               = TestProbe[Components]
       val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]
@@ -155,7 +140,6 @@ class ContainerCmdTest(ignore: Int)
         }
 
       enterBarrier("running")
-
       enterBarrier("offline")
       enterBarrier("before-shutdown")
       enterBarrier("eton-shutdown")
@@ -164,29 +148,23 @@ class ContainerCmdTest(ignore: Int)
     runOn(member1) {
       enterBarrier("config-file-uploaded")
 
-      val testProbe = TestProbe[ContainerLifecycleState]
-
-      // withEntries required for multi-node test where seed node is picked up from environment variable
+      val testProbe    = TestProbe[ContainerLifecycleState]
       val containerCmd = new ContainerCmd("laser_container_app", CSW, false)
 
       // only file path is provided, by default - file will be fetched from configuration service
       // and will be considered as container configuration.
       val args = Array("/laser_container.conf")
-      containerCmd.start(args).asInstanceOf[ActorRef[ContainerMessage]]
-
-      val containerRef = resolveContainer("LGSF_Container")
-
+      containerCmd.start(args)
+      val containerRef = resolveLgsfContainer().futureValue.value.containerRef
       assertThatContainerIsRunning(containerRef, testProbe, 5.seconds)
-
       enterBarrier("container-started")
       enterBarrier("running")
 
       val laserContainerComponentsF: Future[Components] = containerRef ? (x => GetComponents(x))
-      val laserContainerComponents                      = laserContainerComponentsF.await.components
+      val laserContainerComponents                      = laserContainerComponentsF.futureValue.components
 
       // resolve and send message to component running in different jvm or on different physical machine
-      val etonSupervisorF        = resolveEtonHcd()
-      val etonSupervisorLocation = Await.result(etonSupervisorF, 15.seconds).get
+      val etonSupervisorLocation = resolveEtonHcd().futureValue.value
 
       val etonSupervisorTypedRef = etonSupervisorLocation.componentRef
       val eatonCompStateProbe    = TestProbe[CurrentState]
@@ -226,7 +204,7 @@ class ContainerCmdTest(ignore: Int)
 
       enterBarrier("offline")
 
-      val supervisorRef = resolveEtonHcd().await.get.componentRef
+      val supervisorRef = resolveEtonHcd().futureValue.value.componentRef
       Thread.sleep(500)
 
       val lifecycleProbe = TestProbe[SupervisorLifecycleState]
@@ -258,10 +236,8 @@ class ContainerCmdTest(ignore: Int)
       val standaloneConfFilePath = createStandaloneTmpFile()
 
       val args = Array("--standalone", "--local", standaloneConfFilePath.toString)
-      containerCmd.start(args).asInstanceOf[ActorRef[ComponentMessage]]
-
-      val supervisorRef = resolveEtonHcd().await.get.componentRef
-
+      containerCmd.start(args)
+      val supervisorRef = resolveEtonHcd().futureValue.value.componentRef
       assertThatSupervisorIsRunning(supervisorRef, testProbe, 5.seconds)
       enterBarrier("container-started")
       enterBarrier("running")
