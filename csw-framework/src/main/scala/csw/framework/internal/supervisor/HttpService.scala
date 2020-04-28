@@ -1,13 +1,11 @@
 package csw.framework.internal.supervisor
 
-import akka.actor
 import akka.actor.CoordinatedShutdown
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter._
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
 import akka.http.scaladsl.server.Route
-import akka.stream.Materializer
 import csw.location.api.models.Connection.HttpConnection
 import csw.location.api.models.HttpRegistration
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
@@ -46,9 +44,6 @@ class HttpService(
   }
 
   private def bind() = {
-    implicit val untypedActorSystem: actor.ActorSystem = actorSystem.toClassic
-    implicit val mat: Materializer                     = Materializer(actorSystem)
-
     Http()(actorSystem.toClassic).bindAndHandle(
       handler = route,
       interface = "0.0.0.0",
