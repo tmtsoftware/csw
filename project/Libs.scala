@@ -11,7 +11,7 @@ object Libs {
   val `scopt`              = "com.github.scopt"       %% "scopt"              % "3.7.1" //MIT License
   val `silencer-plugin`    = "com.github.ghik"        % "silencer-plugin"     % silencerVersion cross CrossVersion.full
   val `silencer-lib`       = "com.github.ghik"        % "silencer-lib"        % silencerVersion cross CrossVersion.full
-  val `mockito-scala`      = "org.mockito"            %% "mockito-scala"      % "1.13.9"
+  val `mockito-scala`      = "org.mockito"            %% "mockito-scala"      % "1.13.10"
 
   //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
   val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.2.3"
