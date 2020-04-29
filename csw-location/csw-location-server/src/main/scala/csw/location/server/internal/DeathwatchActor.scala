@@ -85,11 +85,11 @@ private[location] object DeathwatchActor {
    */
   def start(cswCluster: CswCluster, locationService: LocationService): ActorRef[Msg] = {
     log.debug("Starting Deathwatch actor")
-    val behavior: Behavior[Msg] = new DeathwatchActor(locationService)(cswCluster.typedSystem).behavior(Set.empty)
+    val behavior: Behavior[Msg] = new DeathwatchActor(locationService)(cswCluster.actorSystem).behavior(Set.empty)
     val widenedBehaviour: Behavior[SubscribeResponse[AllServices.Value]] = behavior.transformMessages {
       case x @ Changed(_) => x
     }
-    val actorRef: ActorRef[SubscribeResponse[AllServices.Value]] = cswCluster.typedSystem.spawn(
+    val actorRef: ActorRef[SubscribeResponse[AllServices.Value]] = cswCluster.actorSystem.spawn(
       //span the actor with empty set of watched locations
       widenedBehaviour,
       name = "location-service-death-watch-actor"

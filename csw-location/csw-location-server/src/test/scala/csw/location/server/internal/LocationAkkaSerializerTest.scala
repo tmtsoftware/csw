@@ -4,7 +4,6 @@ import java.net.URI
 
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.serialization.SerializationExtension
 import csw.location.api
 import csw.location.api.extensions.ActorExtension.RichActor
@@ -24,7 +23,7 @@ import scala.concurrent.duration.DurationInt
 private[location] class LocationAkkaSerializerTest extends AnyFunSuite with Matchers with BeforeAndAfterAll {
   // need to instantiate from remote factory to wire up serializer
   private final implicit val system: ActorSystem[_] = ActorSystem(Behaviors.empty, "example")
-  private final val serialization                   = SerializationExtension(system.toClassic)
+  private final val serialization                   = SerializationExtension(system)
   private final val prefix                          = Prefix(Subsystem.NFIRAOS, "TromboneAssembly")
 
   override protected def afterAll(): Unit = {
