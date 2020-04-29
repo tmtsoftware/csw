@@ -9,7 +9,6 @@ import csw.commons.ResourceReader
 import csw.config.api.ConfigData
 import csw.config.cli.helpers.TwoClientsAndServer
 import csw.config.cli.wiring.Wiring
-import csw.config.client.internal.ActorRuntime
 import csw.config.client.scaladsl.ConfigClientFactory
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.mocks.MockedAuthentication
@@ -95,23 +94,22 @@ class ConfigCliAppTest(ignore: Int)
     // config client admin api is exercised on client2
     runOn(client2) {
       enterBarrier("server-started")
-      val actorRuntime  = new ActorRuntime(system.toTyped)
       val configService = ConfigClientFactory.adminApi(system.toTyped, locationService, factory)
 
       enterBarrier("client1-create")
-      val actualConfigValue = configService.getLatest(Paths.get(repoPath1)).await.get.toStringF(actorRuntime.typedSystem).await
+      val actualConfigValue = configService.getLatest(Paths.get(repoPath1)).await.get.toStringF.await
       actualConfigValue shouldBe inputFileContents
       enterBarrier("client2-create-pass")
 
       enterBarrier("client1-update")
       val actualUpdatedConfigValue =
-        configService.getLatest(Paths.get(repoPath1)).await.get.toStringF(actorRuntime.typedSystem).await
+        configService.getLatest(Paths.get(repoPath1)).await.get.toStringF.await
       actualUpdatedConfigValue shouldBe updatedInputFileContents
       enterBarrier("client2-update-pass")
 
       enterBarrier("client1-setActive")
       val actualActiveConfigValue =
-        configService.getActive(Paths.get(repoPath1)).await.get.toStringF(actorRuntime.typedSystem).await
+        configService.getActive(Paths.get(repoPath1)).await.get.toStringF.await
       actualActiveConfigValue shouldBe inputFileContents
 
       configService

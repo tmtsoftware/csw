@@ -43,7 +43,7 @@ class GatewayClient(serverIp: String, port: Int)(implicit val actorSystem: typed
     val request = HttpRequest(HttpMethods.GET, uri = uri)
 
     val sseStreamFuture = async {
-      val response              = await(Http()(actorSystem.toClassic).singleRequest(request))
+      val response              = await(Http().singleRequest(request))
       implicit val unmarshaller = fromEventsStream(actorSystem.toClassic)
       await(Unmarshal(response.entity).to[Source[ServerSentEvent, NotUsed]])
     }

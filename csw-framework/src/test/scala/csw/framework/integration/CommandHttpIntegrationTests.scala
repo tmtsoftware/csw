@@ -1,7 +1,6 @@
 package csw.framework.integration
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.scaladsl.adapter._
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.http.scaladsl.Http
 import akka.util.Timeout
@@ -161,7 +160,7 @@ class CommandHttpIntegrationTests extends FrameworkIntegrationSuite {
     completedResult.result.paramSet shouldEqual rsetup.paramSet
 
     // ********** Message: Shutdown **********
-    Http(containerActorSystem.toClassic).shutdownAllConnectionPools().await
+    Http().shutdownAllConnectionPools().await
     resolvedContainerRef ! Shutdown
 
     // this proves that on shutdown message, container's actor system gets terminated

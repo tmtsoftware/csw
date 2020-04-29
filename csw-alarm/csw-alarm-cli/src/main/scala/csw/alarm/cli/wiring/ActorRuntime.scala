@@ -11,13 +11,13 @@ import csw.network.utils.Networks
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
 class ActorRuntime(_typedSystem: ActorSystem[SpawnProtocol.Command]) {
-  implicit lazy val typedSystem: ActorSystem[SpawnProtocol.Command] = _typedSystem
-  implicit lazy val ec: ExecutionContextExecutor                    = typedSystem.executionContext
+  implicit lazy val actorSystem: ActorSystem[SpawnProtocol.Command] = _typedSystem
+  implicit lazy val ec: ExecutionContextExecutor                    = actorSystem.executionContext
 
-  lazy val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(typedSystem)
+  lazy val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(actorSystem)
 
   def startLogging(name: String): LoggingSystem =
-    LoggingSystemFactory.start(name, BuildInfo.version, Networks().hostname, typedSystem)
+    LoggingSystemFactory.start(name, BuildInfo.version, Networks().hostname, actorSystem)
 
   /**
    * Gracefully shutdown [[_typedSystem]]
@@ -25,7 +25,7 @@ class ActorRuntime(_typedSystem: ActorSystem[SpawnProtocol.Command]) {
    * @return a future that completes when shutdown is successful
    */
   def shutdown(): Future[Done] = {
-    typedSystem.terminate()
-    typedSystem.whenTerminated
+    actorSystem.terminate()
+    actorSystem.whenTerminated
   }
 }

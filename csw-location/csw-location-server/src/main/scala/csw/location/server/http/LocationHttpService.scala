@@ -1,6 +1,5 @@
 package csw.location.server.http
 
-import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives.handleRejections
 import akka.http.scaladsl.server.{RejectionHandler, Route}
@@ -11,7 +10,7 @@ import scala.concurrent.Future
 
 class LocationHttpService(locationRoutes: Route, actorRuntime: ActorRuntime, settings: Settings) {
 
-  implicit val classicSystem: ActorSystem = actorRuntime.classicSystem
+  implicit val actorSystem = actorRuntime.actorSystem
 
   private def applicationRoute: Route = {
     val rejectionHandler = corsRejectionHandler.withFallback(RejectionHandler.default)

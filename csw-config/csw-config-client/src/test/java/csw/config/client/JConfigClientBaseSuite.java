@@ -2,7 +2,6 @@ package csw.config.client;
 
 import akka.actor.typed.ActorSystem;
 import akka.actor.typed.SpawnProtocol;
-import akka.actor.typed.javadsl.Behaviors;
 import csw.config.api.javadsl.IConfigClientService;
 import csw.config.api.javadsl.IConfigService;
 import csw.config.client.internal.ActorRuntime;
@@ -23,11 +22,11 @@ public class JConfigClientBaseSuite extends JMockedAuthentication {
     private csw.location.server.internal.ServerWiring locationWiring = new csw.location.server.internal.ServerWiring(false);
 
     private ActorRuntime actorRuntime = new ActorRuntime(ActorSystem.create(SpawnProtocol.create(), "Guardian"));
-    private ILocationService clientLocationService = JHttpLocationServiceFactory.makeLocalClient(actorRuntime.typedSystem());
+    private ILocationService clientLocationService = JHttpLocationServiceFactory.makeLocalClient(actorRuntime.actorSystem());
 
-    public IConfigService configService = JConfigClientFactory.adminApi(actorRuntime.typedSystem(), clientLocationService, factory());
-    public IConfigClientService configClientApi = JConfigClientFactory.clientApi(actorRuntime.typedSystem(), clientLocationService);
-    public ActorSystem<SpawnProtocol.Command> system = (ActorSystem<SpawnProtocol.Command>) actorRuntime.typedSystem();
+    public IConfigService configService = JConfigClientFactory.adminApi(actorRuntime.actorSystem(), clientLocationService, factory());
+    public IConfigClientService configClientApi = JConfigClientFactory.clientApi(actorRuntime.actorSystem(), clientLocationService);
+    public ActorSystem<SpawnProtocol.Command> system = (ActorSystem<SpawnProtocol.Command>) actorRuntime.actorSystem();
 
     private ServerWiring serverWiring = ServerWiring$.MODULE$.make(securityDirectives());
     private HttpService httpService = serverWiring.httpService();
@@ -49,8 +48,8 @@ public class JConfigClientBaseSuite extends JMockedAuthentication {
 
     public void cleanup() throws Exception {
         Await.result(httpService.shutdown(), timeout);
-        actorRuntime.typedSystem().terminate();
-        Await.result(actorRuntime.typedSystem().whenTerminated(), timeout);
+        actorRuntime.actorSystem().terminate();
+        Await.result(actorRuntime.actorSystem().whenTerminated(), timeout);
         Await.result(serverWiring.actorRuntime().classicSystem().terminate(), timeout);
         Await.result(locationWiring.actorRuntime().shutdown(), timeout);
     }

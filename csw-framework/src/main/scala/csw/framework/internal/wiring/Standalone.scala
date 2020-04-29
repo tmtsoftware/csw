@@ -26,7 +26,7 @@ object Standalone {
     import actorRuntime._
 
     val componentInfo = ConfigParser.parseStandalone(config)
-    val richSystem    = new CswFrameworkSystem(typedSystem)
+    val richSystem    = new CswFrameworkSystem(actorRuntime.actorSystem)
     async {
       val cswCtxF            = CswContext.make(locationService, eventServiceFactory, alarmServiceFactory, componentInfo)(richSystem)
       val supervisorBehavior = SupervisorBehaviorFactory.make(None, registrationFactory, await(cswCtxF))

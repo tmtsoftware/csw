@@ -19,14 +19,14 @@ class ConfigServiceResolverTest extends ConfigClientBaseSuite {
   import actorRuntime._
 
   override protected def afterAll(): Unit = {
-    typedSystem.terminate()
-    typedSystem.whenTerminated.await
+    actorSystem.terminate()
+    actorSystem.whenTerminated.await
     super.afterAll()
   }
 
   test("should throw exception if not able to resolve config service http server") {
     val locationService = HttpLocationServiceFactory.makeLocalClient
-    val configService   = ConfigClientFactory.adminApi(typedSystem, locationService, factory)
+    val configService   = ConfigClientFactory.adminApi(actorSystem, locationService, factory)
 
     val exception = intercept[RuntimeException] {
       Await.result(configService.list(), 7.seconds)
