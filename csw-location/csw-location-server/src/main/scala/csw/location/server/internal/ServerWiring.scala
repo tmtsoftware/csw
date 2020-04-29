@@ -1,7 +1,5 @@
 package csw.location.server.internal
 
-import akka.actor
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.http.scaladsl.server.Route
 import com.typesafe.config.{Config, ConfigFactory}
@@ -21,7 +19,6 @@ private[csw] class ServerWiring(enableAuth: Boolean) extends LocationServiceCode
   lazy val settings                                                 = new Settings(config)
   lazy val clusterSettings: ClusterSettings                         = ClusterAwareSettings.onPort(settings.clusterPort)
   implicit lazy val actorSystem: ActorSystem[SpawnProtocol.Command] = clusterSettings.system
-  lazy val untypedActorSystem: actor.ActorSystem                    = clusterSettings.system.toClassic
   lazy val actorRuntime                                             = new ActorRuntime(actorSystem)
   import actorSystem.executionContext
   lazy val locationService: LocationService = LocationServiceFactory.withSystem(actorSystem)
