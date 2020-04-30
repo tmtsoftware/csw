@@ -50,13 +50,13 @@ class LocationAuthTestWithKeycloak
 
   private implicit def actorSystem: ActorSystem[SpawnProtocol.Command] = locationWiring.get.actorSystem
 
-  test("unregisterAll (protected route) should return 401 when there is no valid token present and keycloak is up and registered") {
+  test("unregisterAll (protected route) should return 401 when there is no valid token present and keycloak is up and registered | CSW-89") {
     val locationNoAuthClient = HttpLocationServiceFactory.make("localhost", httpPort)
     val httpError            = intercept[HttpError](locationNoAuthClient.unregisterAll().await)
     httpError.statusCode shouldBe 401
   }
 
-  test("register (protected route) should return 200 when when a valid token is present in request") {
+  test("register (protected route) should return 200 when when a valid token is present in request | CSW-89") {
     val locationAuthClient = HttpLocationServiceFactory.make("localhost", httpPort, tokenFactory)
     val connection         = HttpConnection(ComponentId(Prefix("TCS.comp1"), ComponentType.Service))
     val servicePort        = 2345
