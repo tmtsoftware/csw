@@ -22,7 +22,7 @@ object AssemblyApp extends App {
 
   import locationWiring.actorRuntime._
 
-  private val assemblyActorRef = typedSystem.spawn(behavior, "assembly")
+  private val assemblyActorRef = actorSystem.spawn(behavior, "assembly")
   private val componentId      = ComponentId(Prefix(NFIRAOS, "assembly"), Assembly)
   private val connection       = AkkaConnection(componentId)
 

@@ -1,7 +1,6 @@
 package csw.framework.integration
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.scaladsl.adapter._
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.http.scaladsl.Http
 import akka.util.Timeout
@@ -17,9 +16,9 @@ import csw.common.components.command.CommandComponentState._
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.location.api.models
-import csw.location.api.models.{ComponentId, ComponentType}
 import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.{ComponentId, ComponentType}
 import csw.location.client.ActorSystemFactory
 import csw.params.commands.CommandResponse._
 import csw.params.commands.Setup
@@ -205,7 +204,7 @@ class CommandIntegrationTests extends FrameworkIntegrationSuite {
     completedResult.result.paramSet shouldEqual rsetup.paramSet
 
     // ********** Message: Shutdown **********
-    Http(containerActorSystem.toClassic).shutdownAllConnectionPools().await
+    Http().shutdownAllConnectionPools().await
     resolvedContainerRef ! Shutdown
 
     // this proves that ComponentBehaviors postStop signal gets invoked for all components

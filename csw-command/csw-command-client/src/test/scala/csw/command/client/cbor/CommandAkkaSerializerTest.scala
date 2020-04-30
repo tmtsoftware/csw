@@ -4,7 +4,6 @@ import java.nio.file.Files
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.serialization.SerializationExtension
 import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
@@ -35,19 +34,19 @@ import csw.params.core.models.Units.{coulomb, pascal}
 import csw.params.core.models.{ArrayData, Id, ObsId}
 import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.prefix.models.Prefix
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks.forAll
 import org.scalatest.prop.Tables.Table
-import org.scalatest.BeforeAndAfterAll
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
-import org.scalatest.funsuite.AnyFunSuite
-import org.scalatest.matchers.should.Matchers
 
 class CommandAkkaSerializerTest extends AnyFunSuite with Matchers with BeforeAndAfterAll {
 
   private final implicit val system: ActorSystem[SpawnProtocol.Command] = typed.ActorSystem(SpawnProtocol(), "example")
-  private final val serialization                                       = SerializationExtension(system.toClassic)
+  private final val serialization                                       = SerializationExtension(system)
   private final val prefix                                              = Prefix("wfos.prog.cloudcover")
 
   override protected def afterAll(): Unit = {

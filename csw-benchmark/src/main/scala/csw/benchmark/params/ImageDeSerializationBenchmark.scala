@@ -5,7 +5,6 @@ import java.util.concurrent.TimeUnit
 
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.serialization.{Serialization, SerializationExtension}
 import csw.params.commands.{CommandName, Observe}
 import csw.params.core.generics.KeyType.ByteArrayKey
@@ -46,7 +45,7 @@ class ImageDeSerializationBenchmark {
   @Setup(Level.Trial)
   def setup(): Unit = {
     system = ActorSystem(Behaviors.empty, "example")
-    serialization = SerializationExtension(system.toClassic)
+    serialization = SerializationExtension(system)
     prefixStr = "wfos.prog.cloudcover"
     obsId = ObsId("Obs001")
 

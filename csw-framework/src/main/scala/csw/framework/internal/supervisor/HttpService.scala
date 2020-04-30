@@ -1,13 +1,10 @@
 package csw.framework.internal.supervisor
 
-import akka.actor
 import akka.actor.CoordinatedShutdown
 import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.adapter._
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
 import akka.http.scaladsl.server.Route
-import akka.stream.Materializer
 import csw.location.api.models.Connection.HttpConnection
 import csw.location.api.models.HttpRegistration
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
@@ -36,7 +33,7 @@ class HttpService(
     val registrationResult = await(register(binding)) // create HttpRegistration and register it with location service
 
     // Add the task to unregister the HttpRegistration from location service.
-    CoordinatedShutdown(actorSystem.toClassic).addTask(
+    CoordinatedShutdown(actorSystem).addTask(
       CoordinatedShutdown.PhaseBeforeServiceUnbind,
       s"unregistering-${registrationResult.location}"
     )(() => registrationResult.unregister())
@@ -46,10 +43,7 @@ class HttpService(
   }
 
   private def bind() = {
-    implicit val untypedActorSystem: actor.ActorSystem = actorSystem.toClassic
-    implicit val mat: Materializer                     = Materializer(actorSystem)
-
-    Http()(actorSystem.toClassic).bindAndHandle(
+    Http().bindAndHandle(
       handler = route,
       interface = "0.0.0.0",
       port = 0

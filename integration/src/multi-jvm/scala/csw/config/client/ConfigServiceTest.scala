@@ -44,7 +44,7 @@ class ConfigServiceTest(ignore: Int)
     runOn(client) {
       enterBarrier("server-started")
       val actorRuntime  = new ActorRuntime(ActorSystem(SpawnProtocol(), "Guardian"))
-      val configService = ConfigClientFactory.adminApi(actorRuntime.typedSystem, locationService, factory)
+      val configService = ConfigClientFactory.adminApi(actorRuntime.actorSystem, locationService, factory)
 
       val configValue: String =
         """
@@ -55,7 +55,7 @@ class ConfigServiceTest(ignore: Int)
 
       val file = Paths.get("test.conf")
       configService.create(file, ConfigData.fromString(configValue), annex = false, "commit test file").await
-      val actualConfigValue = configService.getLatest(file).await.get.toStringF(actorRuntime.typedSystem).await
+      val actualConfigValue = configService.getLatest(file).await.get.toStringF(actorRuntime.actorSystem).await
       actualConfigValue shouldBe configValue
       enterBarrier("end")
     }

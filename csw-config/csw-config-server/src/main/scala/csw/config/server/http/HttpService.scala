@@ -3,7 +3,7 @@ package csw.config.server.http
 import java.net.BindException
 
 import akka.Done
-import akka.actor.{ActorSystem, CoordinatedShutdown}
+import akka.actor.CoordinatedShutdown
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
 import csw.config.server.commons.{ConfigServerLogger, ConfigServiceConnection}
@@ -32,8 +32,7 @@ class HttpService(
     actorRuntime: ActorRuntime
 ) {
 
-  import actorRuntime.{coordinatedShutdown, ec}
-  implicit val classicSystem: ActorSystem = actorRuntime.classicSystem
+  import actorRuntime.{coordinatedShutdown, ec, typedSystem}
 
   private val log: Logger = ConfigServerLogger.getLogger
 

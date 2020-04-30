@@ -14,7 +14,7 @@ import scala.concurrent.{Await, ExecutionContext}
 class ReadCommand(implicit val actorSystem: typed.ActorSystem[_]) extends AppCommand {
   override def run(): Unit = {
     val url      = "http://localhost:7000/data"
-    val response = Await.result(Http(actorSystem.toClassic).singleRequest(HttpRequest(uri = Uri(url))), 2.seconds)
+    val response = Await.result(Http().singleRequest(HttpRequest(uri = Uri(url))), 2.seconds)
     println(convertToString(response.entity))
   }
 }

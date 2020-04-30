@@ -2,7 +2,6 @@ package csw.config.server
 
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.Uri.Path
 import akka.http.scaladsl.model.{HttpRequest, StatusCodes, Uri}
@@ -62,7 +61,7 @@ class MainTest extends HTTPLocationService {
       val uri = Uri(configServiceLocation.uri.toString).withPath(Path / "list")
 
       val request  = HttpRequest(uri = uri)
-      val response = Http()(actorSystem.toClassic).singleRequest(request).await
+      val response = Http().singleRequest(request).await
       response.status shouldBe StatusCodes.OK
       response.discardEntityBytes()
     }
@@ -88,7 +87,7 @@ class MainTest extends HTTPLocationService {
       val uri = Uri(configServiceLocation.uri.toString).withPath(Path / "list")
 
       val request  = HttpRequest(uri = uri)
-      val response = Http()(actorSystem.toClassic).singleRequest(request).await
+      val response = Http().singleRequest(request).await
       response.status shouldBe StatusCodes.OK
     }
     finally {

@@ -1,9 +1,8 @@
 package csw.framework.internal.wiring
 
+import akka.Done
 import akka.actor.CoordinatedShutdown
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.{Done, actor}
 import csw.framework.BuildInfo
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.scaladsl.LoggingSystemFactory
@@ -16,17 +15,16 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
  * A convenient class wrapping actor system and providing handles for execution context and clean up of actor system
  */
 class ActorRuntime(_typedSystem: ActorSystem[SpawnProtocol.Command]) {
-  implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = _typedSystem
-  implicit val ec: ExecutionContextExecutor                    = typedSystem.executionContext
-  lazy val classicSystem: actor.ActorSystem                    = typedSystem.toClassic
-  lazy val coordinatedShutdown: CoordinatedShutdown            = CoordinatedShutdown(classicSystem)
+  implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = _typedSystem
+  implicit val ec: ExecutionContextExecutor                    = actorSystem.executionContext
+  lazy val coordinatedShutdown: CoordinatedShutdown            = CoordinatedShutdown(actorSystem)
 
   def startLogging(name: String): LoggingSystem =
-    LoggingSystemFactory.start(name, BuildInfo.version, Networks().hostname, typedSystem)
+    LoggingSystemFactory.start(name, BuildInfo.version, Networks().hostname, actorSystem)
 
   def shutdown(): Future[Done] = {
-    typedSystem.terminate()
-    typedSystem.whenTerminated
+    actorSystem.terminate()
+    actorSystem.whenTerminated
   }
 }
 // $COVERAGE-ON$
