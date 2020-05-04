@@ -46,12 +46,12 @@ class TimeServiceSchedulerPerfTest extends ScalaTestWithActorTestKit with AnyFun
           times.zipWithIndex.toList.foreach {
             case (_, i) =>
               val currentTime  = times(i).value
-              val t1_s: Double = currentTime.getEpochSecond
+              val t1_s: Double = currentTime.getEpochSecond.toDouble
               val ns: Double   = currentTime.getNano
               val t1           = (t1_s * 1000 * 1000 * 1000) + ns
 
               val previousTime = if (i == 0) UTCTime(Instant.now) else times(i - 1)
-              val t2_s: Double = previousTime.value.getEpochSecond
+              val t2_s: Double = previousTime.value.getEpochSecond.toDouble
               val ns_2: Double = previousTime.value.getNano
               val t2           = (t2_s * 1000 * 1000 * 1000) + ns_2
 

@@ -36,7 +36,7 @@ class ResultReporter(test: String, actorSystem: ActorSystem[_]) {
         f"          50%%ile : ${percentile(50.0)}%.0f µs \n" +
         f"          90%%ile : ${percentile(90.0)}%.0f µs \n" +
         f"          99%%ile : ${percentile(99.0)}%.0f µs \n" +
-        f"          Average: ${nanosToMicros(avgLatency)}%.0f µs \n"
+        f"          Average: ${nanosToMicros(avgLatency.toDouble)}%.0f µs \n"
     )
   }
 

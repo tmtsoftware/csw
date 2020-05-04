@@ -116,7 +116,7 @@ class BasePerfSuite(config: MultiNodeConfig)
         EventUtils.perfResultEvent(
           byteBuffer.array(),
           initialLatencyByteBuffer.array(),
-          eventsReceivedPerNode / nanosToSeconds(totalTimePerNode),
+          eventsReceivedPerNode / nanosToSeconds(totalTimePerNode.toDouble),
           totalDroppedPerNode,
           outOfOrderCountPerNode,
           aggregatedLatencyPerNode / subscribers.size
