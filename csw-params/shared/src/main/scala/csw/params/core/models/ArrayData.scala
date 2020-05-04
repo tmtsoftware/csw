@@ -1,8 +1,6 @@
 package csw.params.core.models
 
-import com.github.ghik.silencer.silent
-
-import scala.annotation.varargs
+import scala.annotation.{nowarn, varargs}
 import scala.collection.mutable
 import scala.language.implicitConversions
 import scala.reflect.ClassTag
@@ -51,7 +49,7 @@ object ArrayData {
    */
   @varargs
   def fromArrays[T](first: T, rest: T*): ArrayData[T] = {
-    @silent
+    @nowarn
     implicit val ct: ClassTag[T] = ClassTag[T](first.getClass)
     ArrayData.fromArray((first +: rest).toArray)
   }

@@ -1,4 +1,3 @@
-import Libs._
 import com.timushev.sbt.updates.UpdatesPlugin.autoImport.dependencyUpdatesFilter
 import com.typesafe.sbt.site.SitePlugin.autoImport.siteDirectory
 import org.scalafmt.sbt.ScalafmtPlugin.autoImport.scalafmtOnCompile
@@ -54,9 +53,8 @@ object Common extends AutoPlugin {
       "-deprecation",
       if (enableFatalWarnings.value) "-Xfatal-warnings" else "",
       "-Xlint:_,-missing-interpolator",
-      "-Ywarn-dead-code",
-//      "-Xprint:typer"
-      if (suppressAnnotatedWarnings.value) s"-P:silencer:sourceRoots=${baseDirectory.value.getCanonicalPath}" else ""
+      "-Ywarn-dead-code"
+//      "-Xprint:typer",
     ),
     javacOptions in (Compile, doc) ++= Seq("-Xdoclint:none"),
     javacOptions in doc ++= Seq("--ignore-source-errors"),
@@ -72,14 +70,11 @@ object Common extends AutoPlugin {
     fork := true,
     suppressAnnotatedWarnings := true,
     enableFatalWarnings := false,
-    libraryDependencies ++= Seq(`silencer-lib` % Provided),
-    libraryDependencies ++= (if (suppressAnnotatedWarnings.value) Seq(compilerPlugin(`silencer-plugin`)) else Seq.empty),
     autoCompilerPlugins := true,
     cancelable in Global := true, // allow ongoing test(or any task) to cancel with ctrl + c and still remain inside sbt
     scalafmtOnCompile := true,
-    unidocGenjavadocVersion := "0.15",
+    unidocGenjavadocVersion := "0.16",
     dependencyUpdatesFilter := dependencyUpdatesFilter.value - moduleFilter(organization = "org.scala-lang"),
-    scalacOptions += "-P:silencer:globalFilters=`silencer-plugin` was enabled but the @silent annotation was not found on classpath - have you added `silencer-lib` as a library dependency?",
     commands += Command.command("openSite") { state =>
       val uri = s"file://${Project.extract(state).get(siteDirectory)}/${docsParentDir.value}/${version.value}/index.html"
       state.log.info(s"Opening browser at $uri ...")

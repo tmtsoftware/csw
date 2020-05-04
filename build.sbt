@@ -633,7 +633,7 @@ lazy val examples = project
   .settings(
     libraryDependencies ++= Dependencies.Examples.value,
     scalacOptions ++= Seq(
-      if (Common.autoImport.suppressAnnotatedWarnings.value) "-P:silencer:pathFilters=.*" else ""
+      if (Common.autoImport.suppressAnnotatedWarnings.value) "-nowarn" else ""
     )
   )
 

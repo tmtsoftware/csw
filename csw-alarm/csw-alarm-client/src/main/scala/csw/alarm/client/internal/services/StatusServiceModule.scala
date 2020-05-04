@@ -4,20 +4,19 @@ import java.time.Clock
 
 import akka.Done
 import akka.actor.typed
-import akka.actor.typed._
 import csw.alarm.api.exceptions.KeyNotFoundException
 import csw.alarm.api.internal._
+import csw.alarm.client.internal.AlarmServiceLogger
+import csw.alarm.client.internal.commons.Settings
+import csw.alarm.client.internal.extensions.TimeExtensions.RichClock
+import csw.alarm.client.internal.models.Alarm
+import csw.alarm.client.internal.redis.RedisConnectionsFactory
 import csw.alarm.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.alarm.models.AlarmSeverity.Okay
 import csw.alarm.models.FullAlarmSeverity.Disconnected
 import csw.alarm.models.Key.{AlarmKey, GlobalKey}
 import csw.alarm.models.ShelveStatus.{Shelved, Unshelved}
 import csw.alarm.models._
-import csw.alarm.client.internal.AlarmServiceLogger
-import csw.alarm.client.internal.commons.Settings
-import csw.alarm.client.internal.extensions.TimeExtensions.RichClock
-import csw.alarm.client.internal.models.Alarm
-import csw.alarm.client.internal.redis.RedisConnectionsFactory
 import csw.time.core.models.UTCTime
 
 import scala.async.Async.{async, await}

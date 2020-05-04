@@ -99,9 +99,9 @@ object Angle {
   }
 
   //implicit conversions
-  implicit def long2angle(d: Long): AngleWrapperDouble = new AngleWrapperDouble(d)
+  implicit def long2angle(d: Long): AngleWrapperDouble = new AngleWrapperDouble(d.toDouble)
 
-  implicit def int2angle(d: Int): AngleWrapperDouble = new AngleWrapperDouble(d)
+  implicit def int2angle(d: Int): AngleWrapperDouble = new AngleWrapperDouble(d.toDouble)
 
   implicit def double2angle(d: Double): AngleWrapperDouble = new AngleWrapperDouble(d)
 
