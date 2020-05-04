@@ -1,7 +1,8 @@
 package csw.logging.client.internal
 
 import play.api.libs.json._
-import com.github.ghik.silencer.silent
+
+import scala.annotation.nowarn
 
 object JsonExtensions {
   implicit class AnyToJson(val x: Any) extends AnyVal {
@@ -14,7 +15,7 @@ object JsonExtensions {
       case x: String                    => JsString(x)
       case null                         => JsNull
       case xs: Seq[Any]                 => JsArray(xs.map(_.asJson))
-      case xs: Map[String, Any] @silent => JsObject(xs.view.mapValues(_.asJson).toMap)
+      case xs: Map[String, Any] @nowarn => JsObject(xs.view.mapValues(_.asJson).toMap)
       case _                            => JsString(x.toString)
     }
   }

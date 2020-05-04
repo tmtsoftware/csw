@@ -2,9 +2,7 @@ package csw.params.core.models
 
 import java.util
 
-import com.github.ghik.silencer.silent
-
-import scala.annotation.varargs
+import scala.annotation.{nowarn, varargs}
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 import scala.language.implicitConversions
@@ -57,7 +55,7 @@ object MatrixData {
   @varargs
   def fromArrays[T](first: Array[T], rest: Array[T]*): MatrixData[T] = {
     // getComponentType gives the Class type of T from Array[T]
-    @silent
+    @nowarn
     implicit val ct: ClassTag[T] = ClassTag[T](first.getClass.getComponentType)
     MatrixData.fromArrays((first +: rest).toArray)
   }
