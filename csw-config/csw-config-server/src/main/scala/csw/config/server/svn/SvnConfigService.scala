@@ -104,7 +104,7 @@ class SvnConfigService(settings: Settings, actorRuntime: ActorRuntime, svnRepo: 
     }
   }
 
-  private def get(path: Path, configId: Option[ConfigId] = None) = async {
+  private def get(path: Path, configId: Option[ConfigId] = None): Future[Option[ConfigData]] = async {
 
     // in case of no configId provided the latest revision for this path is taken
     val svnRevision = await(svnRepo.svnRevision(configId.map(_.id.toLong)))

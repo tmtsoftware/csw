@@ -6,17 +6,18 @@ import scala.annotation.nowarn
 
 object JsonExtensions {
   implicit class AnyToJson(val x: Any) extends AnyVal {
+    @nowarn
     def asJson: JsValue = x match {
-      case x1: Int                      => JsNumber(x1)
-      case x1: Long                     => JsNumber(x1)
-      case x1: Float                    => JsNumber(x1.toDouble)
-      case x1: Double                   => JsNumber(x1)
-      case x: Boolean                   => JsBoolean(x)
-      case x: String                    => JsString(x)
-      case null                         => JsNull
-      case xs: Seq[Any]                 => JsArray(xs.map(_.asJson))
-      case xs: Map[String, Any] @nowarn => JsObject(xs.view.mapValues(_.asJson).toMap)
-      case _                            => JsString(x.toString)
+      case x1: Int              => JsNumber(x1)
+      case x1: Long             => JsNumber(x1)
+      case x1: Float            => JsNumber(x1.toDouble)
+      case x1: Double           => JsNumber(x1)
+      case x: Boolean           => JsBoolean(x)
+      case x: String            => JsString(x)
+      case null                 => JsNull
+      case xs: Seq[Any]         => JsArray(xs.map(_.asJson))
+      case xs: Map[String, Any] => JsObject(xs.view.mapValues(_.asJson).toMap)
+      case _                    => JsString(x.toString)
     }
   }
 
