@@ -133,7 +133,7 @@ class PerfSubscriber(
       payloadSize,
       histogram,
       eventsReceived,
-      totalTime,
+      totalTime.toDouble,
       outOfOrderCount,
       avgLatency()
     )

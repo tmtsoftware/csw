@@ -54,9 +54,7 @@ private[config] class ConfigClient(
 
   private def listUri = baseUri(Path / "list")
 
-  private def baseUri(path: Path) = async {
-    await(configServiceResolver.uri).withPath(path)
-  }
+  private def baseUri(path: Path) = configServiceResolver.uri.map(_.withPath(path))
 
   private implicit class HttpRequestExt(val httpRequest: HttpRequest) {
 

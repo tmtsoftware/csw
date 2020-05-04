@@ -32,7 +32,7 @@ class ResultAggregator(
 
     def aggregateResult(): (LatencyPlots, ThroughputPlots, InitialLatencyPlots) = {
 
-      def percentile(histogram: Histogram, p: Double): Double = nanosToMicros(histogram.getValueAtPercentile(p))
+      def percentile(histogram: Histogram, p: Double): Double = nanosToMicros(histogram.getValueAtPercentile(p).toDouble)
 
       val throughputPlots = ThroughputPlots(
         PlotResult().add(testName, throughput),
@@ -44,7 +44,7 @@ class ResultAggregator(
         PlotResult().add(testName, percentile(histogram, 50.0)),
         PlotResult().add(testName, percentile(histogram, 90.0)),
         PlotResult().add(testName, percentile(histogram, 99.0)),
-        PlotResult().add(testName, nanosToMicros(avgLatency))
+        PlotResult().add(testName, nanosToMicros(avgLatency.toDouble))
       )
 
       val initialLatencyPlots = InitialLatencyPlots(
