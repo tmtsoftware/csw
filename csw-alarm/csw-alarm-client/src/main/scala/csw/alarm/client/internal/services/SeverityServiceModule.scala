@@ -16,6 +16,7 @@ import csw.alarm.models.{AlarmSeverity, FullAlarmSeverity, Key}
 import reactor.core.publisher.FluxSink.OverflowStrategy
 import romaine.RedisResult
 import romaine.extensions.SourceExtensions.RichSource
+import romaine.reactive.RedisSubscription
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Future
@@ -90,7 +91,7 @@ private[client] trait SeverityServiceModule extends SeverityService {
     // create new connection for every client
     val keySpaceApi = redisKeySpaceApi(severityApi)
 
-    val severitySourceF = async {
+    val severitySourceF: Future[Source[FullAlarmSeverity, RedisSubscription]] = async {
       val metadataKeys                          = await(getActiveAlarmKeys(key))
       val activeSeverityKeys: List[SeverityKey] = metadataKeys.map(a => SeverityKey.fromAlarmKey(a))
       val currentSeverities                     = await(severityApi.mget(activeSeverityKeys)).map(result => result.key -> result.value).toMap
