@@ -632,9 +632,9 @@ lazy val examples = project
   .enablePlugins(DeployApp)
   .settings(
     libraryDependencies ++= Dependencies.Examples.value,
-    scalacOptions ++= Seq(
-      if (Common.autoImport.suppressAnnotatedWarnings.value) "-nowarn" else ""
-    )
+    scalacOptions ++= (if (Common.autoImport.suppressAnnotatedWarnings.value)
+                         Seq("-Xlint:-unused,-nullary-override,-inaccessible", "-Ywarn-dead-code:false")
+                       else Seq.empty)
   )
 
 /* ================ Jmh Benchmarks ============== */

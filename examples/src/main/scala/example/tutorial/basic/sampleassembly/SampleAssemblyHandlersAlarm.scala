@@ -12,8 +12,8 @@ import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.{AkkaLocation, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.params.commands.CommandResponse._
-import csw.params.commands.{CommandName, CommandResponse, ControlCommand, Setup}
-import csw.params.core.generics.{Key, KeyType, Parameter}
+import csw.params.commands.{CommandResponse, ControlCommand, Setup}
+import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.{Id, ObsId, Units}
 import csw.params.events._
 import csw.prefix.models.Prefix
@@ -122,6 +122,7 @@ class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCt
             val counter = e(hcdCounterKey).head
             log.info(s"Counter = $counter")
             setCounterAlarm(counter)
+
           case _ => log.warn("Unexpected event received.")
         }
       case _: ObserveEvent => log.warn("Unexpected ObserveEvent received.") // not expected

@@ -180,12 +180,14 @@ class SampleAssemblyHandlersWithMonitor(ctx: ActorContext[TopLevelActorMessage],
               // Don't care about individual responses with success
               commandResponseManager.updateCommand(Completed(runId))
             case OverallFailure(responses) =>
-              val errors = responses.filter(isNegative(_))
+              val errors = responses.filter(isNegative)
               commandResponseManager.updateCommand(errors.head.withRunId(runId))
           }
           .recover(ex => commandResponseManager.updateCommand(Error(runId, ex.toString)))
 
         Started(runId)
+
+      case _ => Invalid(runId, UnsupportedCommandIssue("Unhandled command"))
     }
 
   private def commandHCD(runId: Id, setup: Setup): Unit =

@@ -175,7 +175,7 @@ class CommandServiceTest(ignore: Int)
       // short running command
       //#immediate-response
       val immediateSetup = Setup(prefix, immediateCmd, obsId)
-      val immediateCommandF = async {
+      val immediateCommandF: Future[SubmitResponse] = async {
         await(assemblyCmdService.submitAndWait(immediateSetup)) match {
           case response: Completed =>
             //do something with completed result
