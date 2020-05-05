@@ -1,7 +1,6 @@
 package example.auth.installed.commands
 
 import akka.actor.typed
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpRequest, ResponseEntity, Uri}
 import akka.http.scaladsl.unmarshalling.Unmarshaller

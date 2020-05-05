@@ -25,8 +25,8 @@ import csw.logging.client.scaladsl.{Keys, LoggerFactory, LoggingSystemFactory}
 import csw.prefix.models.{Prefix, Subsystem}
 import example.location.ExampleMessages.{AllDone, CustomException, TrackingEventAdapter}
 import example.location.LocationServiceExampleClient.locationInfoToString
-import example.location.LocationServiceExampleClientApp.typedSystem
 
+import scala.annotation.nowarn
 import scala.async.Async._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
@@ -43,7 +43,7 @@ object LocationServiceExampleClientApp extends App {
   Await.result(wiring.locationHttpService.start(), 5.seconds)
   val untypedSystem = ActorSystem("untyped-system")
   //#create-actor-system
-  implicit val typedSystem: typed.ActorSystem[SpawnProtocol.Command] =
+  val typedSystem: typed.ActorSystem[SpawnProtocol.Command] =
     ActorSystemFactory.remote(SpawnProtocol(), "csw-examples-locationServiceClient")
   //#create-actor-system
 
@@ -57,7 +57,7 @@ object LocationServiceExampleClientApp extends App {
   val loggingSystem: LoggingSystem = LoggingSystemFactory.start("LocationServiceExampleClient", "0.1", host, typedSystem)
   //#create-logging-system
 
-  untypedSystem.actorOf(LocationServiceExampleClient.props(locationService, loggingSystem))
+  untypedSystem.actorOf(LocationServiceExampleClient.props(locationService, loggingSystem)(typedSystem))
 }
 
 sealed trait ExampleMessages
@@ -69,7 +69,9 @@ object ExampleMessages {
 
 object LocationServiceExampleClient {
 
-  def props(locationService: LocationService, loggingSystem: LoggingSystem): Props =
+  def props(locationService: LocationService, loggingSystem: LoggingSystem)(
+      implicit system: typed.ActorSystem[SpawnProtocol.Command]
+  ): Props =
     Props(new LocationServiceExampleClient(locationService, loggingSystem))
 
   def locationInfoToString(loc: Location): String = {
@@ -98,7 +100,9 @@ object LocationServiceExampleClient {
 /**
  * A test client actor that uses the location service to resolve services
  */
-class LocationServiceExampleClient(locationService: LocationService, loggingSystem: LoggingSystem) extends akka.actor.Actor {
+class LocationServiceExampleClient(locationService: LocationService, loggingSystem: LoggingSystem)(
+    implicit typedSystem: typed.ActorSystem[SpawnProtocol.Command]
+) extends akka.actor.Actor {
 
   val log: Logger = new LoggerFactory(Prefix("csw.my-component-name")).getLogger(context)
 
@@ -297,8 +301,9 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
     //#stop-logging-system
   }
 
+  @nowarn("msg=unreachable code")
   override def receive: Receive = {
-    case x =>
+
     // Receive a location from the location service and if it is an akka location, send it a message
     case LocationUpdated(loc) =>
       log.info(s"Location updated ${locationInfoToString(loc)}")
