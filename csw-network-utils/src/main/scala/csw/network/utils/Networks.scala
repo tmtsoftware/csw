@@ -59,10 +59,10 @@ object Networks {
    * config property `csw-networks.hostname.automatic` is enabled only in test scope to automatically detect appropriate hostname
    * so that we do not need to set INTERFACE_NAME env variable in every test or globally on machine before running tests.
    */
-  private def fallbackInterfaceName =
+  private def fallbackInterfaceName(interfaceName: String): String =
     if (automatic) ""
     else {
-      val networkInterfaceNotProvided = NetworkInterfaceNotProvided("INTERFACE_NAME env variable is not set.")
+      val networkInterfaceNotProvided = NetworkInterfaceNotProvided(s"$interfaceName env variable is not set.")
       log.error(networkInterfaceNotProvided.message, ex = networkInterfaceNotProvided)
       throw networkInterfaceNotProvided
     }
@@ -77,10 +77,15 @@ object Networks {
    * If no specific network interface is provided, the first available interface will be taken to pick address
    */
   def apply(interfaceName: Option[String]): Networks = {
-    val ifaceName = interfaceName match {
-      case Some(interface) => interface
-      case None            => (sys.env ++ sys.props).getOrElse("INTERFACE_NAME", fallbackInterfaceName)
+    interfaceName match {
+      case Some(interface) => new Networks(interface, new NetworkInterfaceProvider)
+      case None            => apply("INTERFACE_NAME")
     }
+  }
+
+  def apply(interfaceNameKey: String): Networks = {
+    val ifaceName = (sys.env ++ sys.props).getOrElse(interfaceNameKey, fallbackInterfaceName(interfaceNameKey))
+    //TODO ++values?
     new Networks(ifaceName, new NetworkInterfaceProvider)
   }
 

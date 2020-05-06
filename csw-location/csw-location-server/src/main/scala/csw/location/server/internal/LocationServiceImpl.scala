@@ -18,6 +18,7 @@ import csw.location.api.exceptions.{
 }
 import csw.location.api.models.ComponentType.{Assembly, HCD, Sequencer}
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
+import csw.location.api.models.NetworkType.Public
 import csw.location.api.models._
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.server.commons.{CswCluster, LocationServiceLogger}
@@ -44,7 +45,12 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
   def register(registration: Registration): Future[RegistrationResult] = async {
 
     //Get the location from this registration
-    val location = registration.location(cswCluster.hostname)
+    val location = registration match {
+      case HttpRegistration(_, _, _, networkType) if networkType == Public =>
+        registration.location(cswCluster.publicHostname)
+      case _ => registration.location(cswCluster.hostname)
+    }
+
     log.info(s"Registering connection: [${registration.connection.name}] with location: [${location.uri.toString}]")
 
     //Create a message handler for this connection

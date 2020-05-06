@@ -23,10 +23,10 @@ import csw.location.api.javadsl.IRegistrationResult;
 import csw.location.api.javadsl.JComponentType;
 import csw.location.api.javadsl.JConnectionType;
 import csw.location.api.models.*;
-import csw.location.client.ActorSystemFactory;
-import csw.location.client.javadsl.JHttpLocationServiceFactory;
 import csw.location.api.models.Connection.AkkaConnection;
 import csw.location.api.models.Connection.HttpConnection;
+import csw.location.client.ActorSystemFactory;
+import csw.location.client.javadsl.JHttpLocationServiceFactory;
 import csw.location.server.internal.ServerWiring;
 import csw.location.server.scaladsl.RegistrationFactory;
 import csw.logging.api.javadsl.ILogger;
@@ -34,8 +34,8 @@ import csw.logging.client.internal.LoggingSystem;
 import csw.logging.client.javadsl.JKeys;
 import csw.logging.client.javadsl.JLoggerFactory;
 import csw.logging.client.javadsl.JLoggingSystemFactory;
-import csw.prefix.models.Prefix;
 import csw.prefix.javadsl.JSubsystem;
+import csw.prefix.models.Prefix;
 import scala.concurrent.Await;
 import scala.concurrent.duration.FiniteDuration;
 
@@ -96,14 +96,18 @@ public class JLocationServiceExampleClient extends AbstractActor {
         //#Components-Connections-Registrations
 
         // dummy http connection
-        HttpConnection httpConnection = new HttpConnection(new ComponentId(new Prefix(JSubsystem.CSW, "configuration"), JComponentType.Service));
-        HttpRegistration httpRegistration = new HttpRegistration(httpConnection, 8080, "path123");
+        HttpConnection httpConnection = new HttpConnection(new ComponentId(new Prefix(JSubsystem.CSW,
+                "configuration"), JComponentType.Service));
+        NetworkType privateNetwork = NetworkType.Private$.MODULE$;
+        HttpRegistration httpRegistration = new HttpRegistration(httpConnection, 8080, "path123",
+                privateNetwork);
         httpRegResult = locationService.register(httpRegistration).get();
 
         // ************************************************************************************************************
 
         // dummy HCD connection
-        AkkaConnection hcdConnection = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS, "hcd1"), JComponentType.HCD));
+        AkkaConnection hcdConnection = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS, "hcd1"),
+                JComponentType.HCD));
         ActorRef actorRef = getContext().actorOf(Props.create(AbstractActor.class, () -> new AbstractActor() {
                     @Override
                     public Receive createReceive() {
@@ -125,7 +129,8 @@ public class JLocationServiceExampleClient extends AbstractActor {
         Behavior<String> behavior = Behaviors.setup(ctx -> Behaviors.same());
         akka.actor.typed.ActorRef<String> typedActorRef = Adapter.spawn(context(), behavior, "typed-actor-ref");
 
-        AkkaConnection assemblyConnection = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS, "assembly1"), JComponentType.Assembly));
+        AkkaConnection assemblyConnection = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS,
+                "assembly1"), JComponentType.Assembly));
 
         // Register Typed ActorRef[String] with Location Service
         AkkaRegistration assemblyRegistration = new RegistrationFactory().akkaTyped(assemblyConnection, typedActorRef);
@@ -162,10 +167,12 @@ public class JLocationServiceExampleClient extends AbstractActor {
         findResult.ifPresent(akkaLocation -> {
             //#typed-ref
             // If the component type is HCD or Assembly, use this to get the correct ActorRef
-            akka.actor.typed.ActorRef<ComponentMessage> typedComponentRef = AkkaLocationExt.RichAkkaLocation(akkaLocation).componentRef(typedSystem);
+            akka.actor.typed.ActorRef<ComponentMessage> typedComponentRef =
+                    AkkaLocationExt.RichAkkaLocation(akkaLocation).componentRef(typedSystem);
 
             // If the component type is Container, use this to get the correct ActorRef
-            akka.actor.typed.ActorRef<ContainerMessage> typedContainerRef = AkkaLocationExt.RichAkkaLocation(akkaLocation).containerRef(typedSystem);
+            akka.actor.typed.ActorRef<ContainerMessage> typedContainerRef =
+                    AkkaLocationExt.RichAkkaLocation(akkaLocation).containerRef(typedSystem);
             //#typed-ref
         });
         //#resolve
@@ -174,7 +181,8 @@ public class JLocationServiceExampleClient extends AbstractActor {
         Duration waitForResolveLimit = Duration.ofSeconds(30);
 
         //#log-info-map-supplier
-        log.info(() -> "Attempting to resolve " + exampleConnection + " with a wait of " + waitForResolveLimit + "...", () -> Map.of(
+        log.info(() -> "Attempting to resolve " + exampleConnection + " with a wait of " + waitForResolveLimit + ".." +
+                ".", () -> Map.of(
                 JKeys.OBS_ID, "foo_obs_id",
                 "exampleConnection", exampleConnection.name()
         ));
@@ -268,7 +276,8 @@ public class JLocationServiceExampleClient extends AbstractActor {
 
     private String connectionInfo(Connection connection) {
         // construct string with useful information about a connection
-        return connection.name() + ", component type=" + connection.componentId().componentType() + ", connection type=" + connection.connectionType();
+        return connection.name() + ", component type=" + connection.componentId().componentType() + ", connection " +
+                "type=" + connection.connectionType();
     }
 
     @Override
@@ -324,7 +333,8 @@ public class JLocationServiceExampleClient extends AbstractActor {
         Await.result(locationWiring.locationHttpService().start("127.0.0.1"), new FiniteDuration(5, TimeUnit.SECONDS));
 
         //#create-actor-system
-        ActorSystem<SpawnProtocol.Command> typedSystem = ActorSystemFactory.remote(SpawnProtocol.create(), "csw-examples-locationServiceClient");
+        ActorSystem<SpawnProtocol.Command> typedSystem = ActorSystemFactory.remote(SpawnProtocol.create(), "csw" +
+                "-examples-locationServiceClient");
         //#create-actor-system
 
         //#create-logging-system

@@ -8,7 +8,7 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
 import csw.config.server.commons.{ConfigServerLogger, ConfigServiceConnection}
 import csw.config.server.{ActorRuntime, Settings}
-import csw.location.api.models.HttpRegistration
+import csw.location.api.models.{HttpRegistration, NetworkType}
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.logging.api.scaladsl.Logger
 import csw.network.utils.{Networks, SocketUtils}
@@ -61,7 +61,8 @@ class HttpService(
   def shutdown(): Future[Done] = actorRuntime.shutdown()
 
   private def bind() = {
-    val _host = Networks().hostname
+
+    val _host = Networks(NetworkType.Public.envKey).hostname
     val _port = settings.`service-port`
 
     /*
@@ -74,7 +75,7 @@ class HttpService(
 
     Http().bindAndHandle(
       handler = configServiceRoute.route,
-      interface = "0.0.0.0",
+      interface = _host,
       port = _port
     )
   }
@@ -83,7 +84,8 @@ class HttpService(
     val registration = HttpRegistration(
       connection = ConfigServiceConnection.value,
       port = binding.localAddress.getPort,
-      path = ""
+      path = "",
+      NetworkType.Public
     )
     log.info(
       s"Registering Config Service HTTP Server with Location Service using registration: [${registration.toString}]"

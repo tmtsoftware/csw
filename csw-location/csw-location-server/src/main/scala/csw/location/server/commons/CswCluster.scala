@@ -31,7 +31,8 @@ class CswCluster private (_typedSystem: ActorSystem[SpawnProtocol.Command]) {
   /**
    * Identifies the hostname where ActorSystem is running
    */
-  val hostname: String = _typedSystem.settings.config.getString("akka.remote.artery.canonical.hostname")
+  val hostname: String       = _typedSystem.settings.config.getString("akka.remote.artery.canonical.hostname")
+  val publicHostname: String = _typedSystem.settings.config.getString("akka.cluster.public.hostname")
 
   implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = _typedSystem
   implicit val ec: ExecutionContext                            = actorSystem.executionContext

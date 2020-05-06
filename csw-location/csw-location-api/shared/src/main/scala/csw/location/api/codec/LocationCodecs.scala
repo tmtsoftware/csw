@@ -27,6 +27,7 @@ trait LocationCodecsBase extends CommonCodecs {
 
   lazy val locationCodecValue: Codec[Location]             = deriveAllCodecs
   implicit lazy val registrationCodec: Codec[Registration] = deriveAllCodecs
+  implicit lazy val networkType: Codec[NetworkType]        = deriveAllCodecs
 
   implicit lazy val trackingEventCodec: Codec[TrackingEvent] = {
     @nowarn implicit lazy val locationCodec: Codec[Location] = locationCodecValue
