@@ -70,8 +70,11 @@ object Networks {
   /**
    * Creates instance of `Networks` by reading `INTERFACE_NAME` env variable
    */
-  def apply(): Networks = apply(None)
-
+  def apply(interfaceNameKey: String = "INTERFACE_NAME"): Networks = {
+    val ifaceName = (sys.env ++ sys.props).getOrElse(interfaceNameKey, fallbackInterfaceName(interfaceNameKey))
+    //TODO ++values?
+    new Networks(ifaceName, new NetworkInterfaceProvider)
+  }
   /**
    * Picks an appropriate ipv4 address from the network interface provided.
    * If no specific network interface is provided, the first available interface will be taken to pick address
@@ -79,14 +82,8 @@ object Networks {
   def apply(interfaceName: Option[String]): Networks = {
     interfaceName match {
       case Some(interface) => new Networks(interface, new NetworkInterfaceProvider)
-      case None            => apply("INTERFACE_NAME")
+      case None            => apply()
     }
-  }
-
-  def apply(interfaceNameKey: String): Networks = {
-    val ifaceName = (sys.env ++ sys.props).getOrElse(interfaceNameKey, fallbackInterfaceName(interfaceNameKey))
-    //TODO ++values?
-    new Networks(ifaceName, new NetworkInterfaceProvider)
   }
 
   private def automatic: Boolean = ConfigFactory.load().getBoolean("csw-networks.hostname.automatic")
