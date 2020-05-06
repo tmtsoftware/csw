@@ -75,6 +75,7 @@ object Networks {
     //TODO ++values?
     new Networks(ifaceName, new NetworkInterfaceProvider)
   }
+
   /**
    * Picks an appropriate ipv4 address from the network interface provided.
    * If no specific network interface is provided, the first available interface will be taken to pick address

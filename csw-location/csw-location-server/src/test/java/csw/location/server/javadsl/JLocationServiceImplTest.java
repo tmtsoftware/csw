@@ -49,7 +49,8 @@ public class JLocationServiceImplTest extends JUnitSuite {
     private static akka.actor.ActorSystem untypedSystem;
     private static ActorSystem<SpawnProtocol.Command> typedSystem;
     private static ILocationService locationService;
-    private final String hostname = Networks.apply().hostname();
+    private final NetworkType.Private$ privateNetwork = NetworkType.Private$.MODULE$;
+    private final String hostname = Networks.apply(privateNetwork.envKey()).hostname();
 
     private final ComponentId akkaHcdComponentId = new ComponentId(new Prefix(JSubsystem.CSW, "hcd1"),
             JComponentType.HCD);
@@ -65,7 +66,6 @@ public class JLocationServiceImplTest extends JUnitSuite {
     ), JComponentType.Service);
     private final HttpConnection httpServiceConnection = new HttpConnection(httpServiceComponentId);
     private final String Path = "/path/to/resource";
-    private final NetworkType.Private$ privateNetwork = NetworkType.Private$.MODULE$;
 
     @BeforeClass
     public static void setup() throws Exception {
@@ -98,7 +98,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
         HttpRegistration httpRegistration = new HttpRegistration(httpServiceConnection, port, Path, privateNetwork);
 
         IRegistrationResult registrationResult = locationService.register(httpRegistration).get();
-        Assert.assertEquals(httpRegistration.location(Networks.apply().hostname()), registrationResult.location());
+        Assert.assertEquals(httpRegistration.location(hostname), registrationResult.location());
         locationService.unregister(httpServiceConnection).get();
         Assert.assertEquals(Collections.emptyList(), locationService.list().get());
     }
