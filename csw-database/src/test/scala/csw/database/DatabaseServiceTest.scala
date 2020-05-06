@@ -25,7 +25,7 @@ class DatabaseServiceTest extends AnyFunSuite with Matchers with ScalaFutures wi
   private var postgres: EmbeddedPostgres                 = _
   private var dsl: DSLContext                            = _
 
-  override def beforeAll: Unit = {
+  override def beforeAll(): Unit = {
     postgres = DBTestHelper.postgres(0) // 0 is random port
     dsl = DBTestHelper.dslContext(system, postgres.getPort)
   }

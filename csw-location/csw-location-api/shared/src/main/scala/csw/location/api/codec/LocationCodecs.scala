@@ -2,12 +2,13 @@ package csw.location.api.codec
 
 import java.net.URI
 
-import com.github.ghik.silencer.silent
 import csw.location.api.models._
 import csw.prefix.codecs.CommonCodecs
 import io.bullet.borer.Codec
 import io.bullet.borer.derivation.CompactMapBasedCodecs.deriveCodec
 import io.bullet.borer.derivation.MapBasedCodecs.deriveAllCodecs
+
+import scala.annotation.nowarn
 
 object LocationCodecs extends LocationCodecs
 trait LocationCodecs extends LocationCodecsBase {
@@ -28,7 +29,7 @@ trait LocationCodecsBase extends CommonCodecs {
   implicit lazy val registrationCodec: Codec[Registration] = deriveAllCodecs
 
   implicit lazy val trackingEventCodec: Codec[TrackingEvent] = {
-    @silent implicit lazy val locationCodec: Codec[Location] = locationCodecValue
+    @nowarn implicit lazy val locationCodec: Codec[Location] = locationCodecValue
     deriveAllCodecs
   }
 }

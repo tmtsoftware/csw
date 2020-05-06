@@ -154,7 +154,7 @@ class CommandServiceTest(ignore: Int)
       //#invalidCmd
       val invalidSetup    = Setup(prefix, invalidCmd, obsId)
       val invalidCommandF = assemblyCmdService.submitAndWait(invalidSetup)
-      async {
+      val resultF: Future[Unit] = async {
         await(invalidCommandF) match {
           case Completed(_, _) =>
           // Do Completed thing
@@ -168,11 +168,14 @@ class CommandServiceTest(ignore: Int)
       Await.result(invalidCommandF, 5.seconds) shouldBe a[Invalid]
       //#invalidCmd
 
+      //just to remove the warning of unused and the nullary method. Cannot add @nowarn as it is a snippet for docs.
+      Await.result(resultF, 5.seconds)
+
       // DEOPSCSW-233: Hide implementation by having a CCS API
       // short running command
       //#immediate-response
       val immediateSetup = Setup(prefix, immediateCmd, obsId)
-      val immediateCommandF = async {
+      val immediateCommandF: Future[SubmitResponse] = async {
         await(assemblyCmdService.submitAndWait(immediateSetup)) match {
           case response: Completed =>
             //do something with completed result
@@ -188,7 +191,7 @@ class CommandServiceTest(ignore: Int)
       // #longRunning
       val longRunningSetup = Setup(prefix, longRunningCmd, obsId)
 
-      val longRunningResultF = async {
+      val longRunningResultF: Future[Option[Int]] = async {
         await(assemblyCmdService.submitAndWait(longRunningSetup)) match {
           case Completed(_, result) =>
             result.nonEmpty shouldBe true
@@ -208,7 +211,7 @@ class CommandServiceTest(ignore: Int)
       var longRunningRunId: Id = Id("blah") // Is updated below for use in later test
 
       // #queryLongRunning
-      val longRunningQueryResultF = async {
+      val longRunningQueryResultF: Future[Option[Int]] = async {
         // The following val is set so we can do query and work and complete later
         val longRunningF = assemblyCmdService.submit(longRunningSetup)
         // This is used in a later test
@@ -238,7 +241,7 @@ class CommandServiceTest(ignore: Int)
 
       // This test shows DEOPSCSW-623 because submit is issued without future and queryFinal works
       // #queryFinal
-      val queryFinalF = async {
+      val queryFinalF: Future[Option[Int]] = async {
         // The following submit is made without saving the Future!
         val runId = await(assemblyCmdService.submit(longRunningSetup)).runId
 
@@ -277,7 +280,7 @@ class CommandServiceTest(ignore: Int)
       // `onewayCmd` is a sample to demonstrate oneway without any actions
       val onewaySetup = Setup(prefix, onewayCmd, obsId)
       // Don't care about the futures from async
-      val oneWayF = async {
+      val oneWayF: Future[Unit] = async {
         await(assemblyCmdService.oneway(onewaySetup)) match {
           case invalid: Invalid =>
           // Log an error here
@@ -289,7 +292,7 @@ class CommandServiceTest(ignore: Int)
       //#oneway
 
       //#validate
-      val validateCommandF = async {
+      val validateCommandF: Future[Boolean] = async {
         await(assemblyCmdService.validate(immediateSetup)) match {
           case _: Accepted       => true
           case Invalid(_, issue) =>
@@ -317,7 +320,7 @@ class CommandServiceTest(ignore: Int)
       val submitAllinvalidSetup = Setup(prefix, invalidCmd, obsId)
 
       //#submitAll
-      val submitAllF = async {
+      val submitAllF: Future[List[SubmitResponse]] = async {
         await(assemblyCmdService.submitAllAndWait(List(submitAllSetup1, submitAllSetup2, submitAllinvalidSetup)))
       }
       val submitAllResponse = Await.result(submitAllF, timeout.duration)
@@ -328,7 +331,7 @@ class CommandServiceTest(ignore: Int)
       //#submitAll
 
       //#submitAllInvalid
-      val submitAllF2 = async {
+      val submitAllF2: Future[List[SubmitResponse]] = async {
         await(assemblyCmdService.submitAllAndWait(List(submitAllSetup1, submitAllinvalidSetup, submitAllSetup2)))
       }
       val submitAllResponse2 = Await.result(submitAllF2, timeout.duration)
@@ -376,7 +379,7 @@ class CommandServiceTest(ignore: Int)
       //#matcher
 
       //#onewayAndMatch
-      val onewayMatchF = async {
+      val onewayMatchF: Future[SubmitResponse with MatchingResponse] = async {
         await(assemblyCmdService.onewayAndMatch(setupWithMatcher, demandMatcher)) match {
           case i: Invalid =>
             // Command was not accepted

@@ -16,11 +16,11 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.testkit.scaladsl.CSWService.ConfigServer
 import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
 import org.scalatest._
+import org.scalatest.funsuite.AnyFunSuiteLike
 
 import scala.async.Async._
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{Await, Future}
-import org.scalatest.funsuite.AnyFunSuiteLike
 
 // DEOPSCSW-89: Examples of  Configuration Service usage in Java and Scala
 // DEOPSCSW-592: Create csw testkit for component writers
@@ -102,7 +102,7 @@ class ConfigClientExampleTest
 
         //construct ConfigData from Array[Byte] by reading a local file
         val stream: InputStream    = getClass.getClassLoader.getResourceAsStream("smallBinary.bin")
-        def byteArray: Array[Byte] = Stream.continually(stream.read).takeWhile(_ != -1).map(_.toByte).toArray
+        def byteArray: Array[Byte] = LazyList.continually(stream.read).takeWhile(_ != -1).map(_.toByte).toArray
         val config3                = ConfigData.fromBytes(byteArray)
 
         //store the config, at a specified path as normal text file

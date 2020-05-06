@@ -22,6 +22,7 @@ import csw.prefix.models.Prefix
 import play.api.libs.json.Json
 
 import scala.async.Async._
+import scala.concurrent.Future
 
 class GatewayClient(serverIp: String, port: Int)(implicit val actorSystem: typed.ActorSystem[_]) {
 
@@ -42,7 +43,7 @@ class GatewayClient(serverIp: String, port: Int)(implicit val actorSystem: typed
     val uri     = Uri(s"$baseUri/subscribe/$subsystem?component=$component&event=${eventKey.eventName.name}")
     val request = HttpRequest(HttpMethods.GET, uri = uri)
 
-    val sseStreamFuture = async {
+    val sseStreamFuture: Future[Source[ServerSentEvent, NotUsed]] = async {
       val response              = await(Http().singleRequest(request))
       implicit val unmarshaller = fromEventsStream(actorSystem.toClassic)
       await(Unmarshal(response.entity).to[Source[ServerSentEvent, NotUsed]])

@@ -1,12 +1,10 @@
 package csw.params.core.models
 
-import com.github.ghik.silencer.silent
-
 import scala.annotation.varargs
 import scala.collection.mutable
+import scala.jdk.CollectionConverters._
 import scala.language.implicitConversions
 import scala.reflect.ClassTag
-import scala.jdk.CollectionConverters._
 
 /**
  * A top level key for a parameter set representing an array like collection.
@@ -51,7 +49,6 @@ object ArrayData {
    */
   @varargs
   def fromArrays[T](first: T, rest: T*): ArrayData[T] = {
-    @silent
     implicit val ct: ClassTag[T] = ClassTag[T](first.getClass)
     ArrayData.fromArray((first +: rest).toArray)
   }

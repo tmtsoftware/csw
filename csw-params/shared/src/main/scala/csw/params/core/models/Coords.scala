@@ -3,10 +3,10 @@ import java.util
 
 import csw.params.core.models.Coords.EqFrame.ICRS
 import csw.params.core.models.Coords._
-import scala.jdk.CollectionConverters._
 import enumeratum._
 
 import scala.collection.immutable
+import scala.jdk.CollectionConverters._
 
 object Coords {
 
@@ -124,7 +124,7 @@ object Coords {
         catalogName: String = DEFAULT_CATNAME,
         pmx: Double = DEFAULT_PMX,
         pmy: Double = DEFAULT_PMY
-    ) {
+    ) = {
       this(
         tag,
         ra match {
