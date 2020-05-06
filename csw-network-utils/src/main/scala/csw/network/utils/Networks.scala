@@ -2,7 +2,7 @@ package csw.network.utils
 
 import java.net.{Inet6Address, InetAddress, NetworkInterface}
 
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{Config, ConfigFactory}
 import csw.logging.api.scaladsl.Logger
 import csw.network.utils.commons.NetworksLogger
 import csw.network.utils.exceptions.NetworkInterfaceNotProvided
@@ -59,8 +59,8 @@ object Networks {
    * config property `csw-networks.hostname.automatic` is enabled only in test scope to automatically detect appropriate hostname
    * so that we do not need to set INTERFACE_NAME env variable in every test or globally on machine before running tests.
    */
-  private def fallbackInterfaceName(interfaceName: String): String =
-    if (automatic) ""
+  private def fallbackInterfaceName(interfaceName: String, config: Config): String =
+    if (automatic(config)) ""
     else {
       val networkInterfaceNotProvided = NetworkInterfaceNotProvided(s"$interfaceName env variable is not set.")
       log.error(networkInterfaceNotProvided.message, ex = networkInterfaceNotProvided)
@@ -70,10 +70,9 @@ object Networks {
   /**
    * Creates instance of `Networks` by reading `INTERFACE_NAME` env variable
    */
-  def apply(interfaceNameKey: String = "INTERFACE_NAME"): Networks = {
-    val ifaceName = (sys.env ++ sys.props).getOrElse(interfaceNameKey, fallbackInterfaceName(interfaceNameKey))
-    //TODO ++values?
-    new Networks(ifaceName, new NetworkInterfaceProvider)
+  def apply(interfaceNameEnvKey: String = "INTERFACE_NAME", config: Config = ConfigFactory.load()): Networks = {
+    val interface = (sys.env ++ sys.props).getOrElse(interfaceNameEnvKey, fallbackInterfaceName(interfaceNameEnvKey, config))
+    new Networks(interface, new NetworkInterfaceProvider)
   }
 
   /**
@@ -87,6 +86,9 @@ object Networks {
     }
   }
 
-  private def automatic: Boolean = ConfigFactory.load().getBoolean("csw-networks.hostname.automatic")
+  private def automatic(_config: Config): Boolean = {
+    _config.getBoolean("csw-networks.hostname.automatic")
+//    _config.withFallback(ConfigFactory.load()).getBoolean("csw-networks.hostname.automatic")
+  }
 
 }

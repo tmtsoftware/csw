@@ -6,6 +6,7 @@ import akka.Done
 import akka.actor.CoordinatedShutdown
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
+import com.typesafe.config.{Config, ConfigFactory}
 import csw.config.server.commons.{ConfigServerLogger, ConfigServiceConnection}
 import csw.config.server.{ActorRuntime, Settings}
 import csw.location.api.models.{HttpRegistration, NetworkType}
@@ -29,7 +30,8 @@ class HttpService(
     locationService: LocationService,
     configServiceRoute: ConfigServiceRoute,
     settings: Settings,
-    actorRuntime: ActorRuntime
+    actorRuntime: ActorRuntime,
+    config: Config = ConfigFactory.load() //TODO added to make test override config,find better way and remove this param
 ) {
 
   import actorRuntime.{coordinatedShutdown, ec, typedSystem}
@@ -62,7 +64,7 @@ class HttpService(
 
   private def bind() = {
 
-    val _host = Networks(NetworkType.Public.envKey).hostname
+    val _host = Networks(NetworkType.Public.envKey, config).hostname
     val _port = settings.`service-port`
 
     /*

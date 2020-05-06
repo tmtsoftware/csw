@@ -50,7 +50,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
     private static ActorSystem<SpawnProtocol.Command> typedSystem;
     private static ILocationService locationService;
     private final NetworkType.Private$ privateNetwork = NetworkType.Private$.MODULE$;
-    private final String hostname = Networks.apply(privateNetwork.envKey()).hostname();
+    private final String hostname = Networks.apply(privateNetwork.envKey(),untypedSystem.settings().config()).hostname();
 
     private final ComponentId akkaHcdComponentId = new ComponentId(new Prefix(JSubsystem.CSW, "hcd1"),
             JComponentType.HCD);
