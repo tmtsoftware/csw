@@ -30,7 +30,6 @@ class ClusterSettingsTest extends AnyFunSuite with Matchers with BeforeAndAfterA
 
     clusterSettings.clusterName shouldBe Constants.ClusterName
     config.getString("akka.remote.artery.canonical.hostname") shouldBe Networks().hostname
-    config.getString("akka.cluster.public.hostname") shouldBe Networks().hostname
     config.getInt("akka.remote.artery.canonical.port") shouldBe 0
     config.getList("akka.cluster.seed-nodes").size shouldBe 0
   }

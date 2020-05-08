@@ -119,7 +119,6 @@ private[location] case class ClusterSettings(clusterName: String = Constants.Clu
   private[location] def config: Config = {
     val computedValues: Map[String, Any] = Map(
       "akka.remote.artery.canonical.hostname" -> hostname,
-      "akka.cluster.public.hostname"          -> publicHostname,
       "akka.remote.artery.canonical.port"     -> port,
       "akka.cluster.seed-nodes"               -> seedNodes.asJava,
       "akka.cluster.http.management.hostname" -> hostname,
@@ -136,7 +135,14 @@ private[location] case class ClusterSettings(clusterName: String = Constants.Clu
 
   }
 
-  def system: ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), clusterName, config)
+  lazy val system: ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), clusterName, config)
+}
+
+// ===== TESTING API =====
+private[csw] object ClusterSettings {
+  def make(actorSystem: ActorSystem[SpawnProtocol.Command]): ClusterSettings = new ClusterSettings() {
+    override lazy val system: ActorSystem[SpawnProtocol.Command] = actorSystem
+  }
 }
 
 /**

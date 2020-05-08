@@ -49,8 +49,8 @@ public class JLocationServiceImplTest extends JUnitSuite {
     private static akka.actor.ActorSystem untypedSystem;
     private static ActorSystem<SpawnProtocol.Command> typedSystem;
     private static ILocationService locationService;
-    private final NetworkType.Private$ privateNetwork = NetworkType.Private$.MODULE$;
-    private final String hostname = Networks.apply(privateNetwork.envKey(),untypedSystem.settings().config()).hostname();
+    private static final NetworkType.Private$ privateNetwork = NetworkType.Private$.MODULE$;
+    private static String hostname;
 
     private final ComponentId akkaHcdComponentId = new ComponentId(new Prefix(JSubsystem.CSW, "hcd1"),
             JComponentType.HCD);
@@ -72,6 +72,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
         wiring = new ServerWiring(false);
         typedSystem = ActorSystemFactory.remote(SpawnProtocol.create(), "test");
         untypedSystem = Adapter.toClassic(typedSystem);
+        hostname = Networks.apply(privateNetwork.envKey(), untypedSystem.settings().config()).hostname();
         TestProbe<Object> actorTestProbe = TestProbe.create("test-actor", typedSystem);
         actorRef = actorTestProbe.ref();
         locationService = JHttpLocationServiceFactory.makeLocalClient(typedSystem);

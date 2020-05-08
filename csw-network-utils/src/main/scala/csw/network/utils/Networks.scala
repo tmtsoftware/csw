@@ -79,15 +79,12 @@ object Networks {
    * Picks an appropriate ipv4 address from the network interface provided.
    * If no specific network interface is provided, the first available interface will be taken to pick address
    */
-  def apply(interfaceName: Option[String]): Networks = {
+  def apply(interfaceName: Option[String]): Networks =
     interfaceName match {
       case Some(interface) => new Networks(interface, new NetworkInterfaceProvider)
       case None            => apply()
     }
-  }
 
-  private def automatic(_config: Config): Boolean = {
-    _config.getBoolean("csw-networks.hostname.automatic")
-  }
+  private def automatic(_config: Config): Boolean = _config.getBoolean("csw-networks.hostname.automatic")
 
 }

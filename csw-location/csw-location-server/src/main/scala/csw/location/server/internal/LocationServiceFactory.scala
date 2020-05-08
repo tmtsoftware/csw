@@ -1,6 +1,5 @@
 package csw.location.server.internal
 
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.location.api.scaladsl.LocationService
 import csw.location.server.commons.{ClusterSettings, CswCluster}
 
@@ -13,39 +12,13 @@ import csw.location.server.commons.{ClusterSettings, CswCluster}
 private[location] object LocationServiceFactory {
 
   /**
-   * Create a LocationService instance to manage registrations
-   *
-   * @return an instance of `LocationService`
-   */
-  def make(): LocationService = withCluster(CswCluster.make())
-
-  /**
    * Create an LocationService instance to manage registrations
    *
-   * @param actorSystem the actorSystem used to feed in `CswCluster` and use it's config properties to join the cluster
+   * @param clusterSettings instance of cluster settings which contains all the cluster related configuration
    * @return an instance of `LocationService`
    */
-  def withSystem(actorSystem: ActorSystem[SpawnProtocol.Command]): LocationService =
-    withCluster(CswCluster.withSystem(actorSystem))
-
-  /**
-   * Create an LocationService instance to manage registrations
-   *
-   * @note it is highly recommended to use this method for testing purpose only
-   * @param clusterSettings the custom clusterSettings used to join the cluster
-   * @return an instance of `LocationService`
-   */
-  def withSettings(clusterSettings: ClusterSettings): LocationService =
-    withCluster(CswCluster.withSettings(clusterSettings))
-
-  /**
-   * Create a LocationService instance to manage registrations
-   *
-   * @note it is highly recommended to use it for testing purpose only
-   * @param cswCluster the cswCluster instance used to join the cluster
-   * @return an instance of `LocationService`
-   */
-  def withCluster(cswCluster: CswCluster): LocationService = {
+  def make(clusterSettings: ClusterSettings): LocationService = {
+    val cswCluster                       = CswCluster.make(clusterSettings)
     val locationService: LocationService = new LocationServiceImpl(cswCluster)
     // starts a DeathwatchActor each time a LocationService is created
     DeathwatchActor.start(cswCluster, locationService)

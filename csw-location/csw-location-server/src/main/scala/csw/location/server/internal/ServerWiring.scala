@@ -21,7 +21,7 @@ private[csw] class ServerWiring(enableAuth: Boolean) extends LocationServiceCode
   implicit lazy val actorSystem: ActorSystem[SpawnProtocol.Command] = clusterSettings.system
   lazy val actorRuntime                                             = new ActorRuntime(actorSystem)
   import actorSystem.executionContext
-  lazy val locationService: LocationService = LocationServiceFactory.withSystem(actorSystem)
+  lazy val locationService: LocationService = LocationServiceFactory.make(clusterSettings)
 
   lazy val securityDirectives: SecurityDirectives = SecurityDirectives(config, locationService, !enableAuth)
 
@@ -59,9 +59,5 @@ private[csw] object ServerWiring {
       override lazy val clusterSettings: ClusterSettings = _clusterSettings
     }
 
-  def make(_actorSystem: ActorSystem[SpawnProtocol.Command], enableAuth: Boolean): ServerWiring =
-    new ServerWiring(enableAuth) {
-      override lazy val actorSystem: ActorSystem[SpawnProtocol.Command] = _actorSystem
-    }
 }
 // $COVERAGE-ON$

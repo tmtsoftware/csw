@@ -1,17 +1,14 @@
-package csw.location.server.commons
+package csw.network.utils.internal
 
-import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 import scala.util.Success
-import org.scalatest.funsuite.AnyFunSuite
-import org.scalatest.matchers.should.Matchers
 
 class BlockingUtilsTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
-  // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
-  InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
   test("test that Poll method bottoms out and returns expected result") {
     BlockingUtils.poll(predicate = true) shouldBe true

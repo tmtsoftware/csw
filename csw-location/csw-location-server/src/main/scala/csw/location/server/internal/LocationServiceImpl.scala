@@ -91,9 +91,8 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
 
   private[internal] def getLocation(registration: Registration) = {
     val location = registration match {
-      case HttpRegistration(_, _, _, networkType) if networkType == Public =>
-        registration.location(cswCluster.publicHostname)
-      case _ => registration.location(cswCluster.hostname)
+      case HttpRegistration(_, _, _, Public) => registration.location(cswCluster.publicHostname)
+      case _                                 => registration.location(cswCluster.hostname)
     }
     location
   }

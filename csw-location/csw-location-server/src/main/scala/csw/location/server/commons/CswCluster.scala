@@ -13,6 +13,7 @@ import csw.location.api.exceptions.CouldNotJoinCluster
 import csw.location.server.commons.ClusterConfirmationMessages.{HasJoinedCluster, Shutdown}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
+import csw.network.utils.internal.BlockingUtils
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -24,17 +25,17 @@ import scala.util.control.NonFatal
  *
  * @note it is highly recommended that explicit creation of CswCluster should be for advanced usages or testing purposes only
  */
-class CswCluster private (_typedSystem: ActorSystem[SpawnProtocol.Command]) {
+class CswCluster private (clusterSettings: ClusterSettings) {
 
   private val log: Logger = LocationServiceLogger.getLogger
 
   /**
    * Identifies the hostname where ActorSystem is running
    */
-  val hostname: String       = _typedSystem.settings.config.getString("akka.remote.artery.canonical.hostname")
-  val publicHostname: String = _typedSystem.settings.config.getString("akka.cluster.public.hostname")
+  val hostname: String       = clusterSettings.hostname
+  val publicHostname: String = clusterSettings.publicHostname
 
-  implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = _typedSystem
+  implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = clusterSettings.system
   implicit val ec: ExecutionContext                            = actorSystem.executionContext
   implicit val cluster: Cluster                                = Cluster(actorSystem)
   private val distributedData: DistributedData                 = scaladsl.DistributedData(actorSystem)
@@ -55,7 +56,7 @@ class CswCluster private (_typedSystem: ActorSystem[SpawnProtocol.Command]) {
   private def startClusterManagement(): Unit = {
     val startManagement = actorSystem.settings.config.getBoolean("startManagement")
     if (startManagement) {
-      val akkaManagement = AkkaManagement(_typedSystem)
+      val akkaManagement = AkkaManagement(actorSystem)
       Await.result(akkaManagement.start(), 10.seconds)
     }
   }
@@ -103,27 +104,12 @@ object CswCluster {
   private val log: Logger = LocationServiceLogger.getLogger
 
   /**
-   * Creates CswCluster with the default cluster settings
-   *
-   * @see [[ClusterSettings]] same as [[csw.location.server.commons.CswCluster.withSettings()]]
-   * @return an instance of CswCluster
-   */
-  def make(): CswCluster = withSettings(ClusterSettings())
-
-  /**
    * Creates CswCluster with the given customized settings
    *
    * @return an instance of CswCluster
    */
-  def withSettings(settings: ClusterSettings): CswCluster = withSystem(settings.system)
-
-  /**
-   * Creates CswCluster with the given ActorSystem
-   *
-   * @return an instance of CswCluster
-   */
-  def withSystem(actorSystem: ActorSystem[SpawnProtocol.Command]): CswCluster = {
-    val cswCluster = new CswCluster(actorSystem)
+  def make(settings: ClusterSettings): CswCluster = {
+    val cswCluster = new CswCluster(settings)
     try {
       cswCluster.startClusterManagement()
       cswCluster.joinCluster()

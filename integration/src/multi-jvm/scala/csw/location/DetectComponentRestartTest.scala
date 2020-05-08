@@ -9,7 +9,7 @@ import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{ComponentId, ComponentType, LocationRemoved, LocationUpdated}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.server.commons.CswCluster
+import csw.location.server.commons.ClusterSettings
 import csw.location.server.internal.{LocationServiceFactory, ServerWiring}
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.prefix.models.{Prefix, Subsystem}
@@ -35,11 +35,7 @@ class DetectComponentRestartTest(ignore: Int, mode: String)
     val akkaConnection = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "TromboneHcd"), ComponentType.HCD))
 
     runOn(member1) {
-      locationService
-        .register(
-          make(akkaConnection, typedSystem.spawn(Behaviors.empty, "empty").toURI)
-        )
-        .await
+      locationService.register(make(akkaConnection, typedSystem.spawn(Behaviors.empty, "empty").toURI)).await
 
       enterBarrier("location-registered")
       enterBarrier("location-updated")
@@ -53,28 +49,22 @@ class DetectComponentRestartTest(ignore: Int, mode: String)
           config.settings.joinLocal(3552).config
         else config.settings.config
 
-      val newSystem      = makeSystem(newConfig)
-      val newTypedSystem = newSystem.toTyped.asInstanceOf[ActorSystem[SpawnProtocol.Command]]
+      val newSystem       = makeSystem(newConfig)
+      val newTypedSystem  = newSystem.toTyped.asInstanceOf[ActorSystem[SpawnProtocol.Command]]
+      val clusterSettings = ClusterSettings.make(newTypedSystem)
 
       val freshLocationService = mode match {
         case "http" =>
-          Try(ServerWiring.make(newTypedSystem, enableAuth = false).locationHttpService.start().await) match {
+          Try(ServerWiring.make(clusterSettings, enableAuth = false).locationHttpService.start().await) match {
             case _ => // ignore binding errors
           }
           HttpLocationServiceFactory.makeLocalClient(newTypedSystem)
-        case "cluster" => LocationServiceFactory.withCluster(CswCluster.withSystem(newTypedSystem))
+        case "cluster" => LocationServiceFactory.make(clusterSettings)
       }
 
       Thread.sleep(2000)
 
-      freshLocationService
-        .register(
-          make(
-            akkaConnection,
-            newTypedSystem.spawn(Behaviors.empty, "empty").toURI
-          )
-        )
-        .await
+      freshLocationService.register(make(akkaConnection, newTypedSystem.spawn(Behaviors.empty, "empty").toURI)).await
       enterBarrier("member-re-registered")
     }
 

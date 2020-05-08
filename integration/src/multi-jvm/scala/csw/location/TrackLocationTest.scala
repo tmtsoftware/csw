@@ -21,7 +21,9 @@ class TrackLocationTest(ignore: Int, mode: String) extends helpers.LSNodeSpec(co
   import config._
 
   // DEOPSCSW-26: Track a connection
-  test("two components should able to track same connection and single component should able to track two components | DEOPSCSW-26, DEOPSCSW-429") {
+  test(
+    "two components should able to track same connection and single component should able to track two components | DEOPSCSW-26, DEOPSCSW-429"
+  ) {
     //create akka connection
     val akkaConnection = AkkaConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneHcd"), ComponentType.HCD))
 
@@ -32,7 +34,7 @@ class TrackLocationTest(ignore: Int, mode: String) extends helpers.LSNodeSpec(co
     val tcpConnection = TcpConnection(ComponentId(Prefix(Subsystem.CSW, "redis1"), ComponentType.Service))
 
     runOn(seed) {
-      val actorRef = cswCluster.actorSystem.spawn(Behaviors.empty, "trombone-hcd")
+      val actorRef = clusterSettings.system.spawn(Behaviors.empty, "trombone-hcd")
       locationService.register(AkkaRegistrationFactory.make(akkaConnection, actorRef.toURI)).await
       enterBarrier("Registration")
 

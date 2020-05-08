@@ -6,7 +6,7 @@ import akka.remote.testkit.{MultiNodeSpec, MultiNodeSpecCallbacks}
 import akka.testkit.ImplicitSender
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.server.commons.CswCluster
+import csw.location.server.commons.ClusterSettings
 import csw.location.server.internal.LocationServiceFactory
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.funsuite.AnyFunSuiteLike
@@ -21,10 +21,10 @@ abstract class LSNodeSpec[T <: NMembersAndSeed](val config: T, mode: String = "c
     with BeforeAndAfterAll {
 
   implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = system.toTyped.asInstanceOf[ActorSystem[SpawnProtocol.Command]]
-  protected val cswCluster: CswCluster                         = CswCluster.withSystem(typedSystem)
+  protected lazy val clusterSettings: ClusterSettings = ClusterSettings.make(typedSystem)
   lazy protected val locationService: LocationService = mode match {
     case "http"    => HttpLocationServiceFactory.makeLocalClient(typedSystem)
-    case "cluster" => LocationServiceFactory.withCluster(cswCluster)
+    case "cluster" => LocationServiceFactory.make(clusterSettings)
   }
 
   override def initialParticipants: Int = roles.size
