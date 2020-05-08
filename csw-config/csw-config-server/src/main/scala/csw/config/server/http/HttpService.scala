@@ -62,7 +62,7 @@ class HttpService(
 
   private def bind() = {
 
-    val _host = Networks(NetworkType.Public.envKey, actorRuntime.typedSystem.settings.config).hostname
+    val _host = Networks(NetworkType.Public.envKey).hostname
     val _port = settings.`service-port`
 
     /*

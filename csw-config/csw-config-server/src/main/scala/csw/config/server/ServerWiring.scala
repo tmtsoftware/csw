@@ -48,18 +48,6 @@ private[csw] object ServerWiring {
     override lazy val config: Config = _config.withFallback(ConfigFactory.load())
   }
 
-  def make(
-      maybePort: Option[Int],
-      _actorSystem: ActorSystem[SpawnProtocol.Command],
-      _securityDirectives: SecurityDirectives
-  ): ServerWiring = new ServerWiring {
-    override lazy val actorSystem: ActorSystem[SpawnProtocol.Command] = _actorSystem;
-    override lazy val settings: Settings = new Settings(actorSystem.settings.config) {
-      override val `service-port`: Int = maybePort.getOrElse(super.`service-port`)
-    }
-    override lazy val securityDirectives: SecurityDirectives = _securityDirectives
-  }
-
   def make(_locationService: LocationService, _securityDirectives: SecurityDirectives): ServerWiring = new ServerWiring {
     override lazy val locationService: LocationService       = _locationService
     override lazy val securityDirectives: SecurityDirectives = _securityDirectives

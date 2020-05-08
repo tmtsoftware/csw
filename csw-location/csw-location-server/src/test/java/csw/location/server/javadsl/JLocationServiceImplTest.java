@@ -72,7 +72,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
         wiring = new ServerWiring(false);
         typedSystem = ActorSystemFactory.remote(SpawnProtocol.create(), "test");
         untypedSystem = Adapter.toClassic(typedSystem);
-        hostname = Networks.apply(privateNetwork.envKey(), untypedSystem.settings().config()).hostname();
+        hostname = Networks.apply(privateNetwork.envKey()).hostname();
         TestProbe<Object> actorTestProbe = TestProbe.create("test-actor", typedSystem);
         actorRef = actorTestProbe.ref();
         locationService = JHttpLocationServiceFactory.makeLocalClient(typedSystem);

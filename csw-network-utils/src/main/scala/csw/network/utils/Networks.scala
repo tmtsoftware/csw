@@ -2,7 +2,7 @@ package csw.network.utils
 
 import java.net.{Inet6Address, InetAddress, NetworkInterface}
 
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.ConfigFactory
 import csw.logging.api.scaladsl.Logger
 import csw.network.utils.commons.NetworksLogger
 import csw.network.utils.exceptions.NetworkInterfaceNotProvided
@@ -26,7 +26,7 @@ case class Networks(private val interfaceName: String, networkProvider: NetworkI
    * Gives the non-loopback, ipv4 address for the given network interface. If no interface name is provided then the address mapped
    * to the first available interface is chosen.
    */
-  private[csw] def ipv4AddressWithInterfaceName: (String, InetAddress) =
+  private[network] def ipv4AddressWithInterfaceName: (String, InetAddress) =
     mappings
       .sortBy(_._1)
       .find(pair => isIpv4(pair._2))
@@ -59,8 +59,8 @@ object Networks {
    * config property `csw-networks.hostname.automatic` is enabled only in test scope to automatically detect appropriate hostname
    * so that we do not need to set INTERFACE_NAME env variable in every test or globally on machine before running tests.
    */
-  private def fallbackInterfaceName(interfaceName: String, config: Config): String =
-    if (automatic(config)) ""
+  private def fallbackInterfaceName(interfaceName: String): String =
+    if (automatic) ""
     else {
       val networkInterfaceNotProvided = NetworkInterfaceNotProvided(s"$interfaceName env variable is not set.")
       log.error(networkInterfaceNotProvided.message, ex = networkInterfaceNotProvided)
@@ -70,8 +70,8 @@ object Networks {
   /**
    * Creates instance of `Networks` by reading env variable
    */
-  def apply(interfaceNameEnvKey: String = "INTERFACE_NAME", config: Config = ConfigFactory.load()): Networks = {
-    val interface = (sys.env ++ sys.props).getOrElse(interfaceNameEnvKey, fallbackInterfaceName(interfaceNameEnvKey, config))
+  def apply(interfaceNameEnvKey: String = "INTERFACE_NAME"): Networks = {
+    val interface = (sys.env ++ sys.props).getOrElse(interfaceNameEnvKey, fallbackInterfaceName(interfaceNameEnvKey))
     new Networks(interface, new NetworkInterfaceProvider)
   }
 
@@ -85,6 +85,6 @@ object Networks {
       case None            => apply()
     }
 
-  private def automatic(_config: Config): Boolean = _config.getBoolean("csw-networks.hostname.automatic")
+  private def automatic: Boolean = ConfigFactory.load().getBoolean("csw-networks.hostname.automatic")
 
 }

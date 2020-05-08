@@ -13,21 +13,21 @@ class LocationServiceImplTest extends AnyFunSuite with Matchers with MockitoSuga
   private val httpConnection = HttpConnection(ComponentId(Prefix(Subsystem.CSW, "ConfigServer"), ComponentType.Service))
   private val port           = 5003
 
-  test("should register public hostname when network type is public | CSW 97") {
+  test("should register public hostname when network type is public | CSW-97") {
     val registration = HttpRegistration(connection = httpConnection, port = port, path = "", NetworkType.Public)
 
     when(mockCswCluster.publicHostname) thenReturn ("some-public-ip")
 
     val locationService = new LocationServiceImpl(mockCswCluster)
-    locationService.getLocation(registration).uri.toString should include("some-public-ip")
+    locationService.getLocation(registration).uri.getHost shouldBe "some-public-ip"
   }
 
-  test("should register private hostname when no network type provided | CSW 97") {
+  test("should register private hostname when no network type provided | CSW-97") {
     val registration = HttpRegistration(connection = httpConnection, port = port, path = "")
 
     when(mockCswCluster.hostname) thenReturn ("some-private-ip")
 
     val locationService = new LocationServiceImpl(mockCswCluster)
-    locationService.getLocation(registration).uri.toString should include("some-private-ip")
+    locationService.getLocation(registration).uri.getHost shouldBe "some-private-ip"
   }
 }
