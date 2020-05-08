@@ -14,7 +14,7 @@ object Libs {
   val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.2.3"
 
   val `embedded-keycloak`            = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak"            % "9374d69" //Apache 2.0
-  val `akka-management-cluster-http` = "com.lightbend.akka.management"            %% "akka-management-cluster-http" % "1.0.6"
+  val `akka-management-cluster-http` = "com.lightbend.akka.management"            %% "akka-management-cluster-http" % "1.0.7"
   val `svnkit`                       = "org.tmatesoft.svnkit"                     % "svnkit"                        % "1.10.1" //TMate Open Source License
   val `commons-codec`                = "commons-codec"                            % "commons-codec"                 % "1.10" //Apache 2.0š
   val `scala-reflect`                = "org.scala-lang"                           % "scala-reflect"                 % ScalaVersion //BSD-3
