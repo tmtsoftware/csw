@@ -6,7 +6,6 @@ import akka.Done
 import akka.actor.CoordinatedShutdown
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
-import com.typesafe.config.{Config, ConfigFactory}
 import csw.config.server.commons.{ConfigServerLogger, ConfigServiceConnection}
 import csw.config.server.{ActorRuntime, Settings}
 import csw.location.api.models.{HttpRegistration, NetworkType}
