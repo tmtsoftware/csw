@@ -30,8 +30,7 @@ class HttpService(
     locationService: LocationService,
     configServiceRoute: ConfigServiceRoute,
     settings: Settings,
-    actorRuntime: ActorRuntime,
-    config: Config = ConfigFactory.load() //TODO added to make test override config,find better way and remove this param
+    actorRuntime: ActorRuntime
 ) {
 
   import actorRuntime.{coordinatedShutdown, ec, typedSystem}
@@ -64,7 +63,7 @@ class HttpService(
 
   private def bind() = {
 
-    val _host = Networks(NetworkType.Public.envKey, config).hostname
+    val _host = Networks(NetworkType.Public.envKey, actorRuntime.typedSystem.settings.config).hostname
     val _port = settings.`service-port`
 
     /*

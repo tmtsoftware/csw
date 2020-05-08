@@ -26,7 +26,7 @@ case class Networks(private val interfaceName: String, networkProvider: NetworkI
    * Gives the non-loopback, ipv4 address for the given network interface. If no interface name is provided then the address mapped
    * to the first available interface is chosen.
    */
-  private[network] def ipv4AddressWithInterfaceName: (String, InetAddress) =
+  private[csw] def ipv4AddressWithInterfaceName: (String, InetAddress) =
     mappings
       .sortBy(_._1)
       .find(pair => isIpv4(pair._2))
@@ -68,7 +68,7 @@ object Networks {
     }
 
   /**
-   * Creates instance of `Networks` by reading `INTERFACE_NAME` env variable
+   * Creates instance of `Networks` by reading env variable
    */
   def apply(interfaceNameEnvKey: String = "INTERFACE_NAME", config: Config = ConfigFactory.load()): Networks = {
     val interface = (sys.env ++ sys.props).getOrElse(interfaceNameEnvKey, fallbackInterfaceName(interfaceNameEnvKey, config))
@@ -88,7 +88,6 @@ object Networks {
 
   private def automatic(_config: Config): Boolean = {
     _config.getBoolean("csw-networks.hostname.automatic")
-//    _config.withFallback(ConfigFactory.load()).getBoolean("csw-networks.hostname.automatic")
   }
 
 }

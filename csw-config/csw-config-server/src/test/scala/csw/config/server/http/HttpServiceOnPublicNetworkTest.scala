@@ -1,7 +1,7 @@
 package csw.config.server.http
 
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{Config, ConfigFactory}
 import csw.aas.http.SecurityDirectives
 import csw.config.server.ServerWiring
 import csw.config.server.commons.ConfigServiceConnection
@@ -12,8 +12,12 @@ import csw.network.utils.Networks
 import csw.network.utils.exceptions.NetworkInterfaceNotProvided
 
 class HttpServiceOnPublicNetworkTest extends HTTPLocationService {
-
-  implicit val system: ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), "test")
+  private val config: Config = ConfigFactory
+    .parseString("csw-networks.hostname.automatic = off")
+    .withFallback(ConfigFactory.load())
+  private val system: ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), "test", config)
+  import system.executionContext
+  private val directives: SecurityDirectives = SecurityDirectives.authDisabled(config)
 
   override def beforeAll(): Unit = {
     super.beforeAll()
@@ -26,37 +30,37 @@ class HttpServiceOnPublicNetworkTest extends HTTPLocationService {
     super.afterAll()
   }
 
-  test("should bind config server when PUBLIC_INTERFACE_NAME env variable is Set") {
-    System.setProperty(NetworkType.Public.envKey, "en0")
+  test("should bind config server using PUBLIC_INTERFACE_NAME env variable | CSW 97") {
+    val network = Networks(NetworkType.Public.envKey)
+    System.setProperty(NetworkType.Public.envKey, network.ipv4AddressWithInterfaceName._1)
     val _servicePort = 4005
-    lazy val config  = ConfigFactory.parseString("csw-networks.hostname.automatic = off")
     val serverWiring =
       ServerWiring.make(
         Some(_servicePort),
-        config,
-        SecurityDirectives.authDisabled(ConfigFactory.load())(system.executionContext)
+        system,
+        directives
       )
-    import serverWiring._
+    import serverWiring.{httpService, locationService}
 
     val (_, registrationResult) = httpService.registeredLazyBinding.await
     locationService.find(ConfigServiceConnection.value).await.get.connection shouldBe ConfigServiceConnection.value
 
     val location = registrationResult.location
-    location.uri.getHost shouldBe Networks(NetworkType.Public.envKey).hostname
+    location.uri.getHost shouldBe network.hostname
     location.connection shouldBe ConfigServiceConnection.value
     locationService.unregister(location.connection).await
 
   }
 
-  test("should not bind config server and throw exception when PUBLIC_INTERFACE_NAME env variable is not Set") {
+  test("should not bind config server and throw exception when PUBLIC_INTERFACE_NAME env variable is not Set | " +
+    "CSW-97") {
     System.clearProperty(NetworkType.Public.envKey)
     val _servicePort = 4006
-    lazy val config  = ConfigFactory.parseString("csw-networks.hostname.automatic = off")
     val serverWiring =
       ServerWiring.make(
         Some(_servicePort),
-        config,
-        SecurityDirectives.authDisabled(ConfigFactory.load())(system.executionContext)
+        system,
+        directives
       )
     import serverWiring._
 
@@ -66,5 +70,4 @@ class HttpServiceOnPublicNetworkTest extends HTTPLocationService {
 
     networkInterfaceNotProvidedException.getMessage shouldBe "PUBLIC_INTERFACE_NAME env variable is not set."
   }
-
 }

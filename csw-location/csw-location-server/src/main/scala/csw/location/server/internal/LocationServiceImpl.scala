@@ -44,12 +44,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
    */
   def register(registration: Registration): Future[RegistrationResult] = async {
 
-    //Get the location from this registration
-    val location = registration match {
-      case HttpRegistration(_, _, _, networkType) if networkType == Public =>
-        registration.location(cswCluster.publicHostname)
-      case _ => registration.location(cswCluster.hostname)
-    }
+    val location: Location = getLocation(registration)
 
     log.info(s"Registering connection: [${registration.connection.name}] with location: [${location.uri.toString}]")
 
@@ -92,6 +87,15 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
       case _ => throw logException(new RegistrationFailed(registration.connection))
     }
     await(registrationResultF)
+  }
+
+  private[internal] def getLocation(registration: Registration) = {
+    val location = registration match {
+      case HttpRegistration(_, _, _, networkType) if networkType == Public =>
+        registration.location(cswCluster.publicHostname)
+      case _ => registration.location(cswCluster.hostname)
+    }
+    location
   }
 
   /**

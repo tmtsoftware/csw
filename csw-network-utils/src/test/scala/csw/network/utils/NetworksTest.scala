@@ -14,7 +14,11 @@ import org.scalatest.matchers.should.Matchers
 class NetworksTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach with MockitoSugar {
 
   // DEOPSCSW-673: Make interfaceName environment variable mandatory
-  test("hostname should throw NetworkInterfaceNotProvided when INTERFACE_NAME env variable is not set | DEOPSCSW-673") {
+  test(
+    "hostname should throw NetworkInterfaceNotProvided when INTERFACE_NAME env variable is not set | DEOPSCSW-673 " +
+      "| CSW-97" +
+      ""
+  ) {
     a[NetworkInterfaceNotProvided] shouldBe thrownBy(Networks().hostname)
   }
 

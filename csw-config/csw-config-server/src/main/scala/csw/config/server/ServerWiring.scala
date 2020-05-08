@@ -13,10 +13,10 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
  * Server configuration
  */
 private[csw] class ServerWiring {
-  lazy val config: Config = ConfigFactory.load()
+  lazy val actorSystem    = ActorSystem(SpawnProtocol(), "config-server")
+  lazy val config: Config = actorSystem.settings.config
   lazy val settings       = new Settings(config)
 
-  lazy val actorSystem  = ActorSystem(SpawnProtocol(), "config-server")
   lazy val actorRuntime = new ActorRuntime(actorSystem, settings)
   import actorRuntime._
 
@@ -33,7 +33,7 @@ private[csw] class ServerWiring {
   lazy val securityDirectives = SecurityDirectives(config, locationService)
   lazy val configServiceRoute = new ConfigServiceRoute(configServiceFactory, actorRuntime, configHandlers, securityDirectives)
 
-  lazy val httpService: HttpService = new HttpService(locationService, configServiceRoute, settings, actorRuntime, config)
+  lazy val httpService: HttpService = new HttpService(locationService, configServiceRoute, settings, actorRuntime)
 }
 
 private[csw] object ServerWiring {
@@ -48,11 +48,15 @@ private[csw] object ServerWiring {
     override lazy val config: Config = _config.withFallback(ConfigFactory.load())
   }
 
-  def make(maybePort: Option[Int], _config: Config, _securityDirectives: SecurityDirectives): ServerWiring = new ServerWiring {
-    override lazy val settings: Settings = new Settings(config) {
+  def make(
+      maybePort: Option[Int],
+      _actorSystem: ActorSystem[SpawnProtocol.Command],
+      _securityDirectives: SecurityDirectives
+  ): ServerWiring = new ServerWiring {
+    override lazy val actorSystem: ActorSystem[SpawnProtocol.Command] = _actorSystem;
+    override lazy val settings: Settings = new Settings(actorSystem.settings.config) {
       override val `service-port`: Int = maybePort.getOrElse(super.`service-port`)
     }
-    override lazy val config: Config                         = _config.withFallback(ConfigFactory.load())
     override lazy val securityDirectives: SecurityDirectives = _securityDirectives
   }
 
