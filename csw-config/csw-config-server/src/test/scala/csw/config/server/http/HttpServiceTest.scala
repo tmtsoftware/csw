@@ -1,7 +1,5 @@
 package csw.config.server.http
 
-import java.net.BindException
-
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.aas.core.commons.AASConnection
 import csw.config.server.ServerWiring
@@ -9,6 +7,7 @@ import csw.config.server.commons.ConfigServiceConnection
 import csw.config.server.commons.TestFutureExtension.RichFuture
 import csw.location.api.exceptions.OtherLocationIsRegistered
 import csw.location.api.models
+import csw.location.api.models.NetworkType
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.server.http.HTTPLocationService
@@ -35,13 +34,17 @@ class HttpServiceTest extends HTTPLocationService {
     super.afterAll()
   }
 
+  //CSW-97
   /*
-   * config property `csw-networks.hostname.automatic` is enabled only in test scope to automatically detect appropriate hostname
-   * so that we do not need to set NetworkType.Public.envKey/NetworkType.Private.envKey env variable in every
-   * test or globally on machine before running tests. Due to this Networks().hostname IP and
-   * Networks(NetworkType.Public.envKey).hostname IP will be same in tests and can be used interchangeably
+   * Tests can be run of different OS and each OS follow its own naming convention for interface names.
+   * e.g. for Mac OS  interface names are like en0, en1 ,etc. For Linux they are eth0, eth1, etc. and so on.
+   * Hence, it is not feasible to set and use env variable - NetworkType.Public.envKey and NetworkType.Private.envKey
+   * in tests, as they are machine dependent.
+   * Instead, a config property `csw-networks.hostname.automatic` is enabled in test scope to automatically detect
+   * appropriate interface and hostname, which means Networks().hostname and Networks(NetworkType.Public.envKey)
+   * .hostname will be same in tests.
    */
-  private val hostname: String = Networks().hostname
+  private val hostname: String = Networks(NetworkType.Public.envKey).hostname
 
   test("should bind the http server and register it with location service | CSW-97") {
     val _servicePort = 4005
@@ -58,12 +61,13 @@ class HttpServiceTest extends HTTPLocationService {
   }
 
   test("should not register with location service if server binding fails | CSW-97") {
-    val _servicePort    = 3553 // Location Service runs on this port
-    val serverWiring    = ServerWiring.make(Some(_servicePort))
-    val expectedMessage = s"Bind failed for TCP channel on endpoint [${hostname}:${_servicePort}]. Address already in use."
+    val _servicePort = 3553 // Location Service runs on this port
+    val serverWiring = ServerWiring.make(Some(_servicePort))
+    val expectedMessage = s"Bind failed because of java.net.BindException: [/${hostname}:${_servicePort}] Address " +
+      s"already in use"
     import serverWiring._
 
-    val bindException = intercept[BindException] { httpService.registeredLazyBinding.await }
+    val bindException = intercept[Exception] { httpService.registeredLazyBinding.await }
 
     bindException.getMessage shouldBe expectedMessage
     testLocationService.find(ConfigServiceConnection.value).await shouldBe None
