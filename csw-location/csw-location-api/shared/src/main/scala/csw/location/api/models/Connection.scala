@@ -58,11 +58,12 @@ object Connection {
    * @param input is the string representation of connection e.g. TromboneAssembly-assembly-akka
    * @return a Connection model created from string
    */
-  def from(input: String): Connection = input.split("-") match {
-    case Array(name, componentType, connectionType) =>
-      from(models.ConnectionInfo(Prefix(name), ComponentType.withName(componentType), ConnectionType.withName(connectionType)))
-    case _ => throw new IllegalArgumentException(s"Unable to parse '$input' to make Connection object")
-  }
+  def from(input: String): Connection =
+    input.split("-") match {
+      case Array(name, componentType, connectionType) =>
+        from(models.ConnectionInfo(Prefix(name), ComponentType.withName(componentType), ConnectionType.withName(connectionType)))
+      case _ => throw new IllegalArgumentException(s"Unable to parse '$input' to make Connection object")
+    }
 
   /**
    * Create a Connection from provided ConnectionInfo
@@ -70,16 +71,18 @@ object Connection {
    * @param connectionInfo represents component name, component type and connection type
    * @return A Connection created from connectionInfo
    */
-  def from(connectionInfo: ConnectionInfo): Connection = from(
-    ComponentId(connectionInfo.prefix, connectionInfo.componentType), // TODO: is this right?
-    connectionInfo.connectionType
-  )
+  def from(connectionInfo: ConnectionInfo): Connection =
+    from(
+      ComponentId(connectionInfo.prefix, connectionInfo.componentType), // TODO: is this right?
+      connectionInfo.connectionType
+    )
 
-  private def from(componentId: ComponentId, connectionType: ConnectionType): Connection = connectionType match {
-    case AkkaType => AkkaConnection(componentId)
-    case TcpType  => TcpConnection(componentId)
-    case HttpType => HttpConnection(componentId)
-  }
+  private def from(componentId: ComponentId, connectionType: ConnectionType): Connection =
+    connectionType match {
+      case AkkaType => AkkaConnection(componentId)
+      case TcpType  => TcpConnection(componentId)
+      case HttpType => HttpConnection(componentId)
+    }
 
   /**
    * Represents a connection offered by remote Actors e.g. nfiraos.TromboneAssembly-assembly-akka or nfiraos.TromboneHcd-hcd-akka

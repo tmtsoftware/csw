@@ -93,10 +93,11 @@ private[aas] class InstalledAppAuthAdapterImpl(
   private def accessTokenStr  = queryToken(_.getAccessTokenString, keycloakInstalled.getTokenString)
   private def refreshTokenStr = queryToken(_.getRefreshTokenString, keycloakInstalled.getRefreshToken)
 
-  private def queryToken(withStore: AuthStore => Option[String], withoutStore: => String) = maybeStore match {
-    case Some(store) => withStore(store)
-    case None        => Option(withoutStore)
-  }
+  private def queryToken(withStore: AuthStore => Option[String], withoutStore: => String) =
+    maybeStore match {
+      case Some(store) => withStore(store)
+      case None        => Option(withoutStore)
+    }
 
   private def updateAuthStore(): Unit = {
     val response = keycloakInstalled.getTokenResponse

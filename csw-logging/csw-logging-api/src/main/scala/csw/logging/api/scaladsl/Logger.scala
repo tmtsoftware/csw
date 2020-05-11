@@ -14,8 +14,8 @@ trait Logger {
    * @param ex an optional exception to be logged together with its stack trace.
    * @param id optional id of a request
    */
-  def trace(msg: => String, map: => Map[String, Any] = Map.empty, ex: Throwable = NoLogException, id: AnyId = noId)(
-      implicit factory: SourceFactory
+  def trace(msg: => String, map: => Map[String, Any] = Map.empty, ex: Throwable = NoLogException, id: AnyId = noId)(implicit
+      factory: SourceFactory
   ): Unit
 
   /**
@@ -26,8 +26,8 @@ trait Logger {
    * @param ex an optional exception to be logged together with its stack trace.
    * @param id optional id of a request
    */
-  def debug(msg: => String, map: => Map[String, Any] = Map.empty, ex: Throwable = NoLogException, id: AnyId = noId)(
-      implicit factory: SourceFactory
+  def debug(msg: => String, map: => Map[String, Any] = Map.empty, ex: Throwable = NoLogException, id: AnyId = noId)(implicit
+      factory: SourceFactory
   ): Unit
 
   /**
@@ -38,8 +38,8 @@ trait Logger {
    * @param ex an optional exception to be logged together with its stack trace.
    * @param id optional id of a request
    */
-  def info(msg: => String, map: => Map[String, Any] = Map.empty, ex: Throwable = NoLogException, id: AnyId = noId)(
-      implicit factory: SourceFactory
+  def info(msg: => String, map: => Map[String, Any] = Map.empty, ex: Throwable = NoLogException, id: AnyId = noId)(implicit
+      factory: SourceFactory
   ): Unit
 
   /**
@@ -50,8 +50,8 @@ trait Logger {
    * @param ex an optional exception to be logged together with its stack trace.
    * @param id optional id of a request
    */
-  def warn(msg: => String, map: => Map[String, Any] = Map.empty, ex: Throwable = NoLogException, id: AnyId = noId)(
-      implicit factory: SourceFactory
+  def warn(msg: => String, map: => Map[String, Any] = Map.empty, ex: Throwable = NoLogException, id: AnyId = noId)(implicit
+      factory: SourceFactory
   ): Unit
 
   /**
@@ -62,8 +62,8 @@ trait Logger {
    * @param ex an optional exception to be logged together with its stack trace.
    * @param id optional id of a request
    */
-  def error(msg: => String, map: => Map[String, Any] = Map.empty, ex: Throwable = NoLogException, id: AnyId = noId)(
-      implicit factory: SourceFactory
+  def error(msg: => String, map: => Map[String, Any] = Map.empty, ex: Throwable = NoLogException, id: AnyId = noId)(implicit
+      factory: SourceFactory
   ): Unit
 
   /**
@@ -74,8 +74,8 @@ trait Logger {
    * @param ex an optional exception to be logged together with its stack trace.
    * @param id optional id of a request
    */
-  def fatal(msg: => String, map: => Map[String, Any] = Map.empty, ex: Throwable = NoLogException, id: AnyId = noId)(
-      implicit factory: SourceFactory
+  def fatal(msg: => String, map: => Map[String, Any] = Map.empty, ex: Throwable = NoLogException, id: AnyId = noId)(implicit
+      factory: SourceFactory
   ): Unit
 
   /**

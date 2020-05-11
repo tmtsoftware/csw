@@ -120,13 +120,14 @@ object FrameworkTestKit {
   def apply(
       actorSystem: typed.ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol(), "framework-testkit"),
       testKitSettings: TestKitSettings = TestKitSettings(ConfigFactory.load())
-  ): FrameworkTestKit = new FrameworkTestKit(
-    actorSystem,
-    LocationTestKit(testKitSettings),
-    ConfigTestKit(actorSystem, testKitSettings = testKitSettings),
-    EventTestKit(actorSystem, testKitSettings),
-    AlarmTestKit(actorSystem, testKitSettings)
-  )
+  ): FrameworkTestKit =
+    new FrameworkTestKit(
+      actorSystem,
+      LocationTestKit(testKitSettings),
+      ConfigTestKit(actorSystem, testKitSettings = testKitSettings),
+      EventTestKit(actorSystem, testKitSettings),
+      AlarmTestKit(actorSystem, testKitSettings)
+    )
 
   /**
    * Java API for creating FrameworkTestKit

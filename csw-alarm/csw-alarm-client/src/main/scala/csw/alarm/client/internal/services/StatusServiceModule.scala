@@ -33,42 +33,44 @@ private[client] trait StatusServiceModule extends StatusService {
 
   private val log = AlarmServiceLogger.getLogger
 
-  final override def getStatus(alarmKey: AlarmKey): Future[AlarmStatus] = async {
-    log.debug(s"Getting status for alarm [${alarmKey.value}]")
-    val ackStatusF: Future[Option[AcknowledgementStatus]]   = ackStatusApi.get(alarmKey)
-    val latchedSeverityF: Future[Option[FullAlarmSeverity]] = latchedSeverityApi.get(alarmKey)
-    val shelveStatusF: Future[ShelveStatus]                 = getShelveStatus(alarmKey)
-    val alarmTimeF: Future[Option[UTCTime]]                 = alarmTimeApi.get(alarmKey)
-    val initializingF: Future[Option[Boolean]]              = initializingApi.get(alarmKey)
+  final override def getStatus(alarmKey: AlarmKey): Future[AlarmStatus] =
+    async {
+      log.debug(s"Getting status for alarm [${alarmKey.value}]")
+      val ackStatusF: Future[Option[AcknowledgementStatus]]   = ackStatusApi.get(alarmKey)
+      val latchedSeverityF: Future[Option[FullAlarmSeverity]] = latchedSeverityApi.get(alarmKey)
+      val shelveStatusF: Future[ShelveStatus]                 = getShelveStatus(alarmKey)
+      val alarmTimeF: Future[Option[UTCTime]]                 = alarmTimeApi.get(alarmKey)
+      val initializingF: Future[Option[Boolean]]              = initializingApi.get(alarmKey)
 
-    val defaultAlarmStatus = AlarmStatus()
-    AlarmStatus(
-      await(ackStatusF).getOrElse(defaultAlarmStatus.acknowledgementStatus),
-      await(latchedSeverityF).getOrElse(defaultAlarmStatus.latchedSeverity),
-      await(shelveStatusF),
-      await(alarmTimeF).getOrElse(defaultAlarmStatus.alarmTime),
-      await(initializingF).getOrElse(defaultAlarmStatus.initializing)
-    )
-  }
+      val defaultAlarmStatus = AlarmStatus()
+      AlarmStatus(
+        await(ackStatusF).getOrElse(defaultAlarmStatus.acknowledgementStatus),
+        await(latchedSeverityF).getOrElse(defaultAlarmStatus.latchedSeverity),
+        await(shelveStatusF),
+        await(alarmTimeF).getOrElse(defaultAlarmStatus.alarmTime),
+        await(initializingF).getOrElse(defaultAlarmStatus.initializing)
+      )
+    }
 
   final override def acknowledge(alarmKey: AlarmKey): Future[Done] = setAcknowledgementStatus(alarmKey, Acknowledged)
 
-  final override def reset(alarmKey: AlarmKey): Future[Done] = async {
-    log.debug(s"Reset alarm [${alarmKey.value}]")
+  final override def reset(alarmKey: AlarmKey): Future[Done] =
+    async {
+      log.debug(s"Reset alarm [${alarmKey.value}]")
 
-    val currentSeverity = await(getCurrentSeverity(alarmKey))
-    val originalStatus  = await(getStatus(alarmKey))
+      val currentSeverity = await(getCurrentSeverity(alarmKey))
+      val originalStatus  = await(getStatus(alarmKey))
 
-    val acknowledgedStatus = originalStatus.copy(
-      //reset operation acknowledges alarm
-      acknowledgementStatus = Acknowledged,
-      //reset operation changes latched severity to current severity
-      latchedSeverity = currentSeverity
-    )
+      val acknowledgedStatus = originalStatus.copy(
+        //reset operation acknowledges alarm
+        acknowledgementStatus = Acknowledged,
+        //reset operation changes latched severity to current severity
+        latchedSeverity = currentSeverity
+      )
 
-    if (originalStatus != acknowledgedStatus) await(setStatus(alarmKey, acknowledgedStatus))
-    Done
-  }
+      if (originalStatus != acknowledgedStatus) await(setStatus(alarmKey, acknowledgedStatus))
+      Done
+    }
 
   final override def shelve(alarmKey: AlarmKey): Future[Done] = {
     log.debug(s"Shelve alarm [${alarmKey.value}]")
@@ -102,79 +104,80 @@ private[client] trait StatusServiceModule extends StatusService {
       alarmKey: AlarmKey,
       currentHeartbeatSeverity: FullAlarmSeverity,
       newHeartbeatSeverity: FullAlarmSeverity
-  ): Future[Done] = async {
+  ): Future[Done] =
+    async {
 
-    val metadata       = await(getMetadata(alarmKey))
-    val originalStatus = await(getStatus(alarmKey))
+      val metadata       = await(getMetadata(alarmKey))
+      val originalStatus = await(getStatus(alarmKey))
 
-    // This class is not exposed outside `updateStatusForSeverity` function because
-    // it's logic is strictly internal to this function.
-    // Using closures & extension methods, this class provides a fluent api over AlarmStatus
-    implicit class RichAndFluentAlarmStatus(targetAlarmStatus: AlarmStatus) {
+      // This class is not exposed outside `updateStatusForSeverity` function because
+      // it's logic is strictly internal to this function.
+      // Using closures & extension methods, this class provides a fluent api over AlarmStatus
+      implicit class RichAndFluentAlarmStatus(targetAlarmStatus: AlarmStatus) {
 
-      /**
-       * Updates latched severity of the alarm if it's is greater than original or if component is initializing (component has not sent any heartbeat yet)
-       * This will be a no op if latched severity does not need to change
-       *
+        /**
+         * Updates latched severity of the alarm if it's is greater than original or if component is initializing (component has not sent any heartbeat yet)
+         * This will be a no op if latched severity does not need to change
+         *
        * @return updated AlarmStatus
-       */
-      def updateLatchedSeverity(): AlarmStatus = {
-        if (newHeartbeatSeverity > targetAlarmStatus.latchedSeverity | originalStatus.initializing)
-          targetAlarmStatus.copy(latchedSeverity = newHeartbeatSeverity)
-        else targetAlarmStatus
-      }
-
-      /**
-       * Updates AcknowledgementStatus of alarm if severity is changed to anything but Okay
-       * This will be a no op if AcknowledgementStatus does not need to change
-       *
-       * @return updated AlarmStatus
-       */
-      def updateAckStatus(): AlarmStatus = {
-        def isAutoAckAndOkay            = metadata.isAutoAcknowledgeable && newHeartbeatSeverity == Okay
-        def isSeverityChangedAndNotOkay = newHeartbeatSeverity != currentHeartbeatSeverity && newHeartbeatSeverity != Okay
-
-        if (isAutoAckAndOkay) targetAlarmStatus.copy(acknowledgementStatus = Acknowledged)
-        else if (isSeverityChangedAndNotOkay) targetAlarmStatus.copy(acknowledgementStatus = Unacknowledged)
-        else targetAlarmStatus
-      }
-
-      /**
-       * Updates time of alarm if current severity has changed, otherwise it's a no op
-       *
-       * @return updated AlarmStatus
-       */
-      def updateTime(): AlarmStatus =
-        if (currentHeartbeatSeverity != newHeartbeatSeverity) targetAlarmStatus.copy(alarmTime = UTCTime.now())
-        else targetAlarmStatus
-
-      /**
-       * Sets the initializing flag to false.
-       *
-       * @return updated AlarmStatus
-       */
-      def removeInitializingFlag(): AlarmStatus = targetAlarmStatus.copy(initializing = false)
-
-      /**
-       * Persists the given alarm status to redis if there are any changes, otherwise it's a no op
-       */
-      def persistChanges(): Future[Done] =
-        if (originalStatus != targetAlarmStatus) {
-          log.info(s"Updating alarm status from: [$originalStatus] to: [$targetAlarmStatus]")
-          setStatus(alarmKey, targetAlarmStatus)
+         */
+        def updateLatchedSeverity(): AlarmStatus = {
+          if (newHeartbeatSeverity > targetAlarmStatus.latchedSeverity | originalStatus.initializing)
+            targetAlarmStatus.copy(latchedSeverity = newHeartbeatSeverity)
+          else targetAlarmStatus
         }
-        else Future.successful(Done)
-    }
 
-    await(
-      originalStatus
-        .updateLatchedSeverity()
-        .updateAckStatus()
-        .updateTime()
-        .removeInitializingFlag()
-        .persistChanges()
-    )
-  }
+        /**
+         * Updates AcknowledgementStatus of alarm if severity is changed to anything but Okay
+         * This will be a no op if AcknowledgementStatus does not need to change
+         *
+       * @return updated AlarmStatus
+         */
+        def updateAckStatus(): AlarmStatus = {
+          def isAutoAckAndOkay            = metadata.isAutoAcknowledgeable && newHeartbeatSeverity == Okay
+          def isSeverityChangedAndNotOkay = newHeartbeatSeverity != currentHeartbeatSeverity && newHeartbeatSeverity != Okay
+
+          if (isAutoAckAndOkay) targetAlarmStatus.copy(acknowledgementStatus = Acknowledged)
+          else if (isSeverityChangedAndNotOkay) targetAlarmStatus.copy(acknowledgementStatus = Unacknowledged)
+          else targetAlarmStatus
+        }
+
+        /**
+         * Updates time of alarm if current severity has changed, otherwise it's a no op
+         *
+       * @return updated AlarmStatus
+         */
+        def updateTime(): AlarmStatus =
+          if (currentHeartbeatSeverity != newHeartbeatSeverity) targetAlarmStatus.copy(alarmTime = UTCTime.now())
+          else targetAlarmStatus
+
+        /**
+         * Sets the initializing flag to false.
+         *
+       * @return updated AlarmStatus
+         */
+        def removeInitializingFlag(): AlarmStatus = targetAlarmStatus.copy(initializing = false)
+
+        /**
+         * Persists the given alarm status to redis if there are any changes, otherwise it's a no op
+         */
+        def persistChanges(): Future[Done] =
+          if (originalStatus != targetAlarmStatus) {
+            log.info(s"Updating alarm status from: [$originalStatus] to: [$targetAlarmStatus]")
+            setStatus(alarmKey, targetAlarmStatus)
+          }
+          else Future.successful(Done)
+      }
+
+      await(
+        originalStatus
+          .updateLatchedSeverity()
+          .updateAckStatus()
+          .updateTime()
+          .removeInitializingFlag()
+          .persistChanges()
+      )
+    }
 
   private[alarm] def setStatus(alarmKey: AlarmKey, alarmStatus: AlarmStatus): Future[Done] = {
     log.info(s"Updating alarm status [$alarmStatus] in alarm store")
@@ -209,30 +212,33 @@ private[client] trait StatusServiceModule extends StatusService {
       )
       .map(_ => Done)
 
-  private def getShelveStatus(alarmKey: AlarmKey): Future[ShelveStatus] = async {
-    if (await(metadataApi.exists(alarmKey))) await(shelveStatusApi.get(alarmKey)).getOrElse(Unshelved)
-    else logAndThrow(KeyNotFoundException(alarmKey))
-  }
-
-  private[alarm] def getAlarms(key: Key): Future[List[Alarm]] = metadataApi.keys(key).flatMap {
-    Future.traverse(_) { key =>
-      for {
-        metadata <- getMetadata(key)
-        status   <- getStatus(key)
-        severity <- getCurrentSeverity(key)
-      } yield Alarm(key, metadata, status, severity)
+  private def getShelveStatus(alarmKey: AlarmKey): Future[ShelveStatus] =
+    async {
+      if (await(metadataApi.exists(alarmKey))) await(shelveStatusApi.get(alarmKey)).getOrElse(Unshelved)
+      else logAndThrow(KeyNotFoundException(alarmKey))
     }
-  }
 
-  private def setAcknowledgementStatus(alarmKey: AlarmKey, ackStatus: AcknowledgementStatus): Future[Done] = async {
-    log.debug(s"$ackStatus alarm [${alarmKey.value}]")
+  private[alarm] def getAlarms(key: Key): Future[List[Alarm]] =
+    metadataApi.keys(key).flatMap {
+      Future.traverse(_) { key =>
+        for {
+          metadata <- getMetadata(key)
+          status   <- getStatus(key)
+          severity <- getCurrentSeverity(key)
+        } yield Alarm(key, metadata, status, severity)
+      }
+    }
 
-    val status = await(getStatus(alarmKey))
+  private def setAcknowledgementStatus(alarmKey: AlarmKey, ackStatus: AcknowledgementStatus): Future[Done] =
+    async {
+      log.debug(s"$ackStatus alarm [${alarmKey.value}]")
 
-    if (status.acknowledgementStatus != ackStatus) // save the set call if status is already set to given acknowledgement status
-      await(setStatus(alarmKey, status.copy(acknowledgementStatus = ackStatus)))
-    Done
-  }
+      val status = await(getStatus(alarmKey))
+
+      if (status.acknowledgementStatus != ackStatus) // save the set call if status is already set to given acknowledgement status
+        await(setStatus(alarmKey, status.copy(acknowledgementStatus = ackStatus)))
+      Done
+    }
 
   private def logAndThrow(runtimeException: RuntimeException) = {
     log.error(runtimeException.getMessage, ex = runtimeException)

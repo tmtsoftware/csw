@@ -13,14 +13,15 @@ class LoggingAkkaSerializer extends Serializer {
   private val logger: Logger   = GenericLoggerFactory.getLogger
   override def identifier: Int = 19925
 
-  override def toBinary(o: AnyRef): Array[Byte] = o match {
-    case x: LogMetadata => Cbor.encode(x).toByteArray
-    case x: Level       => Cbor.encode(x).toByteArray
-    case _ =>
-      val ex = new RuntimeException(s"does not support encoding of $o")
-      logger.error(ex.getMessage, ex = ex)
-      throw ex
-  }
+  override def toBinary(o: AnyRef): Array[Byte] =
+    o match {
+      case x: LogMetadata => Cbor.encode(x).toByteArray
+      case x: Level       => Cbor.encode(x).toByteArray
+      case _ =>
+        val ex = new RuntimeException(s"does not support encoding of $o")
+        logger.error(ex.getMessage, ex = ex)
+        throw ex
+    }
 
   override def includeManifest: Boolean = true
 

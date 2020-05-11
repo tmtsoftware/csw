@@ -18,9 +18,10 @@ import csw.logging.api.scaladsl.Logger
  */
 trait HttpParameter extends TokenMaskSupport with Directives with HttpCodecs {
 
-  def prefix(prefix: String): Directive1[Path] = path(prefix / Remaining).flatMap { path =>
-    validate(PathValidator.isValid(path), PathValidator.message(path)).tmap[Path] { _ => Paths.get(path) }
-  }
+  def prefix(prefix: String): Directive1[Path] =
+    path(prefix / Remaining).flatMap { path =>
+      validate(PathValidator.isValid(path), PathValidator.message(path)).tmap[Path] { _ => Paths.get(path) }
+    }
 
   override val logger: Logger = ConfigServerLogger.getLogger
 

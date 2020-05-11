@@ -26,12 +26,13 @@ class CommandLineRunnerTest extends SeedData with Eventually with CommonCodecs {
     var publishedEvents: mutable.Queue[Event] = mutable.Queue.empty
     val eventsGroup: immutable.Seq[Event]     = events(eventName)
 
-    def generate: Option[Event] = Option {
-      val event = eventsGroup(counter)
-      counter += 1
-      publishedEvents.enqueue(event)
-      event
-    }
+    def generate: Option[Event] =
+      Option {
+        val event = eventsGroup(counter)
+        counter += 1
+        publishedEvents.enqueue(event)
+        event
+      }
   }
 
   import cliWiring._

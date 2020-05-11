@@ -24,17 +24,18 @@ private[csw] class AuthServiceLocation(locationService: LocationService) {
    *
    * @return A future that completes with Location representing AAS server location
    */
-  def resolve(within: FiniteDuration = 5.seconds)(implicit executionContext: ExecutionContext): Future[HttpLocation] = async {
-    debug("resolving aas via location service")
-    val location = await(locationService.resolve(AASConnection.value, within)).getOrElse(
-      {
-        error(s"auth service connection=${AASConnection.value.name} could not be resolved")
-        throw AASResolutionFailed(s"auth service connection=${AASConnection.value.name} could not be resolved")
-      }
-    )
-    debug(s"aas resolved to ${location.uri.toString}")
-    location
-  }
+  def resolve(within: FiniteDuration = 5.seconds)(implicit executionContext: ExecutionContext): Future[HttpLocation] =
+    async {
+      debug("resolving aas via location service")
+      val location = await(locationService.resolve(AASConnection.value, within)).getOrElse(
+        {
+          error(s"auth service connection=${AASConnection.value.name} could not be resolved")
+          throw AASResolutionFailed(s"auth service connection=${AASConnection.value.name} could not be resolved")
+        }
+      )
+      debug(s"aas resolved to ${location.uri.toString}")
+      location
+    }
 
   private[csw] def register(authServicePort: Int): Future[RegistrationResult] = {
     val authServicePath = "auth"

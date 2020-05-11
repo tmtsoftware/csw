@@ -258,7 +258,9 @@ class HealthServiceModuleTest
   }
 
   // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
-  test("subscribeAggregatedHealthCallback should throw InactiveAlarmException when all resolved keys are inactive | DEOPSCSW-468") {
+  test(
+    "subscribeAggregatedHealthCallback should throw InactiveAlarmException when all resolved keys are inactive | DEOPSCSW-468"
+  ) {
     val metadataList = getMetadata(SubsystemKey(LGSF)).await
     metadataList.foreach(m => m.isActive shouldBe false)
     a[InactiveAlarmException] shouldBe thrownBy(subscribeAggregatedHealthCallback(SubsystemKey(LGSF), println).ready().await)
@@ -314,7 +316,9 @@ class HealthServiceModuleTest
   }
 
   // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
-  test("subscribeAggregatedHealthActorRef should throw InactiveAlarmException when all resolved keys are inactive | DEOPSCSW-468") {
+  test(
+    "subscribeAggregatedHealthActorRef should throw InactiveAlarmException when all resolved keys are inactive | DEOPSCSW-468"
+  ) {
     val metadataList = getMetadata(SubsystemKey(LGSF)).await
     metadataList.foreach(m => m.isActive shouldBe false)
     a[InactiveAlarmException] shouldBe thrownBy {

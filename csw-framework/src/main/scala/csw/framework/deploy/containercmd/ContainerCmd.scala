@@ -45,27 +45,28 @@ private[framework] class ContainerCmd(
   private lazy val wiring: FrameworkWiring = new FrameworkWiring
   import wiring.actorRuntime._
 
-  def start(args: Array[String]): ActorRef[_] = new ArgsParser(name).parse(args.toList) match {
-    case None => throw UnableToParseOptions
-    case Some(Options(standalone, isLocal, inputFilePath)) =>
-      LocationServerStatus.requireUpLocally()
+  def start(args: Array[String]): ActorRef[_] =
+    new ArgsParser(name).parse(args.toList) match {
+      case None => throw UnableToParseOptions
+      case Some(Options(standalone, isLocal, inputFilePath)) =>
+        LocationServerStatus.requireUpLocally()
 
-      if (startLogging) wiring.actorRuntime.startLogging(name)
+        if (startLogging) wiring.actorRuntime.startLogging(name)
 
-      log.debug(s"$name started with following arguments [${args.mkString(",")}]")
+        log.debug(s"$name started with following arguments [${args.mkString(",")}]")
 
-      try {
-        val actorRef = Await.result(createF(standalone, isLocal, inputFilePath, defaultConfig), 30.seconds)
-        log.info(s"Component is successfully created with actor actorRef $actorRef")
-        actorRef
-      }
-      catch {
-        case NonFatal(ex) =>
-          log.error(s"${ex.getMessage}", ex = ex)
-          shutdown()
-          throw ex
-      }
-  }
+        try {
+          val actorRef = Await.result(createF(standalone, isLocal, inputFilePath, defaultConfig), 30.seconds)
+          log.info(s"Component is successfully created with actor actorRef $actorRef")
+          actorRef
+        }
+        catch {
+          case NonFatal(ex) =>
+            log.error(s"${ex.getMessage}", ex = ex)
+            shutdown()
+            throw ex
+        }
+    }
 
   // fetch config file and start components in container mode or a single component in standalone mode
   private def createF(
@@ -73,12 +74,13 @@ private[framework] class ContainerCmd(
       isLocal: Boolean,
       inputFilePath: Option[Path],
       defaultConfig: Option[Config]
-  ): Future[ActorRef[_]] = async {
-    val config   = await(wiring.configUtils.getConfig(isLocal, inputFilePath, defaultConfig))
-    val actorRef = await(createComponent(standalone, wiring, config))
-    log.info(s"Component is successfully created with actor actorRef $actorRef")
-    actorRef
-  }
+  ): Future[ActorRef[_]] =
+    async {
+      val config   = await(wiring.configUtils.getConfig(isLocal, inputFilePath, defaultConfig))
+      val actorRef = await(createComponent(standalone, wiring, config))
+      log.info(s"Component is successfully created with actor actorRef $actorRef")
+      actorRef
+    }
 
   private def createComponent(standalone: Boolean, wiring: FrameworkWiring, config: Config): Future[ActorRef[_]] =
     if (standalone) Standalone.spawn(config, wiring)

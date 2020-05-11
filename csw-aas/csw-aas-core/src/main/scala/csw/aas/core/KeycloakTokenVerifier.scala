@@ -16,7 +16,8 @@ private[aas] class KeycloakTokenVerifier {
   def verifyToken(
       token: String,
       keycloakDeployment: KeycloakDeployment
-  )(implicit ec: ExecutionContext): Future[KeycloakAccessToken] = Future {
-    blocking { AdapterTokenVerifier.verifyToken(token, keycloakDeployment) }
-  }
+  )(implicit ec: ExecutionContext): Future[KeycloakAccessToken] =
+    Future {
+      blocking { AdapterTokenVerifier.verifyToken(token, keycloakDeployment) }
+    }
 }

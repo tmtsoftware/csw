@@ -15,12 +15,13 @@ import scala.concurrent.{ExecutionContext, Future}
 private[event] class EventServiceLocationResolver(locationService: LocationService)(implicit ec: ExecutionContext)
     extends EventServiceResolver {
 
-  def uri(): Future[URI] = async {
-    val location = await(locationService.resolve(EventServiceConnection.value, 5.seconds)).getOrElse(
-      throw new RuntimeException(
-        s"event service connection=${EventServiceConnection.value.name} can not be resolved"
+  def uri(): Future[URI] =
+    async {
+      val location = await(locationService.resolve(EventServiceConnection.value, 5.seconds)).getOrElse(
+        throw new RuntimeException(
+          s"event service connection=${EventServiceConnection.value.name} can not be resolved"
+        )
       )
-    )
-    location.uri
-  }
+      location.uri
+    }
 }

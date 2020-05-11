@@ -87,20 +87,21 @@ class DatabaseServiceFactory private[database] (actorSystem: ActorSystem[_], val
       dbName: String,
       usernameHolder: String,
       passwordHolder: String
-  ): Future[DSLContext] = async {
-    val resolver = new DatabaseServiceLocationResolver(locationService)
-    val uri      = await(resolver.uri())
-    val envVars  = sys.env ++ values
-    val dataSource: Map[String, Any] = Map(
-      "dataSource.serverName"   -> uri.getHost,
-      "dataSource.portNumber"   -> uri.getPort,
-      "dataSource.databaseName" -> dbName,
-      "dataSource.user"         -> envVars(usernameHolder), //NoSuchElementFoundException can be thrown if no env variable is set
-      "dataSource.password"     -> envVars(passwordHolder) //NoSuchElementFoundException can be thrown if no env variable is set
-    )
-    val dataSourceConfig = ConfigFactory.parseMap(dataSource.asJava)
-    createDslInternal(Some(dataSourceConfig))
-  }
+  ): Future[DSLContext] =
+    async {
+      val resolver = new DatabaseServiceLocationResolver(locationService)
+      val uri      = await(resolver.uri())
+      val envVars  = sys.env ++ values
+      val dataSource: Map[String, Any] = Map(
+        "dataSource.serverName"   -> uri.getHost,
+        "dataSource.portNumber"   -> uri.getPort,
+        "dataSource.databaseName" -> dbName,
+        "dataSource.user"         -> envVars(usernameHolder), //NoSuchElementFoundException can be thrown if no env variable is set
+        "dataSource.password"     -> envVars(passwordHolder) //NoSuchElementFoundException can be thrown if no env variable is set
+      )
+      val dataSourceConfig = ConfigFactory.parseMap(dataSource.asJava)
+      createDslInternal(Some(dataSourceConfig))
+    }
 
   /**
    * A java method to create connection to database with default read access. The username and password for read access

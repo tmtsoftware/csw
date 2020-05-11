@@ -24,12 +24,13 @@ private[config] class ConfigServiceResolver(locationService: LocationService, ac
    *
    * @return A future that completes with URI representing config server location
    */
-  def uri: Future[Uri] = async {
-    val location = await(locationService.resolve(ConfigServiceConnection.value, 5.seconds)).getOrElse(
-      throw new RuntimeException(
-        s"config service connection=${ConfigServiceConnection.value.name} can not be resolved"
+  def uri: Future[Uri] =
+    async {
+      val location = await(locationService.resolve(ConfigServiceConnection.value, 5.seconds)).getOrElse(
+        throw new RuntimeException(
+          s"config service connection=${ConfigServiceConnection.value.name} can not be resolved"
+        )
       )
-    )
-    Uri(location.uri.toString)
-  }
+      Uri(location.uri.toString)
+    }
 }

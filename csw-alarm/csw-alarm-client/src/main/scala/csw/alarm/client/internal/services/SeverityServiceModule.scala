@@ -31,21 +31,23 @@ private[client] trait SeverityServiceModule extends SeverityService {
 
   private val log = AlarmServiceLogger.getLogger
 
-  final override def setSeverity(alarmKey: AlarmKey, severity: AlarmSeverity): Future[Done] = async {
-    val currentSeverity = await(getCurrentSeverity(alarmKey))
-    await(updateStatusForSeverity(alarmKey, currentSeverity, severity))
-    await(setCurrentSeverity(alarmKey, severity))
-  }
+  final override def setSeverity(alarmKey: AlarmKey, severity: AlarmSeverity): Future[Done] =
+    async {
+      val currentSeverity = await(getCurrentSeverity(alarmKey))
+      await(updateStatusForSeverity(alarmKey, currentSeverity, severity))
+      await(setCurrentSeverity(alarmKey, severity))
+    }
 
-  final override def getAggregatedSeverity(key: Key): Future[FullAlarmSeverity] = async {
-    log.debug(s"Get aggregated severity for alarm [${key.value}]")
+  final override def getAggregatedSeverity(key: Key): Future[FullAlarmSeverity] =
+    async {
+      log.debug(s"Get aggregated severity for alarm [${key.value}]")
 
-    val activeAlarms: List[MetadataKey] = await(getActiveAlarmKeys(key))
-    val severityKeys: List[SeverityKey] = activeAlarms.map(a => SeverityKey.fromAlarmKey(a))
-    val severityValues                  = await(severityApi.mget(severityKeys))
-    val severityList                    = severityValues.map(_.value)
-    aggregratorByMax(severityList)
-  }
+      val activeAlarms: List[MetadataKey] = await(getActiveAlarmKeys(key))
+      val severityKeys: List[SeverityKey] = activeAlarms.map(a => SeverityKey.fromAlarmKey(a))
+      val severityValues                  = await(severityApi.mget(severityKeys))
+      val severityList                    = severityValues.map(_.value)
+      aggregratorByMax(severityList)
+    }
 
   final override def subscribeAggregatedSeverityCallback(key: Key, callback: FullAlarmSeverity => Unit): AlarmSubscription = {
     log.debug(s"Subscribe aggregated severity for alarm [${key.value}] with a callback")
@@ -57,29 +59,31 @@ private[client] trait SeverityServiceModule extends SeverityService {
     subscribeAggregatedSeverityCallback(key, actorRef ! _)
   }
 
-  final override def getCurrentSeverity(alarmKey: AlarmKey): Future[FullAlarmSeverity] = async {
-    log.debug(s"Getting severity for alarm [${alarmKey.value}]")
+  final override def getCurrentSeverity(alarmKey: AlarmKey): Future[FullAlarmSeverity] =
+    async {
+      log.debug(s"Getting severity for alarm [${alarmKey.value}]")
 
-    if (await(metadataApi.exists(alarmKey))) await(severityApi.get(alarmKey)).getOrElse(Disconnected)
-    else logAndThrow(KeyNotFoundException(alarmKey))
-  }
+      if (await(metadataApi.exists(alarmKey))) await(severityApi.get(alarmKey)).getOrElse(Disconnected)
+      else logAndThrow(KeyNotFoundException(alarmKey))
+    }
 
-  private[alarm] def setCurrentSeverity(alarmKey: AlarmKey, severity: AlarmSeverity): Future[Done] = async {
-    log.debug(
-      s"Setting severity [${severity.name}] for alarm [${alarmKey.value}] with expire timeout [${settings.severityTTLInSeconds}] seconds"
-    )
+  private[alarm] def setCurrentSeverity(alarmKey: AlarmKey, severity: AlarmSeverity): Future[Done] =
+    async {
+      log.debug(
+        s"Setting severity [${severity.name}] for alarm [${alarmKey.value}] with expire timeout [${settings.severityTTLInSeconds}] seconds"
+      )
 
-    // get alarm metadata
-    val alarm = await(getMetadata(alarmKey))
+      // get alarm metadata
+      val alarm = await(getMetadata(alarmKey))
 
-    // validate if the provided severity is supported by this alarm
-    if (!alarm.allSupportedSeverities.contains(severity))
-      logAndThrow(InvalidSeverityException(alarmKey, alarm.allSupportedSeverities, severity))
+      // validate if the provided severity is supported by this alarm
+      if (!alarm.allSupportedSeverities.contains(severity))
+        logAndThrow(InvalidSeverityException(alarmKey, alarm.allSupportedSeverities, severity))
 
-    // set the severity of the alarm so that it does not transition to `Disconnected` state
-    log.info(s"Updating current severity [${severity.name}] in alarm store")
-    await(severityApi.setex(alarmKey, settings.severityTTLInSeconds, severity))
-  }
+      // set the severity of the alarm so that it does not transition to `Disconnected` state
+      log.info(s"Updating current severity [${severity.name}] in alarm store")
+      await(severityApi.setex(alarmKey, settings.severityTTLInSeconds, severity))
+    }
 
   // PatternMessage gives three values:
   // pattern: e.g  __keyspace@0__:status.nfiraos.*.*,
@@ -115,18 +119,19 @@ private[client] trait SeverityServiceModule extends SeverityService {
       }
   }
 
-  private def getActiveAlarmKeys(key: Key): Future[List[MetadataKey]] = async {
+  private def getActiveAlarmKeys(key: Key): Future[List[MetadataKey]] =
+    async {
 
-    val metadataKeys = await(metadataApi.keys(key))
-    if (metadataKeys.isEmpty) logAndThrow(KeyNotFoundException(key))
+      val metadataKeys = await(metadataApi.keys(key))
+      if (metadataKeys.isEmpty) logAndThrow(KeyNotFoundException(key))
 
-    val keys = await(metadataApi.mget(metadataKeys)).collect {
-      case RedisResult(metadataKey, Some(metadata)) if metadata.isActive => metadataKey
+      val keys = await(metadataApi.mget(metadataKeys)).collect {
+        case RedisResult(metadataKey, Some(metadata)) if metadata.isActive => metadataKey
+      }
+
+      if (keys.isEmpty) logAndThrow(InactiveAlarmException(key))
+      else keys
     }
-
-    if (keys.isEmpty) logAndThrow(InactiveAlarmException(key))
-    else keys
-  }
 
   private def aggregratorByMax(iterable: Iterable[Option[FullAlarmSeverity]]): FullAlarmSeverity =
     iterable.map(x => if (x.isEmpty) Disconnected else x.get).maxBy(_.level)

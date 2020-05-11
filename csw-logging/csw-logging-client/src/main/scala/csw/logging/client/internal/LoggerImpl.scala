@@ -16,10 +16,11 @@ import csw.prefix.models.Prefix
 private[csw] class LoggerImpl(maybePrefix: Option[Prefix], actorName: Option[String]) extends Logger {
 
   // default log level will be applied if component specific log level is not provided in logging configuration inside component-log-levels block
-  private[this] def componentLoggingState: ComponentLoggingState = maybePrefix match {
-    case Some(prefix) => componentsLoggingState.getOrDefault(prefix, ComponentLoggingState(defaultLogLevel))
-    case None         => ComponentLoggingState(defaultLogLevel)
-  }
+  private[this] def componentLoggingState: ComponentLoggingState =
+    maybePrefix match {
+      case Some(prefix) => componentsLoggingState.getOrDefault(prefix, ComponentLoggingState(defaultLogLevel))
+      case None         => ComponentLoggingState(defaultLogLevel)
+    }
 
   private def all(
       level: Level,
@@ -29,7 +30,8 @@ private[csw] class LoggerImpl(maybePrefix: Option[Prefix], actorName: Option[Str
       ex: Throwable,
       sourceLocation: SourceLocation
   ): Unit = {
-    val time = Instant.now().toEpochMilli // The current time being written in logs. In future it has to be fetched from time service
+    val time =
+      Instant.now().toEpochMilli // The current time being written in logs. In future it has to be fetched from time service
     MessageHandler.sendMsg(Log(maybePrefix, level, id, time, actorName, msg, map.asJsObject, sourceLocation, ex))
   }
 
@@ -51,20 +53,20 @@ private[csw] class LoggerImpl(maybePrefix: Option[Prefix], actorName: Option[Str
   def debug(msg: => String, map: => Map[String, Any], ex: Throwable, id: AnyId)(implicit factory: SourceFactory): Unit =
     if (componentLoggingState.doDebug || has(id, DEBUG)) all(DEBUG, id, msg, map, ex, factory.get())
 
-  override def info(msg: => String, map: => Map[String, Any], ex: Throwable, id: AnyId)(
-      implicit factory: SourceFactory
+  override def info(msg: => String, map: => Map[String, Any], ex: Throwable, id: AnyId)(implicit
+      factory: SourceFactory
   ): Unit = if (componentLoggingState.doInfo || has(id, INFO)) all(INFO, id, msg, map, ex, factory.get())
 
-  override def warn(msg: => String, map: => Map[String, Any], ex: Throwable, id: AnyId)(
-      implicit factory: SourceFactory
+  override def warn(msg: => String, map: => Map[String, Any], ex: Throwable, id: AnyId)(implicit
+      factory: SourceFactory
   ): Unit = if (componentLoggingState.doWarn || has(id, WARN)) all(WARN, id, msg, map, ex, factory.get())
 
-  override def error(msg: => String, map: => Map[String, Any], ex: Throwable, id: AnyId)(
-      implicit factory: SourceFactory
+  override def error(msg: => String, map: => Map[String, Any], ex: Throwable, id: AnyId)(implicit
+      factory: SourceFactory
   ): Unit = if (componentLoggingState.doError || has(id, ERROR)) all(ERROR, id, msg, map, ex, factory.get())
 
-  override def fatal(msg: => String, map: => Map[String, Any], ex: Throwable, id: AnyId)(
-      implicit factory: SourceFactory
+  override def fatal(msg: => String, map: => Map[String, Any], ex: Throwable, id: AnyId)(implicit
+      factory: SourceFactory
   ): Unit = all(FATAL, id, msg, map, ex, factory.get())
 
   private[logging] override def alternative(

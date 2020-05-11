@@ -12,25 +12,26 @@ import msocket.impl.post.{HttpPostHandler, ServerHttpCodecs}
 
 import scala.concurrent.ExecutionContext
 
-class LocationHttpHandler(locationService: LocationService, securityDirectives: => SecurityDirectives)(
-    implicit ex: ExecutionContext
+class LocationHttpHandler(locationService: LocationService, securityDirectives: => SecurityDirectives)(implicit
+    ex: ExecutionContext
 ) extends HttpPostHandler[LocationHttpMessage]
     with ServerHttpCodecs {
 
   private lazy val securityDirectivesCached: SecurityDirectives = securityDirectives
 
-  override def handle(request: LocationHttpMessage): Route = request match {
-    case Register(registration) =>
-      securityDirectivesCached.secure(EmptyPolicy)(_ => complete(locationService.register(registration).map(_.location)))
-    case Unregister(connection) =>
-      securityDirectivesCached.secure(EmptyPolicy)(_ => complete(locationService.unregister(connection)))
-    case UnregisterAll                        => securityDirectivesCached.secure(EmptyPolicy)(_ => complete(locationService.unregisterAll()))
-    case Find(connection)                     => complete(locationService.find(connection))
-    case Resolve(connection, within)          => complete(locationService.resolve(connection, within))
-    case ListEntries                          => complete(locationService.list)
-    case ListByComponentType(componentType)   => complete(locationService.list(componentType))
-    case ListByHostname(hostname)             => complete(locationService.list(hostname))
-    case ListByConnectionType(connectionType) => complete(locationService.list(connectionType))
-    case ListByPrefix(prefix)                 => complete(locationService.listByPrefix(prefix))
-  }
+  override def handle(request: LocationHttpMessage): Route =
+    request match {
+      case Register(registration) =>
+        securityDirectivesCached.secure(EmptyPolicy)(_ => complete(locationService.register(registration).map(_.location)))
+      case Unregister(connection) =>
+        securityDirectivesCached.secure(EmptyPolicy)(_ => complete(locationService.unregister(connection)))
+      case UnregisterAll                        => securityDirectivesCached.secure(EmptyPolicy)(_ => complete(locationService.unregisterAll()))
+      case Find(connection)                     => complete(locationService.find(connection))
+      case Resolve(connection, within)          => complete(locationService.resolve(connection, within))
+      case ListEntries                          => complete(locationService.list)
+      case ListByComponentType(componentType)   => complete(locationService.list(componentType))
+      case ListByHostname(hostname)             => complete(locationService.list(hostname))
+      case ListByConnectionType(connectionType) => complete(locationService.list(connectionType))
+      case ListByPrefix(prefix)                 => complete(locationService.listByPrefix(prefix))
+    }
 }

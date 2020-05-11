@@ -53,9 +53,10 @@ private[aas] class RPT(authzClient: AuthzClient)(implicit ec: ExecutionContext) 
     }
 
   implicit private class TryOps[T](tryValue: Try[T]) {
-    def toLeftMappedEither(logMsg: String): Either[InvalidToken, T] = tryValue.toEither.left.map {
-      case NonFatal(e) => logger.error(logMsg, ex = e); InvalidToken(e)
-    }
+    def toLeftMappedEither(logMsg: String): Either[InvalidToken, T] =
+      tryValue.toEither.left.map {
+        case NonFatal(e) => logger.error(logMsg, ex = e); InvalidToken(e)
+      }
   }
 
   /**
@@ -63,9 +64,10 @@ private[aas] class RPT(authzClient: AuthzClient)(implicit ec: ExecutionContext) 
    *
    * @param token access token string
    */
-  private def getAuthorizationResponse(token: String): Future[String] = Future {
-    blocking { authzClient.authorization(token).authorize().getToken }
-  }
+  private def getAuthorizationResponse(token: String): Future[String] =
+    Future {
+      blocking { authzClient.authorization(token).authorize().getToken }
+    }
 }
 
 object RPT {

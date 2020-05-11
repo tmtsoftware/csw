@@ -33,10 +33,11 @@ trait BaseProperties {
   implicit lazy val ec: ExecutionContext = actorSystem.executionContext
   val attributes: Attributes             = EventStreamSupervisionStrategy.attributes
 
-  def resolveEventService(locationService: LocationService): Future[URI] = async {
-    val eventServiceResolver = new EventServiceLocationResolver(locationService)
-    await(eventServiceResolver.uri())
-  }
+  def resolveEventService(locationService: LocationService): Future[URI] =
+    async {
+      val eventServiceResolver = new EventServiceLocationResolver(locationService)
+      await(eventServiceResolver.uri())
+    }
 }
 
 object BaseProperties {

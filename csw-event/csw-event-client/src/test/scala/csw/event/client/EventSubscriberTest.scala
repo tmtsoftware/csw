@@ -51,15 +51,17 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   }
 
   @DataProvider(name = "event-service-provider")
-  def pubSubProvider: Array[Array[_ <: BaseProperties]] = Array(
-    Array(redisTestProps),
-    Array(kafkaTestProps)
-  )
+  def pubSubProvider: Array[Array[_ <: BaseProperties]] =
+    Array(
+      Array(redisTestProps),
+      Array(kafkaTestProps)
+    )
 
   @DataProvider(name = "redis-provider")
-  def redisPubSubProvider: Array[Array[RedisTestProps]] = Array(
-    Array(redisTestProps)
-  )
+  def redisPubSubProvider: Array[Array[RedisTestProps]] =
+    Array(
+      Array(redisTestProps)
+    )
 
   val events: immutable.Seq[Event]                  = for (i <- 1 to 1500) yield makeEvent(i)
   def events(name: EventName): immutable.Seq[Event] = for (i <- 1 to 1500) yield makeEventForKeyName(name, i)
@@ -78,10 +80,11 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   }
 
   var eventId = 0
-  def eventGenerator(): Option[Event] = Option {
-    eventId += 1
-    events(eventId)
-  }
+  def eventGenerator(): Option[Event] =
+    Option {
+      eventId += 1
+      events(eventId)
+    }
 
   //DEOPSCSW-346: Subscribe to event irrespective of Publisher's existence
   //DEOPSCSW-343: Unsubscribe based on prefix and event name
@@ -311,9 +314,10 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     val inbox4 = TestInbox[Event]()
     val inbox5 = TestInbox[Event]()
 
-    val eventPattern  = "*.movement.*"  //subscribe to events with any prefix but event name containing 'movement'
-    val eventPattern2 = "*.move*"       //subscribe to events with any prefix but event name containing 'move'
-    val eventPattern3 = "*.?ove"        //subscribe to events with any prefix but event name matching any first  character followed by `ove`
+    val eventPattern  = "*.movement.*" //subscribe to events with any prefix but event name containing 'movement'
+    val eventPattern2 = "*.move*"      //subscribe to events with any prefix but event name containing 'move'
+    val eventPattern3 =
+      "*.?ove" //subscribe to events with any prefix but event name matching any first  character followed by `ove`
     val eventPattern4 = "test_prefix.*" //subscribe to all events with prefix `test_prefix` irresepective of event names
     val eventPattern5 = "*"             //subscribe to all events with prefix `test_prefix` irresepective of event names
 

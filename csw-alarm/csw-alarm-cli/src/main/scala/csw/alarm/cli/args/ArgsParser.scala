@@ -117,11 +117,12 @@ class ArgsParser(name: String) {
       else success
     }
 
-    private def validateKey(c: Options) = (c.maybeSubsystem, c.maybeComponent, c.maybeAlarmName) match {
-      case (None, None, Some(_)) | (Some(_), None, Some(_)) => failure("Please specify subsystem and component of the alarm.")
-      case (None, Some(_), _)                               => failure("Please specify subsystem of the component.")
-      case _                                                => success
-    }
+    private def validateKey(c: Options) =
+      (c.maybeSubsystem, c.maybeComponent, c.maybeAlarmName) match {
+        case (None, None, Some(_)) | (Some(_), None, Some(_)) => failure("Please specify subsystem and component of the alarm.")
+        case (None, Some(_), _)                               => failure("Please specify subsystem of the component.")
+        case _                                                => success
+      }
   }
 
   def parse(args: Seq[String]): Option[Options] = parser.parse(args, Options())

@@ -16,14 +16,15 @@ object LogAdminUtil {
    * @param prefix represents full name (from prefix) of component whose LogMetadata needs to be fetched
    * @return LogMetaData of the given component
    */
-  def getLogMetadata(prefix: Prefix): LogMetadata = LogMetadata(
-    LoggingState.logLevel,
-    LoggingState.akkaLogLevel,
-    LoggingState.slf4jLogLevel,
-    LoggingState.componentsLoggingState
-      .getOrDefault(prefix, ComponentLoggingState(LoggingState.defaultLogLevel))
-      .componentLogLevel
-  )
+  def getLogMetadata(prefix: Prefix): LogMetadata =
+    LogMetadata(
+      LoggingState.logLevel,
+      LoggingState.akkaLogLevel,
+      LoggingState.slf4jLogLevel,
+      LoggingState.componentsLoggingState
+        .getOrDefault(prefix, ComponentLoggingState(LoggingState.defaultLogLevel))
+        .componentLogLevel
+    )
 
   /**
    * Updates the log level of component

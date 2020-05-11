@@ -28,19 +28,20 @@ class HttpService(
 
   import actorSystem.executionContext
 
-  def bindAndRegister(): Future[(ServerBinding, RegistrationResult)] = async {
-    val binding            = await(bind())            // create HttpBinding with appropriate hostname and port
-    val registrationResult = await(register(binding)) // create HttpRegistration and register it with location service
+  def bindAndRegister(): Future[(ServerBinding, RegistrationResult)] =
+    async {
+      val binding            = await(bind())            // create HttpBinding with appropriate hostname and port
+      val registrationResult = await(register(binding)) // create HttpRegistration and register it with location service
 
-    // Add the task to unregister the HttpRegistration from location service.
-    CoordinatedShutdown(actorSystem).addTask(
-      CoordinatedShutdown.PhaseBeforeServiceUnbind,
-      s"unregistering-${registrationResult.location}"
-    )(() => registrationResult.unregister())
+      // Add the task to unregister the HttpRegistration from location service.
+      CoordinatedShutdown(actorSystem).addTask(
+        CoordinatedShutdown.PhaseBeforeServiceUnbind,
+        s"unregistering-${registrationResult.location}"
+      )(() => registrationResult.unregister())
 
-    log.info(s"Server online at http://${binding.localAddress.getHostName}:${binding.localAddress.getPort}/")
-    (binding, registrationResult)
-  }
+      log.info(s"Server online at http://${binding.localAddress.getHostName}:${binding.localAddress.getPort}/")
+      (binding, registrationResult)
+    }
 
   private def bind() = {
     Http().bindAndHandle(

@@ -29,48 +29,50 @@ class AnnexFileService(settings: Settings, fileRepo: AnnexFileRepo, actorRuntime
   private val log: Logger = ConfigServerLogger.getLogger
 
   // The debug statements help understand the flow of the method
-  def post(configData: ConfigData): Future[String] = async {
-    log.debug("Creating temporary file and calculating it's sha")
-    val (tempFilePath, sha) = await(saveAndSha(configData))
+  def post(configData: ConfigData): Future[String] =
+    async {
+      log.debug("Creating temporary file and calculating it's sha")
+      val (tempFilePath, sha) = await(saveAndSha(configData))
 
-    val outPath = makePath(settings.`annex-files-dir`, sha)
+      val outPath = makePath(settings.`annex-files-dir`, sha)
 
-    if (await(fileRepo.exists(outPath))) {
-      log.debug(s"Annex file already exists at path ${outPath.toString}")
-      await(fileRepo.delete(tempFilePath))
-      sha
-    }
-    else {
-      log.debug(s"Creating directory at ${outPath.getParent.toString}")
-      await(fileRepo.createDirectories(outPath.getParent))
-      await(fileRepo.move(tempFilePath, outPath))
-      log.debug("Validating if annex file is created with intended contents")
-      if (await(validate(sha, outPath))) {
+      if (await(fileRepo.exists(outPath))) {
+        log.debug(s"Annex file already exists at path ${outPath.toString}")
+        await(fileRepo.delete(tempFilePath))
         sha
       }
       else {
-        log.debug(
-          s"Deleting annex file from path ${outPath.toString} and temporary file from path ${tempFilePath.toString}"
-        )
-        await(fileRepo.delete(outPath))
-        await(fileRepo.delete(tempFilePath))
-        throw new RuntimeException(s" Error in creating file for $sha")
+        log.debug(s"Creating directory at ${outPath.getParent.toString}")
+        await(fileRepo.createDirectories(outPath.getParent))
+        await(fileRepo.move(tempFilePath, outPath))
+        log.debug("Validating if annex file is created with intended contents")
+        if (await(validate(sha, outPath))) {
+          sha
+        }
+        else {
+          log.debug(
+            s"Deleting annex file from path ${outPath.toString} and temporary file from path ${tempFilePath.toString}"
+          )
+          await(fileRepo.delete(outPath))
+          await(fileRepo.delete(tempFilePath))
+          throw new RuntimeException(s" Error in creating file for $sha")
+        }
       }
     }
-  }
 
   // The debug statements help understand the flow of the method
-  def get(sha: String): Future[Option[ConfigData]] = async {
-    val repoFilePath = makePath(settings.`annex-files-dir`, sha)
+  def get(sha: String): Future[Option[ConfigData]] =
+    async {
+      val repoFilePath = makePath(settings.`annex-files-dir`, sha)
 
-    log.debug(s"Checking if annex file exists at ${repoFilePath.toString}")
-    if (await(fileRepo.exists(repoFilePath))) {
-      Some(ConfigData.fromPath(repoFilePath))
+      log.debug(s"Checking if annex file exists at ${repoFilePath.toString}")
+      if (await(fileRepo.exists(repoFilePath))) {
+        Some(ConfigData.fromPath(repoFilePath))
+      }
+      else {
+        None
+      }
     }
-    else {
-      None
-    }
-  }
 
   /**
    * Returns the name of the file to use in the configured directory.
@@ -93,9 +95,10 @@ class AnnexFileService(settings: Settings, fileRepo: AnnexFileRepo, actorRuntime
    * @param path the file to check
    * @return true if the file is valid
    */
-  private def validate(id: String, path: Path): Future[Boolean] = async {
-    id == await(Sha1.fromPath(path))
-  }
+  private def validate(id: String, path: Path): Future[Boolean] =
+    async {
+      id == await(Sha1.fromPath(path))
+    }
 
   /**
    * The stream of data is branched into two flows, one to dump it in temporary file and other to calculate incremental
@@ -104,14 +107,15 @@ class AnnexFileService(settings: Settings, fileRepo: AnnexFileRepo, actorRuntime
    * @param configData The data to be saved temporarily
    * @return The tuple of file path where data is saved temporarily and the sha calculated out of that data
    */
-  private def saveAndSha(configData: ConfigData): Future[(Path, String)] = async {
-    val path = await(fileRepo.createTempFile("config-service-oversize-", ".tmp"))
-    val (resultF, shaF) = configData.source
-      .alsoToMat(FileIO.toPath(path))(Keep.right)
-      .toMat(Sha1.sink)(Keep.both)
-      .run()(matFromSystem(typedSystem))
-    await(resultF)
-    (path, await(shaF))
-  }
+  private def saveAndSha(configData: ConfigData): Future[(Path, String)] =
+    async {
+      val path = await(fileRepo.createTempFile("config-service-oversize-", ".tmp"))
+      val (resultF, shaF) = configData.source
+        .alsoToMat(FileIO.toPath(path))(Keep.right)
+        .toMat(Sha1.sink)(Keep.both)
+        .run()(matFromSystem(typedSystem))
+      await(resultF)
+      (path, await(shaF))
+    }
 
 }

@@ -21,10 +21,11 @@ class EventSubscriberUtil(implicit actorSystem: ActorSystem[_]) {
   def subscriptionModeStage(
       every: FiniteDuration,
       mode: SubscriptionMode
-  ): GraphStage[FlowShape[Event, Event]] = mode match {
-    case RateAdapterMode => new RateAdapterStage[Event](every)
-    case RateLimiterMode => new RateLimiterStage[Event](every)
-  }
+  ): GraphStage[FlowShape[Event, Event]] =
+    mode match {
+      case RateAdapterMode => new RateAdapterStage[Event](every)
+      case RateLimiterMode => new RateLimiterStage[Event](every)
+    }
 
   def subscribeAsync(eventSource: Source[Event, EventSubscription], callback: Event => Future[_]): EventSubscription =
     eventSource.mapAsync(1)(x => callback(x)).withAttributes(attributes).to(Sink.ignore).run()

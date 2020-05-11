@@ -163,7 +163,9 @@ class ConfigParserTest extends AnyFunSuite with Matchers {
     }
   }
 
-  test("should able to throw error when 'subsystem' is missing for hcd | DEOPSCSW-167, DEOPSCSW-170, DEOPSCSW-172, DEOPSCSW-283") {
+  test(
+    "should able to throw error when 'subsystem' is missing for hcd | DEOPSCSW-167, DEOPSCSW-170, DEOPSCSW-172, DEOPSCSW-283"
+  ) {
     val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/hcd/missing_prefix.conf")
 
     intercept[java.lang.RuntimeException] {

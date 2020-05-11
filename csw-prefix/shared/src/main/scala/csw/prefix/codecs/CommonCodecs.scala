@@ -27,10 +27,11 @@ trait CommonCodecs {
     json = Decoder.forString.map(Instant.parse)
   )
 
-  implicit def enumCodec[T <: EnumEntry: Enum]: Codec[T] = Codec.bimap[String, T](
-    _.entryName,
-    implicitly[Enum[T]].withNameInsensitive
-  )
+  implicit def enumCodec[T <: EnumEntry: Enum]: Codec[T] =
+    Codec.bimap[String, T](
+      _.entryName,
+      implicitly[Enum[T]].withNameInsensitive
+    )
 
   implicit lazy val finiteDurationCodec: Codec[FiniteDuration] = Codec.bimap[String, FiniteDuration](
     _.toString(),

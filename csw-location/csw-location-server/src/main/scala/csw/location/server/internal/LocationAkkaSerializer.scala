@@ -16,16 +16,17 @@ class LocationAkkaSerializer extends Serializer with LocationCodecs {
 
   override def includeManifest: Boolean = true
 
-  override def toBinary(o: AnyRef): Array[Byte] = o match {
-    case x: Connection    => Cbor.encode(x).toByteArray
-    case x: Location      => Cbor.encode(x).toByteArray
-    case x: Registration  => Cbor.encode(x).toByteArray
-    case x: TrackingEvent => Cbor.encode(x).toByteArray
-    case _ =>
-      val ex = new RuntimeException(s"does not support encoding of $o")
-      logger.error(ex.getMessage, ex = ex)
-      throw ex
-  }
+  override def toBinary(o: AnyRef): Array[Byte] =
+    o match {
+      case x: Connection    => Cbor.encode(x).toByteArray
+      case x: Location      => Cbor.encode(x).toByteArray
+      case x: Registration  => Cbor.encode(x).toByteArray
+      case x: TrackingEvent => Cbor.encode(x).toByteArray
+      case _ =>
+        val ex = new RuntimeException(s"does not support encoding of $o")
+        logger.error(ex.getMessage, ex = ex)
+        throw ex
+    }
 
   override def fromBinary(bytes: Array[Byte], manifest: Option[Class[_]]): AnyRef = {
     def fromBinary[T: ClassTag: Decoder]: Option[T] = {

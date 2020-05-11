@@ -33,12 +33,13 @@ object JComponentInfo {
       locationServiceUsage: LocationServiceUsage,
       connections: util.Set[Connection],
       initializeTimeout: Duration
-  ): ComponentInfo = ComponentInfo(
-    prefix,
-    componentType,
-    className,
-    locationServiceUsage,
-    connections.asScala.toSet,
-    initializeTimeout.toScala
-  )
+  ): ComponentInfo =
+    ComponentInfo(
+      prefix,
+      componentType,
+      className,
+      locationServiceUsage,
+      connections.asScala.toSet,
+      initializeTimeout.toScala
+    )
 }

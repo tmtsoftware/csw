@@ -69,16 +69,17 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
     }
   }
 
-  override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = controlCommand.commandName match {
-    case `cancelCmd`          => processAcceptedSubmitCmd(runId, controlCommand.asInstanceOf[Setup])
-    case `onewayCmd`          => // Do nothing
-    case `matcherCmd`         => processCommandWithMatcher(controlCommand)
-    case `matcherFailedCmd`   => processCommandWithMatcher(controlCommand)
-    case `acceptedCmd`        => //mimic long running process by publishing any state
-    case `matcherTimeoutCmd`  => processCommandWithMatcher(controlCommand)
-    case `hcdCurrentStateCmd` => processCurrentStateOneway(controlCommand)
-    case c                    => println(s"onOneway received an unknown command: $c")
-  }
+  override def onOneway(runId: Id, controlCommand: ControlCommand): Unit =
+    controlCommand.commandName match {
+      case `cancelCmd`          => processAcceptedSubmitCmd(runId, controlCommand.asInstanceOf[Setup])
+      case `onewayCmd`          => // Do nothing
+      case `matcherCmd`         => processCommandWithMatcher(controlCommand)
+      case `matcherFailedCmd`   => processCommandWithMatcher(controlCommand)
+      case `acceptedCmd`        => //mimic long running process by publishing any state
+      case `matcherTimeoutCmd`  => processCommandWithMatcher(controlCommand)
+      case `hcdCurrentStateCmd` => processCurrentStateOneway(controlCommand)
+      case c                    => println(s"onOneway received an unknown command: $c")
+    }
 
   private def processCurrentStateOneway(controlCommand: ControlCommand): Unit = {
     //#subscribeCurrentState

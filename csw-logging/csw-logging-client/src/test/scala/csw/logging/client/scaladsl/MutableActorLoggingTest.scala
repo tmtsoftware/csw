@@ -12,20 +12,21 @@ import csw.logging.models.Level
 import csw.prefix.models.Prefix
 
 object TromboneMutableActor {
-  def behavior(loggerFactory: LoggerFactory): Behaviors.Receive[LogCommand] = Behaviors.receive { (ctx, msg) =>
-    val log: Logger = loggerFactory.getLogger(ctx)
+  def behavior(loggerFactory: LoggerFactory): Behaviors.Receive[LogCommand] =
+    Behaviors.receive { (ctx, msg) =>
+      val log: Logger = loggerFactory.getLogger(ctx)
 
-    msg match {
-      case LogTrace => log.trace("Level is trace")
-      case LogDebug => log.debug("Level is debug")
-      case LogInfo  => log.info("Level is info")
-      case LogWarn  => log.warn("Level is warn")
-      case LogError => log.error("Level is error")
-      case LogFatal => log.fatal("Level is fatal")
-      case Unknown  => log.error("Unexpected actor message", Map("message" -> Unknown))
+      msg match {
+        case LogTrace => log.trace("Level is trace")
+        case LogDebug => log.debug("Level is debug")
+        case LogInfo  => log.info("Level is info")
+        case LogWarn  => log.warn("Level is warn")
+        case LogError => log.error("Level is error")
+        case LogFatal => log.fatal("Level is fatal")
+        case Unknown  => log.error("Unexpected actor message", Map("message" -> Unknown))
+      }
+      Behaviors.same
     }
-    Behaviors.same
-  }
 }
 
 // DEOPSCSW-280 SPIKE: Introduce Akkatyped in logging

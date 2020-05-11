@@ -21,10 +21,11 @@ sealed trait TMTTime extends Product with Serializable {
     FiniteDuration(duration.toNanos, NANOSECONDS)
   }
 
-  private def currentInstant: Instant = this match {
-    case _: UTCTime => UTCTime.now().value
-    case _: TAITime => TAITime.now().value
-  }
+  private def currentInstant: Instant =
+    this match {
+      case _: UTCTime => UTCTime.now().value
+      case _: TAITime => TAITime.now().value
+    }
 }
 
 object TMTTime {
