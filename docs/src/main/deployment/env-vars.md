@@ -20,6 +20,6 @@ specific to their corresponding databases.
  
 * Dev - For starting services using `./csw-services.sh`
 * Prod - For starting services by ways other than `./csw-services.sh`
-* Outside network - Refer @ref:[Network Topology](../network-topology.md).
+* Outside network - Refer @ref:[Network Topology](network-topology.md).
 
 

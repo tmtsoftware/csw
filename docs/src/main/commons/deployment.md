@@ -2,6 +2,7 @@
 
 @@@ index
 * [Environment variables](../deployment/env-vars.md)
+* [Network Topology](../deployment/network-topology.md)
 
 @@@
 
