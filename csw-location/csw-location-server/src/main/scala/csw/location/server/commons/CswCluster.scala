@@ -32,8 +32,8 @@ class CswCluster private (clusterSettings: ClusterSettings) {
   /**
    * Identifies the hostname where ActorSystem is running
    */
-  val hostname: String       = clusterSettings.hostname
-  val publicHostname: String = clusterSettings.publicHostname
+  val hostname: String            = clusterSettings.hostname
+  lazy val publicHostname: String = clusterSettings.publicHostname
 
   implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = clusterSettings.system
   implicit val ec: ExecutionContext                            = actorSystem.executionContext

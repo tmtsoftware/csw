@@ -1,7 +1,5 @@
 package csw.config.server.http
 
-import java.net.BindException
-
 import akka.Done
 import akka.actor.CoordinatedShutdown
 import akka.http.scaladsl.Http
@@ -11,7 +9,7 @@ import csw.config.server.{ActorRuntime, Settings}
 import csw.location.api.models.{HttpRegistration, NetworkType}
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.logging.api.scaladsl.Logger
-import csw.network.utils.{Networks, SocketUtils}
+import csw.network.utils.Networks
 
 import scala.async.Async._
 import scala.concurrent.Future

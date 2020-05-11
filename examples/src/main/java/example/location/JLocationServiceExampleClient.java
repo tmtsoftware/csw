@@ -61,6 +61,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
     private AkkaConnection exampleConnection = LocationServiceExampleComponent.connection();
 
     private IRegistrationResult httpRegResult;
+    private IRegistrationResult httpRegResultonPublicNetwork;
     private IRegistrationResult hcdRegResult;
     private IRegistrationResult assemblyRegResult;
 
@@ -95,9 +96,14 @@ public class JLocationServiceExampleClient extends AbstractActor {
         // dummy http connection
         HttpConnection httpConnection = new HttpConnection(new ComponentId(new Prefix(JSubsystem.CSW,
                 "configuration"), JComponentType.Service));
+
         HttpRegistration httpRegistration = new HttpRegistration(httpConnection, 8080, "path123",
                 JNetworkType.Private);
         httpRegResult = locationService.register(httpRegistration).get();
+
+        HttpRegistration httpRegistrationOnPublicNetwork = new HttpRegistration(httpConnection, 8080, "path123",
+                JNetworkType.Public);
+        httpRegResultonPublicNetwork = locationService.register(httpRegistrationOnPublicNetwork).get();
 
         // ************************************************************************************************************
 
@@ -280,6 +286,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
     public void postStop() throws ExecutionException, InterruptedException {
         //#unregister
         httpRegResult.unregister();
+        httpRegResultonPublicNetwork.unregister();
         hcdRegResult.unregister();
         assemblyRegResult.unregister();
         //#unregister

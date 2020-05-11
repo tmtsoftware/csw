@@ -164,10 +164,17 @@ Due to the way random port numbers are used for CSW components, firewalls should
 which are assumed to be in an internal network that is protected from outside access.
 @@@
 
-In order to determine the correct IP address to use for the local host, it is necessary to set the _INTERFACE_NAME_ environment variable or property to the name of the network interface to use (There could be multiple NICs).
+In order to determine the correct [private IP](../network-topology.md) address to use for the local host, it is
+necessary to set the _INTERFACE_NAME_ environment variable or property to the name of the network interface to use (There could be multiple NICs).
 The [ClusterSettings]($github.base_url$/csw-location/csw-location-server/src/main/scala/csw/location/server/commons/ClusterSettings.scala) class uses that information, along with other settings when starting the cluster actor.
 It also needs to know the _cluster seeds_, a comma separated list of _host:port_ values for at least one other actor in the cluster.
 This information is needed in order to join the Location Service cluster.
+
+In order to determine the correct [public IP](../network-topology.md) address to use for the local host, it is
+necessary to set the _PUBLIC_INTERFACE_NAME_ environment variable or property to the name of the network interface to
+use (There could be multiple NICs). This variable or property is read by [ClusterSettings]($github.base_url$/csw-location/csw-location-server/src/main/scala/csw/location/server/commons/ClusterSettings.scala) when location service
+is started. During registration call, a service can choose which network type it wants to register itself with and
+location service will register that service to appropriate network. 
 
 The Location Service HTTP server is implemented by the [LocationHttpHandler]($github.base_url$/csw-location/csw-location-server/src/main/scala/csw/location/server/http/LocationHttpHandler.scala) class, 
 [LocationWebsocketHandler]($github.base_url$/csw-location/csw-location-server/src/main/scala/csw/location/server/http/LocationWebsocketHandler.scala) and talks to the cluster actor on the client's behalf.
