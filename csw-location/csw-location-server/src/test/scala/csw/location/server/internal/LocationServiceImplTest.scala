@@ -1,7 +1,9 @@
 package csw.location.server.internal
 
-import csw.location.api.models.Connection.HttpConnection
-import csw.location.api.models.{ComponentId, ComponentType, HttpRegistration, NetworkType}
+import java.net.URI
+
+import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
+import csw.location.api.models._
 import csw.location.server.commons.CswCluster
 import csw.prefix.models.{Prefix, Subsystem}
 import org.mockito.MockitoSugar
@@ -13,7 +15,7 @@ class LocationServiceImplTest extends AnyFunSuite with Matchers with MockitoSuga
   private val httpConnection = HttpConnection(ComponentId(Prefix(Subsystem.CSW, "ConfigServer"), ComponentType.Service))
   private val port           = 5003
 
-  test("should register public hostname when network type is public | CSW-97") {
+  test("should select public hostname when network type is public | CSW-97") {
     val registration = HttpRegistration(connection = httpConnection, port = port, path = "", NetworkType.Public)
 
     when(mockCswCluster.publicHostname) thenReturn ("some-public-ip")
@@ -22,12 +24,26 @@ class LocationServiceImplTest extends AnyFunSuite with Matchers with MockitoSuga
     locationService.getLocation(registration).uri.getHost shouldBe "some-public-ip"
   }
 
-  test("should register private hostname when no network type provided | CSW-97") {
+  test("should select private hostname when no network type provided | CSW-97") {
     val registration = HttpRegistration(connection = httpConnection, port = port, path = "")
 
     when(mockCswCluster.hostname) thenReturn ("some-private-ip")
 
     val locationService = new LocationServiceImpl(mockCswCluster)
     locationService.getLocation(registration).uri.getHost shouldBe "some-private-ip"
+  }
+
+  test("should not use public or private cluster hostname for Akka Registration | CSW-97") {
+    val componentId: ComponentId           = ComponentId(Prefix("tcs.filter.wheel"), ComponentType.HCD)
+    val akkaConnection: AkkaConnection     = AkkaConnection(componentId)
+    val akkaRegistration: AkkaRegistration = AkkaRegistration(akkaConnection, new URI("some-actor-uri"))
+
+    when(mockCswCluster.hostname) thenReturn ("some-private-ip")
+    when(mockCswCluster.publicHostname) thenReturn ("some-public-ip")
+
+    val locationService = new LocationServiceImpl(mockCswCluster)
+    locationService.getLocation(akkaRegistration).uri.toString shouldBe "some-actor-uri"
+    locationService.getLocation(akkaRegistration).uri.toString should not include "some-private-ip"
+    locationService.getLocation(akkaRegistration).uri.toString should not include "some-public-ip"
   }
 }

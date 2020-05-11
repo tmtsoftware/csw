@@ -66,9 +66,8 @@ class HttpService(
     val _port = settings.`service-port`
 
     /*
-      Explicitly check _host:_port is free as we register Networks().hostname with location service
-      But we bind server to all interfaces so that it can be accessible from any server via localhost
-      and it can happen that server gets bind to some of the interfaces and not to Networks().hostname
+      Check _host:_port is free. If we bind to 0.0.0.0:_port, then it will allow some other third party application/service
+       to bind to _host:_port at later point of time. To avoid that we bind and register to specific _host:_port.
      */
     if (SocketUtils.isAddressInUse(_host, _port))
       throw new BindException(s"Bind failed for TCP channel on endpoint [${_host}:${_port}]. Address already in use.")
