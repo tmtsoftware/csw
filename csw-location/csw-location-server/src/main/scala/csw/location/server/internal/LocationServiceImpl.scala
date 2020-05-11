@@ -45,8 +45,8 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
   def register(registration: Registration): Future[RegistrationResult] =
     async {
 
-    val location: Location = getLocation(registration)
-    log.info(s"Registering connection: [${registration.connection.name}] with location: [${location.uri.toString}]")
+      val location: Location = getLocation(registration)
+      log.info(s"Registering connection: [${registration.connection.name}] with location: [${location.uri.toString}]")
 
       //Create a message handler for this connection
       val service = new Registry.Service(registration.connection)

@@ -140,9 +140,10 @@ private[location] case class ClusterSettings(clusterName: String = Constants.Clu
 
 // ===== TESTING API =====
 private[csw] object ClusterSettings {
-  def make(actorSystem: ActorSystem[SpawnProtocol.Command]): ClusterSettings = new ClusterSettings() {
-    override lazy val system: ActorSystem[SpawnProtocol.Command] = actorSystem
-  }
+  def make(actorSystem: ActorSystem[SpawnProtocol.Command]): ClusterSettings =
+    new ClusterSettings() {
+      override lazy val system: ActorSystem[SpawnProtocol.Command] = actorSystem
+    }
 }
 
 /**
