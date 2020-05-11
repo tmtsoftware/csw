@@ -93,7 +93,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
     public void testRegistrationAndUnregistrationOfHttpComponent__DEOPSCSW_13() throws ExecutionException,
             InterruptedException {
         int port = 8080;
-        HttpRegistration httpRegistration = new HttpRegistration(httpServiceConnection, port, Path, privateNetwork);
+        HttpRegistration httpRegistration = new HttpRegistration(httpServiceConnection, port, Path);
 
         IRegistrationResult registrationResult = locationService.register(httpRegistration).get();
         Assert.assertEquals(httpRegistration.location(hostname), registrationResult.location());
@@ -107,7 +107,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
             InterruptedException {
         int port = 8080;
         AkkaRegistration akkaRegistration = new RegistrationFactory().akkaTyped(akkaHcdConnection, actorRef);
-        HttpRegistration httpRegistration = new HttpRegistration(httpServiceConnection, port, Path, privateNetwork);
+        HttpRegistration httpRegistration = new HttpRegistration(httpServiceConnection, port, Path);
         TcpRegistration tcpRegistration = new TcpRegistration(tcpServiceConnection, port);
 
         locationService.register(akkaRegistration).get();
@@ -150,7 +150,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
     public void testHttpRegistration__DEOPSCSW_39() throws ExecutionException, InterruptedException {
         int port = 8080;
         String Path = "/path/to/resource";
-        HttpRegistration httpRegistration = new HttpRegistration(httpServiceConnection, port, Path, privateNetwork);
+        HttpRegistration httpRegistration = new HttpRegistration(httpServiceConnection, port, Path);
 
         IRegistrationResult registrationResult = locationService.register(httpRegistration).get();
         Assert.assertEquals(httpServiceComponentId, registrationResult.location().connection().componentId());
@@ -184,8 +184,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
     @Test
     public void testListComponents__DEOPSCSW_13_DEOPSCSW_39() throws ExecutionException, InterruptedException {
         //  Register Http connection
-        HttpRegistration httpRegistration = new HttpRegistration(httpServiceConnection, 4000, "/svn/", privateNetwork
-        );
+        HttpRegistration httpRegistration = new HttpRegistration(httpServiceConnection, 4000, "/svn/");
         locationService.register(httpRegistration).get();
 
         //  Register Akka connection
@@ -244,8 +243,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
         ComponentId httpServiceComponentId = new ComponentId(new Prefix(JSubsystem.CSW, "ConfigService"),
                 JComponentType.Service);
         HttpConnection httpServiceConnection = new HttpConnection(httpServiceComponentId);
-        HttpRegistration httpServiceRegistration = new HttpRegistration(httpServiceConnection, 4000, "/config/svn/",
-                privateNetwork);
+        HttpRegistration httpServiceRegistration = new HttpRegistration(httpServiceConnection, 4000, "/config/svn/");
         locationService.register(httpServiceRegistration).get();
 
         //  Filter by HCD type
@@ -303,8 +301,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
         locationService.register(tcpRegistration).get();
 
         // Register Http connection
-        HttpRegistration httpRegistration = new HttpRegistration(httpServiceConnection, 4000, "/config/svn/",
-                privateNetwork);
+        HttpRegistration httpRegistration = new HttpRegistration(httpServiceConnection, 4000, "/config/svn/");
         locationService.register(httpRegistration).get();
 
         // Register Akka connection

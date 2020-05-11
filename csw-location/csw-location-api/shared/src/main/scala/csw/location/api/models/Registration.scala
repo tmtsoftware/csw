@@ -71,6 +71,9 @@ final case class TcpRegistration(connection: TcpConnection, port: Int) extends R
 final case class HttpRegistration(connection: HttpConnection, port: Int, path: String, networkType: NetworkType)
     extends Registration {
 
+  //Used for JAVA API
+  def this(connection: HttpConnection, port: Int, path: String) = this(connection, port, path, NetworkType.Private)
+
   /**
    * Create a HttpLocation that represents the live Http service
    *
@@ -82,10 +85,6 @@ final case class HttpRegistration(connection: HttpConnection, port: Int, path: S
 }
 
 object HttpRegistration {
-  def apply(
-      connection: HttpConnection,
-      port: Int,
-      path: String,
-      networkType: NetworkType = NetworkType.Private
-  ): HttpRegistration = new HttpRegistration(connection, port, path, networkType)
+  def apply(connection: HttpConnection, port: Int, path: String): HttpRegistration =
+    new HttpRegistration(connection, port, path, NetworkType.Private)
 }

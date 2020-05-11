@@ -97,8 +97,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         HttpConnection httpConnection = new HttpConnection(new ComponentId(new Prefix(JSubsystem.CSW,
                 "configuration"), JComponentType.Service));
 
-        HttpRegistration httpRegistration = new HttpRegistration(httpConnection, 8080, "path123",
-                JNetworkType.Private);
+        HttpRegistration httpRegistration = new HttpRegistration(httpConnection, 8080, "path123");
         httpRegResult = locationService.register(httpRegistration).get();
 
         HttpRegistration httpRegistrationOnPublicNetwork = new HttpRegistration(httpConnection, 8080, "path123",
