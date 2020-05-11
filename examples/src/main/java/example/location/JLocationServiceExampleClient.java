@@ -18,10 +18,7 @@ import csw.command.client.messages.ComponentMessage;
 import csw.command.client.messages.ContainerMessage;
 import csw.location.api.extensions.ActorExtension;
 import csw.location.api.extensions.URIExtension;
-import csw.location.api.javadsl.ILocationService;
-import csw.location.api.javadsl.IRegistrationResult;
-import csw.location.api.javadsl.JComponentType;
-import csw.location.api.javadsl.JConnectionType;
+import csw.location.api.javadsl.*;
 import csw.location.api.models.*;
 import csw.location.api.models.Connection.AkkaConnection;
 import csw.location.api.models.Connection.HttpConnection;
@@ -98,9 +95,8 @@ public class JLocationServiceExampleClient extends AbstractActor {
         // dummy http connection
         HttpConnection httpConnection = new HttpConnection(new ComponentId(new Prefix(JSubsystem.CSW,
                 "configuration"), JComponentType.Service));
-        NetworkType privateNetwork = NetworkType.Private$.MODULE$;
         HttpRegistration httpRegistration = new HttpRegistration(httpConnection, 8080, "path123",
-                privateNetwork);
+                JNetworkType.Private);
         httpRegResult = locationService.register(httpRegistration).get();
 
         // ************************************************************************************************************

@@ -9,10 +9,7 @@ import akka.stream.javadsl.Keep;
 import akka.stream.testkit.TestSubscriber;
 import akka.stream.testkit.scaladsl.TestSink;
 import csw.location.api.commons.Constants;
-import csw.location.api.javadsl.ILocationService;
-import csw.location.api.javadsl.IRegistrationResult;
-import csw.location.api.javadsl.JComponentType;
-import csw.location.api.javadsl.JConnectionType;
+import csw.location.api.javadsl.*;
 import csw.location.api.models.*;
 import csw.location.api.models.Connection.AkkaConnection;
 import csw.location.api.models.Connection.HttpConnection;
@@ -49,7 +46,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
     private static akka.actor.ActorSystem untypedSystem;
     private static ActorSystem<SpawnProtocol.Command> typedSystem;
     private static ILocationService locationService;
-    private static final NetworkType.Private$ privateNetwork = NetworkType.Private$.MODULE$;
+    private static NetworkType privateNetwork = JNetworkType.Private;
     private static String hostname;
 
     private final ComponentId akkaHcdComponentId = new ComponentId(new Prefix(JSubsystem.CSW, "hcd1"),
