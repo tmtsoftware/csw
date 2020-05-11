@@ -70,11 +70,12 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
   import scala.concurrent.duration._
   private def publishCounter(): Cancellable = {
     var counter = 0
-    def incrementCounterEvent() = Option {
-      counter += 1
-      val param: Parameter[Int] = KeyType.IntKey.make("counter").set(counter)
-      SystemEvent(prefix, EventName("HcdCounter")).add(param)
-    }
+    def incrementCounterEvent() =
+      Option {
+        counter += 1
+        val param: Parameter[Int] = KeyType.IntKey.make("counter").set(counter)
+        SystemEvent(prefix, EventName("HcdCounter")).add(param)
+      }
 
     log.info(s"HCD: $prefix started publishing stream")
     eventService.defaultPublisher.publish(incrementCounterEvent(), 2.second, err => log.error(err.getMessage, ex = err))

@@ -133,8 +133,8 @@ private[logging] object LogActorOperations {
 
     if (log.prefix.isDefined)
       jsonObject = jsonObject ++
-        Json.obj(LoggingKeys.PREFIX         -> log.prefix.get.toString) ++
-        Json.obj(LoggingKeys.SUBSYSTEM      -> log.prefix.get.subsystem.name) ++
+        Json.obj(LoggingKeys.PREFIX -> log.prefix.get.toString) ++
+        Json.obj(LoggingKeys.SUBSYSTEM -> log.prefix.get.subsystem.name) ++
         Json.obj(LoggingKeys.COMPONENT_NAME -> log.prefix.get.componentName)
 
     if (log.ex != NoLogException) jsonObject = jsonObject ++ exceptionJson(log.ex)

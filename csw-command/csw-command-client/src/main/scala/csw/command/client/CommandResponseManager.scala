@@ -18,8 +18,8 @@ import scala.jdk.FutureConverters._
  * @param commandResponseManagerActor underlying actor managing command responses for started commands
  * @param actorSystem actor system for allowing sending messages in API
  */
-class CommandResponseManager(val commandResponseManagerActor: ActorRef[MiniCRM.CRMMessage])(
-    implicit val actorSystem: ActorSystem[_]
+class CommandResponseManager(val commandResponseManagerActor: ActorRef[MiniCRM.CRMMessage])(implicit
+    val actorSystem: ActorSystem[_]
 ) {
 
   /**

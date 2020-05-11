@@ -13,12 +13,13 @@ import scala.concurrent.{ExecutionContext, Future}
  */
 private[database] class DatabaseServiceLocationResolver(locationService: LocationService)(implicit ec: ExecutionContext) {
 
-  def uri(): Future[URI] = async {
-    val location = await(locationService.resolve(DatabaseServiceConnection.value, 5.seconds)).getOrElse(
-      throw new RuntimeException(
-        s"Database service connection=${DatabaseServiceConnection.value.name} can not be resolved"
+  def uri(): Future[URI] =
+    async {
+      val location = await(locationService.resolve(DatabaseServiceConnection.value, 5.seconds)).getOrElse(
+        throw new RuntimeException(
+          s"Database service connection=${DatabaseServiceConnection.value.name} can not be resolved"
+        )
       )
-    )
-    location.uri
-  }
+      location.uri
+    }
 }

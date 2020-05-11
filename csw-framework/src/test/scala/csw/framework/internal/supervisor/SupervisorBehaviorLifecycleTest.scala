@@ -285,5 +285,5 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
       CommandResponseManagerMessage.Unsubscribe(testCmdId, queryResponseProbe.ref)
     )
   }
- */
+   */
 }

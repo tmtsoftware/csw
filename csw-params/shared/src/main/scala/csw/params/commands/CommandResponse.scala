@@ -145,10 +145,11 @@ object CommandResponse {
    * @param sr response for testing
    * @return true if it is final
    */
-  def isFinal(sr: SubmitResponse): Boolean = sr match {
-    case Started(_) => false
-    case _          => true
-  }
+  def isFinal(sr: SubmitResponse): Boolean =
+    sr match {
+      case Started(_) => false
+      case _          => true
+    }
 
   /**
    * Test a response to determine if it is a positive response
@@ -156,10 +157,11 @@ object CommandResponse {
    * @param sr response for testing
    * @return true if it is positive
    */
-  def isPositive(sr: SubmitResponse): Boolean = sr match {
-    case Completed(_, _) => true
-    case _               => false
-  }
+  def isPositive(sr: SubmitResponse): Boolean =
+    sr match {
+      case Completed(_, _) => true
+      case _               => false
+    }
 
   /**
    * Test a OnewayResponse to determine if it is a positive response
@@ -167,10 +169,11 @@ object CommandResponse {
    * @param or a OnewayResponse for testing
    * @return true if positive, false otherwise
    */
-  def isPositive(or: OnewayResponse): Boolean = or match {
-    case Accepted(_) => true
-    case _           => false
-  }
+  def isPositive(or: OnewayResponse): Boolean =
+    or match {
+      case Accepted(_) => true
+      case _           => false
+    }
 
   /**
    * Tests a response to determine if it is a negative response
@@ -186,8 +189,9 @@ object CommandResponse {
    * @param sr response for testing
    * @return returns true if it is intermediate
    */
-  def isIntermediate(sr: SubmitResponse): Boolean = sr match {
-    case Started(_) => true
-    case _          => false
-  }
+  def isIntermediate(sr: SubmitResponse): Boolean =
+    sr match {
+      case Started(_) => true
+      case _          => false
+    }
 }

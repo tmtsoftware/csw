@@ -26,15 +26,17 @@ class ConfigUtils(configClientService: ConfigClientService)(implicit system: Act
     if (isLocal) getConfigFromLocalFile(inputFilePath)
     else getConfigFromRemoteFile(inputFilePath)
 
-  private def getConfigFromLocalFile(inputFilePath: Path): Future[Config] = async {
-    if (Files.exists(inputFilePath)) ConfigFactory.parseFile(inputFilePath.toFile)
-    else throw LocalFileNotFound(inputFilePath)
-  }
-
-  private def getConfigFromRemoteFile(inputFilePath: Path): Future[Config] = async {
-    await(configClientService.getActive(inputFilePath)) match {
-      case Some(configData) => await(configData.toConfigObject)
-      case None             => throw FileNotFound(inputFilePath)
+  private def getConfigFromLocalFile(inputFilePath: Path): Future[Config] =
+    async {
+      if (Files.exists(inputFilePath)) ConfigFactory.parseFile(inputFilePath.toFile)
+      else throw LocalFileNotFound(inputFilePath)
     }
-  }
+
+  private def getConfigFromRemoteFile(inputFilePath: Path): Future[Config] =
+    async {
+      await(configClientService.getActive(inputFilePath)) match {
+        case Some(configData) => await(configData.toConfigObject)
+        case None             => throw FileNotFound(inputFilePath)
+      }
+    }
 }

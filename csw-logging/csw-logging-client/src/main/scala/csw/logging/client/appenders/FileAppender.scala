@@ -32,13 +32,15 @@ private[logging] class FileAppenderHelper(path: String, name: String, category: 
   def appendAdd(maybeTimestamp: Option[ZonedDateTime], line: String, rotateFlag: Boolean): Unit = {
     maybePrintWriter match {
       case Some(w) =>
-        if (rotateFlag && maybeTimestamp.get
-              .isAfter(
-                fileSpanTimestamp.getOrElse(
-                  ZonedDateTime
-                    .of(LocalDateTime.MIN, ZoneId.from(ZoneOffset.UTC))
-                )
-              )) {
+        if (
+          rotateFlag && maybeTimestamp.get
+            .isAfter(
+              fileSpanTimestamp.getOrElse(
+                ZonedDateTime
+                  .of(LocalDateTime.MIN, ZoneId.from(ZoneOffset.UTC))
+              )
+            )
+        ) {
           w.close()
           open(maybeTimestamp, rotateFlag)
         }

@@ -28,27 +28,30 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
 
   import actorRuntime._
 
-  def inspect(options: Options): Future[Unit] = async {
-    val events = await(getEvents(options.eventKeys))
-    new EventOnelineTransformer(options).transform(events).foreach(printLine)
-  }
-
-  def get(options: Options): Future[Unit] = async {
-    val events = await(getEvents(options.eventsMap.keys.toSeq))
-    if (options.isJsonOut)
-      events.foreach(event => processGetJson(event, options))
-    else new EventOnelineTransformer(options).transform(events).foreach(printLine)
-  }
-
-  def publish(options: Options): Future[Done] = async {
-    val event        = await(getEvent(options.eventKey, options.eventData))
-    val updatedEvent = updateEventParams(event, options.params)
-
-    options.maybeInterval match {
-      case Some(interval) => await(publishEventsWithInterval(updatedEvent, interval, options.period))
-      case None           => await(publishEvent(updatedEvent))
+  def inspect(options: Options): Future[Unit] =
+    async {
+      val events = await(getEvents(options.eventKeys))
+      new EventOnelineTransformer(options).transform(events).foreach(printLine)
     }
-  }
+
+  def get(options: Options): Future[Unit] =
+    async {
+      val events = await(getEvents(options.eventsMap.keys.toSeq))
+      if (options.isJsonOut)
+        events.foreach(event => processGetJson(event, options))
+      else new EventOnelineTransformer(options).transform(events).foreach(printLine)
+    }
+
+  def publish(options: Options): Future[Done] =
+    async {
+      val event        = await(getEvent(options.eventKey, options.eventData))
+      val updatedEvent = updateEventParams(event, options.params)
+
+      options.maybeInterval match {
+        case Some(interval) => await(publishEventsWithInterval(updatedEvent, interval, options.period))
+        case None           => await(publishEvent(updatedEvent))
+      }
+    }
 
   def subscribe(options: Options): (EventSubscription, Future[Done]) = {
     val keys        = options.eventsMap.keys.toSet
@@ -107,15 +110,17 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
     }
   }
 
-  private def updateEventParams(event: Event, paramSet: Set[Parameter[_]]) = event match {
-    case event: SystemEvent  => event.madd(paramSet)
-    case event: ObserveEvent => event.madd(paramSet)
-  }
+  private def updateEventParams(event: Event, paramSet: Set[Parameter[_]]) =
+    event match {
+      case event: SystemEvent  => event.madd(paramSet)
+      case event: ObserveEvent => event.madd(paramSet)
+    }
 
-  private def eventGenerator(initialEvent: Event): Event = initialEvent match {
-    case event: SystemEvent  => event.copy(eventId = Id(), eventTime = UTCTime.now())
-    case event: ObserveEvent => event.copy(eventId = Id(), eventTime = UTCTime.now())
-  }
+  private def eventGenerator(initialEvent: Event): Event =
+    initialEvent match {
+      case event: SystemEvent  => event.copy(eventId = Id(), eventTime = UTCTime.now())
+      case event: ObserveEvent => event.copy(eventId = Id(), eventTime = UTCTime.now())
+    }
 
   private def publishEvent(event: Event): Future[Done] = {
     val publisher     = eventService.defaultPublisher

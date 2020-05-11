@@ -18,8 +18,8 @@ import scala.concurrent.Future
  * @param actorSystem actor system to be used by Producer and Consumer API of akka-stream-kafka
  */
 // $COVERAGE-OFF$
-private[event] class KafkaEventService(eventServiceResolver: EventServiceResolver)(
-    implicit actorSystem: ActorSystem[_]
+private[event] class KafkaEventService(eventServiceResolver: EventServiceResolver)(implicit
+    actorSystem: ActorSystem[_]
 ) extends EventService {
 
   import actorSystem.executionContext
@@ -27,16 +27,18 @@ private[event] class KafkaEventService(eventServiceResolver: EventServiceResolve
   override def makeNewSubscriber(): KafkaSubscriber = new KafkaSubscriber(consumerSettings)
 
   // resolve event service every time before creating a new publisher
-  private def producerSettings: Future[ProducerSettings[String, Array[Byte]]] = eventServiceResolver.uri().map { uri =>
-    ProducerSettings(actorSystem.toClassic, None, None).withBootstrapServers(s"${uri.getHost}:${uri.getPort}")
-  }
+  private def producerSettings: Future[ProducerSettings[String, Array[Byte]]] =
+    eventServiceResolver.uri().map { uri =>
+      ProducerSettings(actorSystem.toClassic, None, None).withBootstrapServers(s"${uri.getHost}:${uri.getPort}")
+    }
 
   // resolve event service every time before creating a new subscriber
-  private def consumerSettings: Future[ConsumerSettings[String, Array[Byte]]] = eventServiceResolver.uri().map { uri =>
-    ConsumerSettings(actorSystem.toClassic, None, None)
-      .withBootstrapServers(s"${uri.getHost}:${uri.getPort}")
-      .withGroupId(UUID.randomUUID().toString)
-  }
+  private def consumerSettings: Future[ConsumerSettings[String, Array[Byte]]] =
+    eventServiceResolver.uri().map { uri =>
+      ConsumerSettings(actorSystem.toClassic, None, None)
+        .withBootstrapServers(s"${uri.getHost}:${uri.getPort}")
+        .withGroupId(UUID.randomUUID().toString)
+    }
 
 }
 // $COVERAGE-ON$

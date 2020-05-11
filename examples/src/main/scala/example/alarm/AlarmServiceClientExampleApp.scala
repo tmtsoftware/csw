@@ -23,10 +23,11 @@ object AlarmServiceClientExampleApp {
   implicit val ec: ExecutionContext        = actorSystem.executionContext
   private val locationService              = HttpLocationServiceFactory.makeLocalClient
 
-  private def behaviour[T]: Behaviors.Receive[T] = Behaviors.receive { (ctx, msg) =>
-    println(msg)
-    Behaviors.same
-  }
+  private def behaviour[T]: Behaviors.Receive[T] =
+    Behaviors.receive { (ctx, msg) =>
+      println(msg)
+      Behaviors.same
+    }
 
   //#create-scala-api
   // create alarm client using host and port of alarm server

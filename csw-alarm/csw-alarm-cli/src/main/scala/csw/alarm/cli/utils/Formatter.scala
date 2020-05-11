@@ -28,13 +28,14 @@ object Formatter {
   def formatAggregatedHealth(key: Key, health: AlarmHealth): String           = msg(key, "Health", health.toString)
   def formatRefreshSeverity(key: Key, severity: FullAlarmSeverity): String    = s"Severity for [$key] refreshed to: $severity"
 
-  def msg(key: Key, property: String, value: String): String = key match {
-    case GlobalKey               => s"Aggregated $property of Alarm Service: $value"
-    case SubsystemKey(subsystem) => s"Aggregated $property of Subsystem [$subsystem]: $value"
-    case ComponentKey(Prefix(subsystem, component)) =>
-      s"Aggregated $property of Component [${subsystem.name}$KeySeparator$component]: $value"
-    case _: AlarmKey => s"$property of Alarm [$key]: $value"
-  }
+  def msg(key: Key, property: String, value: String): String =
+    key match {
+      case GlobalKey               => s"Aggregated $property of Alarm Service: $value"
+      case SubsystemKey(subsystem) => s"Aggregated $property of Subsystem [$subsystem]: $value"
+      case ComponentKey(Prefix(subsystem, component)) =>
+        s"Aggregated $property of Component [${subsystem.name}$KeySeparator$component]: $value"
+      case _: AlarmKey => s"$property of Alarm [$key]: $value"
+    }
 
   private def formatAlarm(alarm: Alarm): String =
     List(formatMetadata(alarm.metadata), formatStatus(alarm.status), formatSeverity(alarm.severity)).mkString(Newline)

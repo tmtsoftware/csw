@@ -9,8 +9,8 @@ import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
 
 // #write-command
-class WriteCommand(val installedAppAuthAdapter: InstalledAppAuthAdapter, value: String)(
-    implicit val actorSystem: typed.ActorSystem[_]
+class WriteCommand(val installedAppAuthAdapter: InstalledAppAuthAdapter, value: String)(implicit
+    val actorSystem: typed.ActorSystem[_]
 ) extends AppCommand {
   override def run(): Unit = {
 

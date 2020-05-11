@@ -14,14 +14,16 @@ object WorkerActorMsgs {
 
 object WorkerActor {
 
-  def behavior(configData: ConfigData): Behavior[WorkerActorMsg] = Behaviors.setup { ctx =>
-    // some setup required for the actor could be done here
+  def behavior(configData: ConfigData): Behavior[WorkerActorMsg] =
+    Behaviors.setup { ctx =>
+      // some setup required for the actor could be done here
 
-    def receive(state: Int): Behavior[WorkerActorMsg] = Behaviors.receiveMessage {
-      case _: InitialState  => receive(0) // do something and return new behavior with the changed state
-      case _: GetStatistics => receive(1) // do something else
+      def receive(state: Int): Behavior[WorkerActorMsg] =
+        Behaviors.receiveMessage {
+          case _: InitialState  => receive(0) // do something and return new behavior with the changed state
+          case _: GetStatistics => receive(1) // do something else
+        }
+
+      receive(-1)
     }
-
-    receive(-1)
-  }
 }

@@ -37,57 +37,62 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
   var commandHandler: ActorRef[CommandHandlerMsgs]                 = _
 
   //#initialize-handler
-  override def initialize(): Future[Unit] = async {
+  override def initialize(): Future[Unit] =
+    async {
 
-    // Initialization could include following steps :
+      // Initialization could include following steps :
 
-    // 1. fetch config (preferably from configuration service)
-    val calculationConfig = await(getAssemblyConfig)
+      // 1. fetch config (preferably from configuration service)
+      val calculationConfig = await(getAssemblyConfig)
 
-    // 2. create a worker actor which is used by this assembly
-    val worker: ActorRef[WorkerActorMsg] = ctx.spawnAnonymous(WorkerActor.behavior(calculationConfig))
+      // 2. create a worker actor which is used by this assembly
+      val worker: ActorRef[WorkerActorMsg] = ctx.spawnAnonymous(WorkerActor.behavior(calculationConfig))
 
-    // 3. find a Hcd connection from the connections provided in componentInfo
-    val maybeConnection =
-      componentInfo.connections.find(connection => connection.componentId.componentType == ComponentType.HCD)
+      // 3. find a Hcd connection from the connections provided in componentInfo
+      val maybeConnection =
+        componentInfo.connections.find(connection => connection.componentId.componentType == ComponentType.HCD)
 
-    // 4. If an Hcd is found as a connection, resolve its location from location service and create other
-    // required worker actors required by this assembly
+      // 4. If an Hcd is found as a connection, resolve its location from location service and create other
+      // required worker actors required by this assembly
 
-    maybeConnection match {
-      case Some(_) =>
-        resolveHcd().map {
-          case Some(hcd) =>
-            runningHcds = runningHcds.updated(maybeConnection.get, Some(CommandServiceFactory.make(hcd)(ctx.system)))
-            diagnosticsPublisher = ctx.spawnAnonymous(DiagnosticsPublisher.behavior(runningHcds(maybeConnection.get).get, worker))
-            commandHandler = ctx.spawnAnonymous(CommandHandler.behavior(calculationConfig, runningHcds(maybeConnection.get)))
-          case None => // do something
-        }
-      case None => Future.successful(())
+      maybeConnection match {
+        case Some(_) =>
+          resolveHcd().map {
+            case Some(hcd) =>
+              runningHcds = runningHcds.updated(maybeConnection.get, Some(CommandServiceFactory.make(hcd)(ctx.system)))
+              diagnosticsPublisher =
+                ctx.spawnAnonymous(DiagnosticsPublisher.behavior(runningHcds(maybeConnection.get).get, worker))
+              commandHandler = ctx.spawnAnonymous(CommandHandler.behavior(calculationConfig, runningHcds(maybeConnection.get)))
+            case None => // do something
+          }
+        case None => Future.successful(())
+      }
+
     }
-
-  }
   //#initialize-handler
 
   //#validateCommand-handler
-  override def validateCommand(runId: Id, controlCommand: ControlCommand): ValidateCommandResponse = controlCommand match {
-    case _: Setup   => Accepted(runId) // validation for setup goes here
-    case _: Observe => Accepted(runId) // validation for observe goes here
-  }
+  override def validateCommand(runId: Id, controlCommand: ControlCommand): ValidateCommandResponse =
+    controlCommand match {
+      case _: Setup   => Accepted(runId) // validation for setup goes here
+      case _: Observe => Accepted(runId) // validation for observe goes here
+    }
   //#validateCommand-handler
 
   //#onSubmit-handler
-  override def onSubmit(runId: Id, controlCommand: ControlCommand): SubmitResponse = controlCommand match {
-    case setup: Setup     => submitSetup(runId, setup)     // includes logic to handle Submit with Setup config command
-    case observe: Observe => submitObserve(runId, observe) // includes logic to handle Submit with Observe config command
-  }
+  override def onSubmit(runId: Id, controlCommand: ControlCommand): SubmitResponse =
+    controlCommand match {
+      case setup: Setup     => submitSetup(runId, setup)     // includes logic to handle Submit with Setup config command
+      case observe: Observe => submitObserve(runId, observe) // includes logic to handle Submit with Observe config command
+    }
   //#onSubmit-handler
 
   //#onOneway-handler
-  override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = controlCommand match {
-    case setup: Setup     => onewaySetup(runId, setup)     // includes logic to handle Oneway with Setup config command
-    case observe: Observe => onewayObserve(runId, observe) // includes logic to handle Oneway with Observe config command
-  }
+  override def onOneway(runId: Id, controlCommand: ControlCommand): Unit =
+    controlCommand match {
+      case setup: Setup     => onewaySetup(runId, setup)     // includes logic to handle Oneway with Setup config command
+      case observe: Observe => onewayObserve(runId, observe) // includes logic to handle Oneway with Observe config command
+    }
   //#onOneway-handler
 
   //#onGoOffline-handler
@@ -103,9 +108,10 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
   //#onGoOnline-handler
 
   //#onShutdown-handler
-  override def onShutdown(): Future[Unit] = async {
-    // clean up resources
-  }
+  override def onShutdown(): Future[Unit] =
+    async {
+      // clean up resources
+    }
   //#onShutdown-handler
 
   override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = {
@@ -117,10 +123,11 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
   }
 
   //#onLocationTrackingEvent-handler
-  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = trackingEvent match {
-    case LocationUpdated(location)   => // do something for the tracked location when it is updated
-    case LocationRemoved(connection) => // do something for the tracked location when it is no longer available
-  }
+  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit =
+    trackingEvent match {
+      case LocationUpdated(location)   => // do something for the tracked location when it is updated
+      case LocationRemoved(connection) => // do something for the tracked location when it is no longer available
+    }
   //#onLocationTrackingEvent-handler
 
   private def processSetup(sc: Setup): Unit = {

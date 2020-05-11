@@ -23,8 +23,8 @@ import scala.util.control.NonFatal
  * @param producerSettings future of settings for akka-streams-kafka API for Apache Kafka producer
  */
 // $COVERAGE-OFF$
-private[event] class KafkaPublisher(producerSettings: Future[ProducerSettings[String, Array[Byte]]])(
-    implicit actorSystem: ActorSystem[_]
+private[event] class KafkaPublisher(producerSettings: Future[ProducerSettings[String, Array[Byte]]])(implicit
+    actorSystem: ActorSystem[_]
 ) extends EventPublisher {
 
   import actorSystem.executionContext
@@ -95,11 +95,12 @@ private[event] class KafkaPublisher(producerSettings: Future[ProducerSettings[St
   ): Cancellable =
     publish(eventPublisherUtil.eventSource(eventGenerator, parallelism, startTime.durationFromNow, every), onError)
 
-  override def shutdown(): Future[Done] = kafkaProducer.map { x =>
-    eventPublisherUtil.shutdown()
-    scala.concurrent.blocking(x.close())
-    Done
-  }
+  override def shutdown(): Future[Done] =
+    kafkaProducer.map { x =>
+      eventPublisherUtil.shutdown()
+      scala.concurrent.blocking(x.close())
+      Done
+    }
 
   private def eventToProducerRecord(event: Event): ProducerRecord[String, Array[Byte]] =
     new ProducerRecord(event.eventKey.key, EventConverter.toBytes[Array[Byte]](event))

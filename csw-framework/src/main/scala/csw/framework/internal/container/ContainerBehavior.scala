@@ -111,45 +111,47 @@ private[framework] final class ContainerBehavior(
    *
    * @param commonMessage message representing a message received in any lifecycle state
    */
-  private def onCommon(commonMessage: ContainerCommonMessage): Unit = commonMessage match {
-    case GetComponents(replyTo) =>
-      replyTo ! Components(supervisors.map(_.component))
-    case GetContainerLifecycleState(replyTo) =>
-      replyTo ! lifecycleState
-    case Restart =>
-      log.debug(s"Container is changing lifecycle state from [$lifecycleState] to [${ContainerLifecycleState.Idle}]")
-      lifecycleState = ContainerLifecycleState.Idle
-      runningComponents = Set.empty
-      supervisors.foreach(_.component.supervisor ! Restart)
-    case Shutdown =>
-      log.debug(s"Container is changing lifecycle state from [$lifecycleState] to [${ContainerLifecycleState.Idle}]")
-      lifecycleState = ContainerLifecycleState.Idle
-      supervisors.foreach(_.component.supervisor ! Shutdown)
-  }
+  private def onCommon(commonMessage: ContainerCommonMessage): Unit =
+    commonMessage match {
+      case GetComponents(replyTo) =>
+        replyTo ! Components(supervisors.map(_.component))
+      case GetContainerLifecycleState(replyTo) =>
+        replyTo ! lifecycleState
+      case Restart =>
+        log.debug(s"Container is changing lifecycle state from [$lifecycleState] to [${ContainerLifecycleState.Idle}]")
+        lifecycleState = ContainerLifecycleState.Idle
+        runningComponents = Set.empty
+        supervisors.foreach(_.component.supervisor ! Restart)
+      case Shutdown =>
+        log.debug(s"Container is changing lifecycle state from [$lifecycleState] to [${ContainerLifecycleState.Idle}]")
+        lifecycleState = ContainerLifecycleState.Idle
+        supervisors.foreach(_.component.supervisor ! Shutdown)
+    }
 
   /**
    * Defines action for messages which can be received in [[csw.command.client.models.framework.ContainerLifecycleState.Idle]] state
    *
    * @param idleMessage message representing a message received in [[csw.command.client.models.framework.ContainerLifecycleState.Idle]] state
    */
-  private def onIdle(idleMessage: ContainerIdleMessage): Unit = idleMessage match {
-    case SupervisorsCreated(supervisorInfos) =>
-      if (supervisorInfos.isEmpty) {
-        log.error(s"Failed to spawn supervisors for ComponentInfo's :[${containerInfo.components.mkString(", ")}]")
-        ctx.system.terminate()
-      }
-      else {
-        supervisors = supervisorInfos
-        log.info(s"Container created following supervisors :[${supervisors.map(_.component.supervisor).mkString(",")}]")
-        supervisors.foreach(supervisorInfo => ctx.watch(supervisorInfo.component.supervisor))
-        updateContainerStateToRunning()
-      }
-    case SupervisorLifecycleStateChanged(supervisor, supervisorLifecycleState) =>
-      if (supervisorLifecycleState == SupervisorLifecycleState.Running) {
-        runningComponents = runningComponents + supervisor
-        updateContainerStateToRunning()
-      }
-  }
+  private def onIdle(idleMessage: ContainerIdleMessage): Unit =
+    idleMessage match {
+      case SupervisorsCreated(supervisorInfos) =>
+        if (supervisorInfos.isEmpty) {
+          log.error(s"Failed to spawn supervisors for ComponentInfo's :[${containerInfo.components.mkString(", ")}]")
+          ctx.system.terminate()
+        }
+        else {
+          supervisors = supervisorInfos
+          log.info(s"Container created following supervisors :[${supervisors.map(_.component.supervisor).mkString(",")}]")
+          supervisors.foreach(supervisorInfo => ctx.watch(supervisorInfo.component.supervisor))
+          updateContainerStateToRunning()
+        }
+      case SupervisorLifecycleStateChanged(supervisor, supervisorLifecycleState) =>
+        if (supervisorLifecycleState == SupervisorLifecycleState.Running) {
+          runningComponents = runningComponents + supervisor
+          updateContainerStateToRunning()
+        }
+    }
 
   /**
    * Create supervisors for all components and return a set of all successfully created supervisors as a message to self

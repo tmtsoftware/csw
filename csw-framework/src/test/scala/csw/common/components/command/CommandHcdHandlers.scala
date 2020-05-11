@@ -89,10 +89,11 @@ class CommandHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCon
     }
   }
 
-  override def onShutdown(): Future[Unit] = Future {
-    currentStatePublisher.publish(CurrentState(filterHcdPrefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))
-    Thread.sleep(500)
-  }
+  override def onShutdown(): Future[Unit] =
+    Future {
+      currentStatePublisher.publish(CurrentState(filterHcdPrefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))
+      Thread.sleep(500)
+    }
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {}
 

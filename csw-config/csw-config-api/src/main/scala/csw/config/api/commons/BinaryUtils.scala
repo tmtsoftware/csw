@@ -29,7 +29,7 @@ private[config] object BinaryUtils {
    * @return boolean value indicating if the bytes represents text content
    */
   def isNotText(bytes: Array[Byte]): Boolean = {
-    val binaryCount = bytes.count(b => b < 0x08 || (b > 0x0d && b < 0x20) || b > 0x7F)
+    val binaryCount = bytes.count(b => b < 0x08 || (b > 0x0d && b < 0x20) || b > 0x7f)
     bytes.length > 0 && binaryCount * 1000 / bytes.length > 150
   }
 }

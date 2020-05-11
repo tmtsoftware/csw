@@ -26,8 +26,8 @@ class SecurityDirectives private[csw] (
     realm: String,
     resourceName: String,
     disabled: Boolean
-)(
-    implicit ec: ExecutionContext
+)(implicit
+    ec: ExecutionContext
 ) {
 
   private val logger = AuthLogger.getLogger
@@ -188,8 +188,8 @@ object SecurityDirectives {
    * Resolves auth server url using location service (blocking call)
    * @param disabled if explicitly disabled/enabled, it will ignore `disabled` key from config
    */
-  private[csw] def apply(config: Config, locationService: LocationService, disabled: Boolean)(
-      implicit ec: ExecutionContext
+  private[csw] def apply(config: Config, locationService: LocationService, disabled: Boolean)(implicit
+      ec: ExecutionContext
   ): SecurityDirectives = {
     val maybeLocation = if (disabled) None else Some(authLocation(locationService))
     from(AuthConfig.create(config, maybeLocation, Some(disabled)))

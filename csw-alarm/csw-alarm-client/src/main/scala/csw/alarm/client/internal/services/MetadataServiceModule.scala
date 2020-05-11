@@ -23,42 +23,47 @@ private[client] trait MetadataServiceModule extends MetadataService {
 
   private val log = AlarmServiceLogger.getLogger
 
-  final override def activate(alarmKey: AlarmKey): Future[Done] = async {
-    log.debug(s"Activate alarm [${alarmKey.value}]")
+  final override def activate(alarmKey: AlarmKey): Future[Done] =
+    async {
+      log.debug(s"Activate alarm [${alarmKey.value}]")
 
-    val metadata = await(metadataApi.get(alarmKey)).getOrElse(logAndThrow(KeyNotFoundException(alarmKey)))
-    if (!metadata.isActive) await(metadataApi.set(alarmKey, metadata.copy(activationStatus = Active)))
-    Done
-  }
+      val metadata = await(metadataApi.get(alarmKey)).getOrElse(logAndThrow(KeyNotFoundException(alarmKey)))
+      if (!metadata.isActive) await(metadataApi.set(alarmKey, metadata.copy(activationStatus = Active)))
+      Done
+    }
 
-  final override def deactivate(alarmKey: AlarmKey): Future[Done] = async {
-    log.debug(s"Deactivate alarm [${alarmKey.value}]")
+  final override def deactivate(alarmKey: AlarmKey): Future[Done] =
+    async {
+      log.debug(s"Deactivate alarm [${alarmKey.value}]")
 
-    val metadata = await(metadataApi.get(alarmKey)).getOrElse(logAndThrow(KeyNotFoundException(alarmKey)))
-    if (metadata.isActive) await(metadataApi.set(alarmKey, metadata.copy(activationStatus = Inactive)))
-    Done
-  }
+      val metadata = await(metadataApi.get(alarmKey)).getOrElse(logAndThrow(KeyNotFoundException(alarmKey)))
+      if (metadata.isActive) await(metadataApi.set(alarmKey, metadata.copy(activationStatus = Inactive)))
+      Done
+    }
 
-  final override def getMetadata(alarmKey: AlarmKey): Future[AlarmMetadata] = async {
-    log.debug(s"Getting metadata for alarm [${alarmKey.value}]")
+  final override def getMetadata(alarmKey: AlarmKey): Future[AlarmMetadata] =
+    async {
+      log.debug(s"Getting metadata for alarm [${alarmKey.value}]")
 
-    await(metadataApi.get(alarmKey)).getOrElse(logAndThrow(KeyNotFoundException(alarmKey)))
-  }
+      await(metadataApi.get(alarmKey)).getOrElse(logAndThrow(KeyNotFoundException(alarmKey)))
+    }
 
-  final override def getMetadata(key: Key): Future[List[AlarmMetadata]] = async {
-    log.debug(s"Getting metadata for alarms matching [${key.value}]")
+  final override def getMetadata(key: Key): Future[List[AlarmMetadata]] =
+    async {
+      log.debug(s"Getting metadata for alarms matching [${key.value}]")
 
-    val metadataKeys = await(metadataApi.keys(key))
-    if (metadataKeys.isEmpty) logAndThrow(KeyNotFoundException(key))
-    await(metadataApi.mget(metadataKeys)).collect { case RedisResult(_, Some(metadata)) => metadata }
-  }
+      val metadataKeys = await(metadataApi.keys(key))
+      if (metadataKeys.isEmpty) logAndThrow(KeyNotFoundException(key))
+      await(metadataApi.mget(metadataKeys)).collect { case RedisResult(_, Some(metadata)) => metadata }
+    }
 
-  final override def initAlarms(inputConfig: Config, reset: Boolean): Future[Done] = async {
-    log.debug(s"Initializing alarm store with reset [$reset] and alarms [$inputConfig]")
-    val alarmMetadataSet = ConfigParser.parseAlarmMetadataSet(inputConfig)
-    if (reset) await(clearAlarmStore())
-    await(feedAlarmStore(alarmMetadataSet))
-  }
+  final override def initAlarms(inputConfig: Config, reset: Boolean): Future[Done] =
+    async {
+      log.debug(s"Initializing alarm store with reset [$reset] and alarms [$inputConfig]")
+      val alarmMetadataSet = ConfigParser.parseAlarmMetadataSet(inputConfig)
+      if (reset) await(clearAlarmStore())
+      await(feedAlarmStore(alarmMetadataSet))
+    }
 
   private def feedAlarmStore(alarmMetadataSet: AlarmMetadataSet): Future[Done] = {
     val alarms                                = alarmMetadataSet.alarms

@@ -13,7 +13,8 @@ import msocket.api.ContentType
 
 class LocationWebsocketHandler(locationService: LocationService, contentType: ContentType)
     extends WebsocketHandler[LocationWebsocketMessage](contentType) {
-  override def handle(request: LocationWebsocketMessage): Source[Message, NotUsed] = request match {
-    case Track(connection) => stream(locationService.track(connection))
-  }
+  override def handle(request: LocationWebsocketMessage): Source[Message, NotUsed] =
+    request match {
+      case Track(connection) => stream(locationService.track(connection))
+    }
 }

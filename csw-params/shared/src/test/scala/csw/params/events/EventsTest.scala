@@ -61,7 +61,9 @@ class EventsTest extends AnyFunSpec with Matchers {
       assert(sc1.missingKeys(k1, k2, k3) == Set(k3.keyName))
     }
 
-    it("Should allow removing | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-327, DEOPSCSW-328, DEOPSCSW-329, DEOPSCSW-330, DEOPSCSW-331") {
+    it(
+      "Should allow removing | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-327, DEOPSCSW-328, DEOPSCSW-329, DEOPSCSW-330, DEOPSCSW-331"
+    ) {
       val i1  = k1.set(22)
       val i2  = k2.set(44)
       val sc1 = SystemEvent(prefix, eventName).madd(i1, i2)
@@ -163,7 +165,9 @@ class EventsTest extends AnyFunSpec with Matchers {
       assert(sc1.missingKeys(k1, k2, k3) == Set(k3.keyName))
     }
 
-    it("Should allow removing | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-327, DEOPSCSW-328, DEOPSCSW-329, DEOPSCSW-330, DEOPSCSW-331") {
+    it(
+      "Should allow removing | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-327, DEOPSCSW-328, DEOPSCSW-329, DEOPSCSW-330, DEOPSCSW-331"
+    ) {
       val i1  = k1.set(22)
       val i2  = k2.set(44)
       val oc1 = ObserveEvent(prefix, eventName).madd(i1, i2)

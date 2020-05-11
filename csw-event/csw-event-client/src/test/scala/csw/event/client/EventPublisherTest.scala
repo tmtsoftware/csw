@@ -55,10 +55,11 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
   }
 
   @DataProvider(name = "event-service-provider")
-  def pubSubProvider: Array[Array[_ <: BaseProperties]] = Array(
-    Array(redisTestProps),
-    Array(kafkaTestProps)
-  )
+  def pubSubProvider: Array[Array[_ <: BaseProperties]] =
+    Array(
+      Array(redisTestProps),
+      Array(kafkaTestProps)
+    )
 
   //DEOPSCSW-659: Investigate initial latency in event service pub sub API for single publish
   @Test
@@ -162,11 +163,12 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
     var counter                      = -1
     val events: immutable.Seq[Event] = for (i <- 31 to 41) yield makeEventWithPrefix(i, Prefix("csw.move"))
 
-    def eventGenerator(): Future[Option[Event]] = Future {
-      counter += 1
-      if (counter > 1) None
-      else Some(events(counter))
-    }
+    def eventGenerator(): Future[Option[Event]] =
+      Future {
+        counter += 1
+        if (counter > 1) None
+        else Some(events(counter))
+      }
 
     val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
     val eventKey: EventKey          = events.head.eventKey
@@ -285,11 +287,12 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
     var counter                      = -1
     val events: immutable.Seq[Event] = for (i <- 31 to 41) yield makeEventWithPrefix(i, Prefix("csw.publishAsync"))
 
-    def eventGenerator(): Future[Option[Event]] = Future {
-      counter += 1
-      if (counter > 1) None
-      else Some(events(counter))
-    }
+    def eventGenerator(): Future[Option[Event]] =
+      Future {
+        counter += 1
+        if (counter > 1) None
+        else Some(events(counter))
+      }
 
     val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
     val eventKey: EventKey          = events.head.eventKey

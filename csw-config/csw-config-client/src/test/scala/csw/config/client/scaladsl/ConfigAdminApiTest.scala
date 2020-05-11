@@ -204,7 +204,9 @@ class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
   }
 
   // DEOPSCSW-577: Ability to view detailed change log in SVN
-  test("should get the list of a file with correct username | DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-577, DEOPSCSW-88, DEOPSCSW-138") {
+  test(
+    "should get the list of a file with correct username | DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-577, DEOPSCSW-88, DEOPSCSW-138"
+  ) {
     val user1 = "user1"
     val user2 = "user2"
     when(validToken.preferred_username).thenReturn(Some(user1), Some(user2))

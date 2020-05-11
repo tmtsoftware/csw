@@ -70,7 +70,9 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar with A
     verify(sampleHcdHandler).isOnline
   }
 
-  test("running component should not accept RunOffline lifecycle message when it is already offline | DEOPSCSW-177, DEOPSCSW-179") {
+  test(
+    "running component should not accept RunOffline lifecycle message when it is already offline | DEOPSCSW-177, DEOPSCSW-179"
+  ) {
     val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]
     val commandStatusServiceProbe = TestProbe[CRMMessage]
     val runningComponent          = new RunningComponent(supervisorProbe, commandStatusServiceProbe)

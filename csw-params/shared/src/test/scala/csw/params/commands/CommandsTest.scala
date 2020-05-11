@@ -529,7 +529,7 @@ class CommandsTest extends AnyFunSpec {
     val i2  = k2.set(1.0, 2.0, 3.0).withUnits(meter)
     val i3  = k3.set("A", "B", "C")
     val i4  = k4.set(ArrayData(Array.fill[Long](100)(10)), ArrayData(Array.fill[Long](100)(100)))
-    val i5  = k1.set(22) // This is not added for testing not present removal
+    val i5  = k1.set(22)                        // This is not added for testing not present removal
 
     it("Should allow removing one at a time | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320") {
       var sc1 = Setup(Prefix(ck3), commandName, Some(obsId)).madd(i1, i2, i3, i4)
@@ -625,5 +625,5 @@ class CommandsTest extends AnyFunSpec {
 
     }
   }
- */
+   */
 }

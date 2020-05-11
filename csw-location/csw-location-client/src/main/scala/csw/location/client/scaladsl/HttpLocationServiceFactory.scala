@@ -28,8 +28,8 @@ object HttpLocationServiceFactory extends LocationServiceCodecs {
    * Use this factory method to create http location client when location server ip is known.
    * HTTP Location server runs on port 7654.
    * */
-  private[csw] def make(serverIp: String, port: Int, tokenFactory: () => Option[String] = () => None)(
-      implicit actorSystem: ActorSystem[_]
+  private[csw] def make(serverIp: String, port: Int, tokenFactory: () => Option[String] = () => None)(implicit
+      actorSystem: ActorSystem[_]
   ): LocationService = {
     val httpUri      = s"http://$serverIp:$port/post-endpoint"
     val websocketUri = s"ws://$serverIp:$port/websocket-endpoint"

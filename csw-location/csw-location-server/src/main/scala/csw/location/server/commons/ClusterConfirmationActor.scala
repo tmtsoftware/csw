@@ -9,19 +9,21 @@ import csw.location.server.commons.ClusterConfirmationMessages.{HasJoinedCluster
 
 private[location] object ClusterConfirmationActor {
 
-  def behavior(): Behavior[Any] = Behaviors.setup { ctx =>
-    val cluster: Cluster = Cluster(ctx.system)
-    cluster.subscriptions ! Subscribe(ctx.self, classOf[MemberEvent])
+  def behavior(): Behavior[Any] =
+    Behaviors.setup { ctx =>
+      val cluster: Cluster = Cluster(ctx.system)
+      cluster.subscriptions ! Subscribe(ctx.self, classOf[MemberEvent])
 
-    def receiveBehavior(state: Option[Done] = None): Behaviors.Receive[Any] = Behaviors.receiveMessage[Any] {
-      case MemberUp(member) if member.address == cluster.selfMember.address       => receiveBehavior(Some(Done))
-      case MemberWeaklyUp(member) if member.address == cluster.selfMember.address => receiveBehavior(Some(Done))
-      case HasJoinedCluster(ref)                                                  => ref ! state; Behaviors.same
-      case Shutdown                                                               => Behaviors.stopped(() => cluster.subscriptions ! Unsubscribe(ctx.self))
-      case _                                                                      => Behaviors.same
+      def receiveBehavior(state: Option[Done] = None): Behaviors.Receive[Any] =
+        Behaviors.receiveMessage[Any] {
+          case MemberUp(member) if member.address == cluster.selfMember.address       => receiveBehavior(Some(Done))
+          case MemberWeaklyUp(member) if member.address == cluster.selfMember.address => receiveBehavior(Some(Done))
+          case HasJoinedCluster(ref)                                                  => ref ! state; Behaviors.same
+          case Shutdown                                                               => Behaviors.stopped(() => cluster.subscriptions ! Unsubscribe(ctx.self))
+          case _                                                                      => Behaviors.same
+        }
+      receiveBehavior()
     }
-    receiveBehavior()
-  }
 
 }
 

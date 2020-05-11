@@ -9,10 +9,11 @@ trait RomaineCodec[T] { outer =>
   def toBytes(value: T): ByteBuffer
   def fromBytes(byteBuffer: ByteBuffer): T
 
-  def bimap[S](from: S => T, to: T => S): RomaineCodec[S] = new RomaineCodec[S] {
-    override def toBytes(value: S): ByteBuffer        = outer.toBytes(from(value))
-    override def fromBytes(byteBuffer: ByteBuffer): S = to(outer.fromBytes(byteBuffer))
-  }
+  def bimap[S](from: S => T, to: T => S): RomaineCodec[S] =
+    new RomaineCodec[S] {
+      override def toBytes(value: S): ByteBuffer        = outer.toBytes(from(value))
+      override def fromBytes(byteBuffer: ByteBuffer): S = to(outer.fromBytes(byteBuffer))
+    }
 }
 
 object RomaineCodec {

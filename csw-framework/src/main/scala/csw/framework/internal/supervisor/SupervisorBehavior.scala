@@ -131,13 +131,14 @@ private[framework] final class SupervisorBehavior(
    *
    * @param commonMessage message representing a message received in any lifecycle state
    */
-  private def onCommon(commonMessage: ComponentCommonMessage): Unit = commonMessage match {
-    case LifecycleStateSubscription(subscriberMessage) => pubSubLifecycle ! subscriberMessage
-    case ComponentStateSubscription(subscriberMessage) => currentStatePublisher.publisherActor.unsafeUpcast ! subscriberMessage
-    case GetSupervisorLifecycleState(replyTo)          => replyTo ! lifecycleState
-    case Restart                                       => onRestart()
-    case Shutdown                                      => onShutdown()
-  }
+  private def onCommon(commonMessage: ComponentCommonMessage): Unit =
+    commonMessage match {
+      case LifecycleStateSubscription(subscriberMessage) => pubSubLifecycle ! subscriberMessage
+      case ComponentStateSubscription(subscriberMessage) => currentStatePublisher.publisherActor.unsafeUpcast ! subscriberMessage
+      case GetSupervisorLifecycleState(replyTo)          => replyTo ! lifecycleState
+      case Restart                                       => onRestart()
+      case Shutdown                                      => onShutdown()
+    }
 
   private def onRestart(): Unit = {
     updateLifecycleState(SupervisorLifecycleState.Restart)
@@ -169,10 +170,11 @@ private[framework] final class SupervisorBehavior(
    *
    * @param idleMessage message representing a message received in [[SupervisorLifecycleState.Idle]] state
    */
-  private def onIdle(idleMessage: SupervisorIdleMessage): Unit = idleMessage match {
-    case Running(componentRef) => onComponentRunning(componentRef)
-    case InitializeTimeout     => onInitializeTimeout()
-  }
+  private def onIdle(idleMessage: SupervisorIdleMessage): Unit =
+    idleMessage match {
+      case Running(componentRef) => onComponentRunning(componentRef)
+      case InitializeTimeout     => onInitializeTimeout()
+    }
 
   private def onInitializeTimeout(): Unit = {
     log.error("Component TLA initialization timed out")
@@ -203,14 +205,15 @@ private[framework] final class SupervisorBehavior(
    *
    * @param restartMessage message representing a message received in [[SupervisorLifecycleState.Restart]] state
    */
-  private def onRestarting(restartMessage: SupervisorRestartMessage): Unit = restartMessage match {
-    case UnRegistrationComplete =>
-      log.info("Supervisor unregistered itself from location service")
-      respawnComponent()
-    case UnRegistrationFailed(throwable) =>
-      log.error(throwable.getMessage, ex = throwable)
-      respawnComponent()
-  }
+  private def onRestarting(restartMessage: SupervisorRestartMessage): Unit =
+    restartMessage match {
+      case UnRegistrationComplete =>
+        log.info("Supervisor unregistered itself from location service")
+        respawnComponent()
+      case UnRegistrationFailed(throwable) =>
+        log.error(throwable.getMessage, ex = throwable)
+        respawnComponent()
+    }
 
   private def respawnComponent(): Unit = {
     log.info("Supervisor re-spawning component")
@@ -225,11 +228,12 @@ private[framework] final class SupervisorBehavior(
    *
    * @param internalRunningMessage message representing a message received in [[SupervisorLifecycleState.Running]] state
    */
-  private def onInternalRunning(internalRunningMessage: SupervisorInternalRunningMessage): Unit = internalRunningMessage match {
-    case RegistrationSuccess(componentRef)     => onRegistrationComplete(componentRef)
-    case RegistrationNotRequired(componentRef) => onRegistrationComplete(componentRef)
-    case RegistrationFailed(throwable)         => onRegistrationFailed(throwable)
-  }
+  private def onInternalRunning(internalRunningMessage: SupervisorInternalRunningMessage): Unit =
+    internalRunningMessage match {
+      case RegistrationSuccess(componentRef)     => onRegistrationComplete(componentRef)
+      case RegistrationNotRequired(componentRef) => onRegistrationComplete(componentRef)
+      case RegistrationFailed(throwable)         => onRegistrationFailed(throwable)
+    }
 
   private def onRegistrationComplete(componentRef: ActorRef[RunningMessage]): Unit = {
     maybeContainerRef.foreach { container =>
@@ -253,18 +257,19 @@ private[framework] final class SupervisorBehavior(
    *
    * @param runningMessage message representing a message received in [[SupervisorLifecycleState.Running]] state
    */
-  private def onRunning(runningMessage: SupervisorRunningMessage): Unit = runningMessage match {
-    case Query(runId, replyTo) => commandResponseManager.commandResponseManagerActor ! MiniCRMMessage.Query(runId, replyTo)
-    case QueryFinal(runId, replyTo) =>
-      commandResponseManager.commandResponseManagerActor ! MiniCRMMessage.QueryFinal(runId, replyTo)
-    case Lock(source, replyTo, leaseDuration) => lockComponent(source, replyTo, leaseDuration)
-    case Unlock(source, replyTo)              => unlockComponent(source, replyTo)
-    case cmdMsg: CommandMessage =>
-      if (lockManager.allowCommand(cmdMsg)) runningComponent.get ! cmdMsg
-      else cmdMsg.replyTo ! Locked(Id()) /// NOTE: Here creating new ID which is different than old impl
-    case runningMessage: RunningMessage => handleRunningMessage(runningMessage)
-    case msg @ Running(_)               => log.info(s"Ignoring [$msg] message received from TLA as Supervisor already in Running state")
-  }
+  private def onRunning(runningMessage: SupervisorRunningMessage): Unit =
+    runningMessage match {
+      case Query(runId, replyTo) => commandResponseManager.commandResponseManagerActor ! MiniCRMMessage.Query(runId, replyTo)
+      case QueryFinal(runId, replyTo) =>
+        commandResponseManager.commandResponseManagerActor ! MiniCRMMessage.QueryFinal(runId, replyTo)
+      case Lock(source, replyTo, leaseDuration) => lockComponent(source, replyTo, leaseDuration)
+      case Unlock(source, replyTo)              => unlockComponent(source, replyTo)
+      case cmdMsg: CommandMessage =>
+        if (lockManager.allowCommand(cmdMsg)) runningComponent.get ! cmdMsg
+        else cmdMsg.replyTo ! Locked(Id()) /// NOTE: Here creating new ID which is different than old impl
+      case runningMessage: RunningMessage => handleRunningMessage(runningMessage)
+      case msg @ Running(_)               => log.info(s"Ignoring [$msg] message received from TLA as Supervisor already in Running state")
+    }
 
   private def lockComponent(source: Prefix, replyTo: ActorRef[LockingResponse], leaseDuration: FiniteDuration): Unit = {
     lockManager = lockManager.lockComponent(source, replyTo) {
@@ -290,12 +295,13 @@ private[framework] final class SupervisorBehavior(
     runningComponent.get ! runningMessage
   }
 
-  private def onLifeCycle(message: ToComponentLifecycleMessage): Unit = message match {
-    case GoOffline =>
-      if (lifecycleState == SupervisorLifecycleState.Running) updateLifecycleState(SupervisorLifecycleState.RunningOffline)
-    case GoOnline =>
-      if (lifecycleState == SupervisorLifecycleState.RunningOffline) updateLifecycleState(SupervisorLifecycleState.Running)
-  }
+  private def onLifeCycle(message: ToComponentLifecycleMessage): Unit =
+    message match {
+      case GoOffline =>
+        if (lifecycleState == SupervisorLifecycleState.Running) updateLifecycleState(SupervisorLifecycleState.RunningOffline)
+      case GoOnline =>
+        if (lifecycleState == SupervisorLifecycleState.RunningOffline) updateLifecycleState(SupervisorLifecycleState.Running)
+    }
 
   private def onLockTimeout(): Unit = {
     lockManager = lockManager.releaseLockOnTimeout()

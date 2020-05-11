@@ -15,13 +15,14 @@ object ParameterArgParser {
 
   private def extractParams(paramsStr: String) = paramsStr.split(PARAMS_SEP)
 
-  private def keyValue(paramStr: String) = paramStr.split(KEY_VALUE_SEP).toList match {
-    case List(key, values) => KeyArg(key) -> parseValues(values)
-    case _ =>
-      throw new RuntimeException(
-        s"Values are not provided in parameter arg [$paramStr], please specify param argument like keyName:keyType:unit=v1,v2"
-      )
-  }
+  private def keyValue(paramStr: String) =
+    paramStr.split(KEY_VALUE_SEP).toList match {
+      case List(key, values) => KeyArg(key) -> parseValues(values)
+      case _ =>
+        throw new RuntimeException(
+          s"Values are not provided in parameter arg [$paramStr], please specify param argument like keyName:keyType:unit=v1,v2"
+        )
+    }
 
   private def parseValues(values: String) = {
     val trimmedValues = trim(values, VALUES_OPENING, VALUES_CLOSING)

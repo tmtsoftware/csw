@@ -242,9 +242,9 @@ class ContainerIntegrationTest extends FrameworkIntegrationSuite {
     // this proves that postStop signal of all supervisor's gets invoked
     // as supervisor gets unregistered in postStop signal
     val filterAssemblyRemoved = filterAssemblyTracker.fishForSpecificMessage(5.seconds) { case x: LocationRemoved => x }
-    val instrumentHcdRemoved  = instrumentHcdTracker.fishForSpecificMessage(5.seconds) { case x: LocationRemoved  => x }
-    val disperserHcdRemoved   = disperserHcdTracker.fishForSpecificMessage(5.seconds) { case x: LocationRemoved   => x }
-    val containerRemoved      = containerTracker.fishForSpecificMessage(5.seconds) { case x: LocationRemoved      => x }
+    val instrumentHcdRemoved  = instrumentHcdTracker.fishForSpecificMessage(5.seconds) { case x: LocationRemoved => x }
+    val disperserHcdRemoved   = disperserHcdTracker.fishForSpecificMessage(5.seconds) { case x: LocationRemoved => x }
+    val containerRemoved      = containerTracker.fishForSpecificMessage(5.seconds) { case x: LocationRemoved => x }
 
     filterAssemblyRemoved.connection shouldBe filterAssemblyAkkaConnection
     instrumentHcdRemoved.connection shouldBe instrumentHcdAkkaConnection

@@ -10,8 +10,8 @@ import romaine.reactive.subscribe.{RedisPSubscribeApi, RedisReactiveApi, RedisSu
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class RedisSubscriptionApi[K, V](reactiveApiFactory: () => Future[RedisPubSubReactiveCommands[K, V]])(
-    implicit ec: ExecutionContext
+class RedisSubscriptionApi[K, V](reactiveApiFactory: () => Future[RedisPubSubReactiveCommands[K, V]])(implicit
+    ec: ExecutionContext
 ) {
   def subscribe(keys: List[K], overflowStrategy: OverflowStrategy): Source[RedisResult[K, V], RedisSubscription] =
     subscribeInternal(keys, overflowStrategy, () => reactiveApiFactory().map(x => new RedisSubscribeApi(x)))

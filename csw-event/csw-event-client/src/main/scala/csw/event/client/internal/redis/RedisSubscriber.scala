@@ -28,8 +28,8 @@ import scala.concurrent.duration.FiniteDuration
  * @param redisClient redis client available from lettuce
  * @param actorSystem to be used for performing asynchronous operations
  */
-private[event] class RedisSubscriber(redisURI: Future[RedisURI], redisClient: RedisClient)(
-    implicit actorSystem: ActorSystem[_]
+private[event] class RedisSubscriber(redisURI: Future[RedisURI], redisClient: RedisClient)(implicit
+    actorSystem: ActorSystem[_]
 ) extends EventSubscriber {
 
   import EventRomaineCodecs._
@@ -107,11 +107,12 @@ private[event] class RedisSubscriber(redisURI: Future[RedisURI], redisClient: Re
 
   override def get(eventKeys: Set[EventKey]): Future[Set[Event]] = Future.sequence(eventKeys.map(get))
 
-  override def get(eventKey: EventKey): Future[Event] = async {
-    log.info(s"Fetching event key: $eventKey")
-    val event = await(recoverWithError(asyncApi.get(eventKey)))
-    event.getOrElse(Event.invalidEvent(eventKey))
-  }
+  override def get(eventKey: EventKey): Future[Event] =
+    async {
+      log.info(s"Fetching event key: $eventKey")
+      val event = await(recoverWithError(asyncApi.get(eventKey)))
+      event.getOrElse(Event.invalidEvent(eventKey))
+    }
 
   private def eventStream[T](
       eventKeys: T,
@@ -127,8 +128,9 @@ private[event] class RedisSubscriber(redisURI: Future[RedisURI], redisClient: Re
       }
     }
 
-  private def recoverWithError[T](f: Future[T]) = f.recover {
-    case RedisServerNotAvailable(ex) => throw EventServerNotAvailable(ex)
-  }
+  private def recoverWithError[T](f: Future[T]) =
+    f.recover {
+      case RedisServerNotAvailable(ex) => throw EventServerNotAvailable(ex)
+    }
 
 }

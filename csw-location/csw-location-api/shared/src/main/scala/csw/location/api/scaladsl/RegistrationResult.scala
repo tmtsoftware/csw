@@ -29,8 +29,9 @@ trait RegistrationResult {
 }
 
 object RegistrationResult {
-  def from(_location: Location, _unregister: Connection => Future[Done]): RegistrationResult = new RegistrationResult {
-    override def unregister(): Future[Done] = _unregister(location.connection)
-    override def location: Location         = _location
-  }
+  def from(_location: Location, _unregister: Connection => Future[Done]): RegistrationResult =
+    new RegistrationResult {
+      override def unregister(): Future[Done] = _unregister(location.connection)
+      override def location: Location         = _location
+    }
 }

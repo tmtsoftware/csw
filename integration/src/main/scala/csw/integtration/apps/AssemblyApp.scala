@@ -30,9 +30,10 @@ object AssemblyApp extends App {
   private val locationService    = HttpLocationServiceFactory.makeLocalClient
   private val registrationResult = locationService.register(registration).await
 
-  def behavior: Behaviors.Receive[String] = Behaviors.receiveMessage[String] {
-    case "Unregister" =>
-      registrationResult.unregister()
-      Behaviors.same
-  }
+  def behavior: Behaviors.Receive[String] =
+    Behaviors.receiveMessage[String] {
+      case "Unregister" =>
+        registrationResult.unregister()
+        Behaviors.same
+    }
 }

@@ -106,12 +106,13 @@ class SvnRepo(userName: String, settings: Settings, blockingIoDispatcher: Messag
       editor.closeEdit
     }
 
-  def delete(path: Path, comment: String): Future[SVNCommitInfo] = withAsyncSvnOpFactory { svnOperationFactory =>
-    val remoteDelete = svnOperationFactory.createRemoteDelete()
-    remoteDelete.setSingleTarget(SvnTarget.fromURL(settings.svnUrl.appendPath(path.toString, false)))
-    remoteDelete.setCommitMessage(comment)
-    remoteDelete.run()
-  }
+  def delete(path: Path, comment: String): Future[SVNCommitInfo] =
+    withAsyncSvnOpFactory { svnOperationFactory =>
+      val remoteDelete = svnOperationFactory.createRemoteDelete()
+      remoteDelete.setSingleTarget(SvnTarget.fromURL(settings.svnUrl.appendPath(path.toString, false)))
+      remoteDelete.setCommitMessage(comment)
+      remoteDelete.run()
+    }
 
   def list(fileType: Option[FileType] = None, pattern: Option[String] = None): Future[List[SVNDirEntry]] =
     withAsyncSvnOpFactory { svnOperationFactory =>
@@ -126,8 +127,10 @@ class SvnRepo(userName: String, settings: Settings, blockingIoDispatcher: Messag
       // it is important that we first strip the suffix settings.`sha1-suffix` before matching the pattern so that pattern
       // is properly matched on exact name of file name
       val receiver: ISvnObjectReceiver[SVNDirEntry] = { (_, entry: SVNDirEntry) =>
-        if (entry.isFile && entry.isNotActiveFile(settings.`active-config-suffix`) && entry
-              .matchesFileType(fileType, settings.`sha1-suffix`)) {
+        if (
+          entry.isFile && entry.isNotActiveFile(settings.`active-config-suffix`) && entry
+            .matchesFileType(fileType, settings.`sha1-suffix`)
+        ) {
           entry.stripAnnexSuffix(settings.`sha1-suffix`)
           if (entry.matches(compiledPattern)) entries = entry :: entries
         }
@@ -141,8 +144,8 @@ class SvnRepo(userName: String, settings: Settings, blockingIoDispatcher: Messag
       entries.sortWith(_.getRelativePath < _.getRelativePath)
     }
 
-  def hist(path: Path, from: Instant, to: Instant, maxResults: Int): Future[List[SVNLogEntry]] = withAsyncSvnClientMgr {
-    clientManager =>
+  def hist(path: Path, from: Instant, to: Instant, maxResults: Int): Future[List[SVNLogEntry]] =
+    withAsyncSvnClientMgr { clientManager =>
       var logEntries = List[SVNLogEntry]()
       val logClient  = clientManager.getLogClient
       val handler: ISVNLogEntryHandler = logEntry =>
@@ -151,37 +154,41 @@ class SvnRepo(userName: String, settings: Settings, blockingIoDispatcher: Messag
           else logEntries
       logClient.doLog(settings.svnUrl, Array(path.toString), SVNRevision.HEAD, null, null, true, true, maxResults, handler)
       logEntries.sortWith(_.getRevision > _.getRevision)
-  }
+    }
 
   // Gets the svn revision from the given id, defaulting to HEAD
-  def svnRevision(id: Option[Long] = None): Future[SVNRevision] = Future {
-    id match {
-      case Some(value) => SVNRevision.create(value)
-      case None        => SVNRevision.HEAD
+  def svnRevision(id: Option[Long] = None): Future[SVNRevision] =
+    Future {
+      id match {
+        case Some(value) => SVNRevision.create(value)
+        case None        => SVNRevision.HEAD
+      }
     }
-  }
 
-  def pathExists(path: Path, id: Option[Long]): Future[Boolean] = Future {
-    checkPath(path, SVNNodeKind.FILE, id.getOrElse(SVNRepository.INVALID_REVISION))
-  }
+  def pathExists(path: Path, id: Option[Long]): Future[Boolean] =
+    Future {
+      checkPath(path, SVNNodeKind.FILE, id.getOrElse(SVNRepository.INVALID_REVISION))
+    }
 
   // test if there're no problems with accessing a repository
-  def testConnection(): Unit = withSvn { svn =>
-    log.debug("Testing svn connection")
-    svn.testConnection()
-  }
+  def testConnection(): Unit =
+    withSvn { svn =>
+      log.debug("Testing svn connection")
+      svn.testConnection()
+    }
 
   // true if the directory path exists in the repository
   private def dirExists(path: Path): Boolean = checkPath(path, SVNNodeKind.DIR, SVNRepository.INVALID_REVISION)
 
-  private def checkPath(path: Path, kind: SVNNodeKind, revision: Long): Boolean = withSvn { svn =>
-    try {
-      svn.checkPath(path.toString, revision) == kind
+  private def checkPath(path: Path, kind: SVNNodeKind, revision: Long): Boolean =
+    withSvn { svn =>
+      try {
+        svn.checkPath(path.toString, revision) == kind
+      }
+      catch {
+        case ex: SVNException if ex.getErrorMessage.getErrorCode == SVNErrorCode.FS_NO_SUCH_REVISION => false
+      }
     }
-    catch {
-      case ex: SVNException if ex.getErrorMessage.getErrorCode == SVNErrorCode.FS_NO_SUCH_REVISION => false
-    }
-  }
 
   // gets an object for accessing the svn repository (not reusing a single instance since not thread safe)
   private def svnHandle(): SVNRepository = {

@@ -13,11 +13,12 @@ private[framework] class LockManager(val lockPrefix: Option[Prefix], loggerFacto
   private val log: Logger = loggerFactory.getLogger
   private val AdminPrefix = Prefix(s"${Subsystem.CSW}.admin")
 
-  def lockComponent(source: Prefix, replyTo: ActorRef[LockingResponse])(startTimer: => Unit): LockManager = lockPrefix match {
-    case None                => onAcquiringLock(source, replyTo, startTimer)
-    case Some(`source`)      => onReAcquiringLock(source, replyTo, startTimer)
-    case Some(currentPrefix) => onAcquiringFailed(replyTo, source, currentPrefix)
-  }
+  def lockComponent(source: Prefix, replyTo: ActorRef[LockingResponse])(startTimer: => Unit): LockManager =
+    lockPrefix match {
+      case None                => onAcquiringLock(source, replyTo, startTimer)
+      case Some(`source`)      => onReAcquiringLock(source, replyTo, startTimer)
+      case Some(currentPrefix) => onAcquiringFailed(replyTo, source, currentPrefix)
+    }
 
   def unlockComponent(sourcePrefix: Prefix, replyTo: ActorRef[LockingResponse])(stopTimer: => Unit): LockManager = {
     (lockPrefix, AdminPrefix) match {
@@ -30,18 +31,21 @@ private[framework] class LockManager(val lockPrefix: Option[Prefix], loggerFacto
   def releaseLockOnTimeout(): LockManager = new LockManager(None, loggerFactory)
 
   // Checks to see if component is locked, and if so, does the incoming prefix match the locked prefix
-  def allowCommand(msg: CommandMessage): Boolean = lockPrefix match {
-    case None => true
-    case Some(currentPrefix) =>
-      msg.command.source match {
-        case `currentPrefix` =>
-          log.info(s"Forwarding message ${msg.toString} to TLA for component: $currentPrefix")
-          true
-        case _ =>
-          log.error(s"Cannot process the command [${msg.command.toString}] as the lock is acquired by component: $currentPrefix")
-          false
-      }
-  }
+  def allowCommand(msg: CommandMessage): Boolean =
+    lockPrefix match {
+      case None => true
+      case Some(currentPrefix) =>
+        msg.command.source match {
+          case `currentPrefix` =>
+            log.info(s"Forwarding message ${msg.toString} to TLA for component: $currentPrefix")
+            true
+          case _ =>
+            log.error(
+              s"Cannot process the command [${msg.command.toString}] as the lock is acquired by component: $currentPrefix"
+            )
+            false
+        }
+    }
 
   def isLocked: Boolean = lockPrefix.isDefined
 
