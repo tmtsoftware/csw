@@ -14,11 +14,12 @@ class ArgsParserTest extends AnyFunSuite with Matchers {
   private val outCapture = new ByteArrayOutputStream
   private val errCapture = new ByteArrayOutputStream
 
-  def silentParse(options: Array[String]): Option[Options] = Console.withOut(outCapture) {
-    Console.withErr(errCapture) {
-      new ArgsParser(BuildInfo.name).parse(options.toList)
+  def silentParse(options: Array[String]): Option[Options] =
+    Console.withOut(outCapture) {
+      Console.withErr(errCapture) {
+        new ArgsParser(BuildInfo.name).parse(options.toList)
+      }
     }
-  }
 
   test("parse without specifying operation") {
     val options = Array("")

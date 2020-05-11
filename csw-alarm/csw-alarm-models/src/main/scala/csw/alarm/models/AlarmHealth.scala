@@ -35,9 +35,10 @@ object AlarmHealth extends Enum[AlarmHealth] {
    */
   case object Bad extends AlarmHealth
 
-  private[alarm] def fromSeverity(alarmSeverity: FullAlarmSeverity): AlarmHealth = alarmSeverity match {
-    case Disconnected | Indeterminate | Critical => Bad
-    case Major                                   => Ill
-    case Okay | Warning                          => Good
-  }
+  private[alarm] def fromSeverity(alarmSeverity: FullAlarmSeverity): AlarmHealth =
+    alarmSeverity match {
+      case Disconnected | Indeterminate | Critical => Bad
+      case Major                                   => Ill
+      case Okay | Warning                          => Good
+    }
 }

@@ -36,15 +36,16 @@ case class JCswContext(
   /**
    * Returns the Java API for this instance of csw services
    */
-  def asScala = new CswContext(
-    locationService.asScala,
-    eventService.asScala,
-    alarmService.asScala,
-    timeServiceScheduler,
-    loggerFactory.asScala,
-    configClientService.asScala,
-    currentStatePublisher,
-    commandResponseManager,
-    componentInfo: ComponentInfo
-  )
+  def asScala =
+    new CswContext(
+      locationService.asScala,
+      eventService.asScala,
+      alarmService.asScala,
+      timeServiceScheduler,
+      loggerFactory.asScala,
+      configClientService.asScala,
+      currentStatePublisher,
+      commandResponseManager,
+      componentInfo: ComponentInfo
+    )
 }

@@ -23,27 +23,28 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
 
   private var dsl: DSLContext = _
-  override def initialize(): Future[Unit] = async {
-    //#dbFactory-access
-    val dbFactory = new DatabaseServiceFactory(ctx.system)
+  override def initialize(): Future[Unit] =
+    async {
+      //#dbFactory-access
+      val dbFactory = new DatabaseServiceFactory(ctx.system)
 
-    dbFactory
-      .makeDsl(locationService, "postgres")         // postgres is dbName
-      .foreach((dsl: DSLContext) => this.dsl = dsl) // save returned dsl to a local variable
-    //#dbFactory-access
+      dbFactory
+        .makeDsl(locationService, "postgres")         // postgres is dbName
+        .foreach((dsl: DSLContext) => this.dsl = dsl) // save returned dsl to a local variable
+      //#dbFactory-access
 
-    //#dbFactory-write-access
-    dbFactory
-      .makeDsl(locationService, "postgres", "DB_WRITE_USERNAME", "DB_WRITE_PASSWORD")
-      .foreach((dsl: DSLContext) => this.dsl = dsl) // save returned dsl to a local variable
-    //#dbFactory-write-access
+      //#dbFactory-write-access
+      dbFactory
+        .makeDsl(locationService, "postgres", "DB_WRITE_USERNAME", "DB_WRITE_PASSWORD")
+        .foreach((dsl: DSLContext) => this.dsl = dsl) // save returned dsl to a local variable
+      //#dbFactory-write-access
 
-    //#dbFactory-test-access
-    dbFactory
-      .makeDsl()
-      .foreach((dsl: DSLContext) => this.dsl = dsl) // save returned dsl to a local variable
-    //#dbFactory-test-access
-  }
+      //#dbFactory-test-access
+      dbFactory
+        .makeDsl()
+        .foreach((dsl: DSLContext) => this.dsl = dsl) // save returned dsl to a local variable
+      //#dbFactory-test-access
+    }
 
   override def onSubmit(runId: Id, controlCommand: ControlCommand): CommandResponse.SubmitResponse = {
 

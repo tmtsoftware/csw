@@ -350,6 +350,6 @@ class CommandsTest extends AnyFunSpec with Matchers {
       assert(wait.paramSet == wait2.paramSet)
     }
 
-   */
+     */
   }
 }

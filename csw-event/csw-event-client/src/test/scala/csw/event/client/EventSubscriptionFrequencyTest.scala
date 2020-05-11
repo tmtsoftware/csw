@@ -40,15 +40,17 @@ class EventSubscriptionFrequencyTest extends TestNGSuite with Matchers with Even
   }
 
   @DataProvider(name = "event-service-provider")
-  def pubSubProvider: Array[Array[_ <: BaseProperties]] = Array(
-    Array(redisTestProps),
-    Array(kafkaTestProps)
-  )
+  def pubSubProvider: Array[Array[_ <: BaseProperties]] =
+    Array(
+      Array(redisTestProps),
+      Array(kafkaTestProps)
+    )
 
   @DataProvider(name = "redis-provider")
-  def redisPubSubProvider: Array[Array[RedisTestProps]] = Array(
-    Array(redisTestProps)
-  )
+  def redisPubSubProvider: Array[Array[RedisTestProps]] =
+    Array(
+      Array(redisTestProps)
+    )
 
   def events(name: EventName): immutable.Seq[Event] = for (i <- 1 to 1500) yield makeEventForKeyName(name, i)
 
@@ -57,12 +59,13 @@ class EventSubscriptionFrequencyTest extends TestNGSuite with Matchers with Even
     var publishedEvents: mutable.Queue[Event] = mutable.Queue.empty
     val eventsGroup: immutable.Seq[Event]     = events(eventName)
 
-    def generator: Option[Event] = Option {
-      counter += 1
-      val event = eventsGroup(counter)
-      publishedEvents.enqueue(event)
-      event
-    }
+    def generator: Option[Event] =
+      Option {
+        counter += 1
+        val event = eventsGroup(counter)
+        publishedEvents.enqueue(event)
+        event
+      }
   }
 
   //DEOPSCSW-342: Subscription with consumption frequency

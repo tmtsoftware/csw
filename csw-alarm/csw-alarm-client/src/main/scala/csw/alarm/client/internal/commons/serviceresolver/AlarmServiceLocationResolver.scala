@@ -15,12 +15,13 @@ import scala.concurrent.{ExecutionContext, Future}
 private[client] class AlarmServiceLocationResolver(locationService: LocationService)(implicit ec: ExecutionContext)
     extends AlarmServiceResolver {
 
-  def uri(): Future[URI] = async {
-    val location = await(locationService.resolve(AlarmServiceConnection.value, 5.seconds)).getOrElse(
-      throw new RuntimeException(
-        s"Alarm service connection=${AlarmServiceConnection.value.name} can not be resolved"
+  def uri(): Future[URI] =
+    async {
+      val location = await(locationService.resolve(AlarmServiceConnection.value, 5.seconds)).getOrElse(
+        throw new RuntimeException(
+          s"Alarm service connection=${AlarmServiceConnection.value.name} can not be resolved"
+        )
       )
-    )
-    location.uri
-  }
+      location.uri
+    }
 }

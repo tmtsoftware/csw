@@ -56,7 +56,7 @@ object Sha1 {
         digester
       }
       .mapConcat(_.digest().toList)
-      .map(_ & 0xFF)
+      .map(_ & 0xff)
       .map("%02x" format _)
       .toMat(Sink.fold("")(_ + _))(Keep.right)
   }

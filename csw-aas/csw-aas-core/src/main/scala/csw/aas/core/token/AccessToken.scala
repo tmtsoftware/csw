@@ -101,9 +101,10 @@ case class AccessToken(
   /**
    * Returns username in case of a user token or client id in case of client token
    */
-  def userOrClientName: String = (preferred_username, clientId) match {
-    case (Some(u), _)    => u
-    case (None, Some(c)) => c
-    case _               => UnknownUser
-  }
+  def userOrClientName: String =
+    (preferred_username, clientId) match {
+      case (Some(u), _)    => u
+      case (None, Some(c)) => c
+      case _               => UnknownUser
+    }
 }

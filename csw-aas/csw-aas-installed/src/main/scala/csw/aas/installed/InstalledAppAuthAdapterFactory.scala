@@ -25,8 +25,8 @@ object InstalledAppAuthAdapterFactory {
    * @param executionContext require for execution of asynchronous task
    * @return handle to [[csw.aas.installed.api.InstalledAppAuthAdapter]] with which you can login, logout and get access tokens
    */
-  def make(config: Config, locationService: LocationService, secretStore: AuthStore)(
-      implicit executionContext: ExecutionContext
+  def make(config: Config, locationService: LocationService, secretStore: AuthStore)(implicit
+      executionContext: ExecutionContext
   ): InstalledAppAuthAdapter = make(locationService, Some(secretStore), config)
 
   /**
@@ -38,8 +38,8 @@ object InstalledAppAuthAdapterFactory {
    * @param executionContext  require for execution of asynchronous task
    * @return handle to [[csw.aas.installed.api.InstalledAppAuthAdapter]] with which you can login, logout and get access tokens
    */
-  def make(locationService: LocationService, secretStore: AuthStore)(
-      implicit executionContext: ExecutionContext
+  def make(locationService: LocationService, secretStore: AuthStore)(implicit
+      executionContext: ExecutionContext
   ): InstalledAppAuthAdapter = make(locationService, Some(secretStore))
 
   /**
@@ -97,8 +97,8 @@ object InstalledAppAuthAdapterFactory {
   private def authLocation(locationService: LocationService)(implicit ec: ExecutionContext): HttpLocation =
     Await.result(AuthServiceLocation(locationService).resolve(5.seconds), 6.seconds)
 
-  private def makeAuthConfig(locationService: LocationService, config: Config)(
-      implicit executionContext: ExecutionContext
+  private def makeAuthConfig(locationService: LocationService, config: Config)(implicit
+      executionContext: ExecutionContext
   ) = {
     val maybeLocation: Option[HttpLocation] = if (disabled(config)) None else Some(authLocation(locationService))
     AuthConfig.create(config, maybeLocation)

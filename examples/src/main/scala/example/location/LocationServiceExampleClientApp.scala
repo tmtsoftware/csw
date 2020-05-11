@@ -69,8 +69,8 @@ object ExampleMessages {
 
 object LocationServiceExampleClient {
 
-  def props(locationService: LocationService, loggingSystem: LoggingSystem)(
-      implicit system: typed.ActorSystem[SpawnProtocol.Command]
+  def props(locationService: LocationService, loggingSystem: LoggingSystem)(implicit
+      system: typed.ActorSystem[SpawnProtocol.Command]
   ): Props =
     Props(new LocationServiceExampleClient(locationService, loggingSystem))
 
@@ -80,28 +80,29 @@ object LocationServiceExampleClient {
   }
 
   //#tracking
-  def sinkBehavior: Behaviors.Receive[ExampleMessages] = Behaviors.receive[ExampleMessages] { (ctx, msg) =>
-    {
-      val log: Logger = new LoggerFactory(Prefix("csw.my-component-name")).getLogger(ctx)
+  def sinkBehavior: Behaviors.Receive[ExampleMessages] =
+    Behaviors.receive[ExampleMessages] { (ctx, msg) =>
+      {
+        val log: Logger = new LoggerFactory(Prefix("csw.my-component-name")).getLogger(ctx)
 
-      msg match {
-        case TrackingEventAdapter(LocationUpdated(loc)) => log.info(s"Location updated ${locationInfoToString(loc)}")
-        case TrackingEventAdapter(LocationRemoved(conn)) =>
-          log.warn(s"Location removed $conn", Map("connection" -> conn.toString))
-        case AllDone(exampleConnection) => log.info(s"Tracking of $exampleConnection complete.")
-        case CustomException(throwable) => log.error(throwable.getMessage, ex = throwable)
+        msg match {
+          case TrackingEventAdapter(LocationUpdated(loc)) => log.info(s"Location updated ${locationInfoToString(loc)}")
+          case TrackingEventAdapter(LocationRemoved(conn)) =>
+            log.warn(s"Location removed $conn", Map("connection" -> conn.toString))
+          case AllDone(exampleConnection) => log.info(s"Tracking of $exampleConnection complete.")
+          case CustomException(throwable) => log.error(throwable.getMessage, ex = throwable)
+        }
+        Behaviors.same
       }
-      Behaviors.same
     }
-  }
   //#tracking
 }
 
 /**
  * A test client actor that uses the location service to resolve services
  */
-class LocationServiceExampleClient(locationService: LocationService, loggingSystem: LoggingSystem)(
-    implicit typedSystem: typed.ActorSystem[SpawnProtocol.Command]
+class LocationServiceExampleClient(locationService: LocationService, loggingSystem: LoggingSystem)(implicit
+    typedSystem: typed.ActorSystem[SpawnProtocol.Command]
 ) extends akka.actor.Actor {
 
   val log: Logger = new LoggerFactory(Prefix("csw.my-component-name")).getLogger(context)
@@ -144,11 +145,14 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   val hcdRegistration: AkkaRegistration = AkkaRegistrationFactory.make(
     hcdConnection,
     context
-      .actorOf(Props(new Actor {
-        override def receive: Receive = {
-          case "print" => log.info("hello world")
-        }
-      }), name = "my-actor-1")
+      .actorOf(
+        Props(new Actor {
+          override def receive: Receive = {
+            case "print" => log.info("hello world")
+          }
+        }),
+        name = "my-actor-1"
+      )
       .toTyped
       .toURI
   )

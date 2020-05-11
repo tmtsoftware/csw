@@ -13,8 +13,9 @@ import msocket.impl.ws.WebsocketHandler
 class CommandServiceWebsocketHandlers(commandService: CommandService, contentType: ContentType)
     extends WebsocketHandler[CommandServiceWebsocketMessage](contentType) {
 
-  override def handle(request: CommandServiceWebsocketMessage): Source[Message, NotUsed] = request match {
-    case QueryFinal(runId, timeout)   => stream(commandService.queryFinal(runId)(timeout))
-    case SubscribeCurrentState(names) => stream(commandService.subscribeCurrentState(names))
-  }
+  override def handle(request: CommandServiceWebsocketMessage): Source[Message, NotUsed] =
+    request match {
+      case QueryFinal(runId, timeout)   => stream(commandService.queryFinal(runId)(timeout))
+      case SubscribeCurrentState(names) => stream(commandService.subscribeCurrentState(names))
+    }
 }

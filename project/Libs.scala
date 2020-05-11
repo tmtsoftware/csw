@@ -8,13 +8,13 @@ object Libs {
   val `scala-java8-compat` = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.1" //BSD 3-clause "New" or "Revised" License
   val `scala-async`        = "org.scala-lang.modules" %% "scala-async"        % "0.10.0" //BSD 3-clause "New" or "Revised" License
   val `scopt`              = "com.github.scopt"       %% "scopt"              % "3.7.1" //MIT License
-  val `mockito-scala`      = "org.mockito"            %% "mockito-scala"      % "1.13.11"
+  val `mockito-scala`      = "org.mockito"            %% "mockito-scala"      % "1.14.1"
 
   //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
   val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.2.3"
 
   val `embedded-keycloak`            = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak"            % "9374d69" //Apache 2.0
-  val `akka-management-cluster-http` = "com.lightbend.akka.management"            %% "akka-management-cluster-http" % "1.0.6"
+  val `akka-management-cluster-http` = "com.lightbend.akka.management"            %% "akka-management-cluster-http" % "1.0.7"
   val `svnkit`                       = "org.tmatesoft.svnkit"                     % "svnkit"                        % "1.10.1" //TMate Open Source License
   val `commons-codec`                = "commons-codec"                            % "commons-codec"                 % "1.10" //Apache 2.0š
   val `scala-reflect`                = "org.scala-lang"                           % "scala-reflect"                 % ScalaVersion //BSD-3

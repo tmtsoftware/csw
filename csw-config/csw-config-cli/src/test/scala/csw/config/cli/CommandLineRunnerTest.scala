@@ -111,7 +111,9 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
   }
 
   // DEOPSCSW-577: Ability to view detailed change log in SVN
-  test("should be able to list files with author and use filter pattern | DEOPSCSW-112, DEOPSCSW-43, DEOPSCSW-576, DEOPSCSW-577") {
+  test(
+    "should be able to list files with author and use filter pattern | DEOPSCSW-112, DEOPSCSW-43, DEOPSCSW-576, DEOPSCSW-577"
+  ) {
     val normalFileName                                = "troubleshooting"
     val annexFileName                                 = "firmware"
     def relativeRepoPath(fileName: String, i: String) = s"path/hcd/$fileName$i.conf"
@@ -193,7 +195,9 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
   // DEOPSCSW-66: Include identity of configuration file creator/editor
   // DEOPSCSW-577: Ability to view detailed change log in SVN
   // DEOPSCSW-625: Include username from svn in history model of config service
-  test("should able to fetch history of file. | DEOPSCSW-576, DEOPSCSW-43, DEOPSCSW-577, DEOPSCSW-112, DEOPSCSW-66, DEOPSCSW-625") {
+  test(
+    "should able to fetch history of file. | DEOPSCSW-576, DEOPSCSW-43, DEOPSCSW-577, DEOPSCSW-112, DEOPSCSW-66, DEOPSCSW-625"
+  ) {
     val user1 = "user1"
     val user2 = "user2"
     val user3 = "user3"

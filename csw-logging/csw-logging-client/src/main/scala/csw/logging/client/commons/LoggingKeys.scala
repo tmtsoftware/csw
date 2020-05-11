@@ -13,7 +13,8 @@ private[csw] object LoggingKeys {
   val HOST    = "@host"    // loggingSystem - full header
   val NAME    = "@name"    // logging System - full header (name of LoggingSystem)
   val VERSION = "@version" // loggingSystem - full header (user supplied when instantiating LoggingSystem)
-  val SERVICE = "@service" // this appears to be intended for the CSW service name and version. Not used except for custom appender in test. Should this be in full header?
+  val SERVICE =
+    "@service" // this appears to be intended for the CSW service name and version. Not used except for custom appender in test. Should this be in full header?
 
   // the following keys are always present
   val TIMESTAMP = "timestamp" // logger gets this when constructing Log Message

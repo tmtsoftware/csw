@@ -16,15 +16,16 @@ class GenericClass {
 //#generic-logger-actor
 object GenericActor {
 
-  def behavior[T]: Behavior[T] = Behaviors.setup[T] { context =>
-    val log: Logger = GenericLoggerFactory.getLogger(context)
-    // actor setup
+  def behavior[T]: Behavior[T] =
+    Behaviors.setup[T] { context =>
+      val log: Logger = GenericLoggerFactory.getLogger(context)
+      // actor setup
 
-    Behaviors.receiveMessage {
-      case _ => // handle messages and return new behavior
-        Behaviors.same
+      Behaviors.receiveMessage {
+        case _ => // handle messages and return new behavior
+          Behaviors.same
+      }
     }
-  }
 }
 //#generic-logger-actor
 

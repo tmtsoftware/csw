@@ -17,23 +17,25 @@ object Utils {
   private val jParam: Parameter[Integer] = JKeyType.IntKey.make("counter").set(1)
   private val param: Parameter[Int]      = IntKey.make("counter").set(1)
 
-  def makeEvent(id: Int): Event = event.copy(
-    eventId = Id(id.toString),
-    eventTime = UTCTime.now(),
-    paramSet = Set(timeNanosKey.set(System.nanoTime()))
-  )
+  def makeEvent(id: Int): Event =
+    event.copy(
+      eventId = Id(id.toString),
+      eventTime = UTCTime.now(),
+      paramSet = Set(timeNanosKey.set(System.nanoTime()))
+    )
 
   def makeEventForKeyName(name: EventName, id: Int): Event = event.copy(eventName = name, eventId = Id(id.toString))
 
   def makeEventForPrefixAndKeyName(prefix: Prefix, name: EventName, id: Int): Event =
     SystemEvent(prefix, name).copy(eventId = Id(id.toString))
 
-  def makeEventWithPrefix(id: Int, prefix: Prefix): Event = event.copy(
-    eventId = Id(id.toString),
-    source = prefix,
-    eventTime = UTCTime.now(),
-    paramSet = Set(timeNanosKey.set(System.nanoTime()))
-  )
+  def makeEventWithPrefix(id: Int, prefix: Prefix): Event =
+    event.copy(
+      eventId = Id(id.toString),
+      source = prefix,
+      eventTime = UTCTime.now(),
+      paramSet = Set(timeNanosKey.set(System.nanoTime()))
+    )
 
   def makeDistinctEvent(id: Int): Event = {
     val eventName = EventName(s"system_$id")

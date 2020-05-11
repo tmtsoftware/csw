@@ -182,7 +182,9 @@ class RedisFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
   }
 
   //DEOPSCSW-516: Optionally Publish - API Change
-  test("should not invoke onError on opting to not publish event with eventGenerator | DEOPSCSW-398, DEOPSCSW-399, DEOPSCSW-516") {
+  test(
+    "should not invoke onError on opting to not publish event with eventGenerator | DEOPSCSW-398, DEOPSCSW-399, DEOPSCSW-516"
+  ) {
     import redisTestProps._
     val publisher = eventService.makeNewPublisher()
     val testProbe = TestProbe[PublishFailure]()(actorSystem)

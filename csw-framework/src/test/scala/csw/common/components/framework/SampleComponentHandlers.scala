@@ -106,10 +106,11 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
     else Invalid(runId, OtherIssue("Testing: Received failure, will return Invalid."))
   }
 
-  override def onShutdown(): Future[Unit] = Future {
-    currentStatePublisher.publish(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))
-    Thread.sleep(500)
-  }
+  override def onShutdown(): Future[Unit] =
+    Future {
+      currentStatePublisher.publish(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))
+      Thread.sleep(500)
+    }
 
   //#onDiagnostic-mode
   // While dealing with mutable state, make sure you create a worker actor to avoid concurrency issues
@@ -133,39 +134,40 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   }
   //#onOperations-mode
 
-  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = trackingEvent match {
-    case LocationUpdated(location) =>
-      location.connection match {
-        case _: AkkaConnection =>
-          Future {
-            Thread.sleep(500)
+  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit =
+    trackingEvent match {
+      case LocationUpdated(location) =>
+        location.connection match {
+          case _: AkkaConnection =>
+            Future {
+              Thread.sleep(500)
+              currentStatePublisher.publish(
+                CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(akkaLocationUpdatedChoice)))
+              )
+            }
+          case _: HttpConnection =>
             currentStatePublisher.publish(
-              CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(akkaLocationUpdatedChoice)))
+              CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(httpLocationUpdatedChoice)))
             )
-          }
-        case _: HttpConnection =>
-          currentStatePublisher.publish(
-            CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(httpLocationUpdatedChoice)))
-          )
-        case _: TcpConnection =>
-          currentStatePublisher.publish(
-            CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(tcpLocationUpdatedChoice)))
-          )
-      }
-    case LocationRemoved(connection) =>
-      connection match {
-        case _: AkkaConnection =>
-          currentStatePublisher.publish(
-            CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(akkaLocationRemovedChoice)))
-          )
-        case _: HttpConnection =>
-          currentStatePublisher.publish(
-            CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(httpLocationRemovedChoice)))
-          )
-        case _: TcpConnection =>
-          currentStatePublisher.publish(
-            CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(tcpLocationRemovedChoice)))
-          )
-      }
-  }
+          case _: TcpConnection =>
+            currentStatePublisher.publish(
+              CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(tcpLocationUpdatedChoice)))
+            )
+        }
+      case LocationRemoved(connection) =>
+        connection match {
+          case _: AkkaConnection =>
+            currentStatePublisher.publish(
+              CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(akkaLocationRemovedChoice)))
+            )
+          case _: HttpConnection =>
+            currentStatePublisher.publish(
+              CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(httpLocationRemovedChoice)))
+            )
+          case _: TcpConnection =>
+            currentStatePublisher.publish(
+              CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(tcpLocationRemovedChoice)))
+            )
+        }
+    }
 }

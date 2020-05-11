@@ -18,10 +18,11 @@ trait LocationCodecsBase extends CommonCodecs {
   implicit lazy val componentIdCodec: Codec[ComponentId]       = deriveCodec
   implicit lazy val connectionInfoCodec: Codec[ConnectionInfo] = deriveCodec
 
-  implicit def connectionCodec[C <: Connection]: Codec[C] = Codec.bimap[ConnectionInfo, C](
-    _.connectionInfo,
-    x => Connection.from(x).asInstanceOf[C]
-  )
+  implicit def connectionCodec[C <: Connection]: Codec[C] =
+    Codec.bimap[ConnectionInfo, C](
+      _.connectionInfo,
+      x => Connection.from(x).asInstanceOf[C]
+    )
 
   implicit lazy val uriCodec: Codec[URI] = Codec.bimap[String, URI](_.toString, new URI(_))
 

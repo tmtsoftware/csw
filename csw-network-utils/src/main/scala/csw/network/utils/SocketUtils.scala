@@ -11,21 +11,23 @@ import scala.util.{Failure, Success, Try}
 
 object SocketUtils {
 
-  final def isAddressInUse(host: String = "localhost", port: Int): Boolean = Try(new Socket(host, port)) match {
-    case Success(socket) => socket.close(); true
-    case Failure(_)      => false
-  }
+  final def isAddressInUse(host: String = "localhost", port: Int): Boolean =
+    Try(new Socket(host, port)) match {
+      case Success(socket) => socket.close(); true
+      case Failure(_)      => false
+    }
 
   final def requireServerUp(host: String = "localhost", port: Int, within: Duration = 5.seconds, msg: String): Unit =
     require(poll(SocketUtils.isAddressInUse(host, port)), msg)
 
   @tailrec
-  final def getFreePort: Int = Try(new ServerSocket(0)) match {
-    case Success(socket) =>
-      val port = socket.getLocalPort
-      socket.close()
-      port
-    case Failure(_: IOException) => getFreePort
-    case Failure(e)              => throw e
-  }
+  final def getFreePort: Int =
+    Try(new ServerSocket(0)) match {
+      case Success(socket) =>
+        val port = socket.getLocalPort
+        socket.close()
+        port
+      case Failure(_: IOException) => getFreePort
+      case Failure(e)              => throw e
+    }
 }

@@ -8,10 +8,11 @@ import romaine.codec.RomaineCodec
 import romaine.codec.RomaineCodec.stringCodec
 
 private[client] object AlarmRomaineCodec extends AlarmCodecs {
-  def viaJsonCodec[A: Codec]: RomaineCodec[A] = stringCodec.bimap[A](
-    x => Json.encode(x).toUtf8String,
-    x => Json.decode(x.getBytes()).to[A].value
-  )
+  def viaJsonCodec[A: Codec]: RomaineCodec[A] =
+    stringCodec.bimap[A](
+      x => Json.encode(x).toUtf8String,
+      x => Json.decode(x.getBytes()).to[A].value
+    )
 
   //Key Codecs
   implicit val metadataKeyRomaineCodec: RomaineCodec[MetadataKey]         = stringCodec.bimap(_.value, MetadataKey.apply)

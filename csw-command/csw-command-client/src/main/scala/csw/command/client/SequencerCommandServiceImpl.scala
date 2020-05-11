@@ -21,8 +21,8 @@ import scala.concurrent.Future
  * @param sequencerLocation  the destination sequencer location to which sequence needs to be sent
  * @param actorSystem required for sending sequence commands or querying the sequencer
  */
-class SequencerCommandServiceImpl(sequencerLocation: AkkaLocation)(
-    implicit actorSystem: ActorSystem[_]
+class SequencerCommandServiceImpl(sequencerLocation: AkkaLocation)(implicit
+    actorSystem: ActorSystem[_]
 ) extends SequencerCommandService {
   import actorSystem.executionContext
 

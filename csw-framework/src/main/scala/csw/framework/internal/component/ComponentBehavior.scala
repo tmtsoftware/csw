@@ -72,50 +72,53 @@ private[framework] object ComponentBehavior {
        * Defines action for messages which can be received in any ComponentLifecycleState state
        * @param commonMessage message representing a message received in any lifecycle state
        */
-      def onCommon(commonMessage: TopLevelActorCommonMessage): Unit = commonMessage match {
-        case UnderlyingHookFailed(exception) =>
-          log.error(exception.getMessage, ex = exception)
-          throw exception
-        case TrackingEventReceived(trackingEvent) =>
-          lifecycleHandlers.onLocationTrackingEvent(trackingEvent)
-      }
+      def onCommon(commonMessage: TopLevelActorCommonMessage): Unit =
+        commonMessage match {
+          case UnderlyingHookFailed(exception) =>
+            log.error(exception.getMessage, ex = exception)
+            throw exception
+          case TrackingEventReceived(trackingEvent) =>
+            lifecycleHandlers.onLocationTrackingEvent(trackingEvent)
+        }
 
       /*
        * Defines action for messages which can be received in [[ComponentLifecycleState.Idle]] state
        * @param idleMessage message representing a message received in [[ComponentLifecycleState.Idle]] state
        */
-      def onIdle(idleMessage: TopLevelActorIdleMessage): Unit = idleMessage match {
-        case Initialize =>
-          async {
-            log.info("Invoking lifecycle handler's initialize hook")
-            await(lifecycleHandlers.initialize())
-            log.debug(
-              s"Component TLA is changing lifecycle state from [$lifecycleState] to [${ComponentLifecycleState.Initialized}]"
-            )
-            lifecycleState = ComponentLifecycleState.Initialized
-            // track all connections in component info for location updates
-            if (componentInfo.locationServiceUsage == RegisterAndTrackServices) {
-              componentInfo.connections.foreach(connection => {
-                locationService.subscribe(connection, trackingEvent => ctx.self ! TrackingEventReceived(trackingEvent))
-              })
-            }
-            lifecycleState = ComponentLifecycleState.Running
-            lifecycleHandlers.isOnline = true
-            supervisor ! Running(ctx.self)
-          }.failed.foreach(throwable => ctx.self ! UnderlyingHookFailed(throwable))
-      }
+      def onIdle(idleMessage: TopLevelActorIdleMessage): Unit =
+        idleMessage match {
+          case Initialize =>
+            async {
+              log.info("Invoking lifecycle handler's initialize hook")
+              await(lifecycleHandlers.initialize())
+              log.debug(
+                s"Component TLA is changing lifecycle state from [$lifecycleState] to [${ComponentLifecycleState.Initialized}]"
+              )
+              lifecycleState = ComponentLifecycleState.Initialized
+              // track all connections in component info for location updates
+              if (componentInfo.locationServiceUsage == RegisterAndTrackServices) {
+                componentInfo.connections.foreach(connection => {
+                  locationService.subscribe(connection, trackingEvent => ctx.self ! TrackingEventReceived(trackingEvent))
+                })
+              }
+              lifecycleState = ComponentLifecycleState.Running
+              lifecycleHandlers.isOnline = true
+              supervisor ! Running(ctx.self)
+            }.failed.foreach(throwable => ctx.self ! UnderlyingHookFailed(throwable))
+        }
 
       /*
        * Defines action for messages which can be received in [[ComponentLifecycleState.Running]] state
        *
        * @param runningMessage message representing a message received in [[ComponentLifecycleState.Running]] state
        */
-      def onRun(runningMessage: RunningMessage): Unit = runningMessage match {
-        case Lifecycle(message)       => onLifecycle(message)
-        case x: CommandMessage        => onRunningCompCommandMessage(x)
-        case x: DiagnosticDataMessage => onRunningCompDiagnosticDataMessage(x)
-        case msg                      => log.error(s"Component TLA cannot handle message :[$msg]")
-      }
+      def onRun(runningMessage: RunningMessage): Unit =
+        runningMessage match {
+          case Lifecycle(message)       => onLifecycle(message)
+          case x: CommandMessage        => onRunningCompCommandMessage(x)
+          case x: DiagnosticDataMessage => onRunningCompDiagnosticDataMessage(x)
+          case msg                      => log.error(s"Component TLA cannot handle message :[$msg]")
+        }
 
       /*
        * Defines action for messages which alter the [[ComponentLifecycleState]] state
@@ -142,21 +145,23 @@ private[framework] object ComponentBehavior {
             }
         }
 
-      def onRunningCompDiagnosticDataMessage(diagnosticDataMessage: DiagnosticDataMessage): Unit = diagnosticDataMessage match {
-        case DiagnosticMode(startTime, hint) => lifecycleHandlers.onDiagnosticMode(startTime, hint)
-        case OperationsMode                  => lifecycleHandlers.onOperationsMode()
-      }
+      def onRunningCompDiagnosticDataMessage(diagnosticDataMessage: DiagnosticDataMessage): Unit =
+        diagnosticDataMessage match {
+          case DiagnosticMode(startTime, hint) => lifecycleHandlers.onDiagnosticMode(startTime, hint)
+          case OperationsMode                  => lifecycleHandlers.onOperationsMode()
+        }
 
       /*
        * Defines action for messages which represent a [[csw.params.commands.Command]]
        *
        * @param commandMessage message encapsulating a [[csw.params.commands.Command]]
        */
-      def onRunningCompCommandMessage(commandMessage: CommandMessage): Unit = commandMessage match {
-        case Validate(_, replyTo) => handleValidate(Id(), commandMessage, replyTo)
-        case Oneway(_, replyTo)   => handleOneway(Id(), commandMessage, replyTo)
-        case Submit(_, replyTo)   => handleSubmit(Id(), commandMessage, replyTo)
-      }
+      def onRunningCompCommandMessage(commandMessage: CommandMessage): Unit =
+        commandMessage match {
+          case Validate(_, replyTo) => handleValidate(Id(), commandMessage, replyTo)
+          case Oneway(_, replyTo)   => handleOneway(Id(), commandMessage, replyTo)
+          case Submit(_, replyTo)   => handleSubmit(Id(), commandMessage, replyTo)
+        }
 
       def handleValidate(runId: Id, commandMessage: CommandMessage, replyTo: ActorRef[ValidateResponse]): Unit = {
         log.info(s"Invoking lifecycle handler's validateCommand hook with msg :[$commandMessage]")

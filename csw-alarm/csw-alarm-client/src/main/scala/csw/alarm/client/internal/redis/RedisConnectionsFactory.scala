@@ -17,8 +17,8 @@ private[client] class RedisConnectionsFactory(
     alarmServiceResolver: AlarmServiceResolver,
     masterId: String,
     romaineFactory: RomaineFactory
-)(
-    implicit val ec: ExecutionContext
+)(implicit
+    val ec: ExecutionContext
 ) {
   import csw.alarm.client.internal.AlarmRomaineCodec._
 

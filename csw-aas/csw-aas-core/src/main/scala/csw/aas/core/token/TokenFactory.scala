@@ -7,8 +7,8 @@ import org.keycloak.authorization.client.AuthzClient
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class TokenFactory(keycloakDeployment: KeycloakDeployment, tokenVerifier: TokenVerifier, enablePermissions: Boolean)(
-    implicit ec: ExecutionContext
+class TokenFactory(keycloakDeployment: KeycloakDeployment, tokenVerifier: TokenVerifier, enablePermissions: Boolean)(implicit
+    ec: ExecutionContext
 ) {
   private lazy val authzClient: AuthzClient = AuthzClient.create(keycloakDeployment)
 

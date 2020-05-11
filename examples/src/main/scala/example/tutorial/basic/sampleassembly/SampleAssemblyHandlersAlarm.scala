@@ -134,12 +134,13 @@ class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCt
   private val safeRange  = 0 to 10
   private val warnRange  = 11 to 15
   private val majorRange = 16 to 20
-  private def getCounterSeverity(counter: Int) = counter match {
-    case x if safeRange contains x  => AlarmSeverity.Okay
-    case x if warnRange contains x  => AlarmSeverity.Warning
-    case x if majorRange contains x => AlarmSeverity.Major
-    case _                          => AlarmSeverity.Critical
-  }
+  private def getCounterSeverity(counter: Int) =
+    counter match {
+      case x if safeRange contains x  => AlarmSeverity.Okay
+      case x if warnRange contains x  => AlarmSeverity.Warning
+      case x if majorRange contains x => AlarmSeverity.Major
+      case _                          => AlarmSeverity.Critical
+    }
 
   private val counterAlarmKey = AlarmKey(componentInfo.prefix, "CounterTooHighAlarm")
   private def setCounterAlarm(counter: Int): Unit = {

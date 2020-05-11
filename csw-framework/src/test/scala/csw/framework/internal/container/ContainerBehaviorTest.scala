@@ -138,7 +138,9 @@ class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar 
     componentProbes.map(_.expectMessage(Restart))
   }
 
-  test("should change its lifecycle state from Idle to Running after all components have restarted | DEOPSCSW-182, DEOPSCSW-216") {
+  test(
+    "should change its lifecycle state from Idle to Running after all components have restarted | DEOPSCSW-182, DEOPSCSW-216"
+  ) {
     val runningContainer = new RunningContainer
     import runningContainer._
     val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]

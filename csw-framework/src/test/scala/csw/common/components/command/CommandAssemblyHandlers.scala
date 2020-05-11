@@ -154,10 +154,11 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
         Invalid(runId, CommandIssue.UnsupportedCommandIssue(s"${command.commandName.name}"))
     }
 
-  override def onShutdown(): Future[Unit] = Future {
-    currentStatePublisher.publish(CurrentState(filterAsmPrefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))
-    Thread.sleep(500)
-  }
+  override def onShutdown(): Future[Unit] =
+    Future {
+      currentStatePublisher.publish(CurrentState(filterAsmPrefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))
+      Thread.sleep(500)
+    }
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {}
 

@@ -13,30 +13,31 @@ object IRISLibraryLogger extends LoggerFactory(Prefix(CSW, IRIS.COMPONENT_NAME))
 
 class IRIS(logger: LoggerFactory) {
 
-  def behavior: Behavior[IRISLogMessages] = Behaviors.setup[IRISLogMessages] { ctx =>
-    // DEOPSCSW-316: Improve Logger accessibility for component developers
-    val log: Logger = logger.getLogger(ctx)
-    Behaviors.receiveMessage[IRISLogMessages] { msg =>
-      // Do not add any lines before this method
-      // Tests are written to assert on this line numbers
-      // In case any line needs to be added then update constants in companion object
-      msg match {
-        case LogTrace           => log.trace(irisLogs("trace"))
-        case LogDebug           => log.debug(irisLogs("debug"))
-        case LogInfo            => log.info(irisLogs("info"))
-        case LogWarn            => log.warn(irisLogs("warn"))
-        case LogError           => log.error(irisLogs("error"))
-        case LogFatal           => log.fatal(irisLogs("fatal"))
-        case LogErrorWithMap(x) => log.error("Logging error with map", Map("reason" -> x, "actorRef" -> ctx.self.toString))
+  def behavior: Behavior[IRISLogMessages] =
+    Behaviors.setup[IRISLogMessages] { ctx =>
+      // DEOPSCSW-316: Improve Logger accessibility for component developers
+      val log: Logger = logger.getLogger(ctx)
+      Behaviors.receiveMessage[IRISLogMessages] { msg =>
+        // Do not add any lines before this method
+        // Tests are written to assert on this line numbers
+        // In case any line needs to be added then update constants in companion object
+        msg match {
+          case LogTrace           => log.trace(irisLogs("trace"))
+          case LogDebug           => log.debug(irisLogs("debug"))
+          case LogInfo            => log.info(irisLogs("info"))
+          case LogWarn            => log.warn(irisLogs("warn"))
+          case LogError           => log.error(irisLogs("error"))
+          case LogFatal           => log.fatal(irisLogs("fatal"))
+          case LogErrorWithMap(x) => log.error("Logging error with map", Map("reason" -> x, "actorRef" -> ctx.self.toString))
+        }
+        Behaviors.same
       }
-      Behaviors.same
     }
-  }
 }
 
 object IRIS {
 
-  val TRACE_LINE_NO         = 24
+  val TRACE_LINE_NO         = 25
   val DEBUG_LINE_NO         = TRACE_LINE_NO + 1
   val INFO_LINE_NO          = TRACE_LINE_NO + 2
   val WARN_LINE_NO          = TRACE_LINE_NO + 3
@@ -104,21 +105,22 @@ class IrisUtil {
 
 object IrisActorUtil {
 
-  def behavior: Behavior[IRISLogMessages] = Behaviors.setup[IRISLogMessages] { ctx =>
-    // DEOPSCSW-316: Improve Logger accessibility for component developers
-    val log: Logger = GenericLoggerFactory.getLogger(ctx)
+  def behavior: Behavior[IRISLogMessages] =
+    Behaviors.setup[IRISLogMessages] { ctx =>
+      // DEOPSCSW-316: Improve Logger accessibility for component developers
+      val log: Logger = GenericLoggerFactory.getLogger(ctx)
 
-    Behaviors.receiveMessage[IRISLogMessages] { msg =>
-      msg match {
-        case LogTrace           => log.trace(irisLogs("trace"))
-        case LogDebug           => log.debug(irisLogs("debug"))
-        case LogInfo            => log.info(irisLogs("info"))
-        case LogWarn            => log.warn(irisLogs("warn"))
-        case LogError           => log.error(irisLogs("error"))
-        case LogFatal           => log.fatal(irisLogs("fatal"))
-        case LogErrorWithMap(x) => log.error("Logging error with map", Map("reason" -> x, "actorRef" -> ctx.self.toString))
+      Behaviors.receiveMessage[IRISLogMessages] { msg =>
+        msg match {
+          case LogTrace           => log.trace(irisLogs("trace"))
+          case LogDebug           => log.debug(irisLogs("debug"))
+          case LogInfo            => log.info(irisLogs("info"))
+          case LogWarn            => log.warn(irisLogs("warn"))
+          case LogError           => log.error(irisLogs("error"))
+          case LogFatal           => log.fatal(irisLogs("fatal"))
+          case LogErrorWithMap(x) => log.error("Logging error with map", Map("reason" -> x, "actorRef" -> ctx.self.toString))
+        }
+        Behaviors.same
       }
-      Behaviors.same
     }
-  }
 }

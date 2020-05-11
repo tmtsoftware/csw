@@ -20,14 +20,15 @@ object SampleHttpApp extends HttpApp with App {
   val directives      = SecurityDirectives(config, locationService)
   import directives._
 
-  override protected def routes: Route = pathPrefix("api") {
-    get {
-      complete("SUCCESS")
-    } ~
-    sPost(RealmRolePolicy("admin")) {
-      complete("SUCCESS")
+  override protected def routes: Route =
+    pathPrefix("api") {
+      get {
+        complete("SUCCESS")
+      } ~
+      sPost(RealmRolePolicy("admin")) {
+        complete("SUCCESS")
+      }
     }
-  }
 
   private val host = "0.0.0.0"
   private val port = 9003

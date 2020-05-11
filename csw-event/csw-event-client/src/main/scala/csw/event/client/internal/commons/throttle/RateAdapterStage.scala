@@ -18,37 +18,44 @@ private[event] class RateAdapterStage[A](delay: FiniteDuration) extends GraphSta
   final val out   = Outlet.create[A]("DroppingThrottle.out")
   final val shape = FlowShape.of(in, out)
 
-  override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = new TimerGraphStageLogic(shape) {
-    private var isPulled             = false
-    private var firstTick            = true
-    private var maybeElem: Option[A] = None
+  override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
+    new TimerGraphStageLogic(shape) {
+      private var isPulled             = false
+      private var firstTick            = true
+      private var maybeElem: Option[A] = None
 
-    override def preStart(): Unit = {
-      scheduleAtFixedRate(None, delay, delay)
-      pull(in)
-    }
+      override def preStart(): Unit = {
+        scheduleAtFixedRate(None, delay, delay)
+        pull(in)
+      }
 
-    setHandler(in, new InHandler {
-      override def onPush(): Unit = {
-        val ele = grab(in)
-        maybeElem = Some(ele)
-        if (firstTick) {
-          push(out, ele); firstTick = false
+      setHandler(
+        in,
+        new InHandler {
+          override def onPush(): Unit = {
+            val ele = grab(in)
+            maybeElem = Some(ele)
+            if (firstTick) {
+              push(out, ele); firstTick = false
+            }
+            pull(in) //drop
+          }
         }
-        pull(in) //drop
-      }
-    })
+      )
 
-    setHandler(out, new OutHandler {
-      override def onPull(): Unit =
-        isPulled = true
-    })
+      setHandler(
+        out,
+        new OutHandler {
+          override def onPull(): Unit =
+            isPulled = true
+        }
+      )
 
-    override def onTimer(key: Any): Unit = {
-      if (isPulled) maybeElem.foreach { x =>
-        isPulled = false
-        push(out, x)
+      override def onTimer(key: Any): Unit = {
+        if (isPulled) maybeElem.foreach { x =>
+          isPulled = false
+          push(out, x)
+        }
       }
     }
-  }
 }

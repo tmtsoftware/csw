@@ -153,7 +153,9 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
     }
 
     // DEOPSCSW-190: Implement Unit Support
-    it("should test with list | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-188, DEOPSCSW-184, DEOPSCSW-196, DEOPSCSW-186, DEOPSCSW-190") {
+    it(
+      "should test with list | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-188, DEOPSCSW-184, DEOPSCSW-196, DEOPSCSW-186, DEOPSCSW-190"
+    ) {
       val li2 = lk.setAll(listIn)
       li2.units should be theSameInstanceAs encoder
       li2.value(1) should equal(listIn(1))
@@ -206,7 +208,9 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
     val listIn = Array(lm1, lm2)
 
     // DEOPSCSW-190: Implement Unit Support
-    it("should work with list and withUnits | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-188, DEOPSCSW-184, DEOPSCSW-196, DEOPSCSW-186") {
+    it(
+      "should work with list and withUnits | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-188, DEOPSCSW-184, DEOPSCSW-196, DEOPSCSW-186"
+    ) {
       val di = dk.setAll(listIn).withUnits(degree)
       di.units should be theSameInstanceAs degree
       di.value(1) should equal(listIn(1))
@@ -214,7 +218,9 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
     }
 
     // DEOPSCSW-190: Implement Unit Support
-    it("should work with list | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-188, DEOPSCSW-184, DEOPSCSW-196, DEOPSCSW-186, DEOPSCSW-190") {
+    it(
+      "should work with list | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-188, DEOPSCSW-184, DEOPSCSW-196, DEOPSCSW-186, DEOPSCSW-190"
+    ) {
       val di = dk.setAll(listIn)
       di.units should be theSameInstanceAs encoder
       di.value(1) should equal(listIn(1))
@@ -985,7 +991,9 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
       li.values should equal(listIn)
     }
 
-    it("should work with list | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-188, DEOPSCSW-184, DEOPSCSW-196, DEOPSCSW-282, DEOPSCSW-661") {
+    it(
+      "should work with list | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-188, DEOPSCSW-184, DEOPSCSW-196, DEOPSCSW-282, DEOPSCSW-661"
+    ) {
       val li: Parameter[UTCTime] = utcTimeKey.setAll(listIn)
       li.units should be(second)
       li.value(0) should equal(listIn(0))
@@ -1194,7 +1202,9 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
   describe("test setting multiple values") {
 
     val intKey = KeyType.IntKey.make("test1")
-    it("should allow setting a single value | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-188, DEOPSCSW-184, DEOPSCSW-196, DEOPSCSW-190") {
+    it(
+      "should allow setting a single value | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-188, DEOPSCSW-184, DEOPSCSW-196, DEOPSCSW-190"
+    ) {
       val i1 = intKey.set(1)
       assert(i1.values === Array(1))
       assert(i1.units == NoUnits)

@@ -78,7 +78,9 @@ class LoggerCompTest extends LoggingTestSuite {
   // This test simulates single jvm multiple components use cases
   // DEOPSCSW-117: Provide unique name for each logging instance of components
   // DEOPSCSW-127: Runtime update for logging characteristics
-  test("changing log level of component should only affect component specific classes | DEOPSCSW-316, DEOPSCSW-117, DEOPSCSW-127") {
+  test(
+    "changing log level of component should only affect component specific classes | DEOPSCSW-316, DEOPSCSW-117, DEOPSCSW-127"
+  ) {
     allComponentsStartLogging()
 
     // extract component and non-component logs and group them

@@ -37,10 +37,11 @@ class CommandLineRunner(
       await(alarmService.initAlarms(config, options.reset))
     }.transformWithSideEffect(printLine)
 
-  def getSeverity(options: Options): Future[Unit] = async {
-    val severity = await(alarmService.getAggregatedSeverity(options.key))
-    printLine(Formatter.formatAggregatedSeverity(options.key, severity))
-  }
+  def getSeverity(options: Options): Future[Unit] =
+    async {
+      val severity = await(alarmService.getAggregatedSeverity(options.key))
+      printLine(Formatter.formatAggregatedSeverity(options.key, severity))
+    }
 
   def setSeverity(options: Options): Future[Done] =
     alarmService.setSeverity(options.alarmKey, options.severity.get).transformWithSideEffect(printLine)
@@ -93,15 +94,17 @@ class CommandLineRunner(
   def reset(options: Options): Future[Done] =
     alarmService.reset(options.alarmKey).transformWithSideEffect(printLine)
 
-  def list(options: Options): Future[Unit] = async {
-    val alarms = await(alarmService.getAlarms(options.key)).sortWith(_.key.value > _.key.value)
-    printLine(Formatter.formatAlarms(alarms, options))
-  }
+  def list(options: Options): Future[Unit] =
+    async {
+      val alarms = await(alarmService.getAlarms(options.key)).sortWith(_.key.value > _.key.value)
+      printLine(Formatter.formatAlarms(alarms, options))
+    }
 
-  def getHealth(options: Options): Future[Unit] = async {
-    val health = await(alarmService.getAggregatedHealth(options.key))
-    printLine(Formatter.formatAggregatedHealth(options.key, health))
-  }
+  def getHealth(options: Options): Future[Unit] =
+    async {
+      val health = await(alarmService.getAggregatedHealth(options.key))
+      printLine(Formatter.formatAggregatedHealth(options.key, health))
+    }
 
   def subscribeHealth(options: Options): (AlarmSubscription, Future[Done]) = {
     val (subscription, doneF) = alarmService

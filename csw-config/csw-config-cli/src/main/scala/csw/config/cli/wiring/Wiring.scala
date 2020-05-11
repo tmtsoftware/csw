@@ -37,10 +37,11 @@ private[csw] class Wiring {
 
 private[config] object Wiring {
 
-  def make(locationHost: String): Wiring = new Wiring {
-    override lazy val locationService: LocationService =
-      HttpLocationServiceFactory.make(locationHost)(actorSystem)
-  }
+  def make(locationHost: String): Wiring =
+    new Wiring {
+      override lazy val locationService: LocationService =
+        HttpLocationServiceFactory.make(locationHost)(actorSystem)
+    }
 
   def noPrinting(_config: Config): Wiring =
     new Wiring {
