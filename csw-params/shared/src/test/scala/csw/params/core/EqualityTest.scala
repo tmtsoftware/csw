@@ -163,8 +163,8 @@ class EqualityTest extends AnyFunSpec {
     val k1 = DoubleMatrixKey.make("myMatrix")
     val m1 = MatrixData.fromArrays(Array[Double](1, 2, 3), Array[Double](2, 3, 6), Array[Double](4, 6, 12))
     val m2 = MatrixData.fromArrays(Array[Double](1, 2, 3), Array[Double](2, 3, 6), Array[Double](4, 6, 12))
-    val m3 =
-      MatrixData.fromArrays(Array[Double](1, 2, 3), Array[Double](2, 3, 6), Array[Double](0, 6, 12)) // Note one value different
+    // Note one value different
+    val m3 = MatrixData.fromArrays(Array[Double](1, 2, 3), Array[Double](2, 3, 6), Array[Double](0, 6, 12))
     val m4 = MatrixData.fromArrays(Array[Double](1, 0, 0), Array[Double](0, 1, 0), Array[Double](0, 0, 1))
     val i1 = k1.set(m1)
     val i2 = k1.set(m2)
@@ -222,8 +222,8 @@ class EqualityTest extends AnyFunSpec {
     val k1 = FloatMatrixKey.make("myMatrix")
     val m1 = MatrixData.fromArrays(Array[Float](1, 2, 3), Array[Float](2, 3, 6), Array[Float](4, 6, 12))
     val m2 = MatrixData.fromArrays(Array[Float](1, 2, 3), Array[Float](2, 3, 6), Array[Float](4, 6, 12))
-    val m3 =
-      MatrixData.fromArrays(Array[Float](1, 2, 3), Array[Float](2, 3, 6), Array[Float](0, 6, 12)) // Note one value different
+    // Note one value different
+    val m3 = MatrixData.fromArrays(Array[Float](1, 2, 3), Array[Float](2, 3, 6), Array[Float](0, 6, 12))
     val m4 = MatrixData.fromArrays(Array[Float](1, 0, 0), Array[Float](0, 1, 0), Array[Float](0, 0, 1))
     val i1 = k1.set(m1)
     val i2 = k1.set(m2)
@@ -281,8 +281,8 @@ class EqualityTest extends AnyFunSpec {
     val k1                  = IntMatrixKey.make("myMatrix")
     val m1: MatrixData[Int] = MatrixData.fromArrays(Array[Int](1, 2, 3), Array[Int](2, 3, 6), Array[Int](4, 6, 12))
     val m2: MatrixData[Int] = MatrixData.fromArrays(Array[Int](1, 2, 3), Array[Int](2, 3, 6), Array[Int](4, 6, 12))
-    val m3: MatrixData[Int] =
-      MatrixData.fromArrays(Array[Int](1, 2, 3), Array[Int](2, 3, 6), Array[Int](0, 6, 12)) // Note one value different
+    // Note one value different
+    val m3: MatrixData[Int] = MatrixData.fromArrays(Array[Int](1, 2, 3), Array[Int](2, 3, 6), Array[Int](0, 6, 12))
     val m4: MatrixData[Int] = MatrixData.fromArrays(Array[Int](1, 0, 0), Array[Int](0, 1, 0), Array[Int](0, 0, 1))
     val i1                  = k1.set(m1)
     val i2                  = k1.set(m2)
@@ -340,8 +340,8 @@ class EqualityTest extends AnyFunSpec {
     val k1 = ShortMatrixKey.make("myMatrix")
     val m1 = MatrixData.fromArrays(Array[Short](1, 2, 3), Array[Short](2, 3, 6), Array[Short](4, 6, 12))
     val m2 = MatrixData.fromArrays(Array[Short](1, 2, 3), Array[Short](2, 3, 6), Array[Short](4, 6, 12))
-    val m3 =
-      MatrixData.fromArrays(Array[Short](1, 2, 3), Array[Short](2, 3, 6), Array[Short](0, 6, 12)) // Note one value different
+    // Note one value different
+    val m3 = MatrixData.fromArrays(Array[Short](1, 2, 3), Array[Short](2, 3, 6), Array[Short](0, 6, 12))
     val m4 = MatrixData.fromArrays(Array[Short](1, 0, 0), Array[Short](0, 1, 0), Array[Short](0, 0, 1))
     val i1 = k1.set(m1)
     val i2 = k1.set(m2)

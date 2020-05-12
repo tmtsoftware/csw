@@ -128,8 +128,9 @@ class SvnRepo(userName: String, settings: Settings, blockingIoDispatcher: Messag
       // is properly matched on exact name of file name
       val receiver: ISvnObjectReceiver[SVNDirEntry] = { (_, entry: SVNDirEntry) =>
         if (
-          entry.isFile && entry.isNotActiveFile(settings.`active-config-suffix`) && entry
-            .matchesFileType(fileType, settings.`sha1-suffix`)
+          entry.isFile &&
+          entry.isNotActiveFile(settings.`active-config-suffix`) &&
+          entry.matchesFileType(fileType, settings.`sha1-suffix`)
         ) {
           entry.stripAnnexSuffix(settings.`sha1-suffix`)
           if (entry.matches(compiledPattern)) entries = entry :: entries

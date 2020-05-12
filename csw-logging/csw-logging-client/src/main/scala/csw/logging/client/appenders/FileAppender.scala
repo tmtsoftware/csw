@@ -33,13 +33,10 @@ private[logging] class FileAppenderHelper(path: String, name: String, category: 
     maybePrintWriter match {
       case Some(w) =>
         if (
-          rotateFlag && maybeTimestamp.get
-            .isAfter(
-              fileSpanTimestamp.getOrElse(
-                ZonedDateTime
-                  .of(LocalDateTime.MIN, ZoneId.from(ZoneOffset.UTC))
-              )
-            )
+          rotateFlag &&
+          maybeTimestamp.get.isAfter(
+            fileSpanTimestamp.getOrElse(ZonedDateTime.of(LocalDateTime.MIN, ZoneId.from(ZoneOffset.UTC)))
+          )
         ) {
           w.close()
           open(maybeTimestamp, rotateFlag)

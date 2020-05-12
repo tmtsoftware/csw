@@ -58,10 +58,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     )
 
   @DataProvider(name = "redis-provider")
-  def redisPubSubProvider: Array[Array[RedisTestProps]] =
-    Array(
-      Array(redisTestProps)
-    )
+  def redisPubSubProvider: Array[Array[RedisTestProps]] = Array(Array(redisTestProps))
 
   val events: immutable.Seq[Event]                  = for (i <- 1 to 1500) yield makeEvent(i)
   def events(name: EventName): immutable.Seq[Event] = for (i <- 1 to 1500) yield makeEventForKeyName(name, i)

@@ -48,9 +48,7 @@ class EventSubscriptionFrequencyTest extends TestNGSuite with Matchers with Even
 
   @DataProvider(name = "redis-provider")
   def redisPubSubProvider: Array[Array[RedisTestProps]] =
-    Array(
-      Array(redisTestProps)
-    )
+    Array(Array(redisTestProps))
 
   def events(name: EventName): immutable.Seq[Event] = for (i <- 1 to 1500) yield makeEventForKeyName(name, i)
 
