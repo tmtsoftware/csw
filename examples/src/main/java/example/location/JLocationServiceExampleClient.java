@@ -97,9 +97,11 @@ public class JLocationServiceExampleClient extends AbstractActor {
         HttpConnection httpConnection = new HttpConnection(new ComponentId(new Prefix(JSubsystem.CSW,
                 "configuration"), JComponentType.Service));
 
+        // When no network type is provided in httpRegistration, default is JNetworkType.Private
         HttpRegistration httpRegistration = new HttpRegistration(httpConnection, 8080, "path123");
         httpRegResult = locationService.register(httpRegistration).get();
 
+        // When a service wants to register itself on Public network, it can provide JNetworkType.Public in httpRegistration
         HttpRegistration httpRegistrationOnPublicNetwork = new HttpRegistration(httpConnection, 8080, "path123",
                 JNetworkType.Public);
         httpRegResultonPublicNetwork = locationService.register(httpRegistrationOnPublicNetwork).get();

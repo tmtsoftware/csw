@@ -89,13 +89,11 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
       await(registrationResultF)
     }
 
-  private[internal] def getLocation(registration: Registration) = {
-    val location = registration match {
+  private[internal] def getLocation(registration: Registration) =
+    registration match {
       case HttpRegistration(_, _, _, Public) => registration.location(cswCluster.publicHostname)
       case _                                 => registration.location(cswCluster.hostname)
     }
-    location
-  }
 
   /**
    * Unregister the connection from CRDT

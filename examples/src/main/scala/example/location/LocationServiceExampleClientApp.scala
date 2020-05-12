@@ -127,10 +127,12 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   // dummy http connection
   val httpPort       = 8080
   val httpConnection = HttpConnection(api.models.ComponentId(Prefix(Subsystem.CSW, "configuration"), ComponentType.Service))
+
   // When no network type is provided in httpRegistration, default is NetworkType.Private
   val httpRegistration                  = HttpRegistration(httpConnection, httpPort, "path123")
   val httpRegResult: RegistrationResult = Await.result(locationService.register(httpRegistration), 2.seconds)
 
+  // When a service wants to register itself on Public network, it can provide NetworkType.Public in httpRegistration
   val httpRegistrationOnPublicNetwork = HttpRegistration(httpConnection, httpPort, "path123", NetworkType.Public)
   val httpRegResultOnPublicNetwork: RegistrationResult =
     Await.result(locationService.register(httpRegistrationOnPublicNetwork), 2.seconds)

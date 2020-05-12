@@ -3,6 +3,7 @@
 ![Network Topology](../images/deployment/network-topology.png)
 
 There are two network in this network topology.
+
 * Both these networks are withing VPN
 * A process/service/component which is accessible within Inside network is not protected by auth.
 * A process/service/component which is exposed to Outside network is protected by auth.
@@ -14,11 +15,13 @@ There are two network in this network topology.
   single network IP only.
 
 ## Examples
-* Gateway should accessed in Outside network, hence it is auth enabled and its public IP is registered with location
+
+* Gateway should be accessed in Outside network, hence it is auth enabled and its public IP is registered with location
  service.
 * HCD/Assembly should be accessed within Inside network only, hence their private IP is registered with location service
 
 ## Terminologies
+
 * Private and inside network means the same thing 
 * Public and outiside network means the same thing 
 
