@@ -3,7 +3,6 @@ package csw.location.server.scaladsl
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.location.api.models.Connection.TcpConnection
 import csw.location.api.models.{ComponentId, ComponentType, TcpRegistration}
-import csw.location.api.scaladsl.LocationService
 import csw.location.server.commons.TestFutureExtension.RichFuture
 import csw.location.server.commons._
 import csw.location.server.internal.LocationServiceFactory
@@ -16,24 +15,17 @@ import scala.concurrent.duration.DurationInt
 
 class MultiActorSystemTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
-  var connection: TcpConnection = _
+  private val connection      = TcpConnection(ComponentId(Prefix(Subsystem.CSW, "exampleTCPService"), ComponentType.Service))
+  private val tcpRegistration = TcpRegistration(connection, 1234)
 
-  private var system1: ActorSystem[SpawnProtocol.Command] = _
-  private var system2: ActorSystem[SpawnProtocol.Command] = _
+  private lazy val clusterSettings1 = ClusterSettings().onPort(3558)
+  private lazy val clusterSettings2 = ClusterSettings().joinLocal(3558)
 
-  private var locationService: LocationService  = _
-  private var locationService2: LocationService = _
+  private lazy val system1: ActorSystem[SpawnProtocol.Command] = clusterSettings1.system
+  private lazy val system2: ActorSystem[SpawnProtocol.Command] = clusterSettings2.system
 
-  var tcpRegistration: TcpRegistration = _
-
-  override protected def beforeAll(): Unit = {
-    connection = TcpConnection(ComponentId(Prefix(Subsystem.CSW, "exampleTCPService"), ComponentType.Service))
-    system1 = ClusterSettings().onPort(3558).system
-    system2 = ClusterSettings().joinLocal(3558).system
-    locationService = LocationServiceFactory.withCluster(CswCluster.withSystem(system1))
-    locationService2 = LocationServiceFactory.withCluster(CswCluster.withSystem(system2))
-    tcpRegistration = TcpRegistration(connection, 1234)
-  }
+  private lazy val locationService1 = LocationServiceFactory.make(clusterSettings1)
+  private lazy val locationService2 = LocationServiceFactory.make(clusterSettings2)
 
   override protected def afterAll(): Unit = {
     system2.terminate()
@@ -41,7 +33,7 @@ class MultiActorSystemTest extends AnyFunSuite with Matchers with BeforeAndAfter
   }
 
   test("ensure that location service works across two actorSystems within the same JVM") {
-    locationService.register(tcpRegistration).await
+    locationService1.register(tcpRegistration).await
     locationService2.resolve(connection, 5.seconds).await.get.connection shouldBe tcpRegistration.connection
 
     system1.terminate()

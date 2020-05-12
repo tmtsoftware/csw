@@ -15,7 +15,7 @@ import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.server.commons.BlockingUtils
+import csw.network.utils.internal.BlockingUtils
 import csw.prefix.models.{Prefix, Subsystem}
 
 import scala.concurrent.Await

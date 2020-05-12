@@ -1,17 +1,15 @@
 package csw.config.server.http
 
-import java.net.BindException
-
 import akka.Done
 import akka.actor.CoordinatedShutdown
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
 import csw.config.server.commons.{ConfigServerLogger, ConfigServiceConnection}
 import csw.config.server.{ActorRuntime, Settings}
-import csw.location.api.models.HttpRegistration
+import csw.location.api.models.{HttpRegistration, NetworkType}
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.logging.api.scaladsl.Logger
-import csw.network.utils.{Networks, SocketUtils}
+import csw.network.utils.Networks
 
 import scala.async.Async._
 import scala.concurrent.Future
@@ -61,20 +59,13 @@ class HttpService(
   def shutdown(): Future[Done] = actorRuntime.shutdown()
 
   private def bind() = {
-    val _host = Networks().hostname
-    val _port = settings.`service-port`
 
-    /*
-      Explicitly check _host:_port is free as we register Networks().hostname with location service
-      But we bind server to all interfaces so that it can be accessible from any server via localhost
-      and it can happen that server gets bind to some of the interfaces and not to Networks().hostname
-     */
-    if (SocketUtils.isAddressInUse(_host, _port))
-      throw new BindException(s"Bind failed for TCP channel on endpoint [${_host}:${_port}]. Address already in use.")
+    val _host = Networks(NetworkType.Public.envKey).hostname
+    val _port = settings.`service-port`
 
     Http().bindAndHandle(
       handler = configServiceRoute.route,
-      interface = "0.0.0.0",
+      interface = _host,
       port = _port
     )
   }
@@ -83,7 +74,8 @@ class HttpService(
     val registration = HttpRegistration(
       connection = ConfigServiceConnection.value,
       port = binding.localAddress.getPort,
-      path = ""
+      path = "",
+      NetworkType.Public
     )
     log.info(
       s"Registering Config Service HTTP Server with Location Service using registration: [${registration.toString}]"

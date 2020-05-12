@@ -3,6 +3,7 @@ package csw.location.server.commons
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.location.api.commons.Constants
+import csw.location.api.models.NetworkType
 import csw.logging.api.scaladsl.Logger
 import csw.network.utils.Networks
 
@@ -51,11 +52,12 @@ import scala.jdk.CollectionConverters._
  *
  */
 private[location] case class ClusterSettings(clusterName: String = Constants.ClusterName, values: Map[String, Any] = Map.empty) {
-  private val log: Logger       = LocationServiceLogger.getLogger
-  private val InterfaceNameKey  = "INTERFACE_NAME"
-  private val ClusterSeedsKey   = "CLUSTER_SEEDS"
-  private val ClusterPortKey    = "CLUSTER_PORT"
-  private val ManagementPortKey = "MANAGEMENT_PORT"
+  private val log: Logger            = LocationServiceLogger.getLogger
+  private val InterfaceNameKey       = NetworkType.Private.envKey
+  private val PublicInterfaceNameKey = NetworkType.Public.envKey
+  private val ClusterSeedsKey        = "CLUSTER_SEEDS"
+  private val ClusterPortKey         = "CLUSTER_PORT"
+  private val ManagementPortKey      = "MANAGEMENT_PORT"
 
   private def withEntry(key: String, value: Any): ClusterSettings = copy(values = values + (key -> value))
 
@@ -96,6 +98,10 @@ private[location] case class ClusterSettings(clusterName: String = Constants.Clu
   //If it is empty then get the default ipv4 address to start the current ActorSystem on.
   def hostname: String = Networks(interfaceName).hostname
 
+  private[location] def publicInterfaceName: Option[String] = allValues.get(PublicInterfaceNameKey).map(_.toString)
+
+  def publicHostname: String = Networks(publicInterfaceName).hostname
+
   //Get the port for current ActorSystem to start. If no port is provided 0 will be used default.
   //SeedNode should start on a fixed port and rest all can start on random port.
   private[location] def port: Int = allValues.getOrElse(ClusterPortKey, 0).toString.toInt
@@ -129,7 +135,15 @@ private[location] case class ClusterSettings(clusterName: String = Constants.Clu
 
   }
 
-  def system: ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), clusterName, config)
+  lazy val system: ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), clusterName, config)
+}
+
+// ===== TESTING API =====
+private[csw] object ClusterSettings {
+  def make(actorSystem: ActorSystem[SpawnProtocol.Command]): ClusterSettings =
+    new ClusterSettings() {
+      override lazy val system: ActorSystem[SpawnProtocol.Command] = actorSystem
+    }
 }
 
 /**

@@ -68,11 +68,11 @@ final case class TcpRegistration(connection: TcpConnection, port: Int) extends R
  * @param port provide the port where Http service is available
  * @param path provide the path to reach the available http service
  */
-final case class HttpRegistration(
-    connection: HttpConnection,
-    port: Int,
-    path: String
-) extends Registration {
+final case class HttpRegistration(connection: HttpConnection, port: Int, path: String, networkType: NetworkType)
+    extends Registration {
+
+  //Used for JAVA API
+  def this(connection: HttpConnection, port: Int, path: String) = this(connection, port, path, NetworkType.Private)
 
   /**
    * Create a HttpLocation that represents the live Http service
@@ -82,4 +82,9 @@ final case class HttpRegistration(
   override def location(hostname: String): Location = {
     HttpLocation(connection, new URI(s"http://$hostname:$port/$path"))
   }
+}
+
+object HttpRegistration {
+  def apply(connection: HttpConnection, port: Int, path: String): HttpRegistration =
+    new HttpRegistration(connection, port, path, NetworkType.Private)
 }

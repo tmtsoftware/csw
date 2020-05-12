@@ -5,17 +5,27 @@ import java.net.{InetAddress, NetworkInterface}
 import csw.network.utils.exceptions.{NetworkInterfaceNotFound, NetworkInterfaceNotProvided}
 import csw.network.utils.internal.NetworkInterfaceProvider
 import org.mockito.MockitoSugar
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 
 import scala.jdk.CollectionConverters._
-import org.scalatest.funsuite.AnyFunSuite
-import org.scalatest.matchers.should.Matchers
 
 class NetworksTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach with MockitoSugar {
 
   // DEOPSCSW-673: Make interfaceName environment variable mandatory
-  test("hostname should throw NetworkInterfaceNotProvided when INTERFACE_NAME env variable is not set | DEOPSCSW-673") {
+  test(
+    "hostname should throw NetworkInterfaceNotProvided when INTERFACE_NAME env variable is not set " +
+      "| DEOPSCSW-673 | CSW-97"
+  ) {
     a[NetworkInterfaceNotProvided] shouldBe thrownBy(Networks().hostname)
+  }
+
+  test(
+    "hostname should throw NetworkInterfaceNotProvided when provided interface name env variable is not set " +
+      "| CSW-97"
+  ) {
+    a[NetworkInterfaceNotProvided] shouldBe thrownBy(Networks("some-interface-name-env-key").hostname)
   }
 
   test("testGetIpv4Address throws NetworkInterfaceNotFound when provided interface name is not present/valid | ") {

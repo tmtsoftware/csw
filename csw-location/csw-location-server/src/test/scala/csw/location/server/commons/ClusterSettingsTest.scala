@@ -2,11 +2,12 @@ package csw.location.server.commons
 
 import com.typesafe.config.ConfigException
 import csw.location.api.commons.Constants
+import csw.location.api.models.NetworkType
 import csw.network.utils.Networks
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 
 class ClusterSettingsTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
@@ -15,7 +16,9 @@ class ClusterSettingsTest extends AnyFunSuite with Matchers with BeforeAndAfterA
 
   override protected def afterAll(): Unit = {
     System.clearProperty("CLUSTER_SEEDS")
-    System.clearProperty("INTERFACE_NAME")
+    // CSW-97
+    System.clearProperty(NetworkType.Private.envKey)
+    System.clearProperty(NetworkType.Public.envKey)
   }
 
   test("exception is thrown when settings are not found for a given cluster name") {
@@ -56,29 +59,38 @@ class ClusterSettingsTest extends AnyFunSuite with Matchers with BeforeAndAfterA
     clusterSettings.seedNodes shouldBe portList.map { port => s"akka://${clusterSettings.clusterName}@$hostname:$port" }
   }
 
-  test("cluster settings with custom values") {
-    val port                             = 9001
-    val ipList                           = List("10.10.10.10", "10.10.10.11", "10.10.10.12")
-    val values                           = Map("INTERFACE_NAME" -> "en0", "CLUSTER_SEEDS" -> ipList.mkString(", "), "CLUSTER_PORT" -> "9000")
+  test("cluster settings with custom values | CSW-97") {
+    val port   = 9001
+    val ipList = List("10.10.10.10", "10.10.10.11", "10.10.10.12")
+    val values = Map(
+      NetworkType.Private.envKey -> "en0",
+      NetworkType.Public.envKey  -> "en1",
+      "CLUSTER_SEEDS"            -> ipList.mkString(", "),
+      "CLUSTER_PORT"             -> "9000"
+    )
     val clusterSettings: ClusterSettings = ClusterSettings(values = values).onPort(port)
 
     clusterSettings.interfaceName shouldBe Some("en0")
+    clusterSettings.publicInterfaceName shouldBe Some("en1")
     clusterSettings.port shouldBe port
     clusterSettings.seedNodes shouldBe ipList.map { hostname => s"akka://${clusterSettings.clusterName}@$hostname" }
   }
 
-  test("cluster settings with system properties") {
-    val systemPort          = 9002
-    val systemSeeds         = "10.10.10.12, 10.10.10.13"
-    val systemInterfacename = "eth0"
+  test("cluster settings with system properties | CSW-97") {
+    val systemPort      = 9002
+    val systemSeeds     = "10.10.10.12, 10.10.10.13"
+    val systemInterface = "eth0"
+    val publicInterface = "eth1"
 
     System.setProperty("CLUSTER_SEEDS", systemSeeds.toString)
-    System.setProperty("INTERFACE_NAME", systemInterfacename)
+    System.setProperty(NetworkType.Private.envKey, systemInterface)
+    System.setProperty(NetworkType.Public.envKey, publicInterface)
 
     val clusterSettings = ClusterSettings().onPort(systemPort)
 
     clusterSettings.port shouldBe systemPort
-    clusterSettings.interfaceName shouldBe Some(systemInterfacename)
+    clusterSettings.interfaceName shouldBe Some(systemInterface)
+    clusterSettings.publicInterfaceName shouldBe Some(publicInterface)
     clusterSettings.seedNodes shouldBe List("10.10.10.12", "10.10.10.13").map { hostname =>
       s"akka://${clusterSettings.clusterName}@$hostname"
     }

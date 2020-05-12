@@ -13,10 +13,10 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
  * Server configuration
  */
 private[csw] class ServerWiring {
-  lazy val config: Config = ConfigFactory.load()
+  lazy val actorSystem    = ActorSystem(SpawnProtocol(), "config-server")
+  lazy val config: Config = actorSystem.settings.config
   lazy val settings       = new Settings(config)
 
-  lazy val actorSystem  = ActorSystem(SpawnProtocol(), "config-server")
   lazy val actorRuntime = new ActorRuntime(actorSystem, settings)
   import actorRuntime._
 

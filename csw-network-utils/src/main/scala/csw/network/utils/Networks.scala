@@ -59,30 +59,31 @@ object Networks {
    * config property `csw-networks.hostname.automatic` is enabled only in test scope to automatically detect appropriate hostname
    * so that we do not need to set INTERFACE_NAME env variable in every test or globally on machine before running tests.
    */
-  private def fallbackInterfaceName =
+  private def fallbackInterfaceName(interfaceName: String): String =
     if (automatic) ""
     else {
-      val networkInterfaceNotProvided = NetworkInterfaceNotProvided("INTERFACE_NAME env variable is not set.")
+      val networkInterfaceNotProvided = NetworkInterfaceNotProvided(s"$interfaceName env variable is not set.")
       log.error(networkInterfaceNotProvided.message, ex = networkInterfaceNotProvided)
       throw networkInterfaceNotProvided
     }
 
   /**
-   * Creates instance of `Networks` by reading `INTERFACE_NAME` env variable
+   * Creates instance of `Networks` by reading env variable
    */
-  def apply(): Networks = apply(None)
+  def apply(interfaceNameEnvKey: String = "INTERFACE_NAME"): Networks = {
+    val interface = (sys.env ++ sys.props).getOrElse(interfaceNameEnvKey, fallbackInterfaceName(interfaceNameEnvKey))
+    new Networks(interface, new NetworkInterfaceProvider)
+  }
 
   /**
    * Picks an appropriate ipv4 address from the network interface provided.
    * If no specific network interface is provided, the first available interface will be taken to pick address
    */
-  def apply(interfaceName: Option[String]): Networks = {
-    val ifaceName = interfaceName match {
-      case Some(interface) => interface
-      case None            => (sys.env ++ sys.props).getOrElse("INTERFACE_NAME", fallbackInterfaceName)
+  def apply(interfaceName: Option[String]): Networks =
+    interfaceName match {
+      case Some(interface) => new Networks(interface, new NetworkInterfaceProvider)
+      case None            => apply()
     }
-    new Networks(ifaceName, new NetworkInterfaceProvider)
-  }
 
   private def automatic: Boolean = ConfigFactory.load().getBoolean("csw-networks.hostname.automatic")
 

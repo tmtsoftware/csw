@@ -125,10 +125,15 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   // add some dummy registrations for illustrative purposes
 
   // dummy http connection
-  val httpPort                          = 8080
-  val httpConnection                    = HttpConnection(api.models.ComponentId(Prefix(Subsystem.CSW, "configuration"), ComponentType.Service))
+  val httpPort       = 8080
+  val httpConnection = HttpConnection(api.models.ComponentId(Prefix(Subsystem.CSW, "configuration"), ComponentType.Service))
+  // When no network type is provided in httpRegistration, default is NetworkType.Private
   val httpRegistration                  = HttpRegistration(httpConnection, httpPort, "path123")
   val httpRegResult: RegistrationResult = Await.result(locationService.register(httpRegistration), 2.seconds)
+
+  val httpRegistrationOnPublicNetwork = HttpRegistration(httpConnection, httpPort, "path123", NetworkType.Public)
+  val httpRegResultOnPublicNetwork: RegistrationResult =
+    Await.result(locationService.register(httpRegistrationOnPublicNetwork), 2.seconds)
 
   // ************************************************************************************************************
 
@@ -290,6 +295,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
     //#unregister
     val unregisterF = async {
       httpRegResult.unregister()
+      httpRegResultOnPublicNetwork.unregister()
       hcdRegResult.unregister()
       assemblyRegResult.unregister()
     }
