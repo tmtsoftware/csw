@@ -41,7 +41,7 @@ object Main {
           // test if the svn repo can be accessed successfully
           svnRepo.testConnection()
           // start the config server and register it with location service
-          Await.result(httpService.registeredLazyBinding, 15.seconds)
+          Await.result(httpService.registeredLazyBinding, 20.seconds)
           (httpService, wiring)
         }
         catch {
