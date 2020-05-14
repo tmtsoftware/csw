@@ -32,7 +32,7 @@ object Roles {
 }
 
 // maps to command roles config file
-case class CommandRoles private (private val predefinedRoles: Map[CommandKey, Roles]) {
+case class CommandRoles private (private[auth] val predefinedRoles: Map[CommandKey, Roles]) {
   def hasAccess(cmdKey: CommandKey, subsystem: Subsystem, rolesFromToken: Roles): Boolean =
     predefinedRoles.get(cmdKey) match {
       case Some(allowedRoles) => allowedRoles.exist(rolesFromToken)

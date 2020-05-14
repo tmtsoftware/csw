@@ -11,7 +11,7 @@ import csw.prefix.models.Prefix
  *  @param prefix represents the prefix (subsystem and name) of the component e.g. tcs.filter.wheel
  *  @param componentType represents a type of the Component e.g. Assembly, HCD, Sequencer etc
  */
-case class ComponentId private[location] (prefix: Prefix, componentType: ComponentType) {
+case class ComponentId(prefix: Prefix, componentType: ComponentType) {
 
   /**
    * Represents the name and componentType
