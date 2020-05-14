@@ -49,7 +49,7 @@ private[framework] class SupervisorInfoFactory(containerPrefix: Prefix) {
             s"Exception :[${exception.getMessage}] occurred while spawning supervisor: [${componentInfo.prefix}]",
             ex = exception
           )
-          system.terminate
+          system.terminate()
           await(system.whenTerminated)
           None
         }

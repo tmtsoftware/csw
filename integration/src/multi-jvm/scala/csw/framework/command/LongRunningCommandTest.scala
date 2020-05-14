@@ -62,7 +62,7 @@ class LongRunningCommandTest(ignore: Int)
       val assemblyCommandService         = CommandServiceFactory.make(assemblyLocation)
 
       val assemblyLongSetup = Setup(prefix, longRunning, Some(obsId))
-      val probe             = TestProbe[CurrentState]
+      val probe             = TestProbe[CurrentState]()
 
       //#subscribeCurrentState
       // subscribe to the current state of an assembly component and use a callback which forwards each received

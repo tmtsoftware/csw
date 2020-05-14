@@ -49,7 +49,7 @@ class LockManagerTest extends AnyFunSuite with MockitoSugar with Matchers {
   }
 
   test("should able to lock | DEOPSCSW-222, DEOPSCSW-301") {
-    val lockingResponseProbe = TestProbe[LockingResponse]
+    val lockingResponseProbe = TestProbe[LockingResponse]()
 
     val lockManager = new LockManager(None, mockedLoggerFactory)
     lockManager.isLocked shouldBe false
@@ -60,7 +60,7 @@ class LockManagerTest extends AnyFunSuite with MockitoSugar with Matchers {
   }
 
   test("should able to reacquire lock | DEOPSCSW-222, DEOPSCSW-301") {
-    val lockingResponseProbe = TestProbe[LockingResponse]
+    val lockingResponseProbe = TestProbe[LockingResponse]()
 
     val lockManager = new LockManager(Some(prefix), mockedLoggerFactory)
     lockManager.isLocked shouldBe true
@@ -71,7 +71,7 @@ class LockManagerTest extends AnyFunSuite with MockitoSugar with Matchers {
   }
 
   test("should not acquire lock when invalid prefix is provided | DEOPSCSW-222, DEOPSCSW-301") {
-    val lockingResponseProbe = TestProbe[LockingResponse]
+    val lockingResponseProbe = TestProbe[LockingResponse]()
 
     val lockManager = new LockManager(Some(prefix), mockedLoggerFactory)
     lockManager.isLocked shouldBe true
@@ -83,7 +83,7 @@ class LockManagerTest extends AnyFunSuite with MockitoSugar with Matchers {
   }
 
   test("should able to unlock | DEOPSCSW-222, DEOPSCSW-301") {
-    val lockingResponseProbe = TestProbe[LockingResponse]
+    val lockingResponseProbe = TestProbe[LockingResponse]()
 
     val lockManager = new LockManager(Some(prefix), mockedLoggerFactory)
     lockManager.isUnLocked shouldBe false
@@ -94,7 +94,7 @@ class LockManagerTest extends AnyFunSuite with MockitoSugar with Matchers {
   }
 
   test("should not able to unlock with invalid prefix | DEOPSCSW-222, DEOPSCSW-301") {
-    val lockingResponseProbe = TestProbe[LockingResponse]
+    val lockingResponseProbe = TestProbe[LockingResponse]()
 
     val lockManager = new LockManager(Some(prefix), mockedLoggerFactory)
     lockManager.isUnLocked shouldBe false
@@ -105,7 +105,7 @@ class LockManagerTest extends AnyFunSuite with MockitoSugar with Matchers {
   }
 
   test("should not result into failure when tried to unlock already unlocked component | DEOPSCSW-222, DEOPSCSW-301") {
-    val lockingResponseProbe = TestProbe[LockingResponse]
+    val lockingResponseProbe = TestProbe[LockingResponse]()
 
     val lockManager = new LockManager(None, mockedLoggerFactory)
     lockManager.isUnLocked shouldBe true
@@ -116,7 +116,7 @@ class LockManagerTest extends AnyFunSuite with MockitoSugar with Matchers {
   }
 
   test("should allow commands when component is not locked | DEOPSCSW-222, DEOPSCSW-301") {
-    val commandResponseProbe = TestProbe[SubmitResponse]
+    val commandResponseProbe = TestProbe[SubmitResponse]()
 
     val lockManager = new LockManager(None, mockedLoggerFactory)
     lockManager.isUnLocked shouldBe true
@@ -125,7 +125,7 @@ class LockManagerTest extends AnyFunSuite with MockitoSugar with Matchers {
   }
 
   test("should allow commands when component is locked with same prefix | DEOPSCSW-222, DEOPSCSW-301") {
-    val commandResponseProbe = TestProbe[SubmitResponse]
+    val commandResponseProbe = TestProbe[SubmitResponse]()
 
     val lockManager = new LockManager(Some(prefix), mockedLoggerFactory)
     lockManager.isLocked shouldBe true
@@ -134,7 +134,7 @@ class LockManagerTest extends AnyFunSuite with MockitoSugar with Matchers {
   }
 
   test("should not allow commands when component is locked with different prefix | DEOPSCSW-222, DEOPSCSW-301") {
-    val commandResponseProbe = TestProbe[SubmitResponse]
+    val commandResponseProbe = TestProbe[SubmitResponse]()
 
     val lockManager = new LockManager(Some(prefix), mockedLoggerFactory)
     lockManager.isLocked shouldBe true
@@ -144,7 +144,7 @@ class LockManagerTest extends AnyFunSuite with MockitoSugar with Matchers {
 
   // DEOPSCSW-302: Support Unlocking by Admin
   test("should allow unlocking any locked component by admin | DEOPSCSW-222, DEOPSCSW-301, DEOPSCSW-302") {
-    val replyTo        = TestProbe[SubmitResponse].ref
+    val replyTo        = TestProbe[SubmitResponse]().ref
     val adminPrefix    = Prefix(s"${Subsystem.CSW}.admin")
     val nonAdminPrefix = Prefix(s"${Subsystem.CSW}.NonAdmin")
 
@@ -154,7 +154,7 @@ class LockManagerTest extends AnyFunSuite with MockitoSugar with Matchers {
     val nonAdminCmd: Setup = Setup(nonAdminPrefix, CommandName("move"), Some(ObsId("obs1001")), Set(intParam))
     lockManager.allowCommand(Submit(nonAdminCmd, replyTo)) shouldBe false
 
-    val probe               = TestProbe[LockingResponse]
+    val probe               = TestProbe[LockingResponse]()
     val unlockedLockManager = lockManager.unlockComponent(adminPrefix, probe.ref) {}
     probe.expectMessage(LockReleased)
 

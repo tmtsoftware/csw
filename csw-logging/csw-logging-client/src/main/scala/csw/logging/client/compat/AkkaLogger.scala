@@ -15,7 +15,7 @@ private[logging] class AkkaLogger extends Actor {
   import Level._
 
   def receive: Receive = {
-    case InitializeLogger(_) => sender ! LoggerInitialized
+    case InitializeLogger(_) => sender() ! LoggerInitialized
     case event @ Error(cause, logSource, logClass, message) =>
       val c =
         if (cause.toString.contains("NoCause$")) None

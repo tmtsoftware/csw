@@ -27,7 +27,7 @@ object ContainerApp extends App {
 
   Thread.sleep(2000)
 
-  private val containerLifecycleStateProbe: TestProbe[ContainerLifecycleState] = TestProbe[ContainerLifecycleState]
+  private val containerLifecycleStateProbe: TestProbe[ContainerLifecycleState] = TestProbe[ContainerLifecycleState]()
   ref ! GetContainerLifecycleState(containerLifecycleStateProbe.ref)
 
   containerLifecycleStateProbe.expectMessage(ContainerLifecycleState.Running)

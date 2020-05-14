@@ -33,8 +33,8 @@ class PubSubBehaviorTest extends AnyFunSuite with Matchers with BeforeAndAfterAl
   private val mocks                                             = new FrameworkTestMocks()
   private val prefix                                            = Prefix("wfos.red.detector")
 
-  private val lifecycleProbe1    = TestProbe[LifecycleStateChanged]
-  private val lifecycleProbe2    = TestProbe[LifecycleStateChanged]
+  private val lifecycleProbe1    = TestProbe[LifecycleStateChanged]()
+  private val lifecycleProbe2    = TestProbe[LifecycleStateChanged]()
   private val currentStateProbe1 = TestInbox[CurrentState]()
   private val currentStateProbe2 = TestInbox[CurrentState]()
 
@@ -52,7 +52,7 @@ class PubSubBehaviorTest extends AnyFunSuite with Matchers with BeforeAndAfterAl
 
   test("message should be published to all the subscribers | ") {
     val pubSubBehavior: BehaviorTestKit[PubSub[LifecycleStateChanged]] = createLifecycleStatePubSubBehavior()
-    val supervisorProbe                                                = TestProbe[ComponentMessage]
+    val supervisorProbe                                                = TestProbe[ComponentMessage]()
 
     pubSubBehavior.run(Subscribe(lifecycleProbe1.ref))
     pubSubBehavior.run(Subscribe(lifecycleProbe2.ref))
@@ -84,7 +84,7 @@ class PubSubBehaviorTest extends AnyFunSuite with Matchers with BeforeAndAfterAl
 
   test("should not receive messages on un-subscription | ") {
     val pubSubBehavior: BehaviorTestKit[PubSub[LifecycleStateChanged]] = createLifecycleStatePubSubBehavior()
-    val supervisorProbe                                                = TestProbe[ComponentMessage]
+    val supervisorProbe                                                = TestProbe[ComponentMessage]()
 
     pubSubBehavior.run(Subscribe(lifecycleProbe1.ref))
     pubSubBehavior.run(Subscribe(lifecycleProbe2.ref))

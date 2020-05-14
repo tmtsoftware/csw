@@ -117,12 +117,12 @@ trait SystemMonitoringSupport { multiNodeSpec: MultiNodeSpec =>
 
     Future {
       Source
-        .fromInputStream(process.getErrorStream)
+        .fromInputStream(process.getErrorStream())
         .getLines()
         .foreach(line => println(s"[Error @ ${myself.name}($pid)] " + line))
 
       Source
-        .fromInputStream(process.getInputStream)
+        .fromInputStream(process.getInputStream())
         .getLines()
         .foreach(line => println(s"[Info @ ${myself.name}($pid)] " + line))
     }

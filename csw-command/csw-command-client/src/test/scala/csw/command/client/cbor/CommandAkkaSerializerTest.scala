@@ -106,20 +106,20 @@ class CommandAkkaSerializerTest extends AnyFunSuite with Matchers with BeforeAnd
     val param2: Parameter[ArrayData[Byte]] = imageKey -> binaryImgData withUnits pascal
     val observe                            = Observe(prefix, CommandName("move"), Some(ObsId("Obs001"))).add(param2)
 
-    val submitResponseProbe   = TestProbe[SubmitResponse]
-    val onewayResponseProbe   = TestProbe[OnewayResponse]
-    val validateResponseProbe = TestProbe[ValidateResponse]
-    val queryResponseProbe    = TestProbe[SubmitResponse]
-    val lockingResponseProbe  = TestProbe[LockingResponse]
+    val submitResponseProbe   = TestProbe[SubmitResponse]()
+    val onewayResponseProbe   = TestProbe[OnewayResponse]()
+    val validateResponseProbe = TestProbe[ValidateResponse]()
+    val queryResponseProbe    = TestProbe[SubmitResponse]()
+    val lockingResponseProbe  = TestProbe[LockingResponse]()
 
-    val lifecycleProbe                = TestProbe[LifecycleStateChanged]
-    val currentStateProbe             = TestProbe[CurrentState]
-    val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]
+    val lifecycleProbe                = TestProbe[LifecycleStateChanged]()
+    val currentStateProbe             = TestProbe[CurrentState]()
+    val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]()
 
-    val componentsProbe              = TestProbe[Components]
-    val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]
+    val componentsProbe              = TestProbe[Components]()
+    val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]()
 
-    val logMetadataProbe = TestProbe[LogMetadata]
+    val logMetadataProbe = TestProbe[LogMetadata]()
 
     val testData = Table(
       "Command models",
@@ -175,7 +175,7 @@ class CommandAkkaSerializerTest extends AnyFunSuite with Matchers with BeforeAnd
   }
 
   test("should use command serializer for (de)serialize LifecycleStateChanged") {
-    val componentMessageProbe = TestProbe[ComponentMessage]
+    val componentMessageProbe = TestProbe[ComponentMessage]()
     val lifecycleStateChanged = LifecycleStateChanged(componentMessageProbe.ref, Idle)
 
     val serializer = serialization.findSerializerFor(lifecycleStateChanged)
@@ -224,7 +224,7 @@ class CommandAkkaSerializerTest extends AnyFunSuite with Matchers with BeforeAnd
   }
 
   test("should use command serializer for (de)serialize Components") {
-    val componentMessageProbe = TestProbe[ComponentMessage]
+    val componentMessageProbe = TestProbe[ComponentMessage]()
 
     val components =
       Components(
@@ -249,8 +249,8 @@ class CommandAkkaSerializerTest extends AnyFunSuite with Matchers with BeforeAnd
   }
 
   test("should use command serializer for (de)serialize SequencerMsg") {
-    val submitResponseProbe      = TestProbe[SubmitResponse]
-    val queryResponseProbe       = TestProbe[SubmitResponse]
+    val submitResponseProbe      = TestProbe[SubmitResponse]()
+    val queryResponseProbe       = TestProbe[SubmitResponse]()
     val command: SequenceCommand = Setup(Prefix("csw.move"), CommandName("c1"), Some(ObsId("obsId")))
     val sequence                 = Sequence(command)
     val sequenceId               = Id()
