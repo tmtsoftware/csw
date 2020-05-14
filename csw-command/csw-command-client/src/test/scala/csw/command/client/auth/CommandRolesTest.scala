@@ -18,15 +18,14 @@ class CommandRolesTest extends AnyFunSuite with Matchers {
 
   test("CommandRoles.from should successfully parse config file and store it in lower case in the appropriate models") {
 
-    val expectedRoles = CommandRoles(
-      Map(
-        setVoltageCmdKey  -> Roles(Set("iris-user", "aps-eng")),
-        setFirmwareCmdKey -> Roles(Set("tcs-admin")),
-        setLimitsCmdKey   -> Roles(Set("wfos-eng", "tcs-eng"))
-      )
+    val expectedMapping = Map(
+      setVoltageCmdKey  -> Roles(Set("iris-user", "aps-eng")),
+      setFirmwareCmdKey -> Roles(Set("tcs-admin")),
+      setLimitsCmdKey   -> Roles(Set("wfos-eng", "tcs-eng"))
     )
+
     val actualRoles = CommandRoles.from(testConfig)
-    actualRoles shouldBe expectedRoles
+    actualRoles.predefinedRoles shouldBe expectedMapping
   }
 
   test("CommandRoles.hasAccess should return true when user has correct role | ESW-95") {

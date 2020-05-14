@@ -53,8 +53,8 @@ class EventPublishExamples(eventService: EventService, log: Logger) {
       // this holds the logic for event generation, could be based on some computation or current state of HCD
       def eventGenerator(): Option[Event] =
         baseEvent match {
-          case e: SystemEvent  => Some(e.copy(eventId = Id(), eventTime = UTCTime.now()))
-          case e: ObserveEvent => Some(e.copy(eventId = Id(), eventTime = UTCTime.now()))
+          case e: SystemEvent  => Some(SystemEvent(e.source, e.eventName, e.paramSet))
+          case e: ObserveEvent => Some(ObserveEvent(e.source, e.eventName, e.paramSet))
         }
 
       publisher.publish(eventGenerator(), interval)

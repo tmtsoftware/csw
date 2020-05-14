@@ -96,7 +96,7 @@ object Event {
 /**
  * Defines a system event. Constructor is private to ensure eventId is created internally to guarantee unique value.
  */
-case class SystemEvent private[params] (
+case class SystemEvent private[csw] (
     eventId: Id,
     source: Prefix,
     eventName: EventName,
@@ -122,15 +122,6 @@ case class SystemEvent private[params] (
 
 object SystemEvent {
 
-  // The default apply method is used only internally while reading the incoming json and de-serializing it to SystemEvent model
-  private[csw] def apply(
-      eventId: Id,
-      source: Prefix,
-      eventName: EventName,
-      eventTime: UTCTime,
-      paramSet: Set[Parameter[_]]
-  ) = new SystemEvent(eventId, source, eventName, eventTime, paramSet)
-
   /**
    * The apply method is used to create SystemEvent command by end-user. eventId is not accepted and will be created internally to guarantee unique value.
    *
@@ -138,7 +129,8 @@ object SystemEvent {
    * @param eventName the name of event
    * @return a new instance of SystemEvent with auto-generated eventId, eventTime and empty paramSet
    */
-  def apply(source: Prefix, eventName: EventName): SystemEvent = apply(Id(), source, eventName, UTCTime.now(), Set.empty)
+  def apply(source: Prefix, eventName: EventName): SystemEvent =
+    new SystemEvent(Id(), source, eventName, UTCTime.now(), Set.empty)
 
   /**
    * The apply method is used to create SystemEvent command by end-user. eventId is not accepted and will be created internally to guarantee unique value.
@@ -155,7 +147,7 @@ object SystemEvent {
 /**
  * Defines an observe event. Constructor is private to ensure eventId is created internally to guarantee unique value.
  */
-case class ObserveEvent private[params] (
+case class ObserveEvent private[csw] (
     eventId: Id,
     source: Prefix,
     eventName: EventName,
@@ -181,15 +173,6 @@ case class ObserveEvent private[params] (
 
 object ObserveEvent {
 
-  // The default apply method is used only internally while reading the incoming json and de-serializing it to ObserveEvent model
-  private[csw] def apply(
-      eventId: Id,
-      source: Prefix,
-      eventName: EventName,
-      eventTime: UTCTime,
-      paramSet: Set[Parameter[_]]
-  ) = new ObserveEvent(eventId, source, eventName, eventTime, paramSet)
-
   /**
    * The apply method is used to create ObserveEvent command by end-user. eventId is not accepted and will be created internally to guarantee unique value.
    *
@@ -197,7 +180,8 @@ object ObserveEvent {
    * @param eventName the name of event
    * @return a new instance of ObserveEvent with auto-generated eventId, eventTime and empty paramSet
    */
-  def apply(source: Prefix, eventName: EventName): ObserveEvent = apply(Id(), source, eventName, UTCTime.now(), Set.empty)
+  def apply(source: Prefix, eventName: EventName): ObserveEvent =
+    new ObserveEvent(Id(), source, eventName, UTCTime.now(), Set.empty)
 
   /**
    * The apply method is used to create ObserveEvent command by end-user. eventId is not accepted and will be created internally to guarantee unique value.

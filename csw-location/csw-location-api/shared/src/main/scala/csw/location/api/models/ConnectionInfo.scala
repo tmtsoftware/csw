@@ -9,6 +9,6 @@ import csw.prefix.models.Prefix
  * @param componentType represents the type of component e.g. Assembly, HCD, etc
  * @param connectionType represents the type of connection e.g. akka, http, tcp
  */
-case class ConnectionInfo private[location] (prefix: Prefix, componentType: ComponentType, connectionType: ConnectionType) {
+case class ConnectionInfo(prefix: Prefix, componentType: ComponentType, connectionType: ConnectionType) {
   override def toString: String = s"$prefix-${componentType.name}-${connectionType.name}"
 }
