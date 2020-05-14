@@ -275,7 +275,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
 
     // pattern is * for redis
     val subscription = subscriber.pSubscribeCallback(Subsystem.CSW, eventPattern, testProbe.ref ! _)
-    subscription.ready.await
+    subscription.ready().await
     Thread.sleep(500)
 
     publisher.publish(testEvent1).await
@@ -373,12 +373,12 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     val event2: Event = SystemEvent(prefix, eventName2)
 
     val (subscription, seqF) = subscriber.subscribe(Set(event1.eventKey)).take(2).toMat(Sink.seq)(Keep.both).run()
-    subscription.ready.await
+    subscription.ready().await
     Thread.sleep(200)
     publisher.publish(event1).await
 
     val (subscription2, seqF2) = subscriber.subscribe(Set(event2.eventKey)).take(2).toMat(Sink.seq)(Keep.both).run()
-    subscription2.ready.await
+    subscription2.ready().await
     Thread.sleep(200)
     publisher.publish(event2).await
 
@@ -403,7 +403,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
 
     Thread.sleep(500) // Needed for redis set which is fire and forget operation
     val (subscription, seqF) = subscriber.subscribe(Set(eventKey)).take(2).toMat(Sink.seq)(Keep.both).run()
-    subscription.ready.await
+    subscription.ready().await
     Thread.sleep(500) // Needed for getting the latest event
 
     publisher.publish(event3).await

@@ -25,7 +25,7 @@ class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar with Ma
     when(sampleComponentHandler.initialize()).thenReturn(Future.unit)
 
     val commandResponseManager: CommandResponseManager = mock[CommandResponseManager]
-    when(commandResponseManager.commandResponseManagerActor).thenReturn(TestProbe[MiniCRM.CRMMessage].ref)
+    when(commandResponseManager.commandResponseManagerActor).thenReturn(TestProbe[MiniCRM.CRMMessage]().ref)
 
     val cswCtx: CswContext = new CswContext(
       frameworkTestMocks().locationService,
@@ -46,11 +46,11 @@ class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar with Ma
   }
 
   test("component should send itself initialize message and handle initialization | DEOPSCSW-165, DEOPSCSW-166") {
-    val supervisorProbe = TestProbe[FromComponentLifecycleMessage]
+    val supervisorProbe = TestProbe[FromComponentLifecycleMessage]()
     val testData        = new TestData(supervisorProbe)
     import testData._
 
-    componentBehaviorTestKit.selfInbox.receiveMessage() shouldBe Initialize
+    componentBehaviorTestKit.selfInbox().receiveMessage() shouldBe Initialize
 
     componentBehaviorTestKit.run(Initialize)
     supervisorProbe.expectMessageType[Running]
@@ -60,7 +60,7 @@ class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar with Ma
 
   // DEOPSCSW-37: Add diagnosticMode handler to component handlers
   test("component should handle DiagnosticMode message | DEOPSCSW-165, DEOPSCSW-166, DEOPSCSW-37") {
-    val supervisorProbe = TestProbe[FromComponentLifecycleMessage]
+    val supervisorProbe = TestProbe[FromComponentLifecycleMessage]()
     val testData        = new TestData(supervisorProbe)
     import testData._
 

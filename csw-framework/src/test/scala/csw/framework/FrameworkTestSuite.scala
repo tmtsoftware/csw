@@ -40,7 +40,7 @@ private[csw] abstract class FrameworkTestSuite extends AnyFunSuite with Matchers
   def createSupervisorAndStartTLA(
       componentInfo: ComponentInfo,
       testMocks: FrameworkTestMocks,
-      containerRef: ActorRef[ContainerIdleMessage] = TestProbe[ContainerIdleMessage].ref
+      containerRef: ActorRef[ContainerIdleMessage] = TestProbe[ContainerIdleMessage]().ref
   ): ActorRef[ComponentMessage] = {
     import testMocks._
 

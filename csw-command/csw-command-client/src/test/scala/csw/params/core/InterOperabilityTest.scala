@@ -55,9 +55,9 @@ class InterOperabilityTest extends AnyFunSuite with Matchers with BeforeAndAfter
   // 2. onMessage, Java actor extracts paramSet from Setup command and replies back to scala actor
   // 3. also, java actor creates StatusEvent and forward it to scala actor
   test("should able to send commands/events from scala code to java and vice a versa | DEOPSCSW-184") {
-    val ackProbe     = TestProbe[java.util.Set[Parameter[_]]]
-    val replyToProbe = TestProbe[SystemEvent]
-    val obsIdProbe   = TestProbe[Optional[ObsId]]
+    val ackProbe     = TestProbe[java.util.Set[Parameter[_]]]()
+    val replyToProbe = TestProbe[SystemEvent]()
+    val obsIdProbe   = TestProbe[Optional[ObsId]]()
 
     jCommandHandlerActor ! CommandMsg(scalaSetup, ackProbe.ref, replyToProbe.ref, obsIdProbe.ref)
 

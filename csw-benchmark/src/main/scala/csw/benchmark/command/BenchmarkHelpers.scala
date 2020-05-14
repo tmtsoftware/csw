@@ -28,7 +28,7 @@ object BenchmarkHelpers {
     val wiring: FrameworkWiring                                        = FrameworkWiring.make(actorSystem, locationService)
     implicit val typedSystem: typed.ActorSystem[SpawnProtocol.Command] = actorSystem
 
-    val probe = TestProbe[SupervisorLifecycleState]
+    val probe = TestProbe[SupervisorLifecycleState]()
 
     Standalone.spawn(config, wiring)
     val akkaLocation: AkkaLocation =

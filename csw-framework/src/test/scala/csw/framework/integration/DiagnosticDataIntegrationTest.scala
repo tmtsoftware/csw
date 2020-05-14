@@ -60,7 +60,7 @@ class DiagnosticDataIntegrationTest extends FrameworkIntegrationSuite {
     assertThatSupervisorIsRunning(supervisorRef, supervisorLifecycleStateProbe, 5.seconds)
 
     val eventService  = eventServiceFactory.make(locationService)
-    val eventProbe    = TestProbe[Event]
+    val eventProbe    = TestProbe[Event]()
     val diagnosticKey = EventKey(prefix, diagnosticDataEventName)
     val subscription  = eventService.defaultSubscriber.subscribeActorRef(Set(diagnosticKey), eventProbe.ref)
     subscription.ready().await

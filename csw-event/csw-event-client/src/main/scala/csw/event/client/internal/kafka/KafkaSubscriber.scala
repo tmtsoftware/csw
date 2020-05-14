@@ -143,7 +143,7 @@ private[event] class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[S
   private def eventSubscription(controlF: Future[scaladsl.Consumer.Control], completionF: Future[Done]): EventSubscription = {
     new EventSubscription {
       override def unsubscribe(): Future[Done] =
-        controlF.flatMap(_.shutdown).recover {
+        controlF.flatMap(_.shutdown()).recover {
           case NonFatal(_: StreamDetachedException) if completionF.isCompleted => Done
         }
       override def ready(): Future[Done] =

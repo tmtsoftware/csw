@@ -43,7 +43,7 @@ import scala.concurrent.{ExecutionContext, Future}
 // CSW-86: Subsystem should be case-insensitive
 class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
-  val supervisorLifecycleStateProbe: TestProbe[SupervisorLifecycleState] = TestProbe[SupervisorLifecycleState]
+  val supervisorLifecycleStateProbe: TestProbe[SupervisorLifecycleState] = TestProbe[SupervisorLifecycleState]()
   var supervisorRef: ActorRef[ComponentMessage]                          = _
   var initializeAnswer: Answer[Future[Unit]]                             = _
   var submitAnswer: Answer[Future[Unit]]                                 = _
@@ -193,7 +193,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     lifecycleStateProbe.expectMessage(5.seconds, LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
     // Supervisor sends component a submit command which will fail with FailureRestart exception on calling onSubmit Handler
-    supervisorRef ! Submit(setup, TestProbe[SubmitResponse].ref)
+    supervisorRef ! Submit(setup, TestProbe[SubmitResponse]().ref)
 
     // Component initializes again by the akka framework without termination
     compStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))

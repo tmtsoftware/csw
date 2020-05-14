@@ -57,7 +57,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
       {
         val mocks = frameworkTestMocks()
         import mocks._
-        val containerIdleMessageProbe = TestProbe[ContainerIdleMessage]
+        val containerIdleMessageProbe = TestProbe[ContainerIdleMessage]()
         val supervisorRef             = createSupervisorAndStartTLA(info, mocks, containerIdleMessageProbe.ref)
 
         supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
@@ -103,7 +103,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         val mocks = frameworkTestMocks()
         import mocks._
         val supervisorRef       = createSupervisorAndStartTLA(info, mocks)
-        val submitResponseProbe = TestProbe[SubmitResponse]
+        val submitResponseProbe = TestProbe[SubmitResponse]()
 
         supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
         supervisorRef ! LifecycleStateSubscription(Subscribe(lifecycleStateProbe.ref))
@@ -180,7 +180,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         val mocks = frameworkTestMocks()
         import mocks._
         val supervisorRef                                 = createSupervisorAndStartTLA(info, mocks)
-        val onewayResposeProbe: TestProbe[OnewayResponse] = TestProbe[OnewayResponse]
+        val onewayResposeProbe: TestProbe[OnewayResponse] = TestProbe[OnewayResponse]()
 
         supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
         supervisorRef ! LifecycleStateSubscription(Subscribe(lifecycleStateProbe.ref))
@@ -253,8 +253,8 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     forAll(testData) { info: ComponentInfo =>
       {
         val mocks                                          = frameworkTestMocks()
-        val submitResponseProbe: TestProbe[SubmitResponse] = TestProbe[SubmitResponse]
-        val onewayResponseProbe: TestProbe[OnewayResponse] = TestProbe[OnewayResponse]
+        val submitResponseProbe: TestProbe[SubmitResponse] = TestProbe[SubmitResponse]()
+        val onewayResponseProbe: TestProbe[OnewayResponse] = TestProbe[OnewayResponse]()
         import mocks._
         val supervisorRef = createSupervisorAndStartTLA(hcdInfo, mocks)
 
@@ -315,7 +315,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
       {
         val mocks = frameworkTestMocks()
         import mocks._
-        val containerIdleMessageProbe = TestProbe[ContainerIdleMessage]
+        val containerIdleMessageProbe = TestProbe[ContainerIdleMessage]()
         val supervisorRef             = createSupervisorAndStartTLA(info, mocks, containerIdleMessageProbe.ref)
 
         supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
@@ -393,7 +393,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   test(
     "handle InitializeTimeout by stopping TLA | DEOPSCSW-284, DEOPSCSW-166, DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-165, DEOPSCSW-176"
   ) {
-    val supervisorLifecycleStateProbe: TestProbe[SupervisorLifecycleState] = TestProbe[SupervisorLifecycleState]
+    val supervisorLifecycleStateProbe: TestProbe[SupervisorLifecycleState] = TestProbe[SupervisorLifecycleState]()
 
     val testData = Table(
       "componentInfo",
@@ -405,7 +405,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
       {
         val mocks = frameworkTestMocks()
         import mocks._
-        val componentStateProbe: TestProbe[CurrentState] = TestProbe[CurrentState]
+        val componentStateProbe: TestProbe[CurrentState] = TestProbe[CurrentState]()
 
         val supervisorRef = createSupervisorAndStartTLA(info, mocks)
         supervisorRef ! ComponentStateSubscription(Subscribe(componentStateProbe.ref))

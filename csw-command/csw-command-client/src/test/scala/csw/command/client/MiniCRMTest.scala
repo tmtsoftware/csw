@@ -56,7 +56,7 @@ class MiniCRMTest extends AnyFunSuite with Matchers with BeforeAndAfterAll {
   test("add waiters, check inclusion") {
     val crm             = testKit.spawn(MiniCRM.make())
     val responseProbe   = testKit.createTestProbe[SubmitResponse]()
-    val waiterListProbe = testKit.createTestProbe[Waiters]
+    val waiterListProbe = testKit.createTestProbe[Waiters]()
 
     val id1 = Id("1")
     crm ! QueryFinal(id1, responseProbe.ref)

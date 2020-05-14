@@ -92,7 +92,7 @@ class StateVariablesTest extends AnyFunSpec with Matchers {
       val charParam    = charKey.set('A', 'B', 'C').withUnits(NoUnits)
       val intParam     = intKey.set(1, 2, 3).withUnits(meter)
       val booleanParam = booleanKey.set(true, false)
-      val utcTime      = utcTimeKey.set(UTCTime.now)
+      val utcTime      = utcTimeKey.set(UTCTime.now())
 
       //create CurrentState and use sequential add
       val cs1 = CurrentState(prefix, StateName("testStateName")).add(charParam).add(intParam)

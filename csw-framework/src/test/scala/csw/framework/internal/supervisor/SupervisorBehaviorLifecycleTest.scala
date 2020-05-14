@@ -35,7 +35,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
     val sampleHcdHandler: ComponentHandlers                        = mock[ComponentHandlers]
     val timerScheduler: TimerScheduler[SupervisorMessage]          = mock[TimerScheduler[SupervisorMessage]]
-    val containerIdleMessageProbe: TestProbe[ContainerIdleMessage] = TestProbe[ContainerIdleMessage]
+    val containerIdleMessageProbe: TestProbe[ContainerIdleMessage] = TestProbe[ContainerIdleMessage]()
     val componentActorName                                         = s"${compInfo.prefix}-${SupervisorBehavior.ComponentActorNameSuffix}"
     val supervisorBehaviorKit = BehaviorTestKit(
       Behaviors
@@ -58,7 +58,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     val testData = new TestData(hcdInfo)
     import testData._
 
-    val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]
+    val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]()
 
     supervisorBehaviorKit.run(GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref))
     supervisorLifecycleStateProbe.expectMessage(SupervisorLifecycleState.Idle)
@@ -80,7 +80,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     val testData = new TestData(hcdInfo)
     import testData._
     import testData.testMocks._
-    val supervisorLifecycleStateProbe            = TestProbe[SupervisorLifecycleState]
+    val supervisorLifecycleStateProbe            = TestProbe[SupervisorLifecycleState]()
     val childRef: ActorRef[TopLevelActorMessage] = supervisorBehaviorKit.childInbox(componentActorName).ref
 
     supervisorBehaviorKit.run(Running(childRef))
@@ -98,7 +98,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     val testData = new TestData(hcdInfo.copy(locationServiceUsage = DoNotRegister))
     import testData._
     import testData.testMocks._
-    val supervisorLifecycleStateProbe            = TestProbe[SupervisorLifecycleState]
+    val supervisorLifecycleStateProbe            = TestProbe[SupervisorLifecycleState]()
     val childRef: ActorRef[TopLevelActorMessage] = supervisorBehaviorKit.childInbox(componentActorName).ref
 
     supervisorBehaviorKit.run(Running(childRef))
@@ -119,7 +119,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     val testData = new TestData(hcdInfo)
     import testData._
 
-    val supervisorLifecycleStateProbe            = TestProbe[SupervisorLifecycleState]
+    val supervisorLifecycleStateProbe            = TestProbe[SupervisorLifecycleState]()
     val childRef: ActorRef[TopLevelActorMessage] = supervisorBehaviorKit.childInbox(componentActorName).ref
 
     supervisorBehaviorKit.run(Running(childRef))
@@ -141,7 +141,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   ) {
     val testData = new TestData(hcdInfo)
     import testData._
-    val supervisorLifecycleStateProbe            = TestProbe[SupervisorLifecycleState]
+    val supervisorLifecycleStateProbe            = TestProbe[SupervisorLifecycleState]()
     val childRef: ActorRef[TopLevelActorMessage] = supervisorBehaviorKit.childInbox(componentActorName).ref
 
     supervisorBehaviorKit.run(Running(childRef))
@@ -165,8 +165,8 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   ) {
     val testData = new TestData(hcdInfo)
     import testData._
-    val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]
-    val subscriberProbe               = TestProbe[LifecycleStateChanged]
+    val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]()
+    val subscriberProbe               = TestProbe[LifecycleStateChanged]()
 
     supervisorBehaviorKit.run(GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref))
     val previousSupervisorLifecycleState = supervisorLifecycleStateProbe.expectMessageType[SupervisorLifecycleState]
@@ -204,7 +204,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   test("supervisor should handle lifecycle Restart message | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181") {
     val testData = new TestData(hcdInfo)
     import testData._
-    val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]
+    val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]()
 
     supervisorBehaviorKit.run(Restart)
     supervisorBehaviorKit.run(GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref))
@@ -215,7 +215,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     val testData = new TestData(hcdInfo)
     import testData._
 
-    val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]
+    val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]()
 
     val childComponentInbox: TestInbox[TopLevelActorMessage] = supervisorBehaviorKit.childInbox(componentActorName)
 
@@ -232,7 +232,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   test("supervisor should handle lifecycle GoOnline message | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181") {
     val testData = new TestData(hcdInfo)
     import testData._
-    val supervisorLifecycleStateProbe                        = TestProbe[SupervisorLifecycleState]
+    val supervisorLifecycleStateProbe                        = TestProbe[SupervisorLifecycleState]()
     val childComponentInbox: TestInbox[TopLevelActorMessage] = supervisorBehaviorKit.childInbox(componentActorName)
 
     supervisorBehaviorKit.run(Running(childComponentInbox.ref))
@@ -250,7 +250,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   test("supervisor should handle Terminated signal for Idle lifecycle state | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181") {
     val testData = new TestData(hcdInfo)
     import testData._
-    val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]
+    val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]()
 
     val childComponentInbox: TestInbox[TopLevelActorMessage] = supervisorBehaviorKit.childInbox(componentActorName)
 
@@ -267,7 +267,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     import testData._
 
     val childRef: ActorRef[TopLevelActorMessage] = supervisorBehaviorKit.childInbox(componentActorName).ref
-    val queryResponseProbe                       = TestProbe[QueryResponse]
+    val queryResponseProbe                       = TestProbe[QueryResponse]()
     val testCmdId                                = Id()
 
     supervisorBehaviorKit.run(Running(childRef))

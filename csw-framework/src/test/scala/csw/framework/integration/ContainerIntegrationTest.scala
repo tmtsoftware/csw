@@ -140,7 +140,7 @@ class ContainerIntegrationTest extends FrameworkIntegrationSuite {
     filterSupervisor ! LifecycleStateSubscription(Subscribe(filterLifecycleStateProbe.ref))
     disperserSupervisor ! LifecycleStateSubscription(Subscribe(disperserLifecycleStateProbe.ref))
 
-    val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]
+    val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]()
     assemblySupervisor ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref)
     filterSupervisor ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref)
     disperserSupervisor ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref)

@@ -28,7 +28,7 @@ private[config] object ConfigStreamExts {
      */
     def prefixAndStitch(n: Int)(implicit system: ActorSystem[_]): (Future[Seq[Out]], Source[Out, Future[NotUsed]]) = {
       import system.executionContext
-      val p = Promise[Seq[Out]]
+      val p = Promise[Seq[Out]]()
       val futureSource = source.prefixAndTail(n).runWith(Sink.head).map {
         case (prefix, remainingSource) =>
           p.success(prefix)
