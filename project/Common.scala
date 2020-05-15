@@ -54,7 +54,8 @@ object Common extends AutoPlugin {
       if (enableFatalWarnings.value) "-Xfatal-warnings" else "",
       "-Xlint:_,-missing-interpolator",
       "-Ywarn-dead-code",
-      "-Xsource:3"
+      "-Xsource:3",
+      "-Wconf:any:warning-verbose"
 //      "-Xprint:typer",
     ),
     javacOptions in (Compile, doc) ++= Seq("-Xdoclint:none"),

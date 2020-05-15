@@ -7,10 +7,11 @@ import csw.aas.core.token.AccessToken
 import csw.params.commands.CommandName
 import csw.prefix.models.{Prefix, Subsystem}
 
+import scala.annotation.nowarn
 import scala.jdk.CollectionConverters._
 
 // maps to key from command roles config file
-case class CommandKey private (key: String) {
+case class CommandKey @nowarn private (key: String) {
   private val subsystem = key.split('.').headOption.map(Subsystem.withNameInsensitive)
   require(subsystem.nonEmpty, s"$key should start with one of the valid subsystem")
 }
@@ -22,7 +23,7 @@ object CommandKey {
 }
 
 // maps to all the associated roles for the key from command roles config file
-case class Roles private (roles: Set[String]) {
+case class Roles @nowarn private (roles: Set[String]) {
   def exist(that: Roles): Boolean                     = this.roles.exists(that.roles.contains)
   def containsUserRole(subsystem: Subsystem): Boolean = roles.contains(subsystem.name.toLowerCase + "-user")
 }
@@ -32,7 +33,7 @@ object Roles {
 }
 
 // maps to command roles config file
-case class CommandRoles private (private[auth] val predefinedRoles: Map[CommandKey, Roles]) {
+case class CommandRoles @nowarn private (private[auth] val predefinedRoles: Map[CommandKey, Roles]) {
   def hasAccess(cmdKey: CommandKey, subsystem: Subsystem, rolesFromToken: Roles): Boolean =
     predefinedRoles.get(cmdKey) match {
       case Some(allowedRoles) => allowedRoles.exist(rolesFromToken)
