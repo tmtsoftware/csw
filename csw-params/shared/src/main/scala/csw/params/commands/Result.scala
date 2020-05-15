@@ -30,7 +30,7 @@ case class Result private[params] (paramSet: Set[Parameter[_]]) extends Paramete
 
 object Result {
 
-  def emptyResult = Result()
+  def emptyResult = new Result()
 
   /**
    * A helper method to create Result instance
