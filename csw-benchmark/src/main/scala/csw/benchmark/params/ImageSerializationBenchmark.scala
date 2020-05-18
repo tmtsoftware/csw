@@ -63,7 +63,7 @@ class ImageSerializationBenchmark {
 
   @TearDown(Level.Trial)
   def teardown(): Unit = {
-    system.terminate
+    system.terminate()
     Await.result(system.whenTerminated, 5.seconds)
   }
 

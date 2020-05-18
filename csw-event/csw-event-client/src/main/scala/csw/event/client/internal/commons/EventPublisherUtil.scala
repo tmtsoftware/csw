@@ -72,7 +72,7 @@ private[event] class EventPublisherUtil(implicit actorSystem: ActorSystem[_]) {
   def logError(failure: PublishFailure): Unit = logger.error(failure.getMessage, ex = failure)
 
   def publish(event: Event, isStreamTerminated: Boolean): Future[Done] = {
-    val p = Promise[Done]
+    val p = Promise[Done]()
     if (isStreamTerminated) p.tryFailure(PublishFailure(event, new RuntimeException("Publisher is shutdown")))
     else actorRef ! ((event, p))
     p.future

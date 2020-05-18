@@ -125,8 +125,8 @@ class ContainerCmdTest(ignore: Int)
       maybeContainerLoc.map(_.prefix).value shouldBe Prefix(s"${Container.entryName}.LGSF_Container")
       val containerRef = maybeContainerLoc.value.containerRef
 
-      val componentsProbe               = TestProbe[Components]
-      val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]
+      val componentsProbe               = TestProbe[Components]()
+      val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]()
 
       containerRef ! GetComponents(componentsProbe.ref)
       val laserContainerComponents = componentsProbe.expectMessageType[Components].components
@@ -148,7 +148,7 @@ class ContainerCmdTest(ignore: Int)
     runOn(member1) {
       enterBarrier("config-file-uploaded")
 
-      val testProbe    = TestProbe[ContainerLifecycleState]
+      val testProbe    = TestProbe[ContainerLifecycleState]()
       val containerCmd = new ContainerCmd("laser_container_app", CSW, false)
 
       // only file path is provided, by default - file will be fetched from configuration service
@@ -167,7 +167,7 @@ class ContainerCmdTest(ignore: Int)
       val etonSupervisorLocation = resolveEtonHcd().futureValue.value
 
       val etonSupervisorTypedRef = etonSupervisorLocation.componentRef
-      val eatonCompStateProbe    = TestProbe[CurrentState]
+      val eatonCompStateProbe    = TestProbe[CurrentState]()
       val etonCommandService     = CommandServiceFactory.make(etonSupervisorLocation)
 
       // DEOPSCSW-372: Provide an API for PubSubActor that hides actor based interaction
@@ -182,7 +182,7 @@ class ContainerCmdTest(ignore: Int)
       val setupFailure: Setup = Setup(failedPrefix, CommandName("move.failure"), Some(obsId), Set(param))
 
       val laserAssemblySupervisor = laserContainerComponents.head.supervisor
-      val laserCompStateProbe     = TestProbe[CurrentState]
+      val laserCompStateProbe     = TestProbe[CurrentState]()
 
       etonCommandService.submitAndWait(setupFailure).map { commandResponse =>
         commandResponse shouldBe Invalid
@@ -207,7 +207,7 @@ class ContainerCmdTest(ignore: Int)
       val supervisorRef = resolveEtonHcd().futureValue.value.componentRef
       Thread.sleep(500)
 
-      val lifecycleProbe = TestProbe[SupervisorLifecycleState]
+      val lifecycleProbe = TestProbe[SupervisorLifecycleState]()
       supervisorRef ! GetSupervisorLifecycleState(lifecycleProbe.ref)
       lifecycleProbe.expectMessage(SupervisorLifecycleState.RunningOffline)
 
@@ -227,7 +227,7 @@ class ContainerCmdTest(ignore: Int)
     runOn(member2) {
       enterBarrier("config-file-uploaded")
 
-      val testProbe = TestProbe[SupervisorLifecycleState]
+      val testProbe = TestProbe[SupervisorLifecycleState]()
 
       val containerCmd = new ContainerCmd("eaton_hcd_standalone_app", CSW, false)
 

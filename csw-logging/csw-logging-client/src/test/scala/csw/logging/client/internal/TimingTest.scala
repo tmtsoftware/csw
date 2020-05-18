@@ -91,7 +91,7 @@ class TimingTest extends LoggingTestSuite with Timing {
     timeLogBuffer.toList.foreach { log =>
       val itemsMap = log("items").as[List[String]].map(x => Json.parse(x).as[JsObject]).head
 
-      itemsMap.getString("name") shouldBe timerRegionQueue.dequeue
+      itemsMap.getString("name") shouldBe timerRegionQueue.dequeue()
       itemsMap.contains("time0") shouldBe true
       itemsMap.contains("time1") shouldBe true
       itemsMap.contains("total") shouldBe true

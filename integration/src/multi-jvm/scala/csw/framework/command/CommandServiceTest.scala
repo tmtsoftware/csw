@@ -117,7 +117,7 @@ class CommandServiceTest(ignore: Int)
       enterBarrier("short-long-commands")
       enterBarrier("assembly-locked")
 
-      val submitResponseProbe = TestProbe[SubmitResponse]
+      val submitResponseProbe = TestProbe[SubmitResponse]()
 
       // try to send a command to assembly which is already locked
       val assemblyObserve = Observe(invalidPrefix, acceptedCmd, Some(ObsId("Obs001")))
@@ -430,13 +430,13 @@ class CommandServiceTest(ignore: Int)
       enterBarrier("short-long-commands")
 
       // acquire lock on assembly
-      val lockResponseProbe = TestProbe[LockingResponse]
+      val lockResponseProbe = TestProbe[LockingResponse]()
       assemblyLocation.componentRef ! LockCommandFactory.make(prefix, lockResponseProbe.ref)
       lockResponseProbe.expectMessage(LockAcquired)
 
       enterBarrier("assembly-locked")
 
-      val submitResponseProbe = TestProbe[SubmitResponse]
+      val submitResponseProbe = TestProbe[SubmitResponse]()
 
       // send command with lock token and expect command processing response
       val assemblySetup = Setup(prefix, immediateCmd, obsId)

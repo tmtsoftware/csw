@@ -195,7 +195,7 @@ class RedisFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
     publisher.shutdown().await
 
     publisher.publish(None, 20.millis, onError = testProbe.ref ! _)
-    testProbe.expectNoMessage
+    testProbe.expectNoMessage()
 
     val startTime = UTCTime(UTCTime.now().value.plusMillis(200))
     publisher.publish(None, startTime, 20.millis, onError = testProbe.ref ! _)
@@ -218,7 +218,7 @@ class RedisFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
     def eventGenerator(): Future[Option[Event]] = Future.successful(None)
 
     publisher.publishAsync(eventGenerator(), 20.millis, onError = testProbe.ref ! _)
-    testProbe.expectNoMessage
+    testProbe.expectNoMessage()
 
     val startTime = UTCTime(UTCTime.now().value.plusMillis(200))
     publisher.publishAsync(eventGenerator(), startTime, 20.millis, onError = testProbe.ref ! _)

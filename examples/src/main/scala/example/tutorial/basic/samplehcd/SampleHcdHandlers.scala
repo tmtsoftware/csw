@@ -83,7 +83,7 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
 
   private def stopPublishingGenerator(): Unit = {
     log.info(s"HCD: $prefix stops publishing stream")
-    maybePublishingGenerator.foreach(_.cancel)
+    maybePublishingGenerator.foreach(_.cancel())
   }
   //#publish
 

@@ -4,7 +4,9 @@ import csw.event.cli.args.Separators.KEY_SEP
 import csw.params.core.models.Units
 import csw.params.core.models.Units.NoUnits
 
-case class KeyArg private (keyName: String, keyType: Char, units: Units)
+import scala.annotation.nowarn
+
+case class KeyArg @nowarn private (keyName: String, keyType: Char, units: Units)
 
 object KeyArg {
 

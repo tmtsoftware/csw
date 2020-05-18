@@ -72,8 +72,8 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
   private[this] val time = loggingConfig.getBoolean("time")
 
   private[this] implicit val ec: ExecutionContext = system.executionContext
-  private[this] val done                          = Promise[Unit]
-  private[this] val timeActorDonePromise          = Promise[Unit]
+  private[this] val done                          = Promise[Unit]()
+  private[this] val timeActorDonePromise          = Promise[Unit]()
 
   private[this] val initialComponentsLoggingState = ComponentLoggingStateManager.from(loggingConfig)
 

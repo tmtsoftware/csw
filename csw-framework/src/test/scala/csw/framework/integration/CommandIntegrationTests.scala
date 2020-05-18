@@ -105,7 +105,7 @@ class CommandIntegrationTests extends FrameworkIntegrationSuite {
       l.componentRef ! LifecycleStateSubscription(PubSub.Subscribe(assemblyLifecycleStateProbe.ref))
     )
 
-    val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]
+    val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]()
     filterAssemblyLocation.foreach(l => l.componentRef ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref))
 
     // make sure that all the components are in running lifecycle state before sending lifecycle messages

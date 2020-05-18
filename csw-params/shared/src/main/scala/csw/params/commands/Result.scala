@@ -5,7 +5,7 @@ import csw.params.core.generics.{Parameter, ParameterSetType}
 /**
  * A result containing parameters for command response
  */
-case class Result private[params] (paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]) extends ParameterSetType[Result] {
+case class Result private[params] (paramSet: Set[Parameter[_]]) extends ParameterSetType[Result] {
 
   def nonEmpty: Boolean = paramSet.nonEmpty
 
@@ -30,7 +30,15 @@ case class Result private[params] (paramSet: Set[Parameter[_]] = Set.empty[Param
 
 object Result {
 
-  def emptyResult = Result()
+  def emptyResult = new Result()
+
+  /**
+   * A helper method to create Result instance
+   *
+   * @param paramSet a Set of parameters (keys with values)
+   * @return a Result instance with provided paramSet
+   */
+  def apply(paramSet: Set[Parameter[_]]): Result = emptyResult.madd(paramSet)
 
   /**
    * A helper method to create Result instance
@@ -38,7 +46,5 @@ object Result {
    * @param params an optional list of parameters (keys with values)
    * @return a Result instance with provided paramSet
    */
-  def apply(params: Parameter[_]*): Result = {
-    new Result().madd(params.toSet)
-  }
+  def apply(params: Parameter[_]*): Result = Result(params.toSet)
 }

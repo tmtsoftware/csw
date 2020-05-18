@@ -81,7 +81,7 @@ class RegistrationTest extends AnyFunSuite with Matchers with BeforeAndAfterAll 
   }
 
   override protected def afterAll(): Unit = {
-    actorSystem.terminate
+    actorSystem.terminate()
     Await.result(actorSystem.whenTerminated, 10.seconds)
     super.afterAll()
   }

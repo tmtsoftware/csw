@@ -79,8 +79,8 @@ class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar 
       .thenReturn(akkaRegistration)
 
     private val eventualRegistrationResult: Future[RegistrationResult] =
-      Promise[RegistrationResult].complete(Success(registrationResult)).future
-    private val eventualDone: Future[Done] = Promise[Done].complete(Success(Done)).future
+      Promise[RegistrationResult]().complete(Success(registrationResult)).future
+    private val eventualDone: Future[Done] = Promise[Done]().complete(Success(Done)).future
 
     when(locationService.register(akkaRegistration)).thenReturn(eventualRegistrationResult)
     when(registrationResult.unregister()).thenReturn(eventualDone)
@@ -122,7 +122,7 @@ class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar 
   test("should handle restart message by changing its lifecycle state to Idle | DEOPSCSW-182, DEOPSCSW-216") {
     val runningContainer = new RunningContainer
     import runningContainer._
-    val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]
+    val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]()
 
     // verify that Container is in Running state before sending Restart
     containerBehaviorTestkit.run(GetContainerLifecycleState(containerLifecycleStateProbe.ref))
@@ -143,7 +143,7 @@ class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar 
   ) {
     val runningContainer = new RunningContainer
     import runningContainer._
-    val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]
+    val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]()
 
     containerBehaviorTestkit.run(Restart)
 
@@ -165,7 +165,7 @@ class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar 
   test("should handle GoOnline and GoOffline Lifecycle messages by forwarding to all components | DEOPSCSW-182, DEOPSCSW-216") {
     val runningContainer = new RunningContainer
     import runningContainer._
-    val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]
+    val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]()
 
     containerBehaviorTestkit.run(GetContainerLifecycleState(containerLifecycleStateProbe.ref))
     val initialLifecycleState = containerLifecycleStateProbe.expectMessageType[ContainerLifecycleState]

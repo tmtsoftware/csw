@@ -59,8 +59,8 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar with A
   }
 
   test("running component should handle RunOffline lifecycle message | DEOPSCSW-177, DEOPSCSW-179") {
-    val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]
-    val commandStatusServiceProbe = TestProbe[CRMMessage]
+    val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]()
+    val commandStatusServiceProbe = TestProbe[CRMMessage]()
     val runningComponent          = new RunningComponent(supervisorProbe, commandStatusServiceProbe)
     import runningComponent._
     when(sampleHcdHandler.isOnline).thenReturn(true)
@@ -73,8 +73,8 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar with A
   test(
     "running component should not accept RunOffline lifecycle message when it is already offline | DEOPSCSW-177, DEOPSCSW-179"
   ) {
-    val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]
-    val commandStatusServiceProbe = TestProbe[CRMMessage]
+    val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]()
+    val commandStatusServiceProbe = TestProbe[CRMMessage]()
     val runningComponent          = new RunningComponent(supervisorProbe, commandStatusServiceProbe)
     import runningComponent._
     when(sampleHcdHandler.isOnline).thenReturn(false)
@@ -84,8 +84,8 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar with A
   }
 
   test("running component should handle RunOnline lifecycle message when it is Offline | DEOPSCSW-177, DEOPSCSW-179") {
-    val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]
-    val commandStatusServiceProbe = TestProbe[CRMMessage]
+    val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]()
+    val commandStatusServiceProbe = TestProbe[CRMMessage]()
     val runningComponent          = new RunningComponent(supervisorProbe, commandStatusServiceProbe)
     import runningComponent._
     when(sampleHcdHandler.isOnline).thenReturn(false)
@@ -95,8 +95,8 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar with A
   }
 
   test("running component should not accept RunOnline lifecycle message when it is already Online | DEOPSCSW-177, DEOPSCSW-179") {
-    val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]
-    val commandStatusServiceProbe = TestProbe[CRMMessage]
+    val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]()
+    val commandStatusServiceProbe = TestProbe[CRMMessage]()
     val runningComponent          = new RunningComponent(supervisorProbe, commandStatusServiceProbe)
     import runningComponent._
 
@@ -107,8 +107,8 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar with A
   }
 
   test("running component should clean up using onShutdown handler before stopping | DEOPSCSW-177, DEOPSCSW-179") {
-    val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]
-    val commandStatusServiceProbe = TestProbe[CRMMessage]
+    val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]()
+    val commandStatusServiceProbe = TestProbe[CRMMessage]()
     val runningComponent          = new RunningComponent(supervisorProbe, commandStatusServiceProbe)
     import runningComponent._
 
@@ -117,9 +117,9 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar with A
   }
 
   test("running component should handle Submit command | DEOPSCSW-177, DEOPSCSW-179") {
-    val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]
-    val submitResponseProbe       = TestProbe[SubmitResponse]
-    val commandStatusServiceProbe = TestProbe[CRMMessage]
+    val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]()
+    val submitResponseProbe       = TestProbe[SubmitResponse]()
+    val commandStatusServiceProbe = TestProbe[CRMMessage]()
     val runningComponent          = new RunningComponent(supervisorProbe, commandStatusServiceProbe)
     import runningComponent._
 
@@ -145,9 +145,9 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar with A
   }
 
   test("running component should handle Oneway command | DEOPSCSW-177, DEOPSCSW-179") {
-    val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]
-    val onewayResponseProbe       = TestProbe[OnewayResponse]
-    val commandStatusServiceProbe = TestProbe[CRMMessage]
+    val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]()
+    val onewayResponseProbe       = TestProbe[OnewayResponse]()
+    val commandStatusServiceProbe = TestProbe[CRMMessage]()
     val runningComponent          = new RunningComponent(supervisorProbe, commandStatusServiceProbe)
     import runningComponent._
 
@@ -176,9 +176,9 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar with A
   test(
     "running component can send an immediate response to a submit command and avoid invoking further processing | DEOPSCSW-177, DEOPSCSW-179, DEOPSCSW-313"
   ) {
-    val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]
-    val submitResponseProbe       = TestProbe[SubmitResponse]
-    val commandStatusServiceProbe = TestProbe[CRMMessage]
+    val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]()
+    val submitResponseProbe       = TestProbe[SubmitResponse]()
+    val commandStatusServiceProbe = TestProbe[CRMMessage]()
     val runningComponent          = new RunningComponent(supervisorProbe, commandStatusServiceProbe)
     import runningComponent._
 
@@ -202,9 +202,9 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar with A
 
   // Demonstrate oneway failure
   test("running component can send a oneway command that is rejected | DEOPSCSW-177, DEOPSCSW-179") {
-    val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]
-    val onewayResponseProbe       = TestProbe[OnewayResponse]
-    val commandStatusServiceProbe = TestProbe[CRMMessage]
+    val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]()
+    val onewayResponseProbe       = TestProbe[OnewayResponse]()
+    val commandStatusServiceProbe = TestProbe[CRMMessage]()
     val runningComponent          = new RunningComponent(supervisorProbe, commandStatusServiceProbe)
     import runningComponent._
 

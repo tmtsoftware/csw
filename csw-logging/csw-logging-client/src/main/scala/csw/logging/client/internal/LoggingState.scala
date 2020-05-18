@@ -34,7 +34,7 @@ private[logging] object LoggingState {
   var timeActorOption: Option[ActorRef[TimeActorMessage]] = None
 
   // use to sync akka logging actor shutdown
-  val akkaStopPromise: Promise[Unit] = Promise[Unit]
+  val akkaStopPromise: Promise[Unit] = Promise[Unit]()
 
   // a concurrent map of prefix -> LoggingState
   val componentsLoggingState: ConcurrentHashMap[Prefix, ComponentLoggingState] = new ConcurrentHashMap()

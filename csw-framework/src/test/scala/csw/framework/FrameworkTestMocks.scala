@@ -49,8 +49,8 @@ class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol.Command]) ex
   when(eventServiceFactory.make(any[LocationService])(any[ActorSystem[_]])).thenReturn(eventService)
   ///////////////////////////////////////////////
 
-  val lifecycleStateProbe: TestProbe[LifecycleStateChanged] = TestProbe[LifecycleStateChanged]
-  val compStateProbe: TestProbe[CurrentState]               = TestProbe[CurrentState]
+  val lifecycleStateProbe: TestProbe[LifecycleStateChanged] = TestProbe[LifecycleStateChanged]()
+  val compStateProbe: TestProbe[CurrentState]               = TestProbe[CurrentState]()
 
   ///////////////////////////////////////////////
   val loggerFactory: LoggerFactory = mock[LoggerFactory]
@@ -65,7 +65,7 @@ class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol.Command]) ex
     system.spawn(PubSubBehavior.make[CurrentState](loggerFactory), "pub-sub")
   val currentStatePublisher: CurrentStatePublisher = new CurrentStatePublisher(pubSubComponentActor)
 
-  val commandResponseManagerActor: TestProbe[MiniCRM.CRMMessage] = TestProbe[MiniCRM.CRMMessage]
+  val commandResponseManagerActor: TestProbe[MiniCRM.CRMMessage] = TestProbe[MiniCRM.CRMMessage]()
   val commandResponseManager: CommandResponseManager             = mock[CommandResponseManager]
 
   when(commandResponseManager.commandResponseManagerActor).thenReturn(commandResponseManagerActor.ref)
