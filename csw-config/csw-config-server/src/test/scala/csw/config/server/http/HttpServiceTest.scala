@@ -80,8 +80,8 @@ class HttpServiceTest extends HTTPLocationService {
 
   test("should not start server if registration with location service fails") {
     val _existingServicePort = 21212
-    val _servicePort           = 4007
-    val serverWiring           = ServerWiring.make(Some(_servicePort))
+    val _servicePort         = 4007
+    val serverWiring         = ServerWiring.make(Some(_servicePort))
     import serverWiring._
     locationService
       .register(models.HttpRegistration(ConfigServiceConnection.value, _existingServicePort, "", NetworkType.Public))
