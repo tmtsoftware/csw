@@ -9,6 +9,7 @@ import csw.location.api.models.Connection.HttpConnection
 import csw.location.api.models.HttpRegistration
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.logging.api.scaladsl.Logger
+import csw.network.utils.Networks
 
 import scala.async.Async._
 import scala.concurrent.Future
@@ -46,7 +47,7 @@ class HttpService(
   private def bind() = {
     Http().bindAndHandle(
       handler = route,
-      interface = "0.0.0.0",
+      interface = Networks().hostname,
       port = 0
     )
   }
