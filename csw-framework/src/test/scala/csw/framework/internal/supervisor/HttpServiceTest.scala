@@ -11,13 +11,13 @@ import org.mockito.ArgumentMatchersSugar.any
 import org.mockito.MockitoSugar
 import org.mockito.captor.ArgCaptor
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpecLike
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 
-class HttpServiceTest extends AnyWordSpecLike with MockitoSugar with ScalaFutures with Matchers {
+class HttpServiceTest extends AnyFunSuiteLike with MockitoSugar with ScalaFutures with Matchers {
 
   private val locationService                                          = mock[LocationService]
   private val route                                                    = mock[Route]
@@ -27,19 +27,17 @@ class HttpServiceTest extends AnyWordSpecLike with MockitoSugar with ScalaFuture
   implicit override val patienceConfig: PatienceConfig                 = PatienceConfig(10.seconds, 100.millis)
   private val hostname                                                 = Networks().hostname
 
-  "Embedded Http Server" must {
-    "Bind and register to Private Network Type | CSW-96" in {
-      val httpService                        = new HttpService(locationService, route, logger, httpConnection)
-      val result: Future[RegistrationResult] = Future.successful(mock[RegistrationResult])
-      when(locationService.register(any[HttpRegistration])).thenReturn(result)
+  test("Embedded Http Server must Bind and register to Private Network Type | CSW-96") {
+    val httpService                        = new HttpService(locationService, route, logger, httpConnection)
+    val result: Future[RegistrationResult] = Future.successful(mock[RegistrationResult])
+    when(locationService.register(any[HttpRegistration])).thenReturn(result)
 
-      val (binding, _) = httpService.bindAndRegister().futureValue
+    val (binding, _) = httpService.bindAndRegister().futureValue
 
-      val captor = ArgCaptor[HttpRegistration]
+    val captor = ArgCaptor[HttpRegistration]
 
-      binding.localAddress.getAddress.getHostAddress shouldBe hostname
-      verify(locationService).register(captor)
-      captor.value.networkType shouldBe NetworkType.Private
-    }
+    binding.localAddress.getAddress.getHostAddress shouldBe hostname
+    verify(locationService).register(captor)
+    captor.value.networkType shouldBe NetworkType.Private
   }
 }
