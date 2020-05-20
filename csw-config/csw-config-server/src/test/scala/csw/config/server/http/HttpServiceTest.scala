@@ -61,7 +61,9 @@ class HttpServiceTest extends HTTPLocationService {
     location.uri.getHost shouldBe hostname
     location.uri.getPort shouldBe _servicePort
     location.connection shouldBe ConfigServiceConnection.value
+    //should not bind to all but specific hostname IP
     SocketUtils.isAddressInUse(hostname, _servicePort) shouldBe true
+    SocketUtils.isAddressInUse("localhost", _servicePort) shouldBe false
     actorRuntime.shutdown().futureValue
   }
 
