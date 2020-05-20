@@ -24,8 +24,15 @@ class ArgsParserTest extends AnyFunSuite with Matchers {
     silentParse(args) shouldBe None
   }
 
-  test("parse with all arguments") {
-    val args = Array("--clusterPort", "1234")
-    silentParse(args) shouldBe Some(Options(Some(1234)))
+  test("parse with clusterPort argument and without publicNetwork argument | CSW-89") {
+    val args    = Array("--clusterPort", "1234")
+    val port    = 1234
+    val `false` = false
+    silentParse(args) shouldBe Some(Options(Some(port), publicNetwork = `false`))
+  }
+
+  test("parse with publicNetwork argument | CSW-89") {
+    val args = Array("--publicNetwork")
+    silentParse(args) shouldBe Some(Options(publicNetwork = true))
   }
 }

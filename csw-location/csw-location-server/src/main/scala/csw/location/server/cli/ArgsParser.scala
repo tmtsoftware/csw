@@ -18,8 +18,8 @@ class ArgsParser(name: String) {
     opt[Unit]("publicNetwork")
       .action((_, c) => c.copy(publicNetwork = true))
       .text(
-        "binds http location service to all hosts making it available to other machines in the " +
-          "network. This will also enable auth by default."
+        "Optional: Binds http location service to public network IP making it available to machines in the " +
+          "public network. This will also enable auth by default."
       )
 
     help("help")
