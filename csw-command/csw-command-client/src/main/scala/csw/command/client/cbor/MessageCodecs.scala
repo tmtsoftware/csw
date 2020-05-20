@@ -1,9 +1,9 @@
 package csw.command.client.cbor
 
-import akka.actor.typed.{ActorRef, ActorRefResolver, ActorSystem}
 import csw.command.client.messages.CommandSerializationMarker.RemoteMsg
 import csw.command.client.messages.sequencer.CswSequencerMessage
 import csw.command.client.models.framework._
+import csw.commons.codecs.ActorCodecs
 import csw.location.api.codec.LocationCodecs
 import csw.logging.models.codecs.LoggingCodecs
 import csw.params.core.formats.ParamCodecs
@@ -16,18 +16,7 @@ trait MessageCodecs extends MessageCodecsBase {
   implicit lazy val messageRemoteMsgCodec: Codec[RemoteMsg]                       = deriveAllCodecs
 }
 
-trait MessageCodecsBase extends ParamCodecs with LoggingCodecs with LocationCodecs {
-
-  implicit def actorSystem: ActorSystem[_]
-
-  implicit def actorRefCodec[T]: Codec[ActorRef[T]] = {
-    val resolver = ActorRefResolver(actorSystem)
-
-    Codec.bimap[String, ActorRef[T]](
-      resolver.toSerializationFormat,
-      resolver.resolveActorRef
-    )
-  }
+trait MessageCodecsBase extends ParamCodecs with LoggingCodecs with LocationCodecs with ActorCodecs {
 
   def pubSubCodecValue[T: Encoder: Decoder]: Codec[PubSub[T]] = deriveAllCodecs
 

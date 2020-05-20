@@ -1,4 +1,4 @@
-package csw.command.client.cbor
+package csw.commons.cbor
 
 import akka.serialization.Serializer
 import csw.logging.api.scaladsl.Logger

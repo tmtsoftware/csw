@@ -403,7 +403,7 @@ lazy val `csw-command-client` = project
     `csw-location-api`.jvm,
     `csw-location-client` % "test->test",
     `csw-location-server` % "test->test",
-    `csw-commons`         % "test->test"
+    `csw-commons`         % "compile->compile;test->test"
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.CommandClient.value)
