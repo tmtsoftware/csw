@@ -46,6 +46,27 @@ class ArgsParserTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
     x should contain(Options(List(Prefix("csw.aas")), Some("sleep 5"), Some(port), None, None, httpPath = Some("testPath")))
   }
 
+  test("test parser for publicNetwork command line argument | CSW-96") {
+    val services = "csw.aas"
+    val args =
+      Array("--prefix", services, "--publicNetwork")
+
+    val x: Option[Options] = silentParse(args)
+    x should contain(Options(prefixes = List(Prefix(services)), publicNetwork = true))
+  }
+
+  test("test parser when publicNetwork command line argument not provided | CSW-96") {
+    val services = "csw.aas"
+    val args =
+      Array("--prefix", services)
+
+    val x: Option[Options] = silentParse(args)
+    val `false`            = false
+    x should contain(
+      Options(List(Prefix(services)), None, None, None, None, noExit = false, None, publicNetwork = `false`)
+    )
+  }
+
   test("test parser with invalid service name combinations | ") {
     val port = 5555
     val listOfInvalidServices: List[String] =

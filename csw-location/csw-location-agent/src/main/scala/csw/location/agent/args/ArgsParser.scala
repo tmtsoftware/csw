@@ -47,6 +47,11 @@ class ArgsParser(name: String) {
       c.copy(httpPath = Some(p))
     } text "The parameter is optional. Registers services as http with path provided, by default services will be registered as tcp "
 
+    opt[Unit]("publicNetwork") action { (_, c) =>
+      c.copy(publicNetwork = true)
+    } text "The parameter is optional. Registers service using public network IP, by default service will be " +
+      "registered using private network IP "
+
     help("help")
     version("version")
   }

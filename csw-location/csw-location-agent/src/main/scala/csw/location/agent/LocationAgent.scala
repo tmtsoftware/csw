@@ -21,7 +21,7 @@ import scala.util.control.NonFatal
 /**
  * Starts a given external program ([[Connection.TcpConnection]]), registers it with the location service and unregisters it when the program exits.
  */
-class LocationAgent(prefixes: List[Prefix], command: Command, wiring: Wiring) {
+class LocationAgent(prefixes: List[Prefix], command: Command, networkType: NetworkType, wiring: Wiring) {
   private val log: Logger = LocationAgentLogger.getLogger
 
   private val timeout: FiniteDuration = 10.seconds
@@ -67,7 +67,7 @@ class LocationAgent(prefixes: List[Prefix], command: Command, wiring: Wiring) {
   private def registerHttpName(prefix: Prefix, path: String): Future[RegistrationResult] = {
     val componentId = models.ComponentId(prefix, ComponentType.Service)
     val connection  = HttpConnection(componentId)
-    locationService.register(HttpRegistration(connection, command.port, path))
+    locationService.register(HttpRegistration(connection, command.port, path, networkType))
   }
 
   // Registers a shutdownHook to handle service un-registration during abnormal exit

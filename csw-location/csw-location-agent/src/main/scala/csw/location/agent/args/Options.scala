@@ -1,6 +1,7 @@
 package csw.location.agent.args
 import java.io.File
 
+import csw.location.api.models.NetworkType
 import csw.prefix.models.Prefix
 
 /**
@@ -14,6 +15,7 @@ import csw.prefix.models.Prefix
  * @param delay         Number of milliseconds to wait for the app to start
  * @param noExit        For testing, prevents application from exiting after running the command
  * @param httpPath      For registering services as Http location with the given path
+ * @param publicNetwork Optional. To register services using public network IP rather than default private network IP
  */
 case class Options(
     prefixes: List[Prefix] = Nil,
@@ -22,5 +24,8 @@ case class Options(
     appConfigFile: Option[File] = None,
     delay: Option[Int] = None,
     noExit: Boolean = false,
-    httpPath: Option[String] = None
-)
+    httpPath: Option[String] = None,
+    publicNetwork: Boolean = false
+) {
+  val networkType: NetworkType = if (publicNetwork) NetworkType.Public else NetworkType.Private
+}
