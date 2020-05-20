@@ -37,7 +37,7 @@ class HttpServiceTest extends AnyWordSpecLike with MockitoSugar with ScalaFuture
 
       val captor = ArgCaptor[HttpRegistration]
 
-      binding.localAddress.getHostName shouldBe hostname
+      binding.localAddress.getAddress.getHostAddress shouldBe hostname
       verify(locationService).register(captor)
       captor.value.networkType shouldBe NetworkType.Private
     }
