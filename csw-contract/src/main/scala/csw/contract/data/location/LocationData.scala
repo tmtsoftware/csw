@@ -30,9 +30,10 @@ trait LocationData {
   val tcpConnection: TcpConnection   = TcpConnection(componentId)
   val connectionInfo: ConnectionInfo = ConnectionInfo(prefix, ComponentType.HCD, ConnectionType.AkkaType)
 
-  val akkaRegistration: Registration = AkkaRegistration(akkaConnection, uriPath)
-  val httpRegistration: Registration = HttpRegistration(httpConnection, port, pathString)
-  val tcpRegistration: Registration  = TcpRegistration(tcpConnection, port)
+  val akkaRegistration: Registration       = AkkaRegistration(akkaConnection, uriPath)
+  val httpRegistration: Registration       = HttpRegistration(httpConnection, port, pathString)
+  val publicHttpRegistration: Registration = HttpRegistration(httpConnection, port, pathString, NetworkType.Public)
+  val tcpRegistration: Registration        = TcpRegistration(tcpConnection, port)
 
   val akkaLocation: Location = AkkaLocation(akkaConnection, uriPath)
   val httpLocation: Location = HttpLocation(httpConnection, uriPath)
@@ -48,6 +49,7 @@ trait LocationData {
 
   val akkaRegister: Register                           = Register(akkaRegistration)
   val httpRegister: Register                           = Register(httpRegistration)
+  val publicHttpRegister: Register                     = Register(publicHttpRegistration)
   val unregister: Unregister                           = Unregister(httpConnection)
   val unregisterAll: UnregisterAll.type                = UnregisterAll
   val find: Find                                       = Find(akkaConnection)

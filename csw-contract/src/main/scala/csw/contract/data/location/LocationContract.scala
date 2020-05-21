@@ -14,7 +14,7 @@ import io.bullet.borer.Encoder
 
 object LocationContract extends LocationData with LocationServiceCodecs {
   val models: ModelSet = ModelSet(
-    ModelType(akkaRegistration, httpRegistration, tcpRegistration),
+    ModelType(akkaRegistration, httpRegistration, publicHttpRegistration, tcpRegistration),
     ModelType(akkaLocation, httpLocation, tcpLocation),
     ModelType(locationUpdated, locationRemoved),
     ModelType(ConnectionType),
@@ -48,7 +48,7 @@ object LocationContract extends LocationData with LocationServiceCodecs {
   implicit def websocketEnc[Sub <: LocationWebsocketMessage]: Encoder[Sub] = SubTypeCodec.encoder(locationWebsocketMessageCodec)
 
   val httpRequests: ModelSet = ModelSet(
-    ModelType(akkaRegister, httpRegister),
+    ModelType(akkaRegister, httpRegister, publicHttpRegister),
     ModelType(unregister),
     ModelType(unregisterAll),
     ModelType(find),
