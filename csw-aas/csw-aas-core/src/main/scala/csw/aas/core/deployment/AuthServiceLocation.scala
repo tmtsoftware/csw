@@ -1,7 +1,7 @@
 package csw.aas.core.deployment
 
 import csw.aas.core.commons.{AASConnection, AuthLogger}
-import csw.location.api.models.{HttpLocation, HttpRegistration}
+import csw.location.api.models.{HttpLocation, HttpRegistration, NetworkType}
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 
 import scala.async.Async.{async, _}
@@ -38,7 +38,7 @@ private[csw] class AuthServiceLocation(locationService: LocationService) {
   private[csw] def register(authServicePort: Int): Future[RegistrationResult] = {
     val authServicePath = "auth"
     debug(s"registering aas with location service on port: $authServicePort and at path: $authServicePath")
-    val httpRegistration   = HttpRegistration(AASConnection.value, authServicePort, authServicePath)
+    val httpRegistration   = HttpRegistration(AASConnection.value, authServicePort, authServicePath, NetworkType.Public)
     val registrationResult = locationService.register(httpRegistration)
     debug("aas registered with location service")
     registrationResult
