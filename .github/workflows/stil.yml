@@ -18,7 +18,7 @@ jobs:
 
       - name: Configure ntp time
         run: |
-          sudo apt-get install ntp -y
+          sudo yum install ntp -y
           sudo ntptime -T 37
 
       - name: Tests
@@ -62,7 +62,7 @@ jobs:
         with:
           job-status: Success
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
-          channel: ci-dev
+          channel: ci-nightly
 
   slack-failure:
     needs: [unit-tests, multi-jvm-tests]
@@ -73,7 +73,7 @@ jobs:
         with:
           job-status: Failure
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
-          channel: ci-dev
+          channel: ci-nightly
 
   slack-cancelled:
     needs: [unit-tests, multi-jvm-tests]
@@ -84,4 +84,4 @@ jobs:
         with:
           job-status: Cancelled
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
-          channel: ci-dev
+          channel: ci-nightly
