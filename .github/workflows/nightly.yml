@@ -2,11 +2,11 @@ name: nightly
 
 on:
   schedule:
-    - cron: '30 18 * * *' # run at 00:00 AM IST
+    - cron: "30 18 * * *" # run at 00:00 AM IST
 
 jobs:
   test:
-    runs-on: self-hosted
+    runs-on: [self-hosted, tw_runner]
 
     steps:
       - uses: actions/checkout@v2

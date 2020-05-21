@@ -1,0 +1,87 @@
+name: stil
+
+on:
+  push:
+    branches: [master]
+  schedule:
+    - cron: "30 18 * * *" # run at 00:00 AM IST
+
+jobs:
+  unit-tests:
+    runs-on: [self-hosted, stil_runner]
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: olafurpg/setup-scala@v7
+        with:
+          java-version: adopt@1.11
+
+      - name: Configure ntp time
+        run: |
+          sudo apt-get install ntp -y
+          sudo ntptime -T 37
+
+      - name: Tests
+        run: |
+          sbt -DenableCoverage=true ';set every enableFatalWarnings := true; csw-time/test:test'
+          sbt -DenableCoverage=true -DdisableTimeTests ';set every enableFatalWarnings := true; test:test'
+
+      - name: Coverage Report
+        run: |
+          sbt -DenableCoverage=true coverageReport
+          sbt coverageAggregate
+
+      - uses: actions/upload-artifact@v1
+        with:
+          name: Coverage Report
+          path: target/scala-2.13/scoverage-report
+
+  multi-jvm-tests:
+    runs-on: [self-hosted, stil_runner]
+
+    steps:
+      - uses: actions/checkout@v1
+      - uses: olafurpg/setup-scala@v5
+        with:
+          java-version: adopt@1.11
+
+      - name: Docs Check
+        run: |
+          sbt clean scalafmtCheck scalastyle
+          sbt makeSite
+
+      - name: Multi-Jvm Tests
+        run: sbt ';set every enableFatalWarnings := true; integration/multi-jvm:test'
+
+  slack-success:
+    needs: [unit-tests, multi-jvm-tests]
+    if: success()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: kpritam/slack-job-status-action@v1
+        with:
+          job-status: Success
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+          channel: ci-dev
+
+  slack-failure:
+    needs: [unit-tests, multi-jvm-tests]
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: kpritam/slack-job-status-action@v1
+        with:
+          job-status: Failure
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+          channel: ci-dev
+
+  slack-cancelled:
+    needs: [unit-tests, multi-jvm-tests]
+    if: cancelled()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: kpritam/slack-job-status-action@v1
+        with:
+          job-status: Cancelled
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+          channel: ci-dev
