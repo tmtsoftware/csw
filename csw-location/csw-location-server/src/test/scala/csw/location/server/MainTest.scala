@@ -27,6 +27,7 @@ class MainTest extends AnyFunSuiteLike with Matchers with BeforeAndAfterAll with
 
     binding.localAddress.getAddress.getHostAddress shouldBe `127.0.0.1`
     SocketUtils.isAddressInUse(`127.0.0.1`, httpPort) shouldBe true
+    binding.terminate(2.seconds).futureValue
     wiring.actorRuntime.shutdown().futureValue
   }
 
@@ -40,6 +41,7 @@ class MainTest extends AnyFunSuiteLike with Matchers with BeforeAndAfterAll with
 
     binding.localAddress.getAddress.getHostAddress shouldBe hostname
     SocketUtils.isAddressInUse(hostname, httpPort) shouldBe true
+    binding.terminate(2.seconds).futureValue
     wiring.actorRuntime.shutdown().futureValue
   }
 }
