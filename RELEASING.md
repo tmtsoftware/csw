@@ -38,6 +38,3 @@ Release `csw-js` if keycloak version is updated in csw. Refer the **RELEASING.md
 
 Refer to **RELEASING.md** in `esw` repo.
 
-### Release csw-shell
-
-Refer **RELEASING.md** of `csw-shell` repo.
