@@ -4,7 +4,7 @@ List of environment variables which needs to be set for using different Csw serv
 
 | Variable       | Dev       | Prod      | Needs to set before   | Description               |
 | :------------: |:--------: | :-------: | :------------------:  | :------------------------ |
-| CLUSTER_SEEDS   | Optional | Mandatory | starting csw services | The Host and port of the seed nodes of cluster, Ex. CLUSTER_SEEDS=“127.0.0.1:3552, 127.0.0.2:3552”. |
+| CLUSTER_SEEDS   | Optional | Mandatory | starting csw services | The Host and port of the seed nodes of cluster, Ex. CLUSTER_SEEDS=“192.168.1.21:3552, 192.168.1.22:3552”. |
 | INTERFACE_NAME  | Optional | Mandatory | starting csw services | Network interface in which the Akka cluster is formed, Ex. INTERFACE_NAME=en0. |
 | PUBLIC_INTERFACE_NAME  | Optional | Mandatory (for services exposed to Outside network) | starting csw services | Network interface in which services exposed to Outside network are registered, Ex. INTERFACE_NAME=en1. |
 | MANAGEMENT_PORT | Optional  | Optional  | starting location service |  Port on which the Akka provided cluster management service will start (if not provided service won’t start) |

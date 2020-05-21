@@ -31,38 +31,47 @@ Make sure you set all necessary @ref[environment variables](../deployment/env-va
 
 **Running**: Switch to the application directory and run this command - `./bin/csw-location-server --clusterPort=3552`
 
-### Starting Location Server on two machines
-The steps below describe how to run the Location Server on multiple machines, which is the recommended set-up for production usage.
+### Starting Location Server on multiple machines
+In production environment, you will need a capability to access resources of HTTP interface of Location Server
+from @ref:[public network](../deployment/network-topology.md) and provide Authentication and Authorization for some
+critical HTTP resource endpoints. E.g. ability to register/unregister components(which has to undergo maintenance), 
+from a system operator machine present in @ref:[public network](../deployment/network-topology.md)
 
 **Preparation**:
-Identify machines which are running the Location Server and whose IP and port are known. Let's assume they are two for now, and the IP address for machine1 is 192.168.1.21 and
-for machine2 is 192.168.1.22. Also, they will both have dedicated port 3552 to run the Location Server. 
+Identify machines to run Location Server and form Akka cluster and whose IP and port are known. Let's assume they are 3
+for now and IP addresses are machine1 192.168.1.21, machine2 192.168.1.22 and machine3 192.168.1.23. Also, they
+will have dedicated port 3552 to run the Location Server akka interface. 
 
 **Provisioning**:
 Make sure you set all necessary @ref[environment variables](../deployment/env-vars.md).
 
-Switch to application directory and run this command on **machine1 and machine2** - `./bin/csw-location-server --clusterPort=3552`
+`AAS` means Authentication and Authorization Service
 
-Note : `Outside` below means any machine not present in this Akka cluster.
+1.  Switch to application directory and run this command on all machines where you want Location Server in `local-only`
+mode and AAS `disabled`.
+    ```
+    ./bin/csw-location-server --clusterPort=3552 
+    ``` 
 
-In production environment, you may need a capability to access protected resources of Location Server and provide
- Authentication and Authorization for such resources. E.g. ability to register/unregister components(which has to undergo maintenance) from a system operator machine present
- `Outside`.
+2.  Switch to application directory and run this command on all machines where you want Location Server in `public mode`
+and AAS `enabled`.
+    ```
+    ./bin/csw-location-server --clusterPort=3552 --publicNetwork
+    ``` 
 
-1. To enable this, an additional command line argument is available when starting Location Server
-    1. Default is local-only mode and such location server will not be accessible from `Outside`
-    2. Other option is `--publicNetwork`, it means start location server in public mode with auth enabled
-2. Switch to application directory and run this command on all machines where you want Location Server in local-only
- mode (authentication and authorization disabled) - `./bin/csw-location-server --clusterPort=3552` 
-3. Switch to application directory and run this command on all machines where you want Location Server in public
- mode (authentication and authorization enabled) - `./bin/csw-location-server --clusterPort=3552 --publicNetwork`  
-4. Once Akka cluster is up, start @ref:[Authentication and Authorization Service](../services/aas.md) on one of the
- node where Location Server is running in local-only mode, so that it can register itself to this Location Server
-  without the need of authentication and authorization. 
-5. Other Location Server instances including public mode instances will get location of Authentication and
- Authorization Service automatically.
-6. When any application(E.g. Dashboard application used by Operator to monitor System health) wants to access protected
- resource of Location Server, it can connect to any public mode Location Server, pass a valid token and access it.
+3.  Once the Akka cluster formation is done, start @ref:[AAS](../services/aas.md) 
+on one of the node where Location Server is running in `local-only` mode, so that it can register itself to this
+Location Server without the need of authentication and authorization. 
+
+4.  Other Location Server instances including public mode instances will get location of AAS automatically using
+ location server akka cluster.
+
+5.  Now if application in @ref:[public network](../deployment/network-topology.md) wants to access protected resources
+of Location Server, it can connect to any `public mode` Location Server, pass a valid token and access it.
+
+Note : Resolution of AAS is made `lazy` by intention in location server. It will only be resolved `by need` when
+first request on protected resource comes to `public mode` location-server. This helps to resolve
+cyclic dependency during startup of `public mode` location-server and AAS(keycloak) registration.
 
 ### Help
 Use the following command to get help on the options available with this app.
