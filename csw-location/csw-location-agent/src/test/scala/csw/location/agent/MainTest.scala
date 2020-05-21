@@ -6,7 +6,6 @@ import akka.actor.typed
 import akka.actor.typed.scaladsl.Behaviors
 import com.typesafe.config.ConfigFactory
 import csw.commons.ResourceReader
-import csw.location.agent.common.TestFutureExtension.RichFuture
 import csw.location.api.models
 import csw.location.api.models.Connection.{HttpConnection, TcpConnection}
 import csw.location.api.models.{ComponentId, ComponentType, NetworkType}
@@ -14,12 +13,13 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.network.utils.Networks
 import csw.prefix.models.Prefix
 import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.funsuite.AnyFunSuiteLike
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.DurationInt
 
 // DEOPSCSW-592: Create csw testkit for component writers
-class MainTest extends ScalaTestFrameworkTestKit with AnyFunSuiteLike {
+class MainTest extends ScalaTestFrameworkTestKit with AnyFunSuiteLike with ScalaFutures {
 
   implicit private val system: typed.ActorSystem[_] = typed.ActorSystem(Behaviors.empty, "test-system")
   private val locationService                       = HttpLocationServiceFactory.makeLocalClient
@@ -28,7 +28,7 @@ class MainTest extends ScalaTestFrameworkTestKit with AnyFunSuiteLike {
 
   override def afterAll(): Unit = {
     system.terminate()
-    system.whenTerminated.await
+    system.whenTerminated.futureValue
     super.afterAll()
   }
 
@@ -78,25 +78,25 @@ class MainTest extends ScalaTestFrameworkTestKit with AnyFunSuiteLike {
     val process = Main.start(args).get._1
 
     val connection       = TcpConnection(ComponentId(Prefix(name), ComponentType.Service))
-    val resolvedLocation = locationService.resolve(connection, 5.seconds).await.get
+    val resolvedLocation = locationService.resolve(connection, 5.seconds).futureValue.get
 
     resolvedLocation.connection shouldBe connection
     resolvedLocation.uri shouldBe new URI(s"tcp://${Networks().hostname}:$port")
 
     process.destroy()
-    eventually(locationService.list.await shouldBe List.empty)
+    eventually(locationService.list.futureValue shouldBe List.empty)
   }
 
   private def testWithHttp(args: Array[String], name: String, port: Int, path: String, hostname: String): Any = {
     val process = Main.start(args).get._1
 
     val connection       = HttpConnection(models.ComponentId(Prefix(name), ComponentType.Service))
-    val resolvedLocation = locationService.resolve(connection, 5.seconds).await.get
+    val resolvedLocation = locationService.resolve(connection, 5.seconds).futureValue.get
 
     resolvedLocation.connection shouldBe connection
     resolvedLocation.uri shouldBe new URI(s"http://${hostname}:$port/$path")
 
     process.destroy()
-    eventually(locationService.list.await shouldBe List.empty)
+    eventually(locationService.list.futureValue shouldBe List.empty)
   }
 }
