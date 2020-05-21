@@ -8,7 +8,7 @@ import com.typesafe.config.ConfigFactory
 import csw.commons.ResourceReader
 import csw.location.api.models
 import csw.location.api.models.Connection.{HttpConnection, TcpConnection}
-import csw.location.api.models.{ComponentId, ComponentType, NetworkType}
+import csw.location.api.models.{ComponentId, ComponentType}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.network.utils.Networks
 import csw.prefix.models.Prefix
@@ -36,31 +36,16 @@ class MainTest extends ScalaTestFrameworkTestKit with AnyFunSuiteLike with Scala
     val name = "csw.test1"
     val port = 9999
     val args = Array("--prefix", name, "--command", "sleep 200", "--port", port.toString, "--no-exit")
-    testWithTcp(args, name, port)
+    testWithTcp(args, name, port, Networks().hostname)
   }
 
   //DEOPSCSW-628: Add support for registering service as HTTP in location agent
-  test(
-    "Test with command line args with http option and default private Network option | DEOPSCSW-592, DEOPSCSW-628 | " +
-      "CSW-96"
-  ) {
+  test("Test with command line args  with http option | DEOPSCSW-592, DEOPSCSW-628, CSW-96 ") {
     val name = "csw.test3"
     val port = 9998
     val path = "testPath"
     val args = Array("--prefix", name, "--command", "sleep 200", "--port", port.toString, "--no-exit", "--http", path)
     testWithHttp(args, name, port, path, Networks().hostname)
-  }
-
-  test(
-    "Test with command line args with http and public Network option | DEOPSCSW-592, DEOPSCSW-628 | " +
-      "CSW-96"
-  ) {
-    val name = "csw.test3"
-    val port = 9998
-    val path = "testPath"
-    val args =
-      Array("--prefix", name, "--command", "sleep 200", "--port", port.toString, "--no-exit", "--http", path, "--publicNetwork")
-    testWithHttp(args, name, port, path, Networks(NetworkType.Public.envKey).hostname)
   }
 
   // CSW-86: Subsystem should be case-insensitive
@@ -71,32 +56,33 @@ class MainTest extends ScalaTestFrameworkTestKit with AnyFunSuiteLike with Scala
     val port       = config.getInt("CSW.test2.port")
 
     val args = Array("--prefix", name, "--no-exit", configFile.getAbsolutePath)
-    testWithTcp(args, name, port)
+    testWithTcp(args, name, port, Networks().hostname)
   }
 
-  private def testWithTcp(args: Array[String], name: String, port: Int) = {
-    val process = Main.start(args).get._1
+  private def testWithTcp(args: Array[String], name: String, port: Int, hostname: String): Any = {
+    val (process, wiring) = Main.start(args).get
 
     val connection       = TcpConnection(ComponentId(Prefix(name), ComponentType.Service))
     val resolvedLocation = locationService.resolve(connection, 5.seconds).futureValue.get
 
     resolvedLocation.connection shouldBe connection
-    resolvedLocation.uri shouldBe new URI(s"tcp://${Networks().hostname}:$port")
-
+    resolvedLocation.uri shouldBe new URI(s"tcp://$hostname:$port")
     process.destroy()
+    wiring.actorRuntime.shutdown()
     eventually(locationService.list.futureValue shouldBe List.empty)
   }
 
   private def testWithHttp(args: Array[String], name: String, port: Int, path: String, hostname: String): Any = {
-    val process = Main.start(args).get._1
+    val (process, wiring) = Main.start(args).get
 
     val connection       = HttpConnection(models.ComponentId(Prefix(name), ComponentType.Service))
     val resolvedLocation = locationService.resolve(connection, 5.seconds).futureValue.get
 
     resolvedLocation.connection shouldBe connection
-    resolvedLocation.uri shouldBe new URI(s"http://${hostname}:$port/$path")
+    resolvedLocation.uri shouldBe new URI(s"http://$hostname:$port/$path")
 
     process.destroy()
+    wiring.actorRuntime.shutdown()
     eventually(locationService.list.futureValue shouldBe List.empty)
   }
 }

@@ -9,8 +9,7 @@ import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.duration.DurationInt
 class MainTest extends AnyFunSuiteLike with Matchers with BeforeAndAfterAll with ScalaFutures {
-  private val clusterSeedIp = Networks().hostname
-  //TODO bind to available port rather than 7654
+  private val clusterSeedIp             = Networks().hostname
   private val httpPort                  = 7654
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 100.millis)
 
@@ -22,14 +21,13 @@ class MainTest extends AnyFunSuiteLike with Matchers with BeforeAndAfterAll with
     val clusterPort = SocketUtils.getFreePort
     System.clearProperty("CLUSTER_SEEDS")
     System.setProperty("CLUSTER_SEEDS", s"$clusterSeedIp:$clusterPort")
-    val localhost = "127.0.0.1"
+    val `127.0.0.1` = "127.0.0.1"
 
-    val (binding, _) = Main.start(Array("--clusterPort", s"$clusterPort")).get
+    val (binding, wiring) = Main.start(Array("--clusterPort", s"$clusterPort")).get
 
-    binding.localAddress.getAddress.getHostAddress shouldBe localhost
-    SocketUtils.isAddressInUse(localhost, httpPort) shouldBe true
-    binding.terminate(5.seconds).futureValue
-    SocketUtils.isAddressInUse(localhost, httpPort) shouldBe false
+    binding.localAddress.getAddress.getHostAddress shouldBe `127.0.0.1`
+    SocketUtils.isAddressInUse(`127.0.0.1`, httpPort) shouldBe true
+    wiring.actorRuntime.shutdown().futureValue
   }
 
   test("Bind location server to Public Network IP with publicNetwork option | CSW-96, CSW-89") {
@@ -38,11 +36,10 @@ class MainTest extends AnyFunSuiteLike with Matchers with BeforeAndAfterAll with
     System.setProperty("CLUSTER_SEEDS", s"$clusterSeedIp:$clusterPort")
     val hostname = Networks(NetworkType.Public.envKey).hostname
 
-    val (binding, _) = Main.start(Array("--clusterPort", s"$clusterPort", "--publicNetwork")).get
+    val (binding, wiring) = Main.start(Array("--clusterPort", s"$clusterPort", "--publicNetwork")).get
 
     binding.localAddress.getAddress.getHostAddress shouldBe hostname
     SocketUtils.isAddressInUse(hostname, httpPort) shouldBe true
-    binding.terminate(5.seconds).futureValue
-    SocketUtils.isAddressInUse(hostname, httpPort) shouldBe false
+    wiring.actorRuntime.shutdown().futureValue
   }
 }

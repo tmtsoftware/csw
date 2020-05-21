@@ -10,6 +10,7 @@ import csw.network.utils.{Networks, SocketUtils}
 import org.mockito.ArgumentMatchersSugar.any
 import org.mockito.MockitoSugar
 import org.mockito.captor.ArgCaptor
+import org.scalatest.BeforeAndAfterAll
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers
@@ -17,7 +18,7 @@ import org.scalatest.matchers.should.Matchers
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 
-class HttpServiceTest extends AnyFunSuiteLike with MockitoSugar with ScalaFutures with Matchers {
+class HttpServiceTest extends AnyFunSuiteLike with MockitoSugar with ScalaFutures with Matchers with BeforeAndAfterAll {
 
   private val locationService                                          = mock[LocationService]
   private val route                                                    = mock[Route]
@@ -26,6 +27,11 @@ class HttpServiceTest extends AnyFunSuiteLike with MockitoSugar with ScalaFuture
   private implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), "test")
   implicit override val patienceConfig: PatienceConfig                 = PatienceConfig(10.seconds, 100.millis)
   private val hostname                                                 = Networks().hostname
+
+  override def afterAll(): Unit = {
+    actorSystem.terminate()
+    actorSystem.whenTerminated.futureValue
+  }
 
   test("Embedded Http Server must Bind and register to Private Network Type | CSW-96") {
     val httpService                        = new HttpService(locationService, route, logger, httpConnection)
@@ -42,5 +48,6 @@ class HttpServiceTest extends AnyFunSuiteLike with MockitoSugar with ScalaFuture
     //should not bind to all but specific hostname IP
     SocketUtils.isAddressInUse(hostname, binding.localAddress.getPort) shouldBe true
     SocketUtils.isAddressInUse("localhost", binding.localAddress.getPort) shouldBe false
+    binding.terminate(2.seconds).futureValue
   }
 }
