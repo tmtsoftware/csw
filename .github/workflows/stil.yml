@@ -1,8 +1,6 @@
 name: stil
 
 on:
-  push:
-    branches: [master]
   schedule:
     - cron: "30 18 * * *" # run at 00:00 AM IST
 
@@ -40,7 +38,7 @@ jobs:
     runs-on: [self-hosted, stil_runner]
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - uses: olafurpg/setup-scala@v5
         with:
           java-version: adopt@1.11
