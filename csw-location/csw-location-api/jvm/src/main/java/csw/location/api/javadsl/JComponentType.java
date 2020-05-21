@@ -33,6 +33,11 @@ public interface JComponentType {
     ComponentType SequenceComponent = ComponentType.SequenceComponent$.MODULE$;
 
     /**
+     * A sequence component e.g ocs_1, iris_1
+     */
+    ComponentType SequenceManager = ComponentType.SequenceManager$.MODULE$;
+
+    /**
      * A general purpose service component (actor and/or web service application)
      */
     ComponentType Service = ComponentType.Service$.MODULE$;

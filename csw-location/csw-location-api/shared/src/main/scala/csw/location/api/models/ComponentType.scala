@@ -9,7 +9,7 @@ import scala.collection.immutable.IndexedSeq
  * Represents a type of the Component. It should be serializable since it has to be transmittable over the network.
  * The type will always be represented in lower case.
  *
- * @param messageManifest represents the class name of message that a component will understand
+  * @param messageManifest represents the class name of message that a component will understand
  */
 sealed abstract class ComponentType(val messageManifest: String) extends EnumEntry with Snakecase {
 
@@ -50,6 +50,11 @@ object ComponentType extends Enum[ComponentType] {
    * Represents a sequence component e.g ocs_1, iris_1
    */
   case object SequenceComponent extends ComponentType("SequenceComponentMsg")
+
+  /**
+   * Represents a sequence component e.g ocs_1, iris_1
+   */
+  case object SequenceManager extends ComponentType("SequenceManagerMsg")
 
   /**
    * Represents a general purpose service component e.g. actor and/or web service application
