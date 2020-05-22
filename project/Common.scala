@@ -31,7 +31,6 @@ object Common extends AutoPlugin {
 
   import autoImport._
   override lazy val projectSettings: Seq[Setting[_]] = Seq(
-    dependencyOverrides += AkkaHttp.`akka-http-spray-json`,
     organization := "com.github.tmtsoftware.csw",
     organizationName := "TMT Org",
     scalaVersion := Libs.ScalaVersion,

@@ -531,7 +531,6 @@ object Dependencies {
       Akka.`akka-stream-typed`,
       Akka.`akka-stream-testkit`,
       AkkaHttp.`akka-http`,
-      AkkaHttp.`akka-http-spray-json`,
       Akka.`akka-multi-node-testkit`,
       Libs.`embedded-keycloak`,
       Libs.`lettuce`
