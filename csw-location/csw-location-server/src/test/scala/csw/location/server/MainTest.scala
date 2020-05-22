@@ -21,7 +21,7 @@ class MainTest extends AnyFunSuiteLike with Matchers with BeforeAndAfterAll with
     System.clearProperty("CLUSTER_SEEDS")
   }
 
-  test("when publicNetwork option NOT given, should bind to 127.0.0.1 with auth DISABLED | CSW-96, CSW-89") {
+  ignore("when publicNetwork option NOT given, should bind to 127.0.0.1 with auth DISABLED | CSW-96, CSW-89") {
     val clusterPort = SocketUtils.getFreePort
     System.clearProperty("CLUSTER_SEEDS")
     System.setProperty("CLUSTER_SEEDS", s"$clusterSeedIp:$clusterPort")
@@ -40,7 +40,7 @@ class MainTest extends AnyFunSuiteLike with Matchers with BeforeAndAfterAll with
     wiring.actorRuntime.shutdown().futureValue
   }
 
-  test("when publicNetwork option is given, should bind to Public Network IP with auth ENABLED | CSW-96, CSW-89") {
+  ignore("when publicNetwork option is given, should bind to Public Network IP with auth ENABLED | CSW-96, CSW-89") {
     val clusterPort = SocketUtils.getFreePort
     System.clearProperty("CLUSTER_SEEDS")
     System.setProperty("CLUSTER_SEEDS", s"$clusterSeedIp:$clusterPort")
