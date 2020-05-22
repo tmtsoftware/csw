@@ -45,6 +45,7 @@ object Dependencies {
       Akka.`akka-persistence`,
       Libs.`akka-management-cluster-http`,
       AkkaHttp.`akka-http`,
+      AkkaHttp.`akka-http-spray-json`, // akka-cluster-management uses lower version, to avoid conflict, this needs to be overridden
       MSocket.`msocket-impl-jvm`,
       Libs.`scalatest`.value          % Test,
       Libs.`junit-4-12`               % Test,

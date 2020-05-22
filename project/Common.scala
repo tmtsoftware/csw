@@ -37,8 +37,7 @@ object Common extends AutoPlugin {
     homepage := Some(url("https://github.com/tmtsoftware/csw")),
     resolvers ++= Seq(
       "jitpack" at "https://jitpack.io",
-      "bintray" at "https://jcenter.bintray.com",
-      Resolver.bintrayRepo("lonelyplanet", "maven")
+      "bintray" at "https://jcenter.bintray.com"
     ),
     scmInfo := Some(
       ScmInfo(url("https://github.com/tmtsoftware/csw"), "git@github.com:tmtsoftware/csw.git")

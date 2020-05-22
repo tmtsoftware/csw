@@ -97,8 +97,9 @@ object AkkaHttp {
 
   val `akka-http`            = "com.typesafe.akka" %% "akka-http"            % Version //ApacheV2
   val `akka-http-testkit`    = "com.typesafe.akka" %% "akka-http-testkit"    % Version //ApacheV2
-  val `akka-http-cors`       = "ch.megard"         %% "akka-http-cors"       % "0.4.3"
   val `akka-http-spray-json` = "com.typesafe.akka" %% "akka-http-spray-json" % Version
+
+  val `akka-http-cors` = "ch.megard" %% "akka-http-cors" % "0.4.3"
 }
 
 object Keycloak {
@@ -120,7 +121,7 @@ object Jooq {
 }
 
 object MSocket {
-  val Version = "749078469e"
+  val Version = "4a6a2aa"
 
   val `msocket-api`      = dep("com.github.tmtsoftware.msocket" %%% "msocket-api" % Version)
   val `msocket-impl-jvm` = "com.github.tmtsoftware.msocket" %% "msocket-impl" % Version
