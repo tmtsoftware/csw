@@ -1,7 +1,8 @@
 package csw.command.client.internal
 
-import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.actor.typed.javadsl.Behaviors
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import akka.util.Timeout
 import csw.command.client.SequencerCommandServiceImpl
 import csw.command.client.messages.sequencer.SequencerMsg
 import csw.command.client.messages.sequencer.SequencerMsg.{Query, QueryFinal, SubmitSequence}
@@ -17,13 +18,12 @@ import org.mockito.MockitoSugar
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers
+import scala.concurrent.duration.DurationLong
 
-class SequencerCommandServiceImplTest
-    extends ScalaTestWithActorTestKit
-    with AnyFunSuiteLike
-    with Matchers
-    with MockitoSugar
-    with ScalaFutures {
+class SequencerCommandServiceImplTest extends AnyFunSuiteLike with Matchers with MockitoSugar with ScalaFutures {
+
+  private implicit val system: ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), "sequencer-command-system")
+  private implicit val timeout: Timeout                           = Timeout(10.seconds)
 
   test("should submit sequence to the sequencer") {
     val sequence = Sequence(Setup(Prefix("csw.move"), CommandName("command-1"), None))
@@ -34,19 +34,22 @@ class SequencerCommandServiceImplTest
     val queryFinalResponse: SubmitResponse = Error(queryFinalId, "Failed")
     val queryResponse: SubmitResponse      = Invalid(queryId, IdNotAvailableIssue(queryId.id))
 
-    val sequencer = spawn(Behaviors.receiveMessage[SequencerMsg] {
-      case SubmitSequence(`sequence`, replyTo) =>
-        replyTo ! submitResponse
-        Behaviors.same
-      case QueryFinal(_, replyTo) =>
-        replyTo ! queryFinalResponse
-        Behaviors.same
-      case Query(_, replyTo) =>
-        replyTo ! queryResponse
-        Behaviors.same
+    val sequencer = system.systemActorOf(
+      Behaviors.receiveMessage[SequencerMsg] {
+        case SubmitSequence(`sequence`, replyTo) =>
+          replyTo ! submitResponse
+          Behaviors.same
+        case QueryFinal(_, replyTo) =>
+          replyTo ! queryFinalResponse
+          Behaviors.same
+        case Query(_, replyTo) =>
+          replyTo ! queryResponse
+          Behaviors.same
 
-      case _ => Behaviors.same
-    })
+        case _ => Behaviors.same
+      },
+      "sequencer-actor"
+    )
 
     val location =
       AkkaLocation(
