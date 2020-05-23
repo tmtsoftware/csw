@@ -15,21 +15,43 @@ class NetworksTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with
 
   // DEOPSCSW-673: Make interfaceName environment variable mandatory
   test(
-    "hostname should throw NetworkInterfaceNotProvided when INTERFACE_NAME env variable is not set " +
-      "| DEOPSCSW-673 | CSW-97"
+    "Networks() should throw NetworkInterfaceNotProvided when INTERFACE_NAME env variable is not set" +
+      " | DEOPSCSW-673 | CSW-97"
   ) {
-    a[NetworkInterfaceNotProvided] shouldBe thrownBy(Networks().hostname)
+    val networkInterfaceNotProvided = intercept[NetworkInterfaceNotProvided] { Networks() }
+    networkInterfaceNotProvided.getMessage shouldBe "INTERFACE_NAME env variable is not set."
   }
 
   test(
-    "hostname should throw NetworkInterfaceNotProvided when provided interface name env variable is not set " +
+    "Networks(some-interface-name) should throw NetworkInterfaceNotProvided when provided interface name env variable is not set " +
       "| CSW-97"
   ) {
-    a[NetworkInterfaceNotProvided] shouldBe thrownBy(Networks("some-interface-name-env-key").hostname)
+    val networkInterfaceNotProvided = intercept[NetworkInterfaceNotProvided] { Networks("some-interface-name") }
+    networkInterfaceNotProvided.getMessage shouldBe "some-interface-name env variable is not set."
   }
 
-  test("testGetIpv4Address throws NetworkInterfaceNotFound when provided interface name is not present/valid | ") {
-    a[NetworkInterfaceNotFound] shouldBe thrownBy(Networks(Some("test")))
+  test("Networks.interface() throws NetworkInterfaceNotFound when provided interface name is not present/valid | CSW-97") {
+    val networkInterfaceNotFound = intercept[NetworkInterfaceNotFound] { Networks.interface(Some("test")) }
+    networkInterfaceNotFound.getMessage shouldBe "Network interface=test not found"
+  }
+
+  test(
+    "Networks.publicInterface() throws NetworkInterfaceNotFound when provided public interface name is not present/valid | CSW-97"
+  ) {
+    val networkInterfaceNotFound = intercept[NetworkInterfaceNotFound] { Networks.publicInterface(Some("test")) }
+    networkInterfaceNotFound.getMessage shouldBe "Network interface=test not found"
+  }
+
+  test("Networks.interface() throws NetworkInterfaceNotProvided when interface name is not given | CSW-97") {
+    val networkInterfaceNotProvided = intercept[NetworkInterfaceNotProvided] { Networks.interface(None) }
+    networkInterfaceNotProvided.getMessage shouldBe "INTERFACE_NAME env variable is not set."
+  }
+
+  test(
+    "Networks.publicInterface() throws NetworkInterfaceNotProvided when public interface name is not given | CSW-97"
+  ) {
+    val networkInterfaceNotProvided = intercept[NetworkInterfaceNotProvided] { Networks.publicInterface(None) }
+    networkInterfaceNotProvided.getMessage shouldBe "PUBLIC_INTERFACE_NAME env variable is not set."
   }
 
   test("Should filter ipv6 addresses | ") {
@@ -75,10 +97,10 @@ class NetworksTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with
     Networks("", mockedNetworkProvider).ipv4AddressWithInterfaceName._2 shouldBe inet4Address1
   }
 
-  test("testGetIpv4Address returns inet address when provided a valid interface name | ") {
+  test("test" + "GetIpv4Address returns inet address when provided a valid interface name | ") {
     val inetAddresses: List[(String, InetAddress)] =
       NetworkInterface.getNetworkInterfaces.asScala.toList.map { iface =>
-        Networks(Some(iface.getName)).ipv4AddressWithInterfaceName
+        Networks.interface(Some(iface.getName)).ipv4AddressWithInterfaceName
       }
 
     inetAddresses.contains(("LocalHost", InetAddress.getLocalHost)) shouldEqual true

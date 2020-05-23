@@ -96,11 +96,11 @@ private[location] case class ClusterSettings(clusterName: String = Constants.Clu
 
   //Get the host address based on interfaceName provided.
   //If it is empty then get the default ipv4 address to start the current ActorSystem on.
-  def hostname: String = Networks(interfaceName).hostname
+  def hostname: String = Networks.interface(interfaceName).hostname
 
   private[location] def publicInterfaceName: Option[String] = allValues.get(PublicInterfaceNameKey).map(_.toString)
 
-  def publicHostname: String = Networks(publicInterfaceName).hostname
+  def publicHostname: String = Networks.publicInterface(publicInterfaceName).hostname
 
   //Get the port for current ActorSystem to start. If no port is provided 0 will be used default.
   //SeedNode should start on a fixed port and rest all can start on random port.

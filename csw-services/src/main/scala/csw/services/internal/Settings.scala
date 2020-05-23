@@ -18,7 +18,7 @@ case class Settings(
     configAdminUsername: String,
     configAdminPassword: String
 ) {
-  val hostName: String = Networks(Some(interfaceName)).hostname
+  val hostName: String = Networks.interface(Some(interfaceName)).hostname
 }
 
 object Settings {

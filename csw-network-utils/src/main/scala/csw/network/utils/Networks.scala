@@ -55,6 +55,47 @@ object Networks {
 
   private val log: Logger = NetworksLogger.getLogger
 
+  /**
+   * Creates instance of `Networks` by reading given env variable, if not given default is INTERFACE_NAME
+   */
+  def apply(interfaceNameEnvKey: String = "INTERFACE_NAME"): Networks = {
+    createNetwork(readInterfaceNameFromEnv(interfaceNameEnvKey))
+  }
+
+  /**
+   * Picks an appropriate ipv4 address from the network interface provided.
+   * If None interfaceName provided, it will try to read from env variable INTERFACE_NAME
+   * In tests(csw-networks.hostname.automatic=on), If no specific network interface is provided, the first available
+   * interface will be taken to pick address
+   */
+  def interface(interfaceName: Option[String]): Networks =
+    getNetwork(interfaceName, fallbackEnvKey = "INTERFACE_NAME")
+
+  /**
+   * Picks an appropriate ipv4 address from the network interface provided.
+   * If None interfaceName provided, it will try to read from env variable PUBLIC_INTERFACE_NAME
+   * In tests(csw-networks.hostname.automatic=on), If no specific network interface is provided, the first available
+   * interface will be taken to pick address
+   */
+  def publicInterface(interfaceName: Option[String]): Networks =
+    getNetwork(interfaceName, fallbackEnvKey = "PUBLIC_INTERFACE_NAME")
+
+  private def getNetwork(interfaceName: Option[String], fallbackEnvKey: String): Networks =
+    interfaceName match {
+      case Some(interfaceName) => createNetwork(interfaceName)
+      case None                => createNetwork(readInterfaceNameFromEnv(fallbackEnvKey))
+    }
+
+  private def readInterfaceNameFromEnv(envKey: String): String = {
+    (sys.env ++ sys.props).getOrElse(envKey, fallbackInterfaceName(envKey))
+  }
+
+  private def createNetwork(interfaceName: String): Networks = {
+    new Networks(interfaceName, new NetworkInterfaceProvider)
+  }
+
+  private def automatic: Boolean = ConfigFactory.load().getBoolean("csw-networks.hostname.automatic")
+
   /* ======== Testing API ========
    * config property `csw-networks.hostname.automatic` is enabled only in test scope to automatically detect appropriate hostname
    * so that we do not need to set INTERFACE_NAME env variable in every test or globally on machine before running tests.
@@ -66,25 +107,4 @@ object Networks {
       log.error(networkInterfaceNotProvided.message, ex = networkInterfaceNotProvided)
       throw networkInterfaceNotProvided
     }
-
-  /**
-   * Creates instance of `Networks` by reading env variable
-   */
-  def apply(interfaceNameEnvKey: String = "INTERFACE_NAME"): Networks = {
-    val interface = (sys.env ++ sys.props).getOrElse(interfaceNameEnvKey, fallbackInterfaceName(interfaceNameEnvKey))
-    new Networks(interface, new NetworkInterfaceProvider)
-  }
-
-  /**
-   * Picks an appropriate ipv4 address from the network interface provided.
-   * If no specific network interface is provided, the first available interface will be taken to pick address
-   */
-  def apply(interfaceName: Option[String]): Networks =
-    interfaceName match {
-      case Some(interface) => new Networks(interface, new NetworkInterfaceProvider)
-      case None            => apply()
-    }
-
-  private def automatic: Boolean = ConfigFactory.load().getBoolean("csw-networks.hostname.automatic")
-
 }
