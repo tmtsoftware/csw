@@ -18,7 +18,7 @@ object SocketUtils {
     }
 
   final def requireServerUp(host: String = "localhost", port: Int, within: Duration = 5.seconds, msg: String): Unit =
-    require(poll(SocketUtils.isAddressInUse(host, port)), msg)
+    require(poll(SocketUtils.isAddressInUse(host, port), within), msg)
 
   @tailrec
   final def getFreePort: Int =

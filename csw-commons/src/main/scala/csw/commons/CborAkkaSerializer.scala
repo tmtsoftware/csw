@@ -1,14 +1,14 @@
-package csw.commons.cbor
+package csw.commons
 
+import akka.actor.ExtendedActorSystem
+import akka.event.Logging
 import akka.serialization.Serializer
-import csw.logging.api.scaladsl.Logger
-import csw.logging.client.scaladsl.GenericLoggerFactory
 import io.bullet.borer.{Cbor, Codec, Decoder, Encoder}
 
 import scala.reflect.ClassTag
 
-trait CborAkkaSerializer[Ser] extends Serializer {
-  private val logger: Logger = GenericLoggerFactory.getLogger
+abstract class CborAkkaSerializer[Ser](actorSystem: ExtendedActorSystem) extends Serializer {
+  private val logger = Logging(actorSystem, getClass)
 
   private var registrations: List[(Class[_], Codec[_])] = Nil
 
@@ -37,7 +37,7 @@ trait CborAkkaSerializer[Ser] extends Serializer {
       }
       .getOrElse {
         val ex = new RuntimeException(s"$action of $classValue is not configured")
-        logger.error(ex.getMessage, ex = ex)
+        logger.error(ex.getMessage, ex)
         throw ex
       }
   }

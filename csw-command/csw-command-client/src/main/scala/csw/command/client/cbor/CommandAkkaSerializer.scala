@@ -6,12 +6,14 @@ import akka.actor.typed.scaladsl.adapter._
 import csw.command.client.messages._
 import csw.command.client.messages.sequencer.CswSequencerMessage
 import csw.command.client.models.framework._
-import csw.commons.cbor.CborAkkaSerializer
+import csw.commons.CborAkkaSerializer
 import csw.params.commands.CommandResponse
 import csw.params.core.states.StateVariable
 import csw.serializable.CommandSerializable
 
-class CommandAkkaSerializer(_system: ExtendedActorSystem) extends CborAkkaSerializer[CommandSerializable] with MessageCodecs {
+class CommandAkkaSerializer(_system: ExtendedActorSystem)
+    extends CborAkkaSerializer[CommandSerializable](_system)
+    with MessageCodecs {
 
   override implicit def actorSystem: ActorSystem[_] = _system.toTyped
 
