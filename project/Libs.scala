@@ -8,7 +8,7 @@ object Libs {
   val `scala-java8-compat` = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.1"  //BSD 3-clause "New" or "Revised" License
   val `scala-async`        = "org.scala-lang.modules" %% "scala-async"        % "0.10.0" //BSD 3-clause "New" or "Revised" License
   val `scopt`              = "com.github.scopt"       %% "scopt"              % "3.7.1"  //MIT License
-  val `mockito-scala`      = "org.mockito"            %% "mockito-scala"      % "1.14.2"
+  val `mockito-scala`      = "org.mockito"            %% "mockito-scala"      % "1.14.3"
 
   //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
   val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.2.3"
@@ -49,7 +49,7 @@ object Libs {
   val `jboss-logging`     = "org.jboss.logging"             % "jboss-logging"   % "3.4.1.Final"
   val `config`            = "com.typesafe"                  % "config"          % "1.4.0"
   val `os-lib`            = "com.lihaoyi"                  %% "os-lib"          % "0.7.0"
-  val `caffeine`          = "com.github.ben-manes.caffeine" % "caffeine"        % "2.8.2"
+  val `caffeine`          = "com.github.ben-manes.caffeine" % "caffeine"        % "2.8.4"
   val netty               = "io.netty"                      % "netty"           % "3.10.6.Final"
   val `case-app`          = "com.github.alexarchambault"   %% "case-app"        % "2.0.0-M16"
   val `tmt-test-reporter` = "com.github.tmtsoftware"       %% "rtm"             % "ad23cadd427"
