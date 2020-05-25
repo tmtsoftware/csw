@@ -23,7 +23,7 @@ Supported Operating Systems are: CentOS and MacOS
     - [Scalafmt](https://plugins.jetbrains.com/plugin/8236-scalafmt)
 5. Install [Redis](https://redis.io/download) - Version should be greater than 4.0.0
 6. Recommended testing frameworks/tools: 
-	- [ScalaTest](http://www.scalatest.org/)
+	- [ScalaTest](https://www.scalatest.org/)
 	- [JUnit](https://junit.org/junit4/), JUnit Interface
 	- Note: These frameworks are typically downloaded and made available by the sbt tool by specifying them as dependencies.
 	If you are using the [giter8](https://github.com/tmtsoftware/csw.g8) template (see below), these dependencies are specified by default, and the sbt

@@ -128,6 +128,6 @@ In case you want to run your multi-JVM tests across machines, refer to this mult
 
 Mocks are used so that unit tests can be written independent of dependencies.  
 [CSW](https://github.com/tmtsoftware/csw) uses [Mockito](https://site.mockito.org/) for writing unit tests.
-ScalaTest comes with the [MockitoSugar](http://www.scalatest.org/user_guide/testing_with_mock_objects#mockito) trait which provides some basic syntax sugar for Mockito.
+ScalaTest comes with the [MockitoSugar](https://www.scalatest.org/user_guide/testing_with_mock_objects#mockito) trait which provides some basic syntax sugar for Mockito.
 
 For example: [ContainerBehaviorTest.scala]($github.base_url$/csw-framework/src/test/scala/csw/framework/internal/container/ContainerBehaviorTest.scala)
