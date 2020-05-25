@@ -8,11 +8,12 @@ import sbt.{Def, _}
 object NoPublish extends AutoPlugin {
   override def requires: Plugins = plugins.JvmPlugin
 
-  override def projectSettings: Seq[Setting[_]] = Seq(
-    publishArtifact := false,
-    publish := {},
-    publishLocal := {}
-  )
+  override def projectSettings: Seq[Setting[_]] =
+    Seq(
+      publishArtifact := false,
+      publish := {},
+      publishLocal := {}
+    )
 }
 
 object PublishBintray extends AutoPlugin {
@@ -21,10 +22,11 @@ object PublishBintray extends AutoPlugin {
 
   override def requires: Plugins = BintrayPlugin
 
-  override def projectSettings: Seq[Setting[_]] = Seq(
-    bintrayOrganization := Some("twtmt"),
-    bintrayPackage := "csw"
-  )
+  override def projectSettings: Seq[Setting[_]] =
+    Seq(
+      bintrayOrganization := Some("twtmt"),
+      bintrayPackage := "csw"
+    )
 }
 
 object DeployApp extends AutoPlugin {
@@ -50,35 +52,36 @@ object DeployApp extends AutoPlugin {
     tmpFile
   }
 
-  private def scriptsAndConfsMapping = Def.task {
-    val scriptsDir    = file(".") / "scripts"
-    val sentinelConf  = scriptsDir / "conf" / "redis_sentinel" / "sentinel.conf"
-    val authServerDir = scriptsDir / "csw-auth" / "prod"
-    // csw-services-old.sh, redis-sentinel-prod.sh and start-aas.sh scripts are deprecated, use "csw-services.sh" script instead
-    val serviceScript    = scriptsDir / "csw-services-old.sh"
-    val prodScript       = scriptsDir / "redis-sentinel-prod.sh"
-    val authServerScript = authServerDir / "start-aas.sh"
+  private def scriptsAndConfsMapping =
+    Def.task {
+      val scriptsDir    = file(".") / "scripts"
+      val sentinelConf  = scriptsDir / "conf" / "redis_sentinel" / "sentinel.conf"
+      val authServerDir = scriptsDir / "csw-auth" / "prod"
+      // csw-services-old.sh, redis-sentinel-prod.sh and start-aas.sh scripts are deprecated, use "csw-services.sh" script instead
+      val serviceScript    = scriptsDir / "csw-services-old.sh"
+      val prodScript       = scriptsDir / "redis-sentinel-prod.sh"
+      val authServerScript = authServerDir / "start-aas.sh"
 
-    // replace default csw version to current build version in csw-services.sh script
-    val v                 = version.value
-    val originalCswScript = scriptsDir / "csw-services.sh"
-    val cswScript         = replace(originalCswScript, "DEFAULT_CSW_VERSION=\"master-SNAPSHOT\"", s"DEFAULT_CSW_VERSION=$v")
-    val coursierLauncher  = scriptsDir / "coursier"
-    val confs = Path
-      .directory(new File(scriptsDir, "conf"))
-      .filterNot { case (_, s) => s.equals("conf/redis_sentinel/sentinel.conf") }
-    val loggingAggregator = Path
-      .directory(new File(scriptsDir, "logging_aggregator"))
-      .filterNot { case (_, s) => s.startsWith("logging_aggregator/prod") }
+      // replace default csw version to current build version in csw-services.sh script
+      val v                 = version.value
+      val originalCswScript = scriptsDir / "csw-services.sh"
+      val cswScript         = replace(originalCswScript, "DEFAULT_CSW_VERSION=\"master-SNAPSHOT\"", s"DEFAULT_CSW_VERSION=$v")
+      val coursierLauncher  = scriptsDir / "coursier"
+      val confs = Path
+        .directory(new File(scriptsDir, "conf"))
+        .filterNot { case (_, s) => s.equals("conf/redis_sentinel/sentinel.conf") }
+      val loggingAggregator = Path
+        .directory(new File(scriptsDir, "logging_aggregator"))
+        .filterNot { case (_, s) => s.startsWith("logging_aggregator/prod") }
 
-    confs ++ loggingAggregator :+
-    ((serviceScript, s"bin/${serviceScript.getName}")) :+
-    ((prodScript, s"bin/${prodScript.getName}")) :+
-    ((authServerScript, s"bin/${authServerScript.getName}")) :+
-    ((cswScript, s"bin/${originalCswScript.getName}")) :+
-    ((coursierLauncher, s"bin/${coursierLauncher.getName}")) :+
-    ((sentinelConf, s"conf/redis_sentinel/sentinel-template.conf"))
-  }
+      confs ++ loggingAggregator :+
+      ((serviceScript, s"bin/${serviceScript.getName}")) :+
+      ((prodScript, s"bin/${prodScript.getName}")) :+
+      ((authServerScript, s"bin/${authServerScript.getName}")) :+
+      ((cswScript, s"bin/${originalCswScript.getName}")) :+
+      ((coursierLauncher, s"bin/${coursierLauncher.getName}")) :+
+      ((sentinelConf, s"conf/redis_sentinel/sentinel-template.conf"))
+    }
 }
 
 object CswBuildInfo extends AutoPlugin {
@@ -87,10 +90,11 @@ object CswBuildInfo extends AutoPlugin {
 
   override def requires: Plugins = BuildInfoPlugin
 
-  override def projectSettings: Seq[Setting[_]] = Seq(
-    buildInfoKeys := Seq[BuildInfoKey](name, version),
-    // module name(e.g. csw-alarm-cli) gets converted into package name(e.g. csw.alarm.cli) for buildInfo, so it does not have
-    // same package across all modules in the repo
-    buildInfoPackage := name.value.replace('-', '.')
-  )
+  override def projectSettings: Seq[Setting[_]] =
+    Seq(
+      buildInfoKeys := Seq[BuildInfoKey](name, version),
+      // module name(e.g. csw-alarm-cli) gets converted into package name(e.g. csw.alarm.cli) for buildInfo, so it does not have
+      // same package across all modules in the repo
+      buildInfoPackage := name.value.replace('-', '.')
+    )
 }

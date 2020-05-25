@@ -6,13 +6,14 @@ object Coverage extends AutoPlugin {
 
   override def requires: Plugins = ScoverageSbtPlugin
 
-  override def projectSettings: Seq[Setting[_]] = Seq(
-    coverageEnabled := true,
-    coverageMinimum := 80,
-    coverageFailOnMinimum := true,
-    coverageHighlighting := true,
-    coverageOutputCobertura := true,
-    coverageOutputXML := true
-  )
+  override def projectSettings: Seq[Setting[_]] =
+    Seq(
+      coverageEnabled := true,
+      coverageMinimum := 80,
+      coverageFailOnMinimum := true,
+      coverageHighlighting := true,
+      coverageOutputCobertura := true,
+      coverageOutputXML := true
+    )
 
 }
