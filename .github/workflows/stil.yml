@@ -1,8 +1,6 @@
 name: stil
 
 on:
-  push:
-    branches: [master]
   schedule:
     - cron: "30 18 * * *" # run at 00:00 AM IST
 
