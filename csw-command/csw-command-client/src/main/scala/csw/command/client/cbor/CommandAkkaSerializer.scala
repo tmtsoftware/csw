@@ -11,9 +11,7 @@ import csw.params.commands.CommandResponse
 import csw.params.core.states.StateVariable
 import csw.serializable.CommandSerializable
 
-class CommandAkkaSerializer(_system: ExtendedActorSystem)
-    extends CborAkkaSerializer[CommandSerializable](_system)
-    with MessageCodecs {
+class CommandAkkaSerializer(_system: ExtendedActorSystem) extends CborAkkaSerializer[CommandSerializable] with MessageCodecs {
 
   override implicit def actorSystem: ActorSystem[_] = _system.toTyped
 

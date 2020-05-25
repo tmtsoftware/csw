@@ -465,6 +465,7 @@ object Dependencies {
 
   val NetworkUtils = Def.setting(
     Seq(
+      Libs.`config`,
       Libs.`scalatest`.value % Test,
       Libs.`mockito-scala`   % Test
     )
