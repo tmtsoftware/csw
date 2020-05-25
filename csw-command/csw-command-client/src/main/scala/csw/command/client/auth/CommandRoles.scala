@@ -26,6 +26,7 @@ object CommandKey {
 case class Roles @nowarn private (roles: Set[String]) {
   def exist(that: Roles): Boolean                     = this.roles.exists(that.roles.contains)
   def containsUserRole(subsystem: Subsystem): Boolean = roles.contains(subsystem.name.toLowerCase + "-user")
+  def containsAnyRole(subsystem: Subsystem): Boolean  = roles.exists(role => role.contains(subsystem.name.toLowerCase))
 }
 object Roles {
   def apply(roles: Set[String]): Roles = new Roles(roles.map(_.toLowerCase))
@@ -36,8 +37,12 @@ object Roles {
 case class CommandRoles @nowarn private (private[auth] val predefinedRoles: Map[CommandKey, Roles]) {
   def hasAccess(cmdKey: CommandKey, subsystem: Subsystem, rolesFromToken: Roles): Boolean =
     predefinedRoles.get(cmdKey) match {
-      case Some(allowedRoles) => allowedRoles.exist(rolesFromToken)
-      case None               => rolesFromToken.containsUserRole(subsystem)
+      //Command found, Role found in conf
+      case Some(allowedRoles) if allowedRoles.exist(rolesFromToken) => true
+      //Command found, no {subsystem}-{role} found in conf, user has {subsystem}-user Role
+      case Some(allowedRoles) => !allowedRoles.containsAnyRole(subsystem) && rolesFromToken.containsUserRole(subsystem)
+      //Command not found, user has {subsystem}-user Role
+      case None => rolesFromToken.containsUserRole(subsystem)
     }
 }
 
