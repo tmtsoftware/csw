@@ -12,6 +12,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - run: sudo chmod 666 /var/run/docker.sock
 
       - name: Build
         run: |
@@ -36,9 +37,6 @@ jobs:
         with:
           name: Coverage Report
           path: target/scala-2.13/scoverage-report
-
-      - name: Docker Permissions
-        run: sudo chmod 666 /var/run/docker.sock
 
       - name: Package
         run: ./integration/scripts/package_integration.sh
