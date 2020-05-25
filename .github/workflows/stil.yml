@@ -1,6 +1,8 @@
 name: stil
 
 on:
+  push:
+    branches: [master]
   schedule:
     - cron: "30 18 * * *" # run at 00:00 AM IST
 
@@ -10,19 +12,20 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: olafurpg/setup-scala@v7
-        with:
-          java-version: adopt@1.11
 
-      - name: Configure ntp time
+      - name: Build
         run: |
-          sudo yum install ntp -y
-          sudo ntptime -T 37
+          sbt clean scalafmtCheck scalastyle
+          sbt makeSite
+          sbt ';set every Seq(enableFatalWarnings := true, scalafmtOnCompile := false); test:compile; multi-jvm:compile;'
 
       - name: Tests
         run: |
-          sbt -DenableCoverage=true ';set every enableFatalWarnings := true; csw-time/test:test'
-          sbt -DenableCoverage=true -DdisableTimeTests ';set every enableFatalWarnings := true; test:test'
+          sbt -DenableCoverage=true csw-time/test:test
+          sbt -DenableCoverage=true -DdisableTimeTests test:test
+
+      - name: Multi-Jvm Tests
+        run: sbt ';set every enableFatalWarnings := true; integration/multi-jvm:test'
 
       - name: Coverage Report
         run: |
@@ -34,52 +37,23 @@ jobs:
           name: Coverage Report
           path: target/scala-2.13/scoverage-report
 
-  multi-jvm-tests:
-    runs-on: [self-hosted, stil_runner]
+      - name: Docker Permissions
+        run: sudo chmod 666 /var/run/docker.sock
 
-    steps:
-      - uses: actions/checkout@v2
-      - uses: olafurpg/setup-scala@v5
+      - name: Package
+        run: ./integration/scripts/package_integration.sh
+
+      - name: Multi-NICs Docker
+        run: ./integration/scripts/multiple_nic_test.sh
+
+      - name: Paradox Validate Links
+        run: sbt docs/Paradox/paradoxValidateLinks
+
+      - name: Notify slack
+        if: always()
+        continue-on-error: true
+        uses: kpritam/slack-job-status-action@v1
         with:
-          java-version: adopt@1.11
-
-      - name: Docs Check
-        run: |
-          sbt clean scalafmtCheck scalastyle
-          sbt makeSite
-
-      - name: Multi-Jvm Tests
-        run: sbt ';set every enableFatalWarnings := true; integration/multi-jvm:test'
-
-  slack-success:
-    needs: [unit-tests, multi-jvm-tests]
-    if: success()
-    runs-on: ubuntu-latest
-    steps:
-      - uses: kpritam/slack-job-status-action@v1
-        with:
-          job-status: Success
-          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
-          channel: ci-nightly
-
-  slack-failure:
-    needs: [unit-tests, multi-jvm-tests]
-    if: failure()
-    runs-on: ubuntu-latest
-    steps:
-      - uses: kpritam/slack-job-status-action@v1
-        with:
-          job-status: Failure
-          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
-          channel: ci-nightly
-
-  slack-cancelled:
-    needs: [unit-tests, multi-jvm-tests]
-    if: cancelled()
-    runs-on: ubuntu-latest
-    steps:
-      - uses: kpritam/slack-job-status-action@v1
-        with:
-          job-status: Cancelled
+          job-status: ${{ job.status }}
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
           channel: ci-nightly
