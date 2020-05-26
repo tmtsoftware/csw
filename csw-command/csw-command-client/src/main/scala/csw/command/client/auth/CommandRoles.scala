@@ -26,7 +26,7 @@ object CommandKey {
 case class Roles @nowarn private (roles: Set[String]) {
   def exist(that: Roles): Boolean                     = this.roles.exists(that.roles.contains)
   def containsUserRole(subsystem: Subsystem): Boolean = roles.contains(subsystem.name.toLowerCase + "-user")
-  def containsAnyRole(subsystem: Subsystem): Boolean  = roles.exists(role => role.contains(subsystem.name.toLowerCase))
+  def containsAnyRole(subsystem: Subsystem): Boolean  = roles.exists(_.contains(subsystem.name.toLowerCase))
 }
 object Roles {
   def apply(roles: Set[String]): Roles = new Roles(roles.map(_.toLowerCase))
@@ -35,15 +35,20 @@ object Roles {
 
 // maps to command roles config file
 case class CommandRoles @nowarn private (private[auth] val predefinedRoles: Map[CommandKey, Roles]) {
-  def hasAccess(cmdKey: CommandKey, subsystem: Subsystem, rolesFromToken: Roles): Boolean =
-    predefinedRoles.get(cmdKey) match {
-      //Command found, Role found in conf
-      case Some(allowedRoles) if allowedRoles.exist(rolesFromToken) => true
-      //Command found, no {subsystem}-{role} found in conf, user has {subsystem}-user Role
-      case Some(allowedRoles) => !allowedRoles.containsAnyRole(subsystem) && rolesFromToken.containsUserRole(subsystem)
-      //Command not found, user has {subsystem}-user Role
-      case None => rolesFromToken.containsUserRole(subsystem)
+  def hasAccess(cmdKey: CommandKey, subsystem: Subsystem, rolesFromToken: Roles): Boolean = {
+
+    val commandFound: Boolean             = predefinedRoles.contains(cmdKey)
+    val roleFound: Boolean                = predefinedRoles.get(cmdKey).exists(_.exist(rolesFromToken))
+    val anyRoleForSubsystemFound: Boolean = predefinedRoles.get(cmdKey).exists(_.containsAnyRole(subsystem))
+    val userHasSubsystemUserRole: Boolean = rolesFromToken.containsUserRole(subsystem)
+
+    CommandPolicy(commandFound, roleFound, anyRoleForSubsystemFound, userHasSubsystemUserRole) match {
+      case CommandPolicy(true, true, _, _)     => true
+      case CommandPolicy(true, _, false, true) => true
+      case CommandPolicy(false, _, _, true)    => true
+      case _                                   => false
     }
+  }
 }
 
 object CommandRoles {

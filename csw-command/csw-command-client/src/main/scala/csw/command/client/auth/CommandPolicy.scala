@@ -10,3 +10,10 @@ object CommandPolicy {
       roles.hasAccess(CommandKey(destinationPrefix, command.commandName), destinationPrefix.subsystem, Roles(token))
     )
 }
+
+case class CommandPolicy(
+    commandFound: Boolean,
+    roleFound: Boolean,
+    anyRoleForSubsystemFound: Boolean,
+    userHasSubsystemUserRole: Boolean
+)
