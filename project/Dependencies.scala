@@ -454,8 +454,10 @@ object Dependencies {
   val Commons = Def.setting(
     Seq(
       Akka.`akka-actor`,
+      Akka.`akka-actor-typed`,
       AkkaHttp.`akka-http`,
       Borer.`borer-compat-akka`,
+      Borer.`borer-derivation`.value,
       Libs.`scalatest`.value % Test,
       Libs.`embedded-redis`  % Test
     )
@@ -463,6 +465,7 @@ object Dependencies {
 
   val NetworkUtils = Def.setting(
     Seq(
+      Libs.`config`,
       Libs.`scalatest`.value % Test,
       Libs.`mockito-scala`   % Test
     )

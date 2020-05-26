@@ -2,8 +2,6 @@ package csw.network.utils.internal
 
 import java.net.{InetAddress, NetworkInterface}
 
-import csw.logging.api.scaladsl.Logger
-import csw.network.utils.commons.NetworksLogger
 import csw.network.utils.exceptions.NetworkInterfaceNotFound
 
 import scala.jdk.CollectionConverters._
@@ -12,8 +10,6 @@ import scala.jdk.CollectionConverters._
  *  Provides InetAddresses for network interface
  */
 private[network] class NetworkInterfaceProvider {
-
-  private val log: Logger = NetworksLogger.getLogger
 
   /**
    * Get Seq of (Index -> List of InetAddress) mapping for each interface
@@ -29,8 +25,6 @@ private[network] class NetworkInterfaceProvider {
     Option(NetworkInterface.getByName(interfaceName)) match {
       case Some(nic) => List((nic.getIndex, nic.getInetAddresses.asScala.toList))
       case None =>
-        val networkInterfaceNotFound = NetworkInterfaceNotFound(s"Network interface=$interfaceName not found")
-        log.error(networkInterfaceNotFound.getMessage, ex = networkInterfaceNotFound)
-        throw networkInterfaceNotFound
+        throw NetworkInterfaceNotFound(s"Network interface=$interfaceName not found")
     }
 }

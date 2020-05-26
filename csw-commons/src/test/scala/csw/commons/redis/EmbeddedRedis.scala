@@ -1,7 +1,12 @@
 package csw.commons.redis
 
-import csw.network.utils.SocketUtils.getFreePort
+import java.io.IOException
+import java.net.ServerSocket
+
 import redis.embedded.{RedisSentinel, RedisServer}
+
+import scala.annotation.tailrec
+import scala.util.{Failure, Success, Try}
 
 trait EmbeddedRedis {
 
@@ -64,4 +69,15 @@ trait EmbeddedRedis {
 
   private def addJvmShutdownHook[T](hook: => T): Unit =
     Runtime.getRuntime.addShutdownHook(new Thread { override def run(): Unit = hook })
+
+  @tailrec
+  private final def getFreePort: Int =
+    Try(new ServerSocket(0)) match {
+      case Success(socket) =>
+        val port = socket.getLocalPort
+        socket.close()
+        port
+      case Failure(_: IOException) => getFreePort
+      case Failure(e)              => throw e
+    }
 }

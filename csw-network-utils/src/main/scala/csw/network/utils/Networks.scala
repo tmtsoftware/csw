@@ -3,8 +3,6 @@ package csw.network.utils
 import java.net.{Inet6Address, InetAddress, NetworkInterface}
 
 import com.typesafe.config.ConfigFactory
-import csw.logging.api.scaladsl.Logger
-import csw.network.utils.commons.NetworksLogger
 import csw.network.utils.exceptions.NetworkInterfaceNotProvided
 import csw.network.utils.internal.NetworkInterfaceProvider
 
@@ -53,8 +51,6 @@ case class Networks(private val interfaceName: String, networkProvider: NetworkI
 
 object Networks {
 
-  private val log: Logger = NetworksLogger.getLogger
-
   /**
    * Creates instance of `Networks` by reading given env variable, if not given default is INTERFACE_NAME
    */
@@ -102,9 +98,5 @@ object Networks {
    */
   private def fallbackInterfaceName(interfaceName: String): String =
     if (automatic) ""
-    else {
-      val networkInterfaceNotProvided = NetworkInterfaceNotProvided(s"$interfaceName env variable is not set.")
-      log.error(networkInterfaceNotProvided.message, ex = networkInterfaceNotProvided)
-      throw networkInterfaceNotProvided
-    }
+    else throw NetworkInterfaceNotProvided(s"$interfaceName env variable is not set.")
 }
