@@ -19,11 +19,6 @@ class LocationAuthTest
 
   private implicit def actorSystem: ActorSystem[SpawnProtocol.Command] = locationWiring.get.actorSystem
 
-  test("list (un-protected route) should not error out without auth token") {
-    val locationNoAuthClient = HttpLocationServiceFactory.make("localhost", httpPort)
-    locationNoAuthClient.list.await shouldBe List.empty
-  }
-
   test("register (protected route) should return AASResolutionFailed when keycloak is not yet registered") {
     val locationNoAuthClient = HttpLocationServiceFactory.make("localhost", httpPort)
     val aasPort              = 5675
