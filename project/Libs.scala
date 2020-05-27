@@ -19,7 +19,7 @@ object Libs {
   val `commons-codec`                = "commons-codec"                             % "commons-codec"                % "1.10"       //Apache 2.0š
   val `scala-reflect`                = "org.scala-lang"                            % "scala-reflect"                % ScalaVersion //BSD-3
   val `gson`                         = "com.google.code.gson"                      % "gson"                         % "2.8.6"      //Apache 2.0
-  val `play-json`                    = "com.typesafe.play"                        %% "play-json"                    % "2.8.1"      //Apache 2.0
+  val `play-json`                    = "com.typesafe.play"                        %% "play-json"                    % "2.9.0"      //Apache 2.0
 
   val `enumeratum`        = dep("com.beachape" %%% "enumeratum" % "1.6.1") //MIT License
   val `scalajs-java-time` = dep("org.scala-js" %%% "scalajs-java-time" % "1.0.0")
