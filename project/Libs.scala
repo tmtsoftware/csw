@@ -39,7 +39,7 @@ object Libs {
   val `testng-6-7`        = "org.scalatestplus"       %% "testng-6-7"        % "3.1.2.0"
 
   val `scala-csv`             = "com.github.tototoshi" %% "scala-csv"             % "1.3.6"
-  val `json-schema-validator` = "com.github.fge"        % "json-schema-validator" % "2.2.13" //LGPL/ASL
+  val `json-schema-validator` = "com.github.fge"        % "json-schema-validator" % "2.2.14" //LGPL/ASL
 
   val `jna`               = "net.java.dev.jna"              % "jna"             % "5.5.0"
   val `postgresql`        = "org.postgresql"                % "postgresql"      % "42.2.12"
