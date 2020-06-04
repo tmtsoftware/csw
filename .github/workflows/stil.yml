@@ -41,10 +41,10 @@ jobs:
           path: target/scala-2.13/scoverage-report
 
       - name: Upload RTM
-          uses: actions/upload-artifact@v1
-          with:
-            name: RTM
-            path: target/RTM
+        uses: actions/upload-artifact@v1
+        with:
+          name: RTM
+          path: target/RTM
 
       - name: Package
         run: ./integration/scripts/package_integration.sh

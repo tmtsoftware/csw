@@ -56,8 +56,8 @@ jobs:
         run: sbt -DgenerateStoryReport=true integration/multi-jvm:test
 
       - name: Generate RTM
-          run: |
-            ./scripts/coursier launch --channel https://raw.githubusercontent.com/tmtsoftware/apps/master/apps.json rtm:d1c8c7e -- target/RTM/testStoryMapping.txt tools/RTM/cswStoryToRequirementMap.csv target/RTM/testRequirementsMapping.txt
+        run: |
+          ./scripts/coursier launch --channel https://raw.githubusercontent.com/tmtsoftware/apps/master/apps.json rtm:d1c8c7e -- target/RTM/testStoryMapping.txt tools/RTM/cswStoryToRequirementMap.csv target/RTM/testRequirementsMapping.txt
 
       - name: Upload RTM
         uses: actions/upload-artifact@v1
