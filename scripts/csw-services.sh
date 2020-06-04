@@ -22,7 +22,7 @@ CSW_SERVICES_LIB=com.github.tmtsoftware.csw:csw-services_2.13
 
 function run_csw_services() {
     echo "====== CSW Version [$CSW_VERSION] ====="
-    "$SCRIPT_DIR"/coursier launch -r bintray:lonelyplanet/maven -r jitpack $CSW_SERVICES_LIB:"$CSW_VERSION" -- "$@"
+    "$SCRIPT_DIR"/coursier launch -r jitpack $CSW_SERVICES_LIB:"$CSW_VERSION" -- "$@"
 }
 
 function usage() {
