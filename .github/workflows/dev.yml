@@ -52,6 +52,18 @@ jobs:
           sbt -DenableCoverage=true coverageReport
           sbt coverageAggregate
 
+      - name: Generate RTM
+        if: always()
+        run: |
+          ./scripts/coursier launch --channel https://raw.githubusercontent.com/tmtsoftware/apps/master/apps.json rtm:d1c8c7e -- target/RTM/testStoryMapping.txt tools/RTM/cswStoryToRequirementMap.csv target/RTM/testRequirementsMapping.txt
+
+      - name: Upload RTM
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: RTM
+          path: target/RTM
+
       - uses: actions/upload-artifact@v1
         with:
           name: Coverage Report
@@ -89,21 +101,6 @@ jobs:
 
       - name: Multi-Jvm Tests
         run: sbt -DgenerateStoryReport=true ';set every enableFatalWarnings := true; integration/multi-jvm:test'
-
-  RTM:
-    needs: [unit-tests, multi-jvm-tests]
-    runs-on: ubuntu-latest
-    steps:
-
-      - name: Generate RTM
-        run: |
-          ./scripts/coursier launch --channel https://raw.githubusercontent.com/tmtsoftware/apps/master/apps.json rtm:d1c8c7e -- target/RTM/testStoryMapping.txt tools/RTM/cswStoryToRequirementMap.csv target/RTM/testRequirementsMapping.txt
-
-      - name: Upload RTM
-        uses: actions/upload-artifact@v1
-        with:
-          name: RTM
-          path: target/RTM
 
   slack-success:
     needs: [unit-tests, multi-jvm-tests]

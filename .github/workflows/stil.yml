@@ -26,10 +26,6 @@ jobs:
       - name: Multi-Jvm Tests
         run: sbt -DgenerateStoryReport=true ';set every enableFatalWarnings := true; integration/multi-jvm:test'
 
-      - name: Generate RTM
-        run: |
-          ./scripts/coursier launch --channel https://raw.githubusercontent.com/tmtsoftware/apps/master/apps.json rtm:d1c8c7e -- target/RTM/testStoryMapping.txt tools/RTM/cswStoryToRequirementMap.csv target/RTM/testRequirementsMapping.txt
-
       - name: Coverage Report
         run: |
           sbt -DenableCoverage=true coverageReport
@@ -40,7 +36,13 @@ jobs:
           name: Coverage Report
           path: target/scala-2.13/scoverage-report
 
+      - name: Generate RTM
+        if: always()
+        run: |
+          ./scripts/coursier launch --channel https://raw.githubusercontent.com/tmtsoftware/apps/master/apps.json rtm:d1c8c7e -- target/RTM/testStoryMapping.txt tools/RTM/cswStoryToRequirementMap.csv target/RTM/testRequirementsMapping.txt
+
       - name: Upload RTM
+        if: always()
         uses: actions/upload-artifact@v1
         with:
           name: RTM
@@ -55,35 +57,11 @@ jobs:
       - name: Paradox Validate Links
         run: sbt docs/Paradox/paradoxValidateLinks
 
-  slack-success:
-    needs: [unit-tests]
-    if: success()
-    runs-on: ubuntu-latest
-    steps:
-      - uses: kpritam/slack-job-status-action@v1
+      - name: Notify slack
+        if: always()
+        continue-on-error: true
+        uses: kpritam/slack-job-status-action@v1
         with:
-          job-status: Success
-          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
-          channel: ci-nightly
-
-  slack-failure:
-    needs: [unit-tests]
-    if: failure()
-    runs-on: ubuntu-latest
-    steps:
-      - uses: kpritam/slack-job-status-action@v1
-        with:
-          job-status: Failure
-          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
-          channel: ci-nightly
-
-  slack-cancelled:
-    needs: [unit-tests]
-    if: cancelled()
-    runs-on: ubuntu-latest
-    steps:
-      - uses: kpritam/slack-job-status-action@v1
-        with:
-          job-status: Cancelled
+          job-status: ${{ job.status }}
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
           channel: ci-nightly
