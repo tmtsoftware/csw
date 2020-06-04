@@ -35,8 +35,8 @@ jobs:
 
       - name: Unit and Component Tests
         run: |
-          sbt -DenableCoverage=true csw-time/test:test
-          sbt -DenableCoverage=true -DdisableTimeTests test:test
+          sbt -DenableCoverage=true -DgenerateStoryReport=true csw-time/test:test
+          sbt -DenableCoverage=true -DgenerateStoryReport=true -DdisableTimeTests test:test
 
       - name: Coverage Report
         run: |
@@ -53,7 +53,17 @@ jobs:
         run: find . -type d -regex ".*js/target.*" | xargs rm -rf
 
       - name: Multi-Jvm Tests
-        run: sbt integration/multi-jvm:test
+        run: sbt -DgenerateStoryReport=true integration/multi-jvm:test
+
+      - name: Generate RTM
+        run: |
+          ./scripts/coursier launch --channel https://raw.githubusercontent.com/tmtsoftware/apps/master/apps.json rtm:d1c8c7e -- target/RTM/testStoryMapping.txt tools/RTM/cswStoryToRequirementMap.csv target/RTM/testRequirementsMapping.txt
+
+      - name: Upload RTM
+        uses: actions/upload-artifact@v1
+        with:
+          name: RTM
+          path: target/RTM
 
       - name: Github Release
         run: sbt -Dprod.publish=true githubRelease

@@ -20,11 +20,15 @@ jobs:
 
       - name: Tests
         run: |
-          sbt -DenableCoverage=true csw-time/test:test
-          sbt -DenableCoverage=true -DdisableTimeTests test:test
+          sbt -DenableCoverage=true -DgenerateStoryReport=true ';set every enableFatalWarnings := true; csw-time/test:test'
+          sbt -DenableCoverage=true -DgenerateStoryReport=true -DdisableTimeTests ';set every enableFatalWarnings := true; test:test'
 
       - name: Multi-Jvm Tests
-        run: sbt ';set every enableFatalWarnings := true; integration/multi-jvm:test'
+        run: sbt -DgenerateStoryReport=true ';set every enableFatalWarnings := true; integration/multi-jvm:test'
+
+      - name: Generate RTM
+        run: |
+          ./scripts/coursier launch --channel https://raw.githubusercontent.com/tmtsoftware/apps/master/apps.json rtm:d1c8c7e -- target/RTM/testStoryMapping.txt tools/RTM/cswStoryToRequirementMap.csv target/RTM/testRequirementsMapping.txt
 
       - name: Coverage Report
         run: |
@@ -35,6 +39,12 @@ jobs:
         with:
           name: Coverage Report
           path: target/scala-2.13/scoverage-report
+
+      - name: Upload RTM
+        uses: actions/upload-artifact@v1
+        with:
+          name: RTM
+          path: target/RTM
 
       - name: Package
         run: ./integration/scripts/package_integration.sh

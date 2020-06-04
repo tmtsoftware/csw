@@ -33,7 +33,7 @@ pipeline {
                 sh "sbt -DenableCoverage=true -DgenerateStoryReport=true ';set every enableFatalWarnings := true; csw-time/test:test'"
 
                 // story requirement mapping report
-                // sh "./scripts/coursier launch -r jitpack -r https://jcenter.bintray.com com.github.tmtsoftware:rtm_2.13:47b635b289 -M tmt.test.reporter.TestRequirementMapper -- ./target/RTM/testStoryMapping.txt ./tools/RTM/storyRequirementMapping.csv ./target/RTM/testRequirementsMapping.txt"
+                // sh "./scripts/coursier launch -r jitpack -r https://jcenter.bintray.com com.github.tmtsoftware:rtm_2.13:d1c8c7e -M tmt.test.reporter.TestRequirementMapper -- ./target/RTM/testStoryMapping.txt ./tools/RTM/storyRequirementMapping.csv ./target/RTM/testRequirementsMapping.txt"
             }
             post {
                 always {
