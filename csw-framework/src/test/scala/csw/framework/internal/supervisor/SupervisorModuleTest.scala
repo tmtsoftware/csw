@@ -3,11 +3,7 @@ package csw.framework.internal.supervisor
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import csw.command.api.DemandMatcher
 import csw.command.client.messages.CommandMessage.{Oneway, Submit}
-import csw.command.client.messages.ComponentCommonMessage.{
-  ComponentStateSubscription,
-  GetSupervisorLifecycleState,
-  LifecycleStateSubscription
-}
+import csw.command.client.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.command.client.messages.ContainerIdleMessage
 import csw.command.client.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.command.client.messages.RunningMessage.Lifecycle
@@ -27,6 +23,7 @@ import csw.params.core.models.ObsId
 import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.prefix.models.Prefix
 import org.scalatest.BeforeAndAfterEach
+import org.scalatest.concurrent.Eventually
 import org.scalatest.prop.TableDrivenPropertyChecks.forAll
 import org.scalatest.prop.Tables.Table
 
@@ -330,7 +327,11 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         compStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))
         compStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
 
-        lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
+        lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Restart))
+
+        Eventually.eventually(
+          lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
+        )
         containerIdleMessageProbe.expectMessage(SupervisorLifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
         verify(locationService, times(1)).unregister(any[Connection])
@@ -342,7 +343,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   }
 
   test(
-    "running component should ignore RunOnline lifecycle message when it is already online | DEOPSCSW-166, DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-165, DEOPSCSW-176"
+    "running component should not ignore GoOnline lifecycle message when it is already online | DEOPSCSW-166, DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-165, DEOPSCSW-176, CSW-102"
   ) {
     forAll(testData) { info: ComponentInfo =>
       {
@@ -357,13 +358,14 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
         supervisorRef ! Lifecycle(GoOnline)
-        compStateProbe.expectNoMessage(1.seconds)
+        compStateProbe.expectMessageType[CurrentState]
+        lifecycleStateProbe.expectNoMessage(1.seconds)
       }
     }
   }
 
   test(
-    "running component should ignore RunOffline lifecycle message when it is already offline | DEOPSCSW-166, DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-165, DEOPSCSW-176"
+    "running component should not ignore GoOffline lifecycle message when it is already offline | DEOPSCSW-166, DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-165, DEOPSCSW-176, CSW-102"
   ) {
     forAll(testData) { info: ComponentInfo =>
       {
@@ -379,12 +381,15 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
         supervisorRef ! Lifecycle(GoOffline)
         compStateProbe.expectMessageType[CurrentState]
+        lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.RunningOffline))
 
         supervisorRef ! Lifecycle(GoOffline)
-        compStateProbe.expectNoMessage(1.seconds)
+        compStateProbe.expectMessageType[CurrentState]
+        lifecycleStateProbe.expectNoMessage()
 
         supervisorRef ! Lifecycle(GoOnline)
         compStateProbe.expectMessageType[CurrentState]
+        lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
       }
     }
   }

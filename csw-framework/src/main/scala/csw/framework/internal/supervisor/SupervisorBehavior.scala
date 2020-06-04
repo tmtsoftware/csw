@@ -240,7 +240,6 @@ private[framework] final class SupervisorBehavior(
       container ! SupervisorLifecycleStateChanged(ctx.self, lifecycleState)
       log.debug(s"Supervisor acknowledged container :[$container] for lifecycle state :[$lifecycleState]")
     }
-    pubSubLifecycle ! Publish(LifecycleStateChanged(ctx.self, SupervisorLifecycleState.Running))
   }
 
   private def onRegistrationFailed(throwable: Throwable) = {
@@ -359,6 +358,7 @@ private[framework] final class SupervisorBehavior(
 
   private def updateLifecycleState(state: SupervisorLifecycleState): Unit = {
     log.debug(s"Supervisor is changing lifecycle state from [$lifecycleState] to [$state]")
+    pubSubLifecycle ! Publish(LifecycleStateChanged(ctx.self, state))
     lifecycleState = state
   }
 

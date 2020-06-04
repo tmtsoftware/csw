@@ -14,7 +14,6 @@ import csw.command.client.messages.ComponentCommonMessage.{GetSupervisorLifecycl
 import csw.command.client.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
-import csw.command.client.models.framework
 import csw.command.client.models.framework.PubSub.Subscribe
 import csw.command.client.models.framework.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.command.client.models.framework.{Components, ContainerLifecycleState, LifecycleStateChanged, SupervisorLifecycleState}
@@ -183,15 +182,23 @@ class ContainerIntegrationTest extends FrameworkIntegrationSuite {
     filterProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
     disperserProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
 
-    assemblyLifecycleStateProbe.expectMessage(
-      LifecycleStateChanged(assemblySupervisor, SupervisorLifecycleState.Running)
-    )
-    filterLifecycleStateProbe.expectMessage(
-      framework.LifecycleStateChanged(filterSupervisor, SupervisorLifecycleState.Running)
-    )
-    disperserLifecycleStateProbe.expectMessage(
-      framework.LifecycleStateChanged(disperserSupervisor, SupervisorLifecycleState.Running)
-    )
+    eventually {
+      assemblyLifecycleStateProbe.expectMessage(
+        LifecycleStateChanged(assemblySupervisor, SupervisorLifecycleState.Running)
+      )
+    }
+
+    eventually {
+      filterLifecycleStateProbe.expectMessage(
+        LifecycleStateChanged(filterSupervisor, SupervisorLifecycleState.Running)
+      )
+    }
+
+    eventually {
+      disperserLifecycleStateProbe.expectMessage(
+        LifecycleStateChanged(disperserSupervisor, SupervisorLifecycleState.Running)
+      )
+    }
 
     assertThatContainerIsRunning(resolvedContainerRef, containerLifecycleStateProbe, 2.seconds)
 
@@ -213,22 +220,22 @@ class ContainerIntegrationTest extends FrameworkIntegrationSuite {
     seedLocationService
       .track(irisContainerConnection)
       .toMat(Sink.actorRef[TrackingEvent](containerTracker.ref, "Completed", t => Status.Failure(t)))(Keep.both)
-      .run()((matFromSystem(testWiring.seedActorSystem)))
+      .run()(matFromSystem(testWiring.seedActorSystem))
 
     seedLocationService
       .track(filterAssemblyAkkaConnection)
       .toMat(Sink.actorRef[TrackingEvent](filterAssemblyTracker.ref, "Completed", t => Status.Failure(t)))(Keep.both)
-      .run()((matFromSystem(testWiring.seedActorSystem)))
+      .run()(matFromSystem(testWiring.seedActorSystem))
 
     seedLocationService
       .track(instrumentHcdAkkaConnection)
       .toMat(Sink.actorRef[TrackingEvent](instrumentHcdTracker.ref, "Completed", t => Status.Failure(t)))(Keep.both)
-      .run()((matFromSystem(testWiring.seedActorSystem)))
+      .run()(matFromSystem(testWiring.seedActorSystem))
 
     seedLocationService
       .track(disperserHcdAkkaConnection)
       .toMat(Sink.actorRef[TrackingEvent](disperserHcdTracker.ref, "Completed", t => Status.Failure(t)))(Keep.both)
-      .run()((matFromSystem(testWiring.seedActorSystem)))
+      .run()(matFromSystem(testWiring.seedActorSystem))
 
     // ********** Message: Shutdown **********
     resolvedContainerRef ! Shutdown

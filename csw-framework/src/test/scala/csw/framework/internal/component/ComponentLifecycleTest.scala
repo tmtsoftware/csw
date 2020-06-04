@@ -3,12 +3,12 @@ package csw.framework.internal.component
 import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
 import akka.actor.typed.{Behavior, PostStop}
 import csw.command.client.MiniCRM.CRMMessage
-import csw.command.client.{CommandResponseManager, MiniCRM}
 import csw.command.client.messages.CommandMessage.{Oneway, Submit}
 import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.TopLevelActorIdleMessage.Initialize
 import csw.command.client.messages.{FromComponentLifecycleMessage, TopLevelActorMessage}
 import csw.command.client.models.framework.ToComponentLifecycleMessage._
+import csw.command.client.{CommandResponseManager, MiniCRM}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{ComponentInfos, CurrentStatePublisher, FrameworkTestSuite}
@@ -58,52 +58,48 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar with A
     componentBehaviorTestKit.run(Initialize)
   }
 
-  test("running component should handle RunOffline lifecycle message | DEOPSCSW-177, DEOPSCSW-179") {
+  test("running component should handle GoOffline lifecycle message when it is Online | DEOPSCSW-177, DEOPSCSW-179") {
     val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]()
     val commandStatusServiceProbe = TestProbe[CRMMessage]()
     val runningComponent          = new RunningComponent(supervisorProbe, commandStatusServiceProbe)
     import runningComponent._
-    when(sampleHcdHandler.isOnline).thenReturn(true)
 
     componentBehaviorTestKit.run(Lifecycle(GoOffline))
     verify(sampleHcdHandler).onGoOffline()
-    verify(sampleHcdHandler).isOnline
   }
 
   test(
-    "running component should not accept RunOffline lifecycle message when it is already offline | DEOPSCSW-177, DEOPSCSW-179"
+    "running component should accept GoOffline lifecycle message when it is already offline | DEOPSCSW-177, DEOPSCSW-179, CSW-102"
   ) {
     val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]()
     val commandStatusServiceProbe = TestProbe[CRMMessage]()
     val runningComponent          = new RunningComponent(supervisorProbe, commandStatusServiceProbe)
     import runningComponent._
-    when(sampleHcdHandler.isOnline).thenReturn(false)
 
     componentBehaviorTestKit.run(Lifecycle(GoOffline))
-    verify(sampleHcdHandler, never).onGoOffline()
+    verify(sampleHcdHandler).onGoOffline()
   }
 
-  test("running component should handle RunOnline lifecycle message when it is Offline | DEOPSCSW-177, DEOPSCSW-179") {
+  test("running component should handle GoOnline lifecycle message when it is Offline | DEOPSCSW-177, DEOPSCSW-179") {
     val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]()
     val commandStatusServiceProbe = TestProbe[CRMMessage]()
     val runningComponent          = new RunningComponent(supervisorProbe, commandStatusServiceProbe)
     import runningComponent._
-    when(sampleHcdHandler.isOnline).thenReturn(false)
 
     componentBehaviorTestKit.run(Lifecycle(GoOnline))
     verify(sampleHcdHandler).onGoOnline()
   }
 
-  test("running component should not accept RunOnline lifecycle message when it is already Online | DEOPSCSW-177, DEOPSCSW-179") {
+  test(
+    "running component should accept GoOnline lifecycle message when it is already Online | DEOPSCSW-177, DEOPSCSW-179, CSW-102"
+  ) {
     val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]()
     val commandStatusServiceProbe = TestProbe[CRMMessage]()
     val runningComponent          = new RunningComponent(supervisorProbe, commandStatusServiceProbe)
     import runningComponent._
 
-    when(sampleHcdHandler.isOnline).thenReturn(true)
-
     componentBehaviorTestKit.run(Lifecycle(GoOnline))
-    verify(sampleHcdHandler, never).onGoOnline()
+    verify(sampleHcdHandler).onGoOnline()
   }
 
   test("running component should clean up using onShutdown handler before stopping | DEOPSCSW-177, DEOPSCSW-179") {
@@ -132,8 +128,8 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar with A
 
     // Capture the first runId passed in validateCommand
     when(sampleHcdHandler.validateCommand(idCaptor.capture, any[Setup]))
-      .thenAnswer((id: Id, cc: ControlCommand) => Accepted(id))
-    when(sampleHcdHandler.onSubmit(any[Id], any[Setup])).thenAnswer((id: Id, cc: ControlCommand) => Completed(id))
+      .thenAnswer((id: Id, _: ControlCommand) => Accepted(id))
+    when(sampleHcdHandler.onSubmit(any[Id], any[Setup])).thenAnswer((id: Id, _: ControlCommand) => Completed(id))
 
     componentBehaviorTestKit.run(Submit(sc1, submitResponseProbe.ref))
 
@@ -159,7 +155,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar with A
 
     // A one way returns validation but is not entered into command response manager
     when(sampleHcdHandler.validateCommand(idCaptor.capture, any[Setup]))
-      .thenAnswer((id: Id, cc: ControlCommand) => Accepted(id))
+      .thenAnswer((id: Id, _: ControlCommand) => Accepted(id))
     doNothing.when(sampleHcdHandler).onOneway(any[Id], any[Setup])
 
     componentBehaviorTestKit.run(Oneway(sc1, onewayResponseProbe.ref))
@@ -189,8 +185,8 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar with A
     val idCaptor = ArgCaptor[Id]
     // validate returns Accepted and onSubmit returns Completed
     when(sampleHcdHandler.validateCommand(idCaptor.capture, any[Setup]))
-      .thenAnswer((id: Id, cc: ControlCommand) => Accepted(id))
-    when(sampleHcdHandler.onSubmit(any[Id], any[Setup])).thenAnswer((id: Id, cc: ControlCommand) => Completed(id))
+      .thenAnswer((id: Id, _: ControlCommand) => Accepted(id))
+    when(sampleHcdHandler.onSubmit(any[Id], any[Setup])).thenAnswer((id: Id, _: ControlCommand) => Completed(id))
 
     componentBehaviorTestKit.run(Submit(sc1, submitResponseProbe.ref))
 
@@ -216,7 +212,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar with A
 
     //val invalid = Invalid(sc1.commandName, testId, OtherIssue("error from the test command"))
     when(sampleHcdHandler.validateCommand(idCaptor.capture, any[Setup]))
-      .thenAnswer((id: Id, cc: ControlCommand) => Invalid(id, OtherIssue("error from the test command")))
+      .thenAnswer((id: Id, _: ControlCommand) => Invalid(id, OtherIssue("error from the test command")))
     doNothing.when(sampleHcdHandler).onOneway(any[Id], any[Setup])
 
     componentBehaviorTestKit.run(Oneway(sc1, onewayResponseProbe.ref))

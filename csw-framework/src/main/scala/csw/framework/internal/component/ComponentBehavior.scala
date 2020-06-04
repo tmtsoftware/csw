@@ -128,20 +128,25 @@ private[framework] object ComponentBehavior {
       def onLifecycle(toComponentLifecycleMessage: ToComponentLifecycleMessage): Unit =
         toComponentLifecycleMessage match {
           case GoOnline =>
-            // process only if the component is offline currently
+            log.info("Invoking lifecycle handler's onGoOnline hook")
+            lifecycleHandlers.onGoOnline()
             if (!lifecycleHandlers.isOnline) {
               lifecycleHandlers.isOnline = true
-              log.info("Invoking lifecycle handler's onGoOnline hook")
-              lifecycleHandlers.onGoOnline()
               log.debug(s"Component TLA is Online")
             }
+            else {
+              log.debug(s"Component TLA is already Online")
+            }
+
           case GoOffline =>
-            // process only if the component is online currently
+            log.info("Invoking lifecycle handler's onGoOffline hook")
+            lifecycleHandlers.onGoOffline()
             if (lifecycleHandlers.isOnline) {
               lifecycleHandlers.isOnline = false
-              log.info("Invoking lifecycle handler's onGoOffline hook")
-              lifecycleHandlers.onGoOffline()
               log.debug(s"Component TLA is Offline")
+            }
+            else {
+              log.debug(s"Component TLA is already Offline")
             }
         }
 
