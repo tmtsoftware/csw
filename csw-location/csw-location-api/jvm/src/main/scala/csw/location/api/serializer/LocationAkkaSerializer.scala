@@ -1,8 +1,8 @@
-package csw.location.server.internal
+package csw.location.api.serializer
 
-import csw.commons.CborAkkaSerializer
 import csw.location.api.codec.{LocationCodecs, LocationSerializable}
 import csw.location.api.models.{Connection, Location, Registration, TrackingEvent}
+import csw.commons.CborAkkaSerializer
 
 class LocationAkkaSerializer extends CborAkkaSerializer[LocationSerializable] with LocationCodecs {
 

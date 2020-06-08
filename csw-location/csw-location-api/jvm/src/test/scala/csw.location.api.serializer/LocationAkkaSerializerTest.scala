@@ -1,4 +1,4 @@
-package csw.location.server.internal
+package csw.location.api.serializer
 
 import java.net.URI
 
@@ -10,6 +10,7 @@ import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.models.ComponentType.Assembly
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.location.api.models._
+import csw.location.api.serializer.LocationAkkaSerializer
 import csw.prefix.models.{Prefix, Subsystem}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.funsuite.AnyFunSuite
@@ -22,9 +23,10 @@ import scala.concurrent.duration.DurationInt
 
 private[location] class LocationAkkaSerializerTest extends AnyFunSuite with Matchers with BeforeAndAfterAll {
   // need to instantiate from remote factory to wire up serializer
-  private final implicit val system: ActorSystem[_] = ActorSystem(Behaviors.empty, "example")
-  private final val serialization                   = SerializationExtension(system)
-  private final val prefix                          = Prefix(Subsystem.NFIRAOS, "TromboneAssembly")
+  private final implicit val system: ActorSystem[_] =
+    ActorSystem(Behaviors.empty, "example")
+  private final val serialization = SerializationExtension(system)
+  private final val prefix        = Prefix(Subsystem.NFIRAOS, "TromboneAssembly")
 
   override protected def afterAll(): Unit = {
     system.terminate()
@@ -49,9 +51,11 @@ private[location] class LocationAkkaSerializerTest extends AnyFunSuite with Matc
   }
 
   test("should use location serializer for Location (de)serialization") {
-    val akkaConnection = AkkaConnection(api.models.ComponentId(prefix, Assembly))
-    val httpConnection = HttpConnection(api.models.ComponentId(prefix, Assembly))
-    val tcpConnection  = TcpConnection(api.models.ComponentId(prefix, Assembly))
+    val akkaConnection =
+      AkkaConnection(api.models.ComponentId(prefix, Assembly))
+    val httpConnection =
+      HttpConnection(api.models.ComponentId(prefix, Assembly))
+    val tcpConnection = TcpConnection(api.models.ComponentId(prefix, Assembly))
     val testData = Table(
       "Location models",
       AkkaLocation(akkaConnection, system.toURI),
@@ -69,9 +73,11 @@ private[location] class LocationAkkaSerializerTest extends AnyFunSuite with Matc
   }
 
   test("should use location serializer for Registration (de)serialization") {
-    val akkaConnection = AkkaConnection(api.models.ComponentId(prefix, Assembly))
-    val httpConnection = HttpConnection(api.models.ComponentId(prefix, Assembly))
-    val tcpConnection  = TcpConnection(api.models.ComponentId(prefix, Assembly))
+    val akkaConnection =
+      AkkaConnection(api.models.ComponentId(prefix, Assembly))
+    val httpConnection =
+      HttpConnection(api.models.ComponentId(prefix, Assembly))
+    val tcpConnection = TcpConnection(api.models.ComponentId(prefix, Assembly))
     val testData = Table(
       "Registration models",
       AkkaRegistration(akkaConnection, system.toURI),
@@ -89,8 +95,9 @@ private[location] class LocationAkkaSerializerTest extends AnyFunSuite with Matc
   }
 
   test("should use location serializer for TrackingEvent (de)serialization") {
-    val akkaConnection = AkkaConnection(api.models.ComponentId(prefix, Assembly))
-    val akkaLocation   = AkkaLocation(akkaConnection, system.toURI)
+    val akkaConnection =
+      AkkaConnection(api.models.ComponentId(prefix, Assembly))
+    val akkaLocation = AkkaLocation(akkaConnection, system.toURI)
 
     val testData = Table(
       "TrackingEvent models",
