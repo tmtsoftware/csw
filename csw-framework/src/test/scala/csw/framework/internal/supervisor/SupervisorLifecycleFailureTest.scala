@@ -4,7 +4,11 @@ import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.ActorContext
 import csw.command.client.messages.CommandMessage.Submit
-import csw.command.client.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
+import csw.command.client.messages.ComponentCommonMessage.{
+  ComponentStateSubscription,
+  GetSupervisorLifecycleState,
+  LifecycleStateSubscription
+}
 import csw.command.client.messages.SupervisorContainerCommonMessages.Restart
 import csw.command.client.messages.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
 import csw.command.client.models.framework.{LifecycleStateChanged, PubSub, SupervisorLifecycleState}
