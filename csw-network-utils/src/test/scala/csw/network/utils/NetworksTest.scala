@@ -16,7 +16,7 @@ class NetworksTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with
   // DEOPSCSW-673: Make interfaceName environment variable mandatory
   test(
     "Networks() should throw NetworkInterfaceNotProvided when INTERFACE_NAME env variable is not set" +
-      " | DEOPSCSW-673 | DEOPSCSW-97"
+      " | DEOPSCSW-673 , DEOPSCSW-97"
   ) {
     val networkInterfaceNotProvided = intercept[NetworkInterfaceNotProvided] {
       Networks()
