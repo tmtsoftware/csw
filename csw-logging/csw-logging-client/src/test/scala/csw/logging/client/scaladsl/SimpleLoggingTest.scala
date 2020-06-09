@@ -315,7 +315,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     logBuffer.foreach { log => log.getString(LoggingKeys.CATEGORY) shouldBe true }
   }
 
-  test("should able to log exception at ERROR level with complete stacktrace | DEOPSCSW-158 | DEOPSCSW-325") {
+  test("should able to log exception at ERROR level with complete stacktrace | DEOPSCSW-158, DEOPSCSW-325") {
     val tromboneHcd          = new TromboneHcd()
     val tromboneHcdClassName = tromboneHcd.getClass.getName
 
