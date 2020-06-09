@@ -34,17 +34,31 @@ object Roles {
 }
 
 // maps to command roles config file
-case class CommandRoles @nowarn private (private[auth] val predefinedRoles: Map[CommandKey, Roles]) {
-  def hasAccess(cmdKey: CommandKey, subsystem: Subsystem, rolesFromToken: Roles): Boolean = {
-    def subsystemRoleNotPresentIn(allowedRoles: Roles): Boolean = !allowedRoles.containsAnyRole(subsystem)
-    def tokenHasSubsystemUserRole: Boolean                      = rolesFromToken.containsUserRole(subsystem)
+case class CommandRoles @nowarn private (
+    private[auth] val predefinedRoles: Map[CommandKey, Roles]) {
+  def hasAccess(cmdKey: CommandKey,
+                subsystem: Subsystem,
+                rolesFromToken: Roles): Boolean = {
+    def subsystemRoleNotPresentIn(allowedRoles: Roles): Boolean =
+      !allowedRoles.containsAnyRole(subsystem)
+    def tokenHasSubsystemUserRole: Boolean =
+      rolesFromToken.containsUserRole(subsystem)
+
+    def hasAccessToPredefinedCommands(allowedRoles: Roles,
+                                      rolesFromToken: Roles): Boolean = {
+      if (allowedRoles.exist(rolesFromToken)) true
+      else if (subsystemRoleNotPresentIn(allowedRoles))
+        tokenHasSubsystemUserRole
+      else false
+    }
 
     predefinedRoles.get(cmdKey) match {
-      case None                                                          => tokenHasSubsystemUserRole
-      case Some(allowedRoles) if subsystemRoleNotPresentIn(allowedRoles) => tokenHasSubsystemUserRole
-      case Some(allowedRoles)                                            => allowedRoles.exist(rolesFromToken)
+      case None => tokenHasSubsystemUserRole
+      case Some(allowedRoles) =>
+        hasAccessToPredefinedCommands(allowedRoles, rolesFromToken)
     }
   }
+
 }
 
 object CommandRoles {
