@@ -6,7 +6,8 @@ import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 
 class CommandRolesTest extends AnyFunSuite with Matchers {
-  private val testConfig = ConfigFactory.parseString("""
+  private val testConfig =
+    ConfigFactory.parseString("""
                                            |IRIS.instrument1.setTemperature: [APS-eng]
                                            |IRIS.instrument1.setVoltage: [IRIS-eng, APS-eng]
                                            |TCS.filter.wheel.setFirmware: [TCS-admin]
@@ -35,8 +36,11 @@ class CommandRolesTest extends AnyFunSuite with Matchers {
     val roles = CommandRoles.from(testConfig)
     roles.hasAccess(setVoltageCmdKey, IRIS, Roles(Set("IRIS-admin", "IRIS-eng"))) shouldBe true
     roles.hasAccess(setVoltageCmdKey, IRIS, Roles(Set("IRIS-eng"))) shouldBe true
+    roles.hasAccess(setVoltageCmdKey, IRIS, Roles(Set("IRIS-user"))) shouldBe false
     roles.hasAccess(setVoltageCmdKey, IRIS, Roles(Set("APS-eng"))) shouldBe true
     roles.hasAccess(setVoltageCmdKey, IRIS, Roles(Set("IRIS-eng", "APS-eng"))) shouldBe true
+    roles.hasAccess(setTemperatureCmdKey, IRIS, Roles(Set("APS-eng"))) shouldBe true
+    roles.hasAccess(setTemperatureCmdKey, IRIS, Roles(Set("IRIS-user"))) shouldBe true
   }
 
   test("CommandRoles.hasAccess should return false when user does not have required role | ESW-95") {
@@ -58,13 +62,5 @@ class CommandRolesTest extends AnyFunSuite with Matchers {
   ) {
     val roles = CommandRoles.from(testConfig)
     roles.hasAccess(CommandKey("IRIS.filter.setExposure"), IRIS, Roles(Set("WFOS-user"))) shouldBe false
-  }
-
-  test(
-    "CommandRoles.hasAccess should return true when command name exist but have not specified user level access for " +
-      "destination subsystem | ESW-95"
-  ) {
-    val roles = CommandRoles.from(testConfig)
-    roles.hasAccess(CommandKey("IRIS.instrument1.setTemperature"), IRIS, Roles(Set("IRIS-user"))) shouldBe true
   }
 }
