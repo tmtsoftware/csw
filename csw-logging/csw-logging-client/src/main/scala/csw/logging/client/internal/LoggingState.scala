@@ -18,11 +18,11 @@ private[logging] object LoggingState {
 
   // This is a default log level applied to all the components, if components does not specify explicitly
   // This value gets overridden by 'logLevel' field from configuration file when logging system is started
-  var defaultLogLevel = Level("INFO")
+  var defaultLogLevel: Level = Level.INFO
 
-  var logLevel: Level      = _
-  var akkaLogLevel: Level  = _
-  var slf4jLogLevel: Level = _
+  var logLevel: Level      = Level.INFO
+  var akkaLogLevel: Level  = Level.INFO
+  var slf4jLogLevel: Level = Level.INFO
   // queue of messages sent before logger is started
   val msgs = new mutable.Queue[LogActorMessages]()
 
