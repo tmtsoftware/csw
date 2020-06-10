@@ -42,7 +42,7 @@ object Libs {
   val `json-schema-validator` = "com.github.fge"        % "json-schema-validator" % "2.2.13" //LGPL/ASL
 
   val `jna`               = "net.java.dev.jna"              % "jna"             % "5.5.0"
-  val `postgresql`        = "org.postgresql"                % "postgresql"      % "42.2.12"
+  val `postgresql`        = "org.postgresql"                % "postgresql"      % "42.2.14"
   val `hikaricp`          = "com.zaxxer"                    % "HikariCP"        % "3.4.5" //Apache License 2.0
   val `otj-pg-embedded`   = "com.opentable.components"      % "otj-pg-embedded" % "0.13.3"
   val httpclient          = "org.apache.httpcomponents"     % "httpclient"      % "4.5.12"
