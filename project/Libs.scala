@@ -14,20 +14,20 @@ object Libs {
   val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.2.3"
 
   val `embedded-keycloak`            = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak"            % "9374d69"    //Apache 2.0
-  val `akka-management-cluster-http` = "com.lightbend.akka.management"            %% "akka-management-cluster-http" % "1.0.7"
+  val `akka-management-cluster-http` = "com.lightbend.akka.management"            %% "akka-management-cluster-http" % "1.0.8"
   val `svnkit`                       = "org.tmatesoft.svnkit"                      % "svnkit"                       % "1.10.1"     //TMate Open Source License
   val `commons-codec`                = "commons-codec"                             % "commons-codec"                % "1.10"       //Apache 2.0š
   val `scala-reflect`                = "org.scala-lang"                            % "scala-reflect"                % ScalaVersion //BSD-3
   val `gson`                         = "com.google.code.gson"                      % "gson"                         % "2.8.6"      //Apache 2.0
-  val `play-json`                    = "com.typesafe.play"                        %% "play-json"                    % "2.8.1"      //Apache 2.0
+  val `play-json`                    = "com.typesafe.play"                        %% "play-json"                    % "2.9.0"      //Apache 2.0
 
   val `enumeratum`        = dep("com.beachape" %%% "enumeratum" % "1.6.1") //MIT License
   val `scalajs-java-time` = dep("org.scala-js" %%% "scalajs-java-time" % "1.0.0")
   val `scalatest`         = dep("org.scalatest" %%% "scalatest" % "3.1.2") //Apache License 2.0
 
   val `jwt-core`          = "com.pauldijou"           %% "jwt-core"          % "4.3.0"
-  val `lettuce`           = "io.lettuce"               % "lettuce-core"      % "5.3.0.RELEASE"
-  val `reactor-core`      = "io.projectreactor"        % "reactor-core"      % "3.3.5.RELEASE"
+  val `lettuce`           = "io.lettuce"               % "lettuce-core"      % "5.3.1.RELEASE"
+  val `reactor-core`      = "io.projectreactor"        % "reactor-core"      % "3.3.6.RELEASE"
   val `reactive-streams`  = "org.reactivestreams"      % "reactive-streams"  % "1.0.3"
   val `akka-stream-kafka` = "com.typesafe.akka"       %% "akka-stream-kafka" % "2.0.3"
   val `embedded-kafka`    = "io.github.embeddedkafka" %% "embedded-kafka"    % "2.5.0"
@@ -39,10 +39,10 @@ object Libs {
   val `testng-6-7`        = "org.scalatestplus"       %% "testng-6-7"        % "3.1.2.0"
 
   val `scala-csv`             = "com.github.tototoshi" %% "scala-csv"             % "1.3.6"
-  val `json-schema-validator` = "com.github.fge"        % "json-schema-validator" % "2.2.13" //LGPL/ASL
+  val `json-schema-validator` = "com.github.fge"        % "json-schema-validator" % "2.2.14" //LGPL/ASL
 
   val `jna`               = "net.java.dev.jna"              % "jna"             % "5.5.0"
-  val `postgresql`        = "org.postgresql"                % "postgresql"      % "42.2.12"
+  val `postgresql`        = "org.postgresql"                % "postgresql"      % "42.2.14"
   val `hikaricp`          = "com.zaxxer"                    % "HikariCP"        % "3.4.5" //Apache License 2.0
   val `otj-pg-embedded`   = "com.opentable.components"      % "otj-pg-embedded" % "0.13.3"
   val httpclient          = "org.apache.httpcomponents"     % "httpclient"      % "4.5.12"
@@ -51,7 +51,7 @@ object Libs {
   val `os-lib`            = "com.lihaoyi"                  %% "os-lib"          % "0.7.0"
   val `caffeine`          = "com.github.ben-manes.caffeine" % "caffeine"        % "2.8.4"
   val netty               = "io.netty"                      % "netty"           % "3.10.6.Final"
-  val `case-app`          = "com.github.alexarchambault"   %% "case-app"        % "2.0.0-M16"
+  val `case-app`          = "com.github.alexarchambault"   %% "case-app"        % "2.0.0"
   val `tmt-test-reporter` = "com.github.tmtsoftware"       %% "rtm"             % "d1c8c7e"
 }
 
@@ -99,7 +99,7 @@ object AkkaHttp {
   val `akka-http-testkit`    = "com.typesafe.akka" %% "akka-http-testkit"    % Version //ApacheV2
   val `akka-http-spray-json` = "com.typesafe.akka" %% "akka-http-spray-json" % Version
 
-  val `akka-http-cors` = "ch.megard" %% "akka-http-cors" % "0.4.3"
+  val `akka-http-cors` = "ch.megard" %% "akka-http-cors" % "1.0.0"
 }
 
 object Keycloak {
