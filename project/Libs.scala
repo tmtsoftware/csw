@@ -23,7 +23,7 @@ object Libs {
 
   val `enumeratum`        = dep("com.beachape" %%% "enumeratum" % "1.6.1") //MIT License
   val `scalajs-java-time` = dep("org.scala-js" %%% "scalajs-java-time" % "1.0.0")
-  val `scalatest`         = dep("org.scalatest" %%% "scalatest" % "3.1.2") //Apache License 2.0
+  val `scalatest`         = dep("org.scalatest" %%% "scalatest" % "3.2.0") //Apache License 2.0
 
   val `jwt-core`          = "com.pauldijou"           %% "jwt-core"          % "4.3.0"
   val `lettuce`           = "io.lettuce"               % "lettuce-core"      % "5.3.1.RELEASE"
