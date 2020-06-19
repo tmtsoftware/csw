@@ -8,7 +8,7 @@ object Libs {
   val `scala-java8-compat` = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.1"  //BSD 3-clause "New" or "Revised" License
   val `scala-async`        = "org.scala-lang.modules" %% "scala-async"        % "0.10.0" //BSD 3-clause "New" or "Revised" License
   val `scopt`              = "com.github.scopt"       %% "scopt"              % "3.7.1"  //MIT License
-  val `mockito-scala`      = "org.mockito"            %% "mockito-scala"      % "1.14.3"
+  val `mockito-scala`      = "org.mockito"            %% "mockito-scala"      % "1.14.4"
 
   //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
   val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.2.3"
@@ -51,7 +51,7 @@ object Libs {
   val `os-lib`            = "com.lihaoyi"                  %% "os-lib"          % "0.7.0"
   val `caffeine`          = "com.github.ben-manes.caffeine" % "caffeine"        % "2.8.4"
   val netty               = "io.netty"                      % "netty"           % "3.10.6.Final"
-  val `case-app`          = "com.github.alexarchambault"   %% "case-app"        % "2.0.0"
+  val `case-app`          = "com.github.alexarchambault"   %% "case-app"        % "2.0.1"
   val `tmt-test-reporter` = "com.github.tmtsoftware"       %% "rtm"             % "d1c8c7e"
 }
 
@@ -73,7 +73,7 @@ object Jackson {
 }
 
 object Akka {
-  val Version = "2.6.5" //all akka is Apache License 2.0
+  val Version = "2.6.6" //all akka is Apache License 2.0
 
   val `akka-stream`              = "com.typesafe.akka" %% "akka-stream"              % Version
   val `akka-stream-typed`        = "com.typesafe.akka" %% "akka-stream-typed"        % Version
@@ -103,7 +103,7 @@ object AkkaHttp {
 }
 
 object Keycloak {
-  val Version = "10.0.1"
+  val Version = "10.0.2"
 
   val `keycloak-adapter-core` = "org.keycloak" % "keycloak-adapter-core"      % Version
   val `keycloak-core`         = "org.keycloak" % "keycloak-core"              % Version
@@ -113,7 +113,7 @@ object Keycloak {
 }
 
 object Jooq {
-  val Version = "3.13.1"
+  val Version = "3.13.2"
 
   val `jooq`         = "org.jooq" % "jooq"         % Version
   val `jooq-meta`    = "org.jooq" % "jooq-meta"    % Version
@@ -121,7 +121,7 @@ object Jooq {
 }
 
 object MSocket {
-  val Version = "aad3e260a4"
+  val Version = "a36f8db"
 
   val `msocket-api`      = dep("com.github.tmtsoftware.msocket" %%% "msocket-api" % Version)
   val `msocket-impl-jvm` = "com.github.tmtsoftware.msocket" %% "msocket-impl" % Version
