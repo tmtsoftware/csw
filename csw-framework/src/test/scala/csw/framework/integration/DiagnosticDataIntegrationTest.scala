@@ -13,7 +13,6 @@ import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.location.api.models
 import csw.location.api.models.ComponentType.HCD
 import csw.location.api.models.Connection.AkkaConnection
-import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.params.events.{Event, EventKey, SystemEvent}
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.time.core.models.UTCTime
@@ -47,14 +46,11 @@ class DiagnosticDataIntegrationTest extends FrameworkIntegrationSuite {
   test("component should be able to handle diagnostic data request | DEOPSCSW-37") {
     import SampleComponentState._
     import wiring._
-    LoggingSystemFactory.start("", "", "", actorSystem)
     Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring)
 
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]("supervisor-lifecycle-state-probe")
     val akkaConnection                = AkkaConnection(models.ComponentId(Prefix(Subsystem.IRIS, "IFS_Detector"), HCD))
     val location                      = locationService.resolve(akkaConnection, 5.seconds).await
-
-    LoggingSystemFactory.start("", "", "", actorSystem)
 
     val supervisorRef = location.get.componentRef
     assertThatSupervisorIsRunning(supervisorRef, supervisorLifecycleStateProbe, 5.seconds)

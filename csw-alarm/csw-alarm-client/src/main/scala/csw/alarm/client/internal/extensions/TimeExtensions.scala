@@ -1,11 +1,12 @@
 package csw.alarm.client.internal.extensions
 
 import java.time._
-import java.time.format.DateTimeFormatter
+import java.time.format.{DateTimeFormatter, DateTimeFormatterBuilder}
 
 private[alarm] object TimeExtensions {
 
-  val TimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("h:m:s a")
+  val TimeFormatter: DateTimeFormatter =
+    new DateTimeFormatterBuilder().parseCaseInsensitive().appendPattern("h:m:s a").toFormatter
 
   implicit class RichClock(val clock: Clock) extends AnyVal {
     def untilNext(text: String): Duration = untilNext(LocalTime.parse(text, TimeFormatter))

@@ -7,7 +7,6 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import csw.aas.http.AuthorizationPolicy.RealmRolePolicy
 import csw.location.api.scaladsl.LocationService
-import csw.logging.client.scaladsl.LoggingSystemFactory
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -25,7 +24,6 @@ class TestServer(locationService: LocationService) {
   }
 
   def start(testServerPort: Int): Future[Http.ServerBinding] = {
-    LoggingSystemFactory.start("test-server", "", "", actorSystem)
     Http().bindAndHandle(routes, "0.0.0.0", testServerPort)
   }
 }
