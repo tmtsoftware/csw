@@ -35,8 +35,8 @@ object Libs {
   val `scala-compiler`    = "org.scala-lang"           % "scala-compiler"    % ScalaVersion
   val `HdrHistogram`      = "org.hdrhistogram"         % "HdrHistogram"      % "2.1.12"
   val `testng`            = "org.testng"               % "testng"            % "6.14.3"
-  val `junit-4-12`        = "org.scalatestplus"       %% "junit-4-12"        % "3.1.2.0"
-  val `testng-6-7`        = "org.scalatestplus"       %% "testng-6-7"        % "3.1.2.0"
+  val `junit-4-12`        = "org.scalatestplus"       %% "junit-4-12"        % "3.2.0.0"
+  val `testng-6-7`        = "org.scalatestplus"       %% "testng-6-7"        % "3.2.0.0"
 
   val `scala-csv`             = "com.github.tototoshi" %% "scala-csv"             % "1.3.6"
   val `json-schema-validator` = "com.github.fge"        % "json-schema-validator" % "2.2.14" //LGPL/ASL
