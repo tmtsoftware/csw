@@ -69,17 +69,18 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
   }
 
   test("Supervisor should support concurrent updates to log-levels of components | DEOPSCSW-163") {
-    val supervisorBehaviorTestKit = BehaviorTestKit(supervisorBehavior)
-    val logMetadataProbe          = TestProbe[LogMetadata]("log")
+    val supervisor = typedSystem.systemActorOf(supervisorBehavior, "supervisor")
+
+    val logMetadataProbe = TestProbe[LogMetadata]("log")
     import typedSystem.executionContext
 
     Future {
-      supervisorBehaviorTestKit.run(SetComponentLogLevel(WARN))
-      supervisorBehaviorTestKit.run(GetComponentLogMetadata(logMetadataProbe.ref))
+      supervisor ! SetComponentLogLevel(WARN)
+      supervisor ! GetComponentLogMetadata(logMetadataProbe.ref)
     }
     Future {
-      supervisorBehaviorTestKit.run(SetComponentLogLevel(WARN))
-      supervisorBehaviorTestKit.run(GetComponentLogMetadata(logMetadataProbe.ref))
+      supervisor ! SetComponentLogLevel(WARN)
+      supervisor ! GetComponentLogMetadata(logMetadataProbe.ref)
     }
 
     val logMetadata1 = logMetadataProbe.expectMessageType[LogMetadata]
@@ -87,7 +88,6 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
 
     logMetadata1.componentLevel shouldBe WARN
     logMetadata2.componentLevel shouldBe WARN
-
   }
 
   // DEOPSCSW-37: Add diagnosticMode handler to component handlers
