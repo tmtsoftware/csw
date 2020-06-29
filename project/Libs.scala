@@ -49,7 +49,7 @@ object Libs {
   val `jboss-logging`     = "org.jboss.logging"             % "jboss-logging"   % "3.4.1.Final"
   val `config`            = "com.typesafe"                  % "config"          % "1.4.0"
   val `os-lib`            = "com.lihaoyi"                  %% "os-lib"          % "0.7.0"
-  val `caffeine`          = "com.github.ben-manes.caffeine" % "caffeine"        % "2.8.4"
+  val `caffeine`          = "com.github.ben-manes.caffeine" % "caffeine"        % "2.8.5"
   val netty               = "io.netty"                      % "netty"           % "3.10.6.Final"
   val `case-app`          = "com.github.alexarchambault"   %% "case-app"        % "2.0.1"
   val `tmt-test-reporter` = "com.github.tmtsoftware"       %% "rtm"             % "d1c8c7e"
