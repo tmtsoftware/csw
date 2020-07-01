@@ -53,7 +53,7 @@ class ConfigClientExampleTest
     //construct the path
     val filePath = Paths.get("/tmt/trmobone/assembly/hcd.conf")
 
-    val doneF = async {
+    val doneF: Future[Assertion] = async {
       // create file using admin API
       await(adminApi.create(filePath, ConfigData.fromString(defaultStrConf), annex = false, "First commit"))
 
@@ -67,22 +67,23 @@ class ConfigClientExampleTest
 
   test("getActive | DEOPSCSW-89, DEOPSCSW-592") {
     //#getActive
-    val doneF = async {
-      // construct the path
-      val filePath = Paths.get("/tmt/trmobone/assembly/hcd.conf")
+    val doneF: Future[Assertion] =
+      async {
+        // construct the path
+        val filePath = Paths.get("/tmt/trmobone/assembly/hcd.conf")
 
-      await(adminApi.create(filePath, ConfigData.fromString(defaultStrConf), annex = false, "First commit"))
+        await(adminApi.create(filePath, ConfigData.fromString(defaultStrConf), annex = false, "First commit"))
 
-      val activeFile: Option[ConfigData] = await(clientApi.getActive(filePath))
-      await(activeFile.get.toStringF(actorSystem)) shouldBe defaultStrConf
-    }
+        val activeFile: Option[ConfigData] = await(clientApi.getActive(filePath))
+        await(activeFile.get.toStringF(actorSystem)) shouldBe defaultStrConf
+      }
     Await.result(doneF, 5.seconds)
     //#getActive
   }
 
   test("create-update-delete | DEOPSCSW-89, DEOPSCSW-592") {
-    val futC =
-      //#create
+    //#create
+    val futC: Future[Assertion] =
       async {
         //construct ConfigData from String containing ASCII text
         val configString: String =
@@ -126,21 +127,22 @@ class ConfigClientExampleTest
     //#create
 
     //#update
-    val futU = async {
-      val destPath = Paths.get("/hcd/trombone/debug.bin")
-      val newId = await(
-        adminApi
-          .update(destPath, ConfigData.fromString(defaultStrConf), comment = "debug statements")
-      )
+    val futU: Future[Assertion] =
+      async {
+        val destPath = Paths.get("/hcd/trombone/debug.bin")
+        val newId = await(
+          adminApi
+            .update(destPath, ConfigData.fromString(defaultStrConf), comment = "debug statements")
+        )
 
-      //validate the returned id
-      newId shouldEqual ConfigId(7)
-    }
+        //validate the returned id
+        newId shouldEqual ConfigId(7)
+      }
     Await.result(futU, 2.seconds)
     //#update
 
     //#delete
-    val futD = async {
+    val futD: Future[Assertion] = async {
       val unwantedFilePath = Paths.get("/hcd/trombone/debug.bin")
       await(adminApi.delete(unwantedFilePath, "no longer needed"))
       //validates the file is deleted
@@ -152,7 +154,7 @@ class ConfigClientExampleTest
 
   test("getById | DEOPSCSW-89, DEOPSCSW-592") {
     //#getById
-    val doneF = async {
+    val doneF: Future[Assertion] = async {
       // create a file using API first
       val filePath = Paths.get("/tmt/trmobone/assembly/hcd.conf")
       val id: ConfigId =
@@ -188,7 +190,7 @@ class ConfigClientExampleTest
 
   test("getByTime | DEOPSCSW-89, DEOPSCSW-592") {
     //#getByTime
-    val assertionF = async {
+    val assertionF: Future[Assertion] = async {
       val tInitial = Instant.MIN
       //create a file
       val filePath = Paths.get("/a/b/c/test.conf")
@@ -222,7 +224,7 @@ class ConfigClientExampleTest
     //create config files at those paths
     paths map {
       case (path, fileType) =>
-        val createF = async {
+        val createF: Future[ConfigId] = async {
           await(
             adminApi.create(path, ConfigData.fromString(defaultStrConf), Annex == fileType, "initial commit")
           )
@@ -230,7 +232,7 @@ class ConfigClientExampleTest
         Await.result(createF, 2.seconds)
     }
 
-    val assertionF = async {
+    val assertionF: Future[Assertion] = async {
       //retrieve list of all files; for demonstration purpose show validate return values
       await(adminApi.list()).map(info => info.path).toSet shouldBe paths.map {
         case (path, _) => path
@@ -264,7 +266,7 @@ class ConfigClientExampleTest
 
   test("history | DEOPSCSW-89, DEOPSCSW-592") {
     //#history
-    val assertionF = async {
+    val assertionF: Future[Assertion] = async {
       val filePath = Paths.get("/a/test.conf")
       val id0      = await(adminApi.create(filePath, ConfigData.fromString(defaultStrConf), annex = false, "first commit"))
 
@@ -291,7 +293,7 @@ class ConfigClientExampleTest
 
   test("historyActive-setActiveVersion-resetActiveVersion-getActiveVersion-getActiveByTime | DEOPSCSW-89, DEOPSCSW-592") {
     //#active-file-mgmt
-    val assertionF = async {
+    val assertionF: Future[Assertion] = async {
       val tBegin   = Instant.now()
       val filePath = Paths.get("/a/test.conf")
       //create will make the 1st revision active with a default comment
@@ -349,7 +351,7 @@ class ConfigClientExampleTest
 
   test("getMetadata | DEOPSCSW-89, DEOPSCSW-592") {
     //#getMetadata
-    val assertF = async {
+    val assertF: Future[Assertion] = async {
       val metaData: ConfigMetadata = await(adminApi.getMetadata)
       //repository path must not be empty
       metaData.repoPath should not be empty

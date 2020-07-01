@@ -2,12 +2,14 @@ package example.auth.installed
 
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
+import akka.http.scaladsl.Http
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.{HttpApp, Route}
+import akka.http.scaladsl.server.Route
 import com.typesafe.config.ConfigFactory
 import csw.aas.http.AuthorizationPolicy.RealmRolePolicy
+import csw.aas.http.SecurityDirectives
 import spray.json.DefaultJsonProtocol._
 
 import scala.concurrent.ExecutionContext
@@ -16,7 +18,7 @@ object SampleRoutes {
 
   implicit val actorSystem: ActorSystem[_] = ActorSystem(Behaviors.empty, "test")
   implicit val ec: ExecutionContext        = actorSystem.executionContext
-  val securityDirectives =
+  val securityDirectives: SecurityDirectives =
     csw.aas.http.SecurityDirectives(ConfigFactory.parseString("""
       | auth-config {
       |  realm = TMT
@@ -45,7 +47,8 @@ object SampleRoutes {
   // #sample-routes
 }
 
-object SampleServer extends HttpApp with App {
-  override protected def routes: Route = SampleRoutes.routes
-  startServer("localhost", 7000)
+object SampleServer extends App {
+  protected def routes: Route = SampleRoutes.routes
+  import SampleRoutes.actorSystem
+  Http().bindAndHandle(routes, "localhost", 7000)
 }
