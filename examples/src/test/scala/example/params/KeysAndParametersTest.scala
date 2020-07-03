@@ -30,13 +30,12 @@ class KeysAndParametersTest extends AnyFunSpec with Matchers {
 
       //storing multiple values
       val paramWithShorts1: Parameter[Short] = k2.set(1, 2, 3, 4)
-      val paramWithShorts2: Parameter[Short] = k2 -> (1, 2, 3, 4)
-      val paramWithShorts3: Parameter[Short] = k2 -> Array[Short](1, 2, 3, 4)
+      val paramWithShorts3: Parameter[Short] = k2.setAll(Array[Short](1, 2, 3, 4))
 
       //associating units
       val weekDays: Array[String]            = Array("Sunday", "Monday", "Tuesday")
       val paramWithUnits1: Parameter[String] = k3.setAll(weekDays)
-      val paramWithUnits2: Parameter[String] = k3 -> weekDays withUnits Units.day
+      val paramWithUnits2: Parameter[String] = k3.setAll(weekDays) withUnits Units.day
 
       //default unit is NoUnits
       assert(booleanParam.units === Units.NoUnits)
@@ -54,8 +53,7 @@ class KeysAndParametersTest extends AnyFunSpec with Matchers {
       //validations
       assert(head === 1)
       assert(allValues === Array(1, 2, 3, 4))
-      assert(paramWithShorts1.values === paramWithShorts2.values)
-      assert(paramWithShorts2.values === paramWithShorts3.values)
+      assert(paramWithShorts1.values === paramWithShorts3.values)
       assert(paramWithUnits3.units === Units.meter)
       assert(paramWithUnits1.values === paramWithUnits2.values)
     }
@@ -169,7 +167,7 @@ class KeysAndParametersTest extends AnyFunSpec with Matchers {
 
       //store values
       val p1: Parameter[RaDec] = raDecKey.set(raDec1)
-      val p2: Parameter[RaDec] = raDecKey -> Array(raDec1, raDec2)
+      val p2: Parameter[RaDec] = raDecKey.setAll(Array(raDec1, raDec2))
 
       //add units
       val paramWithDegree = p1.withUnits(Units.degree)
@@ -301,7 +299,7 @@ class KeysAndParametersTest extends AnyFunSpec with Matchers {
       //default units via set
       val paramWithUnits1: Parameter[String] = k3.setAll(weekDays)
       //associating units via withUnits
-      val paramWithUnits2: Parameter[String] = k3 -> weekDays withUnits Units.day
+      val paramWithUnits2: Parameter[String] = k3.setAll(weekDays) withUnits Units.day
       //change existing unit
       val paramWithUnits3: Parameter[Short] = paramOfShorts.withUnits(Units.meter)
       //#units

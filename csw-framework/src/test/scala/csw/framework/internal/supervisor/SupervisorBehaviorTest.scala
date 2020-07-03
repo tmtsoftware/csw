@@ -52,9 +52,9 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
       case _             => ""
     }
 
-    spawnedEffects should contain allOf (
+    (spawnedEffects should contain).allOf(
       componentTLAName,
-      SupervisorBehavior.PubSubLifecycleActor,
+      SupervisorBehavior.PubSubLifecycleActor
     )
   }
 
