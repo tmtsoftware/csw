@@ -51,7 +51,7 @@ object Libs {
   val `os-lib`            = "com.lihaoyi"                  %% "os-lib"          % "0.7.0"
   val `caffeine`          = "com.github.ben-manes.caffeine" % "caffeine"        % "2.8.4"
   val netty               = "io.netty"                      % "netty"           % "3.10.6.Final"
-  val `case-app`          = "com.github.alexarchambault"   %% "case-app"        % "2.0.1"
+  val `case-app`          = "com.github.alexarchambault"   %% "case-app"        % "2.0.3"
   val `tmt-test-reporter` = "com.github.tmtsoftware"       %% "rtm"             % "05e9789f460"
 }
 
