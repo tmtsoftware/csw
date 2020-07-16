@@ -1,7 +1,6 @@
 package org.tmt.csw.sample;
 
 import akka.actor.typed.ActorRef;
-import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.util.Timeout;
 import csw.command.api.javadsl.ICommandService;
@@ -9,6 +8,7 @@ import csw.command.client.CommandServiceFactory;
 import csw.command.client.messages.TopLevelActorMessage;
 import csw.event.api.javadsl.IEventSubscription;
 import csw.framework.javadsl.JComponentHandlers;
+import csw.framework.models.ComponentContext;
 import csw.framework.models.JCswContext;
 import csw.location.api.models.*;
 import csw.logging.api.javadsl.ILogger;
@@ -47,14 +47,14 @@ public class JSampleHandlers extends JComponentHandlers {
 
     private JCswContext cswCtx;
     private ILogger log;
-    private ActorContext<TopLevelActorMessage> actorContext;
+    private ComponentContext<TopLevelActorMessage> ctx;
     private final ActorRef<WorkerCommand> commandSender;
 
-    JSampleHandlers(ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
+    JSampleHandlers(ComponentContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
         super(ctx, cswCtx);
         this.cswCtx = cswCtx;
         this.log = cswCtx.loggerFactory().getLogger(getClass());
-        this.actorContext = ctx;
+        this.ctx = ctx;
         this.commandSender = createWorkerActor();
     }
 
@@ -71,7 +71,7 @@ public class JSampleHandlers extends JComponentHandlers {
     }
 
     private ActorRef<WorkerCommand> createWorkerActor() {
-        return actorContext.spawn(
+        return ctx.spawn(
                 Behaviors.receiveMessage(msg -> {
                     if (msg instanceof SendCommand) {
                         SendCommand command = (SendCommand) msg;
@@ -178,7 +178,7 @@ public class JSampleHandlers extends JComponentHandlers {
         if (trackingEvent instanceof LocationUpdated) {
             LocationUpdated updated = (LocationUpdated) trackingEvent;
             Location location = updated.location();
-            ICommandService hcd = CommandServiceFactory.jMake(location, actorContext.getSystem());
+            ICommandService hcd = CommandServiceFactory.jMake(location, ctx.system());
             commandSender.tell(new SendCommand(hcd));
         } else if (trackingEvent instanceof LocationRemoved) {
             log.info("HCD no longer available");

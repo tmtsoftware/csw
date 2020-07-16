@@ -17,6 +17,7 @@ import csw.framework.CurrentStatePublisher;
 import csw.framework.exceptions.FailureRestart;
 import csw.framework.exceptions.FailureStop;
 import csw.framework.javadsl.JComponentHandlers;
+import csw.framework.models.ComponentContext;
 import csw.framework.models.JCswContext;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.api.javadsl.JComponentType;
@@ -42,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 //#jcomponent-handlers-class
 public class JAssemblyComponentHandlers extends JComponentHandlers {
 
-    private final ActorContext<TopLevelActorMessage> ctx;
+    private final ComponentContext<TopLevelActorMessage> ctx;
     private final ComponentInfo componentInfo;
     private final CurrentStatePublisher currentStatePublisher;
     private final CommandResponseManager commandResponseManager;
@@ -54,7 +55,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     private ActorRef<DiagnosticPublisherMessages> diagnosticPublisher;
     private ActorRef<CommandResponse.SubmitResponse> commandResponseAdapter;
 
-    public JAssemblyComponentHandlers(akka.actor.typed.javadsl.ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
+    public JAssemblyComponentHandlers(ComponentContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
         super(ctx, cswCtx);
         this.ctx = ctx;
         this.componentInfo = cswCtx.componentInfo();
@@ -63,11 +64,11 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         this.locationService = cswCtx.locationService();
         this.eventService = cswCtx.eventService();
         log = cswCtx.loggerFactory().getLogger(this.getClass());
-        configClient = JConfigClientFactory.clientApi(ctx.getSystem(), locationService);
+        configClient = JConfigClientFactory.clientApi(ctx.system(), locationService);
 
         runningHcds = new HashMap<>();
-        commandResponseAdapter = TestProbe.<CommandResponse.SubmitResponse>create(ctx.getSystem()).ref();
-        commandResponseAdapter = TestProbe.<CommandResponse.SubmitResponse>create(ctx.getSystem()).ref();
+        commandResponseAdapter = TestProbe.<CommandResponse.SubmitResponse>create(ctx.system()).ref();
+        commandResponseAdapter = TestProbe.<CommandResponse.SubmitResponse>create(ctx.system()).ref();
     }
     //#jcomponent-handlers-class
 
@@ -94,10 +95,10 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                     if (!hcdLocation.isPresent())
                         throw new HcdNotFoundException();
                     else {
-                        runningHcds.put(connection, Optional.of(CommandServiceFactory.jMake(hcdLocation.orElseThrow(), ctx.getSystem())));
+                        runningHcds.put(connection, Optional.of(CommandServiceFactory.jMake(hcdLocation.orElseThrow(), ctx.system())));
                         //#event-subscriber
                     }
-                    diagnosticPublisher = ctx.spawnAnonymous(JDiagnosticsPublisher.behavior(CommandServiceFactory.jMake(hcdLocation.orElseThrow(), ctx.getSystem()), workerActor));
+                    diagnosticPublisher = ctx.spawnAnonymous(JDiagnosticsPublisher.behavior(CommandServiceFactory.jMake(hcdLocation.orElseThrow(), ctx.system()), workerActor));
                 })).orElseThrow();
 
     }
@@ -340,7 +341,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
         CompletableFuture<ICommandService> eventualCommandService = resolvedHcdLocation.thenApply((Optional<AkkaLocation> hcdLocation) -> {
             if (hcdLocation.isPresent())
-                return CommandServiceFactory.jMake(hcdLocation.orElseThrow(), ctx.getSystem());
+                return CommandServiceFactory.jMake(hcdLocation.orElseThrow(), ctx.system());
             else
                 throw new HcdNotFoundException();
         });

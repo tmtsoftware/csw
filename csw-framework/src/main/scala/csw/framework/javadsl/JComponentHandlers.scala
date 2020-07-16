@@ -2,13 +2,12 @@ package csw.framework.javadsl
 
 import java.util.concurrent.CompletableFuture
 
-import akka.actor.typed.javadsl.ActorContext
 import csw.command.client.messages.TopLevelActorMessage
-import csw.framework.models.JCswContext
+import csw.framework.models.{ComponentContext, JCswContext}
 import csw.framework.scaladsl.ComponentHandlers
 
 import scala.compat.java8.FutureConverters._
-import scala.concurrent.{ExecutionContextExecutor, Future}
+import scala.concurrent.Future
 
 /**
  * Base class for component handlers which will be used by the component actor
@@ -16,10 +15,10 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
  * @param ctx the [[akka.actor.typed.javadsl.ActorContext]] under which the actor instance of the component, which use these handlers, is created
  * @param cswCtx provides access to csw services e.g. location, event, alarm, etc
  */
-abstract class JComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: JCswContext)
-    extends ComponentHandlers(ctx.asScala, cswCtx.asScala) {
+abstract class JComponentHandlers(ctx: ComponentContext[TopLevelActorMessage], cswCtx: JCswContext)
+    extends ComponentHandlers(ctx, cswCtx.asScala) {
 
-  implicit val ec: ExecutionContextExecutor = ctx.getExecutionContext
+  import ctx.executionContext
 
   /**
    * A Java helper that is invoked when the component is created. This is different than constructor initialization

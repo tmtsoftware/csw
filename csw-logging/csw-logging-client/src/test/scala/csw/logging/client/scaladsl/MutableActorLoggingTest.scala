@@ -14,7 +14,7 @@ import csw.prefix.models.Prefix
 object TromboneMutableActor {
   def behavior(loggerFactory: LoggerFactory): Behaviors.Receive[LogCommand] =
     Behaviors.receive { (ctx, msg) =>
-      val log: Logger = loggerFactory.getLogger(ctx)
+      val log: Logger = loggerFactory.getLogger(ctx.self)
 
       msg match {
         case LogTrace => log.trace("Level is trace")

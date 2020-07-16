@@ -1,7 +1,6 @@
 package csw.framework
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
 import akka.{Done, actor}
 import csw.alarm.api.scaladsl.AlarmService
@@ -16,9 +15,9 @@ import csw.framework.models.CswContext
 import csw.framework.scaladsl.RegistrationFactory
 import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.extensions.ActorExtension.RichActor
+import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaRegistration, HttpRegistration}
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
-import csw.location.api.models.Connection.AkkaConnection
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.scaladsl.LoggerFactory
@@ -57,8 +56,8 @@ class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol.Command]) ex
   val logger: Logger               = mock[Logger]
 
   when(loggerFactory.getLogger).thenReturn(logger)
-  when(loggerFactory.getLogger(any[actor.ActorContext])).thenReturn(logger)
-  when(loggerFactory.getLogger(any[ActorContext[_]])).thenReturn(logger)
+  when(loggerFactory.getLogger(any[actor.ActorRef])).thenReturn(logger)
+  when(loggerFactory.getLogger(any[ActorRef[_]])).thenReturn(logger)
 
   ///////////////////////////////////////////////
   val pubSubComponentActor: ActorRef[PubSub[CurrentState]] =

@@ -29,7 +29,7 @@ private[location] class DeathwatchActor(locationService: LocationService)(implic
    */
   private[location] def behavior(watchedLocations: Set[Location]): Behavior[Msg] =
     Behaviors.receive[Msg] { (context, changeMsg) =>
-      val log: Logger = LocationServiceLogger.getLogger(context)
+      val log: Logger = LocationServiceLogger.getLogger(context.self)
 
       val allLocations = changeMsg.get(AllServices.Key).entries.values.toSet
 
@@ -47,7 +47,7 @@ private[location] class DeathwatchActor(locationService: LocationService)(implic
       behavior(allLocations)
     } receiveSignal {
       case (ctx, Terminated(deadActorRef)) =>
-        val log: Logger = LocationServiceLogger.getLogger(ctx)
+        val log: Logger = LocationServiceLogger.getLogger(ctx.self)
 
         log.warn(s"Un-watching terminated actor: ${deadActorRef.toString}")
         //stop watching the terminated actor

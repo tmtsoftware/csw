@@ -7,6 +7,7 @@ import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import csw.command.client.messages.TopLevelActorMessage;
 import csw.framework.javadsl.JComponentHandlers;
+import csw.framework.models.ComponentContext;
 import csw.framework.models.JCswContext;
 import csw.location.api.models.TrackingEvent;
 import csw.logging.api.javadsl.ILogger;
@@ -43,9 +44,9 @@ public class JSampleHcdHandlers extends JComponentHandlers {
   private final JCswContext cswCtx;
   private final ILogger log;
   private final Prefix prefix;
-  private final ActorContext<TopLevelActorMessage> ctx;
+  private final ComponentContext<TopLevelActorMessage> ctx;
 
-  JSampleHcdHandlers(ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
+  JSampleHcdHandlers(ComponentContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
     super(ctx, cswCtx);
     this.ctx = ctx;
     this.cswCtx = cswCtx;

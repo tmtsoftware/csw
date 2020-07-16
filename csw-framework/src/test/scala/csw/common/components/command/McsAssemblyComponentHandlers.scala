@@ -1,13 +1,12 @@
 package csw.common.components.command
 
-import akka.actor.typed.scaladsl.ActorContext
 import akka.util.Timeout
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.CommandResponseManager.{OverallFailure, OverallSuccess}
 import csw.command.client.CommandServiceFactory
 import csw.command.client.messages.TopLevelActorMessage
 import csw.common.components.command.ComponentStateForCommand.{longRunningCmdCompleted, _}
-import csw.framework.models.CswContext
+import csw.framework.models.{ComponentContext, CswContext}
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.{AkkaLocation, TrackingEvent}
 import csw.params.commands.CommandIssue.UnsupportedCommandIssue
@@ -22,7 +21,7 @@ import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
+class McsAssemblyComponentHandlers(ctx: ComponentContext[TopLevelActorMessage], cswCtx: CswContext)
     extends ComponentHandlers(ctx, cswCtx) {
 
   private implicit val timeout: Timeout     = 10.seconds

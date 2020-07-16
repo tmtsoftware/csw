@@ -2,23 +2,22 @@ package csw.framework
 
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
 import akka.util.Timeout
 import csw.command.client.messages.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
 import csw.command.client.models.framework.ComponentInfo
 import csw.framework.internal.supervisor.SupervisorBehaviorFactory
-import csw.framework.models.CswContext
+import csw.framework.models.{ComponentContext, CswContext}
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.location.client.ActorSystemFactory
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.scaladsl.LoggerFactory
 import org.scalatest.BeforeAndAfterAll
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
-import org.scalatest.funsuite.AnyFunSuite
-import org.scalatest.matchers.should.Matchers
 
 private[csw] abstract class FrameworkTestSuite extends AnyFunSuite with Matchers with BeforeAndAfterAll {
   implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol(), "testHcd")
@@ -32,10 +31,10 @@ private[csw] abstract class FrameworkTestSuite extends AnyFunSuite with Matchers
   }
 
   def getSampleHcdWiring(componentHandlers: ComponentHandlers): ComponentBehaviorFactory =
-    (_: ActorContext[TopLevelActorMessage], _: CswContext) => componentHandlers
+    (_: ComponentContext[TopLevelActorMessage], _: CswContext) => componentHandlers
 
   def getSampleAssemblyWiring(assemblyHandlers: ComponentHandlers): ComponentBehaviorFactory =
-    (_: ActorContext[TopLevelActorMessage], _: CswContext) => assemblyHandlers
+    (_: ComponentContext[TopLevelActorMessage], _: CswContext) => assemblyHandlers
 
   def createSupervisorAndStartTLA(
       componentInfo: ComponentInfo,

@@ -1,10 +1,9 @@
 package csw.common.components.command
 
-import akka.actor.typed.scaladsl.ActorContext
 import akka.stream.ThrottleMode
 import akka.stream.scaladsl.{Sink, Source}
 import csw.command.client.messages.TopLevelActorMessage
-import csw.framework.models.CswContext
+import csw.framework.models.{ComponentContext, CswContext}
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.TrackingEvent
 import csw.params.commands.CommandIssue.{OtherIssue, WrongPrefixIssue}
@@ -19,7 +18,7 @@ import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
+class ComponentHandlerForCommand(ctx: ComponentContext[TopLevelActorMessage], cswCtx: CswContext)
     extends ComponentHandlers(ctx, cswCtx) {
 
   import cswCtx._

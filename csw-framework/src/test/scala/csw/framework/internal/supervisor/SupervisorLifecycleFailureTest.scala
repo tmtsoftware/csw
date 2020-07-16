@@ -2,7 +2,6 @@ package csw.framework.internal.supervisor
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.ActorRef
-import akka.actor.typed.scaladsl.ActorContext
 import csw.command.client.messages.CommandMessage.Submit
 import csw.command.client.messages.ComponentCommonMessage.{
   ComponentStateSubscription,
@@ -18,7 +17,7 @@ import csw.common.utils.TestAppender
 import csw.framework.ComponentInfos._
 import csw.framework.exceptions.{FailureRestart, FailureStop}
 import csw.framework.internal.component.ComponentBehavior
-import csw.framework.models.CswContext
+import csw.framework.models.{ComponentContext, CswContext}
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
@@ -264,7 +263,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 }
 
 class SampleBehaviorFactory(componentHandlers: ComponentHandlers) extends ComponentBehaviorFactory {
-  override protected def handlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext): ComponentHandlers =
+  override protected def handlers(ctx: ComponentContext[TopLevelActorMessage], cswCtx: CswContext): ComponentHandlers =
     componentHandlers
 }
 

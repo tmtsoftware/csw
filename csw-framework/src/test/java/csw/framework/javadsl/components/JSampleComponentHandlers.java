@@ -1,7 +1,6 @@
 package csw.framework.javadsl.components;
 
 import akka.actor.Cancellable;
-import akka.actor.typed.javadsl.ActorContext;
 import akka.stream.ThrottleMode;
 import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
@@ -12,27 +11,33 @@ import csw.common.components.framework.SampleComponentState;
 import csw.event.api.javadsl.IEventService;
 import csw.framework.CurrentStatePublisher;
 import csw.framework.javadsl.JComponentHandlers;
+import csw.framework.models.ComponentContext;
 import csw.framework.models.JCswContext;
 import csw.location.api.models.TrackingEvent;
 import csw.logging.api.javadsl.ILogger;
 import csw.params.commands.*;
-import csw.params.commands.CommandResponse.*;
+import csw.params.commands.CommandResponse.Completed;
+import csw.params.commands.CommandResponse.Started;
+import csw.params.commands.CommandResponse.SubmitResponse;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.Id;
-import csw.params.javadsl.JUnits;
-import csw.prefix.models.Prefix;
 import csw.params.core.states.CurrentState;
 import csw.params.core.states.StateName;
 import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JUnits;
 import csw.prefix.javadsl.JSubsystem;
+import csw.prefix.models.Prefix;
 import csw.time.core.models.UTCTime;
 
 import java.time.Duration;
 import java.util.Optional;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static csw.common.components.command.ComponentStateForCommand.*;
 
@@ -44,11 +49,11 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     private CommandResponseManager commandResponseManager;
     private CurrentStatePublisher currentStatePublisher;
     private CurrentState currentState = new CurrentState(SampleComponentState.prefix(), new StateName("testStateName"));
-    private ActorContext<TopLevelActorMessage> actorContext;
+    private ComponentContext<TopLevelActorMessage> actorContext;
     private IEventService eventService;
     private Optional<Cancellable> diagModeCancellable = Optional.empty();
 
-    JSampleComponentHandlers(ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
+    JSampleComponentHandlers(ComponentContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
         super(ctx, cswCtx);
         this.currentStatePublisher = cswCtx.currentStatePublisher();
         this.log = cswCtx.loggerFactory().getLogger(getClass());
@@ -186,7 +191,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
                     return i;
                 })
                 .throttle(1, Duration.ofMillis(100), 1, (ThrottleMode) ThrottleMode.shaping())
-                .runWith(Sink.ignore(), actorContext.getSystem());
+                .runWith(Sink.ignore(), actorContext.system());
     }
 
 

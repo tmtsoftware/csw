@@ -1,8 +1,7 @@
 package csw.benchmark.command.component
 
-import akka.actor.typed.scaladsl.ActorContext
 import csw.command.client.messages.TopLevelActorMessage
-import csw.framework.models.CswContext
+import csw.framework.models.{ComponentContext, CswContext}
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.TrackingEvent
 import csw.logging.api.scaladsl.Logger
@@ -13,9 +12,9 @@ import csw.time.core.models.UTCTime
 
 import scala.concurrent.Future
 
-class ActionLessHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext) extends ComponentHandlers(ctx, cswCtx) {
+class ActionLessHandlers(ctx: ComponentContext[TopLevelActorMessage], cswCtx: CswContext) extends ComponentHandlers(ctx, cswCtx) {
 
-  val log: Logger = cswCtx.loggerFactory.getLogger(ctx)
+  val log: Logger = cswCtx.loggerFactory.getLogger(ctx.self)
 
   override def initialize(): Future[Unit] = Future.unit
 

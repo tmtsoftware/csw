@@ -21,7 +21,7 @@ private[framework] object PubSubBehavior {
    */
   def make[T: Nameable](loggerFactory: LoggerFactory): Behavior[PubSub[T]] =
     Behaviors.setup { ctx =>
-      val log: Logger = loggerFactory.getLogger(ctx)
+      val log: Logger = loggerFactory.getLogger(ctx.self)
 
       val nameableData: Nameable[T] = implicitly[Nameable[T]]
 

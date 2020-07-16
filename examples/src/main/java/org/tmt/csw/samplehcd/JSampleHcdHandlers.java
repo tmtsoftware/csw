@@ -2,10 +2,10 @@ package org.tmt.csw.samplehcd;
 
 import akka.actor.Cancellable;
 import akka.actor.typed.ActorRef;
-import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import csw.command.client.messages.TopLevelActorMessage;
 import csw.framework.javadsl.JComponentHandlers;
+import csw.framework.models.ComponentContext;
 import csw.framework.models.JCswContext;
 import csw.location.api.models.TrackingEvent;
 import csw.logging.api.javadsl.ILogger;
@@ -38,15 +38,15 @@ public class JSampleHcdHandlers extends JComponentHandlers {
 
     private final JCswContext cswCtx;
     private final ILogger log;
-    private final ActorContext<TopLevelActorMessage> actorContext;
+    private final ComponentContext<TopLevelActorMessage> ctx;
     private final ActorRef<WorkerCommand> workerActor;
 
 
-    JSampleHcdHandlers(ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
+    JSampleHcdHandlers(ComponentContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
         super(ctx, cswCtx);
         this.cswCtx = cswCtx;
         this.log = cswCtx.loggerFactory().getLogger(getClass());
-        this.actorContext = ctx;
+        this.ctx = ctx;
         workerActor = createWorkerActor();
     }
 
@@ -65,7 +65,7 @@ public class JSampleHcdHandlers extends JComponentHandlers {
     }
 
     private ActorRef<WorkerCommand> createWorkerActor() {
-        return actorContext.spawn(
+        return ctx.spawn(
                 Behaviors.receiveMessage(msg -> {
                     if (msg instanceof Sleep) {
                         Sleep sleep = (Sleep) msg;

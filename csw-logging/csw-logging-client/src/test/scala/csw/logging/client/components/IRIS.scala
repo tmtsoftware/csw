@@ -16,7 +16,7 @@ class IRIS(logger: LoggerFactory) {
   def behavior: Behavior[IRISLogMessages] =
     Behaviors.setup[IRISLogMessages] { ctx =>
       // DEOPSCSW-316: Improve Logger accessibility for component developers
-      val log: Logger = logger.getLogger(ctx)
+      val log: Logger = logger.getLogger(ctx.self)
       Behaviors.receiveMessage[IRISLogMessages] { msg =>
         // Do not add any lines before this method
         // Tests are written to assert on this line numbers
@@ -108,7 +108,7 @@ object IrisActorUtil {
   def behavior: Behavior[IRISLogMessages] =
     Behaviors.setup[IRISLogMessages] { ctx =>
       // DEOPSCSW-316: Improve Logger accessibility for component developers
-      val log: Logger = GenericLoggerFactory.getLogger(ctx)
+      val log: Logger = GenericLoggerFactory.getLogger(ctx.self)
 
       Behaviors.receiveMessage[IRISLogMessages] { msg =>
         msg match {

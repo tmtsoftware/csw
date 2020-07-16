@@ -78,7 +78,7 @@ private[framework] final class SupervisorBehavior(
   import cswCtx._
   import ctx.executionContext
 
-  private val log: Logger                        = loggerFactory.getLogger(ctx)
+  private val log: Logger                        = loggerFactory.getLogger(ctx.self)
   private val prefix: Prefix                     = componentInfo.prefix
   private val componentActorName: String         = s"$prefix-$ComponentActorNameSuffix"
   private val akkaConnection: AkkaConnection     = AkkaConnection(ComponentId(prefix, componentInfo.componentType))

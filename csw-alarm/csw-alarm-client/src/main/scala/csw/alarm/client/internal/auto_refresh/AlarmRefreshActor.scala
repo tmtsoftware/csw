@@ -18,7 +18,7 @@ private[client] object AlarmRefreshActor {
       refreshInterval: FiniteDuration
   ): Behavior[AutoRefreshSeverityMessage] =
     Behaviors.setup[AutoRefreshSeverityMessage] { ctx =>
-      val log: Logger = AlarmServiceLogger.getLogger(ctx)
+      val log: Logger = AlarmServiceLogger.getLogger(ctx.self)
 
       Behaviors.receiveMessage { msg =>
         log.debug(s"AutoRefreshSeverityActor received message :[$msg]")

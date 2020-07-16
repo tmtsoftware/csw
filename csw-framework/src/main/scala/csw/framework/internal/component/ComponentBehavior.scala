@@ -43,7 +43,7 @@ private[framework] object ComponentBehavior {
       import cswCtx._
       import ctx.executionContext
 
-      val log: Logger = loggerFactory.getLogger(ctx)
+      val log: Logger = loggerFactory.getLogger(ctx.self)
 
       val shutdownTimeout: FiniteDuration = 10.seconds
 

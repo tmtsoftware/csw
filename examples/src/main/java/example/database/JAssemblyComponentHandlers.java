@@ -5,6 +5,7 @@ import csw.command.client.messages.TopLevelActorMessage;
 import csw.database.DatabaseServiceFactory;
 import csw.database.javadsl.JooqHelper;
 import csw.framework.javadsl.JComponentHandlers;
+import csw.framework.models.ComponentContext;
 import csw.framework.models.JCswContext;
 import csw.location.api.models.TrackingEvent;
 import csw.params.commands.CommandResponse;
@@ -21,12 +22,12 @@ import java.util.concurrent.CompletionStage;
 //DEOPSCSW-615: DB service accessible to CSW component developers
 public class JAssemblyComponentHandlers extends JComponentHandlers {
 
-    private ActorContext<TopLevelActorMessage> ctx;
+    private ComponentContext<TopLevelActorMessage> ctx;
     private JCswContext cswCtx;
     private DatabaseServiceFactory dbFactory;
     private DSLContext dsl;
 
-    public JAssemblyComponentHandlers(ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
+    public JAssemblyComponentHandlers(ComponentContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
         super(ctx, cswCtx);
         this.ctx = ctx;
         this.cswCtx = cswCtx;
@@ -36,7 +37,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     @Override
     public CompletableFuture<Void> jInitialize() {
         //#dbFactory-access
-        dbFactory = new DatabaseServiceFactory(ctx.getSystem());
+        dbFactory = new DatabaseServiceFactory(ctx.system());
 
         dbFactory
                 .jMakeDsl(cswCtx.locationService(), "postgres") // postgres is dbName
@@ -107,7 +108,8 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         class Films {
             private Integer id;  // variable name (id) and type (Integer) should be same as column's name and type in database
             private String name; // variable name (name) and type (String) should be same as column's name and type in database
-        };
+        }
+        ;
 
         // fetch data from table and map it to Films class
         ResultQuery<Record> selectQuery = dsl.resultQuery("SELECT id, name FROM films WHERE id = ?", 1);

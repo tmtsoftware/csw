@@ -1,9 +1,8 @@
 package csw.common.components.command
 
-import akka.actor.typed.scaladsl.ActorContext
 import csw.command.client.messages.TopLevelActorMessage
 import csw.common.components.command.ComponentStateForCommand._
-import csw.framework.models.CswContext
+import csw.framework.models.{ComponentContext, CswContext}
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.TrackingEvent
 import csw.params.commands.CommandIssue.UnsupportedCommandIssue
@@ -14,7 +13,7 @@ import csw.time.core.models.UTCTime
 
 import scala.concurrent.Future
 
-class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
+class McsHcdComponentHandlers(ctx: ComponentContext[TopLevelActorMessage], cswCtx: CswContext)
     extends ComponentHandlers(ctx, cswCtx) {
 
   import cswCtx._

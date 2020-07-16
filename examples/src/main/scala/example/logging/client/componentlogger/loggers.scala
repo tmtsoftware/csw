@@ -18,7 +18,7 @@ class SampleClass(loggerFactory: LoggerFactory) {
 class SampleActor(loggerFactory: LoggerFactory) extends akka.actor.Actor {
 
   //context is available from akka.actor.Actor
-  val log: Logger = loggerFactory.getLogger(context)
+  val log: Logger = loggerFactory.getLogger(context.self)
 
   override def receive = ???
 }
@@ -27,7 +27,7 @@ class SampleActor(loggerFactory: LoggerFactory) extends akka.actor.Actor {
 //#component-logger-typed-actor
 class SampleTypedActor(loggerFactory: LoggerFactory, ctx: ActorContext[ComponentMessage]) {
 
-  val log: Logger = loggerFactory.getLogger(ctx)
+  val log: Logger = loggerFactory.getLogger(ctx.self)
 }
 //#component-logger-typed-actor
 

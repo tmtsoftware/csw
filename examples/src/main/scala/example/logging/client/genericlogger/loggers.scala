@@ -18,7 +18,7 @@ object GenericActor {
 
   def behavior[T]: Behavior[T] =
     Behaviors.setup[T] { context =>
-      val log: Logger = GenericLoggerFactory.getLogger(context)
+      val log: Logger = GenericLoggerFactory.getLogger(context.self)
       // actor setup
 
       Behaviors.receiveMessage {
@@ -32,6 +32,6 @@ object GenericActor {
 //#generic-logger-typed-actor
 class GenericTypedActor(ctx: ActorContext[ComponentMessage]) {
 
-  val log: Logger = GenericLoggerFactory.getLogger(ctx)
+  val log: Logger = GenericLoggerFactory.getLogger(ctx.self)
 }
 //#generic-logger-typed-actor

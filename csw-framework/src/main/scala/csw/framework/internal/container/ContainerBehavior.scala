@@ -49,7 +49,7 @@ private[framework] final class ContainerBehavior(
 ) extends AbstractBehavior[ContainerActorMessage](ctx) {
 
   import ctx.executionContext
-  private val log: Logger     = loggerFactory.getLogger(ctx)
+  private val log: Logger     = loggerFactory.getLogger(ctx.self)
   private val containerPrefix = containerInfo.prefix
   private val akkaConnection  = AkkaConnection(ComponentId(containerPrefix, ComponentType.Container))
   private val akkaRegistration: AkkaRegistration =

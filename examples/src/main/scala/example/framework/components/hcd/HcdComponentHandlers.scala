@@ -8,7 +8,7 @@ import akka.actor.typed.scaladsl.AskPattern.Askable
 import akka.util.Timeout
 import csw.command.client.messages.TopLevelActorMessage
 import csw.config.api.ConfigData
-import csw.framework.models.CswContext
+import csw.framework.models.{ComponentContext, CswContext}
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.logging.api.scaladsl.Logger
@@ -25,14 +25,14 @@ import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContext, Future}
 
 //#component-handlers-class
-class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
+class HcdComponentHandlers(ctx: ComponentContext[TopLevelActorMessage], cswCtx: CswContext)
     extends ComponentHandlers(ctx, cswCtx)
 //#component-handlers-class
     {
 
   import cswCtx._
 
-  val log: Logger = loggerFactory.getLogger(ctx)
+  val log: Logger = loggerFactory.getLogger(ctx.self)
 
   implicit val ec: ExecutionContext = ctx.executionContext
   implicit val timeout: Timeout     = 5.seconds

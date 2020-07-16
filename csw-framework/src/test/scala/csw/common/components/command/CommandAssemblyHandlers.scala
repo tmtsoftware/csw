@@ -1,13 +1,12 @@
 package csw.common.components.command
 
-import akka.actor.typed.scaladsl.ActorContext
 import akka.util.Timeout
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.CommandResponseManager.{OverallFailure, OverallSuccess}
 import csw.command.client.CommandServiceFactory
 import csw.command.client.messages.TopLevelActorMessage
 import csw.common.components.command.CommandComponentState._
-import csw.framework.models.CswContext
+import csw.framework.models.{ComponentContext, CswContext}
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.ComponentType.HCD
 import csw.location.api.models.Connection.AkkaConnection
@@ -25,12 +24,12 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
+class CommandAssemblyHandlers(ctx: ComponentContext[TopLevelActorMessage], cswCtx: CswContext)
     extends ComponentHandlers(ctx, cswCtx) {
 
   import cswCtx._
 
-  private val log: Logger                   = loggerFactory.getLogger(ctx)
+  private val log: Logger                   = loggerFactory.getLogger(ctx.self)
   private implicit val ec: ExecutionContext = ctx.executionContext
   private implicit val timeout: Timeout     = 15.seconds
 

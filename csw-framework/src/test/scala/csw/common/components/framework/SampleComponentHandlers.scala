@@ -1,9 +1,8 @@
 package csw.common.components.framework
 
 import akka.actor.Cancellable
-import akka.actor.typed.scaladsl.ActorContext
 import csw.command.client.messages.TopLevelActorMessage
-import csw.framework.models.CswContext
+import csw.framework.models.{ComponentContext, CswContext}
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.location.api.models.{LocationRemoved, LocationUpdated, TrackingEvent}
@@ -20,11 +19,11 @@ import csw.time.core.models.UTCTime
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContext, Future}
 
-class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
+class SampleComponentHandlers(ctx: ComponentContext[TopLevelActorMessage], cswCtx: CswContext)
     extends ComponentHandlers(ctx, cswCtx) {
   import cswCtx._
 
-  val log: Logger                   = loggerFactory.getLogger(ctx)
+  val log: Logger                   = loggerFactory.getLogger(ctx.self)
   implicit val ec: ExecutionContext = ctx.executionContext
 
   import SampleComponentState._

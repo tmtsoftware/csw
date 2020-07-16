@@ -2,14 +2,13 @@ package example.framework.components.assembly
 
 import java.nio.file.Paths
 
-import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.{ActorRef, ActorSystem}
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.CommandServiceFactory
 import csw.command.client.messages.TopLevelActorMessage
 import csw.config.api.ConfigData
 import csw.framework.exceptions.{FailureRestart, FailureStop}
-import csw.framework.models.CswContext
+import csw.framework.models.{ComponentContext, CswContext}
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models._
 import csw.logging.api.scaladsl.Logger
@@ -23,7 +22,7 @@ import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
 //#component-handlers-class
-class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
+class AssemblyComponentHandlers(ctx: ComponentContext[TopLevelActorMessage], cswCtx: CswContext)
     extends ComponentHandlers(ctx, cswCtx)
 //#component-handlers-class
     {
@@ -31,7 +30,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
   import cswCtx._
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
 
-  private val log: Logger                                          = loggerFactory.getLogger(ctx)
+  private val log: Logger                                          = loggerFactory.getLogger(ctx.self)
   private var runningHcds: Map[Connection, Option[CommandService]] = Map.empty
   var diagnosticsPublisher: ActorRef[DiagnosticPublisherMessages]  = _
   var commandHandler: ActorRef[CommandHandlerMsgs]                 = _

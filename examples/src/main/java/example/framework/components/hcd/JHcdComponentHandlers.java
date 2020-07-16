@@ -11,6 +11,7 @@ import csw.config.api.ConfigData;
 import csw.event.api.javadsl.IEventService;
 import csw.framework.CurrentStatePublisher;
 import csw.framework.javadsl.JComponentHandlers;
+import csw.framework.models.ComponentContext;
 import csw.framework.models.JCswContext;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.api.models.LocationRemoved;
@@ -33,7 +34,7 @@ import java.util.concurrent.CompletionStage;
 //#jcomponent-handlers-class
 public class JHcdComponentHandlers extends JComponentHandlers {
 
-    private final ActorContext<TopLevelActorMessage> ctx;
+    private final ComponentContext<TopLevelActorMessage> ctx;
     private final ComponentInfo componentInfo;
     private final CommandResponseManager commandResponseManager;
     private final CurrentStatePublisher currentStatePublisher;
@@ -47,7 +48,7 @@ public class JHcdComponentHandlers extends JComponentHandlers {
     private int stats;
 
     public JHcdComponentHandlers(
-            akka.actor.typed.javadsl.ActorContext<TopLevelActorMessage> ctx,
+            ComponentContext<TopLevelActorMessage> ctx,
             JCswContext cswCtx
     ) {
         super(ctx, cswCtx);
@@ -73,10 +74,10 @@ public class JHcdComponentHandlers extends JComponentHandlers {
         worker = ctx.spawnAnonymous(WorkerActor.behavior(hcdConfig));
 
         // initialise some state by using the worker actor created above
-        CompletionStage<Integer> askCurrent = AskPattern.ask(worker, WorkerActorMsgs.JInitialState::new, Duration.ofSeconds(5), ctx.getSystem().scheduler());
+        CompletionStage<Integer> askCurrent = AskPattern.ask(worker, WorkerActorMsgs.JInitialState::new, Duration.ofSeconds(5), ctx.system().scheduler());
         CompletableFuture<Void> currentFuture = askCurrent.thenAccept(c -> current = c).toCompletableFuture();
 
-        CompletionStage<Integer> askStats = AskPattern.ask(worker, WorkerActorMsgs.JInitialState::new, Duration.ofSeconds(5), ctx.getSystem().scheduler());
+        CompletionStage<Integer> askStats = AskPattern.ask(worker, WorkerActorMsgs.JInitialState::new, Duration.ofSeconds(5), ctx.system().scheduler());
         CompletableFuture<Void> statsFuture = askStats.thenAccept(s -> stats = s).toCompletableFuture();
 
         return CompletableFuture.allOf(currentFuture, statsFuture);

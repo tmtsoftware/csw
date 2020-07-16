@@ -27,7 +27,7 @@ private[logging] class TimeActor(tdone: Promise[Unit]) {
 
   def behavior: Behavior[TimeActorMessage] =
     Behaviors.setup[TimeActorMessage] { ctx =>
-      val log: Logger = GenericLoggerFactory.getLogger(ctx)
+      val log: Logger = GenericLoggerFactory.getLogger(ctx.self)
       val items       = mutable.HashMap[String, TimeItem]()
 
       def start(id: RequestId, time: Long): Unit = {

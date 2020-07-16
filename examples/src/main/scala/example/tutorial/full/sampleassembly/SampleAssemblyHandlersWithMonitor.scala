@@ -9,7 +9,7 @@ import csw.command.client.CommandResponseManager.{OverallFailure, OverallSuccess
 import csw.command.client.CommandServiceFactory
 import csw.command.client.messages.TopLevelActorMessage
 import csw.event.api.scaladsl.EventSubscription
-import csw.framework.models.CswContext
+import csw.framework.models.{ComponentContext, CswContext}
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.location.api.models.Connection.AkkaConnection
@@ -37,7 +37,7 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
  * and if validation is successful, then onSubmit hook gets invoked.
  * You can find more information on this here : https://tmtsoftware.github.io/csw/framework.html
  */
-class SampleAssemblyHandlersWithMonitor(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
+class SampleAssemblyHandlersWithMonitor(ctx: ComponentContext[TopLevelActorMessage], cswCtx: CswContext)
     extends ComponentHandlers(ctx, cswCtx) {
 
   import cswCtx._

@@ -47,7 +47,7 @@ object LocationServiceExampleComponent {
 
   def behaviour(locationService: LocationService): Behaviors.Receive[ClientMessage] =
     Behaviors.receive[ClientMessage]((ctx, msg) => {
-      val log: Logger = new LoggerFactory(Prefix("csw.my-component-name")).getLogger(ctx)
+      val log: Logger = new LoggerFactory(Prefix("csw.my-component-name")).getLogger(ctx.self)
       log.info("In actor LocationServiceExampleComponent")
       // Register with the location service
       val registrationResult: Future[RegistrationResult] =

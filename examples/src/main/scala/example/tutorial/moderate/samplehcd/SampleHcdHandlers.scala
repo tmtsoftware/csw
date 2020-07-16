@@ -5,7 +5,7 @@ import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.{ActorRef, Scheduler}
 import akka.util.Timeout
 import csw.command.client.messages.TopLevelActorMessage
-import csw.framework.models.CswContext
+import csw.framework.models.{ComponentContext, CswContext}
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.TrackingEvent
 import csw.params.commands.CommandIssue.UnsupportedCommandIssue
@@ -29,7 +29,7 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
  * and if validation is successful, then onSubmit hook gets invoked.
  * You can find more information on this here : https://tmtsoftware.github.io/csw/framework.html
  */
-class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext) extends ComponentHandlers(ctx, cswCtx) {
+class SampleHcdHandlers(ctx: ComponentContext[TopLevelActorMessage], cswCtx: CswContext) extends ComponentHandlers(ctx, cswCtx) {
   import cswCtx._
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
   private val log                           = loggerFactory.getLogger
