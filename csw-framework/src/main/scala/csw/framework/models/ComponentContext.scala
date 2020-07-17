@@ -19,9 +19,9 @@ abstract class ComponentContext[T] {
 }
 
 object ComponentContext {
-  def from[T](ctx: ActorContext[T]): ComponentContext[T] = {
+  def from[T](ctx: ActorContext[T], ec: ExecutionContextExecutor): ComponentContext[T] = {
     new ComponentContext[T] {
-      override implicit def executionContext: ExecutionContextExecutor = ctx.executionContext
+      override implicit def executionContext: ExecutionContextExecutor = ec
 
       override def self: ActorRef[T]      = ctx.self
       override def system: ActorSystem[_] = ctx.system

@@ -3,6 +3,7 @@ package csw.framework.scaladsl
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior}
 import csw.command.client.messages.{FromComponentLifecycleMessage, TopLevelActorMessage}
+import csw.commons.BehaviourExtensions
 import csw.framework.internal.component.ComponentBehavior
 import csw.framework.models.{ComponentContext, CswContext}
 
@@ -27,10 +28,13 @@ abstract class ComponentBehaviorFactory {
    * @param cswCtx provides access to csw services e.g. location, event, alarm, etc
    * @return behavior for component Actor
    */
-  private[framework] def make(supervisor: ActorRef[FromComponentLifecycleMessage], cswCtx: CswContext): Behavior[Nothing] =
+  private[framework] def make(supervisor: ActorRef[FromComponentLifecycleMessage], cswCtx: CswContext): Behavior[Nothing] = {
     Behaviors
       .setup[TopLevelActorMessage] { ctx =>
-        ComponentBehavior.make(supervisor, handlers(ComponentContext.from(ctx), cswCtx), cswCtx)
+        BehaviourExtensions.withActorBoundEc { ec =>
+          ComponentBehavior.make(supervisor, handlers(ComponentContext.from(ctx, ec), cswCtx), cswCtx)
+        }
       }
       .narrow
+  }
 }
