@@ -29,8 +29,11 @@ case class Contract(endpoints: List[Endpoint], requests: ModelSet)
 case class Service(
     `http-contract`: Contract,
     `websocket-contract`: Contract,
-    models: ModelSet
+    models: ModelSet,
+    readme: Readme
 )
+
+case class Readme(content: String)
 
 case class Services(data: Map[String, Service])
 

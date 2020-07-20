@@ -3,6 +3,7 @@ import java.io.File
 import java.net.URI
 import java.nio.file.{Files, Paths}
 
+import csw.contract.ResourceFetcher
 import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.messages.LocationHttpMessage.Register
 import csw.location.api.messages.LocationWebsocketMessage.Track
@@ -26,15 +27,15 @@ class FilesGeneratorTest extends AnyFunSuite with Matchers with BeforeAndAfterAl
   }
 
   test("should generate samples for given services") {
-    val componentId: ComponentId       = ComponentId(Prefix("tcs.filter.wheel"), ComponentType.HCD)
-    val akkaConnection: AkkaConnection = AkkaConnection(componentId)
-    val httpConnection: HttpConnection = HttpConnection(componentId)
+    val componentId: ComponentId           = ComponentId(Prefix("tcs.filter.wheel"), ComponentType.HCD)
+    val akkaConnection: AkkaConnection     = AkkaConnection(componentId)
+    val httpConnection: HttpConnection     = HttpConnection(componentId)
     val akkaRegistration: AkkaRegistration = AkkaRegistration(akkaConnection, new URI("somePath"))
     val httpRegistration: HttpRegistration = HttpRegistration(httpConnection, 2090, "somePath")
-    val akkaLocation: Location         = AkkaLocation(akkaConnection, new URI("some_path"))
-    val akkaRegister: Register         = Register(akkaRegistration)
-    val httpRegister: Register         = Register(httpRegistration)
-    val track: Track = Track(akkaConnection)
+    val akkaLocation: Location             = AkkaLocation(akkaConnection, new URI("some_path"))
+    val akkaRegister: Register             = Register(akkaRegistration)
+    val httpRegister: Register             = Register(httpRegistration)
+    val track: Track                       = Track(akkaConnection)
     val httpEndpoints: List[Endpoint] = List(
       Endpoint(
         requestType = "Register",
@@ -63,13 +64,13 @@ class FilesGeneratorTest extends AnyFunSuite with Matchers with BeforeAndAfterAl
         "location-service" -> Service(
           `http-contract` = Contract(httpEndpoints, httpRequests),
           `websocket-contract` = Contract(websocketEndpoints, webSocketRequests),
-          models
+          models,
+          Readme(ResourceFetcher.getResourceAsString("/location-service/README.md"))
         )
       )
     )
-    val testOutput   = "csw-contract/src/test/testOutput"
-    val resourcePath = "csw-contract/src/test/resources"
-    FilesGenerator.generate(services, testOutput, resourcePath)
+    val testOutput = "csw-contract/src/test/testOutput"
+    FilesGenerator.generate(services, testOutput)
     val path = Paths.get(testOutput)
     Files.exists(path) shouldBe true
     Files.size(path) should be > 0L
