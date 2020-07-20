@@ -89,8 +89,8 @@ class ConfigServiceRoute(
                 complete(configService().getActiveVersion(filePath))
               } ~
               sPut(ClientRolePolicy(AdminRole)) {
-                token => // set active version - http://{{hostname}}:{{port}}/config/{{path}}?id=my_id&comment=abcd
-                  // reset active version - http://{{hostname}}:{{port}}/config/{{path}}?comment=abcd
+                token => // set active version - http://{{hostname}}:{{port}}/active-version/{{path}}?id=my_id&comment=abcd
+                  // reset active version - http://{{hostname}}:{{port}}/active-version/{{path}}?comment=abcd
                   (idParam & commentParam) {
                     case (Some(configId), comment) =>
                       complete(configService(token.userOrClientName).setActiveVersion(filePath, configId, comment).map(_ => Done))

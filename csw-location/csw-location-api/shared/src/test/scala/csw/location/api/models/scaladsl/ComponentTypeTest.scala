@@ -11,7 +11,7 @@ class ComponentTypeTest extends AnyFunSuite with Matchers with BeforeAndAfterAll
   test(
     "ComponentType should be any one of this types : 'container', 'hcd', 'assembly', 'sequence', 'sequence_component' and 'service' | DEOPSCSW-14"
   ) {
-    val expectedComponentTypeValues = Set("container", "hcd", "assembly", "service", "machine", "sequencer", "sequence_component")
+    val expectedComponentTypeValues = Set("Container", "HCD", "Assembly", "Service", "Machine", "Sequencer", "SequenceComponent")
     val actualComponentTypeValues: Set[String] =
       ComponentType.values.map(componentType => componentType.entryName).toSet
 

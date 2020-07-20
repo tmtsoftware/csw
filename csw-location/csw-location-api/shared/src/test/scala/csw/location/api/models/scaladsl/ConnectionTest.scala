@@ -11,28 +11,28 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 class ConnectionTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
   // DEOPSCSW-14: Codec for data model
   test("should able to form a string representation for akka connection for trombone HCD | DEOPSCSW-14") {
-    val expectedAkkaConnectionName = "NFIRAOS.tromboneHcd-hcd-akka"
+    val expectedAkkaConnectionName = "NFIRAOS.tromboneHcd-HCD-akka"
     val akkaConnection             = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneHcd"), ComponentType.HCD))
     akkaConnection.name shouldBe expectedAkkaConnectionName
   }
 
   // DEOPSCSW-14: Codec for data model
   test("should able to form a string representation for tcp connection for redis | DEOPSCSW-14") {
-    val expectedTcpConnectionName = "CSW.redis-service-tcp"
+    val expectedTcpConnectionName = "CSW.redis-Service-tcp"
     val tcpConnection             = TcpConnection(ComponentId(Prefix(Subsystem.CSW, "redis"), ComponentType.Service))
     tcpConnection.name shouldBe expectedTcpConnectionName
   }
 
   // DEOPSCSW-14: Codec for data model
   test("should able to form a string representation for http connection for config service | DEOPSCSW-14") {
-    val expectedHttpConnectionName = "CSW.config-service-http"
+    val expectedHttpConnectionName = "CSW.config-Service-http"
     val httpConnection             = HttpConnection(ComponentId(Prefix(Subsystem.CSW, "config"), ComponentType.Service))
     httpConnection.name shouldBe expectedHttpConnectionName
   }
 
   // DEOPSCSW-14: Codec for data model
   test("should able to form a string representation for akka connection for trombone container | DEOPSCSW-14") {
-    val expectedAkkaConnectionName = "Container.tromboneContainer-container-akka"
+    val expectedAkkaConnectionName = "Container.tromboneContainer-Container-akka"
     val akkaConnection =
       AkkaConnection(ComponentId(Prefix(Subsystem.Container, "tromboneContainer"), ComponentType.Container))
     akkaConnection.name shouldBe expectedAkkaConnectionName
@@ -40,23 +40,23 @@ class ConnectionTest extends AnyFunSuite with Matchers with BeforeAndAfterAll wi
 
   // DEOPSCSW-14: Codec for data model
   test("should able to form a string representation for akka connection for trombone assembly | DEOPSCSW-14") {
-    val expectedAkkaConnectionName = "NFIRAOS.tromboneAssembly-assembly-akka"
+    val expectedAkkaConnectionName = "NFIRAOS.tromboneAssembly-Assembly-akka"
     val akkaConnection             = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneAssembly"), ComponentType.Assembly))
     akkaConnection.name shouldBe expectedAkkaConnectionName
   }
 
   // DEOPSCSW-14: Codec for data model
   test("should able to form a connection for components from a valid string representation | DEOPSCSW-14") {
-    Connection.from("nfiraos.tromboneAssembly-assembly-akka") shouldBe
+    Connection.from("nfiraos.tromboneAssembly-Assembly-akka") shouldBe
     AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneAssembly"), ComponentType.Assembly))
 
-    Connection.from("nfiraos.tromboneHcd-hcd-akka") shouldBe
+    Connection.from("nfiraos.tromboneHcd-HCD-akka") shouldBe
     AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneHcd"), ComponentType.HCD))
 
-    Connection.from("csw.redis-service-tcp") shouldBe
+    Connection.from("csw.redis-Service-tcp") shouldBe
     TcpConnection(ComponentId(Prefix(Subsystem.CSW, "redis"), ComponentType.Service))
 
-    Connection.from("csw.configService-service-http") shouldBe
+    Connection.from("csw.configService-Service-http") shouldBe
     HttpConnection(ComponentId(Prefix(Subsystem.CSW, "configService"), ComponentType.Service))
   }
 

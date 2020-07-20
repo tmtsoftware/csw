@@ -1,6 +1,5 @@
 package csw.location.api.models
 
-import enumeratum.EnumEntry.Snakecase
 import enumeratum.{Enum, EnumEntry}
 
 import scala.collection.immutable.IndexedSeq
@@ -11,12 +10,13 @@ import scala.collection.immutable.IndexedSeq
  *
  * @param messageManifest represents the class name of message that a component will understand
  */
-sealed abstract class ComponentType(val messageManifest: String) extends EnumEntry with Snakecase {
+sealed abstract class ComponentType(val messageManifest: String) extends EnumEntry {
 
   /**
    * The name of ComponentType e.g. for HCD components, the name will be represented as `hcd`.
    */
   def name: String = entryName
+
 }
 
 object ComponentType extends Enum[ComponentType] {
