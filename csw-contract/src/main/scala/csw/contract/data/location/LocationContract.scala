@@ -69,7 +69,7 @@ object LocationContract extends LocationData with LocationServiceCodecs {
     ModelType(track)
   )
 
-  private val readme: Readme = Readme(ResourceFetcher.getResourceAsString("/location-service/README.md"))
+  private val readme: Readme = Readme(ResourceFetcher.getResourceAsString("location-service/README.md"))
 
   val service: Service = Service(
     Contract(httpEndpoints, httpRequests),

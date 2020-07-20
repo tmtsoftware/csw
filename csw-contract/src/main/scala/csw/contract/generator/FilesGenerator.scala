@@ -17,7 +17,7 @@ object FilesGenerator extends ContractCodecs {
         writeReadme(outputPath, serviceName, service.readme)
     }
     generateEntireJson(services, outputPath)
-    writeReadme(outputPath, "", Readme(ResourceFetcher.getResourceAsString(s"/$ReadmeName")))
+    writeReadme(outputPath, "", Readme(ResourceFetcher.getResourceAsString(ReadmeName)))
   }
 
   def generateEntireJson(services: Services, outputPath: String): Unit = {

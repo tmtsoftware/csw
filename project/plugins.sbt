@@ -20,7 +20,7 @@ addSbtPlugin("com.github.cb372"                  % "sbt-explicit-dependencies" %
 addSbtPlugin("ohnosequences"                     % "sbt-github-release"        % "0.7.0")
 addSbtPlugin("com.dwijnand"                      % "sbt-project-graph"         % "0.4.0")
 addSbtPlugin("com.lightbend.paradox"             % "sbt-paradox"               % "0.8.0")
-addSbtPlugin("com.github.tmtsoftware"            % "sbt-docs"                  % "0.1.4")
+addSbtPlugin("com.github.tmtsoftware"            % "sbt-docs"                  % "0.1.5")
 
 resolvers += Resolver.bintrayRepo("twtmt", "sbt-plugins")
 

@@ -65,7 +65,7 @@ class FilesGeneratorTest extends AnyFunSuite with Matchers with BeforeAndAfterAl
           `http-contract` = Contract(httpEndpoints, httpRequests),
           `websocket-contract` = Contract(websocketEndpoints, webSocketRequests),
           models,
-          Readme(ResourceFetcher.getResourceAsString("/location-service/README.md"))
+          Readme(ResourceFetcher.getResourceAsString("location-service/README.md"))
         )
       )
     )

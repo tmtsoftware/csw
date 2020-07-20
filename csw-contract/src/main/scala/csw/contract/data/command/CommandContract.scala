@@ -83,7 +83,7 @@ object CommandContract extends CommandData with CommandServiceCodecs {
     Endpoint(name[SubscribeCurrentState], name[CurrentState])
   )
 
-  private val readme: Readme = Readme(ResourceFetcher.getResourceAsString("/command-service/README.md"))
+  private val readme: Readme = Readme(ResourceFetcher.getResourceAsString("command-service/README.md"))
 
   val service: Service = Service(
     Contract(httpEndpoints, httpRequests),
