@@ -17,16 +17,7 @@ object CommandContract extends CommandData with CommandServiceCodecs {
   private val models: ModelSet = ModelSet(
     ModelType(observe, setup),
     ModelType(commandName),
-    ModelType[Parameter[_]](
-      intParameter,
-      arrayParameter,
-      structParameter,
-      matrixParameter,
-      coordsParameter,
-      utcTimeParam,
-      raDecParameter,
-      choiceParameter
-    ),
+    ModelType[Parameter[_]](paramSet.toList),
     ModelType(KeyType),
     ModelType(Units),
     ModelType(result),
