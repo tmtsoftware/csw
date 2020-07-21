@@ -101,7 +101,7 @@ lazy val `csw-contract` = project
     `csw-location-api`.jvm,
     `csw-command-api`.jvm,
     `csw-command-client`,
-    `csw-params`.jvm % "compile->test"
+    `csw-params`.jvm
   )
   .settings(
     libraryDependencies ++= Dependencies.Contract.value
