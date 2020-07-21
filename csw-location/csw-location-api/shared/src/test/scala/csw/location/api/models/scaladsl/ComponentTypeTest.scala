@@ -9,7 +9,7 @@ class ComponentTypeTest extends AnyFunSuite with Matchers with BeforeAndAfterAll
 
   // DEOPSCSW-14: Codec for data model
   test(
-    "ComponentType should be any one of this types : 'container', 'hcd', 'assembly', 'sequence', 'sequence_component' and 'service' | DEOPSCSW-14"
+    "ComponentType should be any one of this types : 'Container', 'HCD', 'Assembly', 'Service', 'Machine', 'Sequencer' and  'SequenceComponent' | DEOPSCSW-14"
   ) {
     val expectedComponentTypeValues = Set("Container", "HCD", "Assembly", "Service", "Machine", "Sequencer", "SequenceComponent")
     val actualComponentTypeValues: Set[String] =
