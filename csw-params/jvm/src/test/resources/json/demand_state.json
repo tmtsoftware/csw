@@ -7,9 +7,9 @@
       "CharKey": {
         "keyName": "charKey",
         "values": [
-          65,
-          66,
-          67
+          "A",
+          "B",
+          "C"
         ],
         "units": "NoUnits"
       }

@@ -36,6 +36,17 @@ trait ParamCodecsBase extends CommonCodecs {
   type ArrayEnc[T] = Encoder[Array[T]]
   type ArrayDec[T] = Decoder[Array[T]]
 
+  // default Char codec uses ascii which makes it difficult at typescript side
+  private lazy val charCodec: Codec[Char] = Codec
+    .of[String]
+    .bimap[Char](
+      _.toString,
+      str => if (str.length == 1) str.charAt(0) else throw new RuntimeException(s"Unable to parse $str, char was expected")
+    )
+
+  implicit lazy val charEnc: Encoder[Char] = charCodec.encoder
+  implicit lazy val charDec: Decoder[Char] = charCodec.decoder
+
   // ************************ Base Type Codecs ********************
   implicit lazy val choiceCodec: Codec[Choice] = deriveCodec
   implicit lazy val raDecCodec: Codec[RaDec]   = deriveCodec
