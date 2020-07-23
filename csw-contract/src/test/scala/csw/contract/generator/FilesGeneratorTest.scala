@@ -50,14 +50,14 @@ class FilesGeneratorTest extends AnyFunSuite with Matchers with BeforeAndAfterAl
         errorTypes = List("ServiceError")
       )
     )
-    val models: ModelSet = ModelSet(
+    val models: ModelSet = ModelSet.models(
       ModelType(akkaLocation)
     )
-    val httpRequests = ModelSet(
-      ModelType[LocationHttpMessage](akkaRegister, httpRegister)
+    val httpRequests = ModelSet.requests[LocationHttpMessage](
+      ModelType(akkaRegister, httpRegister)
     )
-    val webSocketRequests = ModelSet(
-      ModelType[LocationWebsocketMessage](track)
+    val webSocketRequests = ModelSet.requests[LocationWebsocketMessage](
+      ModelType(track)
     )
     val services: Services = Services(
       Map(

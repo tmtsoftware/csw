@@ -11,10 +11,9 @@ import csw.location.api.messages.LocationWebsocketMessage.Track
 import csw.location.api.messages.{LocationHttpMessage, LocationWebsocketMessage}
 import csw.location.api.models._
 import csw.prefix.models.Subsystem
-import io.bullet.borer.Encoder
 
 object LocationContract extends LocationData with LocationServiceCodecs {
-  private val models: ModelSet = ModelSet(
+  private val models: ModelSet = ModelSet.models(
     ModelType(akkaRegistration, httpRegistration, publicHttpRegistration, tcpRegistration),
     ModelType(akkaLocation, httpLocation, tcpLocation),
     ModelType(locationUpdated, locationRemoved),
@@ -45,10 +44,7 @@ object LocationContract extends LocationData with LocationServiceCodecs {
     Endpoint(name[ListByPrefix], arrayName[Location], List(name[RegistrationListingFailed]))
   )
 
-  implicit def httpEnc[Sub <: LocationHttpMessage]: Encoder[Sub]           = SubTypeCodec.encoder(locationHttpMessageCodec)
-  implicit def websocketEnc[Sub <: LocationWebsocketMessage]: Encoder[Sub] = SubTypeCodec.encoder(locationWebsocketMessageCodec)
-
-  private val httpRequests: ModelSet = ModelSet(
+  private val httpRequests: ModelSet = ModelSet.requests[LocationHttpMessage](
     ModelType(akkaRegister, httpRegister, publicHttpRegister),
     ModelType(unregister),
     ModelType(unregisterAll),
@@ -65,7 +61,7 @@ object LocationContract extends LocationData with LocationServiceCodecs {
     Endpoint(name[Track], name[TrackingEvent])
   )
 
-  private val websocketRequests: ModelSet = ModelSet(
+  private val websocketRequests: ModelSet = ModelSet.requests[LocationWebsocketMessage](
     ModelType(track)
   )
 

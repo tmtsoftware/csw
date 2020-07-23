@@ -11,10 +11,9 @@ import csw.params.commands.CommandResponse._
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.Units
 import csw.params.core.states.CurrentState
-import io.bullet.borer.Encoder
 
 object CommandContract extends CommandData with CommandServiceCodecs {
-  private val models: ModelSet = ModelSet(
+  private val models: ModelSet = ModelSet.models(
     ModelType(observe, setup),
     ModelType(commandName),
     ModelType[Parameter[_]](paramSet.toList),
@@ -47,17 +46,14 @@ object CommandContract extends CommandData with CommandServiceCodecs {
     )
   )
 
-  implicit def httpEnc[Sub <: CommandServiceHttpMessage]: Encoder[Sub]           = SubTypeCodec.encoder(httpCodecsValue)
-  implicit def websocketEnc[Sub <: CommandServiceWebsocketMessage]: Encoder[Sub] = SubTypeCodec.encoder(websocketCodecs)
-
-  private val httpRequests: ModelSet = ModelSet(
+  private val httpRequests: ModelSet = ModelSet.requests[CommandServiceHttpMessage](
     ModelType(observeValidate),
     ModelType(observeSubmit),
     ModelType(setupQuery),
     ModelType(observeOneway)
   )
 
-  private val websocketRequests: ModelSet = ModelSet(
+  private val websocketRequests: ModelSet = ModelSet.requests[CommandServiceWebsocketMessage](
     ModelType(queryFinal),
     ModelType(subscribeState)
   )
