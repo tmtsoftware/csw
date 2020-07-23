@@ -1,6 +1,6 @@
-package csw.contract.generator
+package csw.contract.data
 
-import csw.contract.data.CswData
+import csw.contract.generator.RoundTrip
 import io.bullet.borer.{Cbor, Json}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
