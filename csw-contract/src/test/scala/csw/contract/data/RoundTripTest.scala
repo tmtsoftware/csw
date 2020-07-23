@@ -25,7 +25,7 @@ class RoundTripTest extends AnyFreeSpec with Matchers {
         }
 
         "websocket requests" - {
-          service.`http-contract`.requests.modelTypes.foreach { modelType =>
+          service.`websocket-contract`.requests.modelTypes.foreach { modelType =>
             validate(modelType)
           }
         }
