@@ -73,10 +73,10 @@ case class Angle(uas: Long) extends /*AnyVal with*/ Serializable with Ordered[An
   override def toString: String = "Angle(" + toDegree + " degree)"
 
   /** Returns sequence of angles with given max value and increment */
-  def to(maxVal: Angle, increment: Angle): Seq[Angle] = (uas to (maxVal.uas, increment.uas)).map(Angle(_))
+  def to(maxVal: Angle, increment: Angle): Seq[Angle] = uas.to(maxVal.uas, increment.uas).map(Angle(_))
 
   /** Returns sequence of angles with given max value and increment */
-  def until(maxVal: Angle, increment: Angle): Seq[Angle] = (uas until (maxVal.uas, increment.uas)).map(Angle(_))
+  def until(maxVal: Angle, increment: Angle): Seq[Angle] = uas.until(maxVal.uas, increment.uas).map(Angle(_))
 }
 
 object Angle {

@@ -29,9 +29,9 @@ class ArgsParser(name: String) {
     } text "logout"
 
     //create operation
-    cmd("create") action { (_, c) =>
+    (cmd("create") action { (_, c) =>
       c.copy(op = "create")
-    } text "creates the input file in the repository at a specified path" children (
+    } text "creates the input file in the repository at a specified path").children(
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "path in the repository",
@@ -47,9 +47,9 @@ class ArgsParser(name: String) {
     )
 
     //update operation
-    cmd("update") action { (_, c) =>
+    (cmd("update") action { (_, c) =>
       c.copy(op = "update")
-    } text "overwrites the file specified in the repository by the input file" children (
+    } text "overwrites the file specified in the repository by the input file").children(
       arg[String]("<path>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "path in the repository",
@@ -62,27 +62,28 @@ class ArgsParser(name: String) {
     )
 
     //get operation
-    cmd("get") action { (_, c) =>
+    (cmd("get") action { (_, c) =>
       c.copy(op = "get")
-    } text "retrieves a file for a given path and saves it to the output file. Latest file is fetched if neither date nor id is specified." children (
-      arg[String]("<relativeRepoPath>") action { (x, c) =>
-        c.copy(relativeRepoPath = Some(Paths.get(x)))
-      } text "path of the file in the repository",
-      opt[String]('o', "out").required() valueName "<outputFile>" action { (x, c) =>
-        c.copy(outputFilePath = Some(Paths.get(x)))
-      } text "output file path",
-      opt[String]("id") action { (x, c) =>
-        c.copy(id = Some(x))
-      } text "optional:. if specified this id will be matched",
-      opt[String]("date") action { (x, c) =>
-        c.copy(date = Some(Instant.parse(x)))
-      } text "optional:. if specified will get the file matching this date. Format: 2017-04-16T16:15:23.503Z"
-    )
+    } text "retrieves a file for a given path and saves it to the output file. Latest file is fetched if neither date nor id is specified.")
+      .children(
+        arg[String]("<relativeRepoPath>") action { (x, c) =>
+          c.copy(relativeRepoPath = Some(Paths.get(x)))
+        } text "path of the file in the repository",
+        opt[String]('o', "out").required() valueName "<outputFile>" action { (x, c) =>
+          c.copy(outputFilePath = Some(Paths.get(x)))
+        } text "output file path",
+        opt[String]("id") action { (x, c) =>
+          c.copy(id = Some(x))
+        } text "optional:. if specified this id will be matched",
+        opt[String]("date") action { (x, c) =>
+          c.copy(date = Some(Instant.parse(x)))
+        } text "optional:. if specified will get the file matching this date. Format: 2017-04-16T16:15:23.503Z"
+      )
 
     //delete operation
-    cmd("delete") action { (_, c) =>
+    (cmd("delete") action { (_, c) =>
       c.copy(op = "delete")
-    } text "deletes the file at specified path in the repository" children (
+    } text "deletes the file at specified path in the repository").children(
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "file path in the repository",
@@ -92,9 +93,9 @@ class ArgsParser(name: String) {
     )
 
     //list operation
-    cmd("list") action { (_, c) =>
+    (cmd("list") action { (_, c) =>
       c.copy(op = "list")
-    } text "lists the files in the repository" children (
+    } text "lists the files in the repository").children(
       opt[Unit]("annex") action { (_, c) =>
         c.copy(annex = true)
       } text "optional: add this option to list only large/binary files",
@@ -107,9 +108,9 @@ class ArgsParser(name: String) {
     )
 
     //history operation
-    cmd("history") action { (_, c) =>
+    (cmd("history") action { (_, c) =>
       c.copy(op = "history")
-    } text "shows versioning history of the file in the repository" children (
+    } text "shows versioning history of the file in the repository").children(
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "file path in the repository",
@@ -125,9 +126,9 @@ class ArgsParser(name: String) {
     )
 
     //setActiveVersion operation
-    cmd("setActiveVersion") action { (_, c) =>
+    (cmd("setActiveVersion") action { (_, c) =>
       c.copy(op = "setActiveVersion")
-    } text "sets active version of the file in the repository" children (
+    } text "sets active version of the file in the repository").children(
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "file path in the repository",
@@ -140,9 +141,9 @@ class ArgsParser(name: String) {
     )
 
     //resetActiveVersion operation
-    cmd("resetActiveVersion") action { (_, c) =>
+    (cmd("resetActiveVersion") action { (_, c) =>
       c.copy(op = "resetActiveVersion")
-    } text "resets the active version to the latest version for the specified file" children (
+    } text "resets the active version to the latest version for the specified file").children(
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "file path in the repository",
@@ -161,9 +162,9 @@ class ArgsParser(name: String) {
     )
 
     //getActiveByTime operation
-    cmd("getActiveByTime") action { (_, c) =>
+    (cmd("getActiveByTime") action { (_, c) =>
       c.copy(op = "getActiveByTime")
-    } text "gets the file that was active at a specified time" children (
+    } text "gets the file that was active at a specified time").children(
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "file path in the repository",
@@ -176,9 +177,9 @@ class ArgsParser(name: String) {
     )
 
     //history operation
-    cmd("historyActive") action { (_, c) =>
+    (cmd("historyActive") action { (_, c) =>
       c.copy(op = "historyActive")
-    } text "shows versioning history of the active file in the repository" children (
+    } text "shows versioning history of the active file in the repository").children(
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "file path in the repository",
@@ -208,9 +209,9 @@ class ArgsParser(name: String) {
     )
 
     //getActive operation
-    cmd("getActive") action { (_, c) =>
+    (cmd("getActive") action { (_, c) =>
       c.copy(op = "getActive")
-    } text "retrieves active file for a given path from config service, and writes it to the output file" children (
+    } text "retrieves active file for a given path from config service, and writes it to the output file").children(
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "path of the file in the repository",

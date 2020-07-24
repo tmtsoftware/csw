@@ -9,6 +9,10 @@ The product is in a new repository: [csw](https://github.com/tmtsoftware/csw).
 
 All notable changes to this project will be documented in this file.
 
+## [CSW upcoming version]
+- `->` method on a Key now takes a single parameter instead of varargs. For varargs, please use `set` method.
+- `->` method on a Key that took an array of values has been removed. Please use `setAll` method instead.
+
 ## [CSW v2.0.1] - 2020-03-20
 
 This is a First minor release post Second major release of the TMT Common Software for project stakeholders.

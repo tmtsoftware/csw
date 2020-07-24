@@ -68,7 +68,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
       case _             => ""
     }
 
-    spawnedEffects should contain allOf (SupervisorBehavior.PubSubLifecycleActor, componentActorName)
+    (spawnedEffects should contain).allOf(SupervisorBehavior.PubSubLifecycleActor, componentActorName)
 
     verify(timerScheduler).startSingleTimer(SupervisorBehavior.InitializeTimerKey, InitializeTimeout, hcdInfo.initializeTimeout)
   }

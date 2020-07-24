@@ -47,25 +47,9 @@ case class Key[S: ClassTag] private[generics] (keyName: String, keyType: KeyType
    *   )
    * }}}
    *
-   * @param values one or more values
    * @return a parameter containing the key name and one value (call withUnits() on the result to set the units)
    */
-  def ->(value: S, values: S*): Parameter[S] = set(value, values: _*)
-
-  /**
-   * Sets the values for the key as a Scala Vector
-   * This definition enables writing code like this:
-   * {{{
-   *   val setup = sc(prefix,
-   *     key1 -> Vector(...),
-   *     key2 -> Vector(...)
-   *   )
-   * }}}
-   *
-   * @param values an Array of values
-   * @return a parameter containing the key name and values (call withUnits() on the result to set the units)
-   */
-  def ->(values: Array[S]): Parameter[S] = setAll(values)
+  def ->(value: S): Parameter[S] = set(value)
 
   /**
    * Returns a string representation of Key as keyName
