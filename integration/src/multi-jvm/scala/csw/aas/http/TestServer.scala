@@ -24,6 +24,6 @@ class TestServer(locationService: LocationService) {
   }
 
   def start(testServerPort: Int): Future[Http.ServerBinding] = {
-    Http().bindAndHandle(routes, "0.0.0.0", testServerPort)
+    Http().newServerAt("0.0.0.0", testServerPort).bind(routes)
   }
 }

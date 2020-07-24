@@ -76,7 +76,7 @@ object CommandResponse {
    * @param runId of command for which this response is created
    * @param result describing the result of completion if needed
    */
-  case class Completed(runId: Id, result: Result = Result.emptyResult) extends SubmitResponse with MatchingResponse {
+  case class Completed(runId: Id, result: Result) extends SubmitResponse with MatchingResponse {
 
     /**
      * Check to see if this response has a result
@@ -90,6 +90,10 @@ object CommandResponse {
     def this(runId: Id) = this(runId, Result())
 
     def withRunId(newRunId: Id): Completed = copy(runId = newRunId)
+  }
+
+  object Completed {
+    def apply(runId: Id): Completed = new Completed(runId, Result.emptyResult)
   }
 
   /**

@@ -18,11 +18,14 @@
 
 1. Update release notes (`notes/<version>.markdown`) in `csw` repo and link the migration guide
  **Note** - The version in `notes` should be of format `v1.0.0`
-1. Update top-level `CHANGELOG.md`
-1. Update top-level `README.md`
-1. Bump up the `csw-contract` version (if needed)
-1. Exclude projects from `build.sbt` which you do not want to release
-1. Run `release.sh $VERSION$` script by providing version number argument (This triggers release workflow)
+2. Update top-level `CHANGELOG.md`
+3. Update top-level `README.md`
+4. Add changes mention in `CHANGELOG.md` of `csw-contract` in top-level `CHANGELOG.md`
+5. Add changes mention in `CHANGELOG.md` of `csw-contract` in the change section of `README.md` of `csw-contract`
+6. Add changes mention in `CHANGELOG.md` of `csw-contract` in top-level `README.md`
+7. Bump up the `csw-contract` version (if needed)
+8. Exclude projects from `build.sbt` which you do not want to release
+9. Run `release.sh $VERSION$` script by providing version number argument (This triggers release workflow)
 
     **Note:** `PROD=true` environment varibale needs to be set before running `release.sh`
 

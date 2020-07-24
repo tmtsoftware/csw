@@ -2,7 +2,14 @@ package example.auth
 
 import akka.actor.typed
 import akka.actor.typed.SpawnProtocol
+import akka.http.scaladsl.common.ToNameReceptacleEnhancements._string2NR
+import akka.http.scaladsl.server.PathMatcher._segmentStringToPathMatcher
+import akka.http.scaladsl.server.PathMatchers.LongNumber
+import akka.http.scaladsl.server.RouteConcatenation._enhanceRouteWithConcatenation
 import akka.http.scaladsl.server._
+import akka.http.scaladsl.server.directives.ParameterDirectives.parameter
+import akka.http.scaladsl.server.directives.PathDirectives.path
+import akka.http.scaladsl.server.directives.RouteDirectives.complete
 import com.typesafe.config.Config
 import csw.aas.http.AuthorizationPolicy._
 import csw.aas.http.SecurityDirectives
@@ -10,7 +17,7 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
 
 import scala.concurrent.{ExecutionContext, Future}
 
-object AuthDocumentation extends HttpApp {
+object AuthDocumentation {
   private implicit val actorSystem: typed.ActorSystem[SpawnProtocol.Command] = typed.ActorSystem(SpawnProtocol(), "")
   private implicit val ec: ExecutionContext                                  = actorSystem.executionContext
 
@@ -115,5 +122,4 @@ object AuthDocumentation extends HttpApp {
     // #directive-composition-anti-pattern
   }
 
-  val routes: Route = ???
 }

@@ -2,7 +2,12 @@ package example.auth
 
 import akka.actor.typed
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.http.scaladsl.server.{HttpApp, Route}
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.server.RouteConcatenation._enhanceRouteWithConcatenation
+import akka.http.scaladsl.server.directives.MethodDirectives.get
+import akka.http.scaladsl.server.directives.PathDirectives.pathPrefix
+import akka.http.scaladsl.server.directives.RouteDirectives.complete
 import csw.aas.http.AuthorizationPolicy.RealmRolePolicy
 import csw.aas.http.SecurityDirectives
 import csw.location.client.scaladsl.HttpLocationServiceFactory
@@ -10,7 +15,7 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
 import scala.concurrent.ExecutionContext
 
 // #sample-http-app
-object SampleHttpApp extends HttpApp with App {
+object SampleHttpApp extends App {
 
   implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = typed.ActorSystem(SpawnProtocol(), "sample-http-app")
   implicit val ec: ExecutionContext                            = actorSystem.executionContext
@@ -20,7 +25,7 @@ object SampleHttpApp extends HttpApp with App {
   val directives      = SecurityDirectives(config, locationService)
   import directives._
 
-  override protected def routes: Route =
+  def routes: Route =
     pathPrefix("api") {
       get {
         complete("SUCCESS")
@@ -33,6 +38,6 @@ object SampleHttpApp extends HttpApp with App {
   private val host = "0.0.0.0"
   private val port = 9003
 
-  startServer(host, port)
+  Http().newServerAt(host, port).bind(routes)
 }
 // #sample-http-app

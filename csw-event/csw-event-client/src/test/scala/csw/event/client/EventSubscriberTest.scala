@@ -347,11 +347,11 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     val receivedEvents4 = inbox4.receiveAll()
     val receivedEvents5 = inbox5.receiveAll()
 
-    receivedEvents should contain only (testEvent1, testEvent2)
-    receivedEvents2 should contain only (testEvent1, testEvent2, testEvent4, testEvent6)
-    receivedEvents3 should contain only (testEvent4, testEvent5, testEvent6)
-    receivedEvents4 should contain only testEvent6
-    receivedEvents5 should contain allOf (testEvent1, testEvent2, testEvent3, testEvent4, testEvent5, testEvent6)
+    (receivedEvents should contain).only(testEvent1, testEvent2)
+    (receivedEvents2 should contain).only(testEvent1, testEvent2, testEvent4, testEvent6)
+    (receivedEvents3 should contain).only(testEvent4, testEvent5, testEvent6)
+    (receivedEvents4 should contain).only(testEvent6)
+    (receivedEvents5 should contain).allOf(testEvent1, testEvent2, testEvent3, testEvent4, testEvent5, testEvent6)
 
     subscription.unsubscribe().await
     subscription2.unsubscribe().await
@@ -514,7 +514,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     Thread.sleep(200)
     subscription.unsubscribe()
 
-    seqF.await should contain inOrder (Event.invalidEvent(eventKey), Event.badEvent())
+    (seqF.await should contain).inOrder(Event.invalidEvent(eventKey), Event.badEvent())
   }
 
   //CSW-73: Make event pub/sub resuming

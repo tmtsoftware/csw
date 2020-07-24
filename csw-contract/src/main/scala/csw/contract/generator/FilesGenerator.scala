@@ -1,32 +1,32 @@
 package csw.contract.generator
 
-import java.nio.file.{Files, Paths, StandardCopyOption}
+import java.nio.file.{Files, Paths}
 
+import csw.contract.ResourceFetcher
 import io.bullet.borer.Encoder
 
 object FilesGenerator extends ContractCodecs {
+  val ReadmeName = "README.md"
 
-  def generate(services: Services, outputPath: String, resourcePath: String): Unit = {
+  def generate(services: Services, outputPath: String): Unit = {
     services.data.foreach {
       case (serviceName, service) =>
         writeData(s"$outputPath/$serviceName/", "http-contract", service.`http-contract`)
         writeData(s"$outputPath/$serviceName/", "websocket-contract", service.`websocket-contract`)
         writeData(s"$outputPath/$serviceName/", "models", service.models)
-        copyReadme(outputPath, serviceName, resourcePath)
+        writeReadme(outputPath, serviceName, service.readme)
     }
     generateEntireJson(services, outputPath)
-    copyReadme(outputPath, "", resourcePath)
+    writeReadme(outputPath, "", Readme(ResourceFetcher.getResourceAsString(ReadmeName)))
   }
 
   def generateEntireJson(services: Services, outputPath: String): Unit = {
     writeData(s"$outputPath", "allServiceData", services.data)
   }
 
-  def copyReadme(outputPath: String, serviceName: String, resourcePath: String): Unit = {
-    val Readme      = "README.md"
-    val source      = Paths.get(s"$resourcePath/$serviceName/$Readme")
-    val destination = Paths.get(s"$outputPath/$serviceName/$Readme")
-    Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING)
+  def writeReadme(outputPath: String, serviceName: String, readme: Readme): Unit = {
+    val destination = Paths.get(s"$outputPath/$serviceName/$ReadmeName")
+    Files.write(destination, readme.content.getBytes)
   }
 
   def writeData[T: Encoder](dir: String, fileName: String, data: T): Unit = {

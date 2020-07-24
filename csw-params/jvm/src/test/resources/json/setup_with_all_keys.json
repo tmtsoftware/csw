@@ -288,8 +288,8 @@
       "CharKey": {
         "keyName": "CharKey",
         "values": [
-          65,
-          66
+          "A",
+          "B"
         ],
         "units": "NoUnits"
       }

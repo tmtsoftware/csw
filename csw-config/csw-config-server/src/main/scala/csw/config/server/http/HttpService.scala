@@ -63,11 +63,7 @@ class HttpService(
     val _host = Networks(NetworkType.Public.envKey).hostname
     val _port = settings.`service-port`
 
-    Http().bindAndHandle(
-      handler = configServiceRoute.route,
-      interface = _host,
-      port = _port
-    )
+    Http().newServerAt(_host, _port).bind(configServiceRoute.route)
   }
 
   private def register(binding: ServerBinding): Future[RegistrationResult] = {

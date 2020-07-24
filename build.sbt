@@ -632,7 +632,7 @@ lazy val examples = project
   .settings(
     libraryDependencies ++= Dependencies.Examples.value,
     scalacOptions ++= (if (Common.autoImport.suppressAnnotatedWarnings.value)
-                         Seq("-Xlint:-unused,-nullary-override,-inaccessible", "-Ywarn-dead-code:false")
+                         Seq("-Xlint:-unused,-inaccessible", "-Ywarn-dead-code:false")
                        else Seq.empty)
   )
 

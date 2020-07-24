@@ -2,6 +2,7 @@ package example.location
 
 import java.net.InetAddress
 
+import akka.Done
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior, SpawnProtocol}
 import akka.actor.{Actor, ActorSystem, Props, typed}
@@ -295,11 +296,11 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   override def postStop(): Unit = {
 
     //#unregister
-    val unregisterF = async {
-      httpRegResult.unregister()
-      httpRegResultOnPublicNetwork.unregister()
-      hcdRegResult.unregister()
-      assemblyRegResult.unregister()
+    val unregisterF: Future[Done] = async {
+      await(httpRegResult.unregister())
+      await(httpRegResultOnPublicNetwork.unregister())
+      await(hcdRegResult.unregister())
+      await(assemblyRegResult.unregister())
     }
     Await.result(unregisterF, 5.seconds)
     //#unregister
