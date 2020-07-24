@@ -13,7 +13,7 @@ import scala.reflect.ClassTag
  *
  * @param data input array of array
  */
-case class MatrixData[T] @nowarn private (data: mutable.ArraySeq[mutable.ArraySeq[T]])(val values: Array[Array[T]]) {
+case class MatrixData[T] private (data: mutable.ArraySeq[mutable.ArraySeq[T]])(val values: Array[Array[T]]) {
 
   /**
    * Returns a value stored at position represented by [row][col]
