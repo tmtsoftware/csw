@@ -42,8 +42,8 @@ class ConfigCliAuthTest(ignore: Int)
   import config._
   import system.dispatcher
 
-  private val adminUser     = "config-admin"
-  private val adminPassword = "config-admin"
+  private val adminUser     = "config-user1"
+  private val adminPassword = "config-user1"
 
   private val testFileUtils = new TestFileUtils(new Settings(ConfigFactory.load()))
 
@@ -64,7 +64,6 @@ class ConfigCliAuthTest(ignore: Int)
         "bearer-only",
         passwordGrantEnabled = false,
         authorizationEnabled = false,
-        clientRoles = Set(configAdmin)
       )
 
       val `csw-config-cli` = Client("csw-config-cli", "public", passwordGrantEnabled = false, authorizationEnabled = false)
@@ -78,9 +77,10 @@ class ConfigCliAuthTest(ignore: Int)
               ApplicationUser(
                 adminUser,
                 adminPassword,
-                clientRoles = Set(ClientRole(`csw-config-server`.name, configAdmin))
+                realmRoles = Set(configAdmin)
               )
-            )
+            ),
+            realmRoles = Set(configAdmin)
           )
         )
       )

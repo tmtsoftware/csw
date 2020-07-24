@@ -3,13 +3,13 @@ package csw.config.server.http
 import akka.Done
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Route
-import csw.aas.http.AuthorizationPolicy.ClientRolePolicy
+import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
+import csw.aas.http.AuthorizationPolicy.RealmRolePolicy
 import csw.aas.http.SecurityDirectives
 import csw.config.api.scaladsl.ConfigService
+import csw.config.models.codecs.ConfigCodecs
 import csw.config.server.ActorRuntime
 import csw.config.server.svn.SvnConfigServiceFactory
-import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
-import csw.config.models.codecs.ConfigCodecs
 
 /**
  * Routes supported by config server
@@ -56,7 +56,7 @@ class ConfigServiceRoute(
                   }
                 }
               } ~
-              sPost(ClientRolePolicy(AdminRole)) {
+              sPost(RealmRolePolicy(AdminRole)) {
                 token => // create file - http://{{hostname}}:{{port}}/config/{{path}}?annex=true&comment=abcd
                   (configDataEntity & annexParam & commentParam) { (configData, annex, comment) =>
                     complete(
@@ -64,13 +64,13 @@ class ConfigServiceRoute(
                     )
                   }
               } ~
-              sPut(ClientRolePolicy(AdminRole)) {
+              sPut(RealmRolePolicy(AdminRole)) {
                 token => // update file - http://{{hostname}}:{{port}}/config/{{path}}?comment=abcd
                   (configDataEntity & commentParam) { (configData, comment) =>
                     complete(configService(token.userOrClientName).update(filePath, configData, comment))
                   }
               } ~
-              sDelete(ClientRolePolicy(AdminRole)) {
+              sDelete(RealmRolePolicy(AdminRole)) {
                 token => // delete file - http://{{hostname}}:{{port}}/config/{{path}}?comment=abcd
                   commentParam { comment =>
                     complete(configService(token.userOrClientName).delete(filePath, comment).map(_ => Done))
@@ -88,7 +88,7 @@ class ConfigServiceRoute(
               (get & rejectEmptyResponse) { // fetch the active version - http://{{hostname}}:{{port}}/active-version/{{path}}
                 complete(configService().getActiveVersion(filePath))
               } ~
-              sPut(ClientRolePolicy(AdminRole)) {
+              sPut(RealmRolePolicy(AdminRole)) {
                 token => // set active version - http://{{hostname}}:{{port}}/active-version/{{path}}?id=my_id&comment=abcd
                   // reset active version - http://{{hostname}}:{{port}}/active-version/{{path}}?comment=abcd
                   (idParam & commentParam) {
