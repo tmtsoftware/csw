@@ -53,7 +53,8 @@ object Common extends AutoPlugin {
       "-Xlint:_,-missing-interpolator",
       "-Ywarn-dead-code",
       "-Xsource:3",
-      "-Wconf:any:warning-verbose"
+      "-Wconf:any:warning-verbose",
+      "-Xasync"
 //      "-Xprint:typer",
     ),
     javacOptions in (Compile, doc) ++= Seq("-Xdoclint:none"),

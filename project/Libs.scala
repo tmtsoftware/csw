@@ -5,9 +5,9 @@ import sbt._
 object Libs {
   val ScalaVersion = "2.13.3"
 
-  val `scala-java8-compat` = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.1"  //BSD 3-clause "New" or "Revised" License
-  val `scala-async`        = "org.scala-lang.modules" %% "scala-async"        % "0.10.0" //BSD 3-clause "New" or "Revised" License
-  val `scopt`              = "com.github.scopt"       %% "scopt"              % "3.7.1"  //MIT License
+  val `scala-java8-compat` = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.1"    //BSD 3-clause "New" or "Revised" License
+  val `scala-async`        = "org.scala-lang.modules" %% "scala-async"        % "1.0.0-M1" //BSD 3-clause "New" or "Revised" License
+  val `scopt`              = "com.github.scopt"       %% "scopt"              % "3.7.1"    //MIT License
   val `mockito-scala`      = "org.mockito"            %% "mockito-scala"      % "1.14.8"
 
   //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
