@@ -3,12 +3,12 @@ import sbt.Def.{setting => dep}
 import sbt._
 
 object Libs {
-  val ScalaVersion = "2.13.2"
+  val ScalaVersion = "2.13.3"
 
   val `scala-java8-compat` = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.1"  //BSD 3-clause "New" or "Revised" License
   val `scala-async`        = "org.scala-lang.modules" %% "scala-async"        % "0.10.0" //BSD 3-clause "New" or "Revised" License
   val `scopt`              = "com.github.scopt"       %% "scopt"              % "3.7.1"  //MIT License
-  val `mockito-scala`      = "org.mockito"            %% "mockito-scala"      % "1.14.4"
+  val `mockito-scala`      = "org.mockito"            %% "mockito-scala"      % "1.14.8"
 
   //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
   val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.2.3"
@@ -27,7 +27,7 @@ object Libs {
 
   val `jwt-core`          = "com.pauldijou"           %% "jwt-core"          % "4.3.0"
   val `lettuce`           = "io.lettuce"               % "lettuce-core"      % "5.3.1.RELEASE"
-  val `reactor-core`      = "io.projectreactor"        % "reactor-core"      % "3.3.6.RELEASE"
+  val `reactor-core`      = "io.projectreactor"        % "reactor-core"      % "3.3.7.RELEASE"
   val `reactive-streams`  = "org.reactivestreams"      % "reactive-streams"  % "1.0.3"
   val `akka-stream-kafka` = "com.typesafe.akka"       %% "akka-stream-kafka" % "2.0.3"
   val `embedded-kafka`    = "io.github.embeddedkafka" %% "embedded-kafka"    % "2.5.0"
@@ -51,7 +51,7 @@ object Libs {
   val `os-lib`            = "com.lihaoyi"                  %% "os-lib"          % "0.7.0"
   val `caffeine`          = "com.github.ben-manes.caffeine" % "caffeine"        % "2.8.4"
   val netty               = "io.netty"                      % "netty"           % "3.10.6.Final"
-  val `case-app`          = "com.github.alexarchambault"   %% "case-app"        % "2.0.1"
+  val `case-app`          = "com.github.alexarchambault"   %% "case-app"        % "2.0.3"
   val `tmt-test-reporter` = "com.github.tmtsoftware"       %% "rtm"             % "05e9789f460"
 }
 
@@ -65,7 +65,7 @@ object Borer {
 }
 
 object Jackson {
-  val Version = "2.11.0"
+  val Version = "2.11.1"
 
   val `jackson-core`         = "com.fasterxml.jackson.core"    % "jackson-core"         % Version
   val `jackson-databind`     = "com.fasterxml.jackson.core"    % "jackson-databind"     % Version
@@ -93,7 +93,7 @@ object Akka {
 }
 
 object AkkaHttp {
-  val Version = "10.2.0-M1"
+  val Version = "10.2.0-RC1"
 
   val `akka-http`            = "com.typesafe.akka" %% "akka-http"            % Version //ApacheV2
   val `akka-http-testkit`    = "com.typesafe.akka" %% "akka-http-testkit"    % Version //ApacheV2
@@ -121,7 +121,7 @@ object Jooq {
 }
 
 object MSocket {
-  val Version = "a36f8db"
+  val Version = "15cc2e1"
 
   val `msocket-api`      = dep("com.github.tmtsoftware.msocket" %%% "msocket-api" % Version)
   val `msocket-impl-jvm` = "com.github.tmtsoftware.msocket" %% "msocket-impl" % Version
