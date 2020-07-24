@@ -45,11 +45,7 @@ class HttpService(
     }
 
   private def bind() = {
-    Http().bindAndHandle(
-      handler = route,
-      interface = Networks().hostname,
-      port = 0
-    )
+    Http().newServerAt(Networks().hostname, 0).bind(route)
   }
 
   private def register(binding: ServerBinding): Future[RegistrationResult] = {

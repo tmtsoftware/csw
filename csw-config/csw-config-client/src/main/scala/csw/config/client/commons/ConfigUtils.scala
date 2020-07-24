@@ -28,8 +28,10 @@ class ConfigUtils(configClientService: ConfigClientService)(implicit system: Act
 
   private def getConfigFromLocalFile(inputFilePath: Path): Future[Config] =
     async {
-      if (Files.exists(inputFilePath)) ConfigFactory.parseFile(inputFilePath.toFile)
-      else throw LocalFileNotFound(inputFilePath)
+      val config =
+        if (Files.exists(inputFilePath)) ConfigFactory.parseFile(inputFilePath.toFile)
+        else throw LocalFileNotFound(inputFilePath)
+      config
     }
 
   private def getConfigFromRemoteFile(inputFilePath: Path): Future[Config] =

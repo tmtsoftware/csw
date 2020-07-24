@@ -50,5 +50,5 @@ object SampleRoutes {
 object SampleServer extends App {
   protected def routes: Route = SampleRoutes.routes
   import SampleRoutes.actorSystem
-  Http().bindAndHandle(routes, "localhost", 7000)
+  Http().newServerAt("localhost", 7000).bind(routes)
 }

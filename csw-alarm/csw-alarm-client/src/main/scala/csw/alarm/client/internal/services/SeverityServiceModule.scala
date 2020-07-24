@@ -121,7 +121,6 @@ private[client] trait SeverityServiceModule extends SeverityService {
 
   private def getActiveAlarmKeys(key: Key): Future[List[MetadataKey]] =
     async {
-
       val metadataKeys = await(metadataApi.keys(key))
       if (metadataKeys.isEmpty) logAndThrow(KeyNotFoundException(key))
 
@@ -129,8 +128,8 @@ private[client] trait SeverityServiceModule extends SeverityService {
         case RedisResult(metadataKey, Some(metadata)) if metadata.isActive => metadataKey
       }
 
-      if (keys.isEmpty) logAndThrow(InactiveAlarmException(key))
-      else keys
+      val result: List[MetadataKey] = if (keys.isEmpty) logAndThrow(InactiveAlarmException(key)) else keys
+      result
     }
 
   private def aggregratorByMax(iterable: Iterable[Option[FullAlarmSeverity]]): FullAlarmSeverity =

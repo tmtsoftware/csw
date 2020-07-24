@@ -22,11 +22,6 @@ class LocationHttpService(locationRoutes: Route, actorRuntime: ActorRuntime, set
   }
 
   def start(httpBindHost: String = "127.0.0.1"): Future[Http.ServerBinding] = {
-
-    Http().bindAndHandle(
-      handler = applicationRoute,
-      interface = httpBindHost,
-      port = settings.httpPort
-    )
+    Http().newServerAt(httpBindHost, settings.httpPort).bind(applicationRoute)
   }
 }

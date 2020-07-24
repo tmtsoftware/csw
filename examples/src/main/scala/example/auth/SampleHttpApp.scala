@@ -38,6 +38,6 @@ object SampleHttpApp extends App {
   private val host = "0.0.0.0"
   private val port = 9003
 
-  Http().bindAndHandle(routes, host, port)
+  Http().newServerAt(host, port).bind(routes)
 }
 // #sample-http-app
