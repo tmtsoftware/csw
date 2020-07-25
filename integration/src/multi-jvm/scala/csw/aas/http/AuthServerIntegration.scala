@@ -93,7 +93,7 @@ class AuthIntegrationTest
         KeycloakData(
           realms = Set(
             Realm(
-              "example",
+              "TMT",
               clients = Set(
                 Client("my-app", "public", passwordGrantEnabled = true, authorizationEnabled = false),
                 Client("my-server", "bearer-only", passwordGrantEnabled = false, authorizationEnabled = false)
@@ -138,7 +138,7 @@ class AuthIntegrationTest
         keycloakPort,
         "john",
         "secret",
-        "example",
+        "TMT",
         "my-app",
         host = testConductor.getAddressFor(keycloak).await.host.get
       )
@@ -166,7 +166,7 @@ class AuthIntegrationTest
         KeycloakData(
           realms = Set(
             Realm(
-              "example",
+              "TMT",
               clients = Set(
                 Client("my-app", "public", passwordGrantEnabled = true, authorizationEnabled = false)
               ),
@@ -210,7 +210,7 @@ class AuthIntegrationTest
         keycloakPort,
         "john",
         "secret",
-        "example",
+        "TMT",
         "my-app",
         host = testConductor.getAddressFor(keycloak).await.host.get
       )

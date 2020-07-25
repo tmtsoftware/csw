@@ -87,7 +87,7 @@ class LocationAuthTestWithKeycloak
     val keycloakData = KeycloakData(
       realms = Set(
         Realm(
-          name = "TMT-test",
+          name = "TMT",
           users = Set(
             ApplicationUser("admin", "password1", clientRoles = Set(ClientRole(locationServer.name, AdminRole))),
             ApplicationUser("nonAdmin", "password2")
@@ -104,7 +104,7 @@ class LocationAuthTestWithKeycloak
     Some(
       BearerToken
         .fromServer(
-          realm = "TMT-test",
+          realm = "TMT",
           client = "csw-location-server",
           host = hostname,
           port = aasPort,
