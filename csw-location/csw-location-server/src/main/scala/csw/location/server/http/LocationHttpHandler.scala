@@ -2,7 +2,7 @@ package csw.location.server.http
 
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import csw.aas.http.AuthorizationPolicy.ClientRolePolicy
+import csw.aas.http.AuthorizationPolicy.RealmRolePolicy
 import csw.aas.http.SecurityDirectives
 import csw.location.api.codec.LocationServiceCodecs._
 import csw.location.api.messages.LocationHttpMessage
@@ -18,7 +18,7 @@ class LocationHttpHandler(locationService: LocationService, securityDirectives: 
     with ServerHttpCodecs {
 
   private lazy val securityDirectivesCached: SecurityDirectives = securityDirectives
-  private val AdminRole                                         = "admin"
+  private val AdminRole                                         = "location-admin"
 
   override def handle(request: LocationHttpMessage): Route =
     request match {
@@ -34,5 +34,5 @@ class LocationHttpHandler(locationService: LocationService, securityDirectives: 
       case ListByPrefix(prefix)                 => complete(locationService.listByPrefix(prefix))
     }
 
-  private def sPost(route: => Route): Route = securityDirectivesCached.sPost(ClientRolePolicy(AdminRole))(_ => route)
+  private def sPost(route: => Route): Route = securityDirectivesCached.sPost(RealmRolePolicy(AdminRole))(_ => route)
 }

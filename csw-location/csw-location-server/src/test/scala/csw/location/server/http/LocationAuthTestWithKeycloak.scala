@@ -62,7 +62,7 @@ class LocationAuthTestWithKeycloak
   }
 
   test(
-    "unregisterAll (protected route) should return 403 when client does not have admin role in token | CSW-98, " +
+    "unregisterAll (protected route) should return 403 when client does not have location admin role in token | CSW-98, " +
       "CSW-89"
   ) {
     val locationClient = HttpLocationServiceFactory.make("localhost", httpPort, tokenFactoryWithoutAdminRole)
@@ -71,7 +71,7 @@ class LocationAuthTestWithKeycloak
     exception.getCause.asInstanceOf[HttpError].statusCode shouldBe 403
   }
 
-  test("register (protected route) should return 200 when client have admin role in token | CSW-98, CSW-89") {
+  test("register (protected route) should return 200 when client have location admin role in token | CSW-98, CSW-89") {
     val locationClient     = HttpLocationServiceFactory.make("localhost", httpPort, tokenFactoryWithAdminRole)
     val connection         = HttpConnection(ComponentId(Prefix("TCS.comp1"), ComponentType.Service))
     val servicePort        = 2345
@@ -81,18 +81,19 @@ class LocationAuthTestWithKeycloak
   }
 
   private def startKeycloak(port: Int): StopHandle = {
-    val AdminRole = "admin"
+    val AdminRole = "location-admin"
     val locationServer =
-      Client(name = "csw-location-server", clientType = "public", passwordGrantEnabled = true, clientRoles = Set(AdminRole))
+      Client(name = "csw-location-server", clientType = "public", passwordGrantEnabled = true)
     val keycloakData = KeycloakData(
       realms = Set(
         Realm(
           name = "TMT",
           users = Set(
-            ApplicationUser("admin", "password1", clientRoles = Set(ClientRole(locationServer.name, AdminRole))),
+            ApplicationUser("admin", "password1", realmRoles = Set(AdminRole)),
             ApplicationUser("nonAdmin", "password2")
           ),
-          clients = Set(locationServer)
+          clients = Set(locationServer),
+          realmRoles = Set(AdminRole)
         )
       )
     )
