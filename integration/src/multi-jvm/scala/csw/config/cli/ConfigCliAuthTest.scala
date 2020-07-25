@@ -97,7 +97,7 @@ class ConfigCliAuthTest(ignore: Int)
       enterBarrier("keycloak started")
       val serverWiring = ServerWiring.make(
         ConfigFactory.parseString(
-          "auth-config.client-id = csw-config-server\n" +
+          "auth-config.client-id = tmt-backend-app\n" +
             "auth-config.realm=TMT"
         )
       )
@@ -116,7 +116,7 @@ class ConfigCliAuthTest(ignore: Int)
 
       val wiring = Wiring.noPrinting(
         ConfigFactory.parseString(
-          "auth-config.client-id = csw-config-cli\n" +
+          "auth-config.client-id = tmt-frontend-app\n" +
             "auth-config.realm=TMT"
         )
       )
