@@ -57,7 +57,7 @@ class ConfigCliAuthTest(ignore: Int)
 
   test("should upload, update, get and set active version of configuration files | DEOPSCSW-43") {
     runOn(keycloak) {
-      val configAdmin = "admin"
+      val configAdmin = "config-admin"
 
       val `csw-config-server` = Client(
         "csw-config-server",

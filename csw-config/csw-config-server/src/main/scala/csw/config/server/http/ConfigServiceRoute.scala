@@ -31,7 +31,7 @@ class ConfigServiceRoute(
   import securityDirectives._
 
   private val UnknownUser = "Unknown"
-  private val AdminRole   = "admin"
+  private val AdminRole   = "config-admin"
 
   private def configService(userName: String = UnknownUser): ConfigService = configServiceFactory.make(userName)
 
