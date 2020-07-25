@@ -60,13 +60,13 @@ class ConfigCliAuthTest(ignore: Int)
       val configAdmin = "config-admin"
 
       val `csw-config-server` = Client(
-        "csw-config-server",
+        "tmt-backend-app",
         "bearer-only",
         passwordGrantEnabled = false,
         authorizationEnabled = false,
       )
 
-      val `csw-config-cli` = Client("csw-config-cli", "public", passwordGrantEnabled = false, authorizationEnabled = false)
+      val `csw-config-cli` = Client("tmt-frontend-app", "public", passwordGrantEnabled = false, authorizationEnabled = false)
 
       val keycloakData = KeycloakData(
         realms = Set(
@@ -97,7 +97,7 @@ class ConfigCliAuthTest(ignore: Int)
       enterBarrier("keycloak started")
       val serverWiring = ServerWiring.make(
         ConfigFactory.parseString(
-          "auth-config.client-id = csw-config-server\n" +
+          "auth-config.client-id = tmt-backend-app\n" +
             "auth-config.realm=TMT"
         )
       )
@@ -116,7 +116,7 @@ class ConfigCliAuthTest(ignore: Int)
 
       val wiring = Wiring.noPrinting(
         ConfigFactory.parseString(
-          "auth-config.client-id = csw-config-cli\n" +
+          "auth-config.client-id = tmt-frontend-app\n" +
             "auth-config.realm=TMT"
         )
       )

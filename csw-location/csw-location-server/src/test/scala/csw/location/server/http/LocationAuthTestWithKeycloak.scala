@@ -82,8 +82,8 @@ class LocationAuthTestWithKeycloak
 
   private def startKeycloak(port: Int): StopHandle = {
     val AdminRole = "location-admin"
-    val locationServer =
-      Client(name = "csw-location-server", clientType = "public", passwordGrantEnabled = true)
+    val locationServerClient =
+      Client(name = "tmt-frontend-app", clientType = "public", passwordGrantEnabled = true)
     val keycloakData = KeycloakData(
       realms = Set(
         Realm(
@@ -92,7 +92,7 @@ class LocationAuthTestWithKeycloak
             ApplicationUser("admin", "password1", realmRoles = Set(AdminRole)),
             ApplicationUser("nonAdmin", "password2")
           ),
-          clients = Set(locationServer),
+          clients = Set(locationServerClient),
           realmRoles = Set(AdminRole)
         )
       )

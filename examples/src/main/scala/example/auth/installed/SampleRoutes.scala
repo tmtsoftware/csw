@@ -22,7 +22,7 @@ object SampleRoutes {
     csw.aas.http.SecurityDirectives(ConfigFactory.parseString("""
       | auth-config {
       |  realm = TMT
-      |  client-id = demo-server
+      |  client-id = tmt-backend-app
       |  auth-server-url = "http://10.131.124.57:8081/auth"
       | }
     """.stripMargin))

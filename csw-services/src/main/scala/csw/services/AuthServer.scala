@@ -15,10 +15,10 @@ class AuthServer(locationService: LocationService, settings: Settings)(implicit 
   private val serviceName = "Auth/AAS Service"
   import settings._
 
-  private val configAdminRole = "admin"
+  private val configAdminRole = "config-admin"
 
   private val `csw-config-server` = Client(
-    "csw-config-server",
+    "tmt-backend-app",
     "bearer-only",
     passwordGrantEnabled = false,
     authorizationEnabled = false,
@@ -26,7 +26,7 @@ class AuthServer(locationService: LocationService, settings: Settings)(implicit 
   )
 
   private val `csw-config-cli` = Client(
-    "csw-config-cli",
+    "tmt-frontend-app",
     "public",
     passwordGrantEnabled = false,
     authorizationEnabled = false
@@ -42,13 +42,14 @@ class AuthServer(locationService: LocationService, settings: Settings)(implicit 
             ApplicationUser(
               configAdminUsername,
               configAdminPassword,
-              clientRoles = Set(ClientRole(`csw-config-server`.name, configAdminRole))
+              realmRoles = Set(configAdminRole)
             ),
             ApplicationUser(
               "config-user",
               "config-user"
             )
-          )
+          ),
+          realmRoles = Set(configAdminRole)
         )
       )
     )
