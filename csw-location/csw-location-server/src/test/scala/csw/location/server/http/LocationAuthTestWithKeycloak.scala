@@ -106,7 +106,7 @@ class LocationAuthTestWithKeycloak
       BearerToken
         .fromServer(
           realm = "TMT",
-          client = "csw-location-server",
+          client = "tmt-frontend-app",
           host = hostname,
           port = aasPort,
           username = userName,

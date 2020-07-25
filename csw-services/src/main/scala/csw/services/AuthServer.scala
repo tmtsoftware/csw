@@ -17,14 +17,6 @@ class AuthServer(locationService: LocationService, settings: Settings)(implicit 
 
   private val configAdminRole = "config-admin"
 
-  private val `csw-config-server` = Client(
-    "tmt-backend-app",
-    "bearer-only",
-    passwordGrantEnabled = false,
-    authorizationEnabled = false,
-    clientRoles = Set(configAdminRole)
-  )
-
   private val `csw-config-cli` = Client(
     "tmt-frontend-app",
     "public",
@@ -37,7 +29,7 @@ class AuthServer(locationService: LocationService, settings: Settings)(implicit 
       realms = Set(
         Realm(
           "TMT",
-          clients = Set(`csw-config-server`, `csw-config-cli`),
+          clients = Set(`csw-config-cli`),
           users = Set(
             ApplicationUser(
               configAdminUsername,

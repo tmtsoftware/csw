@@ -95,9 +95,7 @@ class AuthIntegrationTest
             Realm(
               "TMT",
               clients = Set(
-                Client("tmt-frontend-app", "public", passwordGrantEnabled = true, authorizationEnabled = false),
-                Client("tmt-backend-app", "bearer-only", passwordGrantEnabled = false, authorizationEnabled = false)
-              ),
+                Client("tmt-frontend-app", "public", passwordGrantEnabled = true, authorizationEnabled = false)),
               users = Set(ApplicationUser("john", "secret", realmRoles = Set("admin"))),
               realmRoles = Set("admin")
             )
@@ -139,7 +137,7 @@ class AuthIntegrationTest
         "john",
         "secret",
         "TMT",
-        "my-app",
+        "tmt-frontend-app",
         host = testConductor.getAddressFor(keycloak).await.host.get
       )
 
@@ -211,7 +209,7 @@ class AuthIntegrationTest
         "john",
         "secret",
         "TMT",
-        "my-app",
+        "tmt-frontend-app",
         host = testConductor.getAddressFor(keycloak).await.host.get
       )
 

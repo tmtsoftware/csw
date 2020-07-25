@@ -17,7 +17,7 @@ private[testkit] trait MockedAuthentication extends MockitoSugar {
 
   private val keycloakDeployment = new KeycloakDeployment()
   keycloakDeployment.setRealm("TMT")
-  keycloakDeployment.setResourceName("test")
+  keycloakDeployment.setResourceName("tmt-backend-app")
 
   private val authConfig: AuthConfig = mock[AuthConfig]
   when(authConfig.getDeployment).thenReturn(keycloakDeployment)
@@ -33,7 +33,7 @@ private[testkit] trait MockedAuthentication extends MockitoSugar {
     case _                         => Future.successful(None)
   }
 
-  when(validToken.hasClientRole("admin", "test")).thenReturn(true)
+  when(validToken.hasRealmRole("config-admin")).thenReturn(true)
   when(validToken.preferred_username).thenReturn(Some("test"))
   when(validToken.userOrClientName).thenReturn("test")
   when(authentication.authenticator).thenReturn(authenticator)

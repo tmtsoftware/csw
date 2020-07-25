@@ -59,20 +59,13 @@ class ConfigCliAuthTest(ignore: Int)
     runOn(keycloak) {
       val configAdmin = "config-admin"
 
-      val `csw-config-server` = Client(
-        "tmt-backend-app",
-        "bearer-only",
-        passwordGrantEnabled = false,
-        authorizationEnabled = false,
-      )
-
       val `csw-config-cli` = Client("tmt-frontend-app", "public", passwordGrantEnabled = false, authorizationEnabled = false)
 
       val keycloakData = KeycloakData(
         realms = Set(
           Realm(
             "TMT",
-            clients = Set(`csw-config-server`, `csw-config-cli`),
+            clients = Set(`csw-config-cli`),
             users = Set(
               ApplicationUser(
                 adminUser,

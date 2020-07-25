@@ -21,7 +21,7 @@ trait MockedAuthentication {
 
   private val keycloakDeployment = new KeycloakDeployment()
   keycloakDeployment.setRealm("TMT")
-  keycloakDeployment.setResourceName("test")
+  keycloakDeployment.setResourceName("tmt-backend-app")
 
   private val authConfig: AuthConfig = mock[AuthConfig]
   when(authConfig.getDeployment).thenReturn(keycloakDeployment)
@@ -44,8 +44,8 @@ trait MockedAuthentication {
     case Provided(`validTokenStr`)       => Future.successful(Some(validToken))
     case _                               => Future.successful(None)
   }
-  when(roleMissingToken.hasClientRole("admin", "test")).thenReturn(false)
-  when(validToken.hasClientRole("admin", "test")).thenReturn(true)
+  when(roleMissingToken.hasRealmRole("config-admin")).thenReturn(false)
+  when(validToken.hasRealmRole("config-admin")).thenReturn(true)
   when(validToken.preferred_username).thenReturn(Some(preferredUserName))
   when(validToken.userOrClientName).thenReturn(preferredUserName)
   when(authentication.authenticator).thenReturn(authenticator)
