@@ -49,13 +49,15 @@ object Common extends AutoPlugin {
       "-feature",
       "-unchecked",
       "-deprecation",
-      if (enableFatalWarnings.value) "-Xfatal-warnings" else "",
+      //-W Options
+      "-Wdead-code",
+      if (enableFatalWarnings.value) "-Wconf:any:error" else "-Wconf:any:warning-verbose",
+      //-X Options
       "-Xlint:_,-missing-interpolator",
-      "-Ywarn-dead-code",
       "-Xsource:3",
-      "-Wconf:any:warning-verbose",
+      "-Xcheckinit",
       "-Xasync"
-//      "-Xprint:typer",
+      // -Y options are rarely needed, please look for -W equivalents
     ),
     javacOptions in (Compile, doc) ++= Seq("-Xdoclint:none"),
     javacOptions in doc ++= Seq("--ignore-source-errors"),
