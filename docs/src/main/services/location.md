@@ -305,6 +305,19 @@ Scala
 Java
 :   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/example/location/JLocationServiceExampleClient.java) { #unregister }
 
+## Protected Routes
+The following Location Server routes are `Protected`. To use these routes, the user must be authenticated and authorized with `location-admin` role.
+
+* register
+* unregister
+* unregisterAll
+
+@@@ note
+
+Refer to @ref:[csw-aas](../services/aas.md) docs to know more about how to authenticate and authorize with AAS and get an access token.
+
+@@@
+
 ## Technical Description
 See @ref:[Location Service Technical Description](../technical/location/location.md).
 

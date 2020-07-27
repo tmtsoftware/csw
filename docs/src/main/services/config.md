@@ -217,7 +217,7 @@ Java
 :   @@snip [JConfigClientExampleTest.java](../../../../examples/src/test/java/example/config/JConfigClientExampleTest.java) { #getMetadata }
 
 ## Admin Protected Routes
-The following Config Server routes are `Admin Protected`. To use these routes, the use must be authenticated and authorized.
+The following Config Server routes are `Admin Protected`. To use these routes, the user must be authenticated and authorized.
 
 * create
 * update

@@ -24,6 +24,15 @@ class AuthServer(locationService: LocationService, settings: Settings)(implicit 
     authorizationEnabled = false
   )
 
+  private val applicationUser: ApplicationUser = ApplicationUser(
+    "config-user1",
+    "config-user1"
+  )
+  private val adminUser: ApplicationUser = ApplicationUser(
+    configAdminUsername,
+    configAdminPassword,
+    realmRoles = Set(configAdminRole)
+  )
   private val embeddedKeycloak = new EmbeddedKeycloak(
     KeycloakData(
       realms = Set(
@@ -31,15 +40,8 @@ class AuthServer(locationService: LocationService, settings: Settings)(implicit 
           "TMT",
           clients = Set(`csw-config-cli`),
           users = Set(
-            ApplicationUser(
-              configAdminUsername,
-              configAdminPassword,
-              realmRoles = Set(configAdminRole)
-            ),
-            ApplicationUser(
-              "config-user",
-              "config-user"
-            )
+            adminUser,
+            applicationUser
           ),
           realmRoles = Set(configAdminRole)
         )
