@@ -63,7 +63,7 @@ class LocationAuthTestWithKeycloak
 
   test(
     "unregisterAll (protected route) should return 403 when client does not have location admin role in token | CSW-98, " +
-      "CSW-89"
+      "CSW-89, CSW-106"
   ) {
     val locationClient = HttpLocationServiceFactory.make("localhost", httpPort, tokenFactoryWithoutAdminRole)
     val exception      = intercept[Exception](locationClient.unregisterAll().futureValue)
@@ -71,7 +71,7 @@ class LocationAuthTestWithKeycloak
     exception.getCause.asInstanceOf[HttpError].statusCode shouldBe 403
   }
 
-  test("register (protected route) should return 200 when client have location admin role in token | CSW-98, CSW-89") {
+  test("register (protected route) should return 200 when client have location admin role in token | CSW-98, CSW-89, CSW-106") {
     val locationClient     = HttpLocationServiceFactory.make("localhost", httpPort, tokenFactoryWithAdminRole)
     val connection         = HttpConnection(ComponentId(Prefix("TCS.comp1"), ComponentType.Service))
     val servicePort        = 2345

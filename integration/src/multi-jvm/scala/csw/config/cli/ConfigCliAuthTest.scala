@@ -55,7 +55,7 @@ class ConfigCliAuthTest(ignore: Int)
     testFileUtils.deleteServerFiles()
   }
 
-  test("should upload, update, get and set active version of configuration files | DEOPSCSW-43") {
+  test("should upload, update, get and set active version of configuration files | DEOPSCSW-43, CSW-106") {
     runOn(keycloak) {
       val configAdmin = "config-admin"
 
