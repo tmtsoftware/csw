@@ -100,6 +100,7 @@ lazy val `csw-contract` = project
   .dependsOn(
     `csw-location-api`.jvm,
     `csw-command-api`.jvm,
+    `csw-config-models`.jvm,
     `csw-command-client`,
     `csw-params`.jvm
   )
