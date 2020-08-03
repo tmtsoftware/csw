@@ -20,7 +20,8 @@ class AuthServer(locationService: LocationService, settings: Settings)(implicit 
   private val `csw-config-cli` = Client(
     "tmt-frontend-app",
     "public",
-    passwordGrantEnabled = false,
+    passwordGrantEnabled = true,
+    implicitFlowEnabled = true,
     authorizationEnabled = false
   )
 
