@@ -46,8 +46,8 @@ class SeverityServiceModuleTest
     val hostName     = InetAddress.getLocalHost.getHostName
 
     val expectedMessage1 =
-      "Setting severity [critical] for alarm [nfiraos-trombone-tromboneaxislowlimitalarm] with expire timeout [1] seconds"
-    val expectedMessage2 = "Updating current severity [critical] in alarm store"
+      "Setting severity [Critical] for alarm [nfiraos-trombone-tromboneaxislowlimitalarm] with expire timeout [1] seconds"
+    val expectedMessage2 = "Updating current severity [Critical] in alarm store"
 
     val loggingSystem = new LoggingSystem("logging", "version", hostName, actorSystem)
     loggingSystem.setAppenders(List(testAppender))

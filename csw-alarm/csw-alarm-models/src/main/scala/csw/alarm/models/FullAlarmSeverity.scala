@@ -11,7 +11,7 @@ import scala.collection.immutable.IndexedSeq
  *
  * @param level is a fundamental value in comparing severities
  */
-sealed abstract class FullAlarmSeverity private[alarm] (val level: Int) extends EnumEntry with Lowercase {
+sealed abstract class FullAlarmSeverity private[alarm] (val level: Int) extends EnumEntry {
 
   /**
    * The name of Severity e.g. for `Major`, the name will be represented as `major`

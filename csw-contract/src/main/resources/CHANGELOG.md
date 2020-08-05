@@ -10,6 +10,10 @@
     old: "CharKey": { "values": [ 65, 66 ] }
     new: "CharKey": { "values": [ "A", "B" ] }
 
+- Encoding/Decoding for `AlarmSeverity` has changed from lower case to retain original case
+    old: "AlarmSeverity": "critical"
+    new: "AlarmSeverity": "Critical"
+
 ## [v1] 
 
 - Initial version
