@@ -1,6 +1,5 @@
 package csw.alarm.models
 
-import enumeratum.EnumEntry.Lowercase
 import enumeratum.{Enum, EnumEntry}
 
 import scala.collection.immutable.IndexedSeq
