@@ -3,7 +3,7 @@ package csw.contract.data.config
 import csw.config.models.FileType
 import csw.config.models.codecs.ConfigCodecs
 import csw.contract.ResourceFetcher
-import csw.contract.generator.{Contract, ModelSet, ModelType, Readme, Service}
+import csw.contract.generator._
 
 object ConfigContract extends ConfigData with ConfigCodecs {
   private val models: ModelSet = ModelSet.models(
@@ -15,8 +15,8 @@ object ConfigContract extends ConfigData with ConfigCodecs {
   )
   private val readme: Readme = Readme(ResourceFetcher.getResourceAsString("config-service/README.md"))
   val service: Service = Service(
-    Contract(List.empty, ModelSet.requests()),
-    Contract(List.empty, ModelSet.requests()),
+    Contract.empty,
+    Contract.empty,
     models,
     readme
   )

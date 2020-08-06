@@ -29,6 +29,10 @@ case class Endpoint(requestType: String, responseType: String, errorTypes: List[
 
 case class Contract(endpoints: List[Endpoint], requests: ModelSet)
 
+object Contract {
+  def empty: Contract = Contract(Nil, ModelSet.requests())
+}
+
 case class Service(
     `http-contract`: Contract,
     `websocket-contract`: Contract,
