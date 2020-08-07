@@ -1,0 +1,44 @@
+{
+  "endpoints" : [ {
+    "requestType" : "Register",
+    "responseType" : "Location",
+    "errorTypes" : [ "RegistrationFailed", "OtherLocationIsRegistered" ]
+  } ],
+  "requests" : {
+    "Register" : [ {
+      "_type" : "Register",
+      "registration" : {
+        "_type" : "AkkaRegistration",
+        "connection" : {
+          "prefix" : "TCS.filter.wheel",
+          "componentType" : "HCD",
+          "connectionType" : "akka"
+        },
+        "actorRefURI" : "some_path"
+      }
+    }, {
+      "_type" : "Register",
+      "registration" : {
+        "_type" : "HttpRegistration",
+        "connection" : {
+          "prefix" : "TCS.filter.wheel",
+          "componentType" : "HCD",
+          "connectionType" : "http"
+        },
+        "port" : 2090,
+        "path" : "somePath",
+        "networkType" : {
+          "_type" : "Private"
+        }
+      }
+    } ],
+    "Unregister" : [ {
+      "_type" : "Unregister",
+      "connection" : {
+        "prefix" : "TCS.filter.wheel",
+        "componentType" : "HCD",
+        "connectionType" : "http"
+      }
+    } ]
+  }
+}

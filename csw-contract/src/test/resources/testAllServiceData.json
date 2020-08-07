@@ -1,0 +1,97 @@
+{
+  "location-service" : {
+    "http-contract" : {
+      "endpoints" : [ {
+        "requestType" : "Register",
+        "responseType" : "Location",
+        "errorTypes" : [ "RegistrationFailed", "OtherLocationIsRegistered" ]
+      } ],
+      "requests" : {
+        "Register" : [ {
+          "_type" : "Register",
+          "registration" : {
+            "_type" : "AkkaRegistration",
+            "connection" : {
+              "prefix" : "TCS.filter.wheel",
+              "componentType" : "HCD",
+              "connectionType" : "akka"
+            },
+            "actorRefURI" : "some_path"
+          }
+        }, {
+          "_type" : "Register",
+          "registration" : {
+            "_type" : "HttpRegistration",
+            "connection" : {
+              "prefix" : "TCS.filter.wheel",
+              "componentType" : "HCD",
+              "connectionType" : "http"
+            },
+            "port" : 2090,
+            "path" : "somePath",
+            "networkType" : {
+              "_type" : "Private"
+            }
+          }
+        } ],
+        "Unregister" : [ {
+          "_type" : "Unregister",
+          "connection" : {
+            "prefix" : "TCS.filter.wheel",
+            "componentType" : "HCD",
+            "connectionType" : "http"
+          }
+        } ]
+      }
+    },
+    "websocket-contract" : {
+      "endpoints" : [ {
+        "requestType" : "Track",
+        "responseType" : "TrackingEvent",
+        "errorTypes" : [ "ServiceError" ]
+      } ],
+      "requests" : {
+        "Track" : [ {
+          "_type" : "Track",
+          "connection" : {
+            "prefix" : "TCS.filter.wheel",
+            "componentType" : "HCD",
+            "connectionType" : "akka"
+          }
+        } ]
+      }
+    },
+    "models" : {
+      "Location" : [ {
+        "_type" : "AkkaLocation",
+        "connection" : {
+          "prefix" : "TCS.filter.wheel",
+          "componentType" : "HCD",
+          "connectionType" : "akka"
+        },
+        "uri" : "some_path"
+      }, {
+        "_type" : "HttpLocation",
+        "connection" : {
+          "prefix" : "TCS.filter.wheel",
+          "componentType" : "HCD",
+          "connectionType" : "http"
+        },
+        "uri" : "some_path"
+      } ],
+      "TrackingEvent" : [ {
+        "_type" : "LocationUpdated",
+        "location" : {
+          "_type" : "AkkaLocation",
+          "connection" : {
+            "prefix" : "TCS.filter.wheel",
+            "componentType" : "HCD",
+            "connectionType" : "akka"
+          },
+          "uri" : "some_path"
+        }
+      } ]
+    },
+    "readme" : "# inner README test content\n"
+  }
+}

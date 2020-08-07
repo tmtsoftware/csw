@@ -1,0 +1,31 @@
+{
+  "Location" : [ {
+    "_type" : "AkkaLocation",
+    "connection" : {
+      "prefix" : "TCS.filter.wheel",
+      "componentType" : "HCD",
+      "connectionType" : "akka"
+    },
+    "uri" : "some_path"
+  }, {
+    "_type" : "HttpLocation",
+    "connection" : {
+      "prefix" : "TCS.filter.wheel",
+      "componentType" : "HCD",
+      "connectionType" : "http"
+    },
+    "uri" : "some_path"
+  } ],
+  "TrackingEvent" : [ {
+    "_type" : "LocationUpdated",
+    "location" : {
+      "_type" : "AkkaLocation",
+      "connection" : {
+        "prefix" : "TCS.filter.wheel",
+        "componentType" : "HCD",
+        "connectionType" : "akka"
+      },
+      "uri" : "some_path"
+    }
+  } ]
+}

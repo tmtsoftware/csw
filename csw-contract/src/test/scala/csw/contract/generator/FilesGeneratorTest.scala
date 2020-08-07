@@ -5,7 +5,7 @@ import java.nio.file.{Files, Paths}
 
 import csw.contract.ResourceFetcher
 import csw.location.api.codec.LocationServiceCodecs
-import csw.location.api.messages.LocationHttpMessage.Register
+import csw.location.api.messages.LocationHttpMessage.{Register, Unregister}
 import csw.location.api.messages.LocationWebsocketMessage.Track
 import csw.location.api.messages.{LocationHttpMessage, LocationWebsocketMessage}
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
@@ -27,20 +27,25 @@ class FilesGeneratorTest extends AnyFunSuite with Matchers with BeforeAndAfterAl
   }
 
   test("should generate samples for given services") {
+    val uri                                = new URI("some_path")
+    val locationService                    = "location-service"
     val componentId: ComponentId           = ComponentId(Prefix("tcs.filter.wheel"), ComponentType.HCD)
     val akkaConnection: AkkaConnection     = AkkaConnection(componentId)
     val httpConnection: HttpConnection     = HttpConnection(componentId)
-    val akkaRegistration: AkkaRegistration = AkkaRegistration(akkaConnection, new URI("somePath"))
+    val akkaRegistration: AkkaRegistration = AkkaRegistration(akkaConnection, uri)
     val httpRegistration: HttpRegistration = HttpRegistration(httpConnection, 2090, "somePath")
-    val akkaLocation: Location             = AkkaLocation(akkaConnection, new URI("some_path"))
+    val akkaLocation: Location             = AkkaLocation(akkaConnection, uri)
+    val httpLocation: Location             = HttpLocation(httpConnection, uri)
+    val locationUpdated: TrackingEvent     = LocationUpdated(akkaLocation)
     val akkaRegister: Register             = Register(akkaRegistration)
     val httpRegister: Register             = Register(httpRegistration)
+    val unregister: Unregister             = Unregister(httpConnection)
     val track: Track                       = Track(akkaConnection)
     val httpEndpoints: List[Endpoint] = List(
       Endpoint(
         requestType = "Register",
-        responseType = "RegistrationFailed",
-        errorTypes = Nil
+        responseType = "Location",
+        errorTypes = List("RegistrationFailed", "OtherLocationIsRegistered")
       )
     )
     val websocketEndpoints: List[Endpoint] = List(
@@ -51,29 +56,44 @@ class FilesGeneratorTest extends AnyFunSuite with Matchers with BeforeAndAfterAl
       )
     )
     val models: ModelSet = ModelSet.models(
-      ModelType(akkaLocation)
+      ModelType(akkaLocation, httpLocation),
+      ModelType(locationUpdated)
     )
     val httpRequests = new RequestSet[LocationHttpMessage] {
       requestType(akkaRegister, httpRegister)
+      requestType(unregister)
     }
-
     val webSocketRequests = new RequestSet[LocationWebsocketMessage] {
       requestType(track)
     }
     val services: Services = Services(
       Map(
-        "location-service" -> Service(
+        locationService -> Service(
           `http-contract` = Contract(httpEndpoints, httpRequests),
           `websocket-contract` = Contract(websocketEndpoints, webSocketRequests),
           models,
-          Readme(ResourceFetcher.getResourceAsString("location-service/README.md"))
+          Readme(ResourceFetcher.getResourceAsString(locationService + "/README.md"))
         )
       )
     )
+
     val testOutput = "csw-contract/src/test/testOutput"
     FilesGenerator.generate(services, testOutput)
-    val path = Paths.get(testOutput)
-    Files.exists(path) shouldBe true
-    Files.size(path) should be > 0L
+
+    shouldMatchFile(s"$testOutput/$locationService/http-contract.json", locationService + "/testHttpContract.json")
+    shouldMatchFile(
+      s"$testOutput/$locationService/websocket-contract.json",
+      locationService + "/testWebSocketContract.json"
+    )
+    shouldMatchFile(s"$testOutput/$locationService/models.json", locationService + "/testModels.json")
+    shouldMatchFile(s"$testOutput/$locationService/README.md", locationService + "/README.md")
+    shouldMatchFile(s"$testOutput/allServiceData.json", "testAllServiceData.json")
+    shouldMatchFile(s"$testOutput/README.md", "README.md")
+  }
+
+  private def shouldMatchFile(actual: String, expected: String): Unit = {
+    val actualFilePath   = Paths.get(actual)
+    val expectedFilePath = Paths.get(getClass.getResource(s"/$expected").toURI)
+    Files.readString(actualFilePath).trim should ===(Files.readString(expectedFilePath).trim)
   }
 }

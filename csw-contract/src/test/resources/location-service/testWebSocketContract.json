@@ -1,0 +1,17 @@
+{
+  "endpoints" : [ {
+    "requestType" : "Track",
+    "responseType" : "TrackingEvent",
+    "errorTypes" : [ "ServiceError" ]
+  } ],
+  "requests" : {
+    "Track" : [ {
+      "_type" : "Track",
+      "connection" : {
+        "prefix" : "TCS.filter.wheel",
+        "componentType" : "HCD",
+        "connectionType" : "akka"
+      }
+    } ]
+  }
+}
