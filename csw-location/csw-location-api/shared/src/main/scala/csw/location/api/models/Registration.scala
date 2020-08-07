@@ -54,7 +54,7 @@ final case class AkkaRegistration private[csw] (
    * @return an AkkaLocation location representing a live connection at provided hostname
    */
   override def location(hostname: String): Location =
-    AkkaLocation(connection, actorRefURI)
+    AkkaLocation(connection, actorRefURI, metadata)
 }
 
 object AkkaRegistration {
@@ -81,7 +81,7 @@ final case class TcpRegistration(connection: TcpConnection, port: Int, metadata:
    * @return an TcpLocation location representing a live connection at provided hostname
    */
   override def location(hostname: String): Location =
-    TcpLocation(connection, new URI(s"tcp://$hostname:$port"))
+    TcpLocation(connection, new URI(s"tcp://$hostname:$port"), metadata)
 }
 
 object TcpRegistration {
@@ -120,7 +120,7 @@ final case class HttpRegistration(
     * @param hostname provide the hostname where Http service is available
    */
   override def location(hostname: String): Location = {
-    HttpLocation(connection, new URI(s"http://$hostname:$port/$path"))
+    HttpLocation(connection, new URI(s"http://$hostname:$port/$path"), metadata)
   }
 }
 

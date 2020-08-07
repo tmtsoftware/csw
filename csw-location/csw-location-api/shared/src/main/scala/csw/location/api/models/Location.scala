@@ -44,11 +44,6 @@ sealed abstract class Location extends LocationSerializable {
  */
 final case class AkkaLocation(connection: AkkaConnection, uri: URI, metadata: Metadata) extends Location
 
-object AkkaLocation {
-  def apply(connection: AkkaConnection, uri: URI): AkkaLocation =
-    new AkkaLocation(connection, uri, Metadata.empty)
-}
-
 /**
  * Represents a live Tcp connection
  *
@@ -58,11 +53,6 @@ object AkkaLocation {
  */
 final case class TcpLocation(connection: TcpConnection, uri: URI, metadata: Metadata) extends Location
 
-object TcpLocation {
-  def apply(connection: TcpConnection, uri: URI): TcpLocation =
-    new TcpLocation(connection, uri, Metadata.empty)
-}
-
 /**
  * Represents a live Http connection
  *
@@ -71,8 +61,3 @@ object TcpLocation {
  * @param metadata represents additional metadata information associated with location. Defaulted to empty is not provided while registration.
  */
 final case class HttpLocation(connection: HttpConnection, uri: URI, metadata: Metadata) extends Location
-
-object HttpLocation {
-  def apply(connection: HttpConnection, uri: URI): HttpLocation =
-    new HttpLocation(connection, uri, Metadata.empty)
-}
