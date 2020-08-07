@@ -22,6 +22,11 @@ sealed abstract class Location extends LocationSerializable {
   def uri: URI
 
   /**
+   * metadata represents any additional information (metadata) associated with location
+   */
+  def metadata: Metadata
+
+  /**
    * Represents the fully qualified component name along with the subsystem for e.g. tcs.filter.wheel
    */
   def prefix: Prefix = connection.connectionInfo.prefix
@@ -31,25 +36,43 @@ sealed abstract class Location extends LocationSerializable {
 /**
  * Represents a live Akka connection of an Actor
  *
- * @note Do not directly access actorRef from constructor, use one of component() or containerRef() method
+  * @note Do not directly access actorRef from constructor, use one of component() or containerRef() method
  *       to get the correctly typed actor reference.
  * @param connection represents a connection based on a componentId and the type of connection offered by the component
  * @param uri represents the actor URI of the component. Gateway or router for a component that other components will resolve and talk to.
+ * @param metadata represents additional metadata information associated with location. Defaulted to empty is not provided while registration
  */
-final case class AkkaLocation(connection: AkkaConnection, uri: URI) extends Location
+final case class AkkaLocation(connection: AkkaConnection, uri: URI, metadata: Metadata) extends Location
+
+object AkkaLocation {
+  def apply(connection: AkkaConnection, uri: URI): AkkaLocation =
+    new AkkaLocation(connection, uri, Metadata.empty)
+}
 
 /**
  * Represents a live Tcp connection
  *
- * @param connection represents a connection based on a componentId and the type of connection offered by the component
+  * @param connection represents a connection based on a componentId and the type of connection offered by the component
  * @param uri represents the remote URI of the component that other components will resolve and talk to
+ * @param metadata represents additional metadata information associated with location. Defaulted to empty is not provided while registration.
  */
-final case class TcpLocation(connection: TcpConnection, uri: URI) extends Location
+final case class TcpLocation(connection: TcpConnection, uri: URI, metadata: Metadata) extends Location
+
+object TcpLocation {
+  def apply(connection: TcpConnection, uri: URI): TcpLocation =
+    new TcpLocation(connection, uri, Metadata.empty)
+}
 
 /**
  * Represents a live Http connection
  *
- * @param connection represents a connection based on a componentId and the type of connection offered by the component
+  * @param connection represents a connection based on a componentId and the type of connection offered by the component
  * @param uri represents the remote URI of the component that other components will resolve and talk to
+ * @param metadata represents additional metadata information associated with location. Defaulted to empty is not provided while registration.
  */
-final case class HttpLocation(connection: HttpConnection, uri: URI) extends Location
+final case class HttpLocation(connection: HttpConnection, uri: URI, metadata: Metadata) extends Location
+
+object HttpLocation {
+  def apply(connection: HttpConnection, uri: URI): HttpLocation =
+    new HttpLocation(connection, uri, Metadata.empty)
+}

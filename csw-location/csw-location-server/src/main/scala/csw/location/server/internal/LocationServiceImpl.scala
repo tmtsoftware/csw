@@ -63,14 +63,17 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
       //it will be handled below by ModifyFailure.
       val updateValue = service.update(
         {
-          case r @ LWWRegister(Some(`location`) | None) => r.withValueOf(Some(location))
-          case LWWRegister(Some(otherLocation))         => throw logException(new OtherLocationIsRegistered(location, otherLocation))
+          case r @ LWWRegister(Some(`location`) | None) =>
+            r.withValueOf(Some(location))
+          case LWWRegister(Some(otherLocation)) =>
+            throw logException(new OtherLocationIsRegistered(location, otherLocation))
         },
         await(initialValue)
       )
 
       //Create a message to update connection -> location map in CRDT
-      val updateRegistry = AllServices.update(_ :+ (registration.connection -> location))
+      val updateRegistry =
+        AllServices.update(_ :+ (registration.connection -> location))
 
       //Send the update message for connection key to replicator. On success, send another message to update connection -> location
       //map. If that is successful then return a registrationResult for this Location. In case of any failure throw an exception.
@@ -80,19 +83,22 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
             case _: UpdateSuccess[_] =>
               log.info(s"Successfully registered connection: [${registration.connection.name}] with location [${location.uri}]")
               registrationResult(location)
-            case _ => throw logException(new RegistrationFailed(registration.connection))
+            case _ =>
+              throw logException(new RegistrationFailed(registration.connection))
           }
         case ModifyFailure(service.Key, _, cause, _) =>
           throw logException(cause) // // this exception gets mapped onto OtherLocationIsRegistered
-        case _ => throw logException(new RegistrationFailed(registration.connection))
+        case _ =>
+          throw logException(new RegistrationFailed(registration.connection))
       }
       await(registrationResultF)
     }
 
   private[internal] def getLocation(registration: Registration) =
     registration match {
-      case HttpRegistration(_, _, _, Public) => registration.location(cswCluster.publicHostname)
-      case _                                 => registration.location(cswCluster.hostname)
+      case HttpRegistration(_, _, _, Public, _) =>
+        registration.location(cswCluster.publicHostname)
+      case _ => registration.location(cswCluster.hostname)
     }
 
   /**
@@ -102,8 +108,9 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
    */
   def unregister(connection: Connection): Future[Done] =
     connection.componentId.componentType match {
-      case HCD | Assembly | Sequencer => unregisterEmbeddedComponent(connection.componentId)
-      case _                          => unregister0(connection)
+      case HCD | Assembly | Sequencer =>
+        unregisterEmbeddedComponent(connection.componentId)
+      case _ => unregister0(connection)
     }
 
   private def unregisterEmbeddedComponent(componentId: ComponentId): Future[Done] =
@@ -129,7 +136,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
   /**
    * Unregister all connections from CRDT
    *
-   * @note this method should be used for testing purpose only
+    * @note this method should be used for testing purpose only
    */
   def unregisterAll(): Future[Done] =
     async {
@@ -158,7 +165,8 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     async {
       log.info(s"Resolving location for connection: [${connection.name}] within ${within.toString()}")
       val foundInLocalCache = await(find(connection))
-      if (foundInLocalCache.isDefined) foundInLocalCache else await(resolveWithin(connection, within))
+      if (foundInLocalCache.isDefined) foundInLocalCache
+      else await(resolveWithin(connection, within))
     }
 
   /**
@@ -210,7 +218,8 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
       )
       .mapMaterializedValue {
         //Subscribe materialized actorRef to the changes in connection so that above stream starts emitting messages
-        actorRef => replicator ! Replicator.Subscribe(service.Key, actorRef)
+        actorRef =>
+          replicator ! Replicator.Subscribe(service.Key, actorRef)
       }
 
     //Collect only the Changed events for this connection and transform it to location events.
@@ -223,10 +232,12 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     }
     //Allow stream to be cancellable by giving it a KillSwitch in mat value.
     // Also, deduplicate identical messages in case multiple DeathWatch actors unregisters the same location.
-    trackingEvents.cancellable.distinctUntilChanged.mapMaterializedValue(createSubscription)
+    trackingEvents.cancellable.distinctUntilChanged
+      .mapMaterializedValue(createSubscription)
   }
 
-  private def createSubscription(x: KillSwitch): Subscription = () => x.shutdown()
+  private def createSubscription(x: KillSwitch): Subscription =
+    () => x.shutdown()
 
   /**
    * Subscribe to events of a connection by providing a callback.
@@ -240,7 +251,8 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     new RegistrationResult {
       override def location: Location = loc
 
-      override def unregister(): Future[Done] = outer.unregister(location.connection)
+      override def unregister(): Future[Done] =
+        outer.unregister(location.connection)
 
       override def toString: String = location.toString
     }
