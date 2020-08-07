@@ -21,16 +21,27 @@ object ModelType extends CommonCodecs {
 class ModelSet private (val modelTypes: List[ModelType[_]])
 
 object ModelSet {
-  def models(modelTypes: ModelType[_]*): ModelSet      = new ModelSet(modelTypes.toList)
-  def requests[T](modelTypes: ModelType[T]*): ModelSet = new ModelSet(modelTypes.toList)
+  def models(modelTypes: ModelType[_]*): ModelSet = new ModelSet(modelTypes.toList)
+}
+
+class RequestSet[T: Encoder: Decoder] {
+  private var requests: List[ModelType[_]] = Nil
+
+  protected def requestType[R <: T: ClassTag](models: R*): Unit = {
+    implicit val codec: Codec[R] = Codec.of[T].asInstanceOf[Codec[R]]
+    requests ::= ModelType(models.toList)
+  }
+
+  def modelSet: ModelSet = ModelSet.models(requests.reverse: _*)
 }
 
 case class Endpoint(requestType: String, responseType: String, errorTypes: List[String] = Nil, description: Option[String] = None)
 
-case class Contract(endpoints: List[Endpoint], requests: ModelSet)
+abstract case class Contract private (endpoints: List[Endpoint], requests: ModelSet)
 
 object Contract {
-  def empty: Contract = Contract(Nil, ModelSet.requests())
+  def apply(endpoints: List[Endpoint], requestSet: RequestSet[_]): Contract = new Contract(endpoints, requestSet.modelSet) {}
+  def empty: Contract                                                       = new Contract(Nil, ModelSet.models()) {}
 }
 
 case class Service(

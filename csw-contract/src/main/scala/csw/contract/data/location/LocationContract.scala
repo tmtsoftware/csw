@@ -44,26 +44,26 @@ object LocationContract extends LocationData with LocationServiceCodecs {
     Endpoint(name[ListByPrefix], arrayName[Location], List(name[RegistrationListingFailed]))
   )
 
-  private val httpRequests: ModelSet = ModelSet.requests[LocationHttpMessage](
-    ModelType(akkaRegister, httpRegister, publicHttpRegister),
-    ModelType(unregister),
-    ModelType(unregisterAll),
-    ModelType(find),
-    ModelType(resolve),
-    ModelType(listEntries),
-    ModelType(listByComponentTypeHcd, listByComponentTypeAssembly),
-    ModelType(listByAkkaConnectionType, listByHttpConnectionType),
-    ModelType(listByHostname),
-    ModelType(listByPrefix)
-  )
+  private val httpRequests = new RequestSet[LocationHttpMessage] {
+    requestType(akkaRegister, httpRegister, publicHttpRegister)
+    requestType(unregister)
+    requestType(unregisterAll)
+    requestType(find)
+    requestType(resolve)
+    requestType(listEntries)
+    requestType(listByComponentTypeHcd, listByComponentTypeAssembly)
+    requestType(listByAkkaConnectionType, listByHttpConnectionType)
+    requestType(listByHostname)
+    requestType(listByPrefix)
+  }
 
   private val webSocketEndpoints: List[Endpoint] = List(
     Endpoint(name[Track], name[TrackingEvent])
   )
 
-  private val websocketRequests: ModelSet = ModelSet.requests[LocationWebsocketMessage](
-    ModelType(track)
-  )
+  private val websocketRequests = new RequestSet[LocationWebsocketMessage] {
+    requestType(track)
+  }
 
   private val readme: Readme = Readme(ResourceFetcher.getResourceAsString("location-service/README.md"))
 

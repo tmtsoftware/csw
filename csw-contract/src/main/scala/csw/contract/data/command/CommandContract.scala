@@ -46,17 +46,17 @@ object CommandContract extends CommandData with CommandServiceCodecs {
     )
   )
 
-  private val httpRequests: ModelSet = ModelSet.requests[CommandServiceHttpMessage](
-    ModelType(observeValidate),
-    ModelType(observeSubmit),
-    ModelType(setupQuery),
-    ModelType(observeOneway)
-  )
+  private val httpRequests = new RequestSet[CommandServiceHttpMessage] {
+    requestType(observeValidate)
+    requestType(observeSubmit)
+    requestType(setupQuery)
+    requestType(observeOneway)
+  }
 
-  private val websocketRequests: ModelSet = ModelSet.requests[CommandServiceWebsocketMessage](
-    ModelType(queryFinal),
-    ModelType(subscribeState)
-  )
+  private val websocketRequests = new RequestSet[CommandServiceWebsocketMessage] {
+    requestType(queryFinal)
+    requestType(subscribeState)
+  }
 
   private val httpEndpoints: List[Endpoint] = List(
     Endpoint(name[Validate], name[ValidateResponse]),
