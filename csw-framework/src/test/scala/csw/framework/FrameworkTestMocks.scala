@@ -15,10 +15,9 @@ import csw.framework.internal.pubsub.PubSubBehavior
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.RegistrationFactory
 import csw.location.api.AkkaRegistrationFactory
-import csw.location.api.extensions.ActorExtension.RichActor
+import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaRegistration, HttpRegistration, Metadata}
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
-import csw.location.api.models.Connection.AkkaConnection
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.scaladsl.LoggerFactory
@@ -33,7 +32,7 @@ class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol.Command]) ex
 
   ///////////////////////////////////////////////
   val testActor: ActorRef[Any]                   = TestProbe("test-probe").ref
-  val akkaRegistration: AkkaRegistration         = AkkaRegistrationFactory.make(mock[AkkaConnection], testActor.toURI)
+  val akkaRegistration: AkkaRegistration         = new AkkaRegistrationFactory().make(mock[AkkaConnection], testActor)
   val locationService: LocationService           = mock[LocationService]
   val eventServiceFactory: EventServiceFactory   = mock[EventServiceFactory]
   val eventService: EventService                 = mock[EventService]

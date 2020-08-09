@@ -16,7 +16,7 @@ import akka.stream.javadsl.Sink;
 import csw.command.client.extensions.AkkaLocationExt;
 import csw.command.client.messages.ComponentMessage;
 import csw.command.client.messages.ContainerMessage;
-import csw.location.api.extensions.ActorExtension;
+import csw.location.api.AkkaRegistrationFactory;
 import csw.location.api.extensions.URIExtension;
 import csw.location.api.javadsl.*;
 import csw.location.api.models.*;
@@ -25,7 +25,6 @@ import csw.location.api.models.Connection.HttpConnection;
 import csw.location.client.ActorSystemFactory;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
 import csw.location.server.internal.ServerWiring;
-import csw.location.server.scaladsl.RegistrationFactory;
 import csw.logging.api.javadsl.ILogger;
 import csw.logging.client.internal.LoggingSystem;
 import csw.logging.client.javadsl.JKeys;
@@ -37,7 +36,6 @@ import scala.concurrent.Await;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.net.InetAddress;
-import java.net.URI;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -111,7 +109,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         // dummy HCD connection
         AkkaConnection hcdConnection = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS, "hcd1"),
                 JComponentType.HCD));
-        ActorRef actorRef = getContext().actorOf(Props.create(AbstractActor.class, () -> new AbstractActor() {
+        ActorRef actorRefUntyped = getContext().actorOf(Props.create(AbstractActor.class, () -> new AbstractActor() {
                     @Override
                     public Receive createReceive() {
                         return ReceiveBuilder.create().build();
@@ -123,8 +121,8 @@ public class JLocationServiceExampleClient extends AbstractActor {
         // Register UnTyped ActorRef with Location service. Use javadsl Adapter to convert UnTyped ActorRefs
         // to Typed ActorRef[Nothing]
 
-        URI actorRefURI = ActorExtension.RichActor(Adapter.toTyped(actorRef)).toURI();
-        AkkaRegistration hcdRegistration = csw.location.api.AkkaRegistrationFactory.make(hcdConnection, actorRefURI);
+        akka.actor.typed.ActorRef actorRef = Adapter.toTyped(actorRefUntyped);
+        AkkaRegistration hcdRegistration = new csw.location.api.AkkaRegistrationFactory().make(hcdConnection, actorRef);
         hcdRegResult = locationService.register(hcdRegistration).get();
 
         // ************************************************************************************************************
@@ -136,7 +134,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
                 "assembly1"), JComponentType.Assembly));
 
         // Register Typed ActorRef[String] with Location Service
-        AkkaRegistration assemblyRegistration = new RegistrationFactory().akkaTyped(assemblyConnection, typedActorRef);
+        AkkaRegistration assemblyRegistration = new AkkaRegistrationFactory().make(assemblyConnection, typedActorRef);
 
 
         assemblyRegResult = locationService.register(assemblyRegistration).get();

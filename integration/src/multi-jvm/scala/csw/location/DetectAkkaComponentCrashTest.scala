@@ -4,9 +4,7 @@ import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.SpawnProtocol
 import akka.actor.typed.scaladsl.Behaviors
 import akka.stream.scaladsl.{Keep, Sink}
-import csw.location.api.AkkaRegistrationFactory.make
-import csw.location.api.extensions.ActorExtension.RichActor
-import csw.location.api.models
+import csw.location.api.{AkkaRegistrationFactory, models}
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
 import csw.location.api.models._
 import csw.location.client.ActorSystemFactory
@@ -99,8 +97,11 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String)
       val system   = ActorSystemFactory.remote(SpawnProtocol(), "test")
       val actorRef = system.spawn(Behaviors.empty, "trombone-hcd-1")
 
+      val akkaRegistrationFactory = new AkkaRegistrationFactory()
+      import akkaRegistrationFactory._
+
       locationService
-        .register(make(akkaConnection, actorRef.toURI, Metadata(Map("key1" -> "value1"))))
+        .register(make(akkaConnection, actorRef, Metadata(Map("key1" -> "value1"))))
         .await
       val port = 1234
       locationService.register(HttpRegistration(httpConnection, port, "")).await

@@ -12,7 +12,6 @@ import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.location.api
 import csw.location.api.AkkaRegistrationFactory
-import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
 import csw.location.api.models._
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
@@ -145,7 +144,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
 
   // dummy HCD connection
   val hcdConnection = AkkaConnection(api.models.ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD))
-  val hcdRegistration: AkkaRegistration = AkkaRegistrationFactory.make(
+  val hcdRegistration: AkkaRegistration = new AkkaRegistrationFactory().make(
     hcdConnection,
     context
       .actorOf(
@@ -157,7 +156,6 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
         name = "my-actor-1"
       )
       .toTyped
-      .toURI
   )
 
   // Register UnTyped ActorRef with Location service. Import scaladsl adapter to implicitly convert
@@ -173,7 +171,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
 
   // Register Typed ActorRef[String] with Location Service
   val assemblyRegistration: AkkaRegistration =
-    AkkaRegistrationFactory.make(assemblyConnection, typedActorRef.toURI)
+    new AkkaRegistrationFactory().make(assemblyConnection, typedActorRef)
 
   val assemblyRegResult: RegistrationResult = Await.result(locationService.register(assemblyRegistration), 2.seconds)
   //#Components-Connections-Registrations

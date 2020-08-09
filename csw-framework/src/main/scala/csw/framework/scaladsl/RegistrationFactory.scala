@@ -2,9 +2,8 @@ package csw.framework.scaladsl
 
 import akka.actor.typed.ActorRef
 import csw.location.api.AkkaRegistrationFactory
-import csw.location.api.extensions.ActorExtension.RichActor
-import csw.location.api.models.{AkkaRegistration, Metadata}
 import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.{AkkaRegistration, Metadata}
 
 /**
  * `RegistrationFactory` helps creating an AkkaRegistration. It is currently used by `csw-framework` to register different components on jvm boot-up.
@@ -22,5 +21,5 @@ class RegistrationFactory {
    * @return a handle to the AkkaRegistration that is used to register in location service
    */
   def akkaTyped(akkaConnection: AkkaConnection, actorRef: ActorRef[_], metadata: Metadata = Metadata.empty): AkkaRegistration =
-    AkkaRegistrationFactory.make(akkaConnection, actorRef.toURI, metadata)
+    new AkkaRegistrationFactory().make(akkaConnection, actorRef, metadata)
 }

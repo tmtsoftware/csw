@@ -2,9 +2,8 @@ package csw.location.models
 
 import java.net.URI
 
-import akka.actor.typed
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.location.api
 import csw.location.api.AkkaRegistrationFactory
@@ -25,17 +24,19 @@ import scala.concurrent.duration.DurationDouble
 
 class RegistrationTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
-  implicit val actorSystem: typed.ActorSystem[_] =
-    ActorSystemFactory.remote(Behaviors.empty, "my-actor-1")
+  implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol(), "my-actor-1")
 
   test("should able to create the AkkaRegistration which should internally create AkkaLocation") {
     val hostname = Networks().hostname
 
     val akkaConnection = AkkaConnection(api.models.ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD))
-    val actorRefUri    = actorSystem.toURI
+    val actorRef: ActorRef[_] = actorSystem.spawn(
+      Behaviors.empty,
+      "my-actor-3"
+    )
 
-    val akkaRegistration     = AkkaRegistrationFactory.make(akkaConnection, actorRefUri)
-    val expectedAkkaLocation = AkkaLocation(akkaConnection, actorRefUri, Metadata.empty)
+    val akkaRegistration     = new AkkaRegistrationFactory().make(akkaConnection, actorRef)
+    val expectedAkkaLocation = AkkaLocation(akkaConnection, actorRef.toURI, Metadata.empty)
 
     akkaRegistration.location(hostname) shouldBe expectedAkkaLocation
   }
@@ -44,11 +45,14 @@ class RegistrationTest extends AnyFunSuite with Matchers with BeforeAndAfterAll 
     val hostname = Networks().hostname
 
     val akkaConnection = AkkaConnection(api.models.ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD))
-    val actorRefUri    = actorSystem.toURI
+    val actorRef: ActorRef[_] = actorSystem.spawn(
+      Behaviors.empty,
+      "my-actor-4"
+    )
 
     val metadata             = Metadata(Map("key1" -> "value"))
-    val akkaRegistration     = AkkaRegistrationFactory.make(akkaConnection, actorRefUri, metadata)
-    val expectedAkkaLocation = AkkaLocation(akkaConnection, actorRefUri, metadata)
+    val akkaRegistration     = new AkkaRegistrationFactory().make(akkaConnection, actorRef, metadata)
+    val expectedAkkaLocation = AkkaLocation(akkaConnection, actorRef.toURI, metadata)
 
     akkaRegistration.location(hostname) shouldBe expectedAkkaLocation
   }
@@ -112,11 +116,11 @@ class RegistrationTest extends AnyFunSuite with Matchers with BeforeAndAfterAll 
       """)
 
     implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), "local-actor-system", config)
-    val actorRefURI                                              = actorSystem.spawn(Behaviors.empty, "my-actor-2").toURI
+    val actorRef                                                 = actorSystem.spawn(Behaviors.empty, "my-actor-2")
     val akkaConnection                                           = AkkaConnection(api.models.ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD))
 
     intercept[LocalAkkaActorRegistrationNotAllowed] {
-      AkkaRegistrationFactory.make(akkaConnection, actorRefURI)
+      new AkkaRegistrationFactory().make(akkaConnection, actorRef)
     }
     actorSystem.terminate()
     Await.result(actorSystem.whenTerminated, 10.seconds)

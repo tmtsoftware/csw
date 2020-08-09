@@ -8,6 +8,7 @@ import akka.japi.Pair;
 import akka.stream.javadsl.Keep;
 import akka.stream.testkit.TestSubscriber;
 import akka.stream.testkit.scaladsl.TestSink;
+import csw.location.api.AkkaRegistrationFactory;
 import csw.location.api.commons.Constants;
 import csw.location.api.javadsl.*;
 import csw.location.api.models.*;
@@ -17,7 +18,6 @@ import csw.location.api.models.Connection.TcpConnection;
 import csw.location.client.ActorSystemFactory;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
 import csw.location.server.internal.ServerWiring;
-import csw.location.server.scaladsl.RegistrationFactory;
 import csw.logging.api.javadsl.ILogger;
 import csw.logging.client.commons.AkkaTypedExtension;
 import csw.logging.client.javadsl.JLoggerFactory;
@@ -108,7 +108,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
             InterruptedException {
         int port = 8080;
 
-        AkkaRegistration akkaRegistration = new RegistrationFactory().akkaTyped(akkaHcdConnection, actorRef, new Metadata(Map.of("", "")));
+        AkkaRegistration akkaRegistration = new AkkaRegistrationFactory().make(akkaHcdConnection, actorRef, new Metadata(Map.of("", "")));
         HttpRegistration httpRegistration = new HttpRegistration(httpServiceConnection, port, Path);
         TcpRegistration tcpRegistration = new TcpRegistration(tcpServiceConnection, port);
 
@@ -143,7 +143,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
     // DEOPSCSW-39: examples of Location Service
     @Test
     public void testResolveAkkaConnection__DEOPSCSW_13_DEOPSCSW_39() throws ExecutionException, InterruptedException {
-        AkkaRegistration registration = new RegistrationFactory().akkaTyped(akkaHcdConnection, actorRef);
+        AkkaRegistration registration = new AkkaRegistrationFactory().make(akkaHcdConnection, actorRef);
         locationService.register(registration).get();
         Assert.assertEquals(registration.location(hostname),
                 locationService.find(akkaHcdConnection).get().orElseThrow());
@@ -176,7 +176,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
     // DEOPSCSW-39: examples of Location Service
     @Test
     public void testAkkaRegistration__DEOPSCSW_13_DEOPSCSW_39() throws ExecutionException, InterruptedException {
-        AkkaRegistration registration = new RegistrationFactory().akkaTyped(akkaHcdConnection, actorRef);
+        AkkaRegistration registration = new AkkaRegistrationFactory().make(akkaHcdConnection, actorRef);
 
         locationService.register(registration).get();
         Assert.assertEquals(registration.location(hostname),
@@ -192,7 +192,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
         locationService.register(httpRegistration).get();
 
         //  Register Akka connection
-        AkkaRegistration akkaHcdRegistration = new RegistrationFactory().akkaTyped(akkaHcdConnection, actorRef);
+        AkkaRegistration akkaHcdRegistration = new AkkaRegistrationFactory().make(akkaHcdConnection, actorRef);
         locationService.register(akkaHcdRegistration).get();
 
         //  Register Tcp service
@@ -219,14 +219,14 @@ public class JLocationServiceImplTest extends JUnitSuite {
         ComponentId akkaHcdComponentId = new ComponentId(new Prefix(JSubsystem.NFIRAOS, "tromboneHCD"),
                 JComponentType.HCD);
         AkkaConnection akkaHcdConnection = new AkkaConnection(akkaHcdComponentId);
-        AkkaRegistration akkaHcdRegistration = new RegistrationFactory().akkaTyped(akkaHcdConnection, actorRef);
+        AkkaRegistration akkaHcdRegistration = new AkkaRegistrationFactory().make(akkaHcdConnection, actorRef);
         locationService.register(akkaHcdRegistration).get();
 
         //  Register Assembly type component
         ComponentId akkaAssemblyComponentId = new ComponentId(new Prefix(JSubsystem.NFIRAOS, "tromboneAssembly"),
                 JComponentType.Assembly);
         AkkaConnection akkaAssemblyConnection = new AkkaConnection(akkaAssemblyComponentId);
-        AkkaRegistration akkaAssemblyRegistration = new RegistrationFactory().akkaTyped(akkaAssemblyConnection,
+        AkkaRegistration akkaAssemblyRegistration = new AkkaRegistrationFactory().make(akkaAssemblyConnection,
                 actorRef);
         locationService.register(akkaAssemblyRegistration).get();
 
@@ -234,7 +234,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
         ComponentId akkaContainerComponentId = new ComponentId(new Prefix(JSubsystem.NFIRAOS, "tromboneContainer"),
                 JComponentType.Container);
         AkkaConnection akkaContainerConnection = new AkkaConnection(akkaContainerComponentId);
-        AkkaRegistration akkaContainerRegistration = new RegistrationFactory().akkaTyped(akkaContainerConnection,
+        AkkaRegistration akkaContainerRegistration = new AkkaRegistrationFactory().make(akkaContainerConnection,
                 actorRef);
         locationService.register(akkaContainerRegistration).get();
 
@@ -282,7 +282,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
         locationService.register(tcpRegistration).get();
 
         //  Register Akka connection
-        AkkaRegistration akkaRegistration = new RegistrationFactory().akkaTyped(akkaHcdConnection, actorRef);
+        AkkaRegistration akkaRegistration = new AkkaRegistrationFactory().make(akkaHcdConnection, actorRef);
         locationService.register(akkaRegistration).get();
 
         Set<Location> locations = Set.of(
@@ -309,7 +309,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
         locationService.register(httpRegistration).get();
 
         // Register Akka connection
-        AkkaRegistration akkaRegistration = new RegistrationFactory().akkaTyped(akkaHcdConnection, actorRef);
+        AkkaRegistration akkaRegistration = new AkkaRegistrationFactory().make(akkaHcdConnection, actorRef);
         locationService.register(akkaRegistration).get();
 
         //  filter by Tcp type
@@ -337,9 +337,9 @@ public class JLocationServiceImplTest extends JUnitSuite {
                 ".trombone.hcd3"), JComponentType.HCD));
 
         // Register Akka connection
-        AkkaRegistration akkaRegistration1 = new RegistrationFactory().akkaTyped(akkaHcdConnection1, actorRef);
-        AkkaRegistration akkaRegistration2 = new RegistrationFactory().akkaTyped(akkaHcdConnection2, actorRef);
-        AkkaRegistration akkaRegistration3 = new RegistrationFactory().akkaTyped(akkaHcdConnection3, actorRef);
+        AkkaRegistration akkaRegistration1 = new AkkaRegistrationFactory().make(akkaHcdConnection1, actorRef);
+        AkkaRegistration akkaRegistration2 = new AkkaRegistrationFactory().make(akkaHcdConnection2, actorRef);
+        AkkaRegistration akkaRegistration3 = new AkkaRegistrationFactory().make(akkaHcdConnection3, actorRef);
         locationService.register(akkaRegistration1).get();
         locationService.register(akkaRegistration2).get();
         locationService.register(akkaRegistration3).get();
@@ -440,7 +440,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
                 AkkaTypedExtension.UserActorFactory(typedSystem).spawn(TestActor.behavior(), "test-actor",
                         Props.empty());
 
-        AkkaRegistration registration = new RegistrationFactory().akkaTyped(connection, actorRef);
+        AkkaRegistration registration = new AkkaRegistrationFactory().make(connection, actorRef);
         Location location = registration.location(hostname);
         IRegistrationResult registrationResult = locationService.register(registration).get();
         Assert.assertEquals(location, registrationResult.location());
