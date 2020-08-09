@@ -4,8 +4,8 @@ import java.net.URI
 
 import csw.location.api.commons.LocationServiceLogger
 import csw.location.api.exceptions.LocalAkkaActorRegistrationNotAllowed
-import csw.location.api.models.AkkaRegistration
 import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.{AkkaRegistration, Metadata}
 import csw.logging.api.scaladsl.Logger
 
 /**
@@ -15,13 +15,14 @@ object AkkaRegistrationFactory {
 
   /**
    *
-   * @param connection the `Connection` to register with `LocationService`
-\   * @param actorRefURI Provide a remote actor uri that is offering a connection. Local actors cannot be registered since they can't be
+    * @param connection the `Connection` to register with `LocationService`
+   * @param actorRefURI Provide a remote actor uri that is offering a connection. Local actors cannot be registered since they can't be
    *                 communicated from components across the network
+   * @param metadata represents additional information associated with registration
    * @return AkkaRegistration instance. A [[csw.location.api.exceptions.LocalAkkaActorRegistrationNotAllowed]]
    *        is thrown if the actorRefURI provided is not a remote actorRef uri
    */
-  def make(connection: AkkaConnection, actorRefURI: URI): AkkaRegistration = {
+  def make(connection: AkkaConnection, actorRefURI: URI, metadata: Metadata): AkkaRegistration = {
     if (actorRefURI.getPort == -1) {
       val log: Logger            = LocationServiceLogger.getLogger
       val registrationNotAllowed = LocalAkkaActorRegistrationNotAllowed(actorRefURI)
@@ -29,6 +30,18 @@ object AkkaRegistrationFactory {
       throw registrationNotAllowed
     }
 
-    models.AkkaRegistration(connection, actorRefURI)
+    models.AkkaRegistration(connection, actorRefURI, metadata)
   }
+
+  /**
+   *
+    * @param connection the `Connection` to register with `LocationService`
+   * @param actorRefURI Provide a remote actor uri that is offering a connection. Local actors cannot be registered since they can't be
+   *                 communicated from components across the network
+   * @return AkkaRegistration instance. A [[csw.location.api.exceptions.LocalAkkaActorRegistrationNotAllowed]]
+   *        is thrown if the actorRefURI provided is not a remote actorRef uri
+   */
+  def make(connection: AkkaConnection, actorRefURI: URI): AkkaRegistration =
+    make(connection, actorRefURI, Metadata.empty)
+
 }

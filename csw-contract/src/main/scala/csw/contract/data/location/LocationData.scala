@@ -30,14 +30,16 @@ trait LocationData {
   val tcpConnection: TcpConnection   = TcpConnection(componentId)
   val connectionInfo: ConnectionInfo = ConnectionInfo(prefix, ComponentType.HCD, ConnectionType.AkkaType)
 
-  val akkaRegistration: Registration       = AkkaRegistration(akkaConnection, uriPath)
+  val metadata: Metadata = Metadata(Map("key1" -> "value"))
+
+  val akkaRegistration: Registration       = AkkaRegistration(akkaConnection, uriPath, metadata)
   val httpRegistration: Registration       = HttpRegistration(httpConnection, port, pathString)
   val publicHttpRegistration: Registration = HttpRegistration(httpConnection, port, pathString, NetworkType.Public)
   val tcpRegistration: Registration        = TcpRegistration(tcpConnection, port)
 
-  val akkaLocation: Location = AkkaLocation(akkaConnection, uriPath)
-  val httpLocation: Location = HttpLocation(httpConnection, uriPath)
-  val tcpLocation: Location  = TcpLocation(tcpConnection, uriPath)
+  val akkaLocation: Location = AkkaLocation(akkaConnection, uriPath, metadata)
+  val httpLocation: Location = HttpLocation(httpConnection, uriPath, Metadata.empty)
+  val tcpLocation: Location  = TcpLocation(tcpConnection, uriPath, Metadata.empty)
 
   val registrationFailed: LocationServiceError        = RegistrationFailed(message)
   val otherLocationIsRegistered: LocationServiceError = OtherLocationIsRegistered(message)

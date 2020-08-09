@@ -23,6 +23,7 @@ import csw.framework.scaladsl.RegistrationFactory
 import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.Metadata
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.client.ActorSystemFactory
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
@@ -40,9 +41,9 @@ class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar 
   private val mocks                                            = new FrameworkTestMocks()
 
   class IdleContainer() {
-    private val testActor: ActorRef[Any] = TestProbe("test-probe").ref
-    val akkaRegistration =
-      AkkaRegistrationFactory.make(mock[AkkaConnection], testActor.toURI)
+    private val testActor: ActorRef[Any]                        = TestProbe("test-probe").ref
+    private val metadata: Metadata                              = Metadata(Map("key1" -> "value1"))
+    val akkaRegistration                                        = AkkaRegistrationFactory.make(mock[AkkaConnection], testActor.toURI, metadata)
     val locationService: LocationService                        = mock[LocationService]
     val eventService: EventServiceFactory                       = mock[EventServiceFactory]
     val alarmService: AlarmServiceFactory                       = mock[AlarmServiceFactory]
@@ -75,7 +76,8 @@ class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar 
     when(actorRefResolver.resolveActorRef(any[String])).thenReturn(TestProbe().ref)
 
     private val registrationFactory: RegistrationFactory = mock[RegistrationFactory]
-    when(registrationFactory.akkaTyped(any[AkkaConnection], any[ActorRef[_]]))
+
+    when(registrationFactory.akkaTyped(any[AkkaConnection], any[ActorRef[_]], any[Metadata]))
       .thenReturn(akkaRegistration)
 
     private val eventualRegistrationResult: Future[RegistrationResult] =
@@ -116,7 +118,9 @@ class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar 
     import runningContainer._
 
     containerBehaviorTestkit
-      .retrieveAllEffects() shouldBe components.components.map(component => Watched(component.supervisor)).toList
+      .retrieveAllEffects() shouldBe components.components
+      .map(component => Watched(component.supervisor))
+      .toList
   }
 
   test("should handle restart message by changing its lifecycle state to Idle | DEOPSCSW-182, DEOPSCSW-216") {

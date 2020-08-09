@@ -8,7 +8,7 @@ import csw.admin.impl.AdminServiceImpl
 import csw.command.client.messages.{GetComponentLogMetadata, SetComponentLogLevel}
 import csw.location.api.models
 import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
+import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType, Metadata}
 import csw.location.api.scaladsl.LocationService
 import csw.logging.models.{Level, LogMetadata}
 import csw.prefix.models.{Prefix, Subsystem}
@@ -46,8 +46,9 @@ class AdminServiceImplTest extends AnyFunSuite with Matchers with BeforeAndAfter
     })
     val adminService: AdminServiceImpl = new AdminServiceImpl(locationService)
     val componentId                    = ComponentId(Prefix(Subsystem.AOESW, "test_component"), ComponentType.Assembly)
-    when(locationService.find(AkkaConnection(componentId)))
-      .thenReturn(Future.successful(Some(AkkaLocation(AkkaConnection(componentId), new URI(probe.path.toString)))))
+    when(locationService.find(AkkaConnection(componentId))).thenReturn(
+      Future.successful(Some(AkkaLocation(AkkaConnection(componentId), new URI(probe.path.toString), Metadata.empty)))
+    )
     val actualLogMetadata = adminService.getLogMetadata(componentId).futureValue
     actualLogMetadata shouldBe expectedLogMetadata
   }
@@ -64,7 +65,9 @@ class AdminServiceImplTest extends AnyFunSuite with Matchers with BeforeAndAfter
     val adminService: AdminServiceImpl = new AdminServiceImpl(locationService)
     val componentId                    = models.ComponentId(Prefix(Subsystem.AOESW, "test_sequencer"), ComponentType.Sequencer)
     when(locationService.find(AkkaConnection(componentId)))
-      .thenReturn(Future.successful(Some(models.AkkaLocation(AkkaConnection(componentId), new URI(probe.path.toString)))))
+      .thenReturn(
+        Future.successful(Some(models.AkkaLocation(AkkaConnection(componentId), new URI(probe.path.toString), Metadata.empty)))
+      )
     val actualLogMetadata = adminService.getLogMetadata(componentId).futureValue
     actualLogMetadata shouldBe expectedLogMetadata
   }
@@ -74,8 +77,7 @@ class AdminServiceImplTest extends AnyFunSuite with Matchers with BeforeAndAfter
     val locationService: LocationService = mock[LocationService]
     val adminService: AdminServiceImpl   = new AdminServiceImpl(locationService)
     val componentId                      = models.ComponentId(Prefix(Subsystem.AOESW, "test_sequencer"), ComponentType.Sequencer)
-    when(locationService.find(AkkaConnection(componentId)))
-      .thenReturn(Future.successful(None))
+    when(locationService.find(AkkaConnection(componentId))).thenReturn(Future.successful(None))
     intercept[UnresolvedAkkaLocationException] {
       Await.result(adminService.getLogMetadata(componentId), 100.millis)
     }
@@ -87,8 +89,9 @@ class AdminServiceImplTest extends AnyFunSuite with Matchers with BeforeAndAfter
     val probe                            = actorTestKit.createTestProbe[SetComponentLogLevel]()
     val adminService: AdminServiceImpl   = new AdminServiceImpl(locationService)
     val componentId                      = models.ComponentId(Prefix(Subsystem.AOESW, "test_component"), ComponentType.Assembly)
-    when(locationService.find(AkkaConnection(componentId)))
-      .thenReturn(Future.successful(Some(models.AkkaLocation(AkkaConnection(componentId), new URI(probe.ref.path.toString)))))
+    when(locationService.find(AkkaConnection(componentId))).thenReturn(
+      Future.successful(Some(models.AkkaLocation(AkkaConnection(componentId), new URI(probe.ref.path.toString), Metadata.empty)))
+    )
     adminService.setLogLevel(componentId, Level.FATAL)
     probe.expectMessage(500.millis, SetComponentLogLevel(Level.FATAL))
   }
@@ -99,8 +102,9 @@ class AdminServiceImplTest extends AnyFunSuite with Matchers with BeforeAndAfter
     val probe                            = actorTestKit.createTestProbe[SetComponentLogLevel]()
     val adminService: AdminServiceImpl   = new AdminServiceImpl(locationService)
     val componentId                      = models.ComponentId(Prefix(Subsystem.AOESW, "test_component"), ComponentType.Sequencer)
-    when(locationService.find(AkkaConnection(componentId)))
-      .thenReturn(Future.successful(Some(models.AkkaLocation(AkkaConnection(componentId), new URI(probe.ref.path.toString)))))
+    when(locationService.find(AkkaConnection(componentId))).thenReturn(
+      Future.successful(Some(models.AkkaLocation(AkkaConnection(componentId), new URI(probe.ref.path.toString), Metadata.empty)))
+    )
     adminService.setLogLevel(componentId, Level.FATAL)
     probe.expectMessage(500.millis, SetComponentLogLevel(Level.FATAL))
   }
@@ -110,8 +114,7 @@ class AdminServiceImplTest extends AnyFunSuite with Matchers with BeforeAndAfter
     val locationService: LocationService = mock[LocationService]
     val adminService: AdminServiceImpl   = new AdminServiceImpl(locationService)
     val componentId                      = models.ComponentId(Prefix(Subsystem.AOESW, "test_component"), ComponentType.Sequencer)
-    when(locationService.find(AkkaConnection(componentId)))
-      .thenReturn(Future.successful(None))
+    when(locationService.find(AkkaConnection(componentId))).thenReturn(Future.successful(None))
     intercept[UnresolvedAkkaLocationException] {
       Await.result(adminService.setLogLevel(componentId, Level.FATAL), 100.millis)
     }

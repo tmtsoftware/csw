@@ -8,7 +8,7 @@ import csw.command.client.messages.sequencer.SequencerMsg
 import csw.command.client.messages.sequencer.SequencerMsg.{Query, QueryFinal, SubmitSequence}
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
+import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType, Metadata}
 import csw.params.commands.CommandIssue.IdNotAvailableIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandName, Sequence, Setup}
@@ -18,6 +18,7 @@ import org.mockito.MockitoSugar
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers
+
 import scala.concurrent.duration.DurationLong
 
 class SequencerCommandServiceImplTest extends AnyFunSuiteLike with Matchers with MockitoSugar with ScalaFutures {
@@ -26,8 +27,7 @@ class SequencerCommandServiceImplTest extends AnyFunSuiteLike with Matchers with
   private implicit val timeout: Timeout                           = Timeout(10.seconds)
 
   test("should submit sequence to the sequencer") {
-    val sequence = Sequence(Setup(Prefix("csw.move"), CommandName("command-1"), None))
-
+    val sequence                           = Sequence(Setup(Prefix("csw.move"), CommandName("command-1"), None))
     val queryFinalId                       = Id("queryFinalId")
     val queryId                            = Id("queryId")
     val submitResponse: SubmitResponse     = Started(Id())
@@ -51,11 +51,11 @@ class SequencerCommandServiceImplTest extends AnyFunSuiteLike with Matchers with
       "sequencer-actor"
     )
 
-    val location =
-      AkkaLocation(
-        AkkaConnection(ComponentId(Prefix(Subsystem.IRIS, "sequencer"), ComponentType.Sequencer)),
-        sequencer.toURI
-      )
+    val location = AkkaLocation(
+      AkkaConnection(ComponentId(Prefix(Subsystem.IRIS, "sequencer"), ComponentType.Sequencer)),
+      sequencer.toURI,
+      Metadata.empty
+    )
 
     val sequencerCommandService = new SequencerCommandServiceImpl(location)
 

@@ -80,7 +80,8 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
             case _: UpdateSuccess[_] =>
               log.info(s"Successfully registered connection: [${registration.connection.name}] with location [${location.uri}]")
               registrationResult(location)
-            case _ => throw logException(new RegistrationFailed(registration.connection))
+            case _ =>
+              throw logException(new RegistrationFailed(registration.connection))
           }
         case ModifyFailure(service.Key, _, cause, _) =>
           throw logException(cause) // // this exception gets mapped onto OtherLocationIsRegistered
@@ -91,8 +92,8 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
 
   private[internal] def getLocation(registration: Registration) =
     registration match {
-      case HttpRegistration(_, _, _, Public) => registration.location(cswCluster.publicHostname)
-      case _                                 => registration.location(cswCluster.hostname)
+      case HttpRegistration(_, _, _, Public, _) => registration.location(cswCluster.publicHostname)
+      case _                                    => registration.location(cswCluster.hostname)
     }
 
   /**
@@ -102,8 +103,9 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
    */
   def unregister(connection: Connection): Future[Done] =
     connection.componentId.componentType match {
-      case HCD | Assembly | Sequencer => unregisterEmbeddedComponent(connection.componentId)
-      case _                          => unregister0(connection)
+      case HCD | Assembly | Sequencer =>
+        unregisterEmbeddedComponent(connection.componentId)
+      case _ => unregister0(connection)
     }
 
   private def unregisterEmbeddedComponent(componentId: ComponentId): Future[Done] =
@@ -129,7 +131,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
   /**
    * Unregister all connections from CRDT
    *
-   * @note this method should be used for testing purpose only
+    * @note this method should be used for testing purpose only
    */
   def unregisterAll(): Future[Done] =
     async {
@@ -158,7 +160,8 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     async {
       log.info(s"Resolving location for connection: [${connection.name}] within ${within.toString()}")
       val foundInLocalCache = await(find(connection))
-      if (foundInLocalCache.isDefined) foundInLocalCache else await(resolveWithin(connection, within))
+      if (foundInLocalCache.isDefined) foundInLocalCache
+      else await(resolveWithin(connection, within))
     }
 
   /**
@@ -180,8 +183,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
   /**
    * List all locations registered with the given hostname
    */
-  def list(hostname: String): Future[List[Location]] =
-    list.map(_.filter(_.uri.getHost == hostname))
+  def list(hostname: String): Future[List[Location]] = list.map(_.filter(_.uri.getHost == hostname))
 
   /**
    * List all locations registered with the given connection type
@@ -189,8 +191,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
   def list(connectionType: ConnectionType): Future[List[Location]] =
     list.map(_.filter(_.connection.connectionType == connectionType))
 
-  override def listByPrefix(_prefix: String): Future[List[Location]] =
-    list.map(_.filter(_.prefix.toString.startsWith(_prefix)))
+  override def listByPrefix(_prefix: String): Future[List[Location]] = list.map(_.filter(_.prefix.toString.startsWith(_prefix)))
 
   /**
    * Track the status of given connection
@@ -217,13 +218,13 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     // If the changed event contains a Location, send LocationUpdated event.
     // If not, location must have been removed, send LocationRemoved event.
     val trackingEvents = source.collect {
-      case c @ Changed(service.Key) if c.get(service.Key).value.isDefined =>
-        LocationUpdated(c.get(service.Key).value.get)
-      case c @ Changed(service.Key) => LocationRemoved(connection)
+      case c @ Changed(service.Key) if c.get(service.Key).value.isDefined => LocationUpdated(c.get(service.Key).value.get)
+      case c @ Changed(service.Key)                                       => LocationRemoved(connection)
     }
     //Allow stream to be cancellable by giving it a KillSwitch in mat value.
     // Also, deduplicate identical messages in case multiple DeathWatch actors unregisters the same location.
-    trackingEvents.cancellable.distinctUntilChanged.mapMaterializedValue(createSubscription)
+    trackingEvents.cancellable.distinctUntilChanged
+      .mapMaterializedValue(createSubscription)
   }
 
   private def createSubscription(x: KillSwitch): Subscription = () => x.shutdown()

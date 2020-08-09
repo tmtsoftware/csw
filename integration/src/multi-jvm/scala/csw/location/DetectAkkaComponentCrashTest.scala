@@ -58,14 +58,21 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String)
 
       val probe = TestProbe[TrackingEvent]("test-probe")
 
-      val switch = locationService.track(akkaConnection).toMat(Sink.foreach(probe.ref.tell(_)))(Keep.left).run()
+      val switch = locationService
+        .track(akkaConnection)
+        .toMat(Sink.foreach(probe.ref.tell(_)))(Keep.left)
+        .run()
       enterBarrier("Registration")
 
       probe.expectMessageType[LocationUpdated]
       Thread.sleep(2000)
 
       Await.result(testConductor.exit(member1, 0), 5.seconds)
-      locationService.find(httpConnection).await.value.connection shouldBe httpConnection
+      locationService
+        .find(httpConnection)
+        .await
+        .value
+        .connection shouldBe httpConnection
       enterBarrier("after-crash")
 
       // Story CSW-15 requires crash detection within 10 seconds with a goal of 5 seconds.
@@ -92,7 +99,9 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String)
       val system   = ActorSystemFactory.remote(SpawnProtocol(), "test")
       val actorRef = system.spawn(Behaviors.empty, "trombone-hcd-1")
 
-      locationService.register(make(akkaConnection, actorRef.toURI)).await
+      locationService
+        .register(make(akkaConnection, actorRef.toURI, Metadata(Map("key1" -> "value1"))))
+        .await
       val port = 1234
       locationService.register(HttpRegistration(httpConnection, port, "")).await
       enterBarrier("Registration")
@@ -111,7 +120,10 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String)
       locationService.register(httpRegistration).await
 
       enterBarrier("Registration")
-      val switch = locationService.track(akkaConnection).toMat(Sink.foreach(probe.ref.tell(_)))(Keep.left).run()
+      val switch = locationService
+        .track(akkaConnection)
+        .toMat(Sink.foreach(probe.ref.tell(_)))(Keep.left)
+        .run()
       Thread.sleep(2000)
       enterBarrier("after-crash")
 

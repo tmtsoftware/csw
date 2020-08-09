@@ -26,6 +26,7 @@ trait LocationCodecsBase extends CommonCodecs {
 
   implicit lazy val uriCodec: Codec[URI] = Codec.bimap[String, URI](_.toString, new URI(_))
 
+  implicit lazy val metadataCodec: Codec[Metadata]         = deriveCodec
   lazy val locationCodecValue: Codec[Location]             = deriveAllCodecs
   implicit lazy val registrationCodec: Codec[Registration] = deriveAllCodecs
   implicit lazy val networkType: Codec[NetworkType]        = deriveAllCodecs
