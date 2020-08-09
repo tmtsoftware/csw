@@ -56,7 +56,7 @@ object Libs {
 }
 
 object Borer {
-  val Version = "1.6.0"
+  val Version = "1.6.1"
   val Org     = "io.bullet"
 
   val `borer-core`        = dep(Org %%% "borer-core" % Version)
@@ -65,7 +65,7 @@ object Borer {
 }
 
 object Jackson {
-  val Version = "2.11.1"
+  val Version = "2.11.2"
 
   val `jackson-core`         = "com.fasterxml.jackson.core"    % "jackson-core"         % Version
   val `jackson-databind`     = "com.fasterxml.jackson.core"    % "jackson-databind"     % Version
@@ -93,13 +93,13 @@ object Akka {
 }
 
 object AkkaHttp {
-  val Version = "10.2.0-RC2"
+  val Version = "10.2.0"
 
   val `akka-http`            = "com.typesafe.akka" %% "akka-http"            % Version //ApacheV2
   val `akka-http-testkit`    = "com.typesafe.akka" %% "akka-http-testkit"    % Version //ApacheV2
   val `akka-http-spray-json` = "com.typesafe.akka" %% "akka-http-spray-json" % Version
 
-  val `akka-http-cors` = "ch.megard" %% "akka-http-cors" % "1.0.0"
+  val `akka-http-cors` = "ch.megard" %% "akka-http-cors" % "1.1.0"
 }
 
 object Keycloak {
@@ -113,7 +113,7 @@ object Keycloak {
 }
 
 object Jooq {
-  val Version = "3.13.3"
+  val Version = "3.13.4"
 
   val `jooq`         = "org.jooq" % "jooq"         % Version
   val `jooq-meta`    = "org.jooq" % "jooq-meta"    % Version
@@ -121,7 +121,7 @@ object Jooq {
 }
 
 object MSocket {
-  val Version = "69b9245"
+  val Version = "ee8bbee"
 
   val `msocket-api`      = dep("com.github.tmtsoftware.msocket" %%% "msocket-api" % Version)
   val `msocket-impl-jvm` = "com.github.tmtsoftware.msocket" %% "msocket-impl" % Version
