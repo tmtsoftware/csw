@@ -3,7 +3,7 @@ import java.net.URI
 
 import com.typesafe.config.{ConfigException, ConfigFactory, ConfigValueFactory}
 import csw.location.api.models.Connection.HttpConnection
-import csw.location.api.models.{ComponentId, ComponentType, HttpLocation}
+import csw.location.api.models.{ComponentId, ComponentType, HttpLocation, Metadata}
 import csw.prefix.models.{Prefix, Subsystem}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
@@ -55,7 +55,8 @@ class AuthConfigTest extends AnyFunSuite with Matchers {
     val authServerUrl = "http://somehost:someport"
     val httpLocation = HttpLocation(
       HttpConnection(ComponentId(Prefix(Subsystem.CSW, "testComponent"), ComponentType.Service)),
-      new URI(authServerUrl)
+      new URI(authServerUrl),
+      Metadata.empty
     )
     val authConfig = AuthConfig.create(config, authServerLocation = Some(httpLocation))
 

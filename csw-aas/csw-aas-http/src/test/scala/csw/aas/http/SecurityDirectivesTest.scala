@@ -12,7 +12,7 @@ import csw.aas.core.commons.AASConnection
 import csw.aas.core.token.AccessToken
 import csw.aas.http.AuthorizationPolicy.{ClientRolePolicy, CustomPolicy, PermissionPolicy, RealmRolePolicy}
 import csw.location.api.models.Connection.HttpConnection
-import csw.location.api.models.HttpLocation
+import csw.location.api.models.{HttpLocation, Metadata}
 import csw.location.api.scaladsl.LocationService
 import org.mockito.ArgumentMatchersSugar._
 import org.mockito.MockitoSugar
@@ -216,7 +216,7 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
   test("apply should resolve AAS location when auth is enabled | DEOPSCSW-579") {
     val locationService: LocationService = mock[LocationService]
     when(locationService.resolve(any[HttpConnection], any[FiniteDuration]))
-      .thenReturn(Future.successful(Some(HttpLocation(AASConnection.value, URI.create("")))))
+      .thenReturn(Future.successful(Some(HttpLocation(AASConnection.value, URI.create(""), Metadata.empty))))
     SecurityDirectives(system.settings.config, locationService, disabled = false)
     verify(locationService).resolve(any[HttpConnection], any[FiniteDuration])
   }

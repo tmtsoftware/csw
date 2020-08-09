@@ -6,7 +6,7 @@ import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.aas.core.commons.AASConnection
 import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.models.Connection.HttpConnection
-import csw.location.api.models.{ComponentId, ComponentType, HttpLocation, HttpRegistration}
+import csw.location.api.models.{ComponentId, ComponentType, HttpLocation, HttpRegistration, Metadata}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.network.utils.SocketUtils
 import csw.prefix.models.Prefix
@@ -77,7 +77,11 @@ class LocationAuthTestWithKeycloak
     val servicePort        = 2345
     val registration       = HttpRegistration(connection, servicePort, "abc")
     val registrationResult = locationClient.register(registration).futureValue
-    registrationResult.location shouldBe HttpLocation(connection, URI.create(s"http://$hostname:$servicePort/abc"))
+    registrationResult.location shouldBe HttpLocation(
+      connection,
+      URI.create(s"http://$hostname:$servicePort/abc"),
+      Metadata.empty
+    )
   }
 
   private def startKeycloak(port: Int): StopHandle = {

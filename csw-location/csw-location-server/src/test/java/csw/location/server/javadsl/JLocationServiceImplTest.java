@@ -35,6 +35,7 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -106,7 +107,8 @@ public class JLocationServiceImplTest extends JUnitSuite {
     public void testLocationServiceRegisterWithAkkaHttpTcpAsSequence__DEOPSCSW_39() throws ExecutionException,
             InterruptedException {
         int port = 8080;
-        AkkaRegistration akkaRegistration = new RegistrationFactory().akkaTyped(akkaHcdConnection, actorRef);
+
+        AkkaRegistration akkaRegistration = new RegistrationFactory().akkaTyped(akkaHcdConnection, actorRef, new Metadata(Map.of("", "")));
         HttpRegistration httpRegistration = new HttpRegistration(httpServiceConnection, port, Path);
         TcpRegistration tcpRegistration = new TcpRegistration(tcpServiceConnection, port);
 
@@ -117,6 +119,8 @@ public class JLocationServiceImplTest extends JUnitSuite {
         Assert.assertEquals(3, locationService.list().get().size());
         Assert.assertEquals(akkaRegistration.location(hostname),
                 locationService.find(akkaHcdConnection).get().orElseThrow());
+        Assert.assertEquals(akkaRegistration.metadata(),
+                locationService.find(akkaHcdConnection).get().orElseThrow().metadata());
         Assert.assertEquals(httpRegistration.location(hostname),
                 locationService.find(httpServiceConnection).get().orElseThrow());
         Assert.assertEquals(tcpRegistration.location(hostname),
