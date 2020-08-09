@@ -11,7 +11,6 @@ import scala.jdk.CollectionConverters._
   * @param metadata represents additional information associated with location
  */
 case class Metadata(metadata: Map[String, String]) {
-
   // Used from java API
   def this(metadata: java.util.Map[String, String]) = this(metadata.asScala.toMap)
 

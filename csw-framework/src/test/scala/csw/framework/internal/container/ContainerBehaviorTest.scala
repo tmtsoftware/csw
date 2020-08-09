@@ -42,23 +42,20 @@ class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar 
   private val mocks                      = new FrameworkTestMocks()
 
   class IdleContainer() {
-    private val testActor: ActorRef[Any] = TestProbe("test-probe").ref
-    val akkaRegistration =
-      AkkaRegistrationFactory.make(mock[AkkaConnection], testActor.toURI)
+    private val testActor: ActorRef[Any]                        = TestProbe("test-probe").ref
+    val akkaRegistration                                        = AkkaRegistrationFactory.make(mock[AkkaConnection], testActor.toURI)
     val locationService: LocationService                        = mock[LocationService]
     val eventService: EventServiceFactory                       = mock[EventServiceFactory]
     val alarmService: AlarmServiceFactory                       = mock[AlarmServiceFactory]
     val registrationResult: RegistrationResult                  = mock[RegistrationResult]
     private[container] var supervisorInfos: Set[SupervisorInfo] = Set.empty
     var componentProbes: Set[TestProbe[ComponentMessage]]       = Set.empty
-    val supervisorInfoFactory: SupervisorInfoFactory =
-      mock[SupervisorInfoFactory]
-    val actorRefResolver: ActorRefResolver = mock[ActorRefResolver]
+    val supervisorInfoFactory: SupervisorInfoFactory            = mock[SupervisorInfoFactory]
+    val actorRefResolver: ActorRefResolver                      = mock[ActorRefResolver]
 
     private def answer(ci: ComponentInfo): Future[Some[SupervisorInfo]] = {
       val componentProbe: TestProbe[ComponentMessage] = TestProbe(ci.prefix.toString)
-      val supervisorInfo =
-        SupervisorInfo(typedSystem, Component(componentProbe.ref, ci))
+      val supervisorInfo                              = SupervisorInfo(typedSystem, Component(componentProbe.ref, ci))
 
       supervisorInfos += SupervisorInfo(typedSystem, Component(componentProbe.ref, ci))
       componentProbes += componentProbe
@@ -76,39 +73,34 @@ class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar 
           any[RegistrationFactory]
         )
     ).thenAnswer((_: ActorRef[ContainerIdleMessage], ci: ComponentInfo) => answer(ci))
-    when(actorRefResolver.resolveActorRef(any[String]))
-      .thenReturn(TestProbe().ref)
+    when(actorRefResolver.resolveActorRef(any[String])).thenReturn(TestProbe().ref)
 
-    private val registrationFactory: RegistrationFactory =
-      mock[RegistrationFactory]
+    private val registrationFactory: RegistrationFactory = mock[RegistrationFactory]
     when(registrationFactory.akkaTyped(any[AkkaConnection], any[ActorRef[_]], Metadata(Map("key1" -> "value1"))))
       .thenReturn(akkaRegistration)
 
     private val eventualRegistrationResult: Future[RegistrationResult] =
       Promise[RegistrationResult]().complete(Success(registrationResult)).future
-    private val eventualDone: Future[Done] =
-      Promise[Done]().complete(Success(Done)).future
+    private val eventualDone: Future[Done] = Promise[Done]().complete(Success(Done)).future
 
-    when(locationService.register(akkaRegistration))
-      .thenReturn(eventualRegistrationResult)
+    when(locationService.register(akkaRegistration)).thenReturn(eventualRegistrationResult)
     when(registrationResult.unregister()).thenReturn(eventualDone)
 
-    val containerBehaviorTestkit: BehaviorTestKit[ContainerActorMessage] =
-      BehaviorTestKit(
-        Behaviors.setup(ctx =>
-          new ContainerBehavior(
-            ctx,
-            containerInfo,
-            supervisorInfoFactory,
-            registrationFactory,
-            locationService,
-            eventService,
-            alarmService,
-            mocks.loggerFactory,
-            actorRefResolver
-          )
+    val containerBehaviorTestkit: BehaviorTestKit[ContainerActorMessage] = BehaviorTestKit(
+      Behaviors.setup(ctx =>
+        new ContainerBehavior(
+          ctx,
+          containerInfo,
+          supervisorInfoFactory,
+          registrationFactory,
+          locationService,
+          eventService,
+          alarmService,
+          mocks.loggerFactory,
+          actorRefResolver
         )
       )
+    )
   }
 
   class RunningContainer() extends IdleContainer {
@@ -179,8 +171,7 @@ class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar 
     val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]()
 
     containerBehaviorTestkit.run(GetContainerLifecycleState(containerLifecycleStateProbe.ref))
-    val initialLifecycleState =
-      containerLifecycleStateProbe.expectMessageType[ContainerLifecycleState]
+    val initialLifecycleState = containerLifecycleStateProbe.expectMessageType[ContainerLifecycleState]
 
     containerBehaviorTestkit.run(Lifecycle(GoOnline))
 
@@ -189,8 +180,7 @@ class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar 
 
     // verify that Container LifecycleState does not change on receiving GoOnline message
     containerBehaviorTestkit.run(GetContainerLifecycleState(containerLifecycleStateProbe.ref))
-    val newLifecycleState =
-      containerLifecycleStateProbe.expectMessage(initialLifecycleState)
+    val newLifecycleState = containerLifecycleStateProbe.expectMessage(initialLifecycleState)
 
     containerBehaviorTestkit.run(Lifecycle(GoOffline))
 

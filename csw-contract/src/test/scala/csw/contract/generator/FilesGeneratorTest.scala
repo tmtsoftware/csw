@@ -36,7 +36,7 @@ class FilesGeneratorTest extends AnyFunSuite with Matchers with BeforeAndAfterAl
     val akkaRegistration: AkkaRegistration = AkkaRegistration(akkaConnection, uri, metadata)
     val httpRegistration: HttpRegistration = HttpRegistration(httpConnection, 2090, "somePath")
     val akkaLocation: Location             = AkkaLocation(akkaConnection, uri, metadata)
-    val httpLocation: Location             = HttpLocation(httpConnection, uri)
+    val httpLocation: Location             = HttpLocation(httpConnection, uri, Metadata.empty)
     val locationUpdated: TrackingEvent     = LocationUpdated(akkaLocation)
     val akkaRegister: Register             = Register(akkaRegistration)
     val httpRegister: Register             = Register(httpRegistration)

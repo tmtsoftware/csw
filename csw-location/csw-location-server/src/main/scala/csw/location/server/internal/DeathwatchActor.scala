@@ -54,9 +54,8 @@ private[location] class DeathwatchActor(locationService: LocationService)(implic
         ctx.unwatch(deadActorRef)
         //Unregister the dead location and remove it from the list of watched locations
         val maybeLocation = watchedLocations.find {
-          case AkkaLocation(_, actorRefUri, _) =>
-            deadActorRef == actorRefUri.toActorRef
-          case _ => false
+          case AkkaLocation(_, actorRefUri, _) => deadActorRef == actorRefUri.toActorRef
+          case _                               => false
         }
         maybeLocation match {
           case Some(location) =>
@@ -87,10 +86,9 @@ private[location] object DeathwatchActor {
   def start(cswCluster: CswCluster, locationService: LocationService): ActorRef[Msg] = {
     log.debug("Starting Deathwatch actor")
     val behavior: Behavior[Msg] = new DeathwatchActor(locationService)(cswCluster.actorSystem).behavior(Set.empty)
-    val widenedBehaviour: Behavior[SubscribeResponse[AllServices.Value]] =
-      behavior.transformMessages {
-        case x @ Changed(_) => x
-      }
+    val widenedBehaviour: Behavior[SubscribeResponse[AllServices.Value]] = behavior.transformMessages {
+      case x @ Changed(_) => x
+    }
     val actorRef: ActorRef[SubscribeResponse[AllServices.Value]] =
       cswCluster.actorSystem.spawn(
         //span the actor with empty set of watched locations

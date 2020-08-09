@@ -38,20 +38,17 @@ class AdminServiceImplTest extends AnyFunSuite with Matchers with BeforeAndAfter
   test("getLogMetadata should get log metadata when component is discovered and it responds with metadata") {
     implicit val system: ActorSystem[_]  = actorTestKit.system
     val locationService: LocationService = mock[LocationService]
-    val expectedLogMetadata =
-      LogMetadata(Level.FATAL, Level.ERROR, Level.WARN, Level.DEBUG)
-    val probe =
-      actorTestKit.spawn(Behaviors.receiveMessage[GetComponentLogMetadata] {
-        case GetComponentLogMetadata(replyTo) =>
-          replyTo ! expectedLogMetadata
-          Behaviors.same
-      })
+    val expectedLogMetadata              = LogMetadata(Level.FATAL, Level.ERROR, Level.WARN, Level.DEBUG)
+    val probe = actorTestKit.spawn(Behaviors.receiveMessage[GetComponentLogMetadata] {
+      case GetComponentLogMetadata(replyTo) =>
+        replyTo ! expectedLogMetadata
+        Behaviors.same
+    })
     val adminService: AdminServiceImpl = new AdminServiceImpl(locationService)
     val componentId                    = ComponentId(Prefix(Subsystem.AOESW, "test_component"), ComponentType.Assembly)
-    when(locationService.find(AkkaConnection(componentId)))
-      .thenReturn(
-        Future.successful(Some(AkkaLocation(AkkaConnection(componentId), new URI(probe.path.toString), Metadata.empty)))
-      )
+    when(locationService.find(AkkaConnection(componentId))).thenReturn(
+      Future.successful(Some(AkkaLocation(AkkaConnection(componentId), new URI(probe.path.toString), Metadata.empty)))
+    )
     val actualLogMetadata = adminService.getLogMetadata(componentId).futureValue
     actualLogMetadata shouldBe expectedLogMetadata
   }
@@ -59,17 +56,14 @@ class AdminServiceImplTest extends AnyFunSuite with Matchers with BeforeAndAfter
   test("getLogMetadata should get log metadata when sequencer is discovered and it responds with metadata") {
     implicit val system: ActorSystem[_]  = actorTestKit.system
     val locationService: LocationService = mock[LocationService]
-    val expectedLogMetadata =
-      LogMetadata(Level.FATAL, Level.ERROR, Level.WARN, Level.DEBUG)
-    val probe =
-      actorTestKit.spawn(Behaviors.receiveMessage[GetComponentLogMetadata] {
-        case GetComponentLogMetadata(replyTo) =>
-          replyTo ! expectedLogMetadata
-          Behaviors.same
-      })
+    val expectedLogMetadata              = LogMetadata(Level.FATAL, Level.ERROR, Level.WARN, Level.DEBUG)
+    val probe = actorTestKit.spawn(Behaviors.receiveMessage[GetComponentLogMetadata] {
+      case GetComponentLogMetadata(replyTo) =>
+        replyTo ! expectedLogMetadata
+        Behaviors.same
+    })
     val adminService: AdminServiceImpl = new AdminServiceImpl(locationService)
-    val componentId =
-      models.ComponentId(Prefix(Subsystem.AOESW, "test_sequencer"), ComponentType.Sequencer)
+    val componentId                    = models.ComponentId(Prefix(Subsystem.AOESW, "test_sequencer"), ComponentType.Sequencer)
     when(locationService.find(AkkaConnection(componentId)))
       .thenReturn(
         Future.successful(Some(models.AkkaLocation(AkkaConnection(componentId), new URI(probe.path.toString), Metadata.empty)))
@@ -82,10 +76,8 @@ class AdminServiceImplTest extends AnyFunSuite with Matchers with BeforeAndAfter
     implicit val system: ActorSystem[_]  = actorTestKit.system
     val locationService: LocationService = mock[LocationService]
     val adminService: AdminServiceImpl   = new AdminServiceImpl(locationService)
-    val componentId =
-      models.ComponentId(Prefix(Subsystem.AOESW, "test_sequencer"), ComponentType.Sequencer)
-    when(locationService.find(AkkaConnection(componentId)))
-      .thenReturn(Future.successful(None))
+    val componentId                      = models.ComponentId(Prefix(Subsystem.AOESW, "test_sequencer"), ComponentType.Sequencer)
+    when(locationService.find(AkkaConnection(componentId))).thenReturn(Future.successful(None))
     intercept[UnresolvedAkkaLocationException] {
       Await.result(adminService.getLogMetadata(componentId), 100.millis)
     }
@@ -96,13 +88,10 @@ class AdminServiceImplTest extends AnyFunSuite with Matchers with BeforeAndAfter
     val locationService: LocationService = mock[LocationService]
     val probe                            = actorTestKit.createTestProbe[SetComponentLogLevel]()
     val adminService: AdminServiceImpl   = new AdminServiceImpl(locationService)
-    val componentId =
-      models.ComponentId(Prefix(Subsystem.AOESW, "test_component"), ComponentType.Assembly)
-    when(locationService.find(AkkaConnection(componentId)))
-      .thenReturn(
-        Future
-          .successful(Some(models.AkkaLocation(AkkaConnection(componentId), new URI(probe.ref.path.toString), Metadata.empty)))
-      )
+    val componentId                      = models.ComponentId(Prefix(Subsystem.AOESW, "test_component"), ComponentType.Assembly)
+    when(locationService.find(AkkaConnection(componentId))).thenReturn(
+      Future.successful(Some(models.AkkaLocation(AkkaConnection(componentId), new URI(probe.ref.path.toString), Metadata.empty)))
+    )
     adminService.setLogLevel(componentId, Level.FATAL)
     probe.expectMessage(500.millis, SetComponentLogLevel(Level.FATAL))
   }
@@ -112,13 +101,10 @@ class AdminServiceImplTest extends AnyFunSuite with Matchers with BeforeAndAfter
     val locationService: LocationService = mock[LocationService]
     val probe                            = actorTestKit.createTestProbe[SetComponentLogLevel]()
     val adminService: AdminServiceImpl   = new AdminServiceImpl(locationService)
-    val componentId =
-      models.ComponentId(Prefix(Subsystem.AOESW, "test_component"), ComponentType.Sequencer)
-    when(locationService.find(AkkaConnection(componentId)))
-      .thenReturn(
-        Future
-          .successful(Some(models.AkkaLocation(AkkaConnection(componentId), new URI(probe.ref.path.toString), Metadata.empty)))
-      )
+    val componentId                      = models.ComponentId(Prefix(Subsystem.AOESW, "test_component"), ComponentType.Sequencer)
+    when(locationService.find(AkkaConnection(componentId))).thenReturn(
+      Future.successful(Some(models.AkkaLocation(AkkaConnection(componentId), new URI(probe.ref.path.toString), Metadata.empty)))
+    )
     adminService.setLogLevel(componentId, Level.FATAL)
     probe.expectMessage(500.millis, SetComponentLogLevel(Level.FATAL))
   }
@@ -127,10 +113,8 @@ class AdminServiceImplTest extends AnyFunSuite with Matchers with BeforeAndAfter
     implicit val system: ActorSystem[_]  = actorTestKit.system
     val locationService: LocationService = mock[LocationService]
     val adminService: AdminServiceImpl   = new AdminServiceImpl(locationService)
-    val componentId =
-      models.ComponentId(Prefix(Subsystem.AOESW, "test_component"), ComponentType.Sequencer)
-    when(locationService.find(AkkaConnection(componentId)))
-      .thenReturn(Future.successful(None))
+    val componentId                      = models.ComponentId(Prefix(Subsystem.AOESW, "test_component"), ComponentType.Sequencer)
+    when(locationService.find(AkkaConnection(componentId))).thenReturn(Future.successful(None))
     intercept[UnresolvedAkkaLocationException] {
       Await.result(adminService.setLogLevel(componentId, Level.FATAL), 100.millis)
     }

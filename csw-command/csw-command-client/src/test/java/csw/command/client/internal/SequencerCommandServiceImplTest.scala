@@ -23,20 +23,16 @@ import scala.concurrent.duration.DurationLong
 
 class SequencerCommandServiceImplTest extends AnyFunSuiteLike with Matchers with MockitoSugar with ScalaFutures {
 
-  private implicit val system: ActorSystem[SpawnProtocol.Command] =
-    ActorSystem(SpawnProtocol(), "sequencer-command-system")
-  private implicit val timeout: Timeout = Timeout(10.seconds)
+  private implicit val system: ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), "sequencer-command-system")
+  private implicit val timeout: Timeout                           = Timeout(10.seconds)
 
   test("should submit sequence to the sequencer") {
-    val sequence =
-      Sequence(Setup(Prefix("csw.move"), CommandName("command-1"), None))
-
+    val sequence                           = Sequence(Setup(Prefix("csw.move"), CommandName("command-1"), None))
     val queryFinalId                       = Id("queryFinalId")
     val queryId                            = Id("queryId")
     val submitResponse: SubmitResponse     = Started(Id())
     val queryFinalResponse: SubmitResponse = Error(queryFinalId, "Failed")
-    val queryResponse: SubmitResponse =
-      Invalid(queryId, IdNotAvailableIssue(queryId.id))
+    val queryResponse: SubmitResponse      = Invalid(queryId, IdNotAvailableIssue(queryId.id))
 
     val sequencer = system.systemActorOf(
       Behaviors.receiveMessage[SequencerMsg] {
@@ -55,12 +51,11 @@ class SequencerCommandServiceImplTest extends AnyFunSuiteLike with Matchers with
       "sequencer-actor"
     )
 
-    val location =
-      AkkaLocation(
-        AkkaConnection(ComponentId(Prefix(Subsystem.IRIS, "sequencer"), ComponentType.Sequencer)),
-        sequencer.toURI,
-        Metadata.empty
-      )
+    val location = AkkaLocation(
+      AkkaConnection(ComponentId(Prefix(Subsystem.IRIS, "sequencer"), ComponentType.Sequencer)),
+      sequencer.toURI,
+      Metadata.empty
+    )
 
     val sequencerCommandService = new SequencerCommandServiceImpl(location)
 

@@ -28,43 +28,34 @@ trait LocationData {
   val akkaConnection: AkkaConnection = AkkaConnection(componentId)
   val httpConnection: HttpConnection = HttpConnection(componentId)
   val tcpConnection: TcpConnection   = TcpConnection(componentId)
-  val connectionInfo: ConnectionInfo =
-    ConnectionInfo(prefix, ComponentType.HCD, ConnectionType.AkkaType)
+  val connectionInfo: ConnectionInfo = ConnectionInfo(prefix, ComponentType.HCD, ConnectionType.AkkaType)
 
   val metadata: Metadata = Metadata(Map("key1" -> "value"))
 
-  val akkaRegistration: Registration =
-    AkkaRegistration(akkaConnection, uriPath, metadata)
-  val httpRegistration: Registration =
-    HttpRegistration(httpConnection, port, pathString)
-  val publicHttpRegistration: Registration =
-    HttpRegistration(httpConnection, port, pathString, NetworkType.Public)
-  val tcpRegistration: Registration = TcpRegistration(tcpConnection, port)
+  val akkaRegistration: Registration       = AkkaRegistration(akkaConnection, uriPath, metadata)
+  val httpRegistration: Registration       = HttpRegistration(httpConnection, port, pathString)
+  val publicHttpRegistration: Registration = HttpRegistration(httpConnection, port, pathString, NetworkType.Public)
+  val tcpRegistration: Registration        = TcpRegistration(tcpConnection, port)
 
   val akkaLocation: Location = AkkaLocation(akkaConnection, uriPath, metadata)
-  val httpLocation: Location =
-    HttpLocation(httpConnection, uriPath, Metadata.empty)
-  val tcpLocation: Location =
-    TcpLocation(tcpConnection, uriPath, Metadata.empty)
+  val httpLocation: Location = HttpLocation(httpConnection, uriPath, Metadata.empty)
+  val tcpLocation: Location  = TcpLocation(tcpConnection, uriPath, Metadata.empty)
 
-  val registrationFailed: LocationServiceError = RegistrationFailed(message)
-  val otherLocationIsRegistered: LocationServiceError =
-    OtherLocationIsRegistered(message)
-  val unregisterFailed: LocationServiceError = UnregistrationFailed(akkaConnection)
-  val registrationListingFailed: LocationServiceError =
-    RegistrationListingFailed()
+  val registrationFailed: LocationServiceError        = RegistrationFailed(message)
+  val otherLocationIsRegistered: LocationServiceError = OtherLocationIsRegistered(message)
+  val unregisterFailed: LocationServiceError          = UnregistrationFailed(akkaConnection)
+  val registrationListingFailed: LocationServiceError = RegistrationListingFailed()
 
   val locationUpdated: TrackingEvent = LocationUpdated(akkaLocation)
   val locationRemoved: TrackingEvent = LocationRemoved(akkaConnection)
 
-  val akkaRegister: Register            = Register(akkaRegistration)
-  val httpRegister: Register            = Register(httpRegistration)
-  val publicHttpRegister: Register      = Register(publicHttpRegistration)
-  val unregister: Unregister            = Unregister(httpConnection)
-  val unregisterAll: UnregisterAll.type = UnregisterAll
-  val find: Find                        = Find(akkaConnection)
-  val resolve: Resolve =
-    Resolve(akkaConnection, FiniteDuration(seconds, TimeUnit.SECONDS))
+  val akkaRegister: Register                           = Register(akkaRegistration)
+  val httpRegister: Register                           = Register(httpRegistration)
+  val publicHttpRegister: Register                     = Register(publicHttpRegistration)
+  val unregister: Unregister                           = Unregister(httpConnection)
+  val unregisterAll: UnregisterAll.type                = UnregisterAll
+  val find: Find                                       = Find(akkaConnection)
+  val resolve: Resolve                                 = Resolve(akkaConnection, FiniteDuration(seconds, TimeUnit.SECONDS))
   val listEntries: ListEntries.type                    = ListEntries
   val listByComponentTypeHcd: ListByComponentType      = ListByComponentType(ComponentType.HCD)
   val listByComponentTypeAssembly: ListByComponentType = ListByComponentType(ComponentType.Assembly)

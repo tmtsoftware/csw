@@ -53,8 +53,7 @@ final case class AkkaRegistration private[csw] (
     * @param hostname provide a hostname where the connection endpoint is available
    * @return an AkkaLocation location representing a live connection at provided hostname
    */
-  override def location(hostname: String): Location =
-    AkkaLocation(connection, actorRefURI, metadata)
+  override def location(hostname: String): Location = AkkaLocation(connection, actorRefURI, metadata)
 }
 
 object AkkaRegistration {
@@ -71,8 +70,7 @@ object AkkaRegistration {
 final case class TcpRegistration(connection: TcpConnection, port: Int, metadata: Metadata) extends Registration {
 
   //Used for JAVA API
-  def this(connection: TcpConnection, port: Int) =
-    this(connection, port, Metadata.empty)
+  def this(connection: TcpConnection, port: Int) = this(connection, port, Metadata.empty)
 
   /**
    * Create a TcpLocation that represents the live Tcp service
@@ -80,13 +78,11 @@ final case class TcpRegistration(connection: TcpConnection, port: Int, metadata:
     * @param hostname provide the hostname where Tcp service is available
    * @return an TcpLocation location representing a live connection at provided hostname
    */
-  override def location(hostname: String): Location =
-    TcpLocation(connection, new URI(s"tcp://$hostname:$port"), metadata)
+  override def location(hostname: String): Location = TcpLocation(connection, new URI(s"tcp://$hostname:$port"), metadata)
 }
 
 object TcpRegistration {
-  def apply(connection: TcpConnection, port: Int): TcpRegistration =
-    new TcpRegistration(connection, port, Metadata.empty)
+  def apply(connection: TcpConnection, port: Int): TcpRegistration = new TcpRegistration(connection, port, Metadata.empty)
 }
 
 /**

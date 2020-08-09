@@ -27,8 +27,7 @@ class ConfigServiceResolverTest extends ConfigClientBaseSuite {
 
   test("should throw exception if not able to resolve config service http server") {
     val locationService = HttpLocationServiceFactory.makeLocalClient
-    val configService =
-      ConfigClientFactory.adminApi(actorSystem, locationService, factory)
+    val configService   = ConfigClientFactory.adminApi(actorSystem, locationService, factory)
 
     val exception = intercept[RuntimeException] {
       Await.result(configService.list(), 7.seconds)
@@ -42,12 +41,10 @@ class ConfigServiceResolverTest extends ConfigClientBaseSuite {
     val mockedLocationService  = mock[LocationService]
     val uri                    = new URI(s"http://config-host:4000")
     val resolvedConfigLocation = Future(Some(models.HttpLocation(ConfigServiceConnection.value, uri, Metadata.empty)))
-    when(mockedLocationService.resolve(ConfigServiceConnection.value, 5.seconds))
-      .thenReturn(resolvedConfigLocation)
+    when(mockedLocationService.resolve(ConfigServiceConnection.value, 5.seconds)).thenReturn(resolvedConfigLocation)
 
-    val configServiceResolver =
-      new ConfigServiceResolver(mockedLocationService, actorRuntime)
-    val actualUri = Await.result(configServiceResolver.uri, 2.seconds)
+    val configServiceResolver = new ConfigServiceResolver(mockedLocationService, actorRuntime)
+    val actualUri             = Await.result(configServiceResolver.uri, 2.seconds)
 
     actualUri.toString() shouldEqual uri.toString
   }
