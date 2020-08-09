@@ -36,14 +36,14 @@ import scala.util.Success
 //DEOPSCSW-182-Control Life Cycle of Components
 //DEOPSCSW-216-Locate and connect components to send AKKA commands
 class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar with ArgumentMatchersSugar {
-  implicit val typedSystem: ActorSystem[SpawnProtocol.Command] =
-    ActorSystemFactory.remote(SpawnProtocol(), "test")
-  implicit val settings: TestKitSettings = TestKitSettings(typedSystem)
-  private val mocks                      = new FrameworkTestMocks()
+  implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol(), "test")
+  implicit val settings: TestKitSettings                       = TestKitSettings(typedSystem)
+  private val mocks                                            = new FrameworkTestMocks()
 
   class IdleContainer() {
     private val testActor: ActorRef[Any]                        = TestProbe("test-probe").ref
-    val akkaRegistration                                        = AkkaRegistrationFactory.make(mock[AkkaConnection], testActor.toURI)
+    private val metadata: Metadata                              = Metadata(Map("key1" -> "value1"))
+    val akkaRegistration                                        = AkkaRegistrationFactory.make(mock[AkkaConnection], testActor.toURI, metadata)
     val locationService: LocationService                        = mock[LocationService]
     val eventService: EventServiceFactory                       = mock[EventServiceFactory]
     val alarmService: AlarmServiceFactory                       = mock[AlarmServiceFactory]
@@ -76,7 +76,8 @@ class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar 
     when(actorRefResolver.resolveActorRef(any[String])).thenReturn(TestProbe().ref)
 
     private val registrationFactory: RegistrationFactory = mock[RegistrationFactory]
-    when(registrationFactory.akkaTyped(any[AkkaConnection], any[ActorRef[_]], Metadata(Map("key1" -> "value1"))))
+
+    when(registrationFactory.akkaTyped(any[AkkaConnection], any[ActorRef[_]], any[Metadata]))
       .thenReturn(akkaRegistration)
 
     private val eventualRegistrationResult: Future[RegistrationResult] =

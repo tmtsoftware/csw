@@ -16,7 +16,10 @@
               "componentType" : "HCD",
               "connectionType" : "akka"
             },
-            "actorRefURI" : "some_path"
+            "actorRefURI" : "some_path",
+            "metadata" : {
+              "key1" : "value"
+            }
           }
         }, {
           "_type" : "Register",
@@ -31,7 +34,8 @@
             "path" : "somePath",
             "networkType" : {
               "_type" : "Private"
-            }
+            },
+            "metadata" : { }
           }
         } ],
         "Unregister" : [ {
@@ -69,7 +73,10 @@
           "componentType" : "HCD",
           "connectionType" : "akka"
         },
-        "uri" : "some_path"
+        "uri" : "some_path",
+        "metadata" : {
+          "key1" : "value"
+        }
       }, {
         "_type" : "HttpLocation",
         "connection" : {
@@ -77,7 +84,8 @@
           "componentType" : "HCD",
           "connectionType" : "http"
         },
-        "uri" : "some_path"
+        "uri" : "some_path",
+        "metadata" : { }
       } ],
       "TrackingEvent" : [ {
         "_type" : "LocationUpdated",
@@ -88,7 +96,10 @@
             "componentType" : "HCD",
             "connectionType" : "akka"
           },
-          "uri" : "some_path"
+          "uri" : "some_path",
+          "metadata" : {
+            "key1" : "value"
+          }
         }
       } ]
     },
