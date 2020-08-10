@@ -8,6 +8,8 @@ import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaRegistration, Metadata}
 import csw.logging.api.scaladsl.Logger
 
+object AkkaRegistrationFactory extends AkkaRegistrationFactory
+
 /**
  * A factory to create AkkaRegistration
  */

@@ -34,7 +34,7 @@ class TrackLocationTest(ignore: Int, mode: String) extends helpers.LSNodeSpec(co
 
     runOn(seed) {
       val actorRef = clusterSettings.system.spawn(Behaviors.empty, "trombone-hcd")
-      locationService.register(new AkkaRegistrationFactory().make(akkaConnection, actorRef)).await
+      locationService.register(AkkaRegistrationFactory.make(akkaConnection, actorRef)).await
       enterBarrier("Registration")
 
       locationService.unregister(akkaConnection).await

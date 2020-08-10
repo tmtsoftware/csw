@@ -32,7 +32,7 @@ class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol.Command]) ex
 
   ///////////////////////////////////////////////
   val testActor: ActorRef[Any]                   = TestProbe("test-probe").ref
-  val akkaRegistration: AkkaRegistration         = new AkkaRegistrationFactory().make(mock[AkkaConnection], testActor)
+  val akkaRegistration: AkkaRegistration         = AkkaRegistrationFactory.make(mock[AkkaConnection], testActor)
   val locationService: LocationService           = mock[LocationService]
   val eventServiceFactory: EventServiceFactory   = mock[EventServiceFactory]
   val eventService: EventService                 = mock[EventService]

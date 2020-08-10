@@ -144,7 +144,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
 
   // dummy HCD connection
   val hcdConnection = AkkaConnection(api.models.ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD))
-  val hcdRegistration: AkkaRegistration = new AkkaRegistrationFactory().make(
+  val hcdRegistration: AkkaRegistration = AkkaRegistrationFactory.make(
     hcdConnection,
     context
       .actorOf(
@@ -170,8 +170,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   val assemblyConnection = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "assembly1"), ComponentType.Assembly))
 
   // Register Typed ActorRef[String] with Location Service
-  val assemblyRegistration: AkkaRegistration =
-    new AkkaRegistrationFactory().make(assemblyConnection, typedActorRef)
+  val assemblyRegistration: AkkaRegistration = AkkaRegistrationFactory.make(assemblyConnection, typedActorRef)
 
   val assemblyRegResult: RegistrationResult = Await.result(locationService.register(assemblyRegistration), 2.seconds)
   //#Components-Connections-Registrations

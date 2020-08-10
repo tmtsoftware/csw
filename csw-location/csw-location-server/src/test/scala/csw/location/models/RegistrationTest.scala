@@ -35,7 +35,7 @@ class RegistrationTest extends AnyFunSuite with Matchers with BeforeAndAfterAll 
       "my-actor-3"
     )
 
-    val akkaRegistration     = new AkkaRegistrationFactory().make(akkaConnection, actorRef)
+    val akkaRegistration     = AkkaRegistrationFactory.make(akkaConnection, actorRef)
     val expectedAkkaLocation = AkkaLocation(akkaConnection, actorRef.toURI, Metadata.empty)
 
     akkaRegistration.location(hostname) shouldBe expectedAkkaLocation
@@ -51,7 +51,7 @@ class RegistrationTest extends AnyFunSuite with Matchers with BeforeAndAfterAll 
     )
 
     val metadata             = Metadata(Map("key1" -> "value"))
-    val akkaRegistration     = new AkkaRegistrationFactory().make(akkaConnection, actorRef, metadata)
+    val akkaRegistration     = AkkaRegistrationFactory.make(akkaConnection, actorRef, metadata)
     val expectedAkkaLocation = AkkaLocation(akkaConnection, actorRef.toURI, metadata)
 
     akkaRegistration.location(hostname) shouldBe expectedAkkaLocation
@@ -120,7 +120,7 @@ class RegistrationTest extends AnyFunSuite with Matchers with BeforeAndAfterAll 
     val akkaConnection                                           = AkkaConnection(api.models.ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD))
 
     intercept[LocalAkkaActorRegistrationNotAllowed] {
-      new AkkaRegistrationFactory().make(akkaConnection, actorRef)
+      AkkaRegistrationFactory.make(akkaConnection, actorRef)
     }
     actorSystem.terminate()
     Await.result(actorSystem.whenTerminated, 10.seconds)

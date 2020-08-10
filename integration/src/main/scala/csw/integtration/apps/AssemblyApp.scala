@@ -25,7 +25,7 @@ object AssemblyApp extends App {
   private val componentId      = ComponentId(Prefix(NFIRAOS, "assembly"), Assembly)
   private val connection       = AkkaConnection(componentId)
 
-  private val registration       = new AkkaRegistrationFactory().make(connection, assemblyActorRef)
+  private val registration       = AkkaRegistrationFactory.make(connection, assemblyActorRef)
   private val locationService    = HttpLocationServiceFactory.makeLocalClient
   private val registrationResult = locationService.register(registration).await
 

@@ -25,9 +25,8 @@ class DetectComponentRestartTestMultiJvmNode3 extends DetectComponentRestartTest
 class DetectComponentRestartTest(ignore: Int, mode: String)
     extends helpers.LSNodeSpec(config = new helpers.TwoMembersAndSeed, mode) {
 
+  import AkkaRegistrationFactory._
   import config._
-  val akkaRegistrationFactory = new AkkaRegistrationFactory()
-  import akkaRegistrationFactory._
 
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)

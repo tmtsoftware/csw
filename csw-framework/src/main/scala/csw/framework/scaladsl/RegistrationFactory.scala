@@ -21,5 +21,5 @@ class RegistrationFactory {
    * @return a handle to the AkkaRegistration that is used to register in location service
    */
   def akkaTyped(akkaConnection: AkkaConnection, actorRef: ActorRef[_], metadata: Metadata = Metadata.empty): AkkaRegistration =
-    new AkkaRegistrationFactory().make(akkaConnection, actorRef, metadata)
+    AkkaRegistrationFactory.make(akkaConnection, actorRef, metadata)
 }

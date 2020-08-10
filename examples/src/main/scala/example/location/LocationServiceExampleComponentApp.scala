@@ -51,7 +51,7 @@ object LocationServiceExampleComponent {
       // Register with the location service
       val registrationResult: Future[RegistrationResult] =
         locationService.register(
-          new AkkaRegistrationFactory().make(
+          AkkaRegistrationFactory.make(
             LocationServiceExampleComponent.connection,
             ctx.self
           )

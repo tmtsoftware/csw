@@ -8,11 +8,11 @@ import akka.actor.typed.{Behavior, SpawnProtocol}
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.testkit.TestProbe
 import csw.location.api.exceptions.OtherLocationIsRegistered
-import csw.location.api.{AkkaRegistrationFactory, models}
 import csw.location.api.models.ComponentType.{Assembly, HCD, Sequencer}
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.location.api.models._
 import csw.location.api.scaladsl.LocationService
+import csw.location.api.{AkkaRegistrationFactory, models}
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.server.commons.ClusterAwareSettings
@@ -50,8 +50,7 @@ class LocationServiceCompTest(mode: String)
     case "http"    => HttpLocationServiceFactory.makeLocalClient
     case "cluster" => LocationServiceFactory.make(ClusterAwareSettings)
   }
-  private val akkaRegistrationFactory = new AkkaRegistrationFactory()
-  import akkaRegistrationFactory._
+  import AkkaRegistrationFactory._
 
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 100.millis)
 
@@ -143,7 +142,7 @@ class LocationServiceCompTest(mode: String)
     val componentId      = models.ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), HCD)
     val connection       = AkkaConnection(componentId)
     val actorRef         = typedSystem.spawn(Behaviors.empty, "my-actor-1")
-    val akkaRegistration = new AkkaRegistrationFactory().make(connection, actorRef)
+    val akkaRegistration = AkkaRegistrationFactory.make(connection, actorRef)
 
     // register, resolve & list akka connection for the first time
     locationService.register(akkaRegistration).await.location.connection shouldBe connection
@@ -173,7 +172,7 @@ class LocationServiceCompTest(mode: String)
       val akkaConnection   = AkkaConnection(models.ComponentId(prefix, compType))
       val httpConnection   = HttpConnection(models.ComponentId(prefix, compType))
       val actorRef         = typedSystem.spawn(Behaviors.empty, "my-actor-1")
-      val akkaRegistration = new AkkaRegistrationFactory().make(akkaConnection, actorRef)
+      val akkaRegistration = AkkaRegistrationFactory.make(akkaConnection, actorRef)
       val httpRegistration = HttpRegistration(httpConnection, 8088, "/")
 
       locationService.register(akkaRegistration).await.location.connection shouldBe akkaConnection
@@ -280,7 +279,7 @@ class LocationServiceCompTest(mode: String)
     val akkaComponentId  = models.ComponentId(Prefix(Subsystem.CSW, "container1"), ComponentType.Container)
     val akkaConnection   = AkkaConnection(akkaComponentId)
     val actorRef         = typedSystem.spawn(Behaviors.empty, "container1-actor")
-    val akkaRegistration = new AkkaRegistrationFactory().make(akkaConnection, actorRef)
+    val akkaRegistration = AkkaRegistrationFactory.make(akkaConnection, actorRef)
 
     val httpRegistrationResult = locationService.register(httpRegistration).await
     val akkaRegistrationResult = locationService.register(akkaRegistration).await
