@@ -178,7 +178,6 @@ trait ConfigService extends ConfigClientService {
    *
    * @return a future that completes with an object containing config server's metadata or fails with
    *         [[csw.config.api.exceptions.InvalidInput]] or [[csw.config.api.exceptions.FileNotFound]]
-   *
    */
   def getMetadata: Future[ConfigMetadata]
 

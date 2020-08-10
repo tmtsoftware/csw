@@ -8,7 +8,7 @@ import scala.jdk.CollectionConverters._
  * metadata represents any additional information (metadata) associated with location
  * For example, "agentId": "ESW.agent1" this can be metadata information for sequence component location
  *
-  * @param metadata represents additional information associated with location
+ * @param metadata represents additional information associated with location
  */
 case class Metadata(metadata: Map[String, String]) {
   // Used from java API

@@ -16,7 +16,7 @@ import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 /**
  * DeathWatchActor tracks the health of all components registered with LocationService.
  *
-  * @param locationService is used to unregister Actors that are no more alive
+ * @param locationService is used to unregister Actors that are no more alive
  */
 private[location] class DeathwatchActor(locationService: LocationService)(implicit actorSystem: ActorSystem[_]) {
   import DeathwatchActor.Msg
@@ -25,7 +25,7 @@ private[location] class DeathwatchActor(locationService: LocationService)(implic
    * Deathwatch behavior processes `DeathwatchActor.Msg` type events sent by replicator for newly registered Locations.
    * Terminated signal will be received upon termination of an actor that was being watched.
    *
-    * @see [[akka.actor.Terminated]]
+   * @see [[akka.actor.Terminated]]
    */
   private[location] def behavior(watchedLocations: Set[Location]): Behavior[Msg] =
     Behaviors.receive[Msg] { (context, changeMsg) =>
@@ -81,7 +81,7 @@ private[location] object DeathwatchActor {
   /**
    * Start the DeathwatchActor using the given locationService
    *
-    * @param cswCluster is used to get remote ActorSystem to create DeathwatchActor
+   * @param cswCluster is used to get remote ActorSystem to create DeathwatchActor
    */
   def start(cswCluster: CswCluster, locationService: LocationService): ActorRef[Msg] = {
     log.debug("Starting Deathwatch actor")

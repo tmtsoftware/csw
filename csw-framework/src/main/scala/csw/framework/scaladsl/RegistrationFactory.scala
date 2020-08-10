@@ -15,7 +15,7 @@ class RegistrationFactory {
    * A [[csw.location.api.exceptions.LocalAkkaActorRegistrationNotAllowed]] can be thrown if the actorRef provided
    * is not a remote actorRef.
    *
-    * @param akkaConnection the AkkaConnection representing the component
+   * @param akkaConnection the AkkaConnection representing the component
    * @param actorRef the supervisor actorRef of the component
    * @param metadata represents additional information associated with registration. If not provided, defaulted to empty value
    * @return a handle to the AkkaRegistration that is used to register in location service

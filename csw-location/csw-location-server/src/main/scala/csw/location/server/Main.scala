@@ -15,8 +15,7 @@ import scala.util.control.NonFatal
  * responsible for starting following:
  *  1. location service on provided port (this is required to bootstrap akka cluster, initially cluster will have single seed node)
  *  2. http server which exposes http end point to change/get the log level of components dynamically
- *
- * */
+ */
 // $COVERAGE-OFF$
 object Main {
   private val name    = BuildInfo.name

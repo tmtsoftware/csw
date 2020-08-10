@@ -97,7 +97,9 @@ class AlarmServiceFactory(redisClient: RedisClient = RedisClient.create()) {
   def jMakeClientApi(host: String, port: Int, system: ActorSystem[_]): IAlarmService =
     new JAlarmServiceImpl(makeAdminApi(host, port)(system))
 
-  /************ INTERNAL ************/
+  /**
+   * ********** INTERNAL ***********
+   */
   private def alarmService(alarmServiceResolver: AlarmServiceResolver)(implicit system: ActorSystem[_], ec: ExecutionContext) = {
     val settings = new Settings(ConfigFactory.load())
     val redisConnectionsFactory =

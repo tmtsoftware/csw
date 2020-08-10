@@ -22,6 +22,5 @@ package csw.time
  *   TMTTimeHelper.atLocal(utcTime)
  *   TMTTimeHelper.atHawaii(utcTime)
  * }}}
- *
  */
 package object scheduler {}

@@ -99,7 +99,7 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
    * If component writer wants to track additional connections which are not specified in configuration file,
    * then using trackConnection(connection: Connection) hook which is added in ComponentHandlers can be used
    * Uses of this are shown in [[csw.common.components.framework.SampleComponentHandlers]]
-   * */
+   */
   //DEOPSCSW-219 Discover component connection using HTTP protocol
   test("component should be able to track http and tcp connections | DEOPSCSW-219") {
     implicit val componentActorSystem = ActorSystemFactory.remote(SpawnProtocol(), "test2")

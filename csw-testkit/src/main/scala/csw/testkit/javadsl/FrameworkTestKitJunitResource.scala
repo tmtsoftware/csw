@@ -35,22 +35,23 @@ import scala.jdk.CollectionConverters._
  *
  * }
  * }}}
- *
  */
 final class FrameworkTestKitJunitResource(val frameworkTestKit: FrameworkTestKit, services: java.util.List[CSWService])
     extends ExternalResource {
 
-  /** Initialize testkit with default configuration
+  /**
+   * Initialize testkit with default configuration
    *
    * By default only Location server gets started, if your tests requires other services [ex. Config, Event, Alarm etc.] along with location,
    * then use other override which accepts sequence of [[csw.testkit.scaladsl.CSWService]] to create instance of testkit
-   * */
+   */
   def this() = this(FrameworkTestKit(), Collections.emptyList())
 
-  /** Initialize testkit and start all the provided services.
+  /**
+   * Initialize testkit and start all the provided services.
    *
    * @note Refer [[csw.testkit.scaladsl.CSWService]] for supported services
-   * */
+   */
   def this(services: java.util.List[CSWService]) = this(FrameworkTestKit(), services)
 
   /** Initialize testkit with provided actorSystem */
@@ -64,7 +65,7 @@ final class FrameworkTestKitJunitResource(val frameworkTestKit: FrameworkTestKit
   /** Easy access to testkits typed actor system from java (just wraps untyped to typed). */
 //  lazy val typedSystem: typed.ActorSystem[_] = actorSystem.toTyped
 
-  /** Handle to Java Location service  */
+  /** Handle to Java Location service */
   lazy val jLocationService: ILocationService =
     LocationServiceExt.RichLocationService(wiring.locationService).asJava(wiring.actorRuntime.ec)
 

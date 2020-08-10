@@ -165,7 +165,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
   /**
    * Below methods are just here to show how exceptions can be used to either restart or stop supervisor
    * This are snipped in paradox documentation
-   * */
+   */
   //#failureRestart-Exception
   case class HcdNotFoundException() extends FailureRestart("Could not resolve hcd location. Initialization failure.")
 

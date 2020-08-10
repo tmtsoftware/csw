@@ -30,7 +30,6 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
  * @param currentStatePublisher the pub sub actor to publish state represented by [[csw.params.core.states.CurrentState]] for this component
  * @param commandResponseManager manages state of a started Submit command
  * @param componentInfo         component related information as described in the configuration file
- *
  */
 class CswContext(
     val locationService: LocationService,

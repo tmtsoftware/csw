@@ -213,17 +213,16 @@ private[framework] object ComponentBehavior {
        * @return the existing behavior
        */
       Behaviors
-        .receiveMessage[TopLevelActorMessage] {
-          msg =>
-            log.debug(s"Component TLA in lifecycle state :[$lifecycleState] received message :[$msg]")
-            (lifecycleState, msg) match {
-              case (_, msg: TopLevelActorCommonMessage)                          => onCommon(msg)
-              case (ComponentLifecycleState.Idle, msg: TopLevelActorIdleMessage) => onIdle(msg)
-              case (ComponentLifecycleState.Running, msg: RunningMessage)        => onRun(msg)
-              case _ =>
-                log.error(s"Unexpected message :[$msg] received by component in lifecycle state :[$lifecycleState]")
-            }
-            Behaviors.same
+        .receiveMessage[TopLevelActorMessage] { msg =>
+          log.debug(s"Component TLA in lifecycle state :[$lifecycleState] received message :[$msg]")
+          (lifecycleState, msg) match {
+            case (_, msg: TopLevelActorCommonMessage)                          => onCommon(msg)
+            case (ComponentLifecycleState.Idle, msg: TopLevelActorIdleMessage) => onIdle(msg)
+            case (ComponentLifecycleState.Running, msg: RunningMessage)        => onRun(msg)
+            case _ =>
+              log.error(s"Unexpected message :[$msg] received by component in lifecycle state :[$lifecycleState]")
+          }
+          Behaviors.same
         }
         .receiveSignal(onSignal)
 

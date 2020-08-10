@@ -65,7 +65,8 @@ class ArgsParser(name: String) {
     }
   }
 
-  /**®
+  /**
+   * ®
    * Parses the command line arguments and returns a value if they are valid.
    *
    * @param args the command line arguments

@@ -48,7 +48,6 @@ trait IEventSubscriber {
   def subscribe(eventKeys: util.Set[EventKey], every: Duration, mode: SubscriptionMode): Source[Event, IEventSubscription]
 
   /**
-   *
    * Subscribes an asynchronous callback function to events from multiple eventKeys. The callback is of type event => future
    * and it ensures that the event callbacks are called sequentially in such a way that the subsequent execution will
    * start only after the prior one completes. This API gives the guarantee of ordered execution of the asynchronous callbacks.
@@ -196,9 +195,9 @@ trait IEventSubscriber {
    *
    * @param subsystem a valid `Subsystem` which represents the source of the events
    * @param pattern   Subscribes the client to the given patterns. Supported glob-style patterns:
-   *- h?llo subscribes to hello, hallo and hxllo
-   *- h*llo subscribes to hllo and heeeello
-   *- h[ae]llo subscribes to hello and hallo, but not hillo
+   * - h?llo subscribes to hello, hallo and hxllo
+   * - h*llo subscribes to hllo and heeeello
+   * - h[ae]llo subscribes to hello and hallo, but not hillo
    *                  Use \ to escape special characters if you want to match them verbatim.
    * @param callback  a consumer which defines an operation to execute on each received event
    * @return an [[csw.event.api.javadsl.IEventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to

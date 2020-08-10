@@ -15,17 +15,19 @@ import csw.testkit._
  */
 abstract class ScalaTestFrameworkTestKit(val frameworkTestKit: FrameworkTestKit, services: CSWService*) extends ScalaTestBase {
 
-  /** Initialize testkit with default configuration
+  /**
+   * Initialize testkit with default configuration
    *
    * By default only Location server gets started, if your tests requires other services [ex. Config, Event, Alarm etc.] along with location,
    * then use other override which accepts sequence of [[CSWService]] to create instance of testkit
-   * */
+   */
   def this() = this(FrameworkTestKit())
 
-  /** Initialize testkit and start all the provided services.
+  /**
+   * Initialize testkit and start all the provided services.
    *
    * @note Refer [[CSWService]] for supported services
-   * */
+   */
   def this(services: CSWService*) = this(FrameworkTestKit(), services: _*)
 
   /** Initialize testkit with provided actorSystem */

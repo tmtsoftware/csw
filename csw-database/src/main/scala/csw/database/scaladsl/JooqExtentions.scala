@@ -68,7 +68,6 @@ object JooqExtentions {
      * @return A future that completes with an array of integers. The integer, if it is greater than or equal to zero,
      *         indicates that the command was processed successfully and is an update count giving the number of rows in the
      *         database that were affected by the command's execution.
-     *
      */
     def executeBatchAsync()(implicit ec: ExecutionContext): Future[List[Int]] = {
       Future {

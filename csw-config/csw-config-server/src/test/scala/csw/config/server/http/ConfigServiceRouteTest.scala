@@ -682,7 +682,7 @@ class ConfigServiceRouteTest
 
   // DEOPSCSW-576: Auth token for Configuration service
   // DEOPSCSW-69: Use authorization token to get identity of user creating/updating a configuration file
-  /** Auth Based routes **/
+  /** Auth Based routes * */
   /* ================ Unauthorized code ================*/
   test("create - Unauthorized code | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
     Post("/config/test.conf?comment=create") ~> route ~> check {

@@ -32,7 +32,6 @@ import scala.concurrent.ExecutionContext
  *   testKit.shutdown()
  *
  * }}}
- *
  */
 final class FrameworkTestKit private (
     val actorSystem: typed.ActorSystem[SpawnProtocol.Command],

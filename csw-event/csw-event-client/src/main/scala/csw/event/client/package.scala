@@ -68,9 +68,7 @@ package csw.event
  * 1. `RedisEventService` - Redis as event store and publisher/subscriber functionality
  * 2. `KafkaEventService` - Kafka as event store and publisher/subscriber functionality
  *
- *
  * Complete guide of usage of different API's provided by EventService is available at:
  * [[https://tmtsoftware.github.io/csw/services/event.html]]
- *
  */
 package object client {}

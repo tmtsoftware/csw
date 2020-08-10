@@ -198,7 +198,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   /**
    * Below Tests show that all external messages for the TLA are received by the Supervisor
    * which passes them to TLA (depending on lifecycle)
-  **/
+   */
   // *************** Begin testing of onRunning Messages ***************
 
   test("supervisor should handle lifecycle Restart message | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181") {

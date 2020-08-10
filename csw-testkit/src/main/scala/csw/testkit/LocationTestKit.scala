@@ -20,7 +20,6 @@ import csw.testkit.internal.TestKitUtils
  *   testKit.shutdownLocationServer()
  *
  * }}}
- *
  */
 final class LocationTestKit private (testKitSettings: TestKitSettings) {
 

@@ -19,7 +19,7 @@ sealed abstract class Units(name: String, description: String) extends EnumEntry
   def getName: String = s"[$name]"
 
   /**
-   *The description of unit
+   * The description of unit
    */
   def getDescription: String = description
 }

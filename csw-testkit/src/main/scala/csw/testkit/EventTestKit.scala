@@ -28,7 +28,6 @@ import csw.testkit.redis.RedisStore
  *   testKit.shutdownEventService()
  *
  * }}}
- *
  */
 final class EventTestKit private (_system: typed.ActorSystem[_], testKitSettings: TestKitSettings) extends RedisStore {
 

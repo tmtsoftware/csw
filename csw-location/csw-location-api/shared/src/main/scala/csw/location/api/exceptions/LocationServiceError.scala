@@ -6,7 +6,6 @@ sealed abstract class LocationServiceError(msg: String) extends RuntimeException
 
 /**
  * An Exception representing failure in registration
- *
  */
 case class RegistrationFailed(msg: String) extends LocationServiceError(msg) {
   def this(connection: Connection) = this(s"unable to register $connection")
@@ -14,7 +13,6 @@ case class RegistrationFailed(msg: String) extends LocationServiceError(msg) {
 
 /**
  * An Exception representing failure in registration as other location is already registered in place of the given location
- *
  */
 case class OtherLocationIsRegistered(msg: String) extends LocationServiceError(msg) {
   def this(location: Location, otherLocation: Location) =

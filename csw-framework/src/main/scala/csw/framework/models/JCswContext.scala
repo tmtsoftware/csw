@@ -19,7 +19,6 @@ import csw.time.scheduler.api.TimeServiceScheduler
  * @param currentStatePublisher the pub sub actor to publish state represented by [[csw.params.core.states.CurrentState]] for this component
  * @param commandResponseManager manages state of a long-running, started Submit command
  * @param componentInfo component related information as described in the configuration file
- *
  */
 case class JCswContext(
     locationService: ILocationService,

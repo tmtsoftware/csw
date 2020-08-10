@@ -72,9 +72,11 @@ object InstalledAppAuthAdapterFactory {
    */
   def make(implicit executionContext: ExecutionContext): InstalledAppAuthAdapter = make(None)
 
-  /******************
+  /**
+   * ****************
    *  INTERNAL APIs
-   ******************/
+   * ****************
+   */
   private def make(locationService: LocationService, secretStore: Option[AuthStore], config: Config = ConfigFactory.load())(
       implicit executionContext: ExecutionContext
   ): InstalledAppAuthAdapter = {

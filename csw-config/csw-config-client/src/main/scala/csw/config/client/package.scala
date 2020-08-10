@@ -20,7 +20,6 @@ package csw.config
  *
  * {{{val configClientService = ConfigClientFactory.clientApi(actorSystem, clientLocationService)}}}
  *
- *
  * Config Client Service exposes following two API's:
  *   1. exists: returns true if configuration file with provided id exists
  *

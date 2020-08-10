@@ -22,7 +22,7 @@ trait EventSubscriber {
    * and the stream is stopped after logging appropriately. In all other cases of exception, as per the default behavior, the stream will stop.
    * To avoid that, user should provide a resuming materializer while running the stream.
    *
-   *@note All the other APIs of [[csw.event.api.scaladsl.EventSubscriber]] that do not return a [[akka.stream.scaladsl.Source]],
+   * @note All the other APIs of [[csw.event.api.scaladsl.EventSubscriber]] that do not return a [[akka.stream.scaladsl.Source]],
    *       internally use the resuming materializer which will ignore the failed event and resume receiving further events.
    * @param eventKeys a set of [[csw.params.events.EventKey]] to subscribe to
    * @return a [[akka.stream.scaladsl.Source]] of [[csw.params.events.Event]]. The materialized value of the source provides
@@ -199,9 +199,9 @@ trait EventSubscriber {
    * @note Callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
    * @param subsystem a valid `Subsystem` which represents the source of the events
    * @param pattern   Subscribes the client to the given patterns. Supported glob-style patterns:
-   *- h?llo subscribes to hello, hallo and hxllo
-   *- h*llo subscribes to hllo and heeeello
-   *- h[ae]llo subscribes to hello and hallo, but not hillo
+   * - h?llo subscribes to hello, hallo and hxllo
+   * - h*llo subscribes to hllo and heeeello
+   * - h[ae]llo subscribes to hello and hallo, but not hillo
    *                  Use \ to escape special characters if you want to match them verbatim.
    * @param callback  a function to execute on each received event
    * @return an [[csw.event.api.scaladsl.EventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to

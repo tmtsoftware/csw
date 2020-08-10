@@ -10,7 +10,6 @@ object ParameterSetFilters {
 
   /**
    * A filter type for various parameter set data
-   *
    */
   type ParamSetFilter[A] = A => Boolean
 

@@ -131,7 +131,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
   /**
    * Unregister all connections from CRDT
    *
-    * @note this method should be used for testing purpose only
+   * @note this method should be used for testing purpose only
    */
   def unregisterAll(): Future[Done] =
     async {

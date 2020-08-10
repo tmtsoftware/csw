@@ -435,13 +435,13 @@ object Angle {
   /** multiply to convert Seconds to micro arc seconds */
   val S2Uas: Long = 1000L * 1000L
 
-  /** multiply to convert UAS to degrees  */
+  /** multiply to convert UAS to degrees */
   val Uas2D: Double = 1d / D2Uas
 
-  /** multiply to convert UAS to minutes  */
+  /** multiply to convert UAS to minutes */
   val Uas2M: Double = 1d / M2Uas
 
-  /** multiply to convert UAS to Seconds  */
+  /** multiply to convert UAS to Seconds */
   val Uas2S: Double = 1d / S2Uas
 
   /** multiply to convert  arc seconds to radians */

@@ -31,6 +31,5 @@ package csw.command
  *
  * Complete guide of usage of different API's provided by CommandService is available at:
  * [[https://tmtsoftware.github.io/csw/command.html]]
- *
  */
 package object client {}

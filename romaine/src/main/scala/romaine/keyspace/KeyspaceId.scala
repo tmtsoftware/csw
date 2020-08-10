@@ -10,7 +10,7 @@ sealed abstract class KeyspaceId(val id: String) extends EnumEntry {
 
 /**
  * By default, redis has 16 databases which are identified by id starting from 0
- * */
+ */
 object KeyspaceId extends Enum[KeyspaceId] {
   override def values: immutable.IndexedSeq[KeyspaceId] = findValues
 

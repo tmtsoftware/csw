@@ -28,7 +28,6 @@ import csw.testkit.redis.RedisStore
  *   testKit.shutdownAlarmService()
  *
  * }}}
- *
  */
 final class AlarmTestKit private (_system: ActorSystem[SpawnProtocol.Command], testKitSettings: TestKitSettings)
     extends RedisStore {

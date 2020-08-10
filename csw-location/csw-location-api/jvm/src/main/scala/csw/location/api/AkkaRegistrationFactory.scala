@@ -18,8 +18,7 @@ object JAkkaRegistrationFactory extends AkkaRegistrationFactory
 class AkkaRegistrationFactory {
 
   /**
-   *
-    * @param connection the `Connection` to register with `LocationService`
+   * @param connection the `Connection` to register with `LocationService`
    * @param actorRef Provide a remote actor ref that is offering a connection. Local actors cannot be registered since they can't be
    *                 communicated from components across the network
    * @param metadata represents additional information associated with registration
@@ -39,8 +38,7 @@ class AkkaRegistrationFactory {
   }
 
   /**
-   *
-    * @param connection the `Connection` to register with `LocationService`
+   * @param connection the `Connection` to register with `LocationService`
    * @param actorRef Provide a remote actor ref that is offering a connection. Local actors cannot be registered since they can't be
    *                 communicated from components across the network
    * @return AkkaRegistration instance. A [[csw.location.api.exceptions.LocalAkkaActorRegistrationNotAllowed]]

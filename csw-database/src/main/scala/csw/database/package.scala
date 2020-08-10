@@ -20,6 +20,5 @@ package csw
  *
  * Complete guide of different flavours of `makeDsl()` and how to use `DSLContext` to access data is available at:
  * [[https://tmtsoftware.github.io/csw/services/database.html]]
- *
  */
 package object database {}

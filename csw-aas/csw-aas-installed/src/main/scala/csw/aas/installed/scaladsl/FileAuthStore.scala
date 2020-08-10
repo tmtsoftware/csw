@@ -35,9 +35,11 @@ class FileAuthStore(storePath: Path) extends AuthStore {
     write(refreshTokenPath, refreshToken)
   }
 
-  /************************************************
+  /**
+   * **********************************************
    * Internal APIs: Uses os-libs for file handling
-  ************************************************/
+   * **********************************************
+   */
   private def write(path: Path, content: String): Unit =
     if (os.exists(path)) os.write.over(path, content)
     else os.write(path, content, createFolders = true)

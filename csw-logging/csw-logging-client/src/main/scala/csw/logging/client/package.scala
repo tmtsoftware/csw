@@ -60,7 +60,7 @@ package csw.logging
  *   }
  *
  * }}}
- *̄
+ * ̄
  * Detailed documentation of Logging Service is available at:
  * [[https://tmtsoftware.github.io/csw/services/logging.html]]
  */

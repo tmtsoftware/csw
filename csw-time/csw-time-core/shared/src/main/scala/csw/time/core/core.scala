@@ -17,6 +17,5 @@ package csw.time
  *   val taiTime: TAITime = TAITime.now() // gets current TAI time
  *   taiTime.toUTC // converts the given TAITime instance to UTC timescale
  * }}}
- *
  */
 package object core {}

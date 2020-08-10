@@ -1,7 +1,6 @@
 package csw.command.client.messages
 
 /**
- *
  *                          +-----------------------+                          *                                                             +-------------------+                                                                                               *                        +----------------------+
  *                          |                       |                          *                                                             |                   |                                                                                               *                        |                      |
  *              +-----------+ ContainerActorMessage +---------+                *                                       +---------------------+ SupervisorMessage +------------------------------+-------------------------------------------+                    *      +-----------------+ TopLevelActorMessage +-----------------------------+
@@ -52,6 +51,5 @@ package csw.command.client.messages
  *                                                                                                                                                                                      | CommandMessage |
  *                                                                                                                                                                                      |                |
  *                                                                                                                                                                                      +----------------+
- *
  */
 private[messages] object MessagesArchitecture {}

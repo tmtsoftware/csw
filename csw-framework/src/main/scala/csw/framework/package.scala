@@ -152,6 +152,5 @@ package csw
  *    ]
  *
  * }}}
- *
- **/
+ */
 package object framework {}

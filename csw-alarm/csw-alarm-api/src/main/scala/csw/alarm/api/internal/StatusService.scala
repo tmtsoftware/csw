@@ -39,7 +39,7 @@ private[alarm] trait StatusService {
    *       Also, shelved alarms are considered in aggregation of the severity and health.
    * @param alarmKey represents a unique alarm in alarm store
    * @return a future which completes when alarm is shelved successfully or fails with [[csw.alarm.api.exceptions.KeyNotFoundException]]
-   **/
+   */
   def shelve(alarmKey: AlarmKey): Future[Done]
 
   /**

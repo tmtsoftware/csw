@@ -16,7 +16,6 @@ class TimeServiceSchedulerFactory(implicit scheduler: Scheduler) {
   /**
    * API to create [[csw.time.scheduler.api.TimeServiceScheduler]]
    *
-
    * @param ec an executionContext
    * @return an instance of [[csw.time.scheduler.api.TimeServiceScheduler]] which can be used to schedule one-time/periodic tasks
    */

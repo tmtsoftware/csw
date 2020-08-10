@@ -169,7 +169,9 @@ class DatabaseServiceFactory private[database] (actorSystem: ActorSystem[_], val
     Future(createDslInternal(Some(config)))
   }
 
-  /************ INTERNAL ************/
+  /**
+   * ********** INTERNAL ***********
+   */
   private def createDslInternal(maybeConfig: Option[Config] = None): DSLContext = {
     val cswDatabase: Config      = config.getConfig("csw-database")
     val dataSourceConfig: Config = cswDatabase.getConfig("hikari-datasource")
