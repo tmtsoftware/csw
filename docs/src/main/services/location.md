@@ -66,6 +66,7 @@ The `register` API takes a `Registration` parameter and returns a future registr
 If registration fails for some reason, the returned future will fail with an exception. 
 (Registration will fail if the `csw-location-server` application is not running or could not be found, or if the given component name was already registered.)
 
+`AkkaRegistrationFactory` can be used to instantiate `AkkaRegistration` using `AkkaConnection`, `Actor Ref` and optional `Metadata`.
 The following example shows registration of both an UnTyped ActorRef and a Typed ActorRef:
  
 Scala
@@ -73,6 +74,24 @@ Scala
 
 Java
 :   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/example/location/JLocationServiceExampleClient.java) { #Components-Connections-Registrations }
+
+
+
+### Capability to add metadata while registering connection
+
+Location service supports to add additional information while registering connection. This information is metadata for that registration.
+Metadata given at point of registration is reflected in location model. This metadata information can be used to store additional info 
+e.g. agentId for any component running on that agent. Metadata field is optional while registration, if not provided location will be reflected with empty metadata
+
+Following example shows adding metadata in `HttpRegistration`. Similarly, metadata can be added in `AkkaRegistration` as well as `TcpRegistration`.
+Once location is registered `Metadata` associated can be used for any computation.
+
+Scala
+:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/example/location/LocationServiceExampleClientApp.scala) { #Components-Connections-Registrations-With-Metadata }
+
+Java
+:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/example/location/JLocationServiceExampleClient.java) { #Components-Connections-Registrations-With-Metadata }
+
 
 @@@ note
 

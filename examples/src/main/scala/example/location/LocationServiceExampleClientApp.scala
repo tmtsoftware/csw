@@ -12,7 +12,6 @@ import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.location.api
 import csw.location.api.AkkaRegistrationFactory
-import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
 import csw.location.api.models._
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
@@ -157,7 +156,6 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
         name = "my-actor-1"
       )
       .toTyped
-      .toURI
   )
 
   // Register UnTyped ActorRef with Location service. Import scaladsl adapter to implicitly convert
@@ -172,11 +170,25 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   val assemblyConnection = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "assembly1"), ComponentType.Assembly))
 
   // Register Typed ActorRef[String] with Location Service
-  val assemblyRegistration: AkkaRegistration =
-    AkkaRegistrationFactory.make(assemblyConnection, typedActorRef.toURI)
+  val assemblyRegistration: AkkaRegistration = AkkaRegistrationFactory.make(assemblyConnection, typedActorRef)
 
   val assemblyRegResult: RegistrationResult = Await.result(locationService.register(assemblyRegistration), 2.seconds)
   //#Components-Connections-Registrations
+
+  //#Components-Connections-Registrations-With-Metadata
+  // add some dummy registrations for illustrative purposes
+
+  // dummy http connection
+  val httpPortForService = 8080
+  val httpConnectionForService = HttpConnection(
+    api.models.ComponentId(Prefix(Subsystem.CSW, "configuration"), ComponentType.Service)
+  )
+
+  // When no network type is provided in httpRegistration, default is NetworkType.Private
+  val httpRegistrationForService =
+    HttpRegistration(httpConnectionForService, httpPortForService, "path123", Metadata(Map("key1" -> "value1")))
+  val httpRegResultForService: RegistrationResult = Await.result(locationService.register(httpRegistrationForService), 2.seconds)
+  //#Components-Connections-Registrations-With-Metadata
 
   //#find
   // find connection to LocationServiceExampleComponent in location service

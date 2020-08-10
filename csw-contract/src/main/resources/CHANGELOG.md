@@ -1,5 +1,57 @@
 # Change Log
 
+## [v3] 
+
+- Model change for Registration to accommodate metadata
+    old: {
+           "_type" : "Register",
+           "registration" : {
+             "_type" : "AkkaRegistration",
+             "connection" : {
+               "prefix" : "TCS.filter.wheel",
+               "componentType" : "HCD",
+               "connectionType" : "akka"
+             },
+             "actorRefURI" : "some_path"
+           }
+         }
+    new: {
+           "_type" : "Register",
+           "registration" : {
+             "_type" : "AkkaRegistration",
+             "connection" : {
+               "prefix" : "TCS.filter.wheel",
+               "componentType" : "HCD",
+               "connectionType" : "akka"
+             },
+             "actorRefURI" : "some_path",
+             "metadata" : {
+               "key1" : "value"
+             }
+           }
+         }
+          
+- Model change for location to accommodate metadata
+    old: {
+           "_type" : "HttpLocation",
+           "connection" : {
+             "prefix" : "TCS.filter.wheel",
+             "componentType" : "HCD",
+             "connectionType" : "http"
+           },
+           "uri" : "some_path"
+         }
+    new: {
+           "_type" : "HttpLocation",
+           "connection" : {
+             "prefix" : "TCS.filter.wheel",
+             "componentType" : "HCD",
+             "connectionType" : "http"
+           },
+           "uri" : "some_path",
+           "metadata" : { }
+         }
+
 ## [v2] - 2020-03-20
 
 - Encoding of `ComponentType` model has changed from snake case to retain original case

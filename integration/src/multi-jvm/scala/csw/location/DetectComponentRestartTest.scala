@@ -4,8 +4,7 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.scaladsl.adapter._
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.testkit.TestProbe
-import csw.location.api.AkkaRegistrationFactory.make
-import csw.location.api.extensions.ActorExtension.RichActor
+import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{ComponentId, ComponentType, LocationRemoved, LocationUpdated}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
@@ -26,6 +25,7 @@ class DetectComponentRestartTestMultiJvmNode3 extends DetectComponentRestartTest
 class DetectComponentRestartTest(ignore: Int, mode: String)
     extends helpers.LSNodeSpec(config = new helpers.TwoMembersAndSeed, mode) {
 
+  import AkkaRegistrationFactory._
   import config._
 
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
@@ -35,7 +35,7 @@ class DetectComponentRestartTest(ignore: Int, mode: String)
     val akkaConnection = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "TromboneHcd"), ComponentType.HCD))
 
     runOn(member1) {
-      locationService.register(make(akkaConnection, typedSystem.spawn(Behaviors.empty, "empty").toURI)).await
+      locationService.register(make(akkaConnection, typedSystem.spawn(Behaviors.empty, "empty"))).await
 
       enterBarrier("location-registered")
       enterBarrier("location-updated")
@@ -64,7 +64,7 @@ class DetectComponentRestartTest(ignore: Int, mode: String)
 
       Thread.sleep(2000)
 
-      freshLocationService.register(make(akkaConnection, newTypedSystem.spawn(Behaviors.empty, "empty").toURI)).await
+      freshLocationService.register(make(akkaConnection, newTypedSystem.spawn(Behaviors.empty, "empty"))).await
       enterBarrier("member-re-registered")
     }
 

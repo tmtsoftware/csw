@@ -6,9 +6,8 @@ import akka.actor.typed
 import akka.actor.typed.SpawnProtocol
 import akka.actor.typed.scaladsl.Behaviors
 import csw.location.api.AkkaRegistrationFactory
-import csw.location.api.extensions.ActorExtension.RichActor
-import csw.location.api.models.{ComponentId, ComponentType}
 import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.{ComponentId, ComponentType}
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
@@ -54,7 +53,7 @@ object LocationServiceExampleComponent {
         locationService.register(
           AkkaRegistrationFactory.make(
             LocationServiceExampleComponent.connection,
-            ctx.self.toURI
+            ctx.self
           )
         )
       Await.result(registrationResult, 5.seconds)

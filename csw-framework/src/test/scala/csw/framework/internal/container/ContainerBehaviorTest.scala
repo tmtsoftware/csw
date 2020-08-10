@@ -21,7 +21,6 @@ import csw.framework.FrameworkTestMocks
 import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.scaladsl.RegistrationFactory
 import csw.location.api.AkkaRegistrationFactory
-import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.Metadata
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
@@ -43,7 +42,7 @@ class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar 
   class IdleContainer() {
     private val testActor: ActorRef[Any]                        = TestProbe("test-probe").ref
     private val metadata: Metadata                              = Metadata(Map("key1" -> "value1"))
-    val akkaRegistration                                        = AkkaRegistrationFactory.make(mock[AkkaConnection], testActor.toURI, metadata)
+    val akkaRegistration                                        = AkkaRegistrationFactory.make(mock[AkkaConnection], testActor, metadata)
     val locationService: LocationService                        = mock[LocationService]
     val eventService: EventServiceFactory                       = mock[EventServiceFactory]
     val alarmService: AlarmServiceFactory                       = mock[AlarmServiceFactory]
