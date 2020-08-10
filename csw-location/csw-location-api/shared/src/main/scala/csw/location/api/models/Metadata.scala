@@ -14,7 +14,7 @@ case class Metadata(metadata: Map[String, String]) {
   // Used from java API
   def this(metadata: java.util.Map[String, String]) = this(metadata.asScala.toMap)
 
-  def value: util.Map[String, String] = metadata.asJava
+  def jMetadata: util.Map[String, String] = metadata.asJava
 }
 
 object Metadata {

@@ -10,6 +10,8 @@ import csw.logging.api.scaladsl.Logger
 
 object AkkaRegistrationFactory extends AkkaRegistrationFactory
 
+object JAkkaRegistrationFactory extends AkkaRegistrationFactory
+
 /**
  * A factory to create AkkaRegistration
  */

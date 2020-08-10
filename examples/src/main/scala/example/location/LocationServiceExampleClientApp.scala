@@ -175,6 +175,21 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   val assemblyRegResult: RegistrationResult = Await.result(locationService.register(assemblyRegistration), 2.seconds)
   //#Components-Connections-Registrations
 
+  //#Components-Connections-Registrations-With-Metadata
+  // add some dummy registrations for illustrative purposes
+
+  // dummy http connection
+  val httpPortForService = 8080
+  val httpConnectionForService = HttpConnection(
+    api.models.ComponentId(Prefix(Subsystem.CSW, "configuration"), ComponentType.Service)
+  )
+
+  // When no network type is provided in httpRegistration, default is NetworkType.Private
+  val httpRegistrationForService =
+    HttpRegistration(httpConnectionForService, httpPortForService, "path123", Metadata(Map("key1" -> "value1")))
+  val httpRegResultForService: RegistrationResult = Await.result(locationService.register(httpRegistrationForService), 2.seconds)
+  //#Components-Connections-Registrations-With-Metadata
+
   //#find
   // find connection to LocationServiceExampleComponent in location service
   // [do this before starting LocationServiceExampleComponent.  this should return Future[None]]

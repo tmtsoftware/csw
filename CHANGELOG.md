@@ -13,6 +13,11 @@ All notable changes to this project will be documented in this file.
 - `->` method on a Key now takes a single parameter instead of varargs. For varargs, please use `set` method.
 - `->` method on a Key that took an array of values has been removed. Please use `setAll` method instead.
 - `->` Removed usage of client-role and used realm-role instead in location server and config server routes.
+- Contract change for location service API for example `registration` and `location` model incorporate metadata.
+  `Metadata` is additional information associated with `registration`.
+- Removed `RegistrationFactory` from `location-server` module. Instead, following should be used by Scala and Java users to instantiate `AkkaRegistration`
+    - For Scala users, `AkkaRegistrationFactory` API change to expect actorRef instead of URI of remote actorRef
+    - For Java users, `JAkkaRegistrationFactory` is added.
 
 ## [CSW v2.0.1] - 2020-03-20
 

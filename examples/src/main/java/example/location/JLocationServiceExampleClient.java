@@ -16,7 +16,7 @@ import akka.stream.javadsl.Sink;
 import csw.command.client.extensions.AkkaLocationExt;
 import csw.command.client.messages.ComponentMessage;
 import csw.command.client.messages.ContainerMessage;
-import csw.location.api.AkkaRegistrationFactory;
+import csw.location.api.JAkkaRegistrationFactory;
 import csw.location.api.extensions.URIExtension;
 import csw.location.api.javadsl.*;
 import csw.location.api.models.*;
@@ -134,11 +134,25 @@ public class JLocationServiceExampleClient extends AbstractActor {
                 "assembly1"), JComponentType.Assembly));
 
         // Register Typed ActorRef[String] with Location Service
-        AkkaRegistration assemblyRegistration = new AkkaRegistrationFactory().make(assemblyConnection, typedActorRef);
+        AkkaRegistration assemblyRegistration = JAkkaRegistrationFactory.make(assemblyConnection, typedActorRef);
 
 
         assemblyRegResult = locationService.register(assemblyRegistration).get();
         //#Components-Connections-Registrations
+
+        //#Components-Connections-Registrations-With-Metadata
+
+        // dummy http connection
+        HttpConnection httpConnectionForService = new HttpConnection(new ComponentId(new Prefix(JSubsystem.CSW,
+                "configuration"), JComponentType.Service));
+
+        // When no network type is provided in httpRegistration, default is JNetworkType.Private
+        HttpRegistration httpRegistrationForService = new HttpRegistration(httpConnectionForService, 8080, "path123", new Metadata(Map.of("key1", "value1")));
+        httpRegResult = locationService.register(httpRegistrationForService).get();
+
+        // usage of metadata
+        Map metadataMap = httpRegResult.location().metadata().jMetadata();
+        //#Components-Connections-Registrations-With-Metadata
     }
 
     private void findAndResolveConnectionsBlocking() throws ExecutionException, InterruptedException {
