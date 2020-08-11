@@ -8,7 +8,6 @@ import akka.japi.Pair;
 import akka.stream.javadsl.Keep;
 import akka.stream.testkit.TestSubscriber;
 import akka.stream.testkit.scaladsl.TestSink;
-import csw.location.api.AkkaRegistrationFactory;
 import csw.location.api.JAkkaRegistrationFactory;
 import csw.location.api.commons.Constants;
 import csw.location.api.javadsl.*;

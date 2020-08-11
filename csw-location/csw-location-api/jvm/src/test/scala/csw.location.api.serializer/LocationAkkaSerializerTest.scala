@@ -6,6 +6,7 @@ import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
 import akka.serialization.SerializationExtension
 import csw.location.api
+import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.models.ComponentType.Assembly
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
@@ -70,12 +71,13 @@ private[location] class LocationAkkaSerializerTest extends AnyFunSuite with Matc
   }
 
   test("should use location serializer for Registration (de)serialization") {
-    val akkaConnection = AkkaConnection(api.models.ComponentId(prefix, Assembly))
-    val httpConnection = HttpConnection(api.models.ComponentId(prefix, Assembly))
-    val tcpConnection  = TcpConnection(api.models.ComponentId(prefix, Assembly))
+    val akkaConnection   = AkkaConnection(api.models.ComponentId(prefix, Assembly))
+    val httpConnection   = HttpConnection(api.models.ComponentId(prefix, Assembly))
+    val tcpConnection    = TcpConnection(api.models.ComponentId(prefix, Assembly))
+    val akkaRegistration = AkkaRegistrationFactory.make(akkaConnection, system.systemActorOf(Behaviors.empty, "test-actor"))
     val testData = Table(
       "Registration models",
-      AkkaRegistration(akkaConnection, system.toURI),
+      akkaRegistration,
       HttpRegistration(httpConnection, 1234, ""),
       TcpRegistration(tcpConnection, 1234)
     )

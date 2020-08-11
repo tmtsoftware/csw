@@ -1,7 +1,8 @@
 package csw.location.server.internal
 
-import java.net.URI
-
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
 import csw.location.api.models._
 import csw.location.server.commons.CswCluster
@@ -11,6 +12,7 @@ import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 
 class LocationServiceImplTest extends AnyFunSuite with Matchers with MockitoSugar {
+  private val system         = ActorSystem(SpawnProtocol(), "test-system")
   private val mockCswCluster = mock[CswCluster]
   private val httpConnection = HttpConnection(ComponentId(Prefix(Subsystem.CSW, "ConfigServer"), ComponentType.Service))
   private val port           = 5003
@@ -34,9 +36,10 @@ class LocationServiceImplTest extends AnyFunSuite with Matchers with MockitoSuga
   }
 
   test("should not use public or private cluster hostname for Akka Registration | CSW-97") {
-    val componentId: ComponentId           = ComponentId(Prefix("tcs.filter.wheel"), ComponentType.HCD)
-    val akkaConnection: AkkaConnection     = AkkaConnection(componentId)
-    val akkaRegistration: AkkaRegistration = AkkaRegistration(akkaConnection, new URI("some-actor-uri"))
+    val componentId: ComponentId       = ComponentId(Prefix("tcs.filter.wheel"), ComponentType.HCD)
+    val akkaConnection: AkkaConnection = AkkaConnection(componentId)
+    val akkaRegistration: AkkaRegistration =
+      AkkaRegistrationFactory.make(akkaConnection, system.systemActorOf(Behaviors.empty, "test-actor"))
 
     when(mockCswCluster.hostname) thenReturn ("some-private-ip")
     when(mockCswCluster.publicHostname) thenReturn ("some-public-ip")

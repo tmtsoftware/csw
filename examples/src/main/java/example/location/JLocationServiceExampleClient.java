@@ -122,7 +122,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         // to Typed ActorRef[Nothing]
 
         akka.actor.typed.ActorRef actorRef = Adapter.toTyped(actorRefUntyped);
-        AkkaRegistration hcdRegistration = new csw.location.api.AkkaRegistrationFactory().make(hcdConnection, actorRef);
+        AkkaRegistration hcdRegistration = JAkkaRegistrationFactory.make(hcdConnection, actorRef);
         hcdRegResult = locationService.register(hcdRegistration).get();
 
         // ************************************************************************************************************

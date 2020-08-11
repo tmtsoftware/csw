@@ -43,10 +43,6 @@ final case class AkkaRegistration private[csw] (
     metadata: Metadata
 ) extends Registration {
 
-  //Used for JAVA API
-  def this(connection: AkkaConnection, actorRefURI: URI) =
-    this(connection, actorRefURI, Metadata.empty)
-
   /**
    * Create a AkkaLocation that represents the live connection offered by the actor
    *
@@ -54,11 +50,6 @@ final case class AkkaRegistration private[csw] (
    * @return an AkkaLocation location representing a live connection at provided hostname
    */
   override def location(hostname: String): Location = AkkaLocation(connection, actorRefURI, metadata)
-}
-
-object AkkaRegistration {
-  def apply(connection: AkkaConnection, actorRefURI: URI): AkkaRegistration =
-    new AkkaRegistration(connection, actorRefURI, Metadata.empty)
 }
 
 /**
