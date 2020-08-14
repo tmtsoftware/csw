@@ -11,7 +11,7 @@ class MetadataTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with
     val agentPrefix = "ESW.agent1"
     val PID         = "1234"
 
-    val metadata = Metadata.withAgent(agentPrefix).withPID(PID)
+    val metadata = Metadata().withAgent(agentPrefix).withPID(PID)
 
     metadata.value should ===(Map("agentPrefix" -> agentPrefix, "PID" -> PID))
   }
@@ -20,7 +20,7 @@ class MetadataTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with
     val value1 = "1234"
     val value2 = "abc"
 
-    val metadata = Metadata.add("customKey1", value1).add("customKey2", value2)
+    val metadata = Metadata().add("customKey1", value1).add("customKey2", value2)
 
     metadata.value should ===(Map("customKey1" -> value1, "customKey2" -> value2))
   }
@@ -28,7 +28,7 @@ class MetadataTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with
   test("should be able to get value from metadata for given key | DEOPSCSW-108") {
     val customKey = "customKey1"
     val value1    = "value1"
-    val metadata  = Metadata.add(customKey, value1)
+    val metadata  = Metadata().add(customKey, value1)
 
     metadata.get(customKey).get should ===(value1)
 
@@ -39,14 +39,14 @@ class MetadataTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with
 
   test("should be able to get value from metadata for agentPrefix key | DEOPSCSW-108") {
     val value1   = "ESW.agent"
-    val metadata = Metadata.withAgent(value1)
+    val metadata = Metadata().withAgent(value1)
 
     metadata.getAgentPrefix.get should ===(value1)
   }
 
   test("should be able to get value from metadata for PID key | DEOPSCSW-108") {
     val value1   = "1234"
-    val metadata = Metadata.withPID(value1)
+    val metadata = Metadata().withPID(value1)
 
     metadata.getPID.get should ===(value1)
   }
@@ -54,7 +54,7 @@ class MetadataTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with
   test("should return None from metadata for invalid keys | DEOPSCSW-108") {
     val customKey = "customKey1"
     val value1    = "value1"
-    val metadata  = Metadata.add(customKey, value1)
+    val metadata  = Metadata().add(customKey, value1)
 
     metadata.get("invalidKey") should ===(None)
     metadata.getAgentPrefix should ===(None)
