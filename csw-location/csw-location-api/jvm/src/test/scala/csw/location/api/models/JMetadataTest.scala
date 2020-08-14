@@ -10,7 +10,7 @@ class JMetadataTest extends AnyFunSuite with Matchers with BeforeAndAfterAll wit
   test("should be able to get value from metadata for given key with Java APIs | DEOPSCSW-108") {
     val customKey = "customKey1"
     val value1    = "value1"
-    val metadata  = Metadata.add(customKey, value1)
+    val metadata  = Metadata().add(customKey, value1)
 
     metadata.jGet(customKey).get() should ===(value1)
 

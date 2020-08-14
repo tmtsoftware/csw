@@ -7,7 +7,6 @@ import csw.location.api.models.Metadata.{AgentPrefixKey, PIDKey}
 
 import scala.jdk.CollectionConverters._
 import scala.jdk.OptionConverters.RichOption
-import scala.language.implicitConversions
 
 /**
  * metadata represents any additional information (metadata) associated with location
@@ -40,5 +39,5 @@ object Metadata {
   private val AgentPrefixKey = "agentPrefix"
   def empty: Metadata        = Metadata(Map.empty)
 
-  implicit def toMetadata(metadata: Metadata.type): Metadata = Metadata.empty
+  def apply(): Metadata = Metadata(Map.empty)
 }
