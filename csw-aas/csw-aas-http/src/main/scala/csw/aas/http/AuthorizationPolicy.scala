@@ -1,8 +1,7 @@
 package csw.aas.http
 
 import csw.aas.core.token.AccessToken
-import csw.aas.http.AuthorizationPolicy.PolicyExpression
-import csw.aas.http.AuthorizationPolicy.PolicyExpression.{And, ExpressionOperator, Or}
+import csw.aas.http.AuthorizationPolicy.{AndPolicy, OrPolicy}
 
 import scala.concurrent.Future
 
@@ -18,9 +17,7 @@ sealed trait AuthorizationPolicy {
    * @param authorizationPolicy new Authorization policy
    * @return combined authorization policy
    */
-  def &(authorizationPolicy: AuthorizationPolicy): AuthorizationPolicy = {
-    PolicyExpression(this, And, authorizationPolicy)
-  }
+  def &(authorizationPolicy: AuthorizationPolicy): AuthorizationPolicy = AndPolicy(this, authorizationPolicy)
 
   /**
    * Applies a new authorization policy if the previous policy fails.
@@ -29,31 +26,13 @@ sealed trait AuthorizationPolicy {
    * @param authorizationPolicy new Authorization policy
    * @return combined authorization policy
    */
-  def |(authorizationPolicy: AuthorizationPolicy): AuthorizationPolicy = {
-    PolicyExpression(this, Or, authorizationPolicy)
-  }
+  def |(authorizationPolicy: AuthorizationPolicy): AuthorizationPolicy = OrPolicy(this, authorizationPolicy)
 }
 
 /**
  * An authorization policy is a way to provide filter incoming HTTP requests based on standard rules.
  */
 object AuthorizationPolicy {
-
-  private[aas] final case class PolicyExpression(
-      left: AuthorizationPolicy,
-      operator: ExpressionOperator,
-      right: AuthorizationPolicy
-  ) extends AuthorizationPolicy
-
-  private[aas] object PolicyExpression {
-    trait ExpressionOperator
-    case object Or extends ExpressionOperator {
-      override def toString: String = "|"
-    }
-    case object And extends ExpressionOperator {
-      override def toString: String = "&"
-    }
-  }
 
   /**
    * This policy filters requests based on client specific roles
@@ -97,4 +76,7 @@ object AuthorizationPolicy {
    * Use this when you only need authentication but not authorization
    */
   case object EmptyPolicy extends AuthorizationPolicy
+
+  final case class AndPolicy(left: AuthorizationPolicy, right: AuthorizationPolicy) extends AuthorizationPolicy
+  final case class OrPolicy(left: AuthorizationPolicy, right: AuthorizationPolicy)  extends AuthorizationPolicy
 }

@@ -7,30 +7,29 @@ import akka.http.scaladsl.server.directives.Credentials.Provided
 import akka.http.scaladsl.server.{Directives, Route}
 import akka.http.scaladsl.testkit._
 import csw.aas.core.token.AccessToken
-import csw.aas.http.AuthorizationPolicy.PolicyExpression.{And, ExpressionOperator, Or}
 import csw.aas.http.AuthorizationPolicy.{ClientRolePolicy, CustomPolicy, RealmRolePolicy}
 import org.mockito.MockitoSugar
-
-import scala.concurrent.Future
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
+
+import scala.concurrent.Future
 
 //DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
 class PolicyExpressionTest extends AnyFunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
-  case class TestCase(left: Boolean, operator: ExpressionOperator, right: Boolean, expectedOutcome: Boolean)
+  case class TestCase(left: Boolean, operator: String, right: Boolean, expectedOutcome: Boolean)
 
   val testCases = List(
     //AND truth table
-    TestCase(true, And, true, true),
-    TestCase(true, And, false, false),
-    TestCase(false, And, true, false),
-    TestCase(false, And, false, false),
+    TestCase(true, "And", true, true),
+    TestCase(true, "And", false, false),
+    TestCase(false, "And", true, false),
+    TestCase(false, "And", false, false),
     //OR truth table
-    TestCase(true, Or, true, true),
-    TestCase(true, Or, false, true),
-    TestCase(false, Or, true, true),
-    TestCase(false, Or, false, false)
+    TestCase(true, "Or", true, true),
+    TestCase(true, "Or", false, true),
+    TestCase(false, "Or", true, true),
+    TestCase(false, "Or", false, false)
   )
 
   testCases.foreach(testCase => {
@@ -54,8 +53,8 @@ class PolicyExpressionTest extends AnyFunSuite with MockitoSugar with Directives
       when(authentication.authenticator).thenReturn(authenticator)
 
       val policyExpression = operator match {
-        case And => RealmRolePolicy("admin") & CustomPolicy(_.clientId.isDefined)
-        case Or  => RealmRolePolicy("admin") | CustomPolicy(_.clientId.isDefined)
+        case "And" => RealmRolePolicy("admin") & CustomPolicy(_.clientId.isDefined)
+        case "Or"  => RealmRolePolicy("admin") | CustomPolicy(_.clientId.isDefined)
       }
 
       val route: Route = securityDirectives.authenticate { implicit at =>
