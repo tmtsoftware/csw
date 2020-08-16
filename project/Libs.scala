@@ -30,7 +30,7 @@ object Libs {
   val `reactor-core`      = "io.projectreactor"        % "reactor-core"      % "3.3.8.RELEASE"
   val `reactive-streams`  = "org.reactivestreams"      % "reactive-streams"  % "1.0.3"
   val `akka-stream-kafka` = "com.typesafe.akka"       %% "akka-stream-kafka" % "2.0.4"
-  val `embedded-kafka`    = "io.github.embeddedkafka" %% "embedded-kafka"    % "2.5.0"
+  val `embedded-kafka`    = "io.github.embeddedkafka" %% "embedded-kafka"    % "2.5.1"
   val `embedded-redis`    = "com.github.kstyrc"        % "embedded-redis"    % "0.6"
   val `scala-compiler`    = "org.scala-lang"           % "scala-compiler"    % ScalaVersion
   val `HdrHistogram`      = "org.hdrhistogram"         % "HdrHistogram"      % "2.1.12"
