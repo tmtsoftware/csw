@@ -27,7 +27,7 @@ import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 import scala.util.Random
 
-class LocationHttpHandlerAuthTest
+class LocationHttpHandlerTest
     extends AnyFunSuite
     with ScalatestRouteTest
     with Matchers
