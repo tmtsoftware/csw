@@ -241,7 +241,7 @@ lazy val `csw-config-models` = crossProject(JSPlatform, JVMPlatform)
 lazy val `csw-config-api` = project
   .in(file("csw-config/csw-config-api"))
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
-  .dependsOn(`csw-logging-api`, `csw-config-models`.jvm)
+  .dependsOn(`csw-logging-api`, `csw-config-models`.jvm, `csw-commons`         % "test->test")
   .settings(
     libraryDependencies ++= Dependencies.ConfigApi.value
   )
@@ -499,7 +499,8 @@ lazy val `csw-alarm-cli` = project
     `csw-config-client`,
     `csw-location-client`,
     `csw-location-server` % "test->test",
-    `csw-config-server`   % "test->test"
+    `csw-config-server`   % "test->test",
+    `csw-commons`         % "test->test"
   )
   .enablePlugins(DeployApp, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.AlarmCli.value)
@@ -565,6 +566,7 @@ lazy val `csw-testkit` = project
 lazy val `csw-database` = project
   .dependsOn(
     `csw-location-api`.jvm,
+    `csw-commons`         % "test->test",
     `csw-location-server` % "test->compile;test->test"
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
@@ -693,7 +695,10 @@ lazy val `csw-aas-core` = project
 
 lazy val `csw-aas-http` = project
   .in(file("csw-aas/csw-aas-http"))
-  .dependsOn(`csw-aas-core`)
+  .dependsOn(
+    `csw-aas-core`,
+    `csw-commons`         % "test->test"
+  )
   .settings(
     libraryDependencies ++= Dependencies.AuthAkkaHttpAdapter.value
   )
