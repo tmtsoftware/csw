@@ -43,12 +43,14 @@ final class FrameworkTestKit private (
 
   lazy val frameworkWiring: FrameworkWiring = FrameworkWiring.make(actorSystem)
   implicit lazy val ec: ExecutionContext    = frameworkWiring.actorRuntime.ec
+  private lazy val locationTestkitWithAuth  = LocationTestKit.withAuth(actorSystem.settings.config)
 
   implicit val timeout: Timeout = locationTestKit.timeout
 
-  private var configStarted = false
-  private var eventStarted  = false
-  private var alarmStarted  = false
+  private var configStarted           = false
+  private var eventStarted            = false
+  private var alarmStarted            = false
+  private var locationWithAuthStarted = false
 
   /**
    * Before running tests, use this or [FrameworkTestKit#start] method to start required services
@@ -66,10 +68,11 @@ final class FrameworkTestKit private (
   def start(services: CSWService*): Unit = {
     locationTestKit.startLocationServer()
     services.foreach {
-      case ConfigServer   => configTestKit.startConfigServer(); configStarted = true
-      case EventServer    => eventTestKit.startEventService(); eventStarted = true
-      case AlarmServer    => alarmTestKit.startAlarmService(); alarmStarted = true
-      case LocationServer => // location server is already started above
+      case ConfigServer           => configTestKit.startConfigServer(); configStarted = true
+      case EventServer            => eventTestKit.startEventService(); eventStarted = true
+      case AlarmServer            => alarmTestKit.startAlarmService(); alarmStarted = true
+      case LocationServer         => // location server without auth is already started above
+      case LocationServerWithAuth => locationTestkitWithAuth.startLocationServer(); locationWithAuthStarted = true
     }
   }
 
@@ -102,8 +105,10 @@ final class FrameworkTestKit private (
     if (configStarted) configTestKit.deleteServerFiles(); configTestKit.terminateServer()
     if (eventStarted) eventTestKit.stopRedis()
     if (alarmStarted) alarmTestKit.stopRedis()
+    if (locationWithAuthStarted) locationTestkitWithAuth.shutdownLocationServer()
     TestKitUtils.shutdown(frameworkWiring.actorRuntime.shutdown(), timeout)
     locationTestKit.shutdownLocationServer()
+
   }
 }
 

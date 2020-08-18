@@ -25,8 +25,9 @@ sealed trait CSWService extends Product with Serializable
  * }}}
  */
 object CSWService {
-  case object LocationServer extends CSWService
-  case object ConfigServer   extends CSWService
-  case object EventServer    extends CSWService
-  case object AlarmServer    extends CSWService
+  case object LocationServer         extends CSWService
+  case object LocationServerWithAuth extends CSWService
+  case object ConfigServer           extends CSWService
+  case object EventServer            extends CSWService
+  case object AlarmServer            extends CSWService
 }

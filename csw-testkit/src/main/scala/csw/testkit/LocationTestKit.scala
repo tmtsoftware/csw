@@ -2,8 +2,9 @@ package csw.testkit
 
 import akka.http.scaladsl.Http
 import akka.util.Timeout
-import com.typesafe.config.ConfigFactory
-import csw.location.server.internal.ServerWiring
+import com.typesafe.config.{Config, ConfigFactory}
+import csw.location.server.commons.{ClusterAwareSettings, ClusterSettings}
+import csw.location.server.internal.{ServerWiring, Settings}
 import csw.testkit.internal.TestKitUtils
 
 /**
@@ -21,9 +22,19 @@ import csw.testkit.internal.TestKitUtils
  *
  * }}}
  */
-final class LocationTestKit private (testKitSettings: TestKitSettings) {
+final class LocationTestKit private (testKitSettings: TestKitSettings, enableAuth: Boolean) {
+  private lazy val locationWiring =
+    if (enableAuth) {
+      new ServerWiring(enableAuth) {
+        override lazy val settings: Settings = new Settings(config) {
+          override val clusterPort: Int = testKitSettings.LocationAuthClusterPort
+          override val httpPort: Int    = testKitSettings.LocationAuthHttpPort
+        }
+        override lazy val clusterSettings: ClusterSettings = ClusterAwareSettings.joinLocal(testKitSettings.LocationClusterPort)
+      }
+    }
+    else ServerWiring.make(Some(testKitSettings.LocationClusterPort), Some(testKitSettings.LocationHttpPort), enableAuth = false)
 
-  private lazy val locationWiring = ServerWiring.make(testKitSettings.LocationClusterPort, enableAuth = false)
   import locationWiring.actorRuntime._
 
   implicit lazy val timeout: Timeout = testKitSettings.DefaultTimeout
@@ -57,8 +68,21 @@ object LocationTestKit {
    * When the test has completed you should shutdown the location server
    * with [[LocationTestKit#shutdownLocationServer]].
    */
-  def apply(testKitSettings: TestKitSettings = TestKitSettings(ConfigFactory.load())): LocationTestKit =
-    new LocationTestKit(testKitSettings)
+  def apply(
+      testKitSettings: TestKitSettings = TestKitSettings(ConfigFactory.load()),
+      enableAuth: Boolean = false
+  ): LocationTestKit =
+    new LocationTestKit(testKitSettings, enableAuth)
+
+  /**
+   * Create a LocationTestKit
+   *
+   * When the test has completed you should shutdown the location server
+   * with [[LocationTestKit#shutdownLocationServer]].
+   */
+  def withAuth(config: Config): LocationTestKit = {
+    new LocationTestKit(TestKitSettings(config), true)
+  }
 
   /**
    * Java API for creating LocationTestKit

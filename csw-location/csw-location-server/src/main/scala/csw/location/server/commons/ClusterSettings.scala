@@ -50,7 +50,7 @@ import scala.jdk.CollectionConverters._
  *  - `INTERFACE_NAME` is provide via environment variable and
  *  - the `ClusterSettings` api of providing values should be used for testing purpose only
  */
-private[location] case class ClusterSettings(clusterName: String = Constants.ClusterName, values: Map[String, Any] = Map.empty) {
+private[csw] case class ClusterSettings(clusterName: String = Constants.ClusterName, values: Map[String, Any] = Map.empty) {
   private val log: Logger            = LocationServiceLogger.getLogger
   private val InterfaceNameKey       = NetworkType.Private.envKey
   private val PublicInterfaceNameKey = NetworkType.Public.envKey
