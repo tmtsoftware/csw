@@ -44,8 +44,8 @@ jobs:
 
       - name: Tests
         run: |
-          sbt -DenableCoverage=true -DgenerateStoryReport=true ';set every enableFatalWarnings := true; csw-time/test:test'
-          sbt -DenableCoverage=true -DgenerateStoryReport=true -DdisableTimeTests ';set every enableFatalWarnings := true; test:test'
+          sbt -Dakka.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true ';set every enableFatalWarnings := true; csw-time/test:test'
+          sbt -Dakka.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true -DdisableTimeTests ';set every enableFatalWarnings := true; test:test'
 
       - name: Coverage Report
         run: |
