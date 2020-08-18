@@ -54,7 +54,8 @@ object Dependencies {
       Libs.`jboss-logging`            % Test,
       Libs.`embedded-keycloak`        % Test,
       Libs.netty                      % Test,
-      Akka.`akka-stream-testkit`      % Test
+      Akka.`akka-stream-testkit`      % Test,
+      AkkaHttp.`akka-http-testkit`    % Test
     )
   )
 
