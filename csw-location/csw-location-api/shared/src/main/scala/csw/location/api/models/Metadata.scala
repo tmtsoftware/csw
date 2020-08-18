@@ -17,9 +17,9 @@ import scala.jdk.OptionConverters.RichOption
  */
 case class Metadata(value: Map[String, String]) {
   // Used from java API
-  def this(metadata: java.util.Map[String, String]) = this(metadata.asScala.toMap)
+  def this(value: java.util.Map[String, String]) = this(value.asScala.toMap)
 
-  def jMetadata: util.Map[String, String] = value.asJava
+  def jValue: util.Map[String, String] = value.asJava
 
   def add(key: String, value: String): Metadata = copy(this.value + (key -> value))
 
@@ -31,8 +31,8 @@ case class Metadata(value: Map[String, String]) {
   def getAgentPrefix: Option[Prefix]   = get(AgentPrefixKey).map(Prefix(_))
 
   def jGet(key: String): Optional[String] = get(key).toJava
-  def jGetPid: Optional[Long]             = jGet(PidKey).map(_.toLong)
-  def jGetAgentPrefix: Optional[Prefix]   = jGet(AgentPrefixKey).map(Prefix(_))
+  def jGetPid: Optional[Long]             = getPid.toJava
+  def jGetAgentPrefix: Optional[Prefix]   = getAgentPrefix.toJava
 }
 
 object Metadata {

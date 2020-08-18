@@ -151,7 +151,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         httpRegResult = locationService.register(httpRegistrationForService).get();
 
         // usage of metadata
-        Map metadataMap = httpRegResult.location().metadata().jMetadata();
+        Map metadataMap = httpRegResult.location().metadata().jValue();
         //#Components-Connections-Registrations-With-Metadata
     }
 
