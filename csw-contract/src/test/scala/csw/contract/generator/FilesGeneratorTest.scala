@@ -29,7 +29,7 @@ class FilesGeneratorTest extends AnyFunSuite with Matchers with BeforeAndAfterAl
   test("should generate samples for given services") {
     val uri                                = new URI("some_path")
     val locationService                    = "location-service"
-    val metadata: Metadata                 = Metadata(Map("key1" -> "value"))
+    val metadata: Metadata                 = Metadata().add("key1", "value")
     val componentId: ComponentId           = ComponentId(Prefix("tcs.filter.wheel"), ComponentType.HCD)
     val akkaConnection: AkkaConnection     = AkkaConnection(componentId)
     val httpConnection: HttpConnection     = HttpConnection(componentId)

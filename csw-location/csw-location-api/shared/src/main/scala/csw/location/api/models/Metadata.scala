@@ -3,7 +3,8 @@ package csw.location.api.models
 import java.util
 import java.util.Optional
 
-import csw.location.api.models.Metadata.{AgentPrefixKey, PIDKey}
+import csw.location.api.models.Metadata.{AgentPrefixKey, PidKey}
+import csw.prefix.models.Prefix
 
 import scala.jdk.CollectionConverters._
 import scala.jdk.OptionConverters.RichOption
@@ -20,22 +21,22 @@ case class Metadata(value: Map[String, String]) {
 
   def jMetadata: util.Map[String, String] = value.asJava
 
-  def add(k: String, v: String): Metadata = copy(value + (k -> v))
+  def add(key: String, value: String): Metadata = copy(this.value + (key -> value))
 
-  def withPID(pid: String): Metadata           = add(PIDKey, pid)
-  def withAgent(agentPrefix: String): Metadata = add(AgentPrefixKey, agentPrefix)
+  def withPid(pid: Long): Metadata                   = add(PidKey, pid.toString)
+  def withAgentPrefix(agentPrefix: Prefix): Metadata = add(AgentPrefixKey, agentPrefix.toString)
 
-  def get(k: String): Option[String] = value.get(k)
-  def getPID: Option[String]         = get(PIDKey)
-  def getAgentPrefix: Option[String] = get(AgentPrefixKey)
+  def get(key: String): Option[String] = value.get(key)
+  def getPid: Option[Long]             = get(PidKey).map(_.toLong)
+  def getAgentPrefix: Option[Prefix]   = get(AgentPrefixKey).map(Prefix(_))
 
-  def jGet(k: String): Optional[String] = get(k).toJava
-  def jGetPID: Optional[String]         = jGet(PIDKey)
-  def jGetAgentPrefix: Optional[String] = jGet(AgentPrefixKey)
+  def jGet(key: String): Optional[String] = get(key).toJava
+  def jGetPid: Optional[Long]             = jGet(PidKey).map(_.toLong)
+  def jGetAgentPrefix: Optional[Prefix]   = jGet(AgentPrefixKey).map(Prefix(_))
 }
 
 object Metadata {
-  private val PIDKey         = "PID"
+  private val PidKey         = "PID"
   private val AgentPrefixKey = "agentPrefix"
   def empty: Metadata        = Metadata(Map.empty)
 

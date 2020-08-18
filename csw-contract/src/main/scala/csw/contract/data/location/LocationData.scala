@@ -30,7 +30,7 @@ trait LocationData {
   val tcpConnection: TcpConnection   = TcpConnection(componentId)
   val connectionInfo: ConnectionInfo = ConnectionInfo(prefix, ComponentType.HCD, ConnectionType.AkkaType)
 
-  val metadata: Metadata = Metadata(Map("key1" -> "value"))
+  val metadata: Metadata = Metadata().add("key1", "value")
 
   val akkaRegistration: Registration       = AkkaRegistration(akkaConnection, uriPath, metadata)
   val httpRegistration: Registration       = HttpRegistration(httpConnection, port, pathString)

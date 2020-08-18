@@ -11,7 +11,6 @@ import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.models.ComponentType.Assembly
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.location.api.models._
-import csw.location.api.serializer.LocationAkkaSerializer
 import csw.prefix.models.{Prefix, Subsystem}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.funsuite.AnyFunSuite
@@ -56,8 +55,8 @@ private[location] class LocationAkkaSerializerTest extends AnyFunSuite with Matc
     val tcpConnection  = TcpConnection(api.models.ComponentId(prefix, Assembly))
     val testData = Table(
       "Location models",
-      AkkaLocation(akkaConnection, system.toURI, Metadata(Map("key1" -> "value1", "key2" -> "value2"))),
-      HttpLocation(httpConnection, new URI(""), Metadata(Map("key1" -> "value"))),
+      AkkaLocation(akkaConnection, system.toURI, Metadata().add("key1", "value1").add("key2", "value2")),
+      HttpLocation(httpConnection, new URI(""), Metadata().add("key1", "value")),
       TcpLocation(tcpConnection, new URI(""), Metadata.empty)
     )
 
@@ -93,7 +92,7 @@ private[location] class LocationAkkaSerializerTest extends AnyFunSuite with Matc
 
   test("should use location serializer for TrackingEvent (de)serialization") {
     val akkaConnection = AkkaConnection(api.models.ComponentId(prefix, Assembly))
-    val akkaLocation   = AkkaLocation(akkaConnection, system.toURI, Metadata(Map("key1" -> "value1")))
+    val akkaLocation   = AkkaLocation(akkaConnection, system.toURI, Metadata().add("key1", "value1"))
 
     val testData = Table(
       "TrackingEvent models",
