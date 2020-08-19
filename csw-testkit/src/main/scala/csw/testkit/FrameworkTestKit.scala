@@ -41,9 +41,9 @@ final class FrameworkTestKit private (
     val alarmTestKit: AlarmTestKit
 ) {
 
-  lazy val frameworkWiring: FrameworkWiring = FrameworkWiring.make(actorSystem)
-  implicit lazy val ec: ExecutionContext    = frameworkWiring.actorRuntime.ec
-  private lazy val locationTestkitWithAuth  = LocationTestKit.withAuth(actorSystem.settings.config)
+  lazy val frameworkWiring: FrameworkWiring            = FrameworkWiring.make(actorSystem)
+  implicit lazy val ec: ExecutionContext               = frameworkWiring.actorRuntime.ec
+  private var locationTestkitWithAuth: LocationTestKit = _
 
   implicit val timeout: Timeout = locationTestKit.timeout
 
@@ -68,11 +68,14 @@ final class FrameworkTestKit private (
   def start(services: CSWService*): Unit = {
     locationTestKit.startLocationServer()
     services.foreach {
-      case ConfigServer           => configTestKit.startConfigServer(); configStarted = true
-      case EventServer            => eventTestKit.startEventService(); eventStarted = true
-      case AlarmServer            => alarmTestKit.startAlarmService(); alarmStarted = true
-      case LocationServer         => // location server without auth is already started above
-      case LocationServerWithAuth => locationTestkitWithAuth.startLocationServer(); locationWithAuthStarted = true
+      case ConfigServer   => configTestKit.startConfigServer(); configStarted = true
+      case EventServer    => eventTestKit.startEventService(); eventStarted = true
+      case AlarmServer    => alarmTestKit.startAlarmService(); alarmStarted = true
+      case LocationServer => // location server without auth is already started above
+      case LocationServerWithAuth =>
+        locationTestkitWithAuth = LocationTestKit.withAuth(actorSystem.settings.config)
+        locationTestkitWithAuth.startLocationServer()
+        locationWithAuthStarted = true
     }
   }
 
