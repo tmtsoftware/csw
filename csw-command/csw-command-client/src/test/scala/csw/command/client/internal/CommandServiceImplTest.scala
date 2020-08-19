@@ -15,7 +15,7 @@ import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.prefix.models.Prefix
 import org.mockito.MockitoSugar
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.concurrent.{Eventually, ScalaFutures}
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers
 
@@ -27,8 +27,7 @@ class CommandServiceImplTest
     with Matchers
     with MockitoSugar
     with ScalaFutures
-    with BeforeAndAfterAll
-    with Eventually {
+    with BeforeAndAfterAll {
   private implicit val system: ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), "sequencer-command-system")
   private implicit val timeout: Timeout                           = Timeout(10.seconds)
 
