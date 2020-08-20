@@ -3,12 +3,12 @@ package csw.location.server.http
 import java.net.URI
 
 import akka.Done
-import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.directives.BasicDirectives
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import csw.aas.core.token.AccessToken
 import csw.aas.http.AuthorizationPolicy.RealmRolePolicy
 import csw.aas.http.SecurityDirectives
+import csw.commons.RandomUtils
 import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.messages.LocationHttpMessage
 import csw.location.api.messages.LocationHttpMessage._
@@ -25,7 +25,6 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
-import scala.util.Random
 
 class LocationHttpHandlerTest
     extends AnyFunSuite
@@ -37,13 +36,16 @@ class LocationHttpHandlerTest
     with BeforeAndAfterEach
     with BeforeAndAfterAll {
 
+  private val accessToken        = mock[AccessToken]
+  private val registrationResult = mock[RegistrationResult]
   private val locationService    = mock[LocationService]
   private val securityDirectives = mock[SecurityDirectives]
   private val handler            = new LocationHttpHandler(locationService, securityDirectives)
-  private val route: Route       = new PostRouteFactory[LocationHttpMessage]("post-endpoint", handler).make()
+  private val route              = new PostRouteFactory[LocationHttpMessage]("post-endpoint", handler).make()
 
   override protected def beforeEach(): Unit = {
-    reset(locationService, securityDirectives)
+    reset(locationService, securityDirectives, accessToken, registrationResult)
+    super.beforeEach()
   }
 
   override protected def afterAll(): Unit = {
@@ -51,27 +53,16 @@ class LocationHttpHandlerTest
     system.whenTerminated.futureValue
     super.afterAll()
   }
-  implicit class Narrower(x: LocationHttpMessage) {
-    def narrow: LocationHttpMessage = x
-  }
 
-  def randomFrom[T](values: Iterable[T]): T = values.toList(Random.nextInt(values.size))
-  def randomSubsystem: Subsystem            = randomFrom(Subsystem.values)
-  def randomComponentType: ComponentType    = randomFrom(ComponentType.values)
-  def randomString(size: Int): String       = Random.alphanumeric.take(size).mkString
-
-  private val subsystem     = randomSubsystem
-  private val componentType = randomComponentType
-  private val hostname      = randomString(5)
-  private val prefix        = Prefix(subsystem, randomString(5))
-  private val connection    = AkkaConnection(ComponentId(prefix, componentType))
-  private val registration  = AkkaRegistration(connection, new URI(""), Metadata.empty)
-  private val location      = registration.location(hostname).asInstanceOf[AkkaLocation]
-  private val timeout       = 5.seconds
-  private val locations     = List(location)
-
-  private val accessToken             = mock[AccessToken]
-  private val registrationResult      = mock[RegistrationResult]
+  private val subsystem               = randomSubsystem
+  private val componentType           = randomComponentType
+  private val hostname                = RandomUtils.randomString5()
+  private val prefix                  = Prefix(subsystem, RandomUtils.randomString5())
+  private val connection              = AkkaConnection(ComponentId(prefix, componentType))
+  private val registration            = AkkaRegistration(connection, new URI(""), Metadata.empty)
+  private val location                = registration.location(hostname).asInstanceOf[AkkaLocation]
+  private val timeout                 = 5.seconds
+  private val locations               = List(location)
   private val locationAdminRolePolicy = RealmRolePolicy("location-admin")
   private val accessTokenDirective    = BasicDirectives.extract(_ => accessToken)
 
@@ -139,7 +130,7 @@ class LocationHttpHandlerTest
   }
 
   test("ListByConnectionType must delegate to locationService.list") {
-    val connectionType = randomFrom(ConnectionType.values)
+    val connectionType = RandomUtils.randomFrom(ConnectionType.values)
     when(locationService.list(connectionType)).thenReturn(Future.successful(locations))
 
     Post("/post-endpoint", ListByConnectionType(connectionType).narrow) ~> route ~> check {
@@ -167,4 +158,10 @@ class LocationHttpHandlerTest
     }
   }
 
+  private def randomSubsystem: Subsystem         = RandomUtils.randomFrom(Subsystem.values)
+  private def randomComponentType: ComponentType = RandomUtils.randomFrom(ComponentType.values)
+
+  private implicit class Narrower(x: LocationHttpMessage) {
+    def narrow: LocationHttpMessage = x
+  }
 }

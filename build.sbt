@@ -241,7 +241,7 @@ lazy val `csw-config-models` = crossProject(JSPlatform, JVMPlatform)
 lazy val `csw-config-api` = project
   .in(file("csw-config/csw-config-api"))
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
-  .dependsOn(`csw-logging-api`, `csw-config-models`.jvm, `csw-commons`         % "test->test")
+  .dependsOn(`csw-logging-api`, `csw-config-models`.jvm, `csw-commons` % "test->test")
   .settings(
     libraryDependencies ++= Dependencies.ConfigApi.value
   )
@@ -697,7 +697,7 @@ lazy val `csw-aas-http` = project
   .in(file("csw-aas/csw-aas-http"))
   .dependsOn(
     `csw-aas-core`,
-    `csw-commons`         % "test->test"
+    `csw-commons` % "test->test"
   )
   .settings(
     libraryDependencies ++= Dependencies.AuthAkkaHttpAdapter.value
