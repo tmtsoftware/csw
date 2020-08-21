@@ -2,23 +2,6 @@ import sbt._
 
 object Dependencies {
 
-  val AdminImpl = Def.setting(
-    Seq(
-      Akka.`akka-actor-typed`,
-      Libs.`scalatest`.value % Test
-    )
-  )
-
-  val AdminHandlers = Def.setting(
-    Seq(
-      Akka.`akka-actor-typed`,
-      AkkaHttp.`akka-http`,
-      Libs.`scala-async`,
-      Borer.`borer-compat-akka`,
-      Libs.`scalatest`.value % Test
-    )
-  )
-
   val LocationApi = Def.setting(
     Seq(
       Libs.`enumeratum`.value,

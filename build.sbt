@@ -16,7 +16,6 @@ libraryDependencies in ThisBuild += (Libs.`tmt-test-reporter` % Test)
 lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-prefix`.jvm,
   `csw-prefix`.js,
-  `csw-admin`,
   `csw-location`,
   `csw-config`,
   `csw-logging`,
@@ -55,7 +54,6 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-prefix`.js,
   `csw-command-api`.js,
   `csw-location-api`.js,
-  `csw-admin-api`.js,
   `csw-alarm-models`.js,
   `csw-config-models`.js,
   `csw-network-utils`,
@@ -115,42 +113,6 @@ lazy val `csw-prefix` = crossProject(JSPlatform, JVMPlatform)
   .jsSettings(jsTestArg)
   .settings(fork := false)
   .settings(libraryDependencies ++= Dependencies.Prefix.value)
-
-/* ================= Admin Project ============== */
-
-lazy val `csw-admin` = project
-  .in(file("csw-admin"))
-  .aggregate(
-    `csw-admin-api`.jvm,
-    `csw-admin-api`.js,
-    `csw-admin-impl`
-  )
-
-lazy val `csw-admin-impl` = project
-  .in(file("csw-admin/csw-admin-impl"))
-  .dependsOn(
-    `csw-location-client`,
-    `csw-command-client`,
-    `csw-admin-api`.jvm,
-    `csw-commons`       % "compile->compile;test->test",
-    `csw-framework`     % "test->test",
-    `csw-config-server` % "test->test"
-  )
-  .enablePlugins(DeployApp, MaybeCoverage)
-  .settings(
-    libraryDependencies ++= Dependencies.AdminImpl.value
-  )
-
-lazy val `csw-admin-api` = crossProject(JSPlatform, JVMPlatform)
-  .crossType(CrossType.Pure)
-  .in(file("csw-admin/csw-admin-api"))
-  .dependsOn(`csw-logging-models`, `csw-location-api`)
-  .enablePlugins(PublishBintray)
-  //  the following setting was required by IntelliJ as it can not handle cross-compiled Akka types
-  .jsSettings(SettingKey[Boolean]("ide-skip-project") := true)
-  .jsSettings(jsTestArg)
-  .jvmConfigure(_.enablePlugins(MaybeCoverage, GenJavadocPlugin))
-  .settings(fork := false)
 
 /* ================= Location Service ============== */
 
