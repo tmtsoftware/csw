@@ -2,13 +2,6 @@ import sbt._
 
 object Dependencies {
 
-  val AdminImpl = Def.setting(
-    Seq(
-      Akka.`akka-actor-typed`,
-      Libs.`scalatest`.value % Test
-    )
-  )
-
   val AdminHandlers = Def.setting(
     Seq(
       Akka.`akka-actor-typed`,
