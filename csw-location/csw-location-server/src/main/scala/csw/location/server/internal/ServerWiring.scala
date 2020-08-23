@@ -8,7 +8,6 @@ import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.scaladsl.LocationService
 import csw.location.server.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.location.server.http.{LocationHttpHandler, LocationHttpService, LocationWebsocketHandler}
-import msocket.api.ContentType
 import msocket.impl.RouteFactory
 import msocket.impl.post.PostRouteFactory
 import msocket.impl.ws.WebsocketRouteFactory
@@ -25,8 +24,8 @@ private[csw] class ServerWiring(enableAuth: Boolean) extends LocationServiceCode
 
   lazy val securityDirectives: SecurityDirectives = SecurityDirectives(config, locationService, !enableAuth)
 
-  private lazy val postHandler                           = new LocationHttpHandler(locationService, securityDirectives)
-  private def websocketHandler(contentType: ContentType) = new LocationWebsocketHandler(locationService, contentType)
+  private lazy val postHandler      = new LocationHttpHandler(locationService, securityDirectives)
+  private lazy val websocketHandler = new LocationWebsocketHandler(locationService)
 
   lazy val locationRoutes: Route = RouteFactory.combine(metricsEnabled = false)(
     new PostRouteFactory("post-endpoint", postHandler),
