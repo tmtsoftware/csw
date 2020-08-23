@@ -5,9 +5,9 @@ import java.nio.file.{Files, Paths}
 
 import csw.contract.ResourceFetcher
 import csw.location.api.codec.LocationServiceCodecs
-import csw.location.api.messages.LocationHttpMessage.{Register, Unregister}
-import csw.location.api.messages.LocationWebsocketMessage.Track
-import csw.location.api.messages.{LocationHttpMessage, LocationWebsocketMessage}
+import csw.location.api.messages.LocationRequest.{Register, Unregister}
+import csw.location.api.messages.LocationStreamingRequest.Track
+import csw.location.api.messages.{LocationRequest, LocationStreamingRequest}
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
 import csw.location.api.models._
 import csw.prefix.models.Prefix
@@ -60,11 +60,11 @@ class FilesGeneratorTest extends AnyFunSuite with Matchers with BeforeAndAfterAl
       ModelType(akkaLocation, httpLocation),
       ModelType(locationUpdated)
     )
-    val httpRequests = new RequestSet[LocationHttpMessage] {
+    val httpRequests = new RequestSet[LocationRequest] {
       requestType(akkaRegister, httpRegister)
       requestType(unregister)
     }
-    val webSocketRequests = new RequestSet[LocationWebsocketMessage] {
+    val webSocketRequests = new RequestSet[LocationStreamingRequest] {
       requestType(track)
     }
     val services: Services = Services(

@@ -3,8 +3,8 @@ package csw.command.client.handlers
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import csw.aas.http.SecurityDirectives
 import csw.command.api.codecs.CommandServiceCodecs
-import csw.command.api.messages.CommandServiceHttpMessage
-import csw.command.api.messages.CommandServiceHttpMessage.{Oneway, Query, Submit, Validate}
+import csw.command.api.messages.CommandServiceRequest
+import csw.command.api.messages.CommandServiceRequest.{Oneway, Query, Submit, Validate}
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.handlers.TestHelper.Narrower
 import csw.commons.RandomUtils
@@ -31,8 +31,8 @@ class CommandServiceHttpHandlerTest
 
   private val securityDirective = mock[SecurityDirectives]
   private val commandService    = mock[CommandService]
-  private val handler           = new CommandServiceHttpHandlers(commandService, securityDirective, None)
-  private val route             = new PostRouteFactory[CommandServiceHttpMessage]("post-endpoint", handler).make()
+  private val handler           = new CommandServiceRequestHandler(commandService, securityDirective, None)
+  private val route             = new PostRouteFactory[CommandServiceRequest]("post-endpoint", handler).make()
 
   private val subsystem = randomSubsystem
   private val command   = Setup(Prefix(subsystem, RandomUtils.randomString5()), CommandName(RandomUtils.randomString5()), None)

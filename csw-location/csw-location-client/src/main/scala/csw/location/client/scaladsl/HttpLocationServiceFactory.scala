@@ -3,7 +3,7 @@ package csw.location.client.scaladsl
 import akka.actor.typed.ActorSystem
 import csw.location.api.client.LocationServiceClient
 import csw.location.api.codec.LocationServiceCodecs
-import csw.location.api.messages.{LocationHttpMessage, LocationWebsocketMessage}
+import csw.location.api.messages.{LocationRequest, LocationStreamingRequest}
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.internal.Settings
 import msocket.api.ContentType.Json
@@ -33,10 +33,10 @@ object HttpLocationServiceFactory extends LocationServiceCodecs {
   ): LocationService = {
     val httpUri      = s"http://$serverIp:$port/post-endpoint"
     val websocketUri = s"ws://$serverIp:$port/websocket-endpoint"
-    val httpTransport: Transport[LocationHttpMessage] =
-      new HttpPostTransport[LocationHttpMessage](httpUri, Json, tokenFactory)
-    val websocketTransport: Transport[LocationWebsocketMessage] =
-      new WebsocketTransport[LocationWebsocketMessage](websocketUri, Json)
+    val httpTransport: Transport[LocationRequest] =
+      new HttpPostTransport[LocationRequest](httpUri, Json, tokenFactory)
+    val websocketTransport: Transport[LocationStreamingRequest] =
+      new WebsocketTransport[LocationStreamingRequest](websocketUri, Json)
     new LocationServiceClient(httpTransport, websocketTransport)
   }
 

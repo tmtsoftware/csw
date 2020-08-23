@@ -5,9 +5,9 @@ import akka.stream.scaladsl.Source
 import akka.util.Timeout
 import csw.command.api.StateMatcher
 import csw.command.api.codecs.CommandServiceCodecs
-import csw.command.api.messages.CommandServiceHttpMessage._
-import csw.command.api.messages.CommandServiceWebsocketMessage._
-import csw.command.api.messages.{CommandServiceHttpMessage, CommandServiceWebsocketMessage}
+import csw.command.api.messages.CommandServiceRequest._
+import csw.command.api.messages.CommandServiceStreamingRequest._
+import csw.command.api.messages.{CommandServiceRequest, CommandServiceStreamingRequest}
 import csw.command.api.scaladsl.CommandService
 import csw.command.api.utils.CommandServiceExtension
 import csw.params.commands.CommandResponse._
@@ -19,8 +19,8 @@ import msocket.api.{Subscription, Transport}
 import scala.concurrent.Future
 
 class CommandServiceClient(
-    httpTransport: Transport[CommandServiceHttpMessage],
-    websocketTransport: Transport[CommandServiceWebsocketMessage]
+    httpTransport: Transport[CommandServiceRequest],
+    websocketTransport: Transport[CommandServiceStreamingRequest]
 )(implicit actorSystem: ActorSystem[_])
     extends CommandService
     with CommandServiceCodecs {

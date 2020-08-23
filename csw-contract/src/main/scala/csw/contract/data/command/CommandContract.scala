@@ -1,9 +1,9 @@
 package csw.contract.data.command
 
 import csw.command.api.codecs.CommandServiceCodecs
-import csw.command.api.messages.CommandServiceHttpMessage.{Oneway, Query, Submit, Validate}
-import csw.command.api.messages.CommandServiceWebsocketMessage.{QueryFinal, SubscribeCurrentState}
-import csw.command.api.messages.{CommandServiceHttpMessage, CommandServiceWebsocketMessage}
+import csw.command.api.messages.CommandServiceRequest.{Oneway, Query, Submit, Validate}
+import csw.command.api.messages.CommandServiceStreamingRequest.{QueryFinal, SubscribeCurrentState}
+import csw.command.api.messages.{CommandServiceRequest, CommandServiceStreamingRequest}
 import csw.contract.ResourceFetcher
 import csw.contract.generator.ClassNameHelpers.name
 import csw.contract.generator._
@@ -46,14 +46,14 @@ object CommandContract extends CommandData with CommandServiceCodecs {
     )
   )
 
-  private val httpRequests = new RequestSet[CommandServiceHttpMessage] {
+  private val httpRequests = new RequestSet[CommandServiceRequest] {
     requestType(observeValidate)
     requestType(observeSubmit)
     requestType(setupQuery)
     requestType(observeOneway)
   }
 
-  private val websocketRequests = new RequestSet[CommandServiceWebsocketMessage] {
+  private val websocketRequests = new RequestSet[CommandServiceStreamingRequest] {
     requestType(queryFinal)
     requestType(subscribeState)
   }

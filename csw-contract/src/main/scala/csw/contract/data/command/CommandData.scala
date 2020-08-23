@@ -3,8 +3,8 @@ package csw.contract.data.command
 import java.util.concurrent.TimeUnit
 
 import akka.util.Timeout
-import csw.command.api.messages.CommandServiceHttpMessage.{Oneway, Query, Submit, Validate}
-import csw.command.api.messages.CommandServiceWebsocketMessage.{QueryFinal, SubscribeCurrentState}
+import csw.command.api.messages.CommandServiceRequest.{Oneway, Query, Submit, Validate}
+import csw.command.api.messages.CommandServiceStreamingRequest.{QueryFinal, SubscribeCurrentState}
 import csw.params.commands.CommandIssue._
 import csw.params.commands.CommandResponse._
 import csw.params.commands._

@@ -10,8 +10,8 @@ import csw.aas.http.AuthorizationPolicy.RealmRolePolicy
 import csw.aas.http.SecurityDirectives
 import csw.commons.RandomUtils
 import csw.location.api.codec.LocationServiceCodecs
-import csw.location.api.messages.LocationHttpMessage
-import csw.location.api.messages.LocationHttpMessage._
+import csw.location.api.messages.LocationRequest
+import csw.location.api.messages.LocationRequest._
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models._
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
@@ -26,7 +26,7 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 
-class LocationHttpHandlerTest
+class LocationRequestHandlerTest
     extends AnyFunSuite
     with ScalatestRouteTest
     with Matchers
@@ -40,8 +40,8 @@ class LocationHttpHandlerTest
   private val registrationResult = mock[RegistrationResult]
   private val locationService    = mock[LocationService]
   private val securityDirectives = mock[SecurityDirectives]
-  private val handler            = new LocationHttpHandler(locationService, securityDirectives)
-  private val route              = new PostRouteFactory[LocationHttpMessage]("post-endpoint", handler).make()
+  private val handler            = new LocationRequestHandler(locationService, securityDirectives)
+  private val route              = new PostRouteFactory[LocationRequest]("post-endpoint", handler).make()
 
   override protected def beforeEach(): Unit = {
     reset(locationService, securityDirectives, accessToken, registrationResult)
@@ -161,7 +161,7 @@ class LocationHttpHandlerTest
   private def randomSubsystem: Subsystem         = RandomUtils.randomFrom(Subsystem.values)
   private def randomComponentType: ComponentType = RandomUtils.randomFrom(ComponentType.values)
 
-  private implicit class Narrower(x: LocationHttpMessage) {
-    def narrow: LocationHttpMessage = x
+  private implicit class Narrower(x: LocationRequest) {
+    def narrow: LocationRequest = x
   }
 }

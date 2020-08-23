@@ -5,22 +5,22 @@ import akka.http.scaladsl.server.Route
 import csw.aas.http.AuthorizationPolicy.RealmRolePolicy
 import csw.aas.http.SecurityDirectives
 import csw.location.api.codec.LocationServiceCodecs._
-import csw.location.api.messages.LocationHttpMessage
-import csw.location.api.messages.LocationHttpMessage._
+import csw.location.api.messages.LocationRequest
+import csw.location.api.messages.LocationRequest._
 import csw.location.api.scaladsl.LocationService
 import msocket.impl.post.{HttpPostHandler, ServerHttpCodecs}
 
 import scala.concurrent.ExecutionContext
 
-class LocationHttpHandler(locationService: LocationService, securityDirectives: => SecurityDirectives)(implicit
+class LocationRequestHandler(locationService: LocationService, securityDirectives: => SecurityDirectives)(implicit
     ex: ExecutionContext
-) extends HttpPostHandler[LocationHttpMessage]
+) extends HttpPostHandler[LocationRequest]
     with ServerHttpCodecs {
 
   private lazy val securityDirectivesCached: SecurityDirectives = securityDirectives
   private val AdminRole                                         = "location-admin"
 
-  override def handle(request: LocationHttpMessage): Route =
+  override def handle(request: LocationRequest): Route =
     request match {
       case Register(registration)               => sPost(complete(locationService.register(registration).map(_.location)))
       case Unregister(connection)               => sPost(complete(locationService.unregister(connection)))

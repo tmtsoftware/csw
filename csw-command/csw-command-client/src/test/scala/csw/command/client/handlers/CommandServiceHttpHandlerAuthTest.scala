@@ -7,8 +7,8 @@ import csw.aas.core.token.claims.Access
 import csw.aas.http.AuthorizationPolicy.CustomPolicy
 import csw.aas.http.SecurityDirectives
 import csw.command.api.codecs.CommandServiceCodecs
-import csw.command.api.messages.CommandServiceHttpMessage
-import csw.command.api.messages.CommandServiceHttpMessage.{Oneway, Query, Submit, Validate}
+import csw.command.api.messages.CommandServiceRequest
+import csw.command.api.messages.CommandServiceRequest.{Oneway, Query, Submit, Validate}
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.auth.CommandRoles
 import csw.command.client.handlers.TestHelper.Narrower
@@ -45,8 +45,8 @@ class CommandServiceHttpHandlerAuthTest
   private val securityDirective = mock[SecurityDirectives]
   private val commandService    = mock[CommandService]
   private val accessToken       = mock[AccessToken]
-  private val handler           = new CommandServiceHttpHandlers(commandService, securityDirective, Some(prefix), CommandRoles.empty)
-  private val route             = new PostRouteFactory[CommandServiceHttpMessage]("post-endpoint", handler).make()
+  private val handler           = new CommandServiceRequestHandler(commandService, securityDirective, Some(prefix), CommandRoles.empty)
+  private val route             = new PostRouteFactory[CommandServiceRequest]("post-endpoint", handler).make()
 
   override def beforeEach(): Unit = {
     reset(securityDirective, commandService, accessToken)
@@ -54,7 +54,7 @@ class CommandServiceHttpHandlerAuthTest
   }
 
   private val command = Setup(prefix, CommandName(RandomUtils.randomString5()), None)
-  private val authEnabledRequests = Table[CommandServiceHttpMessage, CommandService => Future[CommandResponse]](
+  private val authEnabledRequests = Table[CommandServiceRequest, CommandService => Future[CommandResponse]](
     ("msg", "action"),
     (Submit(command), _.submit(command)),
     (Validate(command), _.validate(command)),

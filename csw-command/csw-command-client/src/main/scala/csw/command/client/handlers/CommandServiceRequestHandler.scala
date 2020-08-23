@@ -4,23 +4,23 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import csw.aas.http.SecurityDirectives
 import csw.command.api.codecs.CommandServiceCodecs._
-import csw.command.api.messages.CommandServiceHttpMessage
-import csw.command.api.messages.CommandServiceHttpMessage._
+import csw.command.api.messages.CommandServiceRequest
+import csw.command.api.messages.CommandServiceRequest._
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.auth.{CommandPolicy, CommandRoles}
 import csw.params.commands.ControlCommand
 import csw.prefix.models.Prefix
 import msocket.impl.post.{HttpPostHandler, ServerHttpCodecs}
 
-class CommandServiceHttpHandlers(
+class CommandServiceRequestHandler(
     commandService: CommandService,
     securityDirectives: SecurityDirectives,
     destinationPrefix: Option[Prefix] = None,
     commandRoles: CommandRoles = CommandRoles.empty
-) extends HttpPostHandler[CommandServiceHttpMessage]
+) extends HttpPostHandler[CommandServiceRequest]
     with ServerHttpCodecs {
 
-  override def handle(request: CommandServiceHttpMessage): Route =
+  override def handle(request: CommandServiceRequest): Route =
     request match {
       case Validate(controlCommand) => sPost(controlCommand)(complete(commandService.validate(controlCommand)))
       case Submit(controlCommand)   => sPost(controlCommand)(complete(commandService.submit(controlCommand)))

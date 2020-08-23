@@ -1,10 +1,10 @@
 package csw.command.client.handlers
 
-import csw.command.api.messages.CommandServiceHttpMessage
+import csw.command.api.messages.CommandServiceRequest
 
 object TestHelper {
-  implicit class Narrower(x: CommandServiceHttpMessage) {
-    def narrow: CommandServiceHttpMessage = x
+  implicit class Narrower(x: CommandServiceRequest) {
+    def narrow: CommandServiceRequest = x
   }
 
 }

@@ -6,9 +6,9 @@ import csw.contract.generator.ClassNameHelpers._
 import csw.contract.generator._
 import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.exceptions._
-import csw.location.api.messages.LocationHttpMessage._
-import csw.location.api.messages.LocationWebsocketMessage.Track
-import csw.location.api.messages.{LocationHttpMessage, LocationWebsocketMessage}
+import csw.location.api.messages.LocationRequest._
+import csw.location.api.messages.LocationStreamingRequest.Track
+import csw.location.api.messages.{LocationRequest, LocationStreamingRequest}
 import csw.location.api.models._
 import csw.prefix.models.Subsystem
 
@@ -44,7 +44,7 @@ object LocationContract extends LocationData with LocationServiceCodecs {
     Endpoint(name[ListByPrefix], arrayName[Location], List(name[RegistrationListingFailed]))
   )
 
-  private val httpRequests = new RequestSet[LocationHttpMessage] {
+  private val httpRequests = new RequestSet[LocationRequest] {
     requestType(akkaRegister, httpRegister, publicHttpRegister)
     requestType(unregister)
     requestType(unregisterAll)
@@ -61,7 +61,7 @@ object LocationContract extends LocationData with LocationServiceCodecs {
     Endpoint(name[Track], name[TrackingEvent])
   )
 
-  private val websocketRequests = new RequestSet[LocationWebsocketMessage] {
+  private val websocketRequests = new RequestSet[LocationStreamingRequest] {
     requestType(track)
   }
 

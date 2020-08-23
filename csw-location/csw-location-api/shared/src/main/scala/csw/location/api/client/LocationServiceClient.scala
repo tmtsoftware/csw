@@ -4,9 +4,9 @@ import akka.Done
 import akka.actor.typed.ActorSystem
 import akka.stream.scaladsl.Source
 import csw.location.api.codec.LocationServiceCodecs
-import csw.location.api.messages.LocationHttpMessage._
-import csw.location.api.messages.LocationWebsocketMessage.Track
-import csw.location.api.messages.{LocationHttpMessage, LocationWebsocketMessage}
+import csw.location.api.messages.LocationRequest._
+import csw.location.api.messages.LocationStreamingRequest.Track
+import csw.location.api.messages.{LocationRequest, LocationStreamingRequest}
 import csw.location.api.models._
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import msocket.api.codecs.BasicCodecs
@@ -16,8 +16,8 @@ import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 
 class LocationServiceClient(
-    httpTransport: Transport[LocationHttpMessage],
-    websocketTransport: Transport[LocationWebsocketMessage]
+    httpTransport: Transport[LocationRequest],
+    websocketTransport: Transport[LocationStreamingRequest]
 )(implicit actorSystem: ActorSystem[_])
     extends LocationService
     with LocationServiceCodecs
