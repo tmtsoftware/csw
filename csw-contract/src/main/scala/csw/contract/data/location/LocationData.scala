@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit
 import akka.Done
 import csw.location.api.exceptions._
 import csw.location.api.messages.LocationRequest._
-import csw.location.api.messages.LocationStreamingRequest.Track
+import csw.location.api.messages.LocationStreamRequest.Track
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.location.api.models._
 import csw.prefix.models.{Prefix, Subsystem}

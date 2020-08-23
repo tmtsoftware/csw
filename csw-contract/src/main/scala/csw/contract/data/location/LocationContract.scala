@@ -7,8 +7,8 @@ import csw.contract.generator._
 import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.exceptions._
 import csw.location.api.messages.LocationRequest._
-import csw.location.api.messages.LocationStreamingRequest.Track
-import csw.location.api.messages.{LocationRequest, LocationStreamingRequest}
+import csw.location.api.messages.LocationStreamRequest.Track
+import csw.location.api.messages.{LocationRequest, LocationStreamRequest}
 import csw.location.api.models._
 import csw.prefix.models.Subsystem
 
@@ -61,7 +61,7 @@ object LocationContract extends LocationData with LocationServiceCodecs {
     Endpoint(name[Track], name[TrackingEvent])
   )
 
-  private val websocketRequests = new RequestSet[LocationStreamingRequest] {
+  private val websocketRequests = new RequestSet[LocationStreamRequest] {
     requestType(track)
   }
 
