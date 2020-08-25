@@ -10,7 +10,7 @@ import akka.http.scaladsl.server.{Directives, Route}
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import csw.aas.core.commons.AASConnection
 import csw.aas.core.token.AccessToken
-import csw.aas.http.AuthorizationPolicy.{ClientRolePolicy, CustomPolicy, PermissionPolicy, RealmRolePolicy}
+import csw.aas.http.AuthorizationPolicy.{ClientRolePolicy, CustomPolicy, RealmRolePolicy}
 import csw.location.api.models.Connection.HttpConnection
 import csw.location.api.models.{HttpLocation, Metadata}
 import csw.location.api.scaladsl.LocationService
@@ -110,33 +110,6 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
     val route: Route = sPost(RealmRolePolicy("admin")) { _ => complete("OK") }
 
     Post("/").addHeader(validTokenWithRealmRoleHeader) ~> route ~> check {
-      status shouldBe StatusCodes.OK
-    }
-  }
-
-  test("sPut using permission should return 200 OK when token is valid & has permission | DEOPSCSW-579") {
-    val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
-    import securityDirectives._
-
-    val validTokenWithPermissionStr    = "validTokenWithPermissionStr"
-    val validTokenWithPermissionHeader = Authorization(OAuth2BearerToken(validTokenWithPermissionStr))
-
-    val validTokenWithPermission = mock[AccessToken]
-
-    when(validTokenWithPermission.hasPermission("read", "Default Resource"))
-      .thenReturn(true)
-
-    val authenticator: AsyncAuthenticator[AccessToken] = {
-      case Provided(`validTokenWithPermissionStr`) => Future.successful(Some(validTokenWithPermission))
-      case _                                       => Future.successful(None)
-    }
-
-    when(authentication.authenticator).thenReturn(authenticator)
-
-    val route: Route = sPut(PermissionPolicy("read")) { _ => complete("OK") }
-
-    Put("/").addHeader(validTokenWithPermissionHeader) ~> route ~> check {
       status shouldBe StatusCodes.OK
     }
   }

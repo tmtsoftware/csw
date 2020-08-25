@@ -92,12 +92,6 @@ object AuthDocumentation {
       complete("OK")
     }
     // #custom-policy-usage
-
-    // #permission-policy
-    val routeWithPermissions: Route = sDelete(PermissionPolicy("delete", "account")) {
-      complete("OK")
-    }
-    // #permission-policy
   }
 
   object PolicyExpressions {
@@ -106,7 +100,7 @@ object AuthDocumentation {
       sGet(RealmRolePolicy("admin") | CustomPolicy(_.email.contains("super-admin@tmt.org"))) {
         complete("OK")
       } ~
-        sPost(ClientRolePolicy("finance_user") & PermissionPolicy("edit")) {
+        sPost(ClientRolePolicy("finance_user") & ClientRolePolicy("finance_admin")) {
           complete("OK")
         }
     // #policy-expressions

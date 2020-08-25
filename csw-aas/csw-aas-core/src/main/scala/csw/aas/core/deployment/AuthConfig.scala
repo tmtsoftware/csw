@@ -20,14 +20,9 @@ import scala.language.implicitConversions
  */
 class AuthConfig private (config: Config, authServiceLocation: Option[HttpLocation], disabledMaybe: Option[Boolean]) {
 
-  private val enablePermissionsKey = "enable-permissions"
-  private val clientIdKey          = "client-id"
-
-  val permissionsEnabled: Boolean = config.getBooleanOrFalse(enablePermissionsKey)
-  val disabled: Boolean           = disabledMaybe.getOrElse(config.getBooleanOrFalse(disabledKey))
-
-  private val logger = AuthLogger.getLogger
-
+  private val clientIdKey = "client-id"
+  val disabled: Boolean   = disabledMaybe.getOrElse(config.getBooleanOrFalse(disabledKey))
+  private val logger      = AuthLogger.getLogger
   import logger._
 
   /**
@@ -59,7 +54,6 @@ class AuthConfig private (config: Config, authServiceLocation: Option[HttpLocati
   private def convertToDeployment(config: Config): KeycloakDeployment = {
     val clientId = config.getString(clientIdKey)
     val safeConfig = config
-      .withoutPath(enablePermissionsKey)
       .withoutPath(disabledKey)
       .withoutPath(clientIdKey)
       .withValue("resource", ConfigValueFactory.fromAnyRef(clientId))

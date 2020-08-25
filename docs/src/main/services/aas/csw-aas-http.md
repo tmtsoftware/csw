@@ -35,15 +35,11 @@ server on a local machine, you can make use of the csw-services.sh script.
 
 ## Application Configurations
 
-All auth related configurations go inside an `auth-config` block. There are three configurations 
-applicable for an Akka HTTP server application i.e. `realm`, `client-id` & `enable-permissions`. 
+All auth related configurations go inside an `auth-config` block. There are two configurations 
+applicable for an Akka HTTP server application i.e. `realm`, & `client-id`. 
 
 THe `realm` has a default value of `TMT`, if not specified. Ideally all apps in TMT should not have to override
 this, however it might be useful to override this while testing your app.
-
-`enable-permissions` is optional config with a default value of `false`. Typically, roles are used for
-authorization and specific permissions are not needed.  However, if your Akka HTTP server application
-uses permission based authorization policies, this config needs to be set to true.
 
 `client-id` is a mandatory configuration which specifies the client ID of the app as per its registration
 in AAS.
@@ -64,7 +60,6 @@ can be compromised
 ```hocon
 auth-config {
   realm = TMT # DEFAULT
-  enable-permissions = false # DEFAULT
   client-id = demo-cli # REQUIRED
   disabled = false # DEFAULT
 } 
@@ -111,7 +106,6 @@ be applied to protect routes.
 
  - @ref:[ReamRolePolicy](#realmrolepolicy)
  - @ref:[ClientRolePolicy](#clientrolepolicy)
- - @ref:[PermissionPolicy](#permissionpolicy)
  - @ref:[CustomPolicy](#custompolicy)
  - @ref:[CustomPolicyAsync](#custompolicyasync)
  - @ref:[EmptyPolicy](#emptypolicy)
@@ -135,18 +129,6 @@ amrequest if user has been assigned the `accounts-admin` role for the clientId s
 
 Scala
 :   @@snip [Client Role Policy](../../../../../examples/src/main/scala/example/auth/AuthDocumentation.scala) { #client-role-policy-usage }
- 
-
-### PermissionPolicy
-
-This policy filters requests based on permissions. It expects the name of the scope and the name of the resource on which the permission is created 
-in AAS. 
-
-In the following example policy will authorize a request if the user has the appropriate permission associated in AAS which specifies
-the `delete` scope for the `account` resource.
-
-Scala
-:   @@snip [Permission Policy](../../../../../examples/src/main/scala/example/auth/AuthDocumentation.scala) { #permission-policy } 
 
 ### CustomPolicy
 

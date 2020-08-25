@@ -26,8 +26,7 @@ When login method of the adapter is called, then following steps are performed.
 While sending request to server following stops are performed.  
 
 1. Native app retrieves the access token from local store and sends it along with the request. 
-2. Server verifies the token and user permissions. For this verification, server gets `RPT` (requesting party token) from keycloak which have all the information about the user roles and permissions.
-User with right permissions are allowed to perform action otherwise request is rejected with appropriate response code.
+2. Server verifies the token and user permissions. User with right permissions are allowed to perform action otherwise request is rejected with appropriate response code.
 
 # Logout flow
 
