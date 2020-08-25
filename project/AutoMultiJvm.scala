@@ -27,7 +27,7 @@ object AutoMultiJvm extends AutoPlugin {
           val oldStrategy = (assemblyMergeStrategy in assembly in MultiJvm).value
           oldStrategy(x)
       }
-    ) ++ addArtifact(multiJvmArtifact, packageBin in MultiJvm)
+    )
 
   override def projectConfigurations: Seq[Configuration] = List(MultiJvm)
 
