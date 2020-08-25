@@ -9,10 +9,10 @@ import akka.http.scaladsl.testkit._
 import csw.aas.core.token.AccessToken
 import csw.aas.http.AuthorizationPolicy.RealmRolePolicy
 import org.mockito.MockitoSugar
-
-import scala.concurrent.Future
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
+
+import scala.concurrent.Future
 
 //DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
 class RealmRolePolicyTest extends AnyFunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {

@@ -3,7 +3,7 @@ package csw.command.client.auth
 import java.util
 
 import com.typesafe.config.{Config, ConfigValue}
-import csw.aas.core.token.AccessToken
+import csw.aas.http.Roles
 import csw.params.commands.CommandName
 import csw.prefix.models.{Prefix, Subsystem}
 
@@ -21,17 +21,6 @@ object CommandKey {
   def apply(key: String): CommandKey = new CommandKey(key.toLowerCase)
 }
 
-// maps to all the associated roles for the key from command roles config file
-case class Roles private (roles: Set[String]) {
-  def exist(that: Roles): Boolean                     = this.roles.exists(that.roles.contains)
-  def containsUserRole(subsystem: Subsystem): Boolean = roles.contains(subsystem.name.toLowerCase + "-user")
-  def containsAnyRole(subsystem: Subsystem): Boolean  = roles.exists(_.contains(subsystem.name.toLowerCase))
-}
-object Roles {
-  def apply(roles: Set[String]): Roles = new Roles(roles.map(_.toLowerCase))
-  def apply(token: AccessToken): Roles = Roles(token.realm_access.roles)
-}
-
 // maps to command roles config file
 case class CommandRoles private (private[auth] val predefinedRoles: Map[CommandKey, Roles]) {
   def hasAccess(cmdKey: CommandKey, subsystem: Subsystem, rolesFromToken: Roles): Boolean = {
@@ -41,7 +30,7 @@ case class CommandRoles private (private[auth] val predefinedRoles: Map[CommandK
       rolesFromToken.containsUserRole(subsystem)
 
     def hasAccessToPredefinedCommands(allowedRoles: Roles, rolesFromToken: Roles): Boolean = {
-      if (allowedRoles.exist(rolesFromToken)) true
+      if (allowedRoles.intersect(rolesFromToken).nonEmpty) true
       else if (subsystemRoleNotPresentIn(allowedRoles))
         tokenHasSubsystemUserRole
       else false

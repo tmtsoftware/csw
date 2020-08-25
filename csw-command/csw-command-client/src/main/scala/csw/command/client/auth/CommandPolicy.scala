@@ -1,6 +1,7 @@
 package csw.command.client.auth
 
 import csw.aas.http.AuthorizationPolicy.CustomPolicy
+import csw.aas.http.Roles
 import csw.params.commands.ControlCommand
 import csw.prefix.models.Prefix
 

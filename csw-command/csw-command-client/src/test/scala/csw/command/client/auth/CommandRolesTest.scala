@@ -1,6 +1,7 @@
 package csw.command.client.auth
 
 import com.typesafe.config.ConfigFactory
+import csw.aas.http.Roles
 import csw.prefix.models.Subsystem.{IRIS, TCS}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
