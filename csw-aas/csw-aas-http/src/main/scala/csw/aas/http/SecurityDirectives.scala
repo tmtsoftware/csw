@@ -29,10 +29,9 @@ class SecurityDirectives private[csw] (
 ) {
 
   private val logger = AuthLogger.getLogger
-  import logger._
 
   if (disabled)
-    warn(
+    logger.warn(
       "Security directives initialized with auth disabled. " +
         "All un-authorised calls will be granted access"
     )
@@ -118,8 +117,8 @@ class SecurityDirectives private[csw] (
       case CustomPolicy(predicate) =>
         keycloakAuthorize {
           val result = predicate(accessToken)
-          if (!result) debug(s"'${accessToken.userOrClientName}' failed custom policy authorization")
-          else debug(s"authorization succeeded for '${accessToken.userOrClientName}' via a custom policy")
+          if (!result) logger.debug(s"'${accessToken.userOrClientName}' failed custom policy authorization")
+          else logger.debug(s"authorization succeeded for '${accessToken.userOrClientName}' via a custom policy")
           result
         }
       case CustomPolicyAsync(predicate) =>
@@ -128,13 +127,13 @@ class SecurityDirectives private[csw] (
           result.onComplete {
             case Success(authorized) =>
               if (authorized) {
-                debug(s"authorization succeeded for '${accessToken.userOrClientName}' via a custom policy")
+                logger.debug(s"authorization succeeded for '${accessToken.userOrClientName}' via a custom policy")
               }
               else {
-                warn(s"'${accessToken.userOrClientName}' failed custom policy authorization")
+                logger.warn(s"'${accessToken.userOrClientName}' failed custom policy authorization")
               }
             case Failure(exception) =>
-              error(s"error while executing async custom policy for ${accessToken.userOrClientName}", ex = exception)
+              logger.error(s"error while executing async custom policy for ${accessToken.userOrClientName}", ex = exception)
           }
           result
         }

@@ -56,7 +56,6 @@ case class AccessToken(
 ) {
 
   private val logger = AuthLogger.getLogger
-  import logger._
 
   /**
    * Checks whether this access token has given permission or not
@@ -66,8 +65,8 @@ case class AccessToken(
    */
   def hasPermission(scope: String, resource: String = "Default Resource"): Boolean = {
     val result = this.authorization.permissions.exists(p => p.rsname == resource && p.scopes.contains(scope))
-    if (!result) debug(s"'$userOrClientName' doesn't have permission '$scope' for resource '$resource'")
-    else debug(s"authorization granted for user '$userOrClientName' via permission '$scope' and resource '$resource'")
+    if (!result) logger.debug(s"'$userOrClientName' doesn't have permission '$scope' for resource '$resource'")
+    else logger.debug(s"authorization granted for user '$userOrClientName' via permission '$scope' and resource '$resource'")
     result
   }
 
@@ -79,8 +78,8 @@ case class AccessToken(
    */
   def hasClientRole(role: String, clientName: String): Boolean = {
     val result = this.resource_access.get(clientName).exists(_.roles.contains(role))
-    if (!result) debug(s"'$userOrClientName' doesn't have client role '$role' for client '$clientName'")
-    else debug(s"authorization granted for user '$userOrClientName' via client role '$role' and client '$clientName'")
+    if (!result) logger.debug(s"'$userOrClientName' doesn't have client role '$role' for client '$clientName'")
+    else logger.debug(s"authorization granted for user '$userOrClientName' via client role '$role' and client '$clientName'")
     result
   }
 
@@ -91,8 +90,8 @@ case class AccessToken(
    */
   def hasRealmRole(role: String): Boolean = {
     val result = this.realm_access.roles.contains(role)
-    if (!result) debug(s"'$userOrClientName' doesn't have realm role '$role'")
-    else debug(s"authorization granted for user '$userOrClientName' via realm role '$role'")
+    if (!result) logger.debug(s"'$userOrClientName' doesn't have realm role '$role'")
+    else logger.debug(s"authorization granted for user '$userOrClientName' via realm role '$role'")
     result
   }
 

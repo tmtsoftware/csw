@@ -13,7 +13,6 @@ import scala.concurrent.{ExecutionContext, Future}
 private[csw] class Authentication(tokenFactory: TokenFactory)(implicit ec: ExecutionContext) {
 
   private val logger = AuthLogger.getLogger
-  import logger._
 
   /**
    * Returns an instance of AsyncAuthenticator
@@ -22,12 +21,12 @@ private[csw] class Authentication(tokenFactory: TokenFactory)(implicit ec: Execu
   def authenticator: AsyncAuthenticator[AccessToken] = {
     case Provided(token) =>
       tokenFactory.makeToken(token).map { eitherAT =>
-        eitherAT.foreach(at => debug(s"authentication successful for ${at.userOrClientName}"))
+        eitherAT.foreach(at => logger.debug(s"authentication successful for ${at.userOrClientName}"))
         eitherAT.toOption
       }
 
     case _ =>
-      warn("authorization information is missing from request. authentication failed")
+      logger.warn("authorization information is missing from request. authentication failed")
       Future.successful(None)
   }
 }

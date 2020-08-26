@@ -23,7 +23,6 @@ class AuthConfig private (config: Config, authServiceLocation: Option[HttpLocati
   private val clientIdKey = "client-id"
   val disabled: Boolean   = disabledMaybe.getOrElse(config.getBooleanOrFalse(disabledKey))
   private val logger      = AuthLogger.getLogger
-  import logger._
 
   /**
    * Creates an instance of KeycloakDeployment using app config.
@@ -35,7 +34,7 @@ class AuthConfig private (config: Config, authServiceLocation: Option[HttpLocati
   private[csw] def getDeployment: KeycloakDeployment =
     authServiceLocation match {
       case None if disabled =>
-        debug("creating keycloak deployment for disabled configuration")
+        logger.debug("creating keycloak deployment for disabled configuration")
         val configForDisabledAuth =
           config
             .withValue("auth-server-url", ConfigValueFactory.fromAnyRef("http://disabled-auth-service"))
@@ -43,10 +42,10 @@ class AuthConfig private (config: Config, authServiceLocation: Option[HttpLocati
 
         convertToDeployment(configForDisabledAuth)
       case None =>
-        debug("creating keycloak deployment with pre-configured keycloak location")
+        logger.debug("creating keycloak deployment with pre-configured keycloak location")
         convertToDeployment(config)
       case Some(location) =>
-        debug("creating keycloak deployment with keycloak location from location service")
+        logger.debug("creating keycloak deployment with keycloak location from location service")
         val configWithResolvedAuthUrl = config.withValue("auth-server-url", ConfigValueFactory.fromAnyRef(location.uri.toString))
         convertToDeployment(configWithResolvedAuthUrl)
     }
@@ -58,16 +57,16 @@ class AuthConfig private (config: Config, authServiceLocation: Option[HttpLocati
       .withoutPath(clientIdKey)
       .withValue("resource", ConfigValueFactory.fromAnyRef(clientId))
 
-    debug("converting auth config to json")
+    logger.debug("converting auth config to json")
 
     val configJSON: String = safeConfig.root().render(ConfigRenderOptions.concise())
 
     val inputStream: InputStream = new ByteArrayInputStream(configJSON.getBytes())
 
-    debug("initializing keycloak deployment instance from config")
+    logger.debug("initializing keycloak deployment instance from config")
     val deployment: KeycloakDeployment = KeycloakDeploymentBuilder.build(inputStream)
 
-    info("keycloak deployment created successfully with keycloak configurations")
+    logger.info("keycloak deployment created successfully with keycloak configurations")
     deployment
   }
 }
@@ -75,7 +74,6 @@ class AuthConfig private (config: Config, authServiceLocation: Option[HttpLocati
 object AuthConfig {
 
   private val logger = AuthLogger.getLogger
-  import logger._
 
   private[csw] val authConfigKey = "auth-config"
   private[csw] val disabledKey   = "disabled"
@@ -93,7 +91,7 @@ object AuthConfig {
       authServerLocation: Option[HttpLocation] = None,
       disabledMaybe: Option[Boolean] = None
   ): AuthConfig = {
-    debug("loading auth config")
+    logger.debug("loading auth config")
     new AuthConfig(config.getConfig(authConfigKey), authServerLocation, disabledMaybe)
   }
 
