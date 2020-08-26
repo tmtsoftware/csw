@@ -7,7 +7,7 @@ import akka.http.scaladsl.server.directives.Credentials.Provided
 import akka.http.scaladsl.server.{Directives, Route}
 import akka.http.scaladsl.testkit._
 import csw.aas.core.token.AccessToken
-import csw.aas.http.AuthorizationPolicy.{ClientRolePolicy, CustomPolicy, RealmRolePolicy}
+import csw.aas.http.AuthorizationPolicy.{CustomPolicy, RealmRolePolicy}
 import org.mockito.MockitoSugar
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
@@ -36,7 +36,7 @@ class PolicyExpressionTest extends AnyFunSuite with MockitoSugar with Directives
     import testCase._
     test(s"$left $operator $right = $expectedOutcome") {
       val authentication: Authentication = mock[Authentication]
-      val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
+      val securityDirectives             = new SecurityDirectives(authentication, "TMT", false)
 
       val tokenStr = "token"
       val token    = mock[AccessToken]
@@ -76,7 +76,7 @@ class PolicyExpressionTest extends AnyFunSuite with MockitoSugar with Directives
 
   test("policy expression should return AuthenticationFailedRejection when token is invalid | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", false)
 
     val tokenStr    = "token"
     val tokenHeader = Authorization(OAuth2BearerToken(tokenStr))
@@ -87,7 +87,7 @@ class PolicyExpressionTest extends AnyFunSuite with MockitoSugar with Directives
 
     val route: Route = securityDirectives.authenticate { implicit at =>
       get {
-        securityDirectives.authorize(RealmRolePolicy("admin") | ClientRolePolicy("admin"), at) {
+        securityDirectives.authorize(RealmRolePolicy("admin") | RealmRolePolicy("eng"), at) {
           complete("OK")
         }
       }
@@ -100,7 +100,7 @@ class PolicyExpressionTest extends AnyFunSuite with MockitoSugar with Directives
 
   test("policy expression policy should return AuthenticationFailedRejection when token is not present | DEOPSCSW-579") {
     val authentication: Authentication                 = mock[Authentication]
-    val securityDirectives                             = new SecurityDirectives(authentication, "TMT", "test", false)
+    val securityDirectives                             = new SecurityDirectives(authentication, "TMT", false)
     val authenticator: AsyncAuthenticator[AccessToken] = _ => Future.successful(None)
 
     when(authentication.authenticator).thenReturn(authenticator)
@@ -120,7 +120,7 @@ class PolicyExpressionTest extends AnyFunSuite with MockitoSugar with Directives
 
   test("policy expression policy should return AuthorizationFailedRejection when expression resolves to false | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", false)
 
     val tokenStr = "token"
     val token    = mock[AccessToken]
@@ -151,7 +151,7 @@ class PolicyExpressionTest extends AnyFunSuite with MockitoSugar with Directives
 
   test("policy expression policy should return 200 OK when token is valid & policy expression resolves to true | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", false)
     val tokenStr                       = "token"
     val token                          = mock[AccessToken]
     val header                         = Authorization(OAuth2BearerToken(tokenStr))
@@ -159,7 +159,8 @@ class PolicyExpressionTest extends AnyFunSuite with MockitoSugar with Directives
     when(token.hasRealmRole("admin"))
       .thenReturn(true)
 
-    when(token.hasClientRole("admin", "test")).thenReturn(false)
+    when(token.hasRealmRole("eng"))
+      .thenReturn(true)
 
     val authenticator: AsyncAuthenticator[AccessToken] = {
       case Provided(`tokenStr`) => Future.successful(Some(token))
@@ -170,7 +171,7 @@ class PolicyExpressionTest extends AnyFunSuite with MockitoSugar with Directives
 
     val route: Route = securityDirectives.authenticate { implicit at =>
       get {
-        securityDirectives.authorize(ClientRolePolicy("admin") | RealmRolePolicy("admin"), at) {
+        securityDirectives.authorize(RealmRolePolicy("eng") | RealmRolePolicy("admin"), at) {
           complete("OK")
         }
       }
