@@ -37,7 +37,7 @@ involves checking access to secure api against roles information present in acce
  
 Following diagrams shows request flow for secure akka http server.
 
-![aas-http-flow.png](akka-http-workflow.png) 
+![akka-http-workflow.png](akka-http-workflow.png) 
 
 
 
