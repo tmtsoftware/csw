@@ -7,7 +7,7 @@ import csw.aas.http.SecurityDirectives
 import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.scaladsl.LocationService
 import csw.location.server.commons.{ClusterAwareSettings, ClusterSettings}
-import csw.location.server.http.{LocationRequestHandler, LocationHttpService, LocationStreamRequestHandler}
+import csw.location.server.http.{LocationHttpService, LocationRequestHandler, LocationStreamRequestHandler}
 import msocket.impl.RouteFactory
 import msocket.impl.post.PostRouteFactory
 import msocket.impl.ws.WebsocketRouteFactory
@@ -22,7 +22,7 @@ private[csw] class ServerWiring(enableAuth: Boolean) extends LocationServiceCode
   import actorSystem.executionContext
   lazy val locationService: LocationService = LocationServiceFactory.make(clusterSettings)
 
-  lazy val securityDirectives: SecurityDirectives = SecurityDirectives(config, locationService, !enableAuth)
+  lazy val securityDirectives: SecurityDirectives = SecurityDirectives(config, locationService, enableAuth)
 
   private lazy val postHandler      = new LocationRequestHandler(locationService, securityDirectives)
   private lazy val websocketHandler = new LocationStreamRequestHandler(locationService)

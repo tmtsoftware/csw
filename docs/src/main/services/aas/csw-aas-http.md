@@ -35,15 +35,11 @@ server on a local machine, you can make use of the csw-services.sh script.
 
 ## Application Configurations
 
-All auth related configurations go inside an `auth-config` block. There are three configurations 
-applicable for an Akka HTTP server application i.e. `realm`, `client-id` & `enable-permissions`. 
+All auth related configurations go inside an `auth-config` block. There are two configurations 
+applicable for an Akka HTTP server application i.e. `realm`, & `client-id`. 
 
 THe `realm` has a default value of `TMT`, if not specified. Ideally all apps in TMT should not have to override
 this, however it might be useful to override this while testing your app.
-
-`enable-permissions` is optional config with a default value of `false`. Typically, roles are used for
-authorization and specific permissions are not needed.  However, if your Akka HTTP server application
-uses permission based authorization policies, this config needs to be set to true.
 
 `client-id` is a mandatory configuration which specifies the client ID of the app as per its registration
 in AAS.
@@ -64,7 +60,6 @@ can be compromised
 ```hocon
 auth-config {
   realm = TMT # DEFAULT
-  enable-permissions = false # DEFAULT
   client-id = demo-cli # REQUIRED
   disabled = false # DEFAULT
 } 
@@ -110,8 +105,6 @@ An authorization policy is a way to provide filtering on incoming HTTP requests 
 be applied to protect routes.
 
  - @ref:[ReamRolePolicy](#realmrolepolicy)
- - @ref:[ClientRolePolicy](#clientrolepolicy)
- - @ref:[PermissionPolicy](#permissionpolicy)
  - @ref:[CustomPolicy](#custompolicy)
  - @ref:[CustomPolicyAsync](#custompolicyasync)
  - @ref:[EmptyPolicy](#emptypolicy)
@@ -125,28 +118,6 @@ In the following example, the policy will authorize a request if the user has be
 
 Scala
 :   @@snip [Realm Role Policy](../../../../../examples/src/main/scala/example/auth/AuthDocumentation.scala) { #realm-role-policy-usage }
- 
-### ClientRolePolicy
-
-Client roles are basically a namespace dedicated to a client. Each client gets its own namespace.
-
-This policy filters requests based on Client Role. In the following example, the policy will authorize 
-amrequest if user has been assigned the `accounts-admin` role for the clientId specified in the configuration.
-
-Scala
-:   @@snip [Client Role Policy](../../../../../examples/src/main/scala/example/auth/AuthDocumentation.scala) { #client-role-policy-usage }
- 
-
-### PermissionPolicy
-
-This policy filters requests based on permissions. It expects the name of the scope and the name of the resource on which the permission is created 
-in AAS. 
-
-In the following example policy will authorize a request if the user has the appropriate permission associated in AAS which specifies
-the `delete` scope for the `account` resource.
-
-Scala
-:   @@snip [Permission Policy](../../../../../examples/src/main/scala/example/auth/AuthDocumentation.scala) { #permission-policy } 
 
 ### CustomPolicy
 
@@ -200,7 +171,7 @@ A handle of the access token type is given to all secure routes. It is optional 
 For example:
 
 Scala
-:   @@snip [Empty Policy](../../../../../examples/src/main/scala/example/auth/AuthDocumentation.scala) { #access-token-handle-demo }
+:   @@snip [Access Token Handle Demo](../../../../../examples/src/main/scala/example/auth/AuthDocumentation.scala) { #access-token-handle-demo }
 
 Both of the above approaches compile and are valid. The access token holds basic information about the user 
 or the client who has made the request.
@@ -217,7 +188,7 @@ So far, we have seen that security directives can accept an authorization policy
 multiple authorization policies. This could be useful to express complex authorization logic. For example:
 
 Scala
-:   @@snip [Empty Policy](../../../../../examples/src/main/scala/example/auth/AuthDocumentation.scala) { #policy-expressions }
+:   @@snip [Policy Expressions](../../../../../examples/src/main/scala/example/auth/AuthDocumentation.scala) { #policy-expressions }
 
 Note the `|` , `&` operators which help compose an expression. A Policy expression could be more complex than this
 and can contain braces to group more expressions. For example:
@@ -235,12 +206,12 @@ directives](https://doc.akka.io/docs/akka-http/current/routing-dsl/directives/cu
 With the help of directive labeling you could write a route like below:
 
 Scala
-:   @@snip [Empty Policy](../../../../../examples/src/main/scala/example/auth/AuthDocumentation.scala) { #directive-composition-anti-pattern }
+:   @@snip [Directive Composition Anti Pattern](../../../../../examples/src/main/scala/example/auth/AuthDocumentation.scala) { #directive-composition-anti-pattern }
 
 The same can be achieved via @ref:[Policy Expressions](#policy-expressions) as shown below
 
 Scala
-:   @@snip [Empty Policy](../../../../../examples/src/main/scala/example/auth/AuthDocumentation.scala) { #policy-expressions-right-way } 
+:   @@snip [Policy Expressions](../../../../../examples/src/main/scala/example/auth/AuthDocumentation.scala) { #policy-expressions-right-way } 
 
 If you want to combine two directives ***and both of them are CSW security directives***,
 we strongly recommend that you use @ref:[Policy Expressions](#policy-expressions). The reason 

@@ -1,7 +1,7 @@
 package csw.aas.core.deployment
 import java.net.URI
 
-import com.typesafe.config.{ConfigException, ConfigFactory, ConfigValueFactory}
+import com.typesafe.config.{ConfigException, ConfigFactory}
 import csw.location.api.models.Connection.HttpConnection
 import csw.location.api.models.{ComponentId, ComponentType, HttpLocation, Metadata}
 import csw.prefix.models.{Prefix, Subsystem}
@@ -11,46 +11,19 @@ import org.scalatest.matchers.should.Matchers
 import scala.jdk.CollectionConverters._
 
 class AuthConfigTest extends AnyFunSuite with Matchers {
-  test("should create KeycloakDeployment from config") {
+  test("should create KeycloakDeployment with auth disabled when authServiceLocation not passed") {
     val config     = ConfigFactory.load()
-    val authConfig = AuthConfig.create(config)
+    val authConfig = AuthConfig(config, None)
 
     val deployment = authConfig.getDeployment
 
     deployment.getResourceName shouldBe config.getConfig("auth-config").getString("client-id")
     deployment.getRealm shouldBe config.getConfig("auth-config").getString("realm")
-    deployment.getAuthServerBaseUrl shouldBe config.getConfig("auth-config").getString("auth-server-url")
-  }
-
-  test("should not resolve auth service when auth is disabled via config") {
-    val config = ConfigFactory
-      .load()
-      .withValue("auth-config.disabled", ConfigValueFactory.fromAnyRef("true"))
-
-    val authConfig = AuthConfig.create(config)
-
-    val deployment = authConfig.getDeployment
-
-    deployment.getResourceName shouldBe "security-disabled-client"
-    deployment.getRealm shouldBe config.getConfig("auth-config").getString("realm")
     deployment.getAuthServerBaseUrl shouldBe "http://disabled-auth-service"
+    authConfig.disabled shouldBe true
   }
 
-  test("should not resolve auth service when auth is disabled via parameter") {
-    val config = ConfigFactory
-      .load()
-      .withValue("auth-config.disabled", ConfigValueFactory.fromAnyRef("true"))
-
-    val authConfig = AuthConfig.create(config, disabledMaybe = Some(true))
-
-    val deployment = authConfig.getDeployment
-
-    deployment.getResourceName shouldBe "security-disabled-client"
-    deployment.getRealm shouldBe config.getConfig("auth-config").getString("realm")
-    deployment.getAuthServerBaseUrl shouldBe "http://disabled-auth-service"
-  }
-
-  test("should create KeycloakDeployment from config and auth server url from location service") {
+  test("should create KeycloakDeployment with auth enabled when authServiceLocation passed") {
     val config        = ConfigFactory.load()
     val authServerUrl = "http://somehost:someport"
     val httpLocation = HttpLocation(
@@ -58,20 +31,22 @@ class AuthConfigTest extends AnyFunSuite with Matchers {
       new URI(authServerUrl),
       Metadata.empty
     )
-    val authConfig = AuthConfig.create(config, authServerLocation = Some(httpLocation))
+    val authConfig = AuthConfig(config, authServiceLocation = Some(httpLocation))
 
     val deployment = authConfig.getDeployment
 
     deployment.getResourceName shouldBe config.getConfig("auth-config").getString("client-id")
     deployment.getRealm shouldBe config.getConfig("auth-config").getString("realm")
     deployment.getAuthServerBaseUrl shouldBe authServerUrl
+    authConfig.disabled shouldBe false
+
   }
 
   test("should throw exception if client-id is not present in config") {
     val map: Map[String, String] = Map("auth-config.realm" -> "test")
     val config                   = ConfigFactory.parseMap(map.asJava)
 
-    val authConfig = AuthConfig.create(config)
+    val authConfig = AuthConfig(config, None)
 
     intercept[ConfigException.Missing] {
       authConfig.getDeployment

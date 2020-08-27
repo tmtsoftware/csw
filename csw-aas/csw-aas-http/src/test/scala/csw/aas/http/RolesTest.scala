@@ -7,8 +7,6 @@ import org.scalatest.matchers.should.Matchers
 
 class RolesTest extends AnyFunSuite with Matchers {
 
-  //  def exist(that: Roles): Boolean                     = this.roles.exists(that.roles.contains)
-
   test("containsUserRole should give true if user role for given subsystem is present") {
     val subsystem = RandomUtils.randomFrom(Subsystem.values)
     val roles     = Roles(Set(s"$subsystem-user"))

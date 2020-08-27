@@ -1,6 +1,6 @@
 package csw.aas.core.deployment
 
-import csw.aas.core.commons.{AASConnection, AuthLogger}
+import csw.aas.core.commons.AASConnection
 import csw.location.api.models.{HttpLocation, HttpRegistration, NetworkType}
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 
@@ -15,9 +15,6 @@ import scala.concurrent.{ExecutionContext, Future}
  */
 private[csw] class AuthServiceLocation(locationService: LocationService) {
 
-  private val logger = AuthLogger.getLogger
-  import logger._
-
   /**
    * Use the resolve api of location service to resolve AAS server and wait for provided duration. If the resolving exceeds
    * provided duration, then returning future completes with a RuntimeException that has appropriate message.
@@ -26,21 +23,16 @@ private[csw] class AuthServiceLocation(locationService: LocationService) {
    */
   def resolve(within: FiniteDuration = 5.seconds)(implicit executionContext: ExecutionContext): Future[HttpLocation] =
     async {
-      debug("resolving aas via location service")
       val location = await(locationService.resolve(AASConnection.value, within)).getOrElse {
-        error(s"auth service connection=${AASConnection.value.name} could not be resolved")
         throw AASResolutionFailed(s"auth service connection=${AASConnection.value.name} could not be resolved")
       }
-      debug(s"aas resolved to ${location.uri.toString}")
       location
     }
 
   private[csw] def register(authServicePort: Int): Future[RegistrationResult] = {
-    val authServicePath = "auth"
-    debug(s"registering aas with location service on port: $authServicePort and at path: $authServicePath")
+    val authServicePath    = "auth"
     val httpRegistration   = HttpRegistration(AASConnection.value, authServicePort, authServicePath, NetworkType.Public)
     val registrationResult = locationService.register(httpRegistration)
-    debug("aas registered with location service")
     registrationResult
   }
 }

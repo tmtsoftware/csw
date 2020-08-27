@@ -4,17 +4,17 @@ import csw.aas.core.TokenVerificationFailure.{InvalidToken, TokenExpired}
 import csw.aas.core.deployment.AuthConfig
 import csw.aas.core.token.AccessToken
 import csw.aas.core.token.claims.{Access, Audience, Authorization}
-import csw.aas.core.utils.Conversions.RichEitherTFuture
 import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.exceptions.{TokenNotActiveException, TokenSignatureInvalidException}
 import org.keycloak.representations.{AccessToken => KeycloakAccessToken}
 import org.mockito.MockitoSugar
 import org.scalatest.EitherValues
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.DurationInt
+import scala.concurrent.{Await, Future}
 
 //DEOPSCSW-558: SPIKE: Token containing user info and roles
 //DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
@@ -35,7 +35,7 @@ class TokenVerifierTest extends AnyFunSuite with MockitoSugar with Matchers with
 
     when(keycloakTokenVerifier.verifyToken(token, deployment)).thenReturn(Future.failed(validationException))
 
-    tmtTokenVerifier.verifyAndDecode(token).block().left.value shouldBe InvalidToken(validationExceptionMsg)
+    Await.result(tmtTokenVerifier.verifyAndDecode(token), 5.seconds).left.value shouldBe InvalidToken(validationExceptionMsg)
   }
 
   test("should throw TokenExpired exception while verifying token | DEOPSCSW-558, DEOPSCSW-579") {
@@ -45,7 +45,7 @@ class TokenVerifierTest extends AnyFunSuite with MockitoSugar with Matchers with
 
     when(keycloakTokenVerifier.verifyToken(token, deployment)).thenReturn(Future.failed(tokenExpiredException))
 
-    tmtTokenVerifier.verifyAndDecode(token).block().left.value shouldBe TokenExpired
+    Await.result(tmtTokenVerifier.verifyAndDecode(token), 5.seconds).left.value shouldBe TokenExpired
   }
 
   // DEOPSCSW-578: Programming Interface for accessing userinfo
@@ -72,7 +72,7 @@ class TokenVerifierTest extends AnyFunSuite with MockitoSugar with Matchers with
     )
 
     when(keycloakTokenVerifier.verifyToken(token, deployment)).thenReturn(Future.successful(keycloakAccessToken))
-    tmtTokenVerifier.verifyAndDecode(token).block().toOption.get shouldBe expectedToken
+    Await.result(tmtTokenVerifier.verifyAndDecode(token), 5.seconds).toOption.get shouldBe expectedToken
   }
 
   test("should throw exception while decoding token | DEOPSCSW-558, DEOPSCSW-579") {
@@ -80,6 +80,8 @@ class TokenVerifierTest extends AnyFunSuite with MockitoSugar with Matchers with
     val expectedExceptionMsg = "Expected token [ey.wer.erwe.werw] to be composed of 2 or 3 parts separated by dots."
 
     when(keycloakTokenVerifier.verifyToken(invalidJsonToken, deployment)).thenReturn(Future.successful(keycloakAccessToken))
-    tmtTokenVerifier.verifyAndDecode(invalidJsonToken).block().left.value shouldBe InvalidToken(expectedExceptionMsg)
+    Await.result(tmtTokenVerifier.verifyAndDecode(invalidJsonToken), 5.seconds).left.value shouldBe InvalidToken(
+      expectedExceptionMsg
+    )
   }
 }

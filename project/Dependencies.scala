@@ -412,7 +412,6 @@ object Dependencies {
       Libs.`config`,
       Keycloak.`keycloak-core`,
       Keycloak.`keycloak-adapter-core`,
-      Keycloak.`keycloak-authz`,
       AkkaHttp.`akka-http`,
       Libs.`scala-async`,
       //(legacy dependencies) required*

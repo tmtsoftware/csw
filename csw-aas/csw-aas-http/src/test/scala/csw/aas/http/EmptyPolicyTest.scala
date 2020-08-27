@@ -9,17 +9,17 @@ import akka.http.scaladsl.testkit._
 import csw.aas.core.token.AccessToken
 import csw.aas.http.AuthorizationPolicy.EmptyPolicy
 import org.mockito.MockitoSugar
-
-import scala.concurrent.Future
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
+
+import scala.concurrent.Future
 
 //DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
 class EmptyPolicyTest extends AnyFunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
   test("empty policy should return AuthenticationFailedRejection when token is invalid | DEOPSCSW-579") {
     val authentication: Authentication         = mock[Authentication]
-    val securityDirectives: SecurityDirectives = new SecurityDirectives(authentication, "TMT", "test", false)
+    val securityDirectives: SecurityDirectives = new SecurityDirectives(authentication, "TMT", false)
     //new SecurityDirectives(authentication, authConfig)
 
     val invalidTokenStr    = "invalid"
@@ -47,7 +47,7 @@ class EmptyPolicyTest extends AnyFunSuite with MockitoSugar with Directives with
 
   test("empty policy should return AuthenticationFailedRejection when token is not present | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", false)
 
     val authenticator: AsyncAuthenticator[AccessToken] = _ => Future.successful(None)
 
@@ -66,21 +66,18 @@ class EmptyPolicyTest extends AnyFunSuite with MockitoSugar with Directives with
     }
   }
 
-  test("empty policy should return 200 OK when token is valid & has permission | DEOPSCSW-579") {
+  test("empty policy should return 200 OK when token is valid | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", false)
 
-    val validTokenWithPermissionStr    = "validTokenWithPermissionStr"
-    val validTokenWithPermissionHeader = Authorization(OAuth2BearerToken(validTokenWithPermissionStr))
+    val validTokenStr    = "validTokenStr"
+    val validTokenHeader = Authorization(OAuth2BearerToken(validTokenStr))
 
-    val validTokenWithPermission = mock[AccessToken]
-
-    when(validTokenWithPermission.hasPermission(scope = "read", resource = "Default Resource"))
-      .thenReturn(true)
+    val validToken = mock[AccessToken]
 
     val authenticator: AsyncAuthenticator[AccessToken] = {
-      case Provided(`validTokenWithPermissionStr`) => Future.successful(Some(validTokenWithPermission))
-      case _                                       => Future.successful(None)
+      case Provided(`validTokenStr`) => Future.successful(Some(validToken))
+      case _                         => Future.successful(None)
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
@@ -93,7 +90,7 @@ class EmptyPolicyTest extends AnyFunSuite with MockitoSugar with Directives with
       }
     }
 
-    Get("/").addHeader(validTokenWithPermissionHeader) ~> route ~> check {
+    Get("/").addHeader(validTokenHeader) ~> route ~> check {
       status shouldBe StatusCodes.OK
     }
   }

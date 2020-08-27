@@ -20,7 +20,6 @@ import scala.util.control.NonFatal
 class TokenVerifier private[aas] (keycloakTokenVerifier: KeycloakTokenVerifier, authConfig: AuthConfig) extends AuthCodecs {
 
   private val logger = AuthLogger.getLogger
-  import logger._
 
   private val keycloakDeployment = authConfig.getDeployment
 
@@ -30,10 +29,10 @@ class TokenVerifier private[aas] (keycloakTokenVerifier: KeycloakTokenVerifier, 
       .map(Right(_))
       .recover {
         case _: TokenNotActiveException =>
-          warn(s"token is expired")
+          logger.warn(s"token is expired")
           Left(TokenExpired)
         case ex: VerificationException =>
-          error("token verification failed", ex = ex)
+          logger.error("token verification failed", ex = ex)
           Left(InvalidToken(ex.getMessage))
       }
 
@@ -43,7 +42,7 @@ class TokenVerifier private[aas] (keycloakTokenVerifier: KeycloakTokenVerifier, 
       Json.decode(claim.getBytes()).to[AccessToken].value.copy(value = token)
     }.toEither.left.map {
       case NonFatal(e) =>
-        error("token verification failed", ex = e)
+        logger.error("token verification failed", ex = e)
         InvalidToken(e.getMessage)
     }
 

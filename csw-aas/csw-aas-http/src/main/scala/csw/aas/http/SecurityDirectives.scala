@@ -23,17 +23,15 @@ import scala.util.{Failure, Success}
 class SecurityDirectives private[csw] (
     authentication: Authentication,
     realm: String,
-    resourceName: String,
     disabled: Boolean
 )(implicit
     ec: ExecutionContext
 ) {
 
   private val logger = AuthLogger.getLogger
-  import logger._
 
   if (disabled)
-    warn(
+    logger.warn(
       "Security directives initialized with auth disabled. " +
         "All un-authorised calls will be granted access"
     )
@@ -115,14 +113,12 @@ class SecurityDirectives private[csw] (
 
   private[aas] def authorize(authorizationPolicy: AuthorizationPolicy, accessToken: AccessToken): Directive0 =
     authorizationPolicy match {
-      case ClientRolePolicy(name)           => keycloakAuthorize(accessToken.hasClientRole(name, resourceName))
-      case RealmRolePolicy(name)            => keycloakAuthorize(accessToken.hasRealmRole(name))
-      case PermissionPolicy(name, resource) => keycloakAuthorize(accessToken.hasPermission(name, resource))
+      case RealmRolePolicy(name) => keycloakAuthorize(accessToken.hasRealmRole(name))
       case CustomPolicy(predicate) =>
         keycloakAuthorize {
           val result = predicate(accessToken)
-          if (!result) debug(s"'${accessToken.userOrClientName}' failed custom policy authorization")
-          else debug(s"authorization succeeded for '${accessToken.userOrClientName}' via a custom policy")
+          if (!result) logger.debug(s"'${accessToken.userOrClientName}' failed custom policy authorization")
+          else logger.debug(s"authorization succeeded for '${accessToken.userOrClientName}' via a custom policy")
           result
         }
       case CustomPolicyAsync(predicate) =>
@@ -131,13 +127,13 @@ class SecurityDirectives private[csw] (
           result.onComplete {
             case Success(authorized) =>
               if (authorized) {
-                debug(s"authorization succeeded for '${accessToken.userOrClientName}' via a custom policy")
+                logger.debug(s"authorization succeeded for '${accessToken.userOrClientName}' via a custom policy")
               }
               else {
-                warn(s"'${accessToken.userOrClientName}' failed custom policy authorization")
+                logger.warn(s"'${accessToken.userOrClientName}' failed custom policy authorization")
               }
             case Failure(exception) =>
-              error(s"error while executing async custom policy for ${accessToken.userOrClientName}", ex = exception)
+              logger.error(s"error while executing async custom policy for ${accessToken.userOrClientName}", ex = exception)
           }
           result
         }
@@ -157,55 +153,51 @@ object SecurityDirectives {
 
   /**
    * Creates instance of [[csw.aas.http.SecurityDirectives]] using provided configurations
-   *
-   * Expects auth-server-url to be present in config.
-   *
-   * @param config Config object provided
-   */
-  def apply(config: Config)(implicit ec: ExecutionContext): SecurityDirectives =
-    from(AuthConfig.create(config, None))
-
-  /**
-   * Creates instance of [[csw.aas.http.SecurityDirectives]] using provided configurations
-   * and auth server url using location service
+   * and resolves auth server url using location service
    *
    * @param config Config object provided
    * @param locationService LocationService instance used to resolve auth server url (blocking call)
    */
   def apply(config: Config, locationService: LocationService)(implicit ec: ExecutionContext): SecurityDirectives = {
-    val maybeLocation = if (disabled(config)) None else Some(authLocation(locationService))
-    from(AuthConfig.create(config, maybeLocation))
+    from(AuthConfig(config, mayBeLocation(enableAuthUsing(config), locationService)))
   }
 
   /**
-   * Creates instance of [[csw.aas.http.SecurityDirectives]] using proivided configurations
+   * Creates instance of [[csw.aas.http.SecurityDirectives]] using provided configurations
+   * and resolves auth server url using location service
    *
+   * @param config Config object provided
    * @param locationService LocationService instance used to resolve auth server url (blocking call)
-   * Resolves auth server url using location service (blocking call)
-   * @param disabled if explicitly disabled/enabled, it will ignore `disabled` key from config
+   * @param enableAuth It will ignore `disabled` key from config. This can be used by cli apps which wants to enable/disable auth
+   *                   based on whether they are started with auth enabled or auth disabled rather than relying on config
    */
-  private[csw] def apply(config: Config, locationService: LocationService, disabled: Boolean)(implicit
+  def apply(config: Config, locationService: LocationService, enableAuth: Boolean)(implicit
       ec: ExecutionContext
   ): SecurityDirectives = {
-    val maybeLocation = if (disabled) None else Some(authLocation(locationService))
-    from(AuthConfig.create(config, maybeLocation, Some(disabled)))
+    from(AuthConfig(config, mayBeLocation(enableAuth, locationService)))
   }
 
   /**
    * Creates instance of [[csw.aas.http.SecurityDirectives]] with auth disabled
    */
   def authDisabled(config: Config)(implicit ec: ExecutionContext): SecurityDirectives =
-    from(AuthConfig.create(config = config, authServerLocation = None, disabledMaybe = Some(true)))
+    from(AuthConfig(config, None))
 
   private def from(authConfig: AuthConfig)(implicit ec: ExecutionContext): SecurityDirectives = {
     val keycloakDeployment = authConfig.getDeployment
     val tokenVerifier      = TokenVerifier(authConfig)
-    val authentication     = new Authentication(new TokenFactory(keycloakDeployment, tokenVerifier, authConfig.permissionsEnabled))
-    new SecurityDirectives(authentication, keycloakDeployment.getRealm, keycloakDeployment.getResourceName, authConfig.disabled)
+    val authentication     = new Authentication(new TokenFactory(tokenVerifier))
+    new SecurityDirectives(authentication, keycloakDeployment.getRealm, authConfig.disabled)
   }
 
-  private def disabled(config: Config): Boolean =
-    config.getConfig(AuthConfig.authConfigKey).getBooleanOrFalse(AuthConfig.disabledKey)
+  private def enableAuthUsing(config: Config): Boolean =
+    !config.getConfig(AuthConfig.authConfigKey).getBooleanOrFalse(AuthConfig.disabledKey)
+
+  private def mayBeLocation(enableAuth: Boolean, locationService: LocationService)(implicit
+      ec: ExecutionContext
+  ): Option[HttpLocation] = {
+    if (enableAuth) Some(authLocation(locationService)) else None
+  }
 
   private def authLocation(locationService: LocationService)(implicit ec: ExecutionContext): HttpLocation =
     Await.result(AuthServiceLocation(locationService).resolve(5.seconds), 6.seconds)
