@@ -108,7 +108,6 @@ object Keycloak {
   val `keycloak-adapter-core` = "org.keycloak" % "keycloak-adapter-core"      % Version
   val `keycloak-core`         = "org.keycloak" % "keycloak-core"              % Version
   val `keycloak-installed`    = "org.keycloak" % "keycloak-installed-adapter" % Version
-  val `keycloak-authz`        = "org.keycloak" % "keycloak-authz-client"      % Version
   val `keycloak-test-helper`  = "org.keycloak" % "keycloak-test-helper"       % Version
 }
 

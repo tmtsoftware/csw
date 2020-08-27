@@ -5,9 +5,6 @@ import com.typesafe.config._
 import csw.aas.core.deployment.AuthConfig._
 import csw.location.api.models.HttpLocation
 import org.keycloak.adapters.{KeycloakDeployment, KeycloakDeploymentBuilder}
-import org.keycloak.authorization.client.Configuration
-
-import scala.language.implicitConversions
 
 /**
  * Represents Authorization configuration
@@ -67,14 +64,4 @@ object AuthConfig {
   def apply(config: Config, authServiceLocation: Option[HttpLocation]): AuthConfig = {
     new AuthConfig(config.getConfig(authConfigKey), authServiceLocation)
   }
-
-  private[aas] implicit def deploymentToConfig(deployment: KeycloakDeployment): Configuration =
-    new Configuration(
-      deployment.getAuthServerBaseUrl,
-      deployment.getRealm,
-      deployment.getResourceName,
-      deployment.getResourceCredentials,
-      deployment.getClient
-    )
-
 }
