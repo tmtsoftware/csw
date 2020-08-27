@@ -11,7 +11,7 @@ import csw.aas.core.commons.AuthLogger
 import csw.aas.core.deployment.{AuthConfig, AuthServiceLocation}
 import csw.aas.core.token.{AccessToken, TokenFactory}
 import csw.aas.core.utils.ConfigExt._
-import csw.aas.http.AuthorizationPolicy._
+import csw.aas.http.AuthorizationPolicy.{EmptyPolicy, _}
 import csw.location.api.models.HttpLocation
 import csw.location.api.scaladsl.LocationService
 
@@ -23,6 +23,7 @@ import scala.util.{Failure, Success}
 class SecurityDirectives private[csw] (
     authentication: Authentication,
     realm: String,
+    resourceName: String,
     disabled: Boolean
 )(implicit
     ec: ExecutionContext
@@ -113,7 +114,8 @@ class SecurityDirectives private[csw] (
 
   private[aas] def authorize(authorizationPolicy: AuthorizationPolicy, accessToken: AccessToken): Directive0 =
     authorizationPolicy match {
-      case RealmRolePolicy(name) => keycloakAuthorize(accessToken.hasRealmRole(name))
+      case ClientRolePolicy(name) => keycloakAuthorize(accessToken.hasClientRole(name, resourceName))
+      case RealmRolePolicy(name)  => keycloakAuthorize(accessToken.hasRealmRole(name))
       case CustomPolicy(predicate) =>
         keycloakAuthorize {
           val result = predicate(accessToken)
@@ -137,6 +139,7 @@ class SecurityDirectives private[csw] (
           }
           result
         }
+      case EmptyPolicy            => Directive.Empty
       case AndPolicy(left, right) => authorize(left, accessToken) & authorize(right, accessToken)
       case OrPolicy(left, right)  => authorize(left, accessToken) | authorize(right, accessToken)
     }
@@ -186,7 +189,7 @@ object SecurityDirectives {
     val keycloakDeployment = authConfig.getDeployment
     val tokenVerifier      = TokenVerifier(authConfig)
     val authentication     = new Authentication(new TokenFactory(tokenVerifier))
-    new SecurityDirectives(authentication, keycloakDeployment.getRealm, authConfig.disabled)
+    new SecurityDirectives(authentication, keycloakDeployment.getRealm, keycloakDeployment.getResourceName, authConfig.disabled)
   }
 
   private def enableAuthUsing(config: Config): Boolean =

@@ -40,14 +40,14 @@ object AuthDocumentation {
   }
 
   // #access-token-handle-demo
-  val routeExampleWithToken: Route = sDelete(CustomPolicy(_ => true)) { token =>
+  val routeExampleWithToken: Route = sDelete(EmptyPolicy) { token =>
     parameter("entityId".as[Long]) { entityId =>
       ThirdPartyService.deleteEntity(entityId, token.preferred_username)
       complete(s"user ${token.given_name} ${token.family_name} deleted entity $entityId")
     }
   }
 
-  val routeExampleWithoutToken: Route = sDelete(CustomPolicy(_ => true)) {
+  val routeExampleWithoutToken: Route = sDelete(EmptyPolicy) {
     parameter("entityId".as[Long]) { entityId =>
       ThirdPartyService.deleteEntity(entityId)
       complete(s"entity $entityId deleted")
@@ -66,11 +66,26 @@ object AuthDocumentation {
       }
     // #custom-policy-async
 
+    // #empty-policy-usage
+    val authenticationOnlyRoute: Route = // GET http://[host]:[post]/api
+      path("api") {
+        sGet(EmptyPolicy) {
+          complete("OK")
+        }
+      }
+    // #empty-policy-usage
+
     //#realm-role-policy-usage
     val routeWithRealmRolePolicy: Route = sGet(RealmRolePolicy("admin")) {
       complete("OK")
     }
     //#realm-role-policy-usage
+
+    //#client-role-policy-usage
+    val routeWithClientRolePolicy: Route = sGet(ClientRolePolicy("accounts-admin")) {
+      complete("OK")
+    }
+    //#client-role-policy-usage
 
     // #custom-policy-usage
     val routeWithCustomPolicy: Route = sPost(CustomPolicy(token => token.given_name.contains("test-user"))) {
@@ -85,7 +100,7 @@ object AuthDocumentation {
       sGet(RealmRolePolicy("admin") | CustomPolicy(_.email.contains("super-admin@tmt.org"))) {
         complete("OK")
       } ~
-        sPost(RealmRolePolicy("finance_user") & RealmRolePolicy("finance_admin")) {
+        sPost(ClientRolePolicy("finance_user") & ClientRolePolicy("finance_admin")) {
           complete("OK")
         }
     // #policy-expressions
@@ -93,11 +108,11 @@ object AuthDocumentation {
 
   object DirectiveComposition {
     // #policy-expressions-right-way
-    sGet(RealmRolePolicy("admin") & RealmRolePolicy("sales_admin"))
+    sGet(RealmRolePolicy("admin") & ClientRolePolicy("sales_admin"))
     // #policy-expressions-right-way
 
     // #directive-composition-anti-pattern
-    sGet(RealmRolePolicy("admin")) & sGet(RealmRolePolicy("sales_admin"))
+    sGet(RealmRolePolicy("admin")) & sGet(ClientRolePolicy("sales_admin"))
     // #directive-composition-anti-pattern
   }
 

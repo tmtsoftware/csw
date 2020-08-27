@@ -11,7 +11,7 @@ import akka.http.scaladsl.testkit.ScalatestRouteTest
 import com.typesafe.config.ConfigValueFactory
 import csw.aas.core.commons.AASConnection
 import csw.aas.core.token.AccessToken
-import csw.aas.http.AuthorizationPolicy.{CustomPolicy, RealmRolePolicy}
+import csw.aas.http.AuthorizationPolicy.{ClientRolePolicy, CustomPolicy, RealmRolePolicy}
 import csw.location.api.models.Connection.HttpConnection
 import csw.location.api.models.{HttpLocation, Metadata}
 import csw.location.api.scaladsl.LocationService
@@ -28,7 +28,7 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
 
   test("secure using customPolicy should return 200 OK when policy matches | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", false)
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
     import securityDirectives._
 
     val validTokenWithPolicyMatchStr    = "validTokenWithPolicyMatch"
@@ -54,7 +54,7 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
 
   test("secure using customPolicy should return 200 OK when token not passed and auth is disabled | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", true)
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", true)
     import securityDirectives._
 
     val route: Route = post {
@@ -68,7 +68,7 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
 
   test("sGet using customPolicy should return 200 OK when policy matches | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", false)
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
     import securityDirectives._
 
     val validTokenWithPolicyMatchStr    = "validTokenWithPolicyMatch"
@@ -92,7 +92,7 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
 
   test("sPost using realmRole should return 200 OK when token is valid & has realmRole | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", false)
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
     import securityDirectives._
 
     val validTokenWithRealmRoleStr    = "validTokenWithRealmRoleStr"
@@ -115,15 +115,15 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
     }
   }
 
-  test("sDelete using realmRole should return 200 OK when token is valid & has realmRole | DEOPSCSW-579") {
+  test("sDelete using clientRole should return 200 OK when token is valid & has clientRole | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", false)
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
     import securityDirectives._
 
     val validTokenWithClientRoleStr    = "validTokenWithClientRoleStr"
     val validTokenWithClientRole       = mock[AccessToken]
     val validTokenWithClientRoleHeader = Authorization(OAuth2BearerToken(validTokenWithClientRoleStr))
-    when(validTokenWithClientRole.hasRealmRole("admin"))
+    when(validTokenWithClientRole.hasClientRole("admin", "test"))
       .thenReturn(true)
 
     val authenticator: AsyncAuthenticator[AccessToken] = {
@@ -133,22 +133,22 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = sDelete(RealmRolePolicy("admin")) { _ => complete("OK") }
+    val route: Route = sDelete(ClientRolePolicy("admin")) { _ => complete("OK") }
 
     Delete("/").addHeader(validTokenWithClientRoleHeader) ~> route ~> check {
       status shouldBe StatusCodes.OK
     }
   }
 
-  test("sHead using realmRole should return 200 OK when token is valid & has realmRole | DEOPSCSW-579") {
+  test("sHead using clientRole should return 200 OK when token is valid & has clientRole | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", false)
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
     import securityDirectives._
 
     val validTokenWithClientRoleStr    = "validTokenWithClientRoleStr"
     val validTokenWithClientRole       = mock[AccessToken]
     val validTokenWithClientRoleHeader = Authorization(OAuth2BearerToken(validTokenWithClientRoleStr))
-    when(validTokenWithClientRole.hasRealmRole("admin"))
+    when(validTokenWithClientRole.hasClientRole("admin", "test"))
       .thenReturn(true)
 
     val authenticator: AsyncAuthenticator[AccessToken] = {
@@ -158,7 +158,7 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = sHead(RealmRolePolicy("admin")) { _ => complete("OK") }
+    val route: Route = sHead(ClientRolePolicy("admin")) { _ => complete("OK") }
 
     Head("/").addHeader(validTokenWithClientRoleHeader) ~> route ~> check {
       status shouldBe StatusCodes.OK
@@ -167,7 +167,7 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
 
   test("sPatch using customPolicy should return AuthenticationFailedRejection when token is not present | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", false)
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
     import securityDirectives._
 
     val authenticator: AsyncAuthenticator[AccessToken] = _ => Future.successful(None)

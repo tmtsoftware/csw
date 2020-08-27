@@ -105,8 +105,10 @@ An authorization policy is a way to provide filtering on incoming HTTP requests 
 be applied to protect routes.
 
  - @ref:[ReamRolePolicy](#realmrolepolicy)
+ - @ref:[ClientRolePolicy](#clientrolepolicy)
  - @ref:[CustomPolicy](#custompolicy)
  - @ref:[CustomPolicyAsync](#custompolicyasync)
+ - @ref:[EmptyPolicy](#emptypolicy)
 
 ### RealmRolePolicy
 
@@ -117,6 +119,16 @@ In the following example, the policy will authorize a request if the user has be
 
 Scala
 :   @@snip [Realm Role Policy](../../../../../examples/src/main/scala/example/auth/AuthDocumentation.scala) { #realm-role-policy-usage }
+ 
+### ClientRolePolicy
+
+Client roles are basically a namespace dedicated to a client. Each client gets its own namespace.
+
+This policy filters requests based on Client Role. In the following example, the policy will authorize 
+amrequest if user has been assigned the `accounts-admin` role for the clientId specified in the configuration.
+
+Scala
+:   @@snip [Client Role Policy](../../../../../examples/src/main/scala/example/auth/AuthDocumentation.scala) { #client-role-policy-usage }
 
 ### CustomPolicy
 
@@ -135,11 +147,20 @@ a Future of Boolean instead of a Boolean. This could be very useful for custom v
 to make an IO call. For example,
 
 Scala
-:   @@snip [Custom Policy Async](../../../../../examples/src/main/scala/example/auth/AuthDocumentation.scala) { #custom-policy-async } 
+:   @@snip [Custom Policy](../../../../../examples/src/main/scala/example/auth/AuthDocumentation.scala) { #custom-policy-async } 
 
 This forms an HTTP route for a secure GET request for the path `/files/[fileId]` and expects a path parameter
 of type `Long`. The async custom policy makes an async database call to check whether the
 file being requested belongs to the user who made the HTTP request.
+
+### EmptyPolicy
+
+This policy is used this when only authentication is needed but not authorization.
+EmptyPolicy is an object and not a class like other policies and it does not need any parameters.
+
+Scala
+:   @@snip [Empty Policy](../../../../../examples/src/main/scala/example/auth/AuthDocumentation.scala) { #empty-policy-usage }
+ 
 
 ## Security Directives
 
@@ -161,7 +182,7 @@ A handle of the access token type is given to all secure routes. It is optional 
 For example:
 
 Scala
-:   @@snip [Access Token Handle Demo](../../../../../examples/src/main/scala/example/auth/AuthDocumentation.scala) { #access-token-handle-demo }
+:   @@snip [Empty Policy](../../../../../examples/src/main/scala/example/auth/AuthDocumentation.scala) { #access-token-handle-demo }
 
 Both of the above approaches compile and are valid. The access token holds basic information about the user 
 or the client who has made the request.
@@ -178,7 +199,7 @@ So far, we have seen that security directives can accept an authorization policy
 multiple authorization policies. This could be useful to express complex authorization logic. For example:
 
 Scala
-:   @@snip [Policy Expressions](../../../../../examples/src/main/scala/example/auth/AuthDocumentation.scala) { #policy-expressions }
+:   @@snip [Empty Policy](../../../../../examples/src/main/scala/example/auth/AuthDocumentation.scala) { #policy-expressions }
 
 Note the `|` , `&` operators which help compose an expression. A Policy expression could be more complex than this
 and can contain braces to group more expressions. For example:
@@ -196,12 +217,12 @@ directives](https://doc.akka.io/docs/akka-http/current/routing-dsl/directives/cu
 With the help of directive labeling you could write a route like below:
 
 Scala
-:   @@snip [Directive Composition Anti Pattern](../../../../../examples/src/main/scala/example/auth/AuthDocumentation.scala) { #directive-composition-anti-pattern }
+:   @@snip [Empty Policy](../../../../../examples/src/main/scala/example/auth/AuthDocumentation.scala) { #directive-composition-anti-pattern }
 
 The same can be achieved via @ref:[Policy Expressions](#policy-expressions) as shown below
 
 Scala
-:   @@snip [Policy Expressions](../../../../../examples/src/main/scala/example/auth/AuthDocumentation.scala) { #policy-expressions-right-way } 
+:   @@snip [Empty Policy](../../../../../examples/src/main/scala/example/auth/AuthDocumentation.scala) { #policy-expressions-right-way } 
 
 If you want to combine two directives ***and both of them are CSW security directives***,
 we strongly recommend that you use @ref:[Policy Expressions](#policy-expressions). The reason 
