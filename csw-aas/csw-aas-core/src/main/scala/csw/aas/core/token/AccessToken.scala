@@ -58,32 +58,6 @@ case class AccessToken(
   private val logger = AuthLogger.getLogger
 
   /**
-   * Checks whether this access token has given permission or not
-   *
-   * @param scope scope name
-   * @param resource resource name
-   */
-  def hasPermission(scope: String, resource: String = "Default Resource"): Boolean = {
-    val result = this.authorization.permissions.exists(p => p.rsname == resource && p.scopes.contains(scope))
-    if (!result) logger.debug(s"'$userOrClientName' doesn't have permission '$scope' for resource '$resource'")
-    else logger.debug(s"authorization granted for user '$userOrClientName' via permission '$scope' and resource '$resource'")
-    result
-  }
-
-  /**
-   * Checks whether this access token has client role (client specific role) or not
-   *
-   * @param role role name
-   * @param clientName client name
-   */
-  def hasClientRole(role: String, clientName: String): Boolean = {
-    val result = this.resource_access.get(clientName).exists(_.roles.contains(role))
-    if (!result) logger.debug(s"'$userOrClientName' doesn't have client role '$role' for client '$clientName'")
-    else logger.debug(s"authorization granted for user '$userOrClientName' via client role '$role' and client '$clientName'")
-    result
-  }
-
-  /**
    * Checks whether this access token has realm role or not
    *
    * @param role role name
