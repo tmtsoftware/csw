@@ -7,25 +7,27 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{Config, ConfigFactory}
 import csw.aas.http.AuthorizationPolicy.RealmRolePolicy
 import csw.aas.http.SecurityDirectives
+import csw.location.api.scaladsl.LocationService
+import csw.location.client.scaladsl.HttpLocationServiceFactory
 import spray.json.DefaultJsonProtocol._
 
 import scala.concurrent.ExecutionContext
 
 object SampleRoutes {
 
-  implicit val actorSystem: ActorSystem[_] = ActorSystem(Behaviors.empty, "test")
-  implicit val ec: ExecutionContext        = actorSystem.executionContext
-  val securityDirectives: SecurityDirectives =
-    csw.aas.http.SecurityDirectives(ConfigFactory.parseString("""
+  implicit val actorSystem: ActorSystem[_]   = ActorSystem(Behaviors.empty, "test")
+  implicit val ec: ExecutionContext          = actorSystem.executionContext
+  private val config: Config                 = ConfigFactory.parseString("""
       | auth-config {
       |  realm = TMT
       |  client-id = tmt-backend-app
-      |  auth-server-url = "http://10.131.124.57:8081/auth"
       | }
-    """.stripMargin))
+    """.stripMargin)
+  val locationService: LocationService       = HttpLocationServiceFactory.makeLocalClient
+  val securityDirectives: SecurityDirectives = SecurityDirectives(config, locationService)
   import securityDirectives._
 
   // #sample-routes

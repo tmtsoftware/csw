@@ -1,4 +1,4 @@
-package csw.aas.core.utils
+package csw.aas.installed.utils
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}

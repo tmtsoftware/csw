@@ -152,45 +152,35 @@ object SecurityDirectives {
 
   /**
    * Creates instance of [[csw.aas.http.SecurityDirectives]] using provided configurations
-   *
-   * Expects auth-server-url to be present in config.
-   *
-   * @param config Config object provided
-   */
-  def apply(config: Config)(implicit ec: ExecutionContext): SecurityDirectives =
-    from(AuthConfig.create(config, None))
-
-  /**
-   * Creates instance of [[csw.aas.http.SecurityDirectives]] using provided configurations
-   * and auth server url using location service
+   * and resolves auth server url using location service
    *
    * @param config Config object provided
    * @param locationService LocationService instance used to resolve auth server url (blocking call)
    */
   def apply(config: Config, locationService: LocationService)(implicit ec: ExecutionContext): SecurityDirectives = {
-    val maybeLocation = if (disabled(config)) None else Some(authLocation(locationService))
-    from(AuthConfig.create(config, maybeLocation))
+    from(AuthConfig(config, mayBeLocation(enableAuthUsing(config), locationService)))
   }
 
   /**
-   * Creates instance of [[csw.aas.http.SecurityDirectives]] using proivided configurations
+   * Creates instance of [[csw.aas.http.SecurityDirectives]] using provided configurations
+   * and resolves auth server url using location service
    *
+   * @param config Config object provided
    * @param locationService LocationService instance used to resolve auth server url (blocking call)
-   * Resolves auth server url using location service (blocking call)
-   * @param disabled if explicitly disabled/enabled, it will ignore `disabled` key from config
+   * @param enableAuth It will ignore `disabled` key from config. This can be used by cli apps which wants to enable/disable auth
+   *                   based on whether they are started with auth enabled or auth disabled rather than relying on config
    */
-  private[csw] def apply(config: Config, locationService: LocationService, disabled: Boolean)(implicit
+  def apply(config: Config, locationService: LocationService, enableAuth: Boolean)(implicit
       ec: ExecutionContext
   ): SecurityDirectives = {
-    val maybeLocation = if (disabled) None else Some(authLocation(locationService))
-    from(AuthConfig.create(config, maybeLocation, Some(disabled)))
+    from(AuthConfig(config, mayBeLocation(enableAuth, locationService)))
   }
 
   /**
    * Creates instance of [[csw.aas.http.SecurityDirectives]] with auth disabled
    */
   def authDisabled(config: Config)(implicit ec: ExecutionContext): SecurityDirectives =
-    from(AuthConfig.create(config = config, authServerLocation = None, disabledMaybe = Some(true)))
+    from(AuthConfig(config, None))
 
   private def from(authConfig: AuthConfig)(implicit ec: ExecutionContext): SecurityDirectives = {
     val keycloakDeployment = authConfig.getDeployment
@@ -199,8 +189,14 @@ object SecurityDirectives {
     new SecurityDirectives(authentication, keycloakDeployment.getRealm, authConfig.disabled)
   }
 
-  private def disabled(config: Config): Boolean =
-    config.getConfig(AuthConfig.authConfigKey).getBooleanOrFalse(AuthConfig.disabledKey)
+  private def enableAuthUsing(config: Config): Boolean =
+    !config.getConfig(AuthConfig.authConfigKey).getBooleanOrFalse(AuthConfig.disabledKey)
+
+  private def mayBeLocation(enableAuth: Boolean, locationService: LocationService)(implicit
+      ec: ExecutionContext
+  ): Option[HttpLocation] = {
+    if (enableAuth) Some(authLocation(locationService)) else None
+  }
 
   private def authLocation(locationService: LocationService)(implicit ec: ExecutionContext): HttpLocation =
     Await.result(AuthServiceLocation(locationService).resolve(5.seconds), 6.seconds)
