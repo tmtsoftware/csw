@@ -16,8 +16,8 @@ which is represented in the form of claims.
 An Access Token is a credential that can be used by an application to access an API. Access Tokens is JSON web token digitally 
 signed using JSON web signature (JWS). They inform the API that the bearer of the token has been authorized to access the API and perform 
 specific actions specified by the scope that has been granted. Access token contains all the information that ID token has. 
-Additionally it has information related to realm and resource roles associated to user. This information is used for authorization 
-based on clientRole and RealmRole policy.
+Additionally, it has information related to realm and roles associated to user. This information is used for authorization 
+based on RealmRole policy.
 
 ## Request flow 
 

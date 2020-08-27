@@ -23,7 +23,6 @@ import scala.util.{Failure, Success}
 class SecurityDirectives private[csw] (
     authentication: Authentication,
     realm: String,
-    resourceName: String,
     disabled: Boolean
 )(implicit
     ec: ExecutionContext
@@ -114,8 +113,7 @@ class SecurityDirectives private[csw] (
 
   private[aas] def authorize(authorizationPolicy: AuthorizationPolicy, accessToken: AccessToken): Directive0 =
     authorizationPolicy match {
-      case ClientRolePolicy(name) => keycloakAuthorize(accessToken.hasClientRole(name, resourceName))
-      case RealmRolePolicy(name)  => keycloakAuthorize(accessToken.hasRealmRole(name))
+      case RealmRolePolicy(name) => keycloakAuthorize(accessToken.hasRealmRole(name))
       case CustomPolicy(predicate) =>
         keycloakAuthorize {
           val result = predicate(accessToken)
@@ -189,7 +187,7 @@ object SecurityDirectives {
     val keycloakDeployment = authConfig.getDeployment
     val tokenVerifier      = TokenVerifier(authConfig)
     val authentication     = new Authentication(new TokenFactory(tokenVerifier))
-    new SecurityDirectives(authentication, keycloakDeployment.getRealm, keycloakDeployment.getResourceName, authConfig.disabled)
+    new SecurityDirectives(authentication, keycloakDeployment.getRealm, authConfig.disabled)
   }
 
   private def enableAuthUsing(config: Config): Boolean =

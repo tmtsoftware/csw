@@ -19,7 +19,7 @@ class CustomPolicyAsyncTest extends AnyFunSuite with MockitoSugar with Directive
 
   test("custom policy async should return AuthenticationFailedRejection when token is invalid | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", false)
 
     val invalidTokenStr    = "invalid"
     val invalidTokenHeader = Authorization(OAuth2BearerToken(invalidTokenStr))
@@ -47,7 +47,7 @@ class CustomPolicyAsyncTest extends AnyFunSuite with MockitoSugar with Directive
 
   test("custom policy async should return AuthenticationFailedRejection when token is not present | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", false)
 
     val authenticator: AsyncAuthenticator[AccessToken] = _ => Future.successful(None)
 
@@ -68,7 +68,7 @@ class CustomPolicyAsyncTest extends AnyFunSuite with MockitoSugar with Directive
 
   test("custom policy async should return AuthorizationFailedRejection when policy does not match | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", false)
 
     val validTokenWithPolicyViolationStr    = "validTokenWithPolicyViolation"
     val validTokenWithPolicyViolationHeader = Authorization(OAuth2BearerToken(validTokenWithPolicyViolationStr))
@@ -97,7 +97,7 @@ class CustomPolicyAsyncTest extends AnyFunSuite with MockitoSugar with Directive
 
   test("custom policy async should return 200 OK when policy matches | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", false)
 
     val validTokenWithPolicyMatchStr    = "validTokenWithPolicyMatch"
     val validTokenWithPolicyMatchHeader = Authorization(OAuth2BearerToken(validTokenWithPolicyMatchStr))
@@ -126,7 +126,7 @@ class CustomPolicyAsyncTest extends AnyFunSuite with MockitoSugar with Directive
 
   test("custom policy async should return AuthorizationFailedRejection when async execution fails | DEOPSCSW-579") {
     val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication, "TMT", "test", false)
+    val securityDirectives             = new SecurityDirectives(authentication, "TMT", false)
 
     val validTokenWithPolicyMatchStr    = "validTokenWithPolicyMatch"
     val validTokenWithPolicyMatchHeader = Authorization(OAuth2BearerToken(validTokenWithPolicyMatchStr))

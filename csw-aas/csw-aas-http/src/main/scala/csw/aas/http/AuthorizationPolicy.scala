@@ -35,13 +35,6 @@ sealed trait AuthorizationPolicy {
 object AuthorizationPolicy {
 
   /**
-   * This policy filters requests based on client specific roles
-   *
-   * @param name Name of role
-   */
-  final case class ClientRolePolicy(name: String) extends AuthorizationPolicy
-
-  /**
    * This policy filters requests based on Realm Role.
    *
    * A Realm Role is global role within a realm and is applicable for all clients within realm.

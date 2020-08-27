@@ -27,7 +27,7 @@ trait MockedAuthentication {
   when(authConfig.getDeployment).thenReturn(keycloakDeployment)
 
   val securityDirectives =
-    new SecurityDirectives(authentication, keycloakDeployment.getRealm, keycloakDeployment.getResourceName, false)
+    new SecurityDirectives(authentication, keycloakDeployment.getRealm, false)
 
   val roleMissingTokenStr = "rolemissing"
   val validTokenStr       = "valid"

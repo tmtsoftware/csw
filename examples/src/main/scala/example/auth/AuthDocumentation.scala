@@ -81,12 +81,6 @@ object AuthDocumentation {
     }
     //#realm-role-policy-usage
 
-    //#client-role-policy-usage
-    val routeWithClientRolePolicy: Route = sGet(ClientRolePolicy("accounts-admin")) {
-      complete("OK")
-    }
-    //#client-role-policy-usage
-
     // #custom-policy-usage
     val routeWithCustomPolicy: Route = sPost(CustomPolicy(token => token.given_name.contains("test-user"))) {
       complete("OK")
@@ -100,7 +94,7 @@ object AuthDocumentation {
       sGet(RealmRolePolicy("admin") | CustomPolicy(_.email.contains("super-admin@tmt.org"))) {
         complete("OK")
       } ~
-        sPost(ClientRolePolicy("finance_user") & ClientRolePolicy("finance_admin")) {
+        sPost(RealmRolePolicy("finance_user") & RealmRolePolicy("finance_admin")) {
           complete("OK")
         }
     // #policy-expressions
@@ -108,11 +102,11 @@ object AuthDocumentation {
 
   object DirectiveComposition {
     // #policy-expressions-right-way
-    sGet(RealmRolePolicy("admin") & ClientRolePolicy("sales_admin"))
+    sGet(RealmRolePolicy("admin") & RealmRolePolicy("sales_admin"))
     // #policy-expressions-right-way
 
     // #directive-composition-anti-pattern
-    sGet(RealmRolePolicy("admin")) & sGet(ClientRolePolicy("sales_admin"))
+    sGet(RealmRolePolicy("admin")) & sGet(RealmRolePolicy("sales_admin"))
     // #directive-composition-anti-pattern
   }
 
