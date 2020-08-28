@@ -1,11 +1,24 @@
 package csw.aas.http
 
+import csw.aas.core.token.AccessToken
+import csw.aas.core.token.claims.Access
 import csw.commons.RandomUtils
 import csw.prefix.models.Subsystem
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 
+import scala.util.Random
+
 class RolesTest extends AnyFunSuite with Matchers {
+
+  test("apply using roles should convert roles to lower case") {
+    Roles(Set("IRIS_ENG", "ESW_USER")).roles shouldBe Set("esw_user", "iris_eng")
+  }
+
+  test("apply using token should convert roles to lower case") {
+    val accessToken = AccessToken(realm_access = Access(Set("IRIS_ENG", "ESW_USER")))
+    Roles(accessToken).roles shouldBe Set("esw_user", "iris_eng")
+  }
 
   test("containsUserRole should give true if user role for given subsystem is present") {
     val subsystem = RandomUtils.randomFrom(Subsystem.values)
@@ -47,9 +60,11 @@ class RolesTest extends AnyFunSuite with Matchers {
   }
 
   test("exist should check if roles have a common entry") {
-    val subsystem1 = RandomUtils.randomFrom(Subsystem.values)
-    val subsystem2 = RandomUtils.randomFrom(Subsystem.values)
-    val subsystem3 = RandomUtils.randomFrom(Subsystem.values)
+    val subSystems = Random.shuffle(Subsystem.values)
+
+    val subsystem1 = subSystems(0)
+    val subsystem2 = subSystems(1)
+    val subsystem3 = subSystems(2)
 
     val commonRole = s"$subsystem2-admin".toLowerCase
     val roles1     = Roles(Set(s"$subsystem1-user", commonRole))

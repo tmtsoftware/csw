@@ -37,5 +37,5 @@ object AutoMultiJvm extends AutoPlugin {
       case None      => Seq.empty
     }
 
-  private lazy val multiJvmArtifact = Def.setting(Artifact(moduleName.value, "multi-jvm"))
+  lazy val multiJvmArtifact = Def.setting(Artifact(moduleName.value, "multi-jvm"))
 }

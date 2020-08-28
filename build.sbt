@@ -1,3 +1,4 @@
+import AutoMultiJvm.multiJvmArtifact
 import org.tmt.sbt.docs.DocKeys._
 import org.tmt.sbt.docs.{Settings => DocSettings}
 import sbtcrossproject.CrossPlugin.autoImport.{CrossType, crossProject}
@@ -636,6 +637,7 @@ lazy val integration = project
   .settings(
     libraryDependencies ++= Dependencies.Integration.value
   )
+  .settings(addArtifact(multiJvmArtifact, packageBin in MultiJvm))
 
 // ================================================
 /* ===================== Auth ================== */

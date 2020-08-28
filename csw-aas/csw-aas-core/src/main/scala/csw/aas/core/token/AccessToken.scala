@@ -63,7 +63,7 @@ case class AccessToken(
    * @param role role name
    */
   def hasRealmRole(role: String): Boolean = {
-    val result = this.realm_access.roles.contains(role)
+    val result = this.realm_access.roles.map(_.toLowerCase).contains(role.toLowerCase)
     if (!result) logger.debug(s"'$userOrClientName' doesn't have realm role '$role'")
     else logger.debug(s"authorization granted for user '$userOrClientName' via realm role '$role'")
     result
