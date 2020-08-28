@@ -58,7 +58,7 @@ class SequencerCommandServiceImplTest
     system.whenTerminated.futureValue
   }
 
-  test("should submit sequence to the sequencer") {
+  test("should submit sequence to the sequencer | CSW-110") {
     val submitResponse = mock[SubmitResponse]
     withBehavior {
       case SubmitSequence(`sequence`, replyTo) => replyTo ! submitResponse
@@ -67,7 +67,7 @@ class SequencerCommandServiceImplTest
     }
   }
 
-  test("should submit sequence to the sequencer and wait for final response") {
+  test("should submit sequence to the sequencer and wait for final response | CSW-110") {
     val submitResponse = Started(id)
     withBehavior {
       case SubmitSequence(`sequence`, replyTo) => replyTo ! submitResponse
@@ -77,7 +77,7 @@ class SequencerCommandServiceImplTest
     }
   }
 
-  test("should query current state from the sequencer") {
+  test("should query current state from the sequencer | CSW-110") {
     withBehavior {
       case Query(`id`, replyTo) => replyTo ! queryResponse
     } check { scs =>
@@ -85,7 +85,7 @@ class SequencerCommandServiceImplTest
     }
   }
 
-  test("should query final response from the sequencer") {
+  test("should query final response from the sequencer | CSW-110") {
     withBehavior {
       case QueryFinal(`id`, replyTo) => replyTo ! queryFinalResponse
     } check { scs =>

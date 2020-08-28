@@ -46,7 +46,7 @@ class CommandServiceImplTest extends AnyFunSuiteLike with Matchers with MockitoS
     system.whenTerminated.futureValue
   }
 
-  test("should send validate message") {
+  test("should send validate message | CSW-110") {
     val validateResponse = mock[ValidateResponse]
     withBehavior {
       case Validate(`setup`, replyTo) => replyTo ! validateResponse
@@ -55,7 +55,7 @@ class CommandServiceImplTest extends AnyFunSuiteLike with Matchers with MockitoS
     }
   }
 
-  test("should submit command and wait for final response") {
+  test("should submit command and wait for final response | CSW-110") {
     val submitResponse     = Started(id)
     val queryFinalResponse = mock[SubmitResponse]
     withBehavior {
@@ -66,7 +66,7 @@ class CommandServiceImplTest extends AnyFunSuiteLike with Matchers with MockitoS
     }
   }
 
-  test("should submit command") {
+  test("should submit command | CSW-110") {
     val submitResponse = mock[SubmitResponse]
     withBehavior {
       case Submit(`setup`, replyTo) => replyTo ! submitResponse
@@ -75,7 +75,7 @@ class CommandServiceImplTest extends AnyFunSuiteLike with Matchers with MockitoS
     }
   }
 
-  test("should submit all commands and wait for final response") {
+  test("should submit all commands and wait for final response | CSW-110") {
     val submitResponse     = Started(id)
     val queryFinalResponse = mock[SubmitResponse]
     withBehavior {
@@ -86,7 +86,7 @@ class CommandServiceImplTest extends AnyFunSuiteLike with Matchers with MockitoS
     }
   }
 
-  test("should send oneway command") {
+  test("should send oneway command | CSW-110") {
     val onewayResponse = mock[OnewayResponse]
     withBehavior {
       case Oneway(`setup`, replyTo) => replyTo ! onewayResponse
@@ -95,7 +95,7 @@ class CommandServiceImplTest extends AnyFunSuiteLike with Matchers with MockitoS
     }
   }
 
-  test("should send oneway command and match state") {
+  test("should send oneway command and match state | CSW-110") {
     val stateName     = StateName(randomString5)
     val demandMatcher = DemandMatcher(DemandState(prefix, stateName), timeout = timeout)
     withBehavior {
@@ -106,7 +106,7 @@ class CommandServiceImplTest extends AnyFunSuiteLike with Matchers with MockitoS
     }
   }
 
-  test("should query current state from the sequencer") {
+  test("should query current state from the sequencer | CSW-110") {
     val queryResponse = mock[SubmitResponse]
     withBehavior {
       case Query(`id`, replyTo) => replyTo ! queryResponse
@@ -115,7 +115,7 @@ class CommandServiceImplTest extends AnyFunSuiteLike with Matchers with MockitoS
     }
   }
 
-  test("should query final response from the sequencer") {
+  test("should query final response from the sequencer | CSW-110") {
     val queryFinalResponse = mock[SubmitResponse]
     withBehavior {
       case QueryFinal(`id`, replyTo) => replyTo ! queryFinalResponse
