@@ -637,7 +637,6 @@ lazy val integration = project
   .settings(
     libraryDependencies ++= Dependencies.Integration.value
   )
-  .settings(addArtifact(multiJvmArtifact, packageBin in MultiJvm))
 
 // ================================================
 /* ===================== Auth ================== */
