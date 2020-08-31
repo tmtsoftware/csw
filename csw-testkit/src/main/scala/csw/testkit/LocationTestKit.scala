@@ -31,7 +31,7 @@ final class LocationTestKit private (testKitSettings: TestKitSettings, enableAut
           override val httpPort: Int    = testKitSettings.LocationAuthHttpPort
         }
         override lazy val clusterSettings: ClusterSettings =
-          ClusterAwareSettings.joinSeeds(s"localhost:${testKitSettings.LocationClusterPort}")
+          ClusterAwareSettings.joinLocal(testKitSettings.LocationClusterPort)
       }
     }
     else ServerWiring.make(Some(testKitSettings.LocationClusterPort), Some(testKitSettings.LocationHttpPort), enableAuth = false)
