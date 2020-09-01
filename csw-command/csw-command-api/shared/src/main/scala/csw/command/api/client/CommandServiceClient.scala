@@ -15,6 +15,7 @@ import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
 import msocket.api.{Subscription, Transport}
+import msocket.portable.Observer
 
 import scala.concurrent.Future
 
@@ -55,8 +56,8 @@ class CommandServiceClient(
     websocketTransport.requestStream[CurrentState](SubscribeCurrentState(names))
 
   override def subscribeCurrentState(callback: CurrentState => Unit): Subscription =
-    websocketTransport.requestStream[CurrentState](SubscribeCurrentState(), callback, (ex: Throwable) => throw ex)
+    websocketTransport.requestStream[CurrentState](SubscribeCurrentState(), Observer.create(callback))
 
   override def subscribeCurrentState(names: Set[StateName], callback: CurrentState => Unit): Subscription =
-    websocketTransport.requestStream[CurrentState](SubscribeCurrentState(names), callback, (ex: Throwable) => throw ex)
+    websocketTransport.requestStream[CurrentState](SubscribeCurrentState(names), Observer.create(callback))
 }

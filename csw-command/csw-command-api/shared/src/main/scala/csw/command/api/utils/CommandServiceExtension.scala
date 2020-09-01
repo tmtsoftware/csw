@@ -7,7 +7,7 @@ import csw.command.api.scaladsl.CommandService
 import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand
 import csw.params.core.states.CurrentState
-import portable.akka.extensions.PortableAkka
+import msocket.portable.PortableAkka
 
 import scala.async.Async._
 import scala.concurrent.{Future, Promise, TimeoutException}
