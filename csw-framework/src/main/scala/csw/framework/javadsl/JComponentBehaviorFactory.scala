@@ -2,10 +2,10 @@ package csw.framework.javadsl
 
 import akka.actor.typed.javadsl.ActorContext
 import akka.actor.typed.scaladsl
-import csw.alarm.client.internal.JAlarmServiceImpl
+import csw.alarm.client.internal.extensions.AlarmServiceExt.RichAlarmService
 import csw.command.client.messages.TopLevelActorMessage
 import csw.config.client.javadsl.JConfigClientFactory
-import csw.event.client.internal.commons.EventServiceAdapter
+import csw.event.client.internal.commons.EventServiceExt.RichEventService
 import csw.framework.models.{CswContext, JCswContext}
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.location.client.extensions.LocationServiceExt.RichLocationService
@@ -22,8 +22,8 @@ abstract class JComponentBehaviorFactory extends ComponentBehaviorFactory() {
       ctx.asJava,
       JCswContext(
         locationService.asJava,
-        EventServiceAdapter.asJava(eventService),
-        new JAlarmServiceImpl(alarmService),
+        eventService.asJava,
+        alarmService.asJava,
         timeServiceScheduler,
         loggerFactory.asJava,
         JConfigClientFactory.clientApi(ctx.system, locationService.asJava),
