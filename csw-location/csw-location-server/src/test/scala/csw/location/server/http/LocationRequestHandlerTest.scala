@@ -16,7 +16,7 @@ import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models._
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.prefix.models.{Prefix, Subsystem}
-import msocket.impl.post.{PostRouteFactory, ServerHttpCodecs}
+import msocket.http.post.{PostRouteFactory, ServerHttpCodecs}
 import org.mockito.MockitoSugar.{mock, reset, verify, when}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.funsuite.AnyFunSuite

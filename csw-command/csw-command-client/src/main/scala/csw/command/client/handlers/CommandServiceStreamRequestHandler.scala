@@ -4,7 +4,7 @@ import csw.command.api.codecs.CommandServiceCodecs._
 import csw.command.api.messages.CommandServiceStreamRequest
 import csw.command.api.messages.CommandServiceStreamRequest._
 import csw.command.api.scaladsl.CommandService
-import msocket.api.{StreamRequestHandler, StreamResponse}
+import msocket.jvm.stream.{StreamRequestHandler, StreamResponse}
 
 import scala.concurrent.Future
 

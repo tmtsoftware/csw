@@ -18,7 +18,7 @@ import csw.params.commands.CommandResponse.Invalid
 import csw.params.commands.{CommandName, CommandResponse, Setup}
 import csw.params.core.models.Id
 import csw.prefix.models.{Prefix, Subsystem}
-import msocket.impl.post.{PostRouteFactory, ServerHttpCodecs}
+import msocket.http.post.{PostRouteFactory, ServerHttpCodecs}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar.{mock, never, reset, verify, when}
 import org.mockito.captor.{ArgCaptor, Captor}

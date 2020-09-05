@@ -29,7 +29,7 @@ object Dependencies {
       Libs.`akka-management-cluster-http`,
       AkkaHttp.`akka-http`,
       AkkaHttp.`akka-http-spray-json`, // akka-cluster-management uses lower version, to avoid conflict, this needs to be overridden
-      MSocket.`msocket-impl-jvm`,
+      MSocket.`msocket-http`,
       Libs.`scalatest`.value          % Test,
       Libs.`junit-4-12`               % Test,
       Libs.`mockito-scala`            % Test,
@@ -52,7 +52,7 @@ object Dependencies {
       Akka.`akka-remote`,
       Libs.`scala-async`,
       Libs.`scala-java8-compat`,
-      MSocket.`msocket-impl-jvm`,
+      MSocket.`msocket-http`,
       Libs.`scalatest`.value % Test,
       Libs.`junit-4-12`      % Test
     )
@@ -209,7 +209,7 @@ object Dependencies {
 
   val CommandClient = Def.setting(
     Seq(
-      MSocket.`msocket-impl-jvm`,
+      MSocket.`msocket-http`,
       Libs.`enumeratum`.value,
       Libs.`config`,
       Libs.`play-json`,

@@ -8,7 +8,7 @@ import csw.location.api.codec.LocationServiceCodecs._
 import csw.location.api.messages.LocationRequest
 import csw.location.api.messages.LocationRequest._
 import csw.location.api.scaladsl.LocationService
-import msocket.impl.post.{HttpPostHandler, ServerHttpCodecs}
+import msocket.http.post.{HttpPostHandler, ServerHttpCodecs}
 
 import scala.concurrent.ExecutionContext
 

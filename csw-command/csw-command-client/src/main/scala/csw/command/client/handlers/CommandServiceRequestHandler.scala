@@ -10,7 +10,7 @@ import csw.command.api.scaladsl.CommandService
 import csw.command.client.auth.{CommandPolicy, CommandRoles}
 import csw.params.commands.ControlCommand
 import csw.prefix.models.Prefix
-import msocket.impl.post.{HttpPostHandler, ServerHttpCodecs}
+import msocket.http.post.{HttpPostHandler, ServerHttpCodecs}
 
 class CommandServiceRequestHandler(
     commandService: CommandService,

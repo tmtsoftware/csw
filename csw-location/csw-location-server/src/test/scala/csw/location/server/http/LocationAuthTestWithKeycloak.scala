@@ -10,7 +10,7 @@ import csw.location.api.models.{ComponentId, ComponentType, HttpLocation, HttpRe
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.network.utils.SocketUtils
 import csw.prefix.models.Prefix
-import msocket.impl.HttpError
+import msocket.http.HttpError
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers

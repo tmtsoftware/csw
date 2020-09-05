@@ -4,7 +4,7 @@ import csw.location.api.codec.LocationServiceCodecs._
 import csw.location.api.messages.LocationStreamRequest
 import csw.location.api.messages.LocationStreamRequest.Track
 import csw.location.api.scaladsl.LocationService
-import msocket.api.{StreamRequestHandler, StreamResponse}
+import msocket.jvm.stream.{StreamRequestHandler, StreamResponse}
 
 import scala.concurrent.Future
 

@@ -12,7 +12,7 @@ import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandName, Setup}
 import csw.params.core.models.Id
 import csw.prefix.models.{Prefix, Subsystem}
-import msocket.impl.post.{PostRouteFactory, ServerHttpCodecs}
+import msocket.http.post.{PostRouteFactory, ServerHttpCodecs}
 import org.mockito.MockitoSugar.{mock, reset, verify, when}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers

@@ -8,9 +8,9 @@ import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.scaladsl.LocationService
 import csw.location.server.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.location.server.http.{LocationHttpService, LocationRequestHandler, LocationStreamRequestHandler}
-import msocket.impl.RouteFactory
-import msocket.impl.post.PostRouteFactory
-import msocket.impl.ws.WebsocketRouteFactory
+import msocket.http.RouteFactory
+import msocket.http.post.PostRouteFactory
+import msocket.http.ws.WebsocketRouteFactory
 
 // $COVERAGE-OFF$
 private[csw] class ServerWiring(enableAuth: Boolean) extends LocationServiceCodecs {

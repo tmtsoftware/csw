@@ -8,8 +8,8 @@ import csw.location.api.scaladsl.LocationService
 import csw.location.client.internal.Settings
 import msocket.api.ContentType.Json
 import msocket.api.Transport
-import msocket.impl.post.HttpPostTransport
-import msocket.impl.ws.WebsocketTransport
+import msocket.http.post.HttpPostTransport
+import msocket.http.ws.WebsocketTransport
 
 /**
  * The factory is used to create LocationService instance.

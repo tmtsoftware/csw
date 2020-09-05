@@ -7,15 +7,16 @@ import csw.command.api.codecs.CommandServiceCodecs
 import csw.command.client.CommandServiceFactory
 import csw.command.client.handlers.{CommandServiceRequestHandler, CommandServiceStreamRequestHandler}
 import csw.command.client.messages.ComponentMessage
-import msocket.impl.RouteFactory
-import msocket.impl.post.PostRouteFactory
-import msocket.impl.ws.WebsocketRouteFactory
+import msocket.http.RouteFactory
+import msocket.http.post.PostRouteFactory
+import msocket.http.ws.WebsocketRouteFactory
 
 object CommandServiceRoutesFactory {
 
   import CommandServiceCodecs._
 
   def createRoutes(component: ActorRef[ComponentMessage])(implicit actorSystem: ActorSystem[_]): Route = {
+    import actorSystem.executionContext
     val commandService     = CommandServiceFactory.make(component)
     val securityDirectives = SecurityDirectives.authDisabled(actorSystem.settings.config)(actorSystem.executionContext)
     val httpHandlers       = new CommandServiceRequestHandler(commandService, securityDirectives)

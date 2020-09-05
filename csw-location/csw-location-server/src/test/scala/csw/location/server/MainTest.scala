@@ -6,7 +6,7 @@ import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.server.cli.ArgsParser
 import csw.network.utils.{Networks, SocketUtils}
-import msocket.impl.HttpError
+import msocket.http.HttpError
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers

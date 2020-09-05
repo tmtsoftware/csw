@@ -11,8 +11,8 @@ import csw.command.client.internal.{CommandServiceImpl, JCommandServiceImpl}
 import csw.command.client.messages.ComponentMessage
 import csw.location.api.models.{AkkaLocation, HttpLocation, Location, TcpLocation}
 import msocket.api.ContentType.Json
-import msocket.impl.post.HttpPostTransport
-import msocket.impl.ws.WebsocketTransport
+import msocket.http.post.HttpPostTransport
+import msocket.http.ws.WebsocketTransport
 
 object CommandServiceFactory {
 
