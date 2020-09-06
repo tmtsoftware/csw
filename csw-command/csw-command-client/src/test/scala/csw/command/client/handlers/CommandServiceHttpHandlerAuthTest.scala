@@ -19,6 +19,7 @@ import csw.params.commands.{CommandName, CommandResponse, Setup}
 import csw.params.core.models.Id
 import csw.prefix.models.{Prefix, Subsystem}
 import msocket.http.post.{PostRouteFactory, ServerHttpCodecs}
+import msocket.jvm.metrics.LabelExtractorImplicits
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar.{mock, never, reset, verify, when}
 import org.mockito.captor.{ArgCaptor, Captor}
@@ -46,7 +47,9 @@ class CommandServiceHttpHandlerAuthTest
   private val commandService    = mock[CommandService]
   private val accessToken       = mock[AccessToken]
   private val handler           = new CommandServiceRequestHandler(commandService, securityDirective, Some(prefix), CommandRoles.empty)
-  private val route             = new PostRouteFactory[CommandServiceRequest]("post-endpoint", handler).make()
+
+  import LabelExtractorImplicits.default
+  private val route = new PostRouteFactory[CommandServiceRequest]("post-endpoint", handler).make()
 
   override def beforeEach(): Unit = {
     reset(securityDirective, commandService, accessToken)

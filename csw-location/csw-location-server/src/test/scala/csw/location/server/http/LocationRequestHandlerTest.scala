@@ -17,6 +17,7 @@ import csw.location.api.models._
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.prefix.models.{Prefix, Subsystem}
 import msocket.http.post.{PostRouteFactory, ServerHttpCodecs}
+import msocket.jvm.metrics.LabelExtractorImplicits
 import org.mockito.MockitoSugar.{mock, reset, verify, when}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.funsuite.AnyFunSuite
@@ -41,7 +42,9 @@ class LocationRequestHandlerTest
   private val locationService    = mock[LocationService]
   private val securityDirectives = mock[SecurityDirectives]
   private val handler            = new LocationRequestHandler(locationService, securityDirectives)
-  private val route              = new PostRouteFactory[LocationRequest]("post-endpoint", handler).make()
+
+  import LabelExtractorImplicits.default
+  private val route = new PostRouteFactory[LocationRequest]("post-endpoint", handler).make()
 
   override protected def beforeEach(): Unit = {
     reset(locationService, securityDirectives, accessToken, registrationResult)

@@ -10,6 +10,7 @@ import csw.command.client.messages.ComponentMessage
 import msocket.http.RouteFactory
 import msocket.http.post.PostRouteFactory
 import msocket.http.ws.WebsocketRouteFactory
+import msocket.jvm.metrics.LabelExtractorImplicits
 
 object CommandServiceRoutesFactory {
 
@@ -21,6 +22,8 @@ object CommandServiceRoutesFactory {
     val securityDirectives = SecurityDirectives.authDisabled(actorSystem.settings.config)(actorSystem.executionContext)
     val httpHandlers       = new CommandServiceRequestHandler(commandService, securityDirectives)
     val websocketHandlers  = new CommandServiceStreamRequestHandler(commandService)
+
+    import LabelExtractorImplicits.default
     RouteFactory.combine(metricsEnabled = false)(
       new PostRouteFactory("post-endpoint", httpHandlers),
       new WebsocketRouteFactory("websocket-endpoint", websocketHandlers)
