@@ -6,8 +6,8 @@ import akka.actor.typed.javadsl.AskPattern;
 import csw.command.client.CommandResponseManager;
 import csw.command.client.messages.TopLevelActorMessage;
 import csw.command.client.models.framework.ComponentInfo;
-import csw.config.api.javadsl.IConfigClientService;
 import csw.config.api.ConfigData;
+import csw.config.api.javadsl.IConfigClientService;
 import csw.event.api.javadsl.IEventService;
 import csw.framework.CurrentStatePublisher;
 import csw.framework.javadsl.JComponentHandlers;
@@ -27,8 +27,7 @@ import example.framework.components.assembly.WorkerActorMsgs;
 
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
+import java.util.concurrent.*;
 
 //#jcomponent-handlers-class
 public class JHcdComponentHandlers extends JComponentHandlers {
@@ -45,6 +44,8 @@ public class JHcdComponentHandlers extends JComponentHandlers {
     private ActorRef<WorkerActorMsg> worker;
     private int current;
     private int stats;
+    private int timeout = 10;
+    private TimeUnit timeUnit = TimeUnit.SECONDS;
 
     public JHcdComponentHandlers(
             akka.actor.typed.javadsl.ActorContext<TopLevelActorMessage> ctx,
@@ -64,22 +65,29 @@ public class JHcdComponentHandlers extends JComponentHandlers {
 
     //#jInitialize-handler
     @Override
-    public CompletableFuture<Void> jInitialize() {
+    public void jInitialize() {
 
         // fetch config (preferably from configuration service)
-        getConfig().thenAccept(config -> hcdConfig = config);
+        try {
+            hcdConfig = getConfig().get(timeout, timeUnit);
+        } catch (InterruptedException | ExecutionException | TimeoutException ex) {
+            throw new RuntimeException("Can not get config ", ex);
+        }
 
         // create a worker actor which is used by this hcd
         worker = ctx.spawnAnonymous(WorkerActor.behavior(hcdConfig));
 
         // initialise some state by using the worker actor created above
-        CompletionStage<Integer> askCurrent = AskPattern.ask(worker, WorkerActorMsgs.JInitialState::new, Duration.ofSeconds(5), ctx.getSystem().scheduler());
-        CompletableFuture<Void> currentFuture = askCurrent.thenAccept(c -> current = c).toCompletableFuture();
+        try {
+            CompletionStage<Integer> askCurrent = AskPattern.ask(worker, WorkerActorMsgs.JInitialState::new, Duration.ofSeconds(5), ctx.getSystem().scheduler());
+            askCurrent.thenAccept(c -> current = c).toCompletableFuture().get(timeout, timeUnit);
 
-        CompletionStage<Integer> askStats = AskPattern.ask(worker, WorkerActorMsgs.JInitialState::new, Duration.ofSeconds(5), ctx.getSystem().scheduler());
-        CompletableFuture<Void> statsFuture = askStats.thenAccept(s -> stats = s).toCompletableFuture();
+            CompletionStage<Integer> askStats = AskPattern.ask(worker, WorkerActorMsgs.JInitialState::new, Duration.ofSeconds(5), ctx.getSystem().scheduler());
+            askStats.thenAccept(s -> stats = s).toCompletableFuture().get(timeout, timeUnit);
 
-        return CompletableFuture.allOf(currentFuture, statsFuture);
+        } catch (InterruptedException | ExecutionException | TimeoutException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     //#jInitialize-handler
@@ -144,10 +152,8 @@ public class JHcdComponentHandlers extends JComponentHandlers {
 
     //#onShutdown-handler
     @Override
-    public CompletableFuture<Void> jOnShutdown() {
-        return CompletableFuture.runAsync(() -> {
-            // clean up resources
-        });
+    public void jOnShutdown() {
+        // clean up resources
     }
     //#onShutdown-handler
 

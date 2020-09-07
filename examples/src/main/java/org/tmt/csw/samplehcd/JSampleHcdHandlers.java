@@ -22,7 +22,6 @@ import csw.time.core.models.UTCTime;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
@@ -88,11 +87,9 @@ public class JSampleHcdHandlers extends JComponentHandlers {
     private Optional<Cancellable> maybePublishingGenerator = Optional.empty();
 
     @Override
-    public CompletableFuture<Void> jInitialize() {
-        return CompletableFuture.runAsync(() -> {
-            log.info("In HCD initialize");
-            maybePublishingGenerator = Optional.of(publishCounter());
-        });
+    public void jInitialize() {
+        log.info("In HCD initialize");
+        maybePublishingGenerator = Optional.of(publishCounter());
     }
 
     @Override
@@ -101,8 +98,8 @@ public class JSampleHcdHandlers extends JComponentHandlers {
     }
 
     @Override
-    public CompletableFuture<Void> jOnShutdown() {
-        return CompletableFuture.runAsync(() -> log.info("HCD is shutting down"));
+    public void jOnShutdown() {
+        log.info("HCD is shutting down");
     }
     //#initialize
 

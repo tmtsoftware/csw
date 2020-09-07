@@ -12,13 +12,11 @@ import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
 import csw.time.core.models.UTCTime
 
-import scala.concurrent.Future
-
 class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
     extends ComponentHandlers(ctx, cswCtx) {
 
   import cswCtx._
-  override def initialize(): Future[Unit] = Future.unit
+  override def initialize(): Unit = {}
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {}
 
@@ -61,7 +59,7 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
 
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = {}
 
-  override def onShutdown(): Future[Unit] = Future.unit
+  override def onShutdown(): Unit = {}
 
   override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = {}
 

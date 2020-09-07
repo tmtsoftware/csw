@@ -34,7 +34,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     }
 
     @Override
-    public CompletableFuture<Void> jInitialize() {
+    public void jInitialize() {
         //#dbFactory-access
         dbFactory = new DatabaseServiceFactory(ctx.getSystem());
 
@@ -54,12 +54,10 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                 .jMakeDsl()
                 .thenAccept((DSLContext dsl) -> this.dsl = dsl);        // save the returned dsl to a local variable
         //#dbFactory-test-access
-        return null;
     }
 
     @Override
-    public CompletableFuture<Void> jOnShutdown() {
-        return null;
+    public void jOnShutdown() {
     }
 
     @Override
@@ -107,7 +105,8 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         class Films {
             private Integer id;  // variable name (id) and type (Integer) should be same as column's name and type in database
             private String name; // variable name (name) and type (String) should be same as column's name and type in database
-        };
+        }
+        ;
 
         // fetch data from table and map it to Films class
         ResultQuery<Record> selectQuery = dsl.resultQuery("SELECT id, name FROM films WHERE id = ?", 1);

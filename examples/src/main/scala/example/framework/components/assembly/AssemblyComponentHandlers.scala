@@ -18,9 +18,8 @@ import csw.params.commands._
 import csw.params.core.models.Id
 import csw.time.core.models.UTCTime
 
-import scala.async.Async._
-import scala.concurrent.duration.DurationDouble
-import scala.concurrent.{ExecutionContextExecutor, Future}
+import scala.concurrent.duration.{DurationInt, FiniteDuration}
+import scala.concurrent.{Await, ExecutionContextExecutor, Future}
 
 //#component-handlers-class
 class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
@@ -35,40 +34,39 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
   private var runningHcds: Map[Connection, Option[CommandService]] = Map.empty
   var diagnosticsPublisher: ActorRef[DiagnosticPublisherMessages]  = _
   var commandHandler: ActorRef[CommandHandlerMsgs]                 = _
+  val timeout: FiniteDuration                                      = 5.seconds
 
   //#initialize-handler
-  override def initialize(): Future[Unit] =
-    async {
+  override def initialize(): Unit = {
 
-      // Initialization could include following steps :
+    // Initialization could include following steps :
 
-      // 1. fetch config (preferably from configuration service)
-      val calculationConfig = await(getAssemblyConfig)
+    // 1. fetch config (preferably from configuration service)
+    val calculationConfig = Await.result(getAssemblyConfig, timeout)
 
-      // 2. create a worker actor which is used by this assembly
-      val worker: ActorRef[WorkerActorMsg] = ctx.spawnAnonymous(WorkerActor.behavior(calculationConfig))
+    // 2. create a worker actor which is used by this assembly
+    val worker: ActorRef[WorkerActorMsg] = ctx.spawnAnonymous(WorkerActor.behavior(calculationConfig))
 
-      // 3. find a Hcd connection from the connections provided in componentInfo
-      val maybeConnection =
-        componentInfo.connections.find(connection => connection.componentId.componentType == ComponentType.HCD)
+    // 3. find a Hcd connection from the connections provided in componentInfo
+    val maybeConnection =
+      componentInfo.connections.find(connection => connection.componentId.componentType == ComponentType.HCD)
 
-      // 4. If an Hcd is found as a connection, resolve its location from location service and create other
-      // required worker actors required by this assembly
+    // 4. If an Hcd is found as a connection, resolve its location from location service and create other
+    // required worker actors required by this assembly
 
-      maybeConnection match {
-        case Some(_) =>
-          resolveHcd().map {
-            case Some(hcd) =>
-              runningHcds = runningHcds.updated(maybeConnection.get, Some(CommandServiceFactory.make(hcd)(ctx.system)))
-              diagnosticsPublisher =
-                ctx.spawnAnonymous(DiagnosticsPublisher.behavior(runningHcds(maybeConnection.get).get, worker))
-              commandHandler = ctx.spawnAnonymous(CommandHandler.behavior(calculationConfig, runningHcds(maybeConnection.get)))
-            case None => // do something
-          }
-        case None => Future.successful(())
-      }
-
+    maybeConnection match {
+      case Some(_) =>
+        resolveHcd().map {
+          case Some(hcd) =>
+            runningHcds = runningHcds.updated(maybeConnection.get, Some(CommandServiceFactory.make(hcd)(ctx.system)))
+            diagnosticsPublisher = ctx.spawnAnonymous(DiagnosticsPublisher.behavior(runningHcds(maybeConnection.get).get, worker))
+            commandHandler = ctx.spawnAnonymous(CommandHandler.behavior(calculationConfig, runningHcds(maybeConnection.get)))
+          case None => // do something
+        }
+      case None => ()
     }
+
+  }
   //#initialize-handler
 
   //#validateCommand-handler
@@ -108,10 +106,9 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
   //#onGoOnline-handler
 
   //#onShutdown-handler
-  override def onShutdown(): Future[Unit] =
-    async {
-      // clean up resources
-    }
+  override def onShutdown(): Unit = {
+    // clean up resources
+  }
   //#onShutdown-handler
 
   override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = {

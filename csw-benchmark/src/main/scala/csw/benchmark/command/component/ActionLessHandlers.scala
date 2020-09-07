@@ -11,13 +11,11 @@ import csw.params.commands._
 import csw.params.core.models.Id
 import csw.time.core.models.UTCTime
 
-import scala.concurrent.Future
-
 class ActionLessHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext) extends ComponentHandlers(ctx, cswCtx) {
 
   val log: Logger = cswCtx.loggerFactory.getLogger(ctx)
 
-  override def initialize(): Future[Unit] = Future.unit
+  override def initialize(): Unit = {}
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ???
 
@@ -27,7 +25,7 @@ class ActionLessHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCon
 
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = ???
 
-  override def onShutdown(): Future[Unit] = ???
+  override def onShutdown(): Unit = ???
 
   override def onGoOffline(): Unit = ???
 

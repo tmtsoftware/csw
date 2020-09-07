@@ -14,15 +14,12 @@ import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
 import csw.time.core.models.UTCTime
 
-import scala.concurrent.{ExecutionContext, Future}
-
 class CommandHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext) extends ComponentHandlers(ctx, cswCtx) {
   import cswCtx._
 
-  private val log: Logger                   = loggerFactory.getLogger(ctx)
-  private implicit val ec: ExecutionContext = ctx.executionContext
+  private val log: Logger = loggerFactory.getLogger(ctx)
 
-  override def initialize(): Future[Unit] = {
+  override def initialize(): Unit = {
     // DEOPSCSW-153: Accessibility of logging service to other CSW components
     log.info("Initializing HCD Component TLA")
     Thread.sleep(100)
@@ -31,7 +28,6 @@ class CommandHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCon
     // Publish the CurrentState using parameter set created using a sample Choice parameter
     currentStatePublisher.publish(CurrentState(filterHcdPrefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
     //#currentStatePublisher
-    Future.unit
   }
 
   override def onGoOffline(): Unit =
@@ -89,11 +85,10 @@ class CommandHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCon
     }
   }
 
-  override def onShutdown(): Future[Unit] =
-    Future {
-      currentStatePublisher.publish(CurrentState(filterHcdPrefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))
-      Thread.sleep(500)
-    }
+  override def onShutdown(): Unit = {
+    currentStatePublisher.publish(CurrentState(filterHcdPrefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))
+    Thread.sleep(500)
+  }
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {}
 
