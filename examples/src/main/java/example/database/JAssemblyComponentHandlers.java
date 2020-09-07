@@ -12,6 +12,7 @@ import csw.params.commands.ControlCommand;
 import csw.params.core.models.Id;
 import csw.time.core.models.UTCTime;
 import org.jooq.*;
+import org.jooq.Record;
 
 import java.util.Arrays;
 import java.util.List;

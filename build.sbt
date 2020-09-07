@@ -290,7 +290,7 @@ lazy val `csw-logging-api` = project
 
 lazy val `csw-logging-client` = project
   .in(file("csw-logging/csw-logging-client"))
-  .dependsOn(`csw-commons`, `csw-logging-macros`, `csw-logging-api`, `csw-prefix`.jvm)
+  .dependsOn(`csw-commons` % "compile->compile;test->test", `csw-logging-macros`, `csw-logging-api`, `csw-prefix`.jvm)
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.LoggingClient.value
