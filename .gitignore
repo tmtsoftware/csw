@@ -1,10 +1,9 @@
+.bsp
 a.out
 ignore
 .vagrant
 logs
 *.log
-project/project/target
-project/target
 target
 tmp
 .history
@@ -19,21 +18,10 @@ dist
 /RUNNING_PID
 .settings
 .DS_Store
-integration/project/build.properties
 test-output/
 .java-version
 build
-
 .vscode
-
-examples/src/main/scala/csw/auth/react/app/node_modules/*
-
-csw-aas/csw-aas-js/node_modules/*
-csw-aas/csw-aas-js/example/node_modules/*
-csw-aas/csw-aas-js/example/build/*
-csw-aas/csw-aas-js/coverage/*
-csw-aas/csw-aas-js/config/node_modules/*
-package-lock.json
 
 # hidden cross project folders
 shared/.js
@@ -49,12 +37,5 @@ shared/.jvm
 .buildpath
 .target
 bin/
-journal
-snapshots
 *.rdb
 .bloop
-project/.bloop
-project/project/.bloop
-scripts/csw-auth/prod/keycloak-4.6.0.Final
-scripts/csw-auth/prod/keycloak-4.6.0.Final.tar.gz
-cmake-build-debug/
