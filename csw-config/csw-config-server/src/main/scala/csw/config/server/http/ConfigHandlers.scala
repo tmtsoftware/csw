@@ -18,15 +18,15 @@ class ConfigHandlers extends Directives with JsonRejectionHandler {
   val jsonExceptionHandler: ExceptionHandler = ExceptionHandler {
     case ex: FileAlreadyExists =>
       log.error(ex.getMessage, ex = ex)
-      complete(JsonSupport.asJsonResponse(StatusCodes.Conflict, ex.getMessage))
+      complete(JsonSupport.asJsonResponse(StatusCodes.Conflict, ex.getClass.getSimpleName, ex.getMessage))
     case ex: FileNotFound =>
       log.error(ex.getMessage, ex = ex)
-      complete(JsonSupport.asJsonResponse(StatusCodes.NotFound, ex.getMessage))
+      complete(JsonSupport.asJsonResponse(StatusCodes.NotFound, ex.getClass.getSimpleName, ex.getMessage))
     case ex: InvalidInput =>
       log.error(ex.getMessage, ex = ex)
-      complete(JsonSupport.asJsonResponse(StatusCodes.BadRequest, ex.getMessage))
+      complete(JsonSupport.asJsonResponse(StatusCodes.BadRequest, ex.getClass.getSimpleName, ex.getMessage))
     case NonFatal(ex) =>
       log.error(ex.getMessage, ex = ex)
-      complete(JsonSupport.asJsonResponse(StatusCodes.InternalServerError, ex.getMessage))
+      complete(JsonSupport.asJsonResponse(StatusCodes.InternalServerError, ex.getClass.getSimpleName, ex.getMessage))
   }
 }

@@ -300,7 +300,7 @@ class ConfigServiceRouteTest
   test("list by pattern - rejection | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
     Get("/list?pattern=?i)") ~> route ~> check {
       status shouldEqual StatusCodes.BadRequest
-      responseAs[ErrorResponse].error.code shouldBe StatusCodes.BadRequest.intValue
+      responseAs[ErrorResponse].error._type shouldBe None
       responseAs[ErrorResponse].error.message should not be empty
     }
   }
@@ -324,7 +324,7 @@ class ConfigServiceRouteTest
   test("list by file type - rejection | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
     Get("/list?type=invalidtype") ~> route ~> check {
       status shouldEqual StatusCodes.BadRequest
-      responseAs[ErrorResponse].error.code shouldBe StatusCodes.BadRequest.intValue
+      responseAs[ErrorResponse].error._type shouldBe None
       responseAs[ErrorResponse].error.message should not be empty
     }
   }

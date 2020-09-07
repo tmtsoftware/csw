@@ -11,11 +11,11 @@ import io.bullet.borer.compat.akka._
  */
 object JsonSupport {
 
-  def asJsonEntity(statusCode: StatusCode, message: String): HttpEntity.Strict = {
-    val errorResponse = ErrorResponse(ErrorMessage(statusCode.intValue, message))
+  def asJsonEntity(message: String, errorName: Option[String] = None): HttpEntity.Strict = {
+    val errorResponse = ErrorResponse(ErrorMessage(message, errorName))
     HttpEntity(ContentTypes.`application/json`, Json.encode(errorResponse).to[ByteString].result)
   }
 
-  def asJsonResponse(statusCode: StatusCode, message: String): HttpResponse =
-    HttpResponse(statusCode, entity = asJsonEntity(statusCode.intValue, message))
+  def asJsonResponse(statusCode: StatusCode, errorName: String, message: String): HttpResponse =
+    HttpResponse(statusCode, entity = asJsonEntity(message, Some(errorName)))
 }

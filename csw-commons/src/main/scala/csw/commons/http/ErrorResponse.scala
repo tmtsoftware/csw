@@ -10,4 +10,4 @@ case class ErrorResponse(error: ErrorMessage)
 /**
  * Internal class representing an error message
  */
-case class ErrorMessage(code: Int, message: String)
+case class ErrorMessage(message: String, _type: Option[String])

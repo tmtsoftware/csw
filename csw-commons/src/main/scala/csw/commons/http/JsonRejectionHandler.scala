@@ -15,7 +15,7 @@ trait JsonRejectionHandler {
         case response @ HttpResponse(status, _, entity: HttpEntity.Strict, _) =>
           // since all Akka default rejection responses are Strict this will handle all rejections
           val message = entity.data.utf8String.replaceAll("\"", """\"""")
-          response.withEntity(asJsonEntity(status.intValue, message))
+          response.withEntity(asJsonEntity(message))
         case x => x
       }
 }
