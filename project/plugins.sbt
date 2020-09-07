@@ -39,3 +39,6 @@ scalacOptions ++= Seq(
   "-Xlint:-unused,_",
   "-Ywarn-dead-code"
 )
+
+// uncomment this to use csbt for updateSbtClassifiers, then comment back
+//addSbtCoursier
