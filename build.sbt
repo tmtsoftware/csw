@@ -510,7 +510,8 @@ lazy val `csw-time-scheduler` = project
   .in(file("csw-time/csw-time-scheduler"))
   .dependsOn(
     `csw-time-core`.jvm % "compile->compile;test->test",
-    `csw-logging-client`
+    `csw-logging-client`,
+    `csw-commons` % "test->test"
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.TimeScheduler.value)
