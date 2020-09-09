@@ -10,7 +10,6 @@ import csw.config.api.TokenFactory
 import org.keycloak.adapters.KeycloakDeployment
 import org.mockito.MockitoSugar
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class JMockedAuthentication extends MockedAuthentication

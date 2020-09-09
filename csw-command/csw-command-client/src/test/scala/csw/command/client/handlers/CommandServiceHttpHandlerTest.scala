@@ -13,7 +13,7 @@ import csw.params.commands.{CommandName, Setup}
 import csw.params.core.models.Id
 import csw.prefix.models.{Prefix, Subsystem}
 import msocket.http.post.{PostRouteFactory, ServerHttpCodecs}
-import msocket.jvm.metrics.LabelExtractorImplicits
+import msocket.jvm.metrics.LabelExtractor
 import org.mockito.MockitoSugar.{mock, reset, verify, when}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
@@ -34,7 +34,7 @@ class CommandServiceHttpHandlerTest
   private val commandService    = mock[CommandService]
   private val handler           = new CommandServiceRequestHandler(commandService, securityDirective, None)
 
-  import LabelExtractorImplicits.default
+  import LabelExtractor.Implicits.default
   private val route = new PostRouteFactory[CommandServiceRequest]("post-endpoint", handler).make()
 
   private val subsystem = randomSubsystem

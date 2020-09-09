@@ -10,7 +10,7 @@ import csw.command.client.messages.ComponentMessage
 import msocket.http.RouteFactory
 import msocket.http.post.PostRouteFactory
 import msocket.http.ws.WebsocketRouteFactory
-import msocket.jvm.metrics.LabelExtractorImplicits
+import msocket.jvm.metrics.LabelExtractor
 
 object CommandServiceRoutesFactory {
 
@@ -23,7 +23,7 @@ object CommandServiceRoutesFactory {
     val httpHandlers       = new CommandServiceRequestHandler(commandService, securityDirectives)
     val websocketHandlers  = new CommandServiceStreamRequestHandler(commandService)
 
-    import LabelExtractorImplicits.default
+    import LabelExtractor.Implicits.default
     RouteFactory.combine(metricsEnabled = false)(
       new PostRouteFactory("post-endpoint", httpHandlers),
       new WebsocketRouteFactory("websocket-endpoint", websocketHandlers)

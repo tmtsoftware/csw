@@ -11,7 +11,7 @@ import csw.location.server.http.{LocationHttpService, LocationRequestHandler, Lo
 import msocket.http.RouteFactory
 import msocket.http.post.PostRouteFactory
 import msocket.http.ws.WebsocketRouteFactory
-import msocket.jvm.metrics.LabelExtractorImplicits
+import msocket.jvm.metrics.LabelExtractor
 
 // $COVERAGE-OFF$
 private[csw] class ServerWiring(enableAuth: Boolean) extends LocationServiceCodecs {
@@ -28,7 +28,7 @@ private[csw] class ServerWiring(enableAuth: Boolean) extends LocationServiceCode
   private lazy val postHandler      = new LocationRequestHandler(locationService, securityDirectives)
   private lazy val websocketHandler = new LocationStreamRequestHandler(locationService)
 
-  import LabelExtractorImplicits.default
+  import LabelExtractor.Implicits.default
   lazy val locationRoutes: Route = RouteFactory.combine(metricsEnabled = false)(
     new PostRouteFactory("post-endpoint", postHandler),
     new WebsocketRouteFactory("websocket-endpoint", websocketHandler)
