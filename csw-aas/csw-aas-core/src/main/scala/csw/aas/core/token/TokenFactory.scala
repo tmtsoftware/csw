@@ -1,6 +1,7 @@
 package csw.aas.core.token
 
 import csw.aas.core.{TokenVerificationFailure, TokenVerifier}
+import msocket.security.models.AccessToken
 
 import scala.concurrent.{ExecutionContext, Future}
 

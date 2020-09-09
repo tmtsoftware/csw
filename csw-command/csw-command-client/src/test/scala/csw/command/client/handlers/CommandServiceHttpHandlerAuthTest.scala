@@ -2,8 +2,6 @@ package csw.command.client.handlers
 
 import akka.http.scaladsl.server.directives.BasicDirectives
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import csw.aas.core.token.AccessToken
-import csw.aas.core.token.claims.Access
 import csw.aas.http.AuthorizationPolicy.CustomPolicy
 import csw.aas.http.SecurityDirectives
 import csw.command.api.codecs.CommandServiceCodecs
@@ -20,6 +18,7 @@ import csw.params.core.models.Id
 import csw.prefix.models.{Prefix, Subsystem}
 import msocket.http.post.{PostRouteFactory, ServerHttpCodecs}
 import msocket.jvm.metrics.LabelExtractor
+import msocket.security.models.{Access, AccessToken}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar.{mock, never, reset, verify, when}
 import org.mockito.captor.{ArgCaptor, Captor}

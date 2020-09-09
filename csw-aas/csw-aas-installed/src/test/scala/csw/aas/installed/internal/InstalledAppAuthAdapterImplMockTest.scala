@@ -3,8 +3,8 @@ package csw.aas.installed.internal
 import csw.aas.core.TokenVerificationFailure.TokenExpired
 import csw.aas.core.TokenVerifier
 import csw.aas.core.deployment.AuthConfig
-import csw.aas.core.token.AccessToken
 import csw.aas.installed.scaladsl.FileAuthStore
+import msocket.security.models.AccessToken
 import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.adapters.installed.KeycloakInstalled
 import org.keycloak.representations.AccessTokenResponse

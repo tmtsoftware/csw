@@ -410,6 +410,7 @@ object Dependencies {
       Libs.`jwt-core`,
       Libs.`play-json`,
       Libs.`config`,
+      MSocket.`msocket-security`,
       Keycloak.`keycloak-core`,
       Keycloak.`keycloak-adapter-core`,
       AkkaHttp.`akka-http`,

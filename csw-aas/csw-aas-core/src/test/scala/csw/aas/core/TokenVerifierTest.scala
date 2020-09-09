@@ -2,8 +2,7 @@ package csw.aas.core
 
 import csw.aas.core.TokenVerificationFailure.{InvalidToken, TokenExpired}
 import csw.aas.core.deployment.AuthConfig
-import csw.aas.core.token.AccessToken
-import csw.aas.core.token.claims.{Access, Audience, Authorization}
+import msocket.security.models.{Access, AccessToken, Audience, Authorization}
 import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.exceptions.{TokenNotActiveException, TokenSignatureInvalidException}
 import org.keycloak.representations.{AccessToken => KeycloakAccessToken}

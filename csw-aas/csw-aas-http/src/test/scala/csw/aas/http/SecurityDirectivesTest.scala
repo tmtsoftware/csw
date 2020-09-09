@@ -10,11 +10,11 @@ import akka.http.scaladsl.server.{Directives, Route}
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import com.typesafe.config.ConfigValueFactory
 import csw.aas.core.commons.AASConnection
-import csw.aas.core.token.AccessToken
 import csw.aas.http.AuthorizationPolicy.{CustomPolicy, RealmRolePolicy}
 import csw.location.api.models.Connection.HttpConnection
 import csw.location.api.models.{HttpLocation, Metadata}
 import csw.location.api.scaladsl.LocationService
+import msocket.security.models.AccessToken
 import org.mockito.ArgumentMatchersSugar._
 import org.mockito.MockitoSugar
 import org.scalatest.funsuite.AnyFunSuite

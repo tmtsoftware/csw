@@ -6,8 +6,8 @@ import akka.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
 import akka.http.scaladsl.server.directives.Credentials.Provided
 import akka.http.scaladsl.server.{Directives, Route}
 import akka.http.scaladsl.testkit._
-import csw.aas.core.token.AccessToken
 import csw.aas.http.AuthorizationPolicy.RealmRolePolicy
+import msocket.security.models.AccessToken
 import org.mockito.MockitoSugar
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers

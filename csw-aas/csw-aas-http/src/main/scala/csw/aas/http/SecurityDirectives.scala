@@ -9,10 +9,12 @@ import com.typesafe.config.Config
 import csw.aas.core.TokenVerifier
 import csw.aas.core.commons.AuthLogger
 import csw.aas.core.deployment.{AuthConfig, AuthServiceLocation}
-import csw.aas.core.token.{AccessToken, TokenFactory}
+import csw.aas.core.token.TokenFactory
 import csw.aas.core.utils.ConfigExt._
 import csw.location.api.models.HttpLocation
 import csw.location.api.scaladsl.LocationService
+import msocket.security.api.AuthorizationPolicy
+import msocket.security.models.AccessToken
 
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, ExecutionContext, Future}

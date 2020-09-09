@@ -4,9 +4,9 @@ import akka.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
 import akka.http.scaladsl.server.Directives.AsyncAuthenticator
 import akka.http.scaladsl.server.directives.Credentials.Provided
 import csw.aas.core.deployment.AuthConfig
-import csw.aas.core.token.AccessToken
 import csw.aas.http.{Authentication, SecurityDirectives}
 import csw.config.api.TokenFactory
+import msocket.security.models.AccessToken
 import org.keycloak.adapters.KeycloakDeployment
 import org.mockito.MockitoSugar
 

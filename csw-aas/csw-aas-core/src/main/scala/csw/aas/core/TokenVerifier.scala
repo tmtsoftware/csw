@@ -3,8 +3,9 @@ package csw.aas.core
 import csw.aas.core.TokenVerificationFailure.{InvalidToken, TokenExpired}
 import csw.aas.core.commons.AuthLogger
 import csw.aas.core.deployment.AuthConfig
-import csw.aas.core.token.AccessToken
 import io.bullet.borer.Json
+import msocket.security.codecs.AuthCodecs
+import msocket.security.models.AccessToken
 import org.keycloak.common.VerificationException
 import org.keycloak.exceptions.TokenNotActiveException
 import org.keycloak.representations.{AccessToken => KAccessToken}
@@ -15,7 +16,7 @@ import scala.util.Try
 import scala.util.control.NonFatal
 
 /**
- * Verifies & decodes the access token into [[csw.aas.core.token.AccessToken]]
+ * Verifies & decodes the access token into [[msocket.security.models.AccessToken]]
  */
 class TokenVerifier private[aas] (keycloakTokenVerifier: KeycloakTokenVerifier, authConfig: AuthConfig) extends AuthCodecs {
 

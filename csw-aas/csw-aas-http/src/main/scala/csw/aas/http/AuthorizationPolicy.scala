@@ -1,53 +1,14 @@
 package csw.aas.http
 
-import csw.aas.core.token.AccessToken
+import msocket.security.models.AccessToken
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 import scala.util.Try
-
-/**
- * An asynchronous authorization policy is a way to filter incoming HTTP requests based on rules
- */
-trait AuthorizationPolicy {
-
-  /**
-   * Implement this method to create an asynchronous AuthorizationPolicy
-   */
-  def authorize(accessToken: AccessToken): Future[Boolean]
-
-  /**
-   * Applies a new authorization policy in combination with previous policy.
-   * Passing of both policies is requried for authorization to succeed.
-   *
-   * @param other new Authorization policy
-   * @return combined authorization policy
-   */
-  def &(other: AuthorizationPolicy)(implicit ec: ExecutionContext): AuthorizationPolicy = { accessToken =>
-    val leftF  = authorize(accessToken)
-    val rightF = other.authorize(accessToken)
-    leftF.zipWith(rightF)(_ && _)
-  }
-
-  /**
-   * Applies a new authorization policy if the previous policy fails.
-   *
-   * Authorization will succeed if any of the provided policy passes.
-   *
-   * @param other new Authorization policy
-   * @return combined authorization policy
-   */
-  def |(other: AuthorizationPolicy)(implicit ec: ExecutionContext): AuthorizationPolicy = { accessToken =>
-    val leftF  = authorize(accessToken)
-    val rightF = other.authorize(accessToken)
-    leftF.zipWith(rightF)(_ || _)
-  }
-
-}
 
 /**
  * A synchronous authorization policy is a way to filter incoming HTTP requests based on rules
  */
-trait SyncAuthorizationPolicy extends AuthorizationPolicy {
+trait SyncAuthorizationPolicy extends msocket.security.api.AuthorizationPolicy {
 
   /**
    * Implement this method to create a synchronous AuthorizationPolicy
@@ -87,7 +48,7 @@ object AuthorizationPolicy {
    *
    * @param predicate Async filter
    */
-  final case class CustomPolicyAsync(predicate: AccessToken => Future[Boolean]) extends AuthorizationPolicy {
+  final case class CustomPolicyAsync(predicate: AccessToken => Future[Boolean]) extends msocket.security.api.AuthorizationPolicy {
     override def authorize(accessToken: AccessToken): Future[Boolean] = predicate(accessToken)
   }
 

@@ -1,7 +1,7 @@
 package csw.aas.http
 
-import csw.aas.core.token.AccessToken
 import csw.prefix.models.Subsystem
+import msocket.security.models.AccessToken
 
 case class Roles private (roles: Set[String]) {
   def intersect(that: Roles): Set[String]             = this.roles.intersect(that.roles)

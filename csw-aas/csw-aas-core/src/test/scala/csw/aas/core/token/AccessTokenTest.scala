@@ -1,6 +1,6 @@
 package csw.aas.core.token
 
-import csw.aas.core.token.claims.Access
+import msocket.security.models.{Access, AccessToken}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 
