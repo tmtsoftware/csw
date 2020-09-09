@@ -40,4 +40,4 @@ scalacOptions ++= Seq(
 )
 
 resolvers += Resolver.bintrayIvyRepo("rtimush", "sbt-plugin-snapshots")
-addSbtPlugin("com.timushev.sbt" % "sbt-rewarn" % "0.0.1-15-3102b36")
+addSbtPlugin("com.timushev.sbt" % "sbt-rewarn" % "0.1.0")
