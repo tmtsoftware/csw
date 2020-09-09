@@ -52,6 +52,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     )
 
     verify(timerScheduler).startSingleTimer(SupervisorBehavior.InitializeTimerKey, InitializeTimeout, hcdInfo.initializeTimeout)
+    when(timerScheduler.isTimerActive(SupervisorBehavior.InitializeTimerKey)).thenReturn(true)
   }
 
   test("supervisor should start in Idle lifecycle state and spawn two actors | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181") {
@@ -85,6 +86,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
     supervisorBehaviorKit.run(Running(childRef))
 
+    verify(timerScheduler).isTimerActive(SupervisorBehavior.InitializeTimerKey)
     verify(timerScheduler).cancel(SupervisorBehavior.InitializeTimerKey)
     verify(locationService).register(akkaRegistration)
 

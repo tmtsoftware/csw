@@ -182,12 +182,14 @@ private[framework] final class SupervisorBehavior(
   }
 
   private def onComponentRunning(componentRef: ActorRef[RunningMessage]): Unit = {
-    log.info("Received Running message from component within timeout, cancelling InitializeTimer")
-    timerScheduler.cancel(InitializeTimerKey)
+    if (timerScheduler.isTimerActive(InitializeTimerKey)) {
+      log.info("Received Running message from component within timeout, cancelling InitializeTimer")
+      timerScheduler.cancel(InitializeTimerKey)
 
-    updateLifecycleState(SupervisorLifecycleState.Running)
-    runningComponent = Some(componentRef)
-    registerWithLocationService(componentRef)
+      updateLifecycleState(SupervisorLifecycleState.Running)
+      runningComponent = Some(componentRef)
+      registerWithLocationService(componentRef)
+    }
   }
 
   private def registerWithLocationService(componentRef: ActorRef[RunningMessage]): Unit = {

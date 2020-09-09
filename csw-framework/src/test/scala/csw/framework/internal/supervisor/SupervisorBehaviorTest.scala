@@ -38,6 +38,7 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
     )
 
   doNothing.when(timerScheduler).cancel(ArgumentMatchers.eq(SupervisorBehavior.InitializeTimerKey))
+  when(timerScheduler.isTimerActive(SupervisorBehavior.InitializeTimerKey)).thenReturn(true)
 
   val supervisorBehavior: Behavior[ComponentMessage] = createBehavior(timerScheduler)
   val componentTLAName                               = s"${hcdInfo.prefix}-${SupervisorBehavior.ComponentActorNameSuffix}"

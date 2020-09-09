@@ -19,6 +19,7 @@ import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandResponse._
 import csw.params.core.models.Id
 
+import scala.concurrent.blocking
 import scala.util.control.NonFatal
 
 // scalastyle:off method.length
@@ -54,7 +55,9 @@ private[framework] object ComponentBehavior {
           log.warn("Component TLA is shutting down")
           try {
             log.info("Invoking lifecycle handler's onShutdown hook")
-            lifecycleHandlers.onShutdown()
+            blocking {
+              lifecycleHandlers.onShutdown()
+            }
           }
           catch {
             case NonFatal(throwable) => log.error(throwable.getMessage, ex = throwable)
@@ -84,7 +87,9 @@ private[framework] object ComponentBehavior {
           case Initialize =>
             try {
               log.info("Invoking lifecycle handler's initialize hook")
-              lifecycleHandlers.initialize()
+              blocking {
+                lifecycleHandlers.initialize()
+              }
               log.debug(
                 s"Component TLA is changing lifecycle state from [$lifecycleState] to [${ComponentLifecycleState.Initialized}]"
               )
