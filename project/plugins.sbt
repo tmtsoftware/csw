@@ -15,7 +15,7 @@ addSbtPlugin("de.johoop"                         % "sbt-testng-plugin"         %
 addSbtPlugin("io.spray"                          % "sbt-revolver"              % "0.9.1")
 addSbtPlugin("com.typesafe.sbt"                  % "sbt-git"                   % "1.0.0")
 addSbtPlugin("org.portable-scala"                % "sbt-scalajs-crossproject"  % "1.0.0")
-addSbtPlugin("org.scala-js"                      % "sbt-scalajs"               % "1.1.1")
+addSbtPlugin("org.scala-js"                      % "sbt-scalajs"               % "1.2.0")
 addSbtPlugin("com.github.cb372"                  % "sbt-explicit-dependencies" % "0.2.13")
 addSbtPlugin("ohnosequences"                     % "sbt-github-release"        % "0.7.0")
 addSbtPlugin("com.dwijnand"                      % "sbt-project-graph"         % "0.4.0")
