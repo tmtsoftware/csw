@@ -290,7 +290,7 @@ lazy val `csw-logging-api` = project
 
 lazy val `csw-logging-client` = project
   .in(file("csw-logging/csw-logging-client"))
-  .dependsOn(`csw-commons`, `csw-logging-macros`, `csw-logging-api`, `csw-prefix`.jvm)
+  .dependsOn(`csw-commons` % "compile->compile;test->test", `csw-logging-macros`, `csw-logging-api`, `csw-prefix`.jvm)
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.LoggingClient.value
@@ -520,10 +520,13 @@ lazy val `csw-testkit` = project
   .dependsOn(
     `csw-location-server`,
     `csw-config-server`,
-    `csw-framework`
+    `csw-framework`,
+    `csw-commons` % "test->test"
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin)
-  .settings(libraryDependencies ++= Dependencies.Testkit.value)
+  .settings(
+    libraryDependencies ++= Dependencies.Testkit.value
+  )
 
 /* ================= Database Service ============== */
 
