@@ -49,7 +49,7 @@ class TokenVerifier private[aas] (keycloakTokenVerifier: KeycloakTokenVerifier, 
 
   /**
    * Verifies the access token string for signature and expiry date
-   * and then decodes it into [[csw.aas.core.token.AccessToken]]
+   * and then decodes it into [[msocket.security.models.AccessToken]]
    *
    * @param token access token string
    */

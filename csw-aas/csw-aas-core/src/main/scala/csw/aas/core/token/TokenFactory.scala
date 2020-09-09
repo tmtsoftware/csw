@@ -9,7 +9,7 @@ class TokenFactory(tokenVerifier: TokenVerifier)(implicit ec: ExecutionContext) 
 
   /**
    * It will validate the token string for signature and expiry and then decode it into
-   * [[csw.aas.core.token.AccessToken]]
+   * [[msocket.security.models.AccessToken]]
    *
    * @param token Access token string
    */
