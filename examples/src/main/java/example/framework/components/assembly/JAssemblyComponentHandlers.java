@@ -24,8 +24,8 @@ import csw.location.api.models.*;
 import csw.logging.api.javadsl.ILogger;
 import csw.params.commands.*;
 import csw.params.core.models.Id;
-import csw.prefix.models.Prefix;
 import csw.prefix.javadsl.JSubsystem;
+import csw.prefix.models.Prefix;
 import csw.time.core.models.UTCTime;
 import scala.concurrent.duration.FiniteDuration;
 
@@ -37,6 +37,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 
 //#jcomponent-handlers-class
@@ -53,6 +54,9 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     private Map<Connection, Optional<ICommandService>> runningHcds;
     private ActorRef<DiagnosticPublisherMessages> diagnosticPublisher;
     private ActorRef<CommandResponse.SubmitResponse> commandResponseAdapter;
+
+    private int timeout = 10;
+    private TimeUnit timeUnit = TimeUnit.SECONDS;
 
     public JAssemblyComponentHandlers(akka.actor.typed.javadsl.ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
         super(ctx, cswCtx);
@@ -73,14 +77,18 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
     //#jInitialize-handler
     @Override
-    public CompletableFuture<Void> jInitialize() {
+    public void jInitialize() {
 
         // fetch config (preferably from configuration service)
-        CompletableFuture<ConfigData> configDataCompletableFuture = getAssemblyConfig();
-
         // create a worker actor which is used by this assembly
-        CompletableFuture<ActorRef<WorkerActorMsg>> worker =
-                configDataCompletableFuture.thenApply(config -> ctx.spawnAnonymous(WorkerActor.behavior(config)));
+        ConfigData configData;
+        ActorRef<WorkerActorMsg> worker;
+        try {
+            configData = getAssemblyConfig().get(timeout, timeUnit);
+            worker = ctx.spawnAnonymous(WorkerActor.behavior(configData));
+        } catch (InterruptedException | ExecutionException | TimeoutException ex) {
+            throw new RuntimeException("Can not get config data", ex);
+        }
 
         // find a Hcd connection from the connections provided in componentInfo
         Optional<Connection> mayBeConnection = componentInfo.getConnections().stream()
@@ -89,17 +97,25 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
         // If an Hcd is found as a connection, resolve its location from location service and create other
         // required worker actors required by this assembly, also subscribe to HCD's filter wheel event stream
-        return mayBeConnection.map(connection ->
-                worker.thenAcceptBoth(resolveHcd(), (workerActor, hcdLocation) -> {
-                    if (!hcdLocation.isPresent())
-                        throw new HcdNotFoundException();
-                    else {
-                        runningHcds.put(connection, Optional.of(CommandServiceFactory.jMake(hcdLocation.orElseThrow(), ctx.getSystem())));
-                        //#event-subscriber
-                    }
-                    diagnosticPublisher = ctx.spawnAnonymous(JDiagnosticsPublisher.behavior(CommandServiceFactory.jMake(hcdLocation.orElseThrow(), ctx.getSystem()), workerActor));
-                })).orElseThrow();
+        mayBeConnection.map(connection ->
+        {
+            Optional<AkkaLocation> hcdLocation;
+            try {
+                hcdLocation = resolveHcd().get(timeout, timeUnit);
+            } catch (InterruptedException | ExecutionException | TimeoutException ex) {
+                throw new RuntimeException("Can not resolve HCD", ex);
+            }
 
+            if (hcdLocation.isEmpty())
+                throw new HcdNotFoundException();
+            else {
+                runningHcds.put(connection, Optional.of(CommandServiceFactory.jMake(hcdLocation.get(), ctx.getSystem())));
+                //#event-subscriber
+            }
+            diagnosticPublisher = ctx.spawnAnonymous(JDiagnosticsPublisher.behavior(CommandServiceFactory.jMake(hcdLocation.get(), ctx.getSystem()), worker));
+            return null;
+        });
+        throw new RuntimeException("can not resolve connection for given HCD");
     }
     //#jInitialize-handler
 
@@ -165,9 +181,8 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
     //#onShutdown-handler
     @Override
-    public CompletableFuture<Void> jOnShutdown() {
+    public void jOnShutdown() {
         // clean up resources
-        return new CompletableFuture<>();
     }
     //#onShutdown-handler
 

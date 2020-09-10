@@ -45,9 +45,9 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 
   val supervisorLifecycleStateProbe: TestProbe[SupervisorLifecycleState] = TestProbe[SupervisorLifecycleState]()
   var supervisorRef: ActorRef[ComponentMessage]                          = _
-  var initializeAnswer: Answer[Future[Unit]]                             = _
+  var initializeAnswer: Answer[Unit]                                     = _
   var submitAnswer: Answer[Future[Unit]]                                 = _
-  var shutdownAnswer: Answer[Future[Unit]]                               = _
+  var shutdownAnswer: Answer[Unit]                                       = _
   var runAnswer: Answer[Future[Unit]]                                    = _
 
   implicit val ec: ExecutionContext = typedSystem.executionContext

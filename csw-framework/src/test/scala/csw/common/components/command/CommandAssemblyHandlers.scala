@@ -22,7 +22,7 @@ import csw.prefix.models.{Prefix, Subsystem}
 import csw.time.core.models.UTCTime
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext}
 import scala.util.{Failure, Success}
 
 class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
@@ -44,7 +44,7 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   private val shortRunning      = Setup(seqPrefix, shorterHcdCmd, None)
   private val shortRunningError = Setup(seqPrefix, shorterHcdErrorCmd, None)
 
-  override def initialize(): Future[Unit] = {
+  override def initialize(): Unit = {
     // DEOPSCSW-153: Accessibility of logging service to other CSW components
     log.info("Initializing Assembly Component TLA")
 
@@ -53,7 +53,6 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
     // Publish the CurrentState using parameter set created using a sample Choice parameter
     currentStatePublisher.publish(CurrentState(filterAsmPrefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
     //#currentStatePublisher
-    Future.unit
   }
 
   override def onGoOffline(): Unit =
@@ -154,11 +153,10 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
         Invalid(runId, CommandIssue.UnsupportedCommandIssue(s"${command.commandName.name}"))
     }
 
-  override def onShutdown(): Future[Unit] =
-    Future {
-      currentStatePublisher.publish(CurrentState(filterAsmPrefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))
-      Thread.sleep(500)
-    }
+  override def onShutdown(): Unit = {
+    currentStatePublisher.publish(CurrentState(filterAsmPrefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))
+    Thread.sleep(500)
+  }
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {}
 

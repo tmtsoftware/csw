@@ -27,6 +27,6 @@ public class JComponentInfos {
             "csw.framework.javadsl.components.JSampleComponentBehaviorFactory",
             LocationServiceUsage.JRegisterOnly(),
             Collections.emptySet(),
-            Duration.ofMillis(10)
+            Duration.ofMillis(50)
     );
 }

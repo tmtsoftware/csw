@@ -58,18 +58,16 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     }
 
     @Override
-    public CompletableFuture<Void> jInitialize() {
+    public void jInitialize() {
         log.debug("Initializing Sample component");
         try {
             Thread.sleep(100);
         } catch (InterruptedException ignored) {
         }
-        return CompletableFuture.runAsync(() -> {
-            //#currentStatePublisher
-            CurrentState initState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.initChoice()));
-            currentStatePublisher.publish(initState);
-            //#currentStatePublisher
-        });
+        //#currentStatePublisher
+        CurrentState initState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.initChoice()));
+        currentStatePublisher.publish(initState);
+        //#currentStatePublisher
     }
 
     @Override
@@ -232,11 +230,9 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     }
 
     @Override
-    public CompletableFuture<Void> jOnShutdown() {
-        return CompletableFuture.runAsync(() -> {
-            CurrentState shutdownState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.shutdownChoice()));
-            currentStatePublisher.publish(shutdownState);
-        });
+    public void jOnShutdown() {
+        CurrentState shutdownState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.shutdownChoice()));
+        currentStatePublisher.publish(shutdownState);
     }
 
     @Override

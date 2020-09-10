@@ -29,7 +29,7 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
 
   import SampleComponentState._
 
-  override def initialize(): Future[Unit] = {
+  override def initialize(): Unit = {
     // DEOPSCSW-153: Accessibility of logging service to other CSW components
     log.info("Initializing Component TLA")
     Thread.sleep(100)
@@ -42,7 +42,6 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
     // DEOPSCSW-219: Discover component connection using HTTP protocol
     trackConnection(httpConnection)
     trackConnection(tcpConnection)
-    Future.unit
   }
 
   override def onGoOffline(): Unit =
@@ -106,11 +105,10 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
     else Invalid(runId, OtherIssue("Testing: Received failure, will return Invalid."))
   }
 
-  override def onShutdown(): Future[Unit] =
-    Future {
-      currentStatePublisher.publish(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))
-      Thread.sleep(500)
-    }
+  override def onShutdown(): Unit = {
+    currentStatePublisher.publish(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))
+    Thread.sleep(500)
+  }
 
   //#onDiagnostic-mode
   // While dealing with mutable state, make sure you create a worker actor to avoid concurrency issues

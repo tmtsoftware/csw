@@ -50,19 +50,17 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
   //#initialize
   var maybePublishingGenerator: Option[Cancellable] = None
 
-  override def initialize(): Future[Unit] = {
+  override def initialize(): Unit = {
     log.info(s"HCD: $prefix initializing")
     maybePublishingGenerator = Some(publishCounter())
-    Future.unit
   }
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {
     log.debug(s"TrackingEvent received: ${trackingEvent.connection.name}")
   }
 
-  override def onShutdown(): Future[Unit] = {
+  override def onShutdown(): Unit = {
     log.info(s"HCD: $prefix is shutting down")
-    Future.unit
   }
   //#initialize
 

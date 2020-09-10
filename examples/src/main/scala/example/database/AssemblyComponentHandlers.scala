@@ -12,7 +12,6 @@ import csw.params.core.models.Id
 import csw.time.core.models.UTCTime
 import org.jooq.{DSLContext, Query}
 
-import scala.async.Async.async
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
 //DEOPSCSW-615: DB service accessible to CSW component developers
@@ -23,28 +22,27 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
 
   private var dsl: DSLContext = _
-  override def initialize(): Future[Unit] =
-    async {
-      //#dbFactory-access
-      val dbFactory = new DatabaseServiceFactory(ctx.system)
+  override def initialize(): Unit = {
+    //#dbFactory-access
+    val dbFactory = new DatabaseServiceFactory(ctx.system)
 
-      dbFactory
-        .makeDsl(locationService, "postgres")         // postgres is dbName
-        .foreach((dsl: DSLContext) => this.dsl = dsl) // save returned dsl to a local variable
-      //#dbFactory-access
+    dbFactory
+      .makeDsl(locationService, "postgres")         // postgres is dbName
+      .foreach((dsl: DSLContext) => this.dsl = dsl) // save returned dsl to a local variable
+    //#dbFactory-access
 
-      //#dbFactory-write-access
-      dbFactory
-        .makeDsl(locationService, "postgres", "DB_WRITE_USERNAME", "DB_WRITE_PASSWORD")
-        .foreach((dsl: DSLContext) => this.dsl = dsl) // save returned dsl to a local variable
-      //#dbFactory-write-access
+    //#dbFactory-write-access
+    dbFactory
+      .makeDsl(locationService, "postgres", "DB_WRITE_USERNAME", "DB_WRITE_PASSWORD")
+      .foreach((dsl: DSLContext) => this.dsl = dsl) // save returned dsl to a local variable
+    //#dbFactory-write-access
 
-      //#dbFactory-test-access
-      dbFactory
-        .makeDsl()
-        .foreach((dsl: DSLContext) => this.dsl = dsl) // save returned dsl to a local variable
-      //#dbFactory-test-access
-    }
+    //#dbFactory-test-access
+    dbFactory
+      .makeDsl()
+      .foreach((dsl: DSLContext) => this.dsl = dsl) // save returned dsl to a local variable
+    //#dbFactory-test-access
+  }
 
   override def onSubmit(runId: Id, controlCommand: ControlCommand): CommandResponse.SubmitResponse = {
 
@@ -104,7 +102,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit                                           = ???
   override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit                                            = ???
   override def onOperationsMode(): Unit                                                                            = ???
-  override def onShutdown(): Future[Unit]                                                                          = ???
+  override def onShutdown(): Unit                                                                                  = ???
   override def onGoOffline(): Unit                                                                                 = ???
   override def onGoOnline(): Unit                                                                                  = ???
 }

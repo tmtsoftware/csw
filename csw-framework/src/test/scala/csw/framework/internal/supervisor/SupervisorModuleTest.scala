@@ -420,6 +420,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         supervisorRef ! ComponentStateSubscription(Subscribe(componentStateProbe.ref))
         supervisorRef ! LifecycleStateSubscription(Subscribe(lifecycleStateProbe.ref))
 
+        componentStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
         componentStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))
 
         supervisorRef ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref)

@@ -21,7 +21,6 @@ import csw.prefix.models.Prefix
 import org.mockito.captor.ArgCaptor
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
-import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble
 
 // DEOPSCSW-177-Hooks for lifecycle management
@@ -36,9 +35,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar with A
     when(commandResponseManager.commandResponseManagerActor).thenReturn(commandStatusServiceProbe.ref)
 
     val sampleHcdHandler: ComponentHandlers = mock[ComponentHandlers]
-    when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
-    when(sampleHcdHandler.onShutdown()).thenReturn(Future.unit)
-    val factory = new TestComponentBehaviorFactory(sampleHcdHandler)
+    val factory                             = new TestComponentBehaviorFactory(sampleHcdHandler)
 
     val cswCtx: CswContext = new CswContext(
       frameworkTestMocks().locationService,

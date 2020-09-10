@@ -74,18 +74,16 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
   private Optional<IEventSubscription> maybeEventSubscription = Optional.empty();
 
   @Override
-  public CompletableFuture<Void> jInitialize() {
+  public void jInitialize() {
     log.info("Assembly: " + prefix + " initialize");
     maybeEventSubscription = Optional.of(subscribeToHcd());
-    return CompletableFuture.runAsync(() -> {
-    });
+    // initialization
   }
 
   @Override
-  public CompletableFuture<Void> jOnShutdown() {
+  public void jOnShutdown() {
     log.info("Assembly: " + prefix + " is shutting down.");
-    return CompletableFuture.runAsync(() -> {
-    });
+    // clean up resources
   }
   //#initialize
 

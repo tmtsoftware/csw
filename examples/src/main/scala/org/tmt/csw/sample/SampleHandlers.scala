@@ -126,15 +126,13 @@ class SampleHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext
 
   //#initialize
   private var maybeEventSubscription: Option[EventSubscription] = None
-  override def initialize(): Future[Unit] = {
+  override def initialize(): Unit = {
     log.info("In Assembly initialize")
     maybeEventSubscription = Some(subscribeToHcd())
-    Future.unit
   }
 
-  override def onShutdown(): Future[Unit] = {
+  override def onShutdown(): Unit = {
     log.info("Assembly is shutting down.")
-    Future.unit
   }
   //#initialize
 

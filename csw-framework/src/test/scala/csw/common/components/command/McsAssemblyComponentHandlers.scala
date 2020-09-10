@@ -32,14 +32,14 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
 
   import cswCtx._
 
-  override def initialize(): Future[Unit] = {
+  override def initialize(): Unit = {
     componentInfo.connections.headOption match {
       case Some(hcd) =>
         cswCtx.locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
           case Some(akkaLocation) => hcdComponent = CommandServiceFactory.make(akkaLocation)(ctx.system)
           case None               => throw new RuntimeException("Could not resolve hcd location, Initialization failure.")
         }
-      case None => Future.successful(())
+      case None => ()
     }
   }
 
@@ -127,7 +127,7 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
 
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = {}
 
-  override def onShutdown(): Future[Unit] = Future.unit
+  override def onShutdown(): Unit = {}
 
   override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = {}
 

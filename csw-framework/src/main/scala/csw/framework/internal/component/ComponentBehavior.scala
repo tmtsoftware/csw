@@ -19,9 +19,7 @@ import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandResponse._
 import csw.params.core.models.Id
 
-import scala.async.Async.{async, await}
-import scala.concurrent.Await
-import scala.concurrent.duration.{DurationDouble, FiniteDuration}
+import scala.concurrent.blocking
 import scala.util.control.NonFatal
 
 // scalastyle:off method.length
@@ -41,11 +39,8 @@ private[framework] object ComponentBehavior {
   ): Behavior[TopLevelActorMessage] =
     Behaviors.setup(ctx => {
       import cswCtx._
-      import ctx.executionContext
 
       val log: Logger = loggerFactory.getLogger(ctx)
-
-      val shutdownTimeout: FiniteDuration = 10.seconds
 
       var lifecycleState: ComponentLifecycleState = ComponentLifecycleState.Idle
 
@@ -60,7 +55,9 @@ private[framework] object ComponentBehavior {
           log.warn("Component TLA is shutting down")
           try {
             log.info("Invoking lifecycle handler's onShutdown hook")
-            Await.result(lifecycleHandlers.onShutdown(), shutdownTimeout)
+            blocking {
+              lifecycleHandlers.onShutdown()
+            }
           }
           catch {
             case NonFatal(throwable) => log.error(throwable.getMessage, ex = throwable)
@@ -88,9 +85,11 @@ private[framework] object ComponentBehavior {
       def onIdle(idleMessage: TopLevelActorIdleMessage): Unit =
         idleMessage match {
           case Initialize =>
-            async {
+            try {
               log.info("Invoking lifecycle handler's initialize hook")
-              await(lifecycleHandlers.initialize())
+              blocking {
+                lifecycleHandlers.initialize()
+              }
               log.debug(
                 s"Component TLA is changing lifecycle state from [$lifecycleState] to [${ComponentLifecycleState.Initialized}]"
               )
@@ -104,7 +103,10 @@ private[framework] object ComponentBehavior {
               lifecycleState = ComponentLifecycleState.Running
               lifecycleHandlers.isOnline = true
               supervisor ! Running(ctx.self)
-            }.failed.foreach(throwable => ctx.self ! UnderlyingHookFailed(throwable))
+            }
+            catch {
+              case NonFatal(e) => ctx.self ! UnderlyingHookFailed(e)
+            }
         }
 
       /*

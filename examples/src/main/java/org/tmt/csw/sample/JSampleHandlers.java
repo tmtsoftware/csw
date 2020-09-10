@@ -10,7 +10,10 @@ import csw.command.client.messages.TopLevelActorMessage;
 import csw.event.api.javadsl.IEventSubscription;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
-import csw.location.api.models.*;
+import csw.location.api.models.Location;
+import csw.location.api.models.LocationRemoved;
+import csw.location.api.models.LocationUpdated;
+import csw.location.api.models.TrackingEvent;
 import csw.logging.api.javadsl.ILogger;
 import csw.params.commands.CommandName;
 import csw.params.commands.CommandResponse;
@@ -158,16 +161,14 @@ public class JSampleHandlers extends JComponentHandlers {
     private Optional<IEventSubscription> maybeEventSubscription = Optional.empty();
 
     @Override
-    public CompletableFuture<Void> jInitialize() {
-        return CompletableFuture.runAsync(() -> {
-            log.info("In Assembly initialize");
-            maybeEventSubscription = Optional.of(subscribeToHcd());
-        });
+    public void jInitialize() {
+        log.info("In Assembly initialize");
+        maybeEventSubscription = Optional.of(subscribeToHcd());
     }
 
     @Override
-    public CompletableFuture<Void> jOnShutdown() {
-        return CompletableFuture.runAsync(() -> log.info("Assembly is shutting down."));
+    public void jOnShutdown() {
+        log.info("Assembly is shutting down.");
     }
     //#initialize
 

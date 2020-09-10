@@ -2,9 +2,9 @@ package example.framework.components.hcd
 
 import java.nio.file.Paths
 
-import akka.actor.typed.{ActorRef, Scheduler}
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.AskPattern.Askable
+import akka.actor.typed.{ActorRef, Scheduler}
 import akka.util.Timeout
 import csw.command.client.messages.TopLevelActorMessage
 import csw.config.api.ConfigData
@@ -20,9 +20,8 @@ import example.framework.components.ConfigNotAvailableException
 import example.framework.components.assembly.WorkerActorMsgs.{GetStatistics, InitialState}
 import example.framework.components.assembly.{WorkerActor, WorkerActorMsg}
 
-import scala.async.Async.{async, await}
 import scala.concurrent.duration.DurationLong
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 //#component-handlers-class
 class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
@@ -41,20 +40,18 @@ class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
   var stats: Int                    = _
 
   //#initialize-handler
-  override def initialize(): Future[Unit] =
-    async {
+  override def initialize(): Unit = {
 
-      // fetch config (preferably from configuration service)
-      val hcdConfig = await(getHcdConfig)
+    // fetch config (preferably from configuration service)
+    val hcdConfig = Await.result(getHcdConfig, timeout.duration)
 
-      // create a worker actor which is used by this hcd
-      val worker: ActorRef[WorkerActorMsg] = ctx.spawnAnonymous(WorkerActor.behavior(hcdConfig))
+    // create a worker actor which is used by this hcd
+    val worker: ActorRef[WorkerActorMsg] = ctx.spawnAnonymous(WorkerActor.behavior(hcdConfig))
 
-      // initialise some state by using the worker actor created above
-      current = await(worker ? InitialState)
-      stats = await(worker ? GetStatistics)
-
-    }
+    // initialise some state by using the worker actor created above
+    current = Await.result(worker ? InitialState, timeout.duration)
+    stats = Await.result(worker ? GetStatistics, timeout.duration)
+  }
   //#initialize-handler
 
   //#validateCommand-handler
@@ -94,10 +91,9 @@ class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
   //#onGoOnline-handler
 
   //#onShutdown-handler
-  override def onShutdown(): Future[Unit] =
-    async {
-      // clean up resources
-    }
+  override def onShutdown(): Unit = {
+    // clean up resources
+  }
   //#onShutdown-handler
 
   override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = {

@@ -29,7 +29,7 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
   private implicit val actorSystem          = ctx.system
   private implicit val ec: ExecutionContext = ctx.executionContext
 
-  override def initialize(): Future[Unit] = Future.unit
+  override def initialize(): Unit = {}
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ???
 
@@ -153,7 +153,7 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
 
   override def onOperationsMode(): Unit = ???
 
-  override def onShutdown(): Future[Unit] = ???
+  override def onShutdown(): Unit = ???
 
   override def onGoOffline(): Unit = ???
 

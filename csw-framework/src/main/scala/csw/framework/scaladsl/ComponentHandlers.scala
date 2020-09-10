@@ -10,8 +10,6 @@ import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
 import csw.time.core.models.UTCTime
 
-import scala.concurrent.Future
-
 /**
  * Base class for component handlers which will be used by the component actor
  *
@@ -26,14 +24,13 @@ abstract class ComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx
   var isOnline: Boolean = false
 
   /**
-   * The initialize handler is invoked when the component is created. This is different than constructor initialization
-   * to allow non-blocking asynchronous operations. The component can initialize state such as configuration to be fetched
+   * The initialize handler is invoked when the component is created. The component can initialize state such as configuration to be fetched
    * from configuration service, location of components or services to be fetched from location service etc. These vary
    * from component to component.
    *
-   * @return a future which completes when the initialization of component completes
+   * @return when the initialization of component completes
    */
-  def initialize(): Future[Unit]
+  def initialize(): Unit
 
   /**
    * The onLocationTrackingEvent handler can be used to take action on the TrackingEvent for a particular connection.
@@ -86,9 +83,9 @@ abstract class ComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx
   /**
    * The onShutdown handler can be used for carrying out the tasks which will allow the component to shutdown gracefully
    *
-   * @return a future which completes when the shutdown completes for component
+   * @return when the shutdown completes for component
    */
-  def onShutdown(): Future[Unit]
+  def onShutdown(): Unit
 
   /**
    * A component can be notified to run in offline mode in case it is not in use. The component can change its behavior
