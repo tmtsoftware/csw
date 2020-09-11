@@ -71,6 +71,7 @@ object Common extends AutoPlugin {
     },
     isSnapshot := !sys.props.get("prod.publish").contains("true"),
     fork := true,
+    javaOptions in Test ++= Seq("-Dakka.actor.serialize-messages=on"),
     suppressAnnotatedWarnings := true,
     enableFatalWarnings := false,
     autoCompilerPlugins := true,
