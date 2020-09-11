@@ -4,6 +4,7 @@ import akka.actor.typed.ActorRef
 import csw.logging.models.Level._
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.commons.LoggingKeys
+import csw.logging.client.components.IRISLogMessages._
 import csw.logging.client.components.IRIS._
 import csw.logging.client.components._
 import csw.logging.client.internal.JsonExtensions.RichJsObject
