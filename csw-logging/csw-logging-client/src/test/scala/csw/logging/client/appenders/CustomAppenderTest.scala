@@ -71,7 +71,8 @@ class CustomAppenderTest extends AnyFunSuite with Matchers {
   ) {
 
     val config =
-      ConfigFactory.parseString("""
+      ConfigFactory
+        .parseString("""
         |include "logging.conf"
         |csw-logging {
         | appenders = ["csw.logging.client.appenders.CustomAppenderBuilderObject$"]
@@ -82,14 +83,20 @@ class CustomAppenderTest extends AnyFunSuite with Matchers {
         | }
         |}
       """.stripMargin)
+        .withFallback(ConfigFactory.load())
 
-    val actorSystem   = typed.ActorSystem(SpawnProtocol(), "test", config.resolve())
+    val actorSystem = typed.ActorSystem(SpawnProtocol(), "test", config.resolve())
+
     val loggingSystem = LoggingSystemFactory.start("foo-name", "foo-version", hostName, actorSystem)
     loggingSystem.setAppenders(List(CustomAppenderBuilderObject))
+    Thread.sleep(200)
+    val logsBeforeMyComponent = CustomAppenderBuilderObject.logBuffer.size
 
     new MyFavComponent().startLogging()
     Thread.sleep(200)
-    CustomAppenderBuilderObject.logBuffer.size shouldBe 4
+
+    val myComponentLogs = CustomAppenderBuilderObject.logBuffer.size - logsBeforeMyComponent
+    myComponentLogs shouldBe 4
 
     CustomAppenderBuilderObject.logBuffer.forall(log => log.contains("IpAddress")) shouldBe true
     CustomAppenderBuilderObject.logBuffer.forall(log => log.getString("IpAddress") == hostName) shouldBe true
@@ -102,7 +109,8 @@ class CustomAppenderTest extends AnyFunSuite with Matchers {
     "should be able to add and configure a custom appender using a class extending from CustomAppenderBuilder | DEOPSCSW-272"
   ) {
 
-    val config = ConfigFactory.parseString("""
+    val config = ConfigFactory
+      .parseString("""
         |include "logging.conf"
         |csw-logging {
         | appenders = ["csw.logging.client.appenders.CustomAppenderBuilderClass"]
@@ -113,6 +121,7 @@ class CustomAppenderTest extends AnyFunSuite with Matchers {
         | }
         |}
       """.stripMargin)
+      .withFallback(ConfigFactory.load())
 
     val actorSystem    = typed.ActorSystem(SpawnProtocol(), "test", config.resolve())
     val loggingSystem  = LoggingSystemFactory.start("foo-name", "foo-version", hostName, actorSystem)
@@ -135,17 +144,19 @@ class CustomAppenderTest extends AnyFunSuite with Matchers {
     "should be able to add and configure a custom appender using a class extending from CustomAppenderBuilder showing config changes | DEOPSCSW-272"
   ) {
 
-    val config = ConfigFactory.parseString("""
-                                             |include "logging.conf"
-                                             |csw-logging {
-                                             | appenders = ["csw.logging.client.appenders.CustomAppenderBuilderClass"]
-                                             | appender-config {
-                                             |   my-fav-appender {
-                                             |     logIpAddress = false
-                                             |   }
-                                             | }
-                                             |}
-                                           """.stripMargin)
+    val config = ConfigFactory
+      .parseString("""
+         |include "logging.conf"
+         |csw-logging {
+         | appenders = ["csw.logging.client.appenders.CustomAppenderBuilderClass"]
+         | appender-config {
+         |   my-fav-appender {
+         |     logIpAddress = false
+         |   }
+         | }
+         |}
+      """.stripMargin)
+      .withFallback(ConfigFactory.load())
 
     val actorSystem    = typed.ActorSystem(SpawnProtocol(), "test", config.resolve())
     val loggingSystem  = LoggingSystemFactory.start("foo-name", "foo-version", hostName, actorSystem)
