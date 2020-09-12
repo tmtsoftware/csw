@@ -1,11 +1,12 @@
 package csw.aas.core.token
 
-import csw.aas.core.{TokenVerificationFailure, TokenVerifier}
+import csw.aas.core.TokenVerifier
+import msocket.security.api.TokenValidator
 import msocket.security.models.AccessToken
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class TokenFactory(tokenVerifier: TokenVerifier)(implicit ec: ExecutionContext) {
+class TokenFactory(tokenVerifier: TokenVerifier)(implicit ec: ExecutionContext) extends TokenValidator {
 
   /**
    * It will validate the token string for signature and expiry and then decode it into
@@ -13,6 +14,9 @@ class TokenFactory(tokenVerifier: TokenVerifier)(implicit ec: ExecutionContext) 
    *
    * @param token Access token string
    */
-  private[aas] def makeToken(token: String): Future[Either[TokenVerificationFailure, AccessToken]] =
-    tokenVerifier.verifyAndDecode(token)
+  override def validate(token: String): Future[AccessToken] =
+    tokenVerifier.verifyAndDecode(token).map {
+      case Left(failure)      => throw failure
+      case Right(accessToken) => accessToken
+    }
 }
