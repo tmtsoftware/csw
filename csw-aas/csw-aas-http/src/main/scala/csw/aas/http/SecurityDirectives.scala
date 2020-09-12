@@ -2,7 +2,7 @@ package csw.aas.http
 
 import akka.http.scaladsl.model.HttpMethod
 import akka.http.scaladsl.model.HttpMethods._
-import akka.http.scaladsl.server.Directives.{authorizeAsync => keycloakAuthorizeAsync, _}
+import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.directives.AuthenticationDirective
 import com.typesafe.config.Config
@@ -107,7 +107,7 @@ class SecurityDirectives private[csw] (authentication: Authentication, realm: St
     authenticateOAuth2Async(realm, authentication.authenticator)
 
   private[aas] def authorize(authorizationPolicy: AuthorizationPolicy, accessToken: AccessToken): Directive0 =
-    keycloakAuthorizeAsync(authorizationPolicy.authorize(accessToken))
+    authorizeAsync(authorizationPolicy.authorize(accessToken))
 
   private def sMethod(httpMethod: HttpMethod, authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] =
     method(httpMethod) & secure(authorizationPolicy)
