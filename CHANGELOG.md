@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 - Removed `RegistrationFactory` from `location-server` module. Instead, following should be used by Scala and Java users to instantiate `AkkaRegistration`
     - For Scala users, `AkkaRegistrationFactory` API change to expect actorRef instead of URI of remote actorRef
     - For Java users, `JAkkaRegistrationFactory` is added.
+- Contract change for ComponentHandlers `initialize` method, return type changed from `Future[Unit]` to `Unit` i.e. from non-blocking to blocking.  
 
 ## [CSW v2.0.1] - 2020-03-20
 
