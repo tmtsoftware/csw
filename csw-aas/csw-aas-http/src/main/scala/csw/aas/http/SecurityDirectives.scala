@@ -2,9 +2,12 @@ package csw.aas.http
 
 import akka.http.scaladsl.model.HttpMethod
 import akka.http.scaladsl.model.HttpMethods._
+import akka.http.scaladsl.model.headers.{HttpChallenges, OAuth2BearerToken}
+import akka.http.scaladsl.server.AuthenticationFailedRejection.{CredentialsMissing, CredentialsRejected}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server._
-import akka.http.scaladsl.server.directives.AuthenticationDirective
+import akka.http.scaladsl.server.directives.BasicDirectives.provide
+import akka.http.scaladsl.server.directives.RouteDirectives.reject
 import com.typesafe.config.Config
 import csw.aas.core.TokenVerifier
 import csw.aas.core.commons.AuthLogger
@@ -14,22 +17,14 @@ import csw.aas.core.utils.ConfigExt._
 import csw.location.api.models.HttpLocation
 import csw.location.api.scaladsl.LocationService
 import msocket.security.api.AuthorizationPolicy
-import msocket.security.models.AccessToken
+import msocket.security.models.{AccessStatus, AccessToken}
+import msocket.security.{AccessControllerFactory, models}
 
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.implicitConversions
 
-class SecurityDirectives private[csw] (authentication: Authentication, realm: String, disabled: Boolean) {
-
-  private val logger = AuthLogger.getLogger
-
-  if (disabled)
-    logger.warn(
-      "Security directives initialized with auth disabled. " +
-        "All un-authorised calls will be granted access"
-    )
-
+class SecurityDirectives private[csw] (accessControllerFactory: AccessControllerFactory, realm: String) {
   implicit def toRouteFunction(route: Route): AccessToken => Route                            = _ => route
   implicit def toBooleanFunction(bool: Boolean): AccessToken => Boolean                       = _ => bool
   implicit def toBooleanFutureFunction(bool: Future[Boolean]): AccessToken => Future[Boolean] = _ => bool
@@ -41,10 +36,31 @@ class SecurityDirectives private[csw] (authentication: Authentication, realm: St
    *                            There are different types of authorization policies. See [[csw.aas.http.AuthorizationPolicy]]
    */
   def secure(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] = {
-    if (!disabled)
-      authenticate.flatMap(token => authorize(authorizationPolicy, token) & provide(token))
-    else
-      provide(AccessToken())
+    extractStringToken.flatMap { maybeToken =>
+      extractRequestContext.flatMap { rc =>
+        import rc.executionContext
+        val accessController     = accessControllerFactory.make(maybeToken)
+        val eventualAccessStatus = accessController.authenticateAndAuthorize(Some(authorizationPolicy))
+        onSuccess(eventualAccessStatus).flatMap(getAccessToken)
+      }
+    }
+  }
+
+  private def extractStringToken: Directive1[Option[String]] = {
+    extractCredentials.map {
+      case Some(OAuth2BearerToken(token)) => Some(token)
+      case _                              => None
+    }
+  }
+
+  private def getAccessToken(accessStatus: AccessStatus): Directive1[AccessToken] = {
+    lazy val challenge = HttpChallenges.oAuth2(realm)
+    accessStatus match {
+      case models.AccessStatus.Authorized(accessToken) => provide(accessToken)
+      case models.AccessStatus.TokenMissing()          => reject(AuthenticationFailedRejection(CredentialsMissing, challenge))
+      case models.AccessStatus.AuthenticationFailed(_) => reject(AuthenticationFailedRejection(CredentialsRejected, challenge))
+      case models.AccessStatus.AuthorizationFailed(_)  => reject(AuthorizationFailedRejection)
+    }
   }
 
   /**
@@ -103,12 +119,6 @@ class SecurityDirectives private[csw] (authentication: Authentication, realm: St
    */
   def sConnect(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] = sMethod(CONNECT, authorizationPolicy)
 
-  private[aas] def authenticate: AuthenticationDirective[AccessToken] =
-    authenticateOAuth2Async(realm, authentication.authenticator)
-
-  private[aas] def authorize(authorizationPolicy: AuthorizationPolicy, accessToken: AccessToken): Directive0 =
-    authorizeAsync(authorizationPolicy.authorize(accessToken))
-
   private def sMethod(httpMethod: HttpMethod, authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] =
     method(httpMethod) & secure(authorizationPolicy)
 }
@@ -152,9 +162,16 @@ object SecurityDirectives {
 
   private def from(authConfig: AuthConfig)(implicit ec: ExecutionContext): SecurityDirectives = {
     val keycloakDeployment = authConfig.getDeployment
-    val tokenVerifier      = TokenVerifier(authConfig)
-    val authentication     = new Authentication(new TokenFactory(tokenVerifier))
-    new SecurityDirectives(authentication, keycloakDeployment.getRealm, authConfig.disabled)
+    val tokenFactory       = new TokenFactory(TokenVerifier(authConfig))
+    val securityEnabled    = !authConfig.disabled
+    if (!securityEnabled) {
+      AuthLogger.getLogger.warn(
+        "Security directives initialized with auth disabled. " +
+          "All un-authorised calls will be granted access"
+      )
+    }
+    val accessControllerFactory = new AccessControllerFactory(tokenFactory, securityEnabled)
+    new SecurityDirectives(accessControllerFactory, keycloakDeployment.getRealm)
   }
 
   private def enableAuthUsing(config: Config): Boolean =

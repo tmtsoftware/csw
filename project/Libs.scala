@@ -120,7 +120,7 @@ object Jooq {
 }
 
 object MSocket {
-  val Version = "bee94b0"
+  val Version = "9328211"
 
   val `msocket-api`      = dep("com.github.tmtsoftware.msocket" %%% "msocket-api" % Version)
   val `msocket-security` = "com.github.tmtsoftware.msocket" %% "msocket-security" % Version

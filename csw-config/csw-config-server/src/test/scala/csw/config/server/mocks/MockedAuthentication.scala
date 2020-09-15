@@ -1,11 +1,11 @@
 package csw.config.server.mocks
 
 import akka.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
-import akka.http.scaladsl.server.Directives.AsyncAuthenticator
-import akka.http.scaladsl.server.directives.Credentials.Provided
 import csw.aas.core.deployment.AuthConfig
-import csw.aas.http.{Authentication, SecurityDirectives}
+import csw.aas.http.SecurityDirectives
 import csw.config.api.TokenFactory
+import msocket.security.AccessControllerFactory
+import msocket.security.api.TokenValidator
 import msocket.security.models.AccessToken
 import org.keycloak.adapters.KeycloakDeployment
 import org.mockito.MockitoSugar
@@ -16,7 +16,6 @@ class JMockedAuthentication extends MockedAuthentication
 
 trait MockedAuthentication {
   import MockitoSugar._
-  val authentication: Authentication = mock[Authentication]
 
   private val keycloakDeployment = new KeycloakDeployment()
   keycloakDeployment.setRealm("TMT")
@@ -24,9 +23,6 @@ trait MockedAuthentication {
 
   private val authConfig: AuthConfig = mock[AuthConfig]
   when(authConfig.getDeployment).thenReturn(keycloakDeployment)
-
-  val securityDirectives =
-    new SecurityDirectives(authentication, keycloakDeployment.getRealm, false)
 
   val roleMissingTokenStr = "rolemissing"
   val validTokenStr       = "valid"
@@ -38,16 +34,18 @@ trait MockedAuthentication {
   val validToken: AccessToken       = mock[AccessToken]
   val invalidToken: AccessToken     = mock[AccessToken]
 
-  private val authenticator: AsyncAuthenticator[AccessToken] = {
-    case Provided(`roleMissingTokenStr`) => Future.successful(Some(roleMissingToken))
-    case Provided(`validTokenStr`)       => Future.successful(Some(validToken))
-    case _                               => Future.successful(None)
+  val tokenValidator: TokenValidator = {
+    case `roleMissingTokenStr` => Future.successful(roleMissingToken)
+    case `validTokenStr`       => Future.successful(validToken)
+    case token                 => Future.failed(new RuntimeException(s"unexpected token $token"))
   }
+
+  val securityDirectives = new SecurityDirectives(new AccessControllerFactory(tokenValidator, true), keycloakDeployment.getRealm)
+
   when(roleMissingToken.hasRealmRole("config-admin")).thenReturn(false)
   when(validToken.hasRealmRole("config-admin")).thenReturn(true)
   when(validToken.preferred_username).thenReturn(Some(preferredUserName))
   when(validToken.userOrClientName).thenReturn(preferredUserName)
-  when(authentication.authenticator).thenReturn(authenticator)
 
   val roleMissingTokenHeader = Authorization(OAuth2BearerToken(roleMissingTokenStr))
   val validTokenHeader       = Authorization(OAuth2BearerToken(validTokenStr))
