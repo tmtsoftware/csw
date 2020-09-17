@@ -28,10 +28,10 @@ object Settings {
     )
   }
 
-  // export CSW_JS_VERSION env variable which is compatible with csw
-  // this represents version number of javascript docs maintained at https://github.com/tmtsoftware/csw-js
-  def cswJsVersion: String =
-    (sys.env ++ sys.props).get("CSW_JS_VERSION") match {
+  // export ESW_TS_VERSION env variable which is compatible with csw
+  // this represents version number of javascript docs maintained at https://github.com/tmtsoftware/esw-ts
+  def eswTsVersion: String =
+    (sys.env ++ sys.props).get("ESW_TS_VERSION") match {
       case Some(v) => v
       case None    => "0.1.0-SNAPSHOT"
     }

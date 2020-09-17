@@ -33,10 +33,6 @@
 
 Refer **RELEASING.md** in `csw.g8` repo.
 
-### Release csw-js (if needed)
-
-Release `csw-js` if keycloak version is updated in csw. Refer the **RELEASING.md** in `csw-js`.
-
 ### Release esw
 
 Refer to **RELEASING.md** in `esw` repo.

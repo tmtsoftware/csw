@@ -564,7 +564,7 @@ lazy val docs = project
   .enablePlugins(NoPublish, ParadoxMaterialSitePlugin)
   .settings(
     paradoxProperties in Paradox ++= Map(
-      "extref.csw_js.base_url" -> s"https://tmtsoftware.github.io/csw-js/${Settings.cswJsVersion}/%s"
+      "extref.esw_ts.base_url" -> s"https://tmtsoftware.github.io/esw-ts/${Settings.eswTsVersion}/%s"
     ),
     paradoxRoots := List(
       "index.html",

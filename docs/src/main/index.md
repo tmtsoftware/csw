@@ -242,4 +242,4 @@ Members of TMT work packages can add issues at the internal maintenance [site](/
 **Documentation for HTTP based services could be found [here](swagger/index.html).**
 
 ## CSW Javascript adapters documentation
-**Documentation for CSW JS adapters could be found @extref[here](csw_js:)**
+**Documentation for CSW JS adapters could be found @extref[here](esw_ts:)**
