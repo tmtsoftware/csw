@@ -9,7 +9,7 @@ import romaine.codec.RomaineCodec
 /**
  * Encodes and decodes keys as EventKeys and values as ProtoBuf byte equivalent of Event
  */
-private[event] object EventRomaineCodecs {
+private[csw] object EventRomaineCodecs {
 
   implicit val eventKeyRomaineCodec: RomaineCodec[EventKey] =
     RomaineCodec.stringCodec.bimap(_.key, EventKey.apply)
