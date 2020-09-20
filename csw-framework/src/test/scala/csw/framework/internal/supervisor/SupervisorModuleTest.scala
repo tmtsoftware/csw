@@ -400,7 +400,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
   // DEOPSCSW-284: Move Timeouts to Config file
   test(
-    "handle InitializeTimeout by stopping TLA | DEOPSCSW-284, DEOPSCSW-166, DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-165, DEOPSCSW-176"
+    "handle InitializeTimeout by logging timeout error | CSW-112, DEOPSCSW-284, DEOPSCSW-166, DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-165, DEOPSCSW-176"
   ) {
     val supervisorLifecycleStateProbe: TestProbe[SupervisorLifecycleState] = TestProbe[SupervisorLifecycleState]()
 
@@ -421,11 +421,10 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         supervisorRef ! LifecycleStateSubscription(Subscribe(lifecycleStateProbe.ref))
 
         componentStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
-        componentStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))
 
         supervisorRef ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref)
-        supervisorLifecycleStateProbe.expectMessage(SupervisorLifecycleState.Idle)
-        verify(locationService, never).register(akkaRegistration)
+        supervisorLifecycleStateProbe.expectMessage(SupervisorLifecycleState.Running)
+        verify(locationService).register(akkaRegistration)
       }
     }
   }
