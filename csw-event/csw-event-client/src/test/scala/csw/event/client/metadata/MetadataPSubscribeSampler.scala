@@ -61,7 +61,7 @@ object MetadataPSubscribeSampler extends App {
   private val redisClient: RedisClient = RedisClient.create()
 
   private val eventualRedisURI: Future[RedisURI] =
-    Future.successful(RedisURI.Builder.sentinel("192.168.43.50", 26379, "eventServer").build())
+    Future.successful(RedisURI.Builder.sentinel("localhost", 26379, "eventServer").build())
 
   private val subscriber = new RedisSubscriber(eventualRedisURI, redisClient)
 

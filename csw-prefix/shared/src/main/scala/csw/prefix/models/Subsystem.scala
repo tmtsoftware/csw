@@ -57,6 +57,7 @@ object Subsystem extends Enum[Subsystem] {
   case object SOSS    extends Subsystem("Science Operations Support System")
   case object TCS     extends Subsystem("Telescope Control System")
   case object WFOS    extends Subsystem("Wide Field Optical Spectrometer")
+  case object *       extends Subsystem("pattern")
 
   case object Container extends Subsystem("Container Subsystem")
 }

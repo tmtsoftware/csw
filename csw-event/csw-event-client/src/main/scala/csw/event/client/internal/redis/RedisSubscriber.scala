@@ -105,7 +105,20 @@ private[event] class RedisSubscriber(redisURI: Future[RedisURI], redisClient: Re
   override def pSubscribeCallback(subsystem: Subsystem, pattern: String, callback: Event => Unit): EventSubscription =
     eventSubscriberUtil.pSubscribe(pSubscribe(subsystem, pattern), callback)
 
-  override def get(eventKeys: Set[EventKey]): Future[Set[Event]] = Future.sequence(eventKeys.map(get))
+  override def get(eventKeys: Set[EventKey]): Future[Set[Event]] = mGet(eventKeys.toList)
+
+  private def mGet(keys: List[EventKey]): Future[Set[Event]] = {
+    async {
+      val events = await(recoverWithError(asyncApi.mget(keys)))
+      events.map { event =>
+        event.value.getOrElse(Event.invalidEvent(event.key))
+      }.toSet
+    }
+  }
+
+  private[event] def keys(pattern: EventKey) = {
+    asyncApi.keys(pattern)
+  }
 
   override def get(eventKey: EventKey): Future[Event] =
     async {
