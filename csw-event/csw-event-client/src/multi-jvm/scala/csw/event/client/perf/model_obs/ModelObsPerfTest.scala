@@ -1,9 +1,9 @@
 package csw.event.client.perf.model_obs
 
-import akka.actor.typed.scaladsl.adapter._
-import akka.remote.testkit.MultiNodeConfig
 import akka.actor.testkit.typed.scaladsl
 import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.adapter._
+import akka.remote.testkit.MultiNodeConfig
 import com.typesafe.config.ConfigFactory
 import csw.event.client.perf.BasePerfSuite
 import csw.event.client.perf.commons.{EventsSetting, PerfPublisher, PerfSubscriber}
@@ -60,8 +60,8 @@ class ModelObsPerfTest extends BasePerfSuite(ModelObsMultiNodeConfig) {
       latencyPlots.printTable()
     }
     enterBarrier("results-printed")
-    topProcess.foreach(
-      _ => plotLatencyHistogram(s"${BenchmarkFileReporter.targetDirectory.getAbsolutePath}/$scenarioName/Aggregated-*", "")
+    topProcess.foreach(_ =>
+      plotLatencyHistogram(s"${BenchmarkFileReporter.targetDirectory.getAbsolutePath}/$scenarioName/Aggregated-*", "")
     )
     super.afterAll()
   }
