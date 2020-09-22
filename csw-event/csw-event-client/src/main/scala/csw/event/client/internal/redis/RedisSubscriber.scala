@@ -28,7 +28,7 @@ import scala.concurrent.duration.FiniteDuration
  * @param redisClient redis client available from lettuce
  * @param actorSystem to be used for performing asynchronous operations
  */
-private[event] class RedisSubscriber(redisURI: Future[RedisURI], redisClient: RedisClient)(implicit
+class RedisSubscriber(redisURI: Future[RedisURI], redisClient: RedisClient)(implicit
     actorSystem: ActorSystem[_]
 ) extends EventSubscriber {
 
@@ -116,7 +116,7 @@ private[event] class RedisSubscriber(redisURI: Future[RedisURI], redisClient: Re
     }
   }
 
-  private[event] def keys(pattern: EventKey) = {
+  def keys(pattern: EventKey) = {
     asyncApi.keys(pattern)
   }
 

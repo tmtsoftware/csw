@@ -1,9 +1,9 @@
-package csw.event.client.metadata
+package sampler.metadata
 
 import java.time.Duration
-import java.util.concurrent.ConcurrentHashMap
 
 import akka.Done
+import akka.actor.CoordinatedShutdown
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.event.client.internal.redis.RedisSubscriber
 import csw.location.client.ActorSystemFactory
@@ -15,28 +15,37 @@ import scala.concurrent.{Await, Future}
 
 class MetadataGetSampler(redisSubscriber: RedisSubscriber)(implicit actorSystem: ActorSystem[_]) {
 
-  var queue: List[ConcurrentHashMap[EventKey, Event]] = List.empty // snapshot store
+  var sumOfDiffs        = 0L
+  var numberOfSnapshots = 0d
 
-  val obsEventsToSnapshotOn: List[EventKey] = List.empty
+  def snapshot(obsEvent: Event): Unit = {
+    val pattern        = EventKey("*.*.*")
+    val eventKeys      = Await.result(redisSubscriber.keys(pattern), 10.seconds).toSet
+    val eventsSnapshot = Await.result(redisSubscriber.get(eventKeys), 10.seconds)
 
-  def snapshot(observeEvent: Event): Unit = {
+    val event = eventsSnapshot.find(_.eventKey.equals(EventKey("ESW.filter.wheel"))).getOrElse(Event.badEvent())
+    val diff  = Duration.between(event.eventTime.value, obsEvent.eventTime.value).toMillis
 
-    val pattern   = EventKey("*.*.*")
-    val eventKeys = Await.result(redisSubscriber.keys(pattern), 5.seconds).toSet
+    numberOfSnapshots += 1
+    if (numberOfSnapshots > 10) { // to discard first values
+      sumOfDiffs += Math.abs(diff)
+    }
 
-    val eventsSnapshot = Await.result(redisSubscriber.get(eventKeys), 5.seconds)
-
-    println("+=======================================")
-    val sampledEvent = eventsSnapshot.find(_.eventKey.equals(EventKey("ESW.filter.wheel"))).getOrElse(Event.badEvent())
-    println("time diff :" + Duration.between(sampledEvent.eventTime.value, observeEvent.eventTime.value).toMillis)
-    println("number of events" + eventsSnapshot.size)
-    println("+=======================================")
+    print(diff + ",")
   }
 
   def subscribeObserveEvents(): Future[Done] =
     redisSubscriber.subscribe(Set(EventKey("esw.observe.expstr"))).runForeach(snapshot)
 
   def start(): Future[Done] = {
+    //print aggregates
+    CoordinatedShutdown(actorSystem).addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "print aggregates") { () =>
+      println("\n++++++++++++++++++++++++++++++++++")
+      println("aggregated time diff " + (sumOfDiffs / (numberOfSnapshots - 10))) // - 10 for discard first value
+      println("+++++++++++++++++++++++++++++++++")
+      Future.successful(Done)
+    }
+
     subscribeObserveEvents() // fire in background
   }
 }

@@ -28,8 +28,8 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
   private val tcs1Prefix = Prefix(s"$tcs.1")
 
   /**
-   * Don not run below scenarios on local box, as it generates load and requires multiple machines to support.
-   * For Local testing, try runnig scenarios mentioned at the bottom of this file.
+   * Do not run below scenarios on local box, as it generates load and requires multiple machines to support.
+   * For Local testing, try running scenarios mentioned at the bottom of this file.
    * */
   // DEOPSCSW-405: [Redis]Measure performance of model observatory scenario
   // DEOPSCSW-406: [Kafka]Measure performance of model observatory scenario

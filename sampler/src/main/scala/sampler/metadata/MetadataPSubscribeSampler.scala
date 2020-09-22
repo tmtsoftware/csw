@@ -1,9 +1,10 @@
-package csw.event.client.metadata
+package sampler.metadata
 
 import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
 
 import akka.Done
+import akka.actor.CoordinatedShutdown
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.stream.scaladsl.{Keep, Sink}
 import csw.event.api.scaladsl.EventSubscriber
@@ -11,10 +12,10 @@ import csw.event.client.internal.redis.{RedisGlobalSubscriber, RedisSubscriber}
 import csw.location.client.ActorSystemFactory
 import csw.params.events.{Event, EventKey}
 import io.lettuce.core.{RedisClient, RedisURI}
+import sampler.metadata.MetadataPSubscribeSampler.system
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
-import scala.jdk.CollectionConverters.EnumerationHasAsScala
 
 class MetadataPSubscribeSampler(
     globalSubscriber: RedisGlobalSubscriber,
@@ -22,27 +23,38 @@ class MetadataPSubscribeSampler(
 )(implicit actorSystem: ActorSystem[_]) {
   import actorSystem.executionContext
 
-  var currentState                                    = new ConcurrentHashMap[EventKey, Event]() // mutable map with variable ref
-  var queue: List[ConcurrentHashMap[EventKey, Event]] = List.empty                               // snapshot store
+  var currentState = new ConcurrentHashMap[EventKey, Event]() // mutable map with variable ref
+  var lastSnapshot = new ConcurrentHashMap[EventKey, Event]()
 
-  val obsEventsToSnapshotOn: List[EventKey] = List.empty
+  var sumOfDiffs        = 0L
+  var numberOfSnapshots = 0d
 
-  def snapshot(e: Event): Unit = {
-    val ss = currentState
-    currentState = new ConcurrentHashMap() //change it with new Map
-    queue = ss :: queue                    // data store
+  def snapshot(obsEvent: Event): Unit = {
+    lastSnapshot = currentState
+    currentState = new ConcurrentHashMap(lastSnapshot) //change it with new Map and clone previous snapshot.
 
-    println("+=======================================")
-    val event = ss.getOrDefault(EventKey("ESW.filter.wheel"), Event.badEvent())
-    println("time diff :" + Duration.between(event.eventTime.value, e.eventTime.value).toMillis)
-    println("number of keys" + ss.keys().asScala.toList.size)
-    println("+=======================================")
+    val event = lastSnapshot.getOrDefault(EventKey("ESW.filter.wheel"), Event.badEvent())
+    val diff  = Duration.between(event.eventTime.value, obsEvent.eventTime.value).toMillis
+
+    numberOfSnapshots += 1
+    if (numberOfSnapshots > 10) { // to discard first values
+      sumOfDiffs += diff
+    }
+    print(diff + ",")
   }
 
   def subscribeObserveEvents(): Future[Done] =
     eventSubscriber.subscribe(Set(EventKey("esw.observe.expstr"))).runForeach(snapshot)
 
   def start(): Future[Done] = {
+    //print aggregates
+    CoordinatedShutdown(actorSystem).addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "print aggregates") { () =>
+      println("\n++++++++++++++++++++++++++++++++++")
+      println("aggregated time diff " + (sumOfDiffs / (numberOfSnapshots - 10))) // - 10 for discard first value
+      println("+++++++++++++++++++++++++++++++++")
+      Future.successful(Done)
+    }
+
     subscribeObserveEvents() // fire in background
 
     globalSubscriber
