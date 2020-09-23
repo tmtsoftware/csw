@@ -79,7 +79,7 @@ sealed trait ControlCommand extends SequenceCommand { self: ParameterSetType[_] 
 case class Setup private[params] (
     source: Prefix,
     commandName: CommandName,
-    maybeObsId: Option[ObsId],
+    maybeObsId: Option[ObsId] = None,
     paramSet: Set[Parameter[_]]
 ) extends ParameterSetType[Setup]
     with ControlCommand {
@@ -109,7 +109,7 @@ object Setup {
    * @param maybeObsId an optional obsId for command
    * @return a new instance of Setup with empty paramSet
    */
-  def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId]): Setup =
+  def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId] = None): Setup =
     new Setup(source, commandName, maybeObsId, Set.empty)
 
   /**
@@ -131,7 +131,7 @@ object Setup {
 case class Observe private[params] (
     source: Prefix,
     commandName: CommandName,
-    maybeObsId: Option[ObsId],
+    maybeObsId: Option[ObsId] = None,
     paramSet: Set[Parameter[_]]
 ) extends ParameterSetType[Observe]
     with ControlCommand {
@@ -161,7 +161,7 @@ object Observe {
    * @param maybeObsId an optional obsId for command
    * @return a new instance of Observe with empty paramSet
    */
-  def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId]): Observe =
+  def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId] = None): Observe =
     new Observe(source, commandName, maybeObsId, Set.empty)
 
   /**
@@ -183,7 +183,7 @@ object Observe {
 case class Wait private[params] (
     source: Prefix,
     commandName: CommandName,
-    maybeObsId: Option[ObsId],
+    maybeObsId: Option[ObsId] = None,
     paramSet: Set[Parameter[_]]
 ) extends ParameterSetType[Wait]
     with SequenceCommand {
@@ -213,7 +213,7 @@ object Wait {
    * @param maybeObsId an optional obsId for command
    * @return a new instance of Wait with empty paramSet
    */
-  def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId]): Wait =
+  def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId] = None): Wait =
     apply(source, commandName, maybeObsId, Set.empty)
 
   /**

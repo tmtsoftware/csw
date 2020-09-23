@@ -40,8 +40,10 @@ trait CommandData {
   val obsId: ObsId             = ObsId("obs001")
   val commandName: CommandName = CommandName("move")
 
-  val observe: ControlCommand = Observe(prefix, commandName, Some(obsId))
-  val setup: ControlCommand   = Setup(prefix, commandName, Some(obsId))
+  val observe: ControlCommand             = Observe(prefix, commandName, Some(obsId))
+  val observeWithoutObsId: ControlCommand = Observe(prefix, commandName)
+  val setup: ControlCommand               = Setup(prefix, commandName, Some(obsId))
+  val setupWithoutObsId: ControlCommand   = Setup(prefix, commandName)
 
   val timeout: Timeout = Timeout(FiniteDuration(values, TimeUnit.SECONDS))
 
