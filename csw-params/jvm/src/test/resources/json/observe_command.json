@@ -2,9 +2,7 @@
   "_type": "Observe",
   "source": "WFOS.blue.filter",
   "commandName": "move",
-  "maybeObsId": [
-    "Obs001"
-  ],
+  "maybeObsId": "Obs001",
   "paramSet": [
     {
       "IntKey": {
