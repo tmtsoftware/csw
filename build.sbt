@@ -563,7 +563,7 @@ lazy val `romaine` = project
 lazy val docs = project
   .enablePlugins(NoPublish, ParadoxMaterialSitePlugin)
   .settings(
-    paradoxProperties in Paradox ++= Map(
+    paradoxProperties ++= Map(
       "extref.esw_ts.base_url" -> s"https://tmtsoftware.github.io/esw-ts/${Settings.eswTsVersion}/%s"
     ),
     paradoxRoots := List(
