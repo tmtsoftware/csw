@@ -9,29 +9,40 @@ import csw.event.client.internal.redis.RedisSubscriber
 import csw.location.client.ActorSystemFactory
 import csw.params.events.{Event, EventKey}
 import io.lettuce.core.{RedisClient, RedisURI}
+import sampler.metadata.SamplerUtil.printAggregates
 
+import scala.collection.mutable.ListBuffer
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
 
 class MetadataGetSampler(redisSubscriber: RedisSubscriber)(implicit actorSystem: ActorSystem[_]) {
 
-  var sumOfDiffs        = 0L
-  var numberOfSnapshots = 0d
+  var numberOfSnapshots                   = 0d
+  val eventTimeDiffList: ListBuffer[Long] = scala.collection.mutable.ListBuffer()
+  val snapshotTimeList: ListBuffer[Long]  = scala.collection.mutable.ListBuffer()
 
   def snapshot(obsEvent: Event): Unit = {
-    val pattern        = EventKey("*.*.*")
-    val eventKeys      = Await.result(redisSubscriber.keys(pattern), 10.seconds).toSet
-    val eventsSnapshot = Await.result(redisSubscriber.get(eventKeys), 10.seconds)
+    val startTime = System.currentTimeMillis()
 
-    val event = eventsSnapshot.find(_.eventKey.equals(EventKey("ESW.filter.wheel"))).getOrElse(Event.badEvent())
-    val diff  = Duration.between(event.eventTime.value, obsEvent.eventTime.value).toMillis
+    val pattern      = EventKey("*.*.*")
+    val eventKeys    = Await.result(redisSubscriber.keys(pattern), 10.seconds).toSet
+    val lastSnapshot = Await.result(redisSubscriber.get(eventKeys), 10.seconds)
+    val endTime      = System.currentTimeMillis()
+
+    val event: Event        = lastSnapshot.find(_.eventKey.equals(EventKey("ESW.filter.wheel"))).getOrElse(Event.badEvent())
+    val eventTimeDiff: Long = Duration.between(event.eventTime.value, obsEvent.eventTime.value).toMillis
+    val snapshotTime: Long  = endTime - startTime
 
     numberOfSnapshots += 1
-    if (numberOfSnapshots > 10) { // to discard first values
-      sumOfDiffs += Math.abs(diff)
+    if (numberOfSnapshots > 10) { // to discard first 10 values
+      //Event time diff
+      eventTimeDiffList.addOne(Math.abs(eventTimeDiff))
+
+      //Snapshot time diff
+      snapshotTimeList.addOne(snapshotTime)
     }
 
-    print(diff + ",")
+    println(s"${lastSnapshot.size} ,$eventTimeDiff ,$snapshotTime")
   }
 
   def subscribeObserveEvents(): Future[Done] =
@@ -40,14 +51,13 @@ class MetadataGetSampler(redisSubscriber: RedisSubscriber)(implicit actorSystem:
   def start(): Future[Done] = {
     //print aggregates
     CoordinatedShutdown(actorSystem).addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "print aggregates") { () =>
-      println("\n++++++++++++++++++++++++++++++++++")
-      println("aggregated time diff " + (sumOfDiffs / (numberOfSnapshots - 10))) // - 10 for discard first value
-      println("+++++++++++++++++++++++++++++++++")
+      printAggregates(eventTimeDiffList, snapshotTimeList)
       Future.successful(Done)
     }
 
     subscribeObserveEvents() // fire in background
   }
+
 }
 
 object MetadataGetSampler extends App {
