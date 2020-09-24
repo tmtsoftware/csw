@@ -1,6 +1,6 @@
 # Releasing
 
-## Prerequisites (This is configured in `release.yml`)
+## Prerequisites (This is already configured in `release.yml`)
 
 * Git authentication works by running cmd: `ssh -vT git@github.com`
 * Node is installed
@@ -12,7 +12,9 @@
 ### Release msocket
 
 1. Refer RELEASING.md of `msocket` repo.
-2. Use the tagged version in csw repo.
+2. Refer RELEASING.md of `embedded-keycloak` repo
+3. Refer RELEASING.md of `sbt-docs` repo.
+2. Use the tagged version of above repos in csw repo.
 
 ### csw
 
@@ -28,12 +30,4 @@
 9. Run `release.sh $VERSION$` script by providing version number argument (This triggers release workflow)
 
     **Note:** `PROD=true` environment varibale needs to be set before running `release.sh`
-
-### csw.g8
-
-Refer **RELEASING.md** in `csw.g8` repo.
-
-### Release esw
-
-Refer to **RELEASING.md** in `esw` repo.
 
