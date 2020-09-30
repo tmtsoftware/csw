@@ -3,8 +3,8 @@ package csw.event.client.internal.commons
 import akka.Done
 import akka.actor.typed.ActorSystem
 import akka.actor.{Cancellable, PoisonPill}
-import akka.stream.OverflowStrategy
-import akka.stream.scaladsl.{Sink, Source}
+import akka.stream.scaladsl.{Keep, Sink, Source}
+import akka.stream.{KillSwitches, OverflowStrategy}
 import csw.event.api.exceptions.PublishFailure
 import csw.params.events.Event
 
@@ -41,6 +41,7 @@ private[event] class EventPublisherUtil(implicit actorSystem: ActorSystem[_]) {
       }
       .runForeach(_ => ())
 
+  //FIXME use initialDelay passed
   // create an akka stream source out of eventGenerator function
   def eventSource(
       eventGenerator: => Future[Option[Event]],
@@ -48,7 +49,23 @@ private[event] class EventPublisherUtil(implicit actorSystem: ActorSystem[_]) {
       initialDelay: FiniteDuration,
       every: FiniteDuration
   ): Source[Event, Cancellable] =
-    Source.tick(initialDelay, every, ()).mapAsync(parallelism)(_ => withErrorLogging(eventGenerator))
+    Source
+      .repeat(())
+      .throttle(1, every)
+      .viaMat(KillSwitches.single)(Keep.right)
+      .mapMaterializedValue(ks =>
+        new Cancellable {
+          var cancelled = false
+          override def cancel(): Boolean = {
+            ks.shutdown()
+            cancelled = true
+            true
+          }
+
+          override def isCancelled: Boolean = cancelled
+        }
+      )
+      .mapAsync(parallelism)(_ => withErrorLogging(eventGenerator))
 
   def publishFromSource[Mat](
       source: Source[Event, Mat],

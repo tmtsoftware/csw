@@ -26,7 +26,7 @@ import scala.util.control.NonFatal
  * @param redisClient redis client available from lettuce
  * @param actorSystem provides Materializer, executionContext, etc
  */
-private[event] class RedisPublisher(redisURI: Future[RedisURI], redisClient: RedisClient)(implicit
+class RedisPublisher(redisURI: Future[RedisURI], redisClient: RedisClient)(implicit
     actorSystem: ActorSystem[_]
 ) extends EventPublisher {
 

@@ -10,7 +10,7 @@ import csw.location.client.ActorSystemFactory
 import csw.params.events.{Event, EventKey}
 import io.lettuce.core.{RedisClient, RedisURI}
 import sampler.metadata.MetadataGetSamplerWithFixedKeys.eventKeys
-import sampler.metadata.SamplerUtil.printAggregates
+import sampler.metadata.SamplerUtil.{printAggregates, recordHistogram}
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.duration.DurationInt
@@ -18,7 +18,6 @@ import scala.concurrent.{Await, Future}
 
 class MetadataGetSamplerWithFixedKeys(redisSubscriber: RedisSubscriber)(implicit actorSystem: ActorSystem[_]) {
 
-  var numberOfSnapshots                   = 0d
   val eventTimeDiffList: ListBuffer[Long] = scala.collection.mutable.ListBuffer()
   val snapshotTimeList: ListBuffer[Long]  = scala.collection.mutable.ListBuffer()
 
@@ -32,20 +31,21 @@ class MetadataGetSamplerWithFixedKeys(redisSubscriber: RedisSubscriber)(implicit
     val eventTimeDiff: Long = Duration.between(event.eventTime.value, obsEvent.eventTime.value).toMillis
     val snapshotTime: Long  = endTime - startTime
 
-    numberOfSnapshots += 1
-    if (numberOfSnapshots > 10) { // to discard first 10 values
-      //Event time diff
-      eventTimeDiffList.addOne(Math.abs(eventTimeDiff))
+    //Event time diff
+    val eventDiffNormalized = if (snapshotTime < 0) Math.abs(eventTimeDiff) + 10 else eventTimeDiff
+    eventTimeDiffList.addOne(eventDiffNormalized)
 
-      //Snapshot time diff
-      snapshotTimeList.addOne(snapshotTime)
-    }
+    //Snapshot time diff
+    snapshotTimeList.addOne(snapshotTime)
+    recordHistogram(Math.abs(eventDiffNormalized), Math.abs(snapshotTime))
 
-    println(s"${lastSnapshot.size} ,$eventTimeDiff ,$snapshotTime")
+    println(s"${lastSnapshot.size} ,$eventDiffNormalized ,$snapshotTime")
   }
 
-  def subscribeObserveEvents(): Future[Done] =
-    redisSubscriber.subscribe(Set(EventKey("esw.observe.expstr"))).runForeach(snapshot)
+  def subscribeObserveEvents(): Future[Done] = {
+    val eventualDone = redisSubscriber.subscribe(Set(EventKey("esw.observe.expstr"))).drop(50).take(10).runForeach(snapshot)
+    eventualDone
+  }
 
   def start(): Future[Done] = {
     //print aggregates
@@ -74,5 +74,7 @@ object MetadataGetSamplerWithFixedKeys extends App {
   val pattern         = EventKey("*.*.*")
   val eventKeys       = Await.result(subscriber.keys(pattern), 10.seconds).toSet
 
-  Await.result(sampler.start(), 1000.seconds)
+  Await.result(sampler.start(), 20.minutes)
+  system.terminate()
+  redisClient.shutdown()
 }

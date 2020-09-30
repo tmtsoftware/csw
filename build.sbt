@@ -107,7 +107,9 @@ lazy val `csw-prefix` = crossProject(JSPlatform, JVMPlatform)
   .settings(fork := false)
   .settings(libraryDependencies ++= Dependencies.Prefix.value)
 
-lazy val `sampler` = project.dependsOn(`csw-event-client`, `csw-location-client`)
+lazy val `sampler` = project
+  .dependsOn(`csw-event-client`, `csw-location-client`)
+  .settings(libraryDependencies ++= Dependencies.Sampler.value)
 
 /* ================= Location Service ============== */
 

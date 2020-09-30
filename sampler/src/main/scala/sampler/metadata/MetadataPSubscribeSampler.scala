@@ -11,7 +11,7 @@ import csw.event.client.internal.redis.{RedisGlobalSubscriber, RedisSubscriber}
 import csw.location.client.ActorSystemFactory
 import csw.params.events.{Event, EventKey}
 import io.lettuce.core.{RedisClient, RedisURI}
-import sampler.metadata.SamplerUtil.printAggregates
+import sampler.metadata.SamplerUtil.{printAggregates, recordHistogram}
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.duration.DurationInt
@@ -23,7 +23,7 @@ class MetadataPSubscribeSampler(
 )(implicit actorSystem: ActorSystem[_]) {
 
   var currentState = new ConcurrentHashMap[EventKey, Event]() // mutable map with variable ref
-  var lastSnapshot = new ConcurrentHashMap[EventKey, Event]()
+  val snapshotMap  = new ConcurrentHashMap[String, ConcurrentHashMap[EventKey, Event]]()
 
   var numberOfSnapshots                   = 0d
   val eventTimeDiffList: ListBuffer[Long] = scala.collection.mutable.ListBuffer()
@@ -31,8 +31,13 @@ class MetadataPSubscribeSampler(
 
   def snapshot(obsEvent: Event): Unit = {
     val startTime = System.currentTimeMillis()
-    lastSnapshot = currentState
-    currentState = new ConcurrentHashMap(lastSnapshot) //change it with new Map and clone previous snapshot.
+    //swap approach
+//    lastSnapshot = currentState
+//    currentState = new ConcurrentHashMap(lastSnapshot) //change it with new Map and clone previous snapshot.
+
+    //clone approach
+    val lastSnapshot: ConcurrentHashMap[EventKey, Event] = new ConcurrentHashMap(currentState)
+    snapshotMap.put("some-exposure-id", lastSnapshot) //obsEvent.eventKey => exposureid
 
     val endTime = System.currentTimeMillis()
 
@@ -40,20 +45,18 @@ class MetadataPSubscribeSampler(
     val eventTimeDiff = Duration.between(event.eventTime.value, obsEvent.eventTime.value).toMillis
     val snapshotTime  = endTime - startTime
 
-    numberOfSnapshots += 1
-    if (numberOfSnapshots > 10) { // to discard first 10 values
-      //Event time diff
-      eventTimeDiffList.addOne(Math.abs(eventTimeDiff))
+    //Event time diff
+    eventTimeDiffList.addOne(Math.abs(eventTimeDiff))
 
-      //Snapshot time diff
-      snapshotTimeList.addOne(snapshotTime)
-    }
+    //Snapshot time diff
+    snapshotTimeList.addOne(snapshotTime)
+    recordHistogram(Math.abs(eventTimeDiff), Math.abs(snapshotTime))
 
     println(s"${lastSnapshot.size} ,$eventTimeDiff ,$snapshotTime")
   }
 
   def subscribeObserveEvents(): Future[Done] =
-    eventSubscriber.subscribe(Set(EventKey("esw.observe.expstr"))).runForeach(snapshot)
+    eventSubscriber.subscribe(Set(EventKey("esw.observe.expstr"))).drop(50).take(1000).runForeach(snapshot)
 
   def start(): Future[Done] = {
     //print aggregates
@@ -62,11 +65,13 @@ class MetadataPSubscribeSampler(
       Future.successful(Done)
     }
 
-    subscribeObserveEvents() // fire in background
+    val subscribeFuture = subscribeObserveEvents() // fire in background
 
     globalSubscriber
       .subscribeAll()
       .runForeach { e => currentState.put(e.eventKey, e) }
+
+    subscribeFuture
   }
 }
 
@@ -85,5 +90,7 @@ object MetadataPSubscribeSampler extends App {
 
   private val sampler = new MetadataPSubscribeSampler(globalSubscriber, subscriber)
 
-  Await.result(sampler.start(), 1000.seconds)
+  Await.result(sampler.start(), 20.minutes)
+  system.terminate()
+  redisClient.shutdown()
 }

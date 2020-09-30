@@ -271,6 +271,12 @@ object Dependencies {
     )
   )
 
+  val Sampler = Def.setting(
+    Seq(
+      Libs.`HdrHistogram`
+    )
+  )
+
   val EventCli = Def.setting(
     Seq(
       Libs.`enumeratum`.value,

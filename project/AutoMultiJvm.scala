@@ -1,4 +1,4 @@
-import sbt.Keys.{moduleName, packageBin}
+import sbt.Keys.moduleName
 import sbt.{Def, _}
 
 object AutoMultiJvm extends AutoPlugin {
@@ -18,11 +18,13 @@ object AutoMultiJvm extends AutoPlugin {
     SbtMultiJvm.multiJvmSettings ++ Seq(
       multiNodeHosts in MultiJvm := multiNodeHostNames,
       assemblyMergeStrategy in assembly in MultiJvm := {
-        case "application.conf"                     => reverseConcat
-        case x if x.contains("versions.properties") => MergeStrategy.discard
-        case x if x.contains("mailcap.default")     => MergeStrategy.last
-        case x if x.contains("mimetypes.default")   => MergeStrategy.last
-        case x if x.contains("schema")              => MergeStrategy.last
+        case "application.conf"                            => reverseConcat
+        case x if x.contains("versions.properties")        => MergeStrategy.discard
+        case x if x.contains("mailcap.default")            => MergeStrategy.last
+        case x if x.contains("mimetypes.default")          => MergeStrategy.last
+        case x if x.contains("schema")                     => MergeStrategy.last
+        case x if x.contains("ScalaTestBundle.properties") => MergeStrategy.concat
+        case x if x.contains("version.conf")               => MergeStrategy.first
         case x =>
           val oldStrategy = (assemblyMergeStrategy in assembly in MultiJvm).value
           oldStrategy(x)

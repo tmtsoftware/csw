@@ -23,6 +23,12 @@ private[logging] object LoggingState {
   var akkaLogLevel: Level  = Level.INFO
   var slf4jLogLevel: Level = Level.INFO
 
+  private[csw] def enqueueMsg(msg: LogActorMessages): Unit =
+    msgs.synchronized {
+      msgs.enqueue(msg)
+      while (msgs.size > 100) { msgs.dequeue }
+    }
+
   // LogActor that gets instantiated when LoggingSystem starts
   var maybeLogActor: Option[ActorRef[LogActorMessages]] = None
   @volatile var loggerStopping                          = false
