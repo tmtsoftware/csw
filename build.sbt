@@ -1,18 +1,10 @@
-import AutoMultiJvm.multiJvmArtifact
-import org.tmt.sbt.docs.DocKeys._
+import Common._
 import org.tmt.sbt.docs.{Settings => DocSettings}
 import sbtcrossproject.CrossPlugin.autoImport.{CrossType, crossProject}
 
-val enableCoverage         = sys.props.get("enableCoverage").contains("true")
-val MaybeCoverage: Plugins = if (enableCoverage) Coverage else Plugins.empty
-
-val jsTestArg = testOptions in Test := Seq(Tests.Argument("-oDF"))
-
-docsRepo in ThisBuild := "https://github.com/tmtsoftware/tmtsoftware.github.io.git"
-docsParentDir in ThisBuild := "csw"
-gitCurrentRepo in ThisBuild := "https://github.com/tmtsoftware/csw"
-
-libraryDependencies in ThisBuild += (Libs.`tmt-test-reporter` % Test)
+inThisBuild(
+  CommonSettings
+)
 
 lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-prefix`.jvm,
@@ -601,9 +593,7 @@ lazy val examples = project
   .enablePlugins(DeployApp)
   .settings(
     libraryDependencies ++= Dependencies.Examples.value,
-    scalacOptions ++= (if (Common.autoImport.suppressAnnotatedWarnings.value)
-                         Seq("-Xlint:-unused,-inaccessible", "-Ywarn-dead-code:false")
-                       else Seq.empty)
+    scalacOptions ++= Seq("-Xlint:-unused,-inaccessible", "-Ywarn-dead-code:false")
   )
 
 /* ================ Jmh Benchmarks ============== */

@@ -1,24 +1,12 @@
-import com.timushev.sbt.updates.UpdatesPlugin.autoImport.dependencyUpdatesFilter
 import com.typesafe.sbt.site.SitePlugin.autoImport.siteDirectory
 import org.scalafmt.sbt.ScalafmtPlugin.autoImport.scalafmtOnCompile
-import org.tmt.sbt.docs.DocKeys.docsParentDir
+import org.tmt.sbt.docs.DocKeys.{docsParentDir, docsRepo, gitCurrentRepo}
 import sbt.Keys._
 import sbt._
-import sbt.plugins.JvmPlugin
 import sbtunidoc.GenJavadocPlugin.autoImport.unidocGenjavadocVersion
 
-object Common extends AutoPlugin {
-
-  // enable these values to be accessible to get and set in sbt console
-  object autoImport {
-    val suppressAnnotatedWarnings: SettingKey[Boolean] = settingKey[Boolean]("enable annotation based suppression of warnings")
-    val enableFatalWarnings: SettingKey[Boolean]       = settingKey[Boolean]("enable fatal warnings")
-  }
-
-  override def trigger: PluginTrigger = allRequirements
-
-  override def requires: Plugins = JvmPlugin
-
+object Common {
+  val enableFatalWarnings: SettingKey[Boolean]     = settingKey[Boolean]("enable fatal warnings")
   private val storyReport: Boolean                 = sys.props.get("generateStoryReport").contains("true")
   private val reporterOptions: Seq[Tests.Argument] =
     // "-oDF" - show full stack traces and test case durations
@@ -29,8 +17,15 @@ object Common extends AutoPlugin {
       )
     else Seq(Tests.Argument("-oDF"))
 
-  import autoImport._
-  override lazy val projectSettings: Seq[Setting[_]] = Seq(
+  val enableCoverage: Boolean = sys.props.get("enableCoverage").contains("true")
+  val MaybeCoverage: Plugins  = if (enableCoverage) Coverage else Plugins.empty
+  val jsTestArg               = testOptions in Test := Seq(Tests.Argument("-oDF"))
+
+  lazy val CommonSettings: Seq[Setting[_]] = Seq(
+    docsRepo := "https://github.com/tmtsoftware/tmtsoftware.github.io.git",
+    docsParentDir := "csw",
+    gitCurrentRepo := "https://github.com/tmtsoftware/csw",
+    libraryDependencies += (Libs.`tmt-test-reporter` % Test),
     organization := "com.github.tmtsoftware.csw",
     organizationName := "TMT Org",
     scalaVersion := Libs.ScalaVersion,
@@ -72,18 +67,20 @@ object Common extends AutoPlugin {
     isSnapshot := !sys.props.get("prod.publish").contains("true"),
     fork := true,
     javaOptions in Test ++= Seq("-Dakka.actor.serialize-messages=on"),
-    suppressAnnotatedWarnings := true,
     enableFatalWarnings := false,
     autoCompilerPlugins := true,
     cancelable in Global := true, // allow ongoing test(or any task) to cancel with ctrl + c and still remain inside sbt
     scalafmtOnCompile := true,
     unidocGenjavadocVersion := "0.16",
-    dependencyUpdatesFilter := dependencyUpdatesFilter.value - moduleFilter(organization = "org.scala-lang"),
     commands += Command.command("openSite") { state =>
       val uri = s"file://${Project.extract(state).get(siteDirectory)}/${docsParentDir.value}/${version.value}/index.html"
       state.log.info(s"Opening browser at $uri ...")
       java.awt.Desktop.getDesktop.browse(new java.net.URI(uri))
       state
-    }
+    },
+    Global / excludeLintKeys := Set(
+      SettingKey[Boolean]("ide-skip-project"),
+      aggregate //verify if this needs to be here or our configuration is wrong
+    )
   )
 }
