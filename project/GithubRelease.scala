@@ -35,7 +35,7 @@ object GithubRelease extends AutoPlugin {
   private def coverageReportZipTask =
     Def.task {
       lazy val coverageReportZip = new File(target.value / "ghrelease", "scoverage-report.zip")
-      IO.zip(Path.allSubpaths(new File(crossTarget.value, "scoverage-report")), coverageReportZip)
+      IO.zip(Path.allSubpaths(new File(crossTarget.value, "scoverage-report")), coverageReportZip, None)
       coverageReportZip
     }
 
@@ -48,7 +48,7 @@ object GithubRelease extends AutoPlugin {
       val xmlFiles           = target.all(aggregateFilter).value.flatMap(targetPath => Path.allSubpaths(targetPath / "test-reports"))
 
       // 1. include all xml files in single zip
-      IO.zip(xmlFiles, testReportZip)
+      IO.zip(xmlFiles, testReportZip, None)
       // 2. generate html report from xml files
       IO.withTemporaryDirectory { dir =>
         // copy xml files from all projects to single directory
@@ -89,7 +89,7 @@ object GithubRelease extends AutoPlugin {
       log.info("Deleting staging directory ...")
       // delete older files from staging directory to avoid getting it included in zip
       // in order to delete directory first and then stage projects, below needs to be a task
-      Def.task {
+      val () = Def.task {
         IO.delete(target.value / "universal" / "stage")
       }.value
 

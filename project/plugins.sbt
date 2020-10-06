@@ -9,7 +9,7 @@ addSbtPlugin("org.scoverage"                     % "sbt-scoverage"             %
 addSbtPlugin("com.typesafe.sbt"                  % "sbt-native-packager"       % "1.7.5")
 addSbtPlugin("com.typesafe.sbt"                  % "sbt-multi-jvm"             % "0.4.0")
 addSbtPlugin("com.eed3si9n"                      % "sbt-buildinfo"             % "0.10.0")
-addSbtPlugin("pl.project13.scala"                % "sbt-jmh"                   % "0.3.7")
+addSbtPlugin("pl.project13.scala"                % "sbt-jmh"                   % "0.4.0")
 addSbtPlugin("com.orrsella"                      % "sbt-stats"                 % "1.0.7")
 addSbtPlugin("de.johoop"                         % "sbt-testng-plugin"         % "3.1.1")
 addSbtPlugin("io.spray"                          % "sbt-revolver"              % "0.9.1")
@@ -20,6 +20,7 @@ addSbtPlugin("com.github.cb372"                  % "sbt-explicit-dependencies" %
 addSbtPlugin("ohnosequences"                     % "sbt-github-release"        % "0.7.0")
 addSbtPlugin("com.dwijnand"                      % "sbt-project-graph"         % "0.4.0")
 addSbtPlugin("com.github.tmtsoftware"            % "sbt-docs"                  % "0.2.0-M1")
+addSbtPlugin("com.timushev.sbt"                  % "sbt-rewarn"                % "0.1.1")
 
 resolvers += Resolver.bintrayRepo("twtmt", "sbt-plugins")
 
@@ -37,6 +38,3 @@ scalacOptions ++= Seq(
   "-Xlint:-unused,_",
   "-Ywarn-dead-code"
 )
-
-resolvers += Resolver.bintrayIvyRepo("rtimush", "sbt-plugin-snapshots")
-addSbtPlugin("com.timushev.sbt" % "sbt-rewarn" % "0.0.1-15-3102b36")
