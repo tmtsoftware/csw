@@ -45,7 +45,7 @@ object Libs {
   val `postgresql`        = "org.postgresql"                % "postgresql"      % "42.2.16"
   val `hikaricp`          = "com.zaxxer"                    % "HikariCP"        % "3.4.5" //Apache License 2.0
   val `otj-pg-embedded`   = "com.opentable.components"      % "otj-pg-embedded" % "0.13.3"
-  val httpclient          = "org.apache.httpcomponents"     % "httpclient"      % "4.5.12"
+  val httpclient          = "org.apache.httpcomponents"     % "httpclient"      % "4.5.13"
   val `jboss-logging`     = "org.jboss.logging"             % "jboss-logging"   % "3.4.1.Final"
   val `config`            = "com.typesafe"                  % "config"          % "1.4.0"
   val `os-lib`            = "com.lihaoyi"                  %% "os-lib"          % "0.7.1"
