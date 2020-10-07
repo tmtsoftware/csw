@@ -16,15 +16,15 @@ jobs:
         run: |
           sbt clean scalafmtCheck scalastyle
           sbt makeSite
-          sbt ';set every Seq(enableFatalWarnings := true, scalafmtOnCompile := false); test:compile; multi-jvm:compile;'
+          sbt -DenableFatalWarnings=true ';set every Seq(scalafmtOnCompile := false); test:compile; multi-jvm:compile;'
 
       - name: Tests
         run: |
-          sbt -DenableCoverage=true -DgenerateStoryReport=true ';set every enableFatalWarnings := true; csw-time/test:test'
-          sbt -DenableCoverage=true -DgenerateStoryReport=true -DdisableTimeTests ';set every enableFatalWarnings := true; test:test'
+          sbt -DenableFatalWarnings=true -DenableCoverage=true -DgenerateStoryReport=true 'csw-time/test:test'
+          sbt -DenableFatalWarnings=true -DenableCoverage=true -DgenerateStoryReport=true -DdisableTimeTests 'test:test'
 
       - name: Multi-Jvm Tests
-        run: sbt -DgenerateStoryReport=true ';set every enableFatalWarnings := true; integration/multi-jvm:test'
+        run: sbt -DenableFatalWarnings=true -DgenerateStoryReport=true 'integration/multi-jvm:test'
 
       - name: Coverage Report
         run: |

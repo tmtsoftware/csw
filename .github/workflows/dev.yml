@@ -30,8 +30,8 @@ jobs:
 
       - name: Tests
         run: |
-          sbt -Dakka.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true ';set every enableFatalWarnings := true; csw-time/test:test'
-          sbt -Dakka.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true -DdisableTimeTests ';set every enableFatalWarnings := true; test:test'
+          sbt -DenableFatalWarnings=true -Dakka.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true 'csw-time/test:test'
+          sbt -DenableFatalWarnings=true -Dakka.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true -DdisableTimeTests 'test:test'
 
       - name: Coverage Report
         run: |
@@ -86,7 +86,7 @@ jobs:
           sbt makeSite
 
       - name: Multi-Jvm Tests
-        run: sbt -DgenerateStoryReport=true ';set every enableFatalWarnings := true; integration/multi-jvm:test'
+        run: sbt -DenableFatalWarnings=true -DgenerateStoryReport=true 'integration/multi-jvm:test'
 
   slack-success:
     needs: [unit-tests, multi-jvm-tests]

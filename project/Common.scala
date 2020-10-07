@@ -6,7 +6,7 @@ import sbt._
 import sbtunidoc.GenJavadocPlugin.autoImport.unidocGenjavadocVersion
 
 object Common {
-  val enableFatalWarnings: SettingKey[Boolean]     = settingKey[Boolean]("enable fatal warnings")
+  private val enableFatalWarnings: Boolean         = sys.props.get("generateStoryReport").contains("true")
   private val storyReport: Boolean                 = sys.props.get("generateStoryReport").contains("true")
   private val reporterOptions: Seq[Tests.Argument] =
     // "-oDF" - show full stack traces and test case durations
@@ -46,7 +46,7 @@ object Common {
       "-deprecation",
       //-W Options
       "-Wdead-code",
-      if (enableFatalWarnings.value) "-Wconf:any:error" else "-Wconf:any:warning-verbose",
+      if (enableFatalWarnings) "-Wconf:any:error" else "-Wconf:any:warning-verbose",
       //-X Options
       "-Xlint:_,-missing-interpolator",
       "-Xsource:3",
@@ -67,7 +67,6 @@ object Common {
     isSnapshot := !sys.props.get("prod.publish").contains("true"),
     fork := true,
     javaOptions in Test ++= Seq("-Dakka.actor.serialize-messages=on"),
-    enableFatalWarnings := false,
     autoCompilerPlugins := true,
     cancelable in Global := true, // allow ongoing test(or any task) to cancel with ctrl + c and still remain inside sbt
     scalafmtOnCompile := true,
