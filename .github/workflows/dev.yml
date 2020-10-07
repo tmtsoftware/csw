@@ -25,6 +25,7 @@ jobs:
       - name: Configure ntp time
         run: |
           sudo apt-get update -y
+          sudo apt-get upgrade -y
           sudo apt-get install ntp -y
           sudo ntptime -T 37
 
