@@ -7,9 +7,7 @@ import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import csw.database.commons.DBTestHelper
 import csw.database.scaladsl.JooqExtentions.{RichQueries, RichQuery, RichResultQuery}
 import org.jooq.DSLContext
-import org.scalatest.concurrent.PatienceConfiguration.Interval
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.time.{Seconds, Span}
 import org.scalatest.BeforeAndAfterAll
 
 import scala.concurrent.duration.DurationDouble
@@ -24,6 +22,8 @@ class DatabaseServiceTest extends AnyFunSuite with Matchers with ScalaFutures wi
   private implicit val ec: ExecutionContext              = system.executionContext
   private var postgres: EmbeddedPostgres                 = _
   private var dsl: DSLContext                            = _
+
+  override implicit val patienceConfig: PatienceConfig = PatienceConfig(5.seconds)
 
   override def beforeAll(): Unit = {
     postgres = DBTestHelper.postgres(0) // 0 is random port
@@ -41,24 +41,24 @@ class DatabaseServiceTest extends AnyFunSuite with Matchers with ScalaFutures wi
     // ensure database isn't already present
     val getDatabaseQuery = dsl.resultQuery("SELECT datname FROM pg_database WHERE datistemplate = false")
 
-    val resultSet = getDatabaseQuery.fetchAsyncScala[String].futureValue(Interval(Span(5, Seconds)))
+    val resultSet = getDatabaseQuery.fetchAsyncScala[String].futureValue
 
     if (resultSet contains "box_office") {
       // drop box_office database
       dsl
         .query("DROP DATABASE box_office")
         .executeAsyncScala()
-        .futureValue(Interval(Span(5, Seconds)))
+        .futureValue
     }
 
     // create box_office database
     dsl
       .query("CREATE DATABASE box_office")
       .executeAsyncScala()
-      .futureValue(Interval(Span(5, Seconds)))
+      .futureValue
 
     // assert creation of database
-    val resultSet2 = getDatabaseQuery.fetchAsyncScala[String].futureValue(Interval(Span(5, Seconds)))
+    val resultSet2 = getDatabaseQuery.fetchAsyncScala[String].futureValue
 
     resultSet2 should contain("box_office")
 
@@ -66,7 +66,7 @@ class DatabaseServiceTest extends AnyFunSuite with Matchers with ScalaFutures wi
     dsl
       .query("DROP DATABASE box_office")
       .executeAsyncScala()
-      .futureValue(Interval(Span(5, Seconds)))
+      .futureValue
 
     // assert removal of database
     val resultSet3 = getDatabaseQuery.fetchAsyncScala[String].futureValue

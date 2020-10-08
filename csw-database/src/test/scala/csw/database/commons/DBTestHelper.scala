@@ -8,11 +8,11 @@ import csw.commons.ResourceReader
 import csw.database.DatabaseServiceFactory
 import csw.database.DatabaseServiceFactory.{ReadPasswordHolder, ReadUsernameHolder}
 import org.jooq.DSLContext
-import org.scalatest.concurrent.PatienceConfiguration.Interval
-import org.scalatest.concurrent.ScalaFutures.convertScalaFuture
-import org.scalatest.time.{Seconds, Span}
+import org.scalatest.concurrent.ScalaFutures
 
-object DBTestHelper {
+import scala.concurrent.duration.DurationInt
+
+object DBTestHelper extends ScalaFutures {
   def postgres(port: Int): EmbeddedPostgres =
     EmbeddedPostgres.builder
       .setServerConfig("listen_addresses", "*")
@@ -25,8 +25,10 @@ object DBTestHelper {
   def dbServiceFactory(system: ActorSystem[SpawnProtocol.Command]) =
     new DatabaseServiceFactory(system, Map(ReadUsernameHolder -> "postgres", ReadPasswordHolder -> "postgres"))
 
-  def dslContext(system: ActorSystem[SpawnProtocol.Command], port: Int): DSLContext =
+  def dslContext(system: ActorSystem[SpawnProtocol.Command], port: Int): DSLContext = {
+    implicit val patienceConfig: PatienceConfig = PatienceConfig(5.seconds)
     dbServiceFactory(system)
       .makeDsl(port)
-      .futureValue(Interval(Span(5, Seconds)))
+      .futureValue
+  }
 }
