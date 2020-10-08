@@ -316,6 +316,7 @@ class LoggingConfigurationTest extends AnyFunSuite with Matchers with BeforeAndA
     var expectedTimestamp: ZonedDateTime = null
 
     Console.withOut(outStream) {
+      // we ignore all the messages before LoggingSystem starts
       log.error(sampleLogMessage)
       log.info(sampleLogMessage)
       loggingSystem = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
@@ -328,7 +329,7 @@ class LoggingConfigurationTest extends AnyFunSuite with Matchers with BeforeAndA
     loggingSystem.getAppenders shouldBe List(StdOutAppender)
 
     parse(outStream.toString)
-    testLogConfiguration(stdOutLogBuffer, false, expectedTimestamp, 2, ERROR)
+    testLogConfiguration(stdOutLogBuffer, false, expectedTimestamp, 1, ERROR)
 
     // clean up
     stdOutLogBuffer.clear()

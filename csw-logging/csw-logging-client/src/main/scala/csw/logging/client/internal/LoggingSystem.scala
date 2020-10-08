@@ -15,7 +15,6 @@ import csw.logging.client.internal.LogActorMessages._
 import csw.logging.client.internal.TimeActorMessages.TimeDone
 import csw.logging.client.models.ComponentLoggingState
 import csw.logging.client.scaladsl.GenericLoggerFactory
-import csw.logging.macros.DefaultSourceLocation
 import csw.logging.models.{Level, Levels, LogMetadata}
 import csw.prefix.models.Prefix
 import org.slf4j.LoggerFactory
@@ -31,10 +30,10 @@ import scala.jdk.CollectionConverters._
  * all(akka, slf4j and tmt) the logs are enqueued in local queue. Once it is instantiated, the queue is emptied and all
  * the logs are forwarded to configured appenders.
  *
- * @param name name of the service (to log).
+ * @param name    name of the service (to log).
  * @param version version of the service (to log).
- * @param host host name (to log).
- * @param system an ActorSystem used to create log actors
+ * @param host    host name (to log).
+ * @param system  an ActorSystem used to create log actors
  */
 class LoggingSystem private[csw] (name: String, version: String, host: String, val system: ActorSystem[SpawnProtocol.Command]) {
 
@@ -113,18 +112,6 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
   }
   else {
     timeActorDonePromise.success(())
-  }
-
-  // Deal with messages send before logger was ready
-  LoggingState.msgs.synchronized {
-    if (LoggingState.msgs.nonEmpty) {
-      // DefaultSourceLocation will have empty `file`, `line` and `class`
-      log.info(s"Saw ${LoggingState.msgs.size} messages before logger start")(() => DefaultSourceLocation)
-      for (msg <- LoggingState.msgs) {
-        MessageHandler.sendMsg(msg)
-      }
-    }
-    LoggingState.msgs.clear()
   }
 
   /**
@@ -222,7 +209,7 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
   /**
    * Shut down the logging system.
    *
-   * @return  future completes when the logging system is shut down.
+   * @return future completes when the logging system is shut down.
    */
   def stop: Future[Done] = {
     def stopAkka(): Future[Unit] = {
@@ -244,7 +231,8 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
     }
 
     def finishAppenders(): Future[Unit] = Future.sequence(appenders map (_.finish())).map(_ => ())
-    def stopAppenders(): Future[Unit]   = Future.sequence(appenders map (_.stop())).map(_ => ())
+
+    def stopAppenders(): Future[Unit] = Future.sequence(appenders map (_.stop())).map(_ => ())
 
     //Stop gc logger
     gcLogger.foreach(_.stop())

@@ -8,7 +8,6 @@ import csw.logging.client.models.ComponentLoggingState
 import csw.logging.models.Level
 import csw.prefix.models.Prefix
 
-import scala.collection.mutable
 import scala.concurrent.Promise
 
 /**
@@ -23,8 +22,6 @@ private[logging] object LoggingState {
   var logLevel: Level      = Level.INFO
   var akkaLogLevel: Level  = Level.INFO
   var slf4jLogLevel: Level = Level.INFO
-  // queue of messages sent before logger is started
-  val msgs = new mutable.Queue[LogActorMessages]()
 
   // LogActor that gets instantiated when LoggingSystem starts
   var maybeLogActor: Option[ActorRef[LogActorMessages]] = None

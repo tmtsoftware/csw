@@ -32,13 +32,7 @@ private[logging] object MessageHandler {
 //      println(s"*** Log message received after logger shutdown: $msg")
     }
     else {
-      maybeLogActor match {
-        case Some(logActor) => logActor ! msg
-        case None =>
-          msgs.synchronized {
-            msgs.enqueue(msg)
-          }
-      }
+      maybeLogActor.foreach(_ ! msg)
     }
 
   // Route akka messages to common log actor
