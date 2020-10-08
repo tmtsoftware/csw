@@ -6,7 +6,6 @@ import java.util.concurrent.CompletableFuture
 import akka.Done
 import akka.actor.typed.{ActorSystem, MailboxSelector, SpawnProtocol}
 import ch.qos.logback.classic.LoggerContext
-import csw.logging.api.scaladsl.Logger
 import csw.logging.client.appenders.LogAppenderBuilder
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.commons.LoggingKeys
@@ -14,7 +13,6 @@ import csw.logging.client.exceptions.AppenderNotFoundException
 import csw.logging.client.internal.LogActorMessages._
 import csw.logging.client.internal.TimeActorMessages.TimeDone
 import csw.logging.client.models.ComponentLoggingState
-import csw.logging.client.scaladsl.GenericLoggerFactory
 import csw.logging.models.{Level, Levels, LogMetadata}
 import csw.prefix.models.Prefix
 import org.slf4j.LoggerFactory
@@ -36,8 +34,6 @@ import scala.jdk.CollectionConverters._
  * @param system  an ActorSystem used to create log actors
  */
 class LoggingSystem private[csw] (name: String, version: String, host: String, val system: ActorSystem[SpawnProtocol.Command]) {
-
-  private val log: Logger = GenericLoggerFactory.getLogger
 
   private[this] val loggingConfig = system.settings.config.getConfig("csw-logging")
 
