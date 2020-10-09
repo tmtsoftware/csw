@@ -6,8 +6,10 @@ import sbt._
 import sbtunidoc.GenJavadocPlugin.autoImport.unidocGenjavadocVersion
 
 object Common {
-  private val enableFatalWarnings: Boolean         = sys.props.get("generateStoryReport").contains("true")
-  private val storyReport: Boolean                 = sys.props.get("generateStoryReport").contains("true")
+  private val enableFatalWarnings: Boolean = sys.props.get("enableFatalWarnings").contains("true")
+  private val storyReport: Boolean         = sys.props.get("generateStoryReport").contains("true")
+  private val enableCoverage: Boolean      = sys.props.get("enableCoverage").contains("true")
+
   private val reporterOptions: Seq[Tests.Argument] =
     // "-oDF" - show full stack traces and test case durations
     // -C - to give fully qualified name of the custom reporter
@@ -17,9 +19,8 @@ object Common {
       )
     else Seq(Tests.Argument("-oDF"))
 
-  val enableCoverage: Boolean = sys.props.get("enableCoverage").contains("true")
-  val MaybeCoverage: Plugins  = if (enableCoverage) Coverage else Plugins.empty
-  val jsTestArg               = testOptions in Test := Seq(Tests.Argument("-oDF"))
+  val MaybeCoverage: Plugins = if (enableCoverage) Coverage else Plugins.empty
+  val jsTestArg              = testOptions in Test := Seq(Tests.Argument("-oDF"))
 
   lazy val CommonSettings: Seq[Setting[_]] = Seq(
     docsRepo := "https://github.com/tmtsoftware/tmtsoftware.github.io.git",
