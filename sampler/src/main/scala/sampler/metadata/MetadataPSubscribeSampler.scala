@@ -13,6 +13,7 @@ import csw.params.events.{Event, EventKey}
 import io.lettuce.core.{RedisClient, RedisURI}
 import sampler.metadata.SamplerUtil.{printAggregates, recordHistogram}
 
+import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
@@ -22,8 +23,8 @@ class MetadataPSubscribeSampler(
     eventSubscriber: EventSubscriber
 )(implicit actorSystem: ActorSystem[_]) {
 
-  var currentState = new ConcurrentHashMap[EventKey, Event]() // mutable map with variable ref
-  val snapshotMap  = new ConcurrentHashMap[String, ConcurrentHashMap[EventKey, Event]]()
+  var currentState   = new ConcurrentHashMap[EventKey, Event]() // mutable map with variable ref
+  val snapshotsQueue = new mutable.Queue[(String, ConcurrentHashMap[EventKey, Event])]()
 
   var numberOfSnapshots                   = 0d
   val eventTimeDiffList: ListBuffer[Long] = scala.collection.mutable.ListBuffer()
@@ -31,13 +32,11 @@ class MetadataPSubscribeSampler(
 
   def snapshot(obsEvent: Event): Unit = {
     val startTime = System.currentTimeMillis()
-    //swap approach
-//    lastSnapshot = currentState
-//    currentState = new ConcurrentHashMap(lastSnapshot) //change it with new Map and clone previous snapshot.
 
-    //clone approach
     val lastSnapshot: ConcurrentHashMap[EventKey, Event] = new ConcurrentHashMap(currentState)
-    snapshotMap.put("some-exposure-id", lastSnapshot) //obsEvent.eventKey => exposureid
+
+    snapshotsQueue.enqueue((obsEvent.eventId.id, lastSnapshot))
+    while (snapshotsQueue.size > 100) { snapshotsQueue.dequeue } // maintain 100 exposures in memory
 
     val endTime = System.currentTimeMillis()
 
@@ -56,7 +55,7 @@ class MetadataPSubscribeSampler(
   }
 
   def subscribeObserveEvents(): Future[Done] =
-    eventSubscriber.subscribe(Set(EventKey("esw.observe.expstr"))).drop(50).take(1000).runForeach(snapshot)
+    eventSubscriber.subscribe(Set(EventKey("esw.observe.expstr"))).drop(5).take(1000).runForeach(snapshot)
 
   def start(): Future[Done] = {
     //print aggregates
@@ -89,6 +88,8 @@ object MetadataPSubscribeSampler extends App {
   private val globalSubscriber: RedisGlobalSubscriber = RedisGlobalSubscriber.make(redisClient, eventualRedisURI)
 
   private val sampler = new MetadataPSubscribeSampler(globalSubscriber, subscriber)
+
+  println("numberOfKeys", "eventTimeDiff", "snapshotTime")
 
   Await.result(sampler.start(), 20.minutes)
   system.terminate()
