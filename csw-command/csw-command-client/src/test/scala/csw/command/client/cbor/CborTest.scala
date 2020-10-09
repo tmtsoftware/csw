@@ -1,16 +1,14 @@
 package csw.command.client.cbor
 
-import akka.actor.typed.ActorSystem
 import csw.command.client.models.framework.LocationServiceUsage
 import csw.command.client.models.framework.LocationServiceUsage.{DoNotRegister, RegisterAndTrackServices, RegisterOnly}
 import io.bullet.borer.Cbor
-import org.scalatest.prop.TableDrivenPropertyChecks.forAll
-import org.scalatest.prop.Tables.Table
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.prop.TableDrivenPropertyChecks.forAll
+import org.scalatest.prop.Tables.Table
 
 class CborTest extends AnyFunSuite with Matchers with MessageCodecs {
-  override implicit def actorSystem: ActorSystem[_] = ???
   test("should encode concrete-type LocationServiceUsage and decode base-type") {
     val testData = Table(
       "LocationServiceUsage models",
