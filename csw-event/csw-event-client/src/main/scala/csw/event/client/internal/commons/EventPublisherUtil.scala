@@ -41,14 +41,24 @@ private[event] class EventPublisherUtil(implicit actorSystem: ActorSystem[_]) {
       }
       .runForeach(_ => ())
 
+  private def tick(initialDelay: FiniteDuration, every: FiniteDuration): Source[Unit, Cancellable] = {
+    // buffer size of the queue should be 0 so as to follow the semantics of Source.tick
+    Source.queue[Unit](0, OverflowStrategy.dropHead).mapMaterializedValue { q =>
+      val cancellable = actorSystem.scheduler.scheduleAtFixedRate(initialDelay, every)(() => q.offer(()))
+      q.watchCompletion().onComplete(_ => cancellable.cancel())
+      cancellable
+    }
+  }
+
   // create an akka stream source out of eventGenerator function
   def eventSource(
       eventGenerator: => Future[Option[Event]],
       parallelism: Int,
       initialDelay: FiniteDuration,
       every: FiniteDuration
-  ): Source[Event, Cancellable] =
-    Source.tick(initialDelay, every, ()).mapAsync(parallelism)(_ => withErrorLogging(eventGenerator))
+  ): Source[Event, Cancellable] = {
+    tick(initialDelay, every).mapAsync(parallelism)(_ => withErrorLogging(eventGenerator))
+  }
 
   def publishFromSource[Mat](
       source: Source[Event, Mat],
