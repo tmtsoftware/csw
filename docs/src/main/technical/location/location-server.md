@@ -94,7 +94,7 @@ Let us go through each action step by step as shown in diagram:
 
     1. On receiving track request, location server internally subscribes to the `replicator` using `Service` key as explained in previous section and generates stream of `TrackingEvent`
 
-    1. Server then maps this stream of `TrackingEvent` to [Websocket] ($github.base_url$/csw-location/csw-location-server/src/main/scala/csw/location/server/http/LocationWebsocketHandler.scala)
+    1. Server then maps this stream of `TrackingEvent` to [Websocket]($github.base_url$/csw-location/csw-location-server/src/main/scala/csw/location/server/http/LocationStreamRequestHandler.scala)
 
     1. Server also keeps sending `ServerSentEvent.heartbeat` every `2 seconds` to keep connection alive
 
@@ -161,8 +161,8 @@ interface to use (There could be multiple NICs). This variable or property is re
 is started. During registration call, a service can choose which network type it wants to register itself with and
 location service will register that service to appropriate network. 
 
-The Location Service HTTP server is implemented by the [LocationHttpHandler]($github.base_url$/csw-location/csw-location-server/src/main/scala/csw/location/server/http/LocationHttpHandler.scala) class, 
-[LocationWebsocketHandler]($github.base_url$/csw-location/csw-location-server/src/main/scala/csw/location/server/http/LocationWebsocketHandler.scala) and talks to the cluster actor on the client's behalf.
+The Location Service HTTP server is implemented by the [LocationRequestHandler]($github.base_url$/csw-location/csw-location-server/src/main/scala/csw/location/server/http/LocationRequestHandler.scala) class, 
+[LocationWebsocketHandler]($github.base_url$/csw-location/csw-location-server/src/main/scala/csw/location/server/http/LocationStreamRequestHandler.scala) and talks to the cluster actor on the client's behalf.
 
 ## Java API
 

@@ -19,7 +19,7 @@ addSbtPlugin("org.scala-js"                      % "sbt-scalajs"               %
 addSbtPlugin("com.github.cb372"                  % "sbt-explicit-dependencies" % "0.2.13")
 addSbtPlugin("ohnosequences"                     % "sbt-github-release"        % "0.7.0")
 addSbtPlugin("com.dwijnand"                      % "sbt-project-graph"         % "0.4.0")
-addSbtPlugin("com.github.tmtsoftware"            % "sbt-docs"                  % "0.2.0-M1")
+addSbtPlugin("com.github.tmtsoftware"            % "sbt-docs"                  % "1275b7a991")
 addSbtPlugin("com.timushev.sbt"                  % "sbt-rewarn"                % "0.1.1")
 
 resolvers += Resolver.bintrayRepo("twtmt", "sbt-plugins")
