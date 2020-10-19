@@ -82,7 +82,16 @@ lazy val `csw` = project
   .settings(Settings.addAliases)
   .settings(DocSettings.docExclusions(unidocExclusions))
   .settings(Settings.multiJvmTestTask(multiJvmProjects))
-  .settings(GithubRelease.githubReleases(githubReleases))
+  .settings(GithubRelease.githubReleases)
+  .settings(
+    ghreleaseRepoOrg := "tmtsoftware",
+    ghreleaseRepoName := "csw",
+  )
+  .settings( ghreleaseAssets := {
+    ghreleaseAssets.value ++ Seq(
+      GithubReleaseSettings.stageAndZipTask(githubReleases).value
+    )
+  })
   .settings(
     generateContract := ContractPlugin.generate(`csw-contract`).value
   )

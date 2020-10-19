@@ -17,16 +17,13 @@ addSbtPlugin("com.typesafe.sbt"                  % "sbt-git"                   %
 addSbtPlugin("org.portable-scala"                % "sbt-scalajs-crossproject"  % "1.0.0")
 addSbtPlugin("org.scala-js"                      % "sbt-scalajs"               % "1.2.0")
 addSbtPlugin("com.github.cb372"                  % "sbt-explicit-dependencies" % "0.2.13")
-addSbtPlugin("ohnosequences"                     % "sbt-github-release"        % "0.7.0")
 addSbtPlugin("com.dwijnand"                      % "sbt-project-graph"         % "0.4.0")
-addSbtPlugin("com.github.tmtsoftware"            % "sbt-docs"                  % "1275b7a991")
 addSbtPlugin("com.timushev.sbt"                  % "sbt-rewarn"                % "0.1.1")
 
 resolvers += Resolver.bintrayRepo("twtmt", "sbt-plugins")
+addSbtPlugin("com.github.tmtsoftware" % "sbt-docs" % "bd4e9c37e4")
 
 classpathTypes += "maven-plugin"
-
-libraryDependencies += "com.sun.activation" % "javax.activation" % "1.2.0"
 
 scalacOptions ++= Seq(
   "-encoding",
