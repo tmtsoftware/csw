@@ -41,7 +41,9 @@ class LocationAgent(settings: Settings) {
           "--prefix",
           "CSW.DatabaseServer",
           "--command",
-          s"postgres --hba_file=$pgHbaConf --unix_socket_directories=$dbUnixSocketDirs -i -p $dbPort"
+          s"postgres --hba_file=$pgHbaConf --unix_socket_directories=$dbUnixSocketDirs -i -p $dbPort",
+          "--port",
+          dbPort
         )
       )
     }
