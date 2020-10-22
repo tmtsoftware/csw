@@ -3,9 +3,15 @@
 A HTTP server application that hosts the Configuration Service.
   
 ## Prerequisites
-The HTTP server hosting the Configuration Service needs to be part of the csw-cluster so that it can be consumed by other components.
-A required check before starting the Configuration Service is to ensure the csw-cluster is setup and the Location Server are available.
-Kindly refer to @ref:[CSW Location Server](../apps/cswlocationserver.md) for more information about the Location Server setup.
+
+- Location server should be running.
+- CSW AAS should be running.
+
+@@@ note
+
+Before running `config-server`, `sbt "csw-services/run start -k"` command can be run to start the location service along with the aas/auth service.
+
+@@@
 
 ## Command line parameter options
 
@@ -14,35 +20,79 @@ Kindly refer to @ref:[CSW Location Server](../apps/cswlocationserver.md) for mor
 * **`--help`** prints the help message.
 * **`--version`** prints the version of the application.
 
+## Running latest release of config-server using Coursier
+
+### 1. Add TMT Apps channel to your local Coursier installation using below command
+
+Channel needs to be added to install application using `cs install`
+
+For developer machine setup,
+
+```bash
+cs install --add-channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/apps.json
+```
+
+For production machine setup,
+
+```bash
+cs install --add-channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/apps.prod.json
+```
+### 2. Install config-server app
+
+Following command creates an executable file named lconfig-server in the default installation directory.
+
+```bash
+cs install config-server:<version | SHA>
+```
+
+One can specify installation directory like following:
+
+```bash
+cs install \
+    --install-dir /tmt/apps \
+    config-server:<version | SHA>
+```
+Note: If you don't provide the version or SHA in above command, `config-server` will be installed with the latest tagged binary of `csw-config-server`
+
 ## Examples
 
-1. 
-```
-csw-config-server --initRepo
+
+```bash
+//cd to installation directory
+cd /tmt/apps
+
+./config-server --initRepo
 ```  
+
 Start an HTTP server on default port 4000. Initialize the repository if it does not exist and register it with the Location Service
  
-2. 
-```
-csw-config-server --initRepo --port 4001
+
+```bash
+//cd to installation directory
+cd /tmt/apps
+
+./config-server --initRepo --port 4001
 ```  
+
 Start an HTTP server on port 4001. Initialize the repository if it does not exist and register it with the Location Service 
 
-3. 
-```
-csw-config-server --help
+
+```bash
+//cd to installation directory
+cd /tmt/apps
+
+./config-server --help
 ```  
+
 Prints help message
 
-4. 
-```
-csw-config-server --version
-```    
+
+```bash
+//cd to installation directory
+cd /tmt/apps
+
+./config-server --version
+```   
+
 Prints application version
 
-@@@ note
-
-Before running `csw-config-server`, make sure that `csw-location-server` is running on local machine at `localhost:7654`.
-As config server uses a local HTTP Location client which expects the Location Server to be running locally.
-
-@@@

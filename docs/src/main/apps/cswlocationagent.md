@@ -2,6 +2,10 @@
 
 A utility application that starts a given external (non-CSW) program, registers a comma separated list of services with the Location Service, and unregisters them when the program exits.
 
+## Prerequisite
+
+- Location server should be running.
+
 ## Command line parameter options
 
 * **`--prefix`** Required: The prefix (or prefixes, separated by comma) used to register the application (also root name in config file).
@@ -15,53 +19,116 @@ A utility application that starts a given external (non-CSW) program, registers 
 * **`--help`** Prints the help message.
 * **`--version`** Prints the version of the application.
 
-## Examples
+## Running latest release of location-agent using Coursier
 
-1. 
+### 1. Add TMT Apps channel to your local Coursier installation using below command
+
+Channel needs to be added to install application using `cs install`
+
+For developer machine setup,
+
+```bash
+cs install --add-channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/apps.json
 ```
-csw-location-agent --prefix "csw.redis" --command "redis-server /usr/local/etc/redis.conf" --port 6379
-```  
+
+For production machine setup,
+
+```bash
+cs install --add-channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/apps.prod.json
+```
+### 2. Install location-agent app
+
+Following command creates an executable file named location-agent in the default installation directory.
+
+```bash
+cs install location-agent:<version | SHA>
+```
+
+One can specify installation directory like following:
+
+```bash
+cs install \
+    --install-dir /tmt/apps \
+    location-agent:<version | SHA>
+```
+Note: If you don't provide the version or SHA in above command, `location-agent` will be installed with the latest tagged binary of `csw-location-agent`
+
+### 3. Examples
+ 
+
+```bash
+//cd to installation directory
+cd /tmt/apps
+
+./location-agent --prefix "csw.redis" --command "redis-server /usr/local/etc/redis.conf" --port 6379
+```
 Application will start a Redis server on port 6379 (the default Redis port) and will register a TcpConnection for it with the Location Service 
 
-2. 
-```
-csw-location-agent --prefix "CSW.foo" --command "sleep 30"
+ 
+```bash
+//cd to installation directory
+cd /tmt/apps
+
+./location-agent --prefix "CSW.foo" --command "sleep 30"
 ```
 Application will sleep for 30 seconds. It will be registered as a service named `CSW.foo` on a random port with the Location Service. After the sleep is over in 30 seconds, it will unregister the `CSW.foo` service.
 
-3. 
-```
-csw-location-agent --prefix "CSW.myHttpServiceAsTcp" --command "python -m SimpleHTTPServer 8080" --port 8080
+
+```bash
+//cd to installation directory
+cd /tmt/apps
+
+./location-agent --prefix "CSW.myHttpServiceAsTcp" --command "python -m SimpleHTTPServer 8080" --port 8080
 ```  
 Application will start a simple HTTP service on port 8080. This will register `CSW.myHttpServiceAsTcp` as a TCP service with the Location Service.
 
-4. 
-```
-csw-location-agent --prefix "CSW.myHttpServiceAsHttp" --command "python -m SimpleHTTPServer 8080" --port 8080 --http "path"
+ 
+```bash
+//cd to installation directory
+cd /tmt/apps
+
+./location-agent --prefix "CSW.myHttpServiceAsHttp" --command "python -m SimpleHTTPServer 8080" --port 8080 --http "path"
 ```  
 Application will start a simple HTTP service on port 8080. This will register `CSW.myHttpServiceAsHttp` as a HTTP service with the provided path with the Location Service. It will register its private network ip with the Location Service.
 
-5. 
-```
-csw-location-agent --prefix "CSW.myHttpServiceAsHttp" --command "python -m SimpleHTTPServer 8080" --port 8080 --http "path" --publicNetwork
+
+```bash
+//cd to installation directory
+cd /tmt/apps
+
+./location-agent --prefix "CSW.myHttpServiceAsHttp" --command "python -m SimpleHTTPServer 8080" --port 8080 --http "path" --publicNetwork
 ```  
 Application will start a simple HTTP service on port 8080. This will register `CSW.myHttpServiceAsHttp` as a HTTP service with the provided path with the Location Service. It will register its public network ip with the Location Service.
+ 
 
-6. 
-```
-csw-location-agent --help
+```bash
+//cd to installation directory
+cd /tmt/apps
+
+./location-agent --help
 ```  
 Prints help message
 
-7. 
-```
-csw-location-agent --version
+
+```bash
+//cd to installation directory
+cd /tmt/apps
+
+./location-agent --version
 ```  
 Prints application version
 
-@@@ note
 
-Before running `csw-location-agent`, make sure that `csw-location-server` is running on the local machine at `localhost:7654`, since the
-location agent uses a local HTTP location client which expects the Location Server to be running locally.
+## Running latest master of location-agent on developer machine
 
-@@@
+The CSW Location Agent application can be installed as binaries or constructed from source. To download the application,
+go to the [CSW Release page](https://github.com/tmtsoftware/csw/releases) and follow instructions.
+
+To run the latest master on dev machine  either use the command `sbt run`, or the command `sbt publishLocal` followed by `cs launch location-agent:0.1.0-SNAPSHOT`.
+
+Command line parameters can also be passed while launching SNAPSHOT version using coursier.
+
+```bash
+  // run location agent using coursier
+  cs launch location-agent:0.1.0-SNAPSHOT -- --prefix "CSW.foo" --command "sleep 5"
+```
