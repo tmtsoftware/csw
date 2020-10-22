@@ -254,6 +254,20 @@ Example:
 
 @@@
 
+## Running latest master of event-cli on developer machine
+
+The CSW Event Cli application can be installed as binaries or constructed from source. To download the application,
+go to the [CSW Release page](https://github.com/tmtsoftware/csw/releases) and follow instructions.
+
+To run the latest master on dev machine either use the command `sbt run`, or the command `sbt publishLocal` followed by `cs launch event-cli:0.1.0-SNAPSHOT`.
+
+Command line parameters can also be passed while launching SNAPSHOT version using coursier.
+
+```bash
+  // run location agent using coursier
+  cs launch event-cli:0.1.0-SNAPSHOT -- publish -e wfos.prog.cloudcover --params "k1:s=['Kevin O\'Brien','Chicago, USA']|k2:s=['2016-08-05T16:23:19.002']"
+```
+
 ## Testing/Development
 While testing or development, in order to use this CLI application, below prerequisites must be satisfied:  
 

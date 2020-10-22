@@ -379,6 +379,20 @@ cd /tmt/apps
 
 Prints the version of the application.
 
+## Running latest master of event-cli on developer machine
+
+The CSW Alarm Cli application can be installed as binaries or constructed from source. To download the application,
+go to the [CSW Release page](https://github.com/tmtsoftware/csw/releases) and follow instructions.
+
+To run the latest master on dev machine either use the command `sbt run`, or the command `sbt publishLocal` followed by `cs launch alarm-cli:0.1.0-SNAPSHOT`.
+
+Command line parameters can also be passed while launching SNAPSHOT version using coursier.
+
+```bash
+  // run location agent using coursier
+  cs launch event-cli:0.1.0-SNAPSHOT -- list --subsystem nfiraos --metadata --status
+```
+
 @@@ note
 
 All the above examples require that `csw-location-server` is running on local machine at `localhost:7654`.

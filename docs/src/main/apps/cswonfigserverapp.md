@@ -96,3 +96,16 @@ cd /tmt/apps
 
 Prints application version
 
+## Running latest master of location-agent on developer machine
+
+The CSW Config Server application can be installed as binaries or constructed from source. To download the application,
+go to the [CSW Release page](https://github.com/tmtsoftware/csw/releases) and follow instructions.
+
+To run the latest master on dev machine  either use the command `sbt run`, or the command `sbt publishLocal` followed by `cs launch config-server:0.1.0-SNAPSHOT`.
+
+Command line parameters can also be passed while launching SNAPSHOT version using coursier.
+
+```bash
+  // run location agent using coursier
+  cs launch config-server:0.1.0-SNAPSHOT -- --initRepo
+```
