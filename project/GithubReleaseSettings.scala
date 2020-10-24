@@ -19,7 +19,7 @@ object GithubReleaseSettings {
       log.info("Deleting staging directory ...")
       // delete older files from staging directory to avoid getting it included in zip
       // in order to delete directory first and then stage projects, below needs to be a task
-      val () = Def.task {
+      Def.task {
         IO.delete(target.value / "universal" / "stage")
       }.value
 
@@ -37,6 +37,5 @@ object GithubReleaseSettings {
       ZipHelper.zipNative(stagedFiles, appsZip)
       appsZip
     }
-
 
 }

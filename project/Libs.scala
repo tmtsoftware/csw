@@ -47,7 +47,7 @@ object Libs {
   val `otj-pg-embedded`   = "com.opentable.components"      % "otj-pg-embedded" % "0.13.3"
   val httpclient          = "org.apache.httpcomponents"     % "httpclient"      % "4.5.12"
   val `jboss-logging`     = "org.jboss.logging"             % "jboss-logging"   % "3.4.1.Final"
-  val `config`            = "com.typesafe"                  % "config"          % "1.4.0"
+  val `config`            = "com.typesafe"                  % "config"          % "1.4.1"
   val `os-lib`            = "com.lihaoyi"                  %% "os-lib"          % "0.7.1"
   val `caffeine`          = "com.github.ben-manes.caffeine" % "caffeine"        % "2.8.5"
   val netty               = "io.netty"                      % "netty"           % "3.10.6.Final"
@@ -73,7 +73,7 @@ object Jackson {
 }
 
 object Akka {
-  val Version = "2.6.9" //all akka is Apache License 2.0
+  val Version = "2.6.10" //all akka is Apache License 2.0
 
   val `akka-stream`              = "com.typesafe.akka" %% "akka-stream"              % Version
   val `akka-stream-typed`        = "com.typesafe.akka" %% "akka-stream-typed"        % Version
@@ -112,7 +112,7 @@ object Keycloak {
 }
 
 object Jooq {
-  val Version = "3.13.5"
+  val Version = "3.14.0"
 
   val `jooq`         = "org.jooq" % "jooq"         % Version
   val `jooq-meta`    = "org.jooq" % "jooq-meta"    % Version
@@ -120,7 +120,7 @@ object Jooq {
 }
 
 object MSocket {
-  val Version = "73728fd"
+  val Version = "2121a4f"
 
   val `msocket-api`      = dep("com.github.tmtsoftware.msocket" %%% "msocket-api" % Version)
   val `msocket-security` = "com.github.tmtsoftware.msocket" %% "msocket-security" % Version
