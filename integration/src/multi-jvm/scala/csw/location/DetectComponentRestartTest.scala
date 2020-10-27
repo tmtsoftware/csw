@@ -62,7 +62,7 @@ class DetectComponentRestartTest(ignore: Int, mode: String)
         case "cluster" => LocationServiceFactory.make(clusterSettings)
       }
 
-      Thread.sleep(2000)
+      Thread.sleep(20000)
 
       freshLocationService.register(make(akkaConnection, newTypedSystem.spawn(Behaviors.empty, "empty"))).await
       enterBarrier("member-re-registered")
@@ -80,7 +80,7 @@ class DetectComponentRestartTest(ignore: Int, mode: String)
         Await.result(testConductor.shutdown(member1), 10.seconds)
       }
 
-      testProbe.expectMsgType[LocationRemoved](5.seconds)
+      testProbe.expectMsgType[LocationRemoved](25.seconds)
       Thread.sleep(2000)
       enterBarrier("member-re-registered")
       testProbe.expectMsgType[LocationUpdated](5.seconds)
