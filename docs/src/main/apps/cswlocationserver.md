@@ -7,23 +7,14 @@ All components (HCD's, Assemblies, Services etc.) use a local HTTP Location clie
 In a production environment, it is required that all machines running components should have the HTTP Location Server running locally.
 
 ## Running latest release of location-server using Coursier
+@@@ note
 
-### 1. Add TMT Apps channel to your local Coursier installation using below command
+This page assumes that you have already installed and set-up coursier : @ref:[coursier-installation](csinstallation.md) { open=new }.
 
-Channel needs to be added to install application using `cs install`
+@@@
 
-For developer machine setup,
 
-```bash
-cs install --add-channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/apps.json
-```
-
-For production machine setup,
-
-```bash
-cs install --add-channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/apps.prod.json
-```
-### 2. Install location-server app
+### Install location-server app
 
 Following command creates an executable file named location-server in the default installation directory.
 
@@ -31,13 +22,6 @@ Following command creates an executable file named location-server in the defaul
 cs install location-server:<version | SHA>
 ```
 
-One can specify installation directory like following:
-
-```bash
-cs install \
-    --install-dir /tmt/apps \
-    location-server:<version | SHA>
-```
 Note: If you don't provide the version or SHA in above command, `location-server` will be installed with the latest tagged binary of `csw-location-server`
      
 
@@ -56,11 +40,8 @@ Make sure you set all necessary @ref[environment variables](../deployment/env-va
 
 This command starts the location server
 ```bash
-//cd to installation directory
-cd /tmt/apps
-
 // run location server
-./location-server --clusterPort=3552
+location-server --clusterPort=3552
 ```
 
 ### Starting Location Server on multiple machines
@@ -83,22 +64,17 @@ Make sure you set all necessary @ref[environment variables](../deployment/env-va
 mode and AAS `disabled`.
    
     ```bash
-    //cd to installation directory
-    cd /tmt/apps
-    
     // run location server
-    ./location-server --clusterPort=3552 
+    location-server --clusterPort=3552 
     ```
 
-2.  Run this command on all machines where you want Location Server in `public mode`
+1.  Run this command on all machines where you want Location Server in `public mode`
 and AAS `enabled`.
+
     ```bash
-    //cd to installation directory
-        cd /tmt/apps
-    
     // run location server
-    ./location-server --clusterPort=3552 --publicNetwork
-    ``` 
+    location-server --clusterPort=3552 --publicNetwork
+    ``` `
 
 3.  Once the Akka cluster formation is done, start @ref:[AAS](../services/aas.md) 
 on one of the node where Location Server is running in `local-only` mode, so that it can register itself to this
@@ -118,28 +94,17 @@ cyclic dependency during startup of `public mode` location-server and AAS(keyclo
 Use the following command to get help on the options available with this app.
 
 ```bash
-  //cd to installation directory
-  cd /tmt/apps
-  
-  // run location server
-  ./location-server --help
+   location-server --help
 ```
 
 ### Version
 Use the following command to get version information for this app.
   
 ```bash
-  //cd to installation directory
-  cd /tmt/apps
-  
-  // run location server
-  ./location-server --version
+   location-server --version
 ```
 
 ## Running latest master of location-server on developer machine
-
-The CSW Location Server application can be installed as binaries or constructed from source. To download the application,
-go to the [CSW Release page](https://github.com/tmtsoftware/csw/releases) and follow instructions.
 
 To run the latest master on dev machine  either use the command `sbt run`, or the command `sbt publishLocal` followed by `cs launch location-server:0.1.0-SNAPSHOT`.
 

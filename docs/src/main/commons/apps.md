@@ -3,6 +3,7 @@
 @@ toc { .main depth=1 }
 
 @@@ index
+* [coursier-installation](../apps/csinstallation.md): Install coursier for launching applications.
 * [csw-location-server](../apps/cswlocationserver.md): Start HTTP location server application, required for running the Location Service.
 * [csw-location-agent](../apps/cswlocationagent.md): Application used to start non-CSW services so that register with Location Service.
 * [csw-config-server](../apps/cswonfigserverapp.md): Start a Configuration Service SVN repository.

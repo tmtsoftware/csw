@@ -8,23 +8,13 @@ A command line application that facilitates interaction with @ref:[Event Service
 - Event Service should be running.
 
 ## Running latest release of event-cli using Coursier
+@@@ note
 
-### 1. Add TMT Apps channel to your local Coursier installation using below command
+This page assumes that you have already installed and set-up coursier : @ref:[coursier-installation](csinstallation.md) { open=new }.
 
-Channel needs to be added to install application using `cs install`
+@@@
 
-For developer machine setup,
-
-```bash
-cs install --add-channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/apps.json
-```
-
-For production machine setup,
-
-```bash
-cs install --add-channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/apps.prod.json
-```
-### 2. Install event-cli app
+### Install event-cli app
 
 Following command creates an executable file named event-cli in the default installation directory.
 
@@ -32,13 +22,6 @@ Following command creates an executable file named event-cli in the default inst
 cs install event-cli:<version | SHA>
 ```
 
-One can specify installation directory like following:
-
-```bash
-cs install \
-    --install-dir /tmt/apps \
-    event-cli:<version | SHA>
-```
 Note: If you don't provide the version or SHA in above command, `event-cli` will be installed with the latest tagged binary of `csw-event-cli`
 
 ## Supported Commands
@@ -54,13 +37,10 @@ Takes a comma separated list of events and displays each event's parameter infor
 
  * `-e`, `--events` : comma separated list of events to inspect
  
-#### Examples:
+#### Example:
 
 ```bash
-//cd to installation directory
-cd /tmt/apps
-
-./event-cli inspect -e wfos.prog.cloudcover,wfos.prog.filter
+event-cli inspect -e wfos.prog.cloudcover,wfos.prog.filter
 ```
 
 @@@ note
@@ -79,40 +59,26 @@ Takes a comma separated list of events with nested key paths and displays event 
 
 #### Examples:
  
-```
-//cd to installation directory
-cd /tmt/apps
-
-./event-cli get -e wfos.prog.cloudcover
-```
-Displays all keys information in one-line form for event `wfos.prog.cloudcover`
+1.  Displays all keys information in one-line form for event `wfos.prog.cloudcover`
+    ```bash
+    event-cli get -e wfos.prog.cloudcover
+    ```
 
  
-```
-//cd to installation directory
-cd /tmt/apps
-
-./event-cli get -e wfos.prog.cloudcover:struct1/ra:epoch -t --id -u
-```
-Displays information of only `struct1/ra` and `epoch` keys as well as `timestamp`, `event id` and `units` of provided keys in one-line form for event `wfos.prog.cloudcover`
+2.  Displays information of only `struct1/ra` and `epoch` keys as well as `timestamp`, `event id` and `units` of provided keys in one-line form for event `wfos.prog.cloudcover`
+    ```bash
+    event-cli get -e wfos.prog.cloudcover:struct1/ra:epoch -t --id -u
+    ```
  
+3.  Displays information of `epoch` of event `wfos.prog.cloudcover` and `ra` key of event `wfos.prog.filter:ra`
+    ```bash
+    event-cli get -e wfos.prog.cloudcover:epoch,wfos.prog.filter:ra
+    ```
 
-```
-//cd to installation directory
-cd /tmt/apps
-
-./event-cli get -e wfos.prog.cloudcover:epoch,wfos.prog.filter:ra
-```
-Displays information of `epoch` of event `wfos.prog.cloudcover` and `ra` key of event `wfos.prog.filter:ra`
-
- 
-```
-//cd to installation directory
-cd /tmt/apps
-
-./event-cli get -e wfos.prog.cloudcover:epoch -o json
-```
-Displays event `wfos.prog.cloudcover` with only `epcoh` key in JSON format.
+4.  Displays event `wfos.prog.cloudcover` with only `epcoh` key in JSON format.
+     ```bash
+    event-cli get -e wfos.prog.cloudcover:epoch -o json
+    ```
 
 @@@ note
 `-t`, `--id` & `--u` options are not applicable when `-o json` option provided. An Event displayed in JSON format will always have `timestamp`, `event id` and `units` irrespective of whether those options are provided via the CLI.
@@ -142,33 +108,23 @@ Option `-p` should be used with `-i`, otherwise `-p` is ignored.
 
 #### Examples:
 
-```
-//cd to installation directory
-cd /tmt/apps
-
-./event-cli publish -e wfos.prog.cloudcover --data /path/to/event.json
-```
-Creates event from provided JSON file and publishes it with key `wfos.prog.cloudcover` to the Event Server. 
+1.  Creates event from provided JSON file and publishes it with key `wfos.prog.cloudcover` to the Event Server. 
+    ```bash
+    event-cli publish -e wfos.prog.cloudcover --data /path/to/event.json
+    ```
  
 
-```
-//cd to installation directory
-cd /tmt/apps
+2.  Creates an Event from provided JSON file and publishes it every `500ms` for duration of `60s`. 
+    ```bash
+    event-cli publish -e wfos.prog.cloudcover --data /path/to/event.json -i 500 -p 60
+    ```
 
-./event-cli publish -e wfos.prog.cloudcover --data /path/to/event.json -i 500 -p 60
-```
-Creates an Event from provided JSON file and publishes it every `500ms` for duration of `60s`. 
-
-
-```
-//cd to installation directory
-cd /tmt/apps
-
-./event-cli publish -e wfos.prog.cloudcover --params "k1:s=['Kevin O\'Brien','Chicago, USA']|k2:s=['2016-08-05T16:23:19.002']"
-```
-First fetches already published Event for key `wfos.prog.cloudcover` from the Event Server and then updates that Event with provided `--params`
+c.  First fetches already published Event for key `wfos.prog.cloudcover` from the Event Server and then updates that Event with provided `--params`
 If provided keys are already present in existing Event, then those will be updated.  Otherwise, new param entries will be added to the Event.
 If no Event is published in past for the provided key, then the new Event gets created with the provided params and Event key. 
+    ```bash
+    event-cli publish -e wfos.prog.cloudcover --params "k1:s=['Kevin O\'Brien','Chicago, USA']|k2:s=['2016-08-05T16:23:19.002']"
+    ```
 
 ### subscribe
 
@@ -183,43 +139,31 @@ Takes a comma separated list of Events with nested key paths and displays contin
 
 #### Examples:
 
-```
-//cd to installation directory
-cd /tmt/apps
-
-./event-cli subscribe -e wfos.prog.cloudcover
-```
-Subscribes to Event key `wfos.prog.cloudcover` and displays all key information as soon as there is an Event published for key `wfos.prog.cloudcover` with the one-line format.
+1.  Subscribes to Event key `wfos.prog.cloudcover` and displays all key information as soon as there is an Event published for key `wfos.prog.cloudcover` with the one-line format.
+    ```bash
+    event-cli subscribe -e wfos.prog.cloudcover
+    ```
 
 
-```
-//cd to installation directory
-cd /tmt/apps
-
-./event-cli subscribe -e wfos.prog.cloudcover:struct1/ra:epoch -t --id -u
-```
-Subscribes to the Event key `wfos.prog.cloudcover` and displays information of only the `struct1/ra` and `epoch` keys 
+2.  Subscribes to the Event key `wfos.prog.cloudcover` and displays information of only the `struct1/ra` and `epoch` keys 
 along with `timestamp`, `event id` and `units` of tge provided keys in one-line format as soon as there is an Event published for the key `wfos.prog.cloudcover`.
+    ```bash
+    event-cli subscribe -e wfos.prog.cloudcover:struct1/ra:epoch -t --id -u
+    ```
 
 
-```
-//cd to installation directory
-cd /tmt/apps
-
-./event-cli subscribe -e wfos.prog.cloudcover -i 500
-```
-Subscribes to the Event key `wfos.prog.cloudcover` and displays all key information at provided interval <500ms>.
+3.  Subscribes to the Event key `wfos.prog.cloudcover` and displays all key information at provided interval <500ms>.
 Irrespective of whether there are multiple Events published for the key `wfos.prog.cloudcover` within `500ms` interval or not, 
 at every tick (i.e. 500ms), the latest Event information will be displayed on the console. 
+    ```bash
+    event-cli subscribe -e wfos.prog.cloudcover -i 500
+    ```
 
 
-```
-//cd to installation directory
-cd /tmt/apps
-
-./event-cli subscribe -e wfos.prog.cloudcover:epoch -o json
-```
-Subscribes to Event key `wfos.prog.cloudcover` and displays only `epoch` key information as soon as there is an Event published for key `wfos.prog.cloudcover`, in JSON format.
+4.  Subscribes to Event key `wfos.prog.cloudcover` and displays only `epoch` key information as soon as there is an Event published for key `wfos.prog.cloudcover`, in JSON format.
+    ```bash
+    event-cli subscribe -e wfos.prog.cloudcover:epoch -o json
+    ```
 
 @@@ note
 `-t`, `--id` & `--u` options are not applicable when the `-o json` option is provided. An Event displayed in `json` format will always have `timestamp`, `event id` and `units` irrespective of whether those options are provided via the CLI.
@@ -227,23 +171,17 @@ Subscribes to Event key `wfos.prog.cloudcover` and displays only `epoch` key inf
 
 ## About this application 
  
-```
-//cd to installation directory
-cd /tmt/apps
-
-./event-cli --help
-```
-
 Prints the help message.
-
+```bash
+event-cli --help
 ```
-//cd to installation directory
-cd /tmt/apps
 
-./event-cli --version
-```
 
 Prints the version of the application.
+```bash
+event-cli --version
+```
+
 
 @@@ note
 
@@ -256,15 +194,12 @@ Example:
 
 ## Running latest master of event-cli on developer machine
 
-The CSW Event Cli application can be installed as binaries or constructed from source. To download the application,
-go to the [CSW Release page](https://github.com/tmtsoftware/csw/releases) and follow instructions.
-
 To run the latest master on dev machine either use the command `sbt run`, or the command `sbt publishLocal` followed by `cs launch event-cli:0.1.0-SNAPSHOT`.
 
 Command line parameters can also be passed while launching SNAPSHOT version using coursier.
 
 ```bash
-  // run location agent using coursier
+  // run evemt-cli using coursier
   cs launch event-cli:0.1.0-SNAPSHOT -- publish -e wfos.prog.cloudcover --params "k1:s=['Kevin O\'Brien','Chicago, USA']|k2:s=['2016-08-05T16:23:19.002']"
 ```
 

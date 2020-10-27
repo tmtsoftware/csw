@@ -8,23 +8,13 @@ A command line application that facilitates interaction with the Configuration S
 - Config Service should be running.
 
 ## Running latest release of config-cli using Coursier
+@@@ note
 
-### 1. Add TMT Apps channel to your local Coursier installation using below command
+This page assumes that you have already installed and set-up coursier : @ref:[coursier-installation](csinstallation.md) { open=new }.
 
-Channel needs to be added to install application using `cs install`
+@@@
 
-For developer machine setup,
-
-```bash
-cs install --add-channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/apps.json
-```
-
-For production machine setup,
-
-```bash
-cs install --add-channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/apps.prod.json
-```
-### 2. Install config-cli app
+### Install config-cli app
 
 Following command creates an executable file named config-cli in the default installation directory.
 
@@ -32,13 +22,6 @@ Following command creates an executable file named config-cli in the default ins
 cs install config-cli:<version | SHA>
 ```
 
-One can specify installation directory like following:
-
-```bash
-cs install \
-    --install-dir /tmt/apps \
-    config-cli:<version | SHA>
-```
 Note: If you don't provide the version or SHA in above command, `event-cli` will be installed with the latest tagged binary of `csw-event-cli`
 
 ## Supported Commands
@@ -73,39 +56,31 @@ These credentials will not be available in actual production environment.
 
 ### Examples
 
-```
-//cd to installation directory
-cd /tmt/apps
-
-./config-cli login
-``` 
-This opens up default browser on your machine and asks you to provide username and password. 
+1.  The command below opens up default browser on your machine and asks you to provide username and password. 
 Once you provide valid credentials, AAS will respond with an access token, refresh token etc. which get stored on the local filesystem.
 So next time when you use any of the above admin protected commands, this access token gets retrieved from local filesystem and is implicitly passed in a request sent to 
 the Config Server.
 
+    ```bash
+    config-cli login
+    ``` 
 
+2.  Instead of opening the default browser on your machine, this will prompt for username and password on the console. (You do not need to leave console in this case.)
 
-```
-//cd to installation directory
-cd /tmt/apps
-
-./config-cli login --consoleLogin
-``` 
-Instead of opening the default browser on your machine, this will prompt for username and password on the console. (You do not need to leave console in this case.)
-
+    ```bash
+    config-cli login --consoleLogin
+    ``` 
+    
 ## logout
 Use this command to logout if you are already logged in or you want to re-login with different credentials.
 
 ### Example
 
-```
-//cd to installation directory
-cd /tmt/apps
+The command below will delete all the tokens stored in local filesystem.
 
-./config-cli logout
+```bash
+config-cli logout
 ```
-This command will delete all the tokens stored in local filesystem.
 
 ## Admin API
 The commands listed below will be used by administrators and maintainers of Configuration Service.
@@ -120,23 +95,16 @@ Takes an input source file and creates the configuration in the repository at a 
  
 #### Examples
 
-```
-//cd to installation directory
-cd /tmt/apps
-
-./config-cli create /path/hcd/trombone.conf -i /Users/admin/configs/trombone.conf -c "Initial version"
-```   
-Creates a config file at path `/path/hcd/trombone.conf`, using the local file at `/Users/admin/configs/trombone.conf`, with `Initial version` as a comment.
+1.  Creates a config file at path `/path/hcd/trombone.conf`, using the local file at `/Users/admin/configs/trombone.conf`, with `Initial version` as a comment.
+    ```bash
+    config-cli create /path/hcd/trombone.conf -i /Users/admin/configs/trombone.conf -c "Initial version"
+    ```   
 
 
-
-```
-//cd to installation directory
-cd /tmt/apps
-
-./config-cli create /path/hcd/trombone.conf -i /Users/admin/large-configs/bigBinary.conf --annex
-```   
-Creates a config file at path `/path/hcd/trombone.conf`, using the local file at `/Users/admin/large-configs/bigBinary.conf`, file will be stored in annex store.
+2.  Creates a config file at path `/path/hcd/trombone.conf`, using the local file at `/Users/admin/large-configs/bigBinary.conf`, file will be stored in annex store.
+    ```bash
+    config-cli create /path/hcd/trombone.conf -i /Users/admin/large-configs/bigBinary.conf --annex
+    ```   
  
 ### update
 Overwrites the file specified in the repository by the input file.
@@ -147,13 +115,10 @@ Overwrites the file specified in the repository by the input file.
  
 #### Example
 
-```
-//cd to installation directory
-cd /tmt/apps
-
-./config-cli update /path/hcd/trombone.conf -i /Users/foo/new_trombone.conf -c "new conf for next observation"
-```    
 Updates repository file `/path/hcd/trombone.conf`, with a local file at `/Users/foo/new_trombone.conf`, using the specified comment.
+```bash
+config-cli update /path/hcd/trombone.conf -i /Users/foo/new_trombone.conf -c "new conf for next observation"
+```    
  
 ### get
 Retrieves a file for a given path and saves it to the output file. The latest file is fetched if neither date nor id is specified.
@@ -165,23 +130,18 @@ Retrieves a file for a given path and saves it to the output file. The latest fi
  
 #### Examples
 
-```
-//cd to installation directory
-cd /tmt/apps
-
-./config-cli get /path/hcd/trombone.conf -o /Users/bar/temp/latest_trombone.conf
-```    
-Gets repository file `/path/hcd/trombone.conf`, stores at the local disk location `/Users/bar/temp/latest_trombone.conf`
+1.  Gets repository file `/path/hcd/trombone.conf`, stores at the local disk location `/Users/bar/temp/latest_trombone.conf`
+    
+    ```bash
+    config-cli get /path/hcd/trombone.conf -o /Users/bar/temp/latest_trombone.conf
+    ```    
 
 
+2.  Gets version revision 10 of the repository file `/path/hcd/trombone.conf`, stores at the local disk location `/Users/bar/temp/old_trombone.conf`
 
-```
-//cd to installation directory
-cd /tmt/apps
-
-./config-cli get /path/hcd/trombone.conf -o /Users/bar/temp/old_trombone.conf --id 10
-```    
-Gets version revision 10 of the repository file `/path/hcd/trombone.conf`, stores at the local disk location `/Users/bar/temp/old_trombone.conf`
+    ```bash
+    config-cli get /path/hcd/trombone.conf -o /Users/bar/temp/old_trombone.conf --id 10
+    ```    
 
 ### delete
 Deletes the file at the specified path in the repository.
@@ -191,13 +151,11 @@ Deletes the file at the specified path in the repository.
   
 #### Example
 
-```
-//cd to installation directory
-cd /tmt/apps
-
-./config-cli delete /path/hcd/outdated_trombone.conf -c monthly maintainance activity
-```    
 Deletes the repository file `/path/hcd/outdated_trombone.conf`, if it exists, using a comment
+
+```bash
+config-cli delete /path/hcd/outdated_trombone.conf -c monthly maintainance activity
+```    
   
 ### list
 Lists the files in the repository. Can't use '--annex' and '--normal' together.
@@ -214,13 +172,10 @@ Shows the version history of the file in the repository.
 
 #### Example
 
-```
-//cd to installation directory
-cd /tmt/apps
-
-./config-cli history /path/hcd/trombone.conf --max 25
-```    
 Prints the history of repository file `/path/hcd/trombone.conf`, with only 25 entries.
+```bash
+config-cli history /path/hcd/trombone.conf --max 25
+```    
 
 
 ### setActiveVersion
@@ -232,13 +187,10 @@ Sets the active version of the file in the repository.
  
 #### Example
 
-```
-//cd to installation directory
-cd /tmt/apps
-
-./config-cli setActiveVersion /path/hcd/trombone.conf --id 4 -c restoring last successful version.
-```
 Sets revision 4 to be active for the repository file `/path/hcd/trombone.conf`, using a comment.
+```bash
+config-cli setActiveVersion /path/hcd/trombone.conf --id 4 -c restoring last successful version.
+```
 
 
 ### resetActiveVersion
@@ -249,13 +201,10 @@ Resets the active version to the latest version for the specified file path.
   
 #### Example
 
-```
-//cd to installation directory
-cd /tmt/apps
-
-./config-cli resetActiveVersion /path/hcd/trombone.conf -c testing most recent config
-```
 Sets latest revision to be active for the repository file `/path/hcd/trombone.conf`, using a comment.
+```bash
+config-cli resetActiveVersion /path/hcd/trombone.conf -c testing most recent config
+```
   
 ### getActiveVersion
 Gets the ID of the active version of the file in the repository.
@@ -264,13 +213,10 @@ Gets the ID of the active version of the file in the repository.
  
 #### Example
 
-```
-//cd to installation directory
-cd /tmt/apps
-
-./config-cli getActiveVersion /path/hcd/trombone.conf
-```    
 Gets active version ID for the repository file `/path/hcd/trombone.conf`.
+```bash
+config-cli getActiveVersion /path/hcd/trombone.conf
+```    
  
 ### getActiveByTime
 Gets the file that was active at a specified time.
@@ -281,13 +227,10 @@ Gets the file that was active at a specified time.
   
 #### Example
 
-```
-//cd to installation directory
-cd /tmt/apps
-
-./config-cli getActiveByTime /path/hcd/trombone.conf -o /usr/tmp/last_week_trombone.conf --date 2017-05-09T07:29:53.242Z
-```
 Gets version of teh repository file `/path/hcd/trombone.conf`, that was active on `2017-05-09T07:29:53.242Z`, and saves it to local disk.
+```bash
+config-cli getActiveByTime /path/hcd/trombone.conf -o /usr/tmp/last_week_trombone.conf --date 2017-05-09T07:29:53.242Z
+```
   
   
 ### getMetadata
@@ -295,13 +238,10 @@ Gets the metadata of the Configuration Service server e.g. repository directory,
 
 #### Example
 
-```
-//cd to installation directory
-cd /tmt/apps
-
-./config-cli getMetadata
-```    
 Prints the metadata on screen.
+```bash
+config-cli getMetadata
+```    
 
 ## Client API
 The following commands are available for component developers.
@@ -313,13 +253,10 @@ Checks if the file exists at specified path in the repository.
  
 #### Example
 
-```
-//cd to installation directory
-cd /tmt/apps
-
-./config-cli exists /path/hcd/trombone.conf
-```    
 True if repository file `/path/hcd/trombone.conf` exists, false otherwise
+```bash
+config-cli exists /path/hcd/trombone.conf
+```    
  
 ### getActive
 Retrieves active file for a given path from the Configuration Service and writes it to the output file.
@@ -327,34 +264,35 @@ Retrieves active file for a given path from the Configuration Service and writes
   * `-o`, `--out` is output file path
   
 #### Example
-```
-//cd to installation directory
-cd /tmt/apps
 
-./config-cli getActive /path/hcd/trombone.conf -o /Users/bar/temp/scheduled_trombone.conf
-```
 Gets currently active version of the repository file `/path/hcd/trombone.conf`, stores to the local disk location `/Users/bar/temp/scheduled_trombone.conf`
+```bash
+config-cli getActive /path/hcd/trombone.conf -o /Users/bar/temp/scheduled_trombone.conf
+```
   
 ## About this application 
  
-```
-//cd to installation directory
-cd /tmt/apps
-
-./config-cli --help
-```
-
 Prints the help message.
-
-```
-//cd to installation directory
-cd /tmt/apps
-
-./config-cli --version
+```bash
+config-cli --help
 ```
 
 Prints the version of the application.
+```bash
+config-cli --version
+```
 
+
+## Running latest master of config-cli on developer machine
+
+To run the latest master on dev machine either use the command `sbt run`, or the command `sbt publishLocal` followed by `cs launch config-cli:0.1.0-SNAPSHOT`.
+
+Command line parameters can also be passed while launching SNAPSHOT version using coursier.
+
+```bash
+  // run config-cli using coursier
+  cs launch config-cli:0.1.0-SNAPSHOT -- login
+```
 
 @@@ note
 
