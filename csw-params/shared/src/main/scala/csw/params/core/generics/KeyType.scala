@@ -1,7 +1,7 @@
 package csw.params.core.generics
 
 import csw.params.core.formats.ParamCodecs._
-import csw.params.core.formats.{ParamCodecs, ParamCore}
+import csw.params.core.formats.{FlatParamCodecs, ParamCodecs, ParamCore}
 import csw.params.core.models.Coords._
 import csw.params.core.models.Units.{NoUnits, second}
 import csw.params.core.models._
@@ -24,8 +24,8 @@ sealed class KeyType[S: ArrayEnc: ArrayDec] extends EnumEntry with Serializable 
   private[params] lazy val paramEncoder: Encoder[Parameter[S]]     = ParamCodecs.paramCodec[S].encoder
   private[params] lazy val paramCoreDecoder: Decoder[ParamCore[S]] = ParamCodecs.paramCoreCodec[S].decoder
 
-  private[params] lazy val flatParamEncoder: Encoder[Parameter[S]]       = ParamCodecs.FlatParamCodecs.flatParamCodec[S].encoder
-  private[params] lazy val arraySeqDecoder: Decoder[mutable.ArraySeq[S]] = ParamCodecs.arraySeqCodec[S].decoder
+  private[params] lazy val flatParamEncoder: Encoder[Parameter[S]]       = FlatParamCodecs.paramCodec[S].encoder
+  private[params] lazy val arraySeqDecoder: Decoder[mutable.ArraySeq[S]] = FlatParamCodecs.arraySeqCodec[S].decoder
 }
 
 /**
