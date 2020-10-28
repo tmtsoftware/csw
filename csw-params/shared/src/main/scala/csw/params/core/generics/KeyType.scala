@@ -9,6 +9,7 @@ import csw.time.core.models.{TAITime, UTCTime}
 import enumeratum.{Enum, EnumEntry}
 import io.bullet.borer.{Decoder, Encoder}
 
+import scala.collection.mutable
 import scala.reflect.ClassTag
 
 /**
@@ -22,6 +23,9 @@ sealed class KeyType[S: ArrayEnc: ArrayDec] extends EnumEntry with Serializable 
 
   private[params] lazy val paramEncoder: Encoder[Parameter[S]]     = ParamCodecs.paramCodec[S].encoder
   private[params] lazy val paramCoreDecoder: Decoder[ParamCore[S]] = ParamCodecs.paramCoreCodec[S].decoder
+
+  private[params] lazy val flatParamEncoder: Encoder[Parameter[S]]       = ParamCodecs.FlatParamCodecs.flatParamCodec[S].encoder
+  private[params] lazy val arraySeqDecoder: Decoder[mutable.ArraySeq[S]] = ParamCodecs.arraySeqCodec[S].decoder
 }
 
 /**
