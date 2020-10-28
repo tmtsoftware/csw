@@ -21,8 +21,8 @@ import scala.jdk.CollectionConverters._
  * @tparam S the type of items this parameter holds
  */
 case class Parameter[S](
-    keyName: String,
     keyType: KeyType[S],
+    keyName: String,
     @key("values") items: mutable.ArraySeq[S],
     units: Units
 ) {

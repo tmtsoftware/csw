@@ -24,7 +24,7 @@ case class Key[S: ClassTag] private[generics] (keyName: String, keyType: KeyType
    * @return an instance of Parameter[S] containing the key name, values (call withUnits() on the result to set the units)
    */
   def setAll(values: Array[S]): Parameter[S] =
-    Parameter(keyName, keyType, mutable.ArraySeq.make(values), units)
+    Parameter(keyType, keyName, mutable.ArraySeq.make(values), units)
 
   /**
    * Sets the values for the key using a variable number of arguments
@@ -34,7 +34,7 @@ case class Key[S: ClassTag] private[generics] (keyName: String, keyType: KeyType
    */
   @varargs
   def set(value: S, values: S*): Parameter[S] =
-    Parameter(keyName, keyType, mutable.ArraySeq.make(value +: values.toArray[S]), units)
+    Parameter(keyType, keyName, mutable.ArraySeq.make(value +: values.toArray[S]), units)
 
   /**
    * Sets the values for the key

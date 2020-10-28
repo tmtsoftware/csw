@@ -146,7 +146,7 @@ case class ParamCore[T](
 object ParamCore {
   def toParam[T](map: Map[String, ParamCore[T]]): Parameter[T] = {
     val (keyType, param) = map.head
-    Parameter(param.keyName, KeyType.withNameInsensitive(keyType).asInstanceOf[KeyType[T]], param.values, param.units)
+    Parameter(KeyType.withNameInsensitive(keyType).asInstanceOf[KeyType[T]], param.keyName, param.values, param.units)
   }
   def fromParam[T](param: Parameter[T]): Map[String, ParamCore[T]] = {
     Map(param.keyType.entryName -> ParamCore(param.keyName, param.items, param.units))
