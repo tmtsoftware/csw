@@ -28,14 +28,13 @@ class FlatParamSetTest extends AnyFunSuite with Matchers {
     val string = Json.encode(paramSet).toUtf8String
     val bytes  = Cbor.encode(paramSet).toByteArray
 
-    val value1 = Json.decode(string.getBytes()).to[Set[Parameter[_]]].value
-    val value2 = Cbor.decode(bytes).to[Set[Parameter[_]]].value
-    val value3 = Json.decode(json.getBytes()).to[Set[Parameter[_]]].value
+    val jsonRoundTrip = Json.decode(string.getBytes()).to[Set[Parameter[_]]].value
+    val cborRoundTrip = Cbor.decode(bytes).to[Set[Parameter[_]]].value
+    val jsonDecoding  = Json.decode(json.getBytes()).to[Set[Parameter[_]]].value
 
-    value1 shouldBe paramSet
-
-    value2 shouldBe paramSet
-    value3 shouldBe paramSet
+    jsonRoundTrip shouldBe paramSet
+    cborRoundTrip shouldBe paramSet
+    jsonDecoding shouldBe paramSet
   }
 
   test("flat encoding should work with recursion created by Struct") {
@@ -53,14 +52,13 @@ class FlatParamSetTest extends AnyFunSuite with Matchers {
     val string = Json.encode(paramSet).toUtf8String
     val bytes  = Cbor.encode(paramSet).toByteArray
 
-    val value1 = Json.decode(string.getBytes()).to[Set[Parameter[_]]].value
-    val value2 = Cbor.decode(bytes).to[Set[Parameter[_]]].value
-    val value3 = Json.decode(json.getBytes()).to[Set[Parameter[_]]].value
+    val jsonRoundTrip = Json.decode(string.getBytes()).to[Set[Parameter[_]]].value
+    val cborRoundTrip = Cbor.decode(bytes).to[Set[Parameter[_]]].value
+    val jsonDecoding  = Json.decode(json.getBytes()).to[Set[Parameter[_]]].value
 
-    value1 shouldBe paramSet
-
-    value2 shouldBe paramSet
-    value3 shouldBe paramSet
+    jsonRoundTrip shouldBe paramSet
+    cborRoundTrip shouldBe paramSet
+    jsonDecoding shouldBe paramSet
   }
 
   test("flat encoding for DMS specific needs to create FITS headers") {
