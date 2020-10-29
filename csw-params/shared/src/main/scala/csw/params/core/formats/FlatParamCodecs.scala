@@ -1,9 +1,9 @@
 package csw.params.core.formats
 
-import csw.params.core.generics.{KeyType, Parameter, SimpleKeyType}
+import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.{Struct, Units}
 import io.bullet.borer._
-import io.bullet.borer.derivation.CompactMapBasedCodecs
+import io.bullet.borer.derivation.{CompactMapBasedCodecs, MapBasedCodecs}
 
 // FlatParamCodecs are specifically designed for DMS, do not use it elsewhere
 // Decoder expects that keyType is always the first member of the parameter
@@ -13,6 +13,8 @@ object FlatParamCodecs extends ParamCodecs {
     implicit lazy val keyCodec: Codec[KeyType[T]] = Codec.of[KeyType[_]].asInstanceOf[Codec[KeyType[T]]]
     CompactMapBasedCodecs.deriveCodec
   }
+
+  implicit lazy val structCodec2: Codec[Struct] = MapBasedCodecs.deriveCodec
 
   override implicit lazy val paramEncExistential: Encoder[Parameter[_]] = { (w: Writer, value: Parameter[_]) =>
     val encoder: Encoder[Parameter[Any]] = value.keyType.flatParamEncoder.asInstanceOf[Encoder[Parameter[Any]]]
