@@ -1,10 +1,19 @@
-# coursier-installation
+# coursier installation
 
-## Coursier Installation
-Please refer to the necessary steps for installation @link:[coursier-installation](https://get-coursier.io/docs/cli-installation) { open=new }. 
+## Coursier Installation and Setup
+1.  Coursier binary needs to be present on the machine to proceed further with the installation.Please refer to the
+necessary steps for downloading coursier launcher @link:[coursier installation](https://get-coursier.io/docs/cli-installation) { open=new }. 
 
-## Coursier Setup
-Please run the command `./cs setup --jvm 11 ` to add cs bin where applications will be installed by default to PATH.
+2. The next step is to setup coursier.
+    
+    ```
+    ./cs setup --jvm 11
+    ```
+    The above command does the following things:
+    
+    1.  It adds coursier bin where applications will be installed by default to PATH.
+    2.  It installs Java AdoptOpenJDK 11.
+
 
 @@@ note
 

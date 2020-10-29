@@ -103,22 +103,3 @@ Use the following command to get version information for this app.
 ```bash
    location-server --version
 ```
-
-## Running latest master of location-server on developer machine
-
-1.  To run the latest master on dev machine the command `sbt run` can be used.
-    ```bash
-      // run location-server using sbt
-      sbt "csw-location-server/run"
-    ```
-    ```bash
-      // run location-server using sbt with arguments
-      sbt "csw-location-server/run --clusterPort=3352"
-    ```
-
-2. Alternatively the command `sbt publishLocal` followed by `cs launch location-server:0.1.0-SNAPSHOT` can be used.
-   Command line parameters can also be passed while launching SNAPSHOT version using coursier.
-    ```bash
-      // run location-server using coursier
-      cs launch location-server:0.1.0-SNAPSHOT -- --clusterPort=3352
-    ``` 

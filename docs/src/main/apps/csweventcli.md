@@ -192,32 +192,13 @@ Example:
 
 @@@
 
-## Running latest master of event-cli on developer machine
+## Testing/Development
+While testing or development, in order to use this CLI application, below prerequisites must be satisfied:  
 
-@@@ note
+*  Location Server is running.
+*  Event Server is running and is registered to the Location Service.
 
-While development or testing, in order to use this CLI application, below prerequisites must be satisfied:  
-
-*  @ref:[csw-location-server](./../apps/cswlocationserver.md) application is running.
-*  @ref:[csw-location-agent](./../apps/cswlocationagent.md) application is running, which has started the Event Server and registered it to the Location Service.
-
-Please refer to @ref:[Starting Apps for Development](cswservices.md#starting-apps-for-development) section for more details on how to start these applications using `csw-services`.
-
-@@@
-
-1.  To run the latest master on dev machine the command `sbt run` can be used.
-    ```bash
-      // run event-cli using sbt
-      sbt "csw-event-cli/run subscribe -e wfos.prog.cloudcover"
-    ```
-
-
-2. Alternatively the command `sbt publishLocal` followed by `cs launch event-cli:0.1.0-SNAPSHOT` can be used.
-   Command line parameters can also be passed while launching SNAPSHOT version using coursier.
-    ```bash
-      // run event-cli using coursier
-      cs launch event-cli:0.1.0-SNAPSHOT -- subscribe -e wfos.prog.cloudcover
-    ```
+Please refer to @ref:[Starting Apps for Development](./../apps/cswservices.md#starting-apps-for-development) section for more details on how to start these applications using `csw-services`.
 
 ## Monitor statistics
 

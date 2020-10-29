@@ -89,4 +89,21 @@ By default `csw-services` application runs services in the foreground, you can p
 
 @@@
 
+## Running latest master of csw-services on developer machine
+
+
+1.  To run the latest master on dev machine the command `sbt run` can be used.
+    ```bash
+      // The below command starts location service along with the auth service
+      sbt "csw-services/run start -k"
+    ```
+
+
+2. If the `sbt run` command cannot be used due to some reason, the command `sbt publishLocal` followed by 
+   `cs launch csw-services:0.1.0-SNAPSHOT` can be used. Command line parameters can also be passed while launching
+    SNAPSHOT version using coursier.
+    ```bash
+      // The below command starts location service along with the auth service
+      cs launch csw-services:0.1.0-SNAPSHOT -- start -k
+    ```
     

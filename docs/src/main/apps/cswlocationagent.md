@@ -74,20 +74,3 @@ Note: If you don't provide the version or SHA in above command, `location-agent`
     ```bash
     location-agent --version
     ```  
-
-
-## Running latest master of location-agent on developer machine
-
-1.  To run the latest master on dev machine the command `sbt run` can be used.
-    ```bash
-      // run location-agent using sbt with arguments
-      sbt 'csw-location-agent/run --prefix "CSW.foo" --command "sleep 5"'
-    ```
-
-
-2. Alternatively the command `sbt publishLocal` followed by `cs launch location-agent:0.1.0-SNAPSHOT` can be used.
-   Command line parameters can also be passed while launching SNAPSHOT version using coursier.
-    ```bash
-      // run location-agent using coursier
-      cs launch location-agent:0.1.0-SNAPSHOT -- --prefix "CSW.foo" --command "sleep 5"
-    ```

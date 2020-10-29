@@ -7,22 +7,16 @@ We’ll use the [sbt](https://www.scala-sbt.org/1.x/docs/index.html) build tool 
 ## Installation
 Supported Operating Systems are: CentOS and MacOS
  
-1.  Make sure you have the Java AdoptOpenJDK 11.
-    -   Run  `javac -version`  in the command line and make sure you see  `javac 11._._`
-    -   If you don’t have version 11 or higher, links given below will help you to reach there.
-        - [Mac](https://github.com/AdoptOpenJDK/homebrew-openjdk)
-        - [Linux](https://adoptopenjdk.net/installation.html?variant=openjdk11&jvmVariant=hotspot)                
-2.  Install sbt
-    -   [Mac](https://www.scala-sbt.org/1.x/docs/Installing-sbt-on-Mac.html)
-    -   [Linux](https://www.scala-sbt.org/1.x/docs/Installing-sbt-on-Linux.html)
-3. Install IntelliJ 
+1.  Make sure you have coursier installed and set up along with Java AdoptOpenJDK 11 and sbt.
+    Please refer to @ref:[coursier installation](../apps/csinstallation.md) for more details.
+2. Install IntelliJ 
 	- [MAC](https://www.jetbrains.com/idea/download/)
 	- [Linux](https://www.jetbrains.com/idea/download/)
-4. Install following IntelliJ Plugins
+3. Install following IntelliJ Plugins
     - [Scala](https://plugins.jetbrains.com/plugin/1347-scala)
     - [Scalafmt](https://plugins.jetbrains.com/plugin/8236-scalafmt)
-5. Install [Redis](https://redis.io/download) - Version should be greater than 4.0.0
-6. Recommended testing frameworks/tools: 
+4. Install [Redis](https://redis.io/download) - Version should be greater than 4.0.0
+5. Recommended testing frameworks/tools: 
 	- [ScalaTest](https://www.scalatest.org/)
 	- [JUnit](https://junit.org/junit4/), JUnit Interface
 	- Note: These frameworks are typically downloaded and made available by the sbt tool by specifying them as dependencies.
