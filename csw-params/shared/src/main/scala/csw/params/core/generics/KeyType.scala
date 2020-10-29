@@ -103,9 +103,8 @@ object KeyType extends Enum[KeyType[_]] {
       make(name, NoUnits, firstChoice, restChoices: _*)
   }
 
-  case object StringKey extends SimpleKeyType[String]
-  import FlatParamCodecs.structCodec2
-  case object StructKey  extends SimpleKeyType[Struct]()
+  case object StringKey  extends SimpleKeyType[String]
+  case object StructKey  extends SimpleKeyType[Struct]
   case object UTCTimeKey extends SimpleKeyTypeWithUnits[UTCTime](second)
   case object TAITimeKey extends SimpleKeyTypeWithUnits[TAITime](second)
 
