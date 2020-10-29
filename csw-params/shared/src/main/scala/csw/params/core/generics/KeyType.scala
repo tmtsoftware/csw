@@ -24,8 +24,8 @@ sealed class KeyType[S: ArrayEnc: ArrayDec] extends EnumEntry with Serializable 
   private[params] lazy val paramEncoder: Encoder[Parameter[S]]     = ParamCodecs.paramCodec[S].encoder
   private[params] lazy val paramCoreDecoder: Decoder[ParamCore[S]] = ParamCodecs.paramCoreCodec[S].decoder
 
-  private[params] lazy val flatParamEncoder: Encoder[Parameter[S]]   = FlatParamCodecs.paramCodec[S].encoder
-  private[params] lazy val arraySeqCodec: Codec[mutable.ArraySeq[S]] = FlatParamCodecs.arraySeqCodec[S]
+  private[params] lazy val flatParamEncoder: Encoder[Parameter[S]] = FlatParamCodecs.paramCodec[S].encoder
+  lazy val _arraySeqCodec: Codec[mutable.ArraySeq[S]]              = FlatParamCodecs.arraySeqCodec[S]
 }
 
 /**
