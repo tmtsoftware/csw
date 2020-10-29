@@ -33,21 +33,28 @@ cs channel --add https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/a
 ### Installing an application
 The  command `cs install <app-name>:<version | SHA>`can be used to install an application using coursier.  
 ```bash
-// location-server is the name of the application installed
+// my-app is the name of the application installed
 // 1.0.0 is the version of the application to be installed
-cs install location-server:1.0.0
+cs install my-app:1.0.0
 ```
+
+The version number or SHA if avoided in the `install`, `my-app` will be installed with the latest tagged binary of `my-app`.
+```bash
+// my-app is the name of the application installed
+cs install my-app
+```
+
 ### Help
 Use the following command to get help on the options available with this app.
 ```bash
-   location-server --help
+   my-app --help
 ```
 
 ### Version
 Use the following command to get version information for the app.
   
 ```bash
-   location-server --version
+   my-app --version
 ```    
 
     

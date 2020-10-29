@@ -307,14 +307,30 @@ alarm-cli --version
 
 ## Running latest master of alarm-cli on developer machine
 
-To run the latest master on dev machine either use the command `sbt run`, or the command `sbt publishLocal` followed by `cs launch alarm-cli:0.1.0-SNAPSHOT`.
+@@@ note
 
-Command line parameters can also be passed while launching SNAPSHOT version using coursier.
+While development or testing, in order to use this CLI application, below prerequisites must be satisfied:  
 
-```bash
-  // run alarm-cli using coursier
-  cs launch alarm-cli:0.1.0-SNAPSHOT -- list --subsystem nfiraos --metadata --status
-```
+*  @ref:[csw-location-server](./../apps/cswlocationserver.md) application is running.
+*  @ref:[csw-location-agent](./../apps/cswlocationagent.md) application is running, which has started the Alarm Server and registered it to the Location Service.
+
+Please refer to @ref:[Starting Apps for Development](cswservices.md#starting-apps-for-development) section for more details on how to start these applications using `csw-services`.
+
+@@@
+
+1.  To run the latest master on dev machine the command `sbt run` can be used.
+    ```bash
+      // run alarm-cli using sbt with arguments
+      sbt "csw-alarm-cli/run list --subsystem nfiraos --metadata --status"
+    ```
+
+
+2. Alternatively the command `sbt publishLocal` followed by `cs launch alarm-cli:0.1.0-SNAPSHOT` can be used.
+   Command line parameters can also be passed while launching SNAPSHOT version using coursier.
+    ```bash
+      // run alarm-cli using coursier
+      cs launch alarm-cli:0.1.0-SNAPSHOT -- list --subsystem nfiraos --metadata --status
+    ```   
 
 @@@ note
 

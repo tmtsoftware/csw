@@ -64,11 +64,20 @@ Note: If you don't provide the version or SHA in above command, `config-server` 
 
 ## Running latest master of location-agent on developer machine
 
-To run the latest master on dev machine  either use the command `sbt run`, or the command `sbt publishLocal` followed by `cs launch config-server:0.1.0-SNAPSHOT`.
+1.  To run the latest master on dev machine the command `sbt run` can be used.
+    ```bash
+      // run config-server using sbt
+      sbt "csw-config-server/run"
+    ```
+    ```bash
+       // run config-server using sbt with arguments
+       sbt "csw-config-server/run --initRepo"
+    ```
 
-Command line parameters can also be passed while launching SNAPSHOT version using coursier.
 
-```bash
-  // run config-server using coursier
-  cs launch config-server:0.1.0-SNAPSHOT -- --initRepo
-```
+2. Alternatively the command `sbt publishLocal` followed by `cs launch config-server:0.1.0-SNAPSHOT` can be used.
+   Command line parameters can also be passed while launching SNAPSHOT version using coursier.
+    ```bash
+      // run config-server using coursier
+      cs launch config-server:0.1.0-SNAPSHOT -- --initRepo
+    ``` 
