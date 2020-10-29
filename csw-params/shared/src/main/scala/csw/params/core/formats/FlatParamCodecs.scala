@@ -30,7 +30,7 @@ object FlatParamCodecs extends ParamCodecs {
     val keyType0    = KeyType.withNameInsensitive(keyTypeName)
     val keyType     = (if (keyType0 == KeyType.StructKey) FlatStructKey else keyType0).asInstanceOf[KeyType[Any]]
     val keyName     = r.readString("keyName").readString()
-    val values      = r.readString("values").read()(keyType.arraySeqDecoder)
+    val values      = r.readString("values").read()(keyType.arraySeqDecoder.decoder)
     val units       = r.readString("units").read()(Decoder[Units])
     val param       = Parameter(keyType, keyName, values, units)
     r.readMapClose(isUnbounded, param)
