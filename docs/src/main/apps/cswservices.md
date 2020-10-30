@@ -2,19 +2,15 @@
 
 @@@ note
 
-This page assumes that you have already installed and set-up coursier : @ref:[coursier-installation](csinstallation.md) { open=new }.
+This page assumes that you have already installed and set-up coursier : @ref:[coursier-installation](csinstallation.md).
 
 @@@
 
 ## Starting Apps for Development
 
-1.  In order to run a component, it is required to run @ref:[csw-location-server](cswlocationserver.md).
-Moreover, even to start applications like @ref:[csw-event-cli](csweventcli.md) and @ref:[csw-config-cli](cswconfigcli.md)
-along with Location Service, services like Event Service and Config Service are required to be up and running respectively.
- 
-2. csw-services is an application that has been provided to make the starting of services more convenient for developers.
-   This application can be used to start the Location Service, Event Service or any set of services that are required by 
-   the developer.
+csw-services is an application that has been provided to start all the services offered by csw. csw-services by default 
+will start all the services but if only specific services , it can be done by passing arguments corresponding to specific 
+services.    
    
 ### Install csw-services app
 
@@ -31,6 +27,17 @@ If you don't provide the version or SHA in above command, `csw-services` will be
 @@@ 
 
 ### Supported Commands
+@@@ warning  { title='Caution' }
+
+csw-services only requires the following things to be set before starting the Database Service:
+
+* The `PGDATA` environment variable set to the Postgres data directory where Postgres is installed e.g. for mac: "/usr/local/var/postgres".
+* Password set for the valid Postgres user. If not, go to the Postgres shell via `psql` and run `ALTER USER <username> WITH PASSWORD '<mypassword>';`.
+
+Also it is not required to set `INTERFACE_NAME` environment variable explicitly but if in any case it is not assigned correctly, For Eg: 
+if multiple interfaces are present on the machine, then one needs to set it explicitly.
+
+@@@
 
 The below command starts all the CSW services.
 
@@ -39,9 +46,14 @@ The below command starts all the CSW services.
 csw-services start
 ```
 
-
+* --interface-name | -i if provided, helps you set the interface name.
+    ```bash
+    // This starts all the services and sets the interface name to en0.
+    csw-services start -i en0
+    ```  
+  
 If only  specific services are to be started then following options can be used along with the `start` command.
-
+  
 * --config | -c if provided, starts configuration service.
     ```bash
     // This starts location service along with the config service
@@ -57,20 +69,12 @@ If only  specific services are to be started then following options can be used 
     // This starts location service along with the alarm service
     csw-services start -a
     ```
+  
 * --database | -d if provided, starts database service.
     ```bash
     // This starts location service along with the database service
     csw-services start -d
     ```
-
-@@@ note
-
-While starting the Database Service i.e running the command `csw-services start -d`, make sure that
- 
-* The `PGDATA` environment variable is set to the Postgres data directory where Postgres is installed e.g. for mac: "/usr/local/var/postgres" and
-* there is a password set for the valid Postgres user. If not, go to the Postgres shell via `psql` and run `ALTER USER <username> WITH PASSWORD '<mypassword>';`.
-
-@@@
   
 * --auth | -k if provided, starts authentication service.
     ```bash
@@ -91,19 +95,9 @@ By default `csw-services` application runs services in the foreground, you can p
 
 ## Running latest master of csw-services on developer machine
 
-
-1.  To run the latest master on dev machine the command `sbt run` can be used.
-    ```bash
-      // The below command starts location service along with the auth service
-      sbt "csw-services/run start -k"
-    ```
-
-
-2. If the `sbt run` command cannot be used due to some reason, the command `sbt publishLocal` followed by 
-   `cs launch csw-services:0.1.0-SNAPSHOT` can be used. Command line parameters can also be passed while launching
-    SNAPSHOT version using coursier.
-    ```bash
-      // The below command starts location service along with the auth service
-      cs launch csw-services:0.1.0-SNAPSHOT -- start -k
-    ```
+ To run the latest master on dev machine the command `sbt run` can be used.
+```bash
+  // The below command starts location service along with the auth service
+  sbt "csw-services/run start -k"
+```
     

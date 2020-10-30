@@ -1,4 +1,6 @@
 # coursier installation
+In TMT we have adopted coursier to setup scala/java environment on development/production machines and install any java based 
+apps provided by csw and esw. 
 
 ## Coursier Installation and Setup
 1.  Coursier binary needs to be present on the machine to proceed further with the installation.Please refer to the
@@ -42,28 +44,28 @@ cs channel --add https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/a
 ### Installing an application
 The  command `cs install <app-name>:<version | SHA>`can be used to install an application using coursier.  
 ```bash
-// my-app is the name of the application installed
-// 1.0.0 is the version of the application to be installed
-cs install my-app:1.0.0
+// location-server is the name of the application installed
+// 2.0.1 is the version of the application to be installed
+cs install location-server:2.0.1
 ```
 
-The version number or SHA if avoided in the `install`, `my-app` will be installed with the latest tagged binary of `my-app`.
+The version number or SHA if avoided in the `install` command, `location-server` will be installed with the latest tagged binary of `csw-location-server`.
 ```bash
-// my-app is the name of the application installed
-cs install my-app
+// location-server is the name of the application installed
+cs install location-server
 ```
 
 ### Help
 Use the following command to get help on the options available with this app.
 ```bash
-   my-app --help
+   location-server --help
 ```
 
 ### Version
 Use the following command to get version information for the app.
   
 ```bash
-   my-app --version
+   location-server --version
 ```    
 
     
