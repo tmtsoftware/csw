@@ -55,7 +55,7 @@ jobs:
         run: ./integration/scripts/multiple_nic_test.sh
 
       - name: Paradox Validate Links
-        run: sbt docs/Paradox/paradoxValidateLinks
+        run: sbt docs/paradoxValidateLinks
 
       - name: Notify slack
         if: always()
