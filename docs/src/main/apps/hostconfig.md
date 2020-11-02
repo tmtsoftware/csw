@@ -1,14 +1,15 @@
 # csw-host-config
 
-This is just a helper to create a host configuration application. 
-A component/subsystem can create their own host configuration application using this helper; 
-to be more precise, every Github repository should have one host configuration application. 
+This is just a helper to create a host configuration application.
+A component/subsystem can create their own host configuration application using this helper;
+to be more precise, every Github repository should have one host configuration application.
 The reason for having one app per repo is, when you run `universal:publish` task,
 it will generate a zip file which will be self contained (will have all the required dependencies) and can be deployed independently on any machine.
 
 This application will start multiple containers on a given host machine and each container will have single/multiple components.
 
 ## How to create
+
 Scala
 :   @@snip [HostConfigApp.scala](../../../../examples/src/main/scala/example/framework/HostConfigApp.scala) { #host-config-app }
 
@@ -46,7 +47,7 @@ The sbt task: `sbt project/universal:packageBin` creates the following four scri
 * `trombone-container-cmd-app.bat` : For Windows machine.
 
 **Examples:**
- 
+
 1. 
 ```
 ./trombone-host-config-app hostconfig.conf -s ./trombone-container-cmd-app

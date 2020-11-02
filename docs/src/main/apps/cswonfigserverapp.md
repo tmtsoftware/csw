@@ -4,31 +4,16 @@ A HTTP server application that hosts the Configuration Service.
   
 ## Prerequisites
 
-- Location server should be running.
-- CSW AAS should be running.
+- Location Service should be running
+- CSW AAS should be running
 
 @@@ note
 
-Before running `config-server`, `sbt "csw-services/run start -k"` command can be run to start the location service along with the aas/auth service or
-`cs launch csw-services -- start -k` command can also be used.
+This page assumes that you have already installed and setup @ref:[coursier](csinstallation.md) { open=new }
 
 @@@
 
-## Command line parameter options
-
-* **`--initRepo`** is an optional parameter. When supplied, the server will try to initialize a repository if it does not exist.
-* **`--port`** is an optional parameter. When specified, the HTTP server will start on this port. Default will be 4000.
-* **`--help`** prints the help message.
-* **`--version`** prints the version of the application.
-
-## Running latest release of config-server using Coursier
-@@@ note
-
-This page assumes that you have already installed and set-up coursier : @ref:[coursier-installation](csinstallation.md) { open=new }.
-
-@@@
-
-### Install config-server app
+## Install config-server app
 
 Following command creates an executable file named lconfig-server in the default installation directory.
 
@@ -38,6 +23,13 @@ cs install config-server:<version | SHA>
 
 Note: If you don't provide the version or SHA in above command, `config-server` will be installed with the latest tagged binary of `csw-config-server`
 
+## Command line parameter options
+
+* **`--initRepo`** is an optional parameter. When supplied, the server will try to initialize a repository if it does not exist.
+* **`--port`** is an optional parameter. When specified, the HTTP server will start on this port. Default will be 4000.
+* **`--help`** prints the help message.
+* **`--version`** prints the version of the application.
+
 ## Examples
 
 1.  Start an HTTP server on default port 4000. Initialize the repository if it does not exist and register it with the Location Service.
@@ -45,7 +37,6 @@ Note: If you don't provide the version or SHA in above command, `config-server` 
     config-server --initRepo
     ```  
 
- 
 2.  Start an HTTP server on port 4001. Initialize the repository if it does not exist and register it with the Location Service.     
     ```bash
     config-server --initRepo --port 4001
@@ -59,5 +50,4 @@ Note: If you don't provide the version or SHA in above command, `config-server` 
 4. Prints application version
     ```bash
     config-server --version
-    ```   
-   
+    ```

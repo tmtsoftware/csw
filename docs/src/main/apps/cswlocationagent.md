@@ -4,7 +4,23 @@ A utility application that starts a given external (non-CSW) program, registers 
 
 ## Prerequisite
 
-- Location server should be running.
+- Location Service should be running
+
+@@@ note
+
+This page assumes that you have already installed and setup @ref:[coursier](csinstallation.md) { open=new }
+
+@@@
+
+## Install location-agent app
+
+Following command creates an executable file named location-agent in the default installation directory.
+
+```bash
+cs install location-agent:<version | SHA>
+```
+
+Note: If you don't provide the version or SHA in above command, `location-agent` will be installed with the latest tagged binary of `csw-location-agent`
 
 ## Command line parameter options
 
@@ -19,22 +35,6 @@ A utility application that starts a given external (non-CSW) program, registers 
 * **`--help`** Prints the help message.
 * **`--version`** Prints the version of the application.
 
-## Running latest release of location-agent using Coursier
-@@@ note
-
-This page assumes that you have already installed and set-up coursier : @ref:[coursier-installation](csinstallation.md) { open=new }.
-
-@@@
-
-### Install location-agent app
-
-Following command creates an executable file named location-agent in the default installation directory.
-
-```bash
-cs install location-agent:<version | SHA>
-```
-
-Note: If you don't provide the version or SHA in above command, `location-agent` will be installed with the latest tagged binary of `csw-location-agent`
 
 ### Examples
  

@@ -4,17 +4,16 @@ A command line application that facilitates interaction with @ref:[Event Service
 
 ## Prerequisite
 
-- Location server should be running.
-- Event Service should be running.
+- Location Service should be running
+- Event Service should be running
 
-## Running latest release of event-cli using Coursier
 @@@ note
 
-This page assumes that you have already installed and set-up coursier : @ref:[coursier-installation](csinstallation.md) { open=new }.
+This page assumes that you have already installed and setup @ref:[coursier](csinstallation.md) { open=new }
 
 @@@
 
-### Install event-cli app
+## Install event-cli app
 
 Following command creates an executable file named event-cli in the default installation directory.
 
@@ -26,18 +25,18 @@ Note: If you don't provide the version or SHA in above command, `event-cli` will
 
 ## Supported Commands
 
-* inspect
-* get
-* publish
-* subscribe
+- inspect
+- get
+- publish
+- subscribe
 
 ### inspect
 
 Takes a comma separated list of events and displays each event's parameter information which includes key name, key type, and unit along with metadata (event key, timestamp & id).
 
- * `-e`, `--events` : comma separated list of events to inspect
- 
-#### Example:
+- `-e`, `--events` : comma separated list of events to inspect
+
+#### Example
 
 ```bash
 event-cli inspect -e wfos.prog.cloudcover,wfos.prog.filter
@@ -46,36 +45,39 @@ event-cli inspect -e wfos.prog.cloudcover,wfos.prog.filter
 @@@ note
 `inspect` command does not display parameter values. To view values, use `get` command instead.
 @@@
- 
+
 ### get
 
 Takes a comma separated list of events with nested key paths and displays event information including values either in one-line or JSON format.
 
- * `-e`, `--events`     comma separated list of events in the form of `<event1:key1>,<event2:key2:key3>`, use `:` to separate multiple keys for same event. Ex. `-e a.b.c:struct1/ra,x.y.z:struct2/dec:epoch`
- * `-o`, `--out`        output format, default is one-line
- * `-t`, `--timestamp`  display timestamp
- * `--id`               display event id
- * `-u`, `--units`      display units
+- `-e`, `--events`     comma separated list of events in the form of `<event1:key1>,<event2:key2:key3>`, use `:` to separate multiple keys for same event. Ex. `-e a.b.c:struct1/ra,x.y.z:struct2/dec:epoch`
+- `-o`, `--out`        output format, default is one-line
+- `-t`, `--timestamp`  display timestamp
+- `--id`               display event id
+- `-u`, `--units`      display units
 
-#### Examples:
- 
-1.  Displays all keys information in one-line form for event `wfos.prog.cloudcover`
+#### Examples
+
+1. Displays all keys information in one-line form for event `wfos.prog.cloudcover`
+
     ```bash
     event-cli get -e wfos.prog.cloudcover
     ```
 
- 
-2.  Displays information of only `struct1/ra` and `epoch` keys as well as `timestamp`, `event id` and `units` of provided keys in one-line form for event `wfos.prog.cloudcover`
+2. Displays information of only `struct1/ra` and `epoch` keys as well as `timestamp`, `event id` and `units` of provided keys in one-line form for event `wfos.prog.cloudcover`
+
     ```bash
     event-cli get -e wfos.prog.cloudcover:struct1/ra:epoch -t --id -u
     ```
- 
-3.  Displays information of `epoch` of event `wfos.prog.cloudcover` and `ra` key of event `wfos.prog.filter:ra`
+
+3. Displays information of `epoch` of event `wfos.prog.cloudcover` and `ra` key of event `wfos.prog.filter:ra`
+
     ```bash
     event-cli get -e wfos.prog.cloudcover:epoch,wfos.prog.filter:ra
     ```
 
-4.  Displays event `wfos.prog.cloudcover` with only `epcoh` key in JSON format.
+4. Displays event `wfos.prog.cloudcover` with only `epcoh` key in JSON format.
+
      ```bash
     event-cli get -e wfos.prog.cloudcover:epoch -o json
     ```
@@ -84,20 +86,19 @@ Takes a comma separated list of events with nested key paths and displays event 
 `-t`, `--id` & `--u` options are not applicable when `-o json` option provided. An Event displayed in JSON format will always have `timestamp`, `event id` and `units` irrespective of whether those options are provided via the CLI.
 @@@
 
- 
 ### publish
 
 Publishes an event to the Event Server from the provided input data file or CLI params.
 
- * `-e`, `--event`      event key to publish
- * `--data`             absolute file path which contains event in JSON format
- * `--params`           pipe '|' separated list of params enclosed in double quotes in the form of `"keyName:keyType:unit=values| ..."`. unit is optional here. Supported key types are: 
+- `-e`, `--event`      event key to publish
+- `--data`             absolute file path which contains event in JSON format
+- `--params`           pipe '|' separated list of params enclosed in double quotes in the form of `"keyName:keyType:unit=values| ..."`. unit is optional here. Supported key types are: 
                         `[i = IntKey | s = StringKey | f = FloatKey | d = DoubleKey | l = LongKey | b = BooleanKey]`.
                         You can optionally choose to enclose param values in \[, \] brackets.
                         Values of a string key should be provided in single quotes and use backslash to escape string.
                         Ex. `"addressKey:s=['Kevin O\'Brien','Chicago, USA']|timestampKey:s=['2016-08-05T16:23:19.002']"`
- * `-i`, `--interval`   interval in milliseconds to publish event. A single event will be published, if not provided
- * `-p`, `--period`     publish events for this duration in seconds on provided interval. Default is `2147483` seconds.
+- `-i`, `--interval`   interval in milliseconds to publish event. A single event will be published, if not provided
+- `-p`, `--period`     publish events for this duration in seconds on provided interval. Default is `2147483` seconds.
 
 @@@ note
 If `--data` & `--params` are provided together, then the Event is generated from both `--data` file & `--params` option.
@@ -106,22 +107,24 @@ If `--data` & `--params` are provided together, then the Event is generated from
 Option `-p` should be used with `-i`, otherwise `-p` is ignored. 
 @@@
 
-#### Examples:
+#### Examples
 
-1.  Creates event from provided JSON file and publishes it with key `wfos.prog.cloudcover` to the Event Server. 
+1. Creates event from provided JSON file and publishes it with key `wfos.prog.cloudcover` to the Event Server.
+
     ```bash
     event-cli publish -e wfos.prog.cloudcover --data /path/to/event.json
     ```
- 
 
-2.  Creates an Event from provided JSON file and publishes it every `500ms` for duration of `60s`. 
+2. Creates an Event from provided JSON file and publishes it every `500ms` for duration of `60s`.
+
     ```bash
     event-cli publish -e wfos.prog.cloudcover --data /path/to/event.json -i 500 -p 60
     ```
 
-c.  First fetches already published Event for key `wfos.prog.cloudcover` from the Event Server and then updates that Event with provided `--params`
+3. First fetches already published Event for key `wfos.prog.cloudcover` from the Event Server and then updates that Event with provided `--params`
 If provided keys are already present in existing Event, then those will be updated.  Otherwise, new param entries will be added to the Event.
-If no Event is published in past for the provided key, then the new Event gets created with the provided params and Event key. 
+If no Event is published in past for the provided key, then the new Event gets created with the provided params and Event key.
+
     ```bash
     event-cli publish -e wfos.prog.cloudcover --params "k1:s=['Kevin O\'Brien','Chicago, USA']|k2:s=['2016-08-05T16:23:19.002']"
     ```
@@ -130,37 +133,38 @@ If no Event is published in past for the provided key, then the new Event gets c
 
 Takes a comma separated list of Events with nested key paths and displays continuous stream of Event information as soon as it receives the Event. 
 
- * `-e`, `--events`     comma separated list of Events in the form of `<event1:key1>,<event2:key2:key3>`, use `:` to separate multiple keys for the same Event. Ex. `-e a.b.c:struct1/ra,x.y.z:struct2/dec:epoch`
- * `-i`, `--interval`   interval in milliseconds which to receive an Event
- * `-o`, `--out`        output format, default is one-line
- * `-t`, `--timestamp`  display timestamp
- * `--id`               display event id
- * `-u`, `--units`      display units
+- `-e`, `--events`     comma separated list of Events in the form of `<event1:key1>,<event2:key2:key3>`, use `:` to separate multiple keys for the same Event. Ex. `-e a.b.c:struct1/ra,x.y.z:struct2/dec:epoch`
+- `-i`, `--interval`   interval in milliseconds which to receive an Event
+- `-o`, `--out`        output format, default is one-line
+- `-t`, `--timestamp`  display timestamp
+- `--id`               display event id
+- `-u`, `--units`      display units
 
-#### Examples:
+#### Examples
 
-1.  Subscribes to Event key `wfos.prog.cloudcover` and displays all key information as soon as there is an Event published for key `wfos.prog.cloudcover` with the one-line format.
+1. Subscribes to Event key `wfos.prog.cloudcover` and displays all key information as soon as there is an Event published for key `wfos.prog.cloudcover` with the one-line format.
+
     ```bash
     event-cli subscribe -e wfos.prog.cloudcover
     ```
 
-
-2.  Subscribes to the Event key `wfos.prog.cloudcover` and displays information of only the `struct1/ra` and `epoch` keys 
+2. Subscribes to the Event key `wfos.prog.cloudcover` and displays information of only the `struct1/ra` and `epoch` keys 
 along with `timestamp`, `event id` and `units` of tge provided keys in one-line format as soon as there is an Event published for the key `wfos.prog.cloudcover`.
+
     ```bash
     event-cli subscribe -e wfos.prog.cloudcover:struct1/ra:epoch -t --id -u
     ```
 
-
-3.  Subscribes to the Event key `wfos.prog.cloudcover` and displays all key information at provided interval <500ms>.
+3. Subscribes to the Event key `wfos.prog.cloudcover` and displays all key information at provided interval <500ms>.
 Irrespective of whether there are multiple Events published for the key `wfos.prog.cloudcover` within `500ms` interval or not, 
 at every tick (i.e. 500ms), the latest Event information will be displayed on the console. 
+
     ```bash
     event-cli subscribe -e wfos.prog.cloudcover -i 500
     ```
 
+4. Subscribes to Event key `wfos.prog.cloudcover` and displays only `epoch` key information as soon as there is an Event published for key `wfos.prog.cloudcover`, in JSON format.
 
-4.  Subscribes to Event key `wfos.prog.cloudcover` and displays only `epoch` key information as soon as there is an Event published for key `wfos.prog.cloudcover`, in JSON format.
     ```bash
     event-cli subscribe -e wfos.prog.cloudcover:epoch -o json
     ```
@@ -169,19 +173,19 @@ at every tick (i.e. 500ms), the latest Event information will be displayed on th
 `-t`, `--id` & `--u` options are not applicable when the `-o json` option is provided. An Event displayed in `json` format will always have `timestamp`, `event id` and `units` irrespective of whether those options are provided via the CLI.
 @@@
 
-## About this application 
- 
+## About this application
+
 Prints the help message.
+
 ```bash
 event-cli --help
 ```
 
-
 Prints the version of the application.
+
 ```bash
 event-cli --version
 ```
-
 
 @@@ note
 
@@ -193,18 +197,19 @@ Example:
 @@@
 
 ## Testing/Development
+
 While testing or development, in order to use this CLI application, below prerequisites must be satisfied:  
 
-*  Location Server is running.
-*  Event Server is running and is registered to the Location Service.
+- Location Service is running.
+- Event Service is running and is registered to the Location Service.
 
-Please refer to @ref:[Starting Apps for Development](./../apps/cswservices.md#starting-apps-for-development) section for more details on how to start these applications using `csw-services`.
+Please refer to @ref:[Starting Apps for Development](./../apps/cswservices.md) section for more details on how to start these applications using `csw-services`.
 
 ## Monitor statistics
 
 `Event Service` uses [redis](https://redis.io/) as the event store. Using `redis-cli`, you can monitor continuous stats about the Event Service.
 
-```
+```bash
 $ redis-cli --stat
 ------- data ------ --------------------- load -------------------- - child -
 keys       mem      clients blocked requests            connections
@@ -218,16 +223,17 @@ keys       mem      clients blocked requests            connections
 
 In the above example, a new line is printed every second with useful information, including the difference between current and old data points. 
 
-* `keys`: Represents all the keys present in the Redis database, which in case of the Event Service are EventKeys
-* `clients`: Represents total number of clients currently connected to the Redis server
-* `requests`: Represents total number of Redis commands processed along with a delta between every interval, specified with the `-i` option (see below)
-* `connections`: Represents total number of socket connections opened to the Redis server
+- `keys`: Represents all the keys present in the Redis database, which in case of the Event Service are EventKeys
+- `clients`: Represents total number of clients currently connected to the Redis server
+- `requests`: Represents total number of Redis commands processed along with a delta between every interval, specified with the `-i` option (see below)
+- `connections`: Represents total number of socket connections opened to the Redis server
 
 The `-i <interval>` option in this case works as a modifier in order to change the frequency at which new lines are emitted. The default is one second.
 
 You can explicitly pass the hostname and port of the Redis server while running `redis-cli`
-```
+
+```bash
 $ redis-cli -h redis.tmt.org -p 6379
 ```
 
-A detailed list of operations you can perform with `redis-cli` can be found [here](https://redis.io/topics/rediscli) 
+A detailed list of operations you can perform with `redis-cli` can be found [here](https://redis.io/topics/rediscli)

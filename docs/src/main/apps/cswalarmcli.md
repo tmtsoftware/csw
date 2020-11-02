@@ -5,17 +5,16 @@ to subscribe to severity and health activities of alarm, and to change current o
 
 ## Prerequisite
 
-- Location server should be running.
-- Alarm Service should be running.
+- Location Service should be running
+- Alarm Service should be running
 
-## Running latest release of alarm-cli using Coursier
 @@@ note
 
-This page assumes that you have already installed and set-up coursier : @ref:[coursier-installation](csinstallation.md) { open=new }.
+This page assumes that you have already installed and setup @ref:[coursier](csinstallation.md) { open=new }
 
 @@@
 
-### Install alarm-cli app
+## Install alarm-cli app
 
 Following command creates an executable file named alarm-cli in the default installation directory.
 
@@ -24,7 +23,6 @@ cs install alarm-cli:<version | SHA>
 ```
 
 Note: If you don't provide the version or SHA in above command, `alarm-cli` will be installed with the latest tagged binary of `csw-alarm-cli`
-
 
 ## Supported Commands
 
@@ -73,7 +71,6 @@ will be displayed.
     ```bash
     alarm-cli list --subsystem nfiraos --component trombone --name tromboneAxisLowLimitAlarm
     ```
-
 
 2.  Displays metadata and status of all alarms which belong to the `nfiraos` subsystem.
     ```bash
@@ -184,7 +181,6 @@ For a single alarm, current severity will be displayed. For a system, subsystem 
     alarm-cli severity get --subsystem nfiraos --component trombone --name tromboneAxisLowLimitAlarm
     ```
 
-
 2.  Displays the aggregated severity of the component with name `trombone` of subsystem `nfiraos`.
     ```bash
     alarm-cli severity get --subsystem nfiraos --component trombone
@@ -205,7 +201,6 @@ Sets the given severity for the specified alarm
     ```bash
     alarm-cli severity set major --subsystem nfiraos --component trombone --name tromboneAxisLowLimitAlarm
     ```
-
 
 2.  Refresh `Major` as the severity of the alarm with name `tromboneAxisLowLimitAlarm` of component `trombone` and subsystem `nfiraos` 
 every 3 seconds.
@@ -234,10 +229,9 @@ Subscribes to the aggregated severity of a component with name `trombone` and su
 alarm-cli severity subscribe --subsystem nfiraos --component trombone
 ```
 
-
 ## health
 
-Health command contains two sub-commands. 
+Health command contains two sub-commands.
 
 ### get
 
@@ -260,7 +254,6 @@ For a single alarm, the current health will be displayed. For the system, subsys
     ```bash
     alarm-cli health get --subsystem nfiraos --component trombone --name tromboneAxisLowLimitAlarm
     ```
-
 
 2.  Displays the aggregated health of the subsystem with name `nfiraos`.
     ```bash
@@ -290,7 +283,6 @@ Subscribes to the aggregated health of the subsystem with name `nfiraos`.
 alarm-cli health subscribe --subsystem nfiraos --component trombone
 ```
 
-
 ## About this application
 
 Prints the help message.
@@ -298,12 +290,10 @@ Prints the help message.
 alarm-cli --help
 ```
 
-
 Prints the version of the application.
 ```bash
 alarm-cli --version
 ```
-
 
 @@@ note
 

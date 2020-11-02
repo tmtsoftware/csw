@@ -2,19 +2,17 @@
 
 Note: Normally you will not need to start this application manually. The csw-services.sh script does this for you. 
 
-This application will start a HTTP CSW Location Server on port 7654 which is required for all Location Service consumers who uses HTTP Location client. 
-All components (HCD's, Assemblies, Services etc.) use a local HTTP Location client which expects the Location Server running at localhost:7654. 
+This application will start a HTTP CSW Location Server on port 7654 which is required for all Location Service consumers who uses HTTP Location client.
+All components (HCD's, Assemblies, Services etc.) use a local HTTP Location client which expects the Location Server running at localhost:7654.
 In a production environment, it is required that all machines running components should have the HTTP Location Server running locally.
 
-## Running latest release of location-server using Coursier
 @@@ note
 
-This page assumes that you have already installed and set-up coursier : @ref:[coursier-installation](csinstallation.md) { open=new }.
+This page assumes that you have already installed and setup @ref:[coursier](csinstallation.md) { open=new }
 
 @@@
 
-
-### Install location-server app
+## Install location-server app
 
 Following command creates an executable file named location-server in the default installation directory.
 
@@ -23,7 +21,6 @@ cs install location-server:<version | SHA>
 ```
 
 Note: If you don't provide the version or SHA in above command, `location-server` will be installed with the latest tagged binary of `csw-location-server`
-     
 
 Choose appropriate instructions from below based on requirement (i.e. single machine or multiple machines).
  

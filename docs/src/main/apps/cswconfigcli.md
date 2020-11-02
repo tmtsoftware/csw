@@ -4,17 +4,16 @@ A command line application that facilitates interaction with the Configuration S
 
 ## Prerequisite
 
-- Location server should be running.
-- Config Service should be running.
+- Location Service should be running
+- Config Service should be running
 
-## Running latest release of config-cli using Coursier
 @@@ note
 
-This page assumes that you have already installed and set-up coursier : @ref:[coursier-installation](csinstallation.md) { open=new }.
+This page assumes that you have already installed and setup @ref:[coursier](csinstallation.md) { open=new }
 
 @@@
 
-### Install config-cli app
+## Install config-cli app
 
 Following command creates an executable file named config-cli in the default installation directory.
 
