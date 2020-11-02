@@ -1,6 +1,10 @@
+import java.io.File
+
 import com.typesafe.sbt.MultiJvmPlugin.MultiJvmKeys.MultiJvm
+import com.typesafe.sbt.packager.universal.ZipHelper
 import sbt.Keys._
 import sbt._
+import sbt.io.Path
 
 object Settings {
 
@@ -35,4 +39,20 @@ object Settings {
       case Some(v) => v
       case None    => "0.1.0-SNAPSHOT"
     }
+
+  def addLoggingAggregator: Def.Initialize[Task[File]] = {
+    Def.task {
+      val ghrleaseDir  = target.value / "ghrelease"
+      val zipFileName  = s"logging-aggregator-${version.value}"
+      lazy val appsZip = new File(ghrleaseDir, s"$zipFileName.zip")
+
+      val scriptsDir = file(".") / "scripts"
+      val loggingAggregator = Path
+        .directory(new File(scriptsDir, "logging_aggregator"))
+        .filterNot { case (_, s) => s.startsWith("logging_aggregator/prod") }
+
+      ZipHelper.zip(loggingAggregator, appsZip)
+      appsZip
+    }
+  }
 }

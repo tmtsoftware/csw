@@ -3,9 +3,16 @@
 A HTTP server application that hosts the Configuration Service.
   
 ## Prerequisites
-The HTTP server hosting the Configuration Service needs to be part of the csw-cluster so that it can be consumed by other components.
-A required check before starting the Configuration Service is to ensure the csw-cluster is setup and the Location Server are available.
-Kindly refer to @ref:[CSW Location Server](../apps/cswlocationserver.md) for more information about the Location Server setup.
+
+- Location server should be running.
+- CSW AAS should be running.
+
+@@@ note
+
+Before running `config-server`, `sbt "csw-services/run start -k"` command can be run to start the location service along with the aas/auth service or
+`cs launch csw-services -- start -k` command can also be used.
+
+@@@
 
 ## Command line parameter options
 
@@ -14,35 +21,43 @@ Kindly refer to @ref:[CSW Location Server](../apps/cswlocationserver.md) for mor
 * **`--help`** prints the help message.
 * **`--version`** prints the version of the application.
 
-## Examples
-
-1. 
-```
-csw-config-server --initRepo
-```  
-Start an HTTP server on default port 4000. Initialize the repository if it does not exist and register it with the Location Service
- 
-2. 
-```
-csw-config-server --initRepo --port 4001
-```  
-Start an HTTP server on port 4001. Initialize the repository if it does not exist and register it with the Location Service 
-
-3. 
-```
-csw-config-server --help
-```  
-Prints help message
-
-4. 
-```
-csw-config-server --version
-```    
-Prints application version
-
+## Running latest release of config-server using Coursier
 @@@ note
 
-Before running `csw-config-server`, make sure that `csw-location-server` is running on local machine at `localhost:7654`.
-As config server uses a local HTTP Location client which expects the Location Server to be running locally.
+This page assumes that you have already installed and set-up coursier : @ref:[coursier-installation](csinstallation.md) { open=new }.
 
 @@@
+
+### Install config-server app
+
+Following command creates an executable file named lconfig-server in the default installation directory.
+
+```bash
+cs install config-server:<version | SHA>
+```
+
+Note: If you don't provide the version or SHA in above command, `config-server` will be installed with the latest tagged binary of `csw-config-server`
+
+## Examples
+
+1.  Start an HTTP server on default port 4000. Initialize the repository if it does not exist and register it with the Location Service.
+    ```bash
+    config-server --initRepo
+    ```  
+
+ 
+2.  Start an HTTP server on port 4001. Initialize the repository if it does not exist and register it with the Location Service.     
+    ```bash
+    config-server --initRepo --port 4001
+    ```  
+
+3.  Prints help message
+    ```bash
+    config-server --help
+    ```  
+
+4. Prints application version
+    ```bash
+    config-server --version
+    ```   
+   

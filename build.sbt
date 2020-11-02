@@ -89,7 +89,7 @@ lazy val `csw` = project
   )
   .settings( ghreleaseAssets := {
     ghreleaseAssets.value ++ Seq(
-      GithubReleaseSettings.stageAndZipTask(githubReleases).value
+      Settings.addLoggingAggregator.value
     )
   })
   .settings(
@@ -152,7 +152,7 @@ lazy val `csw-location-server` = project
     `csw-location-client` % Test,
     `csw-commons`         % "compile->compile;test->test"
   )
-  .enablePlugins(DeployApp, MaybeCoverage)
+  .enablePlugins(CswBuildInfo, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.LocationServer.value
   )
@@ -175,7 +175,7 @@ lazy val `csw-location-agent` = project
     `csw-commons` % "test->test",
     `csw-testkit` % "test->compile"
   )
-  .enablePlugins(DeployApp, MaybeCoverage)
+  .enablePlugins(CswBuildInfo, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.LocationAgent.value
   )
@@ -219,7 +219,7 @@ lazy val `csw-config-server` = project
     `csw-location-server` % "test->test",
     `csw-commons`         % "compile->compile;test->test"
   )
-  .enablePlugins(DeployApp, MaybeCoverage)
+  .enablePlugins(CswBuildInfo, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.ConfigServer.value
   )
@@ -246,7 +246,7 @@ lazy val `csw-config-cli` = project
     `csw-config-server` % "test->test",
     `csw-commons`       % "test->test"
   )
-  .enablePlugins(DeployApp, MaybeCoverage)
+  .enablePlugins(CswBuildInfo, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.ConfigCli.value
   )
@@ -411,7 +411,7 @@ lazy val `csw-event-cli` = project
     `csw-commons`       % "test->test",
     `csw-config-server` % "test->test"
   )
-  .enablePlugins(DeployApp, MaybeCoverage)
+  .enablePlugins(CswBuildInfo, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.EventCli.value)
 
 /* ================= Alarm Service ============== */
@@ -466,7 +466,7 @@ lazy val `csw-alarm-cli` = project
     `csw-config-server`   % "test->test",
     `csw-commons`         % "test->test"
   )
-  .enablePlugins(DeployApp, MaybeCoverage)
+  .enablePlugins(CswBuildInfo, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.AlarmCli.value)
 
 /* ================= Time Service ============== */
@@ -599,7 +599,7 @@ lazy val examples = project
     `csw-testkit`       % "test->compile",
     `csw-config-server` % "test->test"
   )
-  .enablePlugins(DeployApp)
+  .enablePlugins(CswBuildInfo)
   .settings(
     libraryDependencies ++= Dependencies.Examples.value,
     scalacOptions ++= Seq("-Xlint:-unused,-inaccessible", "-Ywarn-dead-code:false")
@@ -636,7 +636,7 @@ lazy val integration = project
     `csw-commons`       % "multi-jvm->test",
     `csw-config-server` % "multi-jvm->test"
   )
-  .enablePlugins(AutoMultiJvm, DeployApp)
+  .enablePlugins(AutoMultiJvm, CswBuildInfo)
   .settings(
     libraryDependencies ++= Dependencies.Integration.value
   )
@@ -678,7 +678,7 @@ lazy val `csw-aas-installed` = project
 
 lazy val `csw-services` = project
   .in(file("csw-services"))
-  .enablePlugins(CswBuildInfo, DeployApp)
+  .enablePlugins(CswBuildInfo)
   .dependsOn(`csw-location-server`, `csw-config-server`, `csw-location-agent`, `csw-commons`)
   .settings(
     libraryDependencies ++= Dependencies.CswServices.value

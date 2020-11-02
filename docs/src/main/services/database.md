@@ -14,7 +14,7 @@ its features, please refer to this [link](https://www.jooq.org/learn/).
 @@@
 
 The Database Service requires `PostgreSQL` server to be running on a machine. To start the PostgreSQL server for development 
-and testing purposes, refer to @ref:[Starting Apps for Development](../commons/apps.md#starting-apps-for-development).
+and testing purposes, refer to @ref:[Starting Apps for Development](../apps/cswservices.md#starting-apps-for-development).
 
 Once the PostgreSQL database is up and running, the Database Service can be used to connect and access data. It is assumed that there
 will be more than one user type registered with PostgreSQL i.e. for read access, for write access, for admin access, etc.

@@ -6,19 +6,26 @@ This application will start a HTTP CSW Location Server on port 7654 which is req
 All components (HCD's, Assemblies, Services etc.) use a local HTTP Location client which expects the Location Server running at localhost:7654. 
 In a production environment, it is required that all machines running components should have the HTTP Location Server running locally.
 
-## Prerequisite
+## Running latest release of location-server using Coursier
+@@@ note
 
-The CSW Location Server application can be installed as binaries or constructed from source. To download the application,
-go to the [CSW Release page](https://github.com/tmtsoftware/csw/releases) and follow instructions.
+This page assumes that you have already installed and set-up coursier : @ref:[coursier-installation](csinstallation.md) { open=new }.
 
-To install from source, the command `sbt csw-location-server/universal:publishLocal` will publish necessary artifacts to run the csw-location-server application. 
-The target of the above command is a zip file titled "csw-location-server.zip" and its path will be printed on console. 
+@@@
 
-Note: An alternative method is to run `sbt publishLocal stage`, which installs all the dependencies locally and also installs all the csw applications
- in `target/universal/stage/bin`.
 
-Unzip either the downloaded or constructed zip file and switch current
-working directory to the extracted folder. Choose appropriate instructions from below based on requirement (i.e. single machine or multiple machines).
+### Install location-server app
+
+Following command creates an executable file named location-server in the default installation directory.
+
+```bash
+cs install location-server:<version | SHA>
+```
+
+Note: If you don't provide the version or SHA in above command, `location-server` will be installed with the latest tagged binary of `csw-location-server`
+     
+
+Choose appropriate instructions from below based on requirement (i.e. single machine or multiple machines).
  
 ### Starting Location Server on a single machine
 The steps below describe how to run the Location Server on a single machine. This can be a requirement for testing or demo purposes.
@@ -29,7 +36,13 @@ Find out the IP address and dedicated port for running the Location Server. Assu
 **Provisioning**:
 Make sure you set all necessary @ref[environment variables](../deployment/env-vars.md). 
 
-**Running**: Switch to the application directory and run this command - `./bin/csw-location-server --clusterPort=3552`
+**Running**: 
+
+This command starts the location server
+```bash
+// run location server
+location-server --clusterPort=3552
+```
 
 ### Starting Location Server on multiple machines
 In production environment, you will need a capability to access resources of HTTP interface of Location Server
@@ -47,17 +60,21 @@ Make sure you set all necessary @ref[environment variables](../deployment/env-va
 
 `AAS` means Authentication and Authorization Service
 
-1.  Switch to application directory and run this command on all machines where you want Location Server in `local-only`
+1.  Run this command on all machines where you want Location Server in `local-only`
 mode and AAS `disabled`.
+   
+    ```bash
+    // run location server
+    location-server --clusterPort=3552 
     ```
-    ./bin/csw-location-server --clusterPort=3552 
-    ``` 
 
-2.  Switch to application directory and run this command on all machines where you want Location Server in `public mode`
+1.  Run this command on all machines where you want Location Server in `public mode`
 and AAS `enabled`.
-    ```
-    ./bin/csw-location-server --clusterPort=3552 --publicNetwork
-    ``` 
+
+    ```bash
+    // run location server
+    location-server --clusterPort=3552 --publicNetwork
+    ``` `
 
 3.  Once the Akka cluster formation is done, start @ref:[AAS](../services/aas.md) 
 on one of the node where Location Server is running in `local-only` mode, so that it can register itself to this
@@ -75,10 +92,14 @@ cyclic dependency during startup of `public mode` location-server and AAS(keyclo
 
 ### Help
 Use the following command to get help on the options available with this app.
-  
-`./bin/csw-location-server --help`
+
+```bash
+   location-server --help
+```
 
 ### Version
 Use the following command to get version information for this app.
   
-`./bin/csw-location-server --version`
+```bash
+   location-server --version
+```

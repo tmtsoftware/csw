@@ -2,6 +2,28 @@
 
 A command line application that facilitates interaction with @ref:[Event Service](./../services/event.md). It accepts various commands to publish and subscribe to events.
 
+## Prerequisite
+
+- Location server should be running.
+- Event Service should be running.
+
+## Running latest release of event-cli using Coursier
+@@@ note
+
+This page assumes that you have already installed and set-up coursier : @ref:[coursier-installation](csinstallation.md) { open=new }.
+
+@@@
+
+### Install event-cli app
+
+Following command creates an executable file named event-cli in the default installation directory.
+
+```bash
+cs install event-cli:<version | SHA>
+```
+
+Note: If you don't provide the version or SHA in above command, `event-cli` will be installed with the latest tagged binary of `csw-event-cli`
+
 ## Supported Commands
 
 * inspect
@@ -15,10 +37,10 @@ Takes a comma separated list of events and displays each event's parameter infor
 
  * `-e`, `--events` : comma separated list of events to inspect
  
-#### Examples:
+#### Example:
 
-```
-csw-event-cli inspect -e wfos.prog.cloudcover,wfos.prog.filter
+```bash
+event-cli inspect -e wfos.prog.cloudcover,wfos.prog.filter
 ```
 
 @@@ note
@@ -27,42 +49,39 @@ csw-event-cli inspect -e wfos.prog.cloudcover,wfos.prog.filter
  
 ### get
 
-Takes a comma separated list of events with nested key paths and displays event information including values either in oneline or JSON format.
+Takes a comma separated list of events with nested key paths and displays event information including values either in one-line or JSON format.
 
  * `-e`, `--events`     comma separated list of events in the form of `<event1:key1>,<event2:key2:key3>`, use `:` to separate multiple keys for same event. Ex. `-e a.b.c:struct1/ra,x.y.z:struct2/dec:epoch`
- * `-o`, `--out`        output format, default is oneline
+ * `-o`, `--out`        output format, default is one-line
  * `-t`, `--timestamp`  display timestamp
  * `--id`               display event id
  * `-u`, `--units`      display units
 
 #### Examples:
+ 
+1.  Displays all keys information in one-line form for event `wfos.prog.cloudcover`
+    ```bash
+    event-cli get -e wfos.prog.cloudcover
+    ```
 
-1. 
-```
-csw-event-cli get -e wfos.prog.cloudcover
-```
-Displays all keys information in oneline form for event `wfos.prog.cloudcover`
+ 
+2.  Displays information of only `struct1/ra` and `epoch` keys as well as `timestamp`, `event id` and `units` of provided keys in one-line form for event `wfos.prog.cloudcover`
+    ```bash
+    event-cli get -e wfos.prog.cloudcover:struct1/ra:epoch -t --id -u
+    ```
+ 
+3.  Displays information of `epoch` of event `wfos.prog.cloudcover` and `ra` key of event `wfos.prog.filter:ra`
+    ```bash
+    event-cli get -e wfos.prog.cloudcover:epoch,wfos.prog.filter:ra
+    ```
 
-2. 
-```
-csw-event-cli get -e wfos.prog.cloudcover:struct1/ra:epoch -t --id -u
-```
-Displays information of only `struct1/ra` and `epoch` keys as well as `timestamp`, `event id` and `units` of provided keys in oneline form for event `wfos.prog.cloudcover`
-
-3. 
-```
-csw-event-cli get -e wfos.prog.cloudcover:epoch,wfos.prog.filter:ra
-```
-Displays information of `epoch` of event `wfos.prog.cloudcover` and `ra` key of event `wfos.prog.filter:ra`
-
-4. 
-```
-csw-event-cli get -e wfos.prog.cloudcover:epoch -o json
-```
-Displays event `wfos.prog.cloudcover` with only `epcoh` key in JSON format.
+4.  Displays event `wfos.prog.cloudcover` with only `epcoh` key in JSON format.
+     ```bash
+    event-cli get -e wfos.prog.cloudcover:epoch -o json
+    ```
 
 @@@ note
-`-t`, `--id` & `--u` options are not applicable when `-o json` option is provided. An Event displayed in JSON format will always have `timestamp`, `event id` and `units` irrespective of whether those options are provided via the CLI.
+`-t`, `--id` & `--u` options are not applicable when `-o json` option provided. An Event displayed in JSON format will always have `timestamp`, `event id` and `units` irrespective of whether those options are provided via the CLI.
 @@@
 
  
@@ -89,25 +108,23 @@ Option `-p` should be used with `-i`, otherwise `-p` is ignored.
 
 #### Examples:
 
-1. 
-```
-csw-event-cli publish -e wfos.prog.cloudcover --data /path/to/event.json
-```
-Creates event from provided JSON file and publishes it with key `wfos.prog.cloudcover` to the Event Server. 
+1.  Creates event from provided JSON file and publishes it with key `wfos.prog.cloudcover` to the Event Server. 
+    ```bash
+    event-cli publish -e wfos.prog.cloudcover --data /path/to/event.json
+    ```
+ 
 
-2. 
-```
-csw-event-cli publish -e wfos.prog.cloudcover --data /path/to/event.json -i 500 -p 60
-```
-Creates an Event from provided JSON file and publishes it every `500ms` for duration of `60s`. 
+2.  Creates an Event from provided JSON file and publishes it every `500ms` for duration of `60s`. 
+    ```bash
+    event-cli publish -e wfos.prog.cloudcover --data /path/to/event.json -i 500 -p 60
+    ```
 
-3. 
-```
-csw-event-cli publish -e wfos.prog.cloudcover --params "k1:s=['Kevin O\'Brien','Chicago, USA']|k2:s=['2016-08-05T16:23:19.002']"
-```
-First fetches already published Event for key `wfos.prog.cloudcover` from the Event Server and then updates that Event with provided `--params`
+c.  First fetches already published Event for key `wfos.prog.cloudcover` from the Event Server and then updates that Event with provided `--params`
 If provided keys are already present in existing Event, then those will be updated.  Otherwise, new param entries will be added to the Event.
 If no Event is published in past for the provided key, then the new Event gets created with the provided params and Event key. 
+    ```bash
+    event-cli publish -e wfos.prog.cloudcover --params "k1:s=['Kevin O\'Brien','Chicago, USA']|k2:s=['2016-08-05T16:23:19.002']"
+    ```
 
 ### subscribe
 
@@ -115,39 +132,38 @@ Takes a comma separated list of Events with nested key paths and displays contin
 
  * `-e`, `--events`     comma separated list of Events in the form of `<event1:key1>,<event2:key2:key3>`, use `:` to separate multiple keys for the same Event. Ex. `-e a.b.c:struct1/ra,x.y.z:struct2/dec:epoch`
  * `-i`, `--interval`   interval in milliseconds which to receive an Event
- * `-o`, `--out`        output format, default is oneline
+ * `-o`, `--out`        output format, default is one-line
  * `-t`, `--timestamp`  display timestamp
  * `--id`               display event id
  * `-u`, `--units`      display units
 
 #### Examples:
 
-1. 
-```
-csw-event-cli subscribe -e wfos.prog.cloudcover
-```
-Subscribes to Event key `wfos.prog.cloudcover` and displays all key information as soon as there is an Event published for key `wfos.prog.cloudcover` with the oneline format.
+1.  Subscribes to Event key `wfos.prog.cloudcover` and displays all key information as soon as there is an Event published for key `wfos.prog.cloudcover` with the one-line format.
+    ```bash
+    event-cli subscribe -e wfos.prog.cloudcover
+    ```
 
-2. 
-```
-csw-event-cli subscribe -e wfos.prog.cloudcover:struct1/ra:epoch -t --id -u
-```
-Subscribes to the Event key `wfos.prog.cloudcover` and displays information of only the `struct1/ra` and `epoch` keys 
-along with `timestamp`, `event id` and `units` of tge provided keys in oneline format as soon as there is an Event published for the key `wfos.prog.cloudcover`.
 
-3. 
-```
-csw-event-cli subscribe -e wfos.prog.cloudcover -i 500
-```
-Subscribes to the Event key `wfos.prog.cloudcover` and displays all key information at provided interval <500ms>.
+2.  Subscribes to the Event key `wfos.prog.cloudcover` and displays information of only the `struct1/ra` and `epoch` keys 
+along with `timestamp`, `event id` and `units` of tge provided keys in one-line format as soon as there is an Event published for the key `wfos.prog.cloudcover`.
+    ```bash
+    event-cli subscribe -e wfos.prog.cloudcover:struct1/ra:epoch -t --id -u
+    ```
+
+
+3.  Subscribes to the Event key `wfos.prog.cloudcover` and displays all key information at provided interval <500ms>.
 Irrespective of whether there are multiple Events published for the key `wfos.prog.cloudcover` within `500ms` interval or not, 
 at every tick (i.e. 500ms), the latest Event information will be displayed on the console. 
+    ```bash
+    event-cli subscribe -e wfos.prog.cloudcover -i 500
+    ```
 
-4. 
-```
-csw-event-cli subscribe -e wfos.prog.cloudcover:epoch -o json
-```
-Subscribes to Event key `wfos.prog.cloudcover` and displays only `epoch` key information as soon as there is an Event published for key `wfos.prog.cloudcover`, in JSON format.
+
+4.  Subscribes to Event key `wfos.prog.cloudcover` and displays only `epoch` key information as soon as there is an Event published for key `wfos.prog.cloudcover`, in JSON format.
+    ```bash
+    event-cli subscribe -e wfos.prog.cloudcover:epoch -o json
+    ```
 
 @@@ note
 `-t`, `--id` & `--u` options are not applicable when the `-o json` option is provided. An Event displayed in `json` format will always have `timestamp`, `event id` and `units` irrespective of whether those options are provided via the CLI.
@@ -155,28 +171,34 @@ Subscribes to Event key `wfos.prog.cloudcover` and displays only `epoch` key inf
 
 ## About this application 
  
-### `--help` 
 Prints the help message.
+```bash
+event-cli --help
+```
 
-### `--version` 
+
 Prints the version of the application.
+```bash
+event-cli --version
+```
+
 
 @@@ note
 
-All the above examples require that `csw-location-server` is running on local machine at `localhost:7654`.
-If `csw-location-server` is running on a remote machine with an IP address of `172.1.1.2`, then you need to pass the additional `--locationHost 172.1.1.2` command line argument.
+All the above examples require that `location-server` is running on local machine at `localhost:7654`.
+If `location-server` is running on a remote machine with an IP address of `172.1.1.2`, then you need to pass the additional `--locationHost 172.1.1.2` command line argument.
 Example:
-`csw-event-cli get -e wfos.prog.cloudcover --locationHost 172.1.1.2`
+`.\event-cli get -e wfos.prog.cloudcover --locationHost 172.1.1.2`
 
 @@@
 
 ## Testing/Development
 While testing or development, in order to use this CLI application, below prerequisites must be satisfied:  
 
-*  @ref:[csw-location-server](./../apps/cswlocationserver.md) application is running.
-*  @ref:[csw-location-agent](./../apps/cswlocationagent.md) application is running, which has started the Event Server and registered it to the Location Service.
+*  Location Server is running.
+*  Event Server is running and is registered to the Location Service.
 
-Please refer to @ref:[Starting Apps for Development](./../commons/apps.md#starting-apps-for-development) section for more details on how to start these applications using `csw-services.sh` script.
+Please refer to @ref:[Starting Apps for Development](./../apps/cswservices.md#starting-apps-for-development) section for more details on how to start these applications using `csw-services`.
 
 ## Monitor statistics
 
