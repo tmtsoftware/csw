@@ -36,12 +36,12 @@ jobs:
       - name: Coverage Report
         run: |
           sbt -DenableCoverage=true coverageReport
-          sbt coverageAggregate
+          sbtn coverageAggregate
 
       - name: Generate RTM
         if: always()
         run: |
-          ./scripts/coursier launch --channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/apps.json rtm:d1c8c7e -- target/RTM/testStoryMapping.txt tools/RTM/cswStoryToRequirementMap.csv target/RTM/testRequirementsMapping.txt
+          cs launch --channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/apps.json rtm:d1c8c7e -- target/RTM/testStoryMapping.txt tools/RTM/cswStoryToRequirementMap.csv target/RTM/testRequirementsMapping.txt
 
       - name: Upload RTM
         if: always()
@@ -60,30 +60,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: olafurpg/setup-scala@v5
+      - uses: laughedelic/coursier-setup@v1
         with:
-          java-version: adopt@1.11
-
-      - name: Cache ~/.cache
-        uses: actions/cache@v1
-        with:
-          path: ~/.cache
-          key: ${{ runner.os }}-coursier-${{ hashFiles('project/Libs.scala') }}-${{ hashFiles('**/*.sbt') }}
-          restore-keys: |
-            ${{ runner.os }}-coursier-
-
-      - name: Cache ~/.sbt
-        uses: actions/cache@v1
-        with:
-          path: ~/.sbt
-          key: ${{ runner.os }}-sbt-${{ hashFiles('project/build.properties') }}-${{ hashFiles('**/*.sbt') }}
-          restore-keys: |
-            ${{ runner.os }}-sbt-
+          jvm: 11
+          apps: sbt sbtn
+      - uses: coursier/cache-action@v5
 
       - name: Docs Check
         run: |
           sbt clean scalafmtCheck scalastyle
-          sbt makeSite
+          sbtn makeSite
 
       - name: Multi-Jvm Tests
         run: sbt -DenableFatalWarnings=true -DgenerateStoryReport=true 'integration/multi-jvm:test'
