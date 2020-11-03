@@ -20,7 +20,7 @@ addSbtPlugin("com.dwijnand"                      % "sbt-project-graph"         %
 addSbtPlugin("com.timushev.sbt"                  % "sbt-rewarn"                % "0.1.2")
 
 resolvers += Resolver.bintrayRepo("twtmt", "sbt-plugins")
-addSbtPlugin("com.github.tmtsoftware" % "sbt-docs" % "bd4e9c37e4")
+addSbtPlugin("com.github.tmtsoftware" % "sbt-docs" % "b3771a7bf5")
 
 classpathTypes += "maven-plugin"
 

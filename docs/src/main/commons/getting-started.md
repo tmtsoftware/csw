@@ -20,7 +20,7 @@ Supported Operating Systems are: CentOS and MacOS
 	- [ScalaTest](https://www.scalatest.org/)
 	- [JUnit](https://junit.org/junit4/), JUnit Interface
 	- Note: These frameworks are typically downloaded and made available by the sbt tool by specifying them as dependencies.
-	If you are using the [giter8](https://github.com/tmtsoftware/csw.g8) template (see below), these dependencies are specified by default, and the sbt
+	If you are using the [giter8 template](https://github.com/tmtsoftware/csw.g8) (see below), these dependencies are specified by default, and the sbt
 	will resolve them when it runs.  
 
 
@@ -28,7 +28,7 @@ Supported Operating Systems are: CentOS and MacOS
 
 1.  `cd`  to an empty folder.
 2.  Run the following command  `sbt new tmtsoftware/csw.g8`. This pulls the ‘csw’ template from GitHub.
-3.  Provide input details when prompted. Follow the template [readme.md](https://github.com/tmtsoftware/csw.g8/blob/master/README.md) for detailed information about input parameters.
+3.  Provide input details when prompted. Follow the template @link:[readme.md]($csw_template.base_url$/README.md) for detailed information about input parameters.
 
 
 To open the project in IntelliJ, start IntelliJ and click on Import Project in the Intro dialog.  If you have a project already open, click on File -> New -> Project from Existing Sources...   

@@ -29,6 +29,8 @@ jobs:
           sudo ntptime -T 37
 
       - name: Build
+        env:
+          CSW_TEMPLATE_VERSION: "v3.0.0-M1"
         run: |
           sbt test:compile multi-jvm:compile
           sbt makeSite
