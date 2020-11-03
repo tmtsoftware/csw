@@ -24,7 +24,7 @@ Refer @link:[this](https://get-coursier.io/docs/cli-setup) { open=new } for deta
 
 @@@
 
-## Installing TMT Channel
+## Add TMT Channel
 
 In order to install applications provided by CSW and ESW, TMT channel needs to be added to local coursier installation using `cs install` command.
 
