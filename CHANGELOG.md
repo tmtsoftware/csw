@@ -19,6 +19,8 @@ All notable changes to this project will be documented in this file.
     - For Scala users, `AkkaRegistrationFactory` API change to expect actorRef instead of URI of remote actorRef
     - For Java users, `JAkkaRegistrationFactory` is added.
 - Contract change for ComponentHandlers `initialize` method, return type changed from `Future[Unit]` to `Unit` i.e. from non-blocking to blocking.  
+- Changed the installation of csw-apps, coursier to be used to install applications instead of downloading apps.zip from release page.
+- logging-aggregator-<some-version>.zip will be available on the release page. 
 
 ## [CSW v3.0.0-M1] - 2020-09-24
 - `->` method on a Key now takes a single parameter instead of varargs. For varargs, please use `set` method.
