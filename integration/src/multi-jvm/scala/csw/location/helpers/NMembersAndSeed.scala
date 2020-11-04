@@ -7,14 +7,14 @@ import akka.remote.testconductor.RoleName
 import akka.remote.testkit.MultiNodeConfig
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.location.server.commons.{ClusterAwareSettings, ClusterSettings}
-import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
+import io.netty.util.internal.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 
 class NMembersAndSeed(n: Int) extends MultiNodeConfig {
 
   val settings = ClusterAwareSettings
 
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
-  InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
+  InternalLoggerFactory.setDefaultFactory(Slf4JLoggerFactory.INSTANCE)
 
   def makeSystem(config: Config): actor.ActorSystem = ActorSystem(SpawnProtocol(), settings.clusterName, config).toClassic
 

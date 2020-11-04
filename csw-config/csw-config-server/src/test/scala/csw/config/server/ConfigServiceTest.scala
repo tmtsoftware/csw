@@ -14,7 +14,7 @@ import csw.config.models.{ConfigFileInfo, ConfigFileRevision, ConfigId, FileType
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.commons.TestFutureExtension.RichFuture
 import csw.config.server.files.Sha1
-import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
+import io.netty.util.internal.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
@@ -22,7 +22,7 @@ import org.scalatest.matchers.should.Matchers
 abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
 
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
-  InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
+  InternalLoggerFactory.setDefaultFactory(Slf4JLoggerFactory.INSTANCE)
 
   def serverWiring: ServerWiring
   def configService: ConfigService

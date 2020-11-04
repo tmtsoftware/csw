@@ -13,7 +13,7 @@ import csw.config.models.{ConfigFileInfo, ConfigFileRevision, ConfigId, ConfigMe
 import csw.config.server.ServerWiring
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.mocks.MockedAuthentication
-import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
+import io.netty.util.internal.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 
@@ -37,7 +37,7 @@ class ConfigServiceRouteTest
     with MockedAuthentication {
 
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
-  InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
+  InternalLoggerFactory.setDefaultFactory(Slf4JLoggerFactory.INSTANCE)
 
   val serverWiring: ServerWiring = ServerWiring.make(securityDirectives)
   import serverWiring._

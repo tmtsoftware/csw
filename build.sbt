@@ -85,9 +85,9 @@ lazy val `csw` = project
   .settings(GithubRelease.githubReleases)
   .settings(
     ghreleaseRepoOrg := "tmtsoftware",
-    ghreleaseRepoName := "csw",
+    ghreleaseRepoName := "csw"
   )
-  .settings( ghreleaseAssets := {
+  .settings(ghreleaseAssets := {
     ghreleaseAssets.value ++ Seq(
       Settings.addLoggingAggregator.value
     )

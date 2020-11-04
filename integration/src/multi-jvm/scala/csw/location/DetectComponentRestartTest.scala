@@ -12,7 +12,7 @@ import csw.location.server.commons.ClusterSettings
 import csw.location.server.internal.{LocationServiceFactory, ServerWiring}
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.prefix.models.{Prefix, Subsystem}
-import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
+import io.netty.util.internal.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -29,7 +29,7 @@ class DetectComponentRestartTest(ignore: Int, mode: String)
   import config._
 
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
-  InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
+  InternalLoggerFactory.setDefaultFactory(Slf4JLoggerFactory.INSTANCE)
   test("should detect re-registering of new location for a connection that has crashed/gone away | DEOPSCSW-429") {
 
     val akkaConnection = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "TromboneHcd"), ComponentType.HCD))

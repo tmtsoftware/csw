@@ -21,7 +21,7 @@ import csw.location.server.internal.LocationServiceFactory
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.network.utils.Networks
 import csw.prefix.models.{Prefix, Subsystem}
-import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
+import io.netty.util.internal.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.concurrent.Eventually
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
@@ -40,7 +40,7 @@ class LocationServiceCompTest(mode: String)
     with Eventually {
 
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
-  InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
+  InternalLoggerFactory.setDefaultFactory(Slf4JLoggerFactory.INSTANCE)
 
   implicit private val typedSystem: typed.ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol(), "test")
   lazy private val clusterSettings                                           = ClusterAwareSettings

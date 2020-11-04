@@ -4,7 +4,7 @@ import com.typesafe.config.ConfigException
 import csw.location.api.commons.Constants
 import csw.location.api.models.NetworkType
 import csw.network.utils.Networks
-import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
+import io.netty.util.internal.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
@@ -12,7 +12,7 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 class ClusterSettingsTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
-  InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
+  InternalLoggerFactory.setDefaultFactory(Slf4JLoggerFactory.INSTANCE)
 
   override protected def afterAll(): Unit = {
     System.clearProperty("CLUSTER_SEEDS")

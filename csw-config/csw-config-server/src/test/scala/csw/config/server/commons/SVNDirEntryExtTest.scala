@@ -6,7 +6,7 @@ import java.util.regex.Pattern
 import csw.config.models.FileType
 import csw.config.server.{ServerWiring, Settings}
 import csw.config.server.commons.SVNDirEntryExt.RichSvnDirEntry
-import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
+import io.netty.util.internal.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.tmatesoft.svn.core.{SVNDirEntry, SVNNodeKind}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
@@ -15,7 +15,7 @@ class SVNDirEntryExtTest extends AnyFunSuite with Matchers {
   val settings: Settings = new ServerWiring().settings
 
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
-  InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
+  InternalLoggerFactory.setDefaultFactory(Slf4JLoggerFactory.INSTANCE)
 
   test("should match the pattern for relative path") {
     val dirEntry = new SVNDirEntry(

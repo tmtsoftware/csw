@@ -5,7 +5,7 @@ import java.nio.file.Paths
 import java.time.Instant
 
 import csw.config.cli.args.{ArgsParser, Options}
-import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
+import io.netty.util.internal.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
@@ -26,7 +26,7 @@ class ArgsParserTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
   val errCapture = new ByteArrayOutputStream
 
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
-  InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
+  InternalLoggerFactory.setDefaultFactory(Slf4JLoggerFactory.INSTANCE)
 
   override protected def afterEach(): Unit = {
     outCapture.reset()

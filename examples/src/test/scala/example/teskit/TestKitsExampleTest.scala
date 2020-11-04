@@ -9,7 +9,7 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.testkit.FrameworkTestKit
 import csw.testkit.scaladsl.CSWService.{ConfigServer, EventServer}
-import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
+import io.netty.util.internal.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{BeforeAndAfterAll, OptionValues}
@@ -20,7 +20,7 @@ import scala.concurrent.duration.DurationLong
 class TestKitsExampleTest extends AnyFunSuiteLike with BeforeAndAfterAll with Matchers with OptionValues {
 
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
-  InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
+  InternalLoggerFactory.setDefaultFactory(Slf4JLoggerFactory.INSTANCE)
 
   //#framework-testkit
   // create instance of framework testkit
