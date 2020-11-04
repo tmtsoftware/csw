@@ -32,7 +32,7 @@ agnostic to whether Filebeat is running or not.
 
 @@@ note
 
-All the files required for logging aggregator configuration can be found [here](https://github.com/tmtsoftware/csw/tree/master/scripts/logging_aggregator).
+All the files required for logging aggregator configuration can be found [here]($github.dir.base_url$/scripts/logging_aggregator).
 How to use each of these files and its significance will be explained further in the document.  For rapid use in a development environment, a Docker image
 has been created.  See @ref:[below](#running-elastic-stack-for-developers) for more information.
 

@@ -14,7 +14,7 @@ authenticated environment, but do not concern themselves directly with authoriza
  - @ref:[Core concepts & terms](aas/core-concepts-and-terms.md)
  - @ref:[Akka HTTP Adapter - csw-aas-http](aas/csw-aas-http.md)
  - @ref:[Installed Auth Adapter - csw-aas-installed](aas/csw-aas-installed.md)
- - @extref[Javascript Adapter - csw-aas-js](esw_ts:aas/csw-aas-js)
+ - @extref[Javascript Adapter - ESW-TS](esw_ts:aas/auth-components)
 
 ## Technical Description
 See @ref:[Authorization and Authentication Service Technical Description](../technical/aas/aas.md).

@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The [csw-location-server](https://github.com/tmtsoftware/csw/tree/master/csw-location/csw-location-server) project contains the main implementation of the Location Service.
+The [csw-location-server]($github.dir.base_url$/csw-location/csw-location-server) project contains the main implementation of the Location Service.
 Think of it as a agent which is running on every machine.
 Normally one instance of the _Location Server_ will run on each host that is running CSW services (although clients can be configured to use a remote host).
 
