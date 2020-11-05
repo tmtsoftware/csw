@@ -30,12 +30,13 @@ logging.conf
 @@@ note { title="IMPORTANT !!!"}
 
 It is required to include `logging.conf` that is shipped with this library in `application.conf` as follows:
+Including logging.conf as required will make sure that logging.conf is on classpath.
 
 ```
-include "logging.conf"
+include required("logging.conf")
 ```
- 
-Default configuration values can be then overridden in `application.conf`. 
+
+Default configuration values can be then overridden in `application.conf`.
 
 @@@
 
