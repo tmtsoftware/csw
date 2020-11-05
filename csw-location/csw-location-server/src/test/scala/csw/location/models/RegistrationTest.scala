@@ -26,7 +26,7 @@ class RegistrationTest extends AnyFunSuite with Matchers with BeforeAndAfterAll 
 
   implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol(), "my-actor-1")
 
-  test("should able to create the AkkaRegistration which should internally create AkkaLocation") {
+  test("should able to create the AkkaRegistration which should internally create AkkaLocation without metadata | CSW-108") {
     val hostname = Networks().hostname
 
     val akkaConnection = AkkaConnection(api.models.ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD))
@@ -41,7 +41,7 @@ class RegistrationTest extends AnyFunSuite with Matchers with BeforeAndAfterAll 
     akkaRegistration.location(hostname) shouldBe expectedAkkaLocation
   }
 
-  test("should able to create the AkkaRegistration with metadata which should internally create AkkaLocation") {
+  test("should able to create the AkkaRegistration with metadata which should internally create AkkaLocation | CSW-108") {
     val hostname = Networks().hostname
 
     val akkaConnection = AkkaConnection(api.models.ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD))
@@ -57,7 +57,7 @@ class RegistrationTest extends AnyFunSuite with Matchers with BeforeAndAfterAll 
     akkaRegistration.location(hostname) shouldBe expectedAkkaLocation
   }
 
-  test("should able to create the HttpRegistration which should internally create HttpLocation") {
+  test("should able to create the HttpRegistration which should internally create HttpLocation without metadata | CSW-108") {
     val hostname = Networks().hostname
     val port     = 9595
     val prefix   = "/trombone/hcd"
@@ -70,7 +70,9 @@ class RegistrationTest extends AnyFunSuite with Matchers with BeforeAndAfterAll 
     httpRegistration.location(hostname) shouldBe expectedhttpLocation
   }
 
-  test("should able to create the HttpRegistration with metadata which should internally create HttpLocation") {
+  test(
+    "should able to create the HttpRegistration with metadata which should internally create HttpLocation with metadata | CSW-108"
+  ) {
     val hostname = Networks().hostname
     val port     = 9595
     val prefix   = "/trombone/hcd"
@@ -85,7 +87,7 @@ class RegistrationTest extends AnyFunSuite with Matchers with BeforeAndAfterAll 
     httpRegistration.location(hostname) shouldBe expectedhttpLocation
   }
 
-  test("should able to create the TcpRegistration which should internally create TcpLocation") {
+  test("should able to create the TcpRegistration which should internally create TcpLocation without metadata | CSW-108") {
     val hostname = Networks().hostname
     val port     = 9596
 
@@ -97,7 +99,7 @@ class RegistrationTest extends AnyFunSuite with Matchers with BeforeAndAfterAll 
     tcpRegistration.location(hostname) shouldBe expectedTcpLocation
   }
 
-  test("should able to create the TcpRegistration with metadata which should internally create TcpLocation") {
+  test("should able to create the TcpRegistration with metadata which should internally create TcpLocation |  CSW-108") {
     val hostname = Networks().hostname
     val port     = 9596
 
