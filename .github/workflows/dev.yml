@@ -2,9 +2,9 @@ name: dev
 
 on:
   pull_request:
-    branches: [master]
+    branches: [ master ]
   push:
-    branches: [master]
+    branches: [ master ]
     paths-ignore:
       - "scripts/**"
       - "tools/**"
@@ -79,7 +79,7 @@ jobs:
         run: sbt -DenableFatalWarnings=true -DgenerateStoryReport=true 'integration/multi-jvm:test'
 
   slack-success:
-    needs: [unit-tests, multi-jvm-tests]
+    needs: [ unit-tests, multi-jvm-tests ]
     if: success()
     runs-on: ubuntu-latest
     steps:
@@ -90,7 +90,7 @@ jobs:
           channel: ci-dev
 
   slack-failure:
-    needs: [unit-tests, multi-jvm-tests]
+    needs: [ unit-tests, multi-jvm-tests ]
     if: failure()
     runs-on: ubuntu-latest
     steps:
@@ -101,7 +101,7 @@ jobs:
           channel: ci-dev
 
   slack-cancelled:
-    needs: [unit-tests, multi-jvm-tests]
+    needs: [ unit-tests, multi-jvm-tests ]
     if: cancelled()
     runs-on: ubuntu-latest
     steps:
