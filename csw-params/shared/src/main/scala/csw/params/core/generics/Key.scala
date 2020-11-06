@@ -1,5 +1,7 @@
 package csw.params.core.generics
 
+import java.util.regex.Pattern
+
 import csw.params.core.models.Units
 
 import scala.annotation.varargs
@@ -16,6 +18,8 @@ import scala.runtime.ScalaRunTime._
  * @param units applicable units
  */
 case class Key[S: ClassTag] private[generics] (keyName: String, keyType: KeyType[S], units: Units) {
+  private lazy val invalidKeyName = Pattern.compile("[\\[\\]/]").matcher(keyName).find()
+  require(!invalidKeyName, "Invalid Key name: Key cannot have '[' , ']' or '/' in its name")
 
   /**
    * Set values against this key

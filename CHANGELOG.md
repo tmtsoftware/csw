@@ -1,6 +1,6 @@
 # Change Log
 
-CSW Common Software is a reimplementation/refactoring of the prototype CSW code [here](https://github.com/tmtsoftware/csw-prototype) 
+CSW Common Software is a reimplementation/refactoring of the prototype CSW code [here](https://github.com/tmtsoftware/csw-prototype)
 developed during the CSW design phase with changes to make the code and public APIs
 more robust and resilient and to improve its usability and performance for use at the
 TMT Observatory.
@@ -18,9 +18,10 @@ All notable changes to this project will be documented in this file.
 - Removed `RegistrationFactory` from `location-server` module. Instead, following should be used by Scala and Java users to instantiate `AkkaRegistration`
     - For Scala users, `AkkaRegistrationFactory` API change to expect actorRef instead of URI of remote actorRef
     - For Java users, `JAkkaRegistrationFactory` is added.
-- Contract change for ComponentHandlers `initialize` and `onShutdown` method, return type changed from `Future[Unit]` to `Unit` i.e. from non-blocking to blocking.  
+- Contract change for ComponentHandlers `initialize` and `onShutdown` method, return type changed from `Future[Unit]` to `Unit` i.e. from non-blocking to blocking.
 - Changed the installation of csw-apps, coursier to be used to install applications instead of downloading apps.zip from release page.
-- logging-aggregator-<some-version>.zip will be available on the release page. 
+- logging-aggregator-<some-version>.zip will be available on the release page.
+- Added Restrictions while creating Parameter key. It cannot have `[`, `]` or `/` characters in the key name.
 
 ## [CSW v3.0.0-M1] - 2020-09-24
 - `->` method on a Key now takes a single parameter instead of varargs. For varargs, please use `set` method.
@@ -31,7 +32,7 @@ All notable changes to this project will be documented in this file.
 - Removed `RegistrationFactory` from `location-server` module. Instead, following should be used by Scala and Java users to instantiate `AkkaRegistration`
     - For Scala users, `AkkaRegistrationFactory` API change to expect actorRef instead of URI of remote actorRef
     - For Java users, `JAkkaRegistrationFactory` is added.
-- Contract change for ComponentHandlers `initialize` and `onShutdown` method, return type changed from `Future[Unit]` to `Unit` i.e. from non-blocking to blocking.  
+- Contract change for ComponentHandlers `initialize` and `onShutdown` method, return type changed from `Future[Unit]` to `Unit` i.e. from non-blocking to blocking.
 
 ## [CSW v2.0.1] - 2020-03-20
 
@@ -55,18 +56,18 @@ Migration guide for v2.0.0 can be found [here](https://tmtsoftware.github.io/csw
 
 ### Changes
 - Simplified CommandResponseManager and removed auto-completion of commands
-- Prefix has Subsystem in constructor 
+- Prefix has Subsystem in constructor
 - Log statements have subsystem and prefix along with componentName
 - AlarmKey and ComponentKey is constructed from prefix instead of string
 - TcpLocation and HttpLocation has prefix along with AkkaLocation
-- ComponentType is displayed to snake_case from lowercase 
+- ComponentType is displayed to snake_case from lowercase
 - Subsystem is displayed in uppercase instead of lowercase
-- ArrayData and MatrixData does not require classtag for creation 
+- ArrayData and MatrixData does not require classtag for creation
 - Admin routes for setting log level and getting log level are now available via gateway
 - JSON contracts for location and command service added in paradox documentation
 - Internal implementation of csw-services.sh script has changed. It is now based on Coursier and newly created `csw-services` sbt module.
 To start all the CSW services, run `csw-services.sh start` command.
-`csw-services.sh` runs all services in the foreground, pressing `ctr+c` will stop all the services. 
+`csw-services.sh` runs all services in the foreground, pressing `ctr+c` will stop all the services.
 
 ### Version Upgrades
 - Scala version upgrade to 2.13.1
@@ -100,7 +101,7 @@ Migration guide for v2.0.0-RC2 can be found [here](https://tmtsoftware.github.io
 
 ### Changes
 Internal implementation of `csw-services.sh` script has changed. It is now based on Coursier and newly created `csw-services` sbt module.
-To start all the CSW services, run `csw-services.sh start` command. 
+To start all the CSW services, run `csw-services.sh start` command.
 `csw-services.sh` runs all services in the foreground, pressing `ctr+c` will stop all the services.
 
 ### Documentation
@@ -115,13 +116,13 @@ See [here](https://tmtsoftware.github.io/csw/2.0.0-RC1/) for a detailed document
 
 ### Changes
 - Simplified CommandResponseManager and removed auto-completion of commands
-- Prefix has Subsystem in constructor 
+- Prefix has Subsystem in constructor
 - Log statements have subsystem and prefix along with componentName
 - AlarmKey and ComponentKey is constructed from prefix instead of string
 - TcpLocation and HttpLocation has prefix along with AkkaLocation
-- ComponentType is displayed to snake_case from lowercase 
+- ComponentType is displayed to snake_case from lowercase
 - Subsystem is displayed in uppercase instead of lowercase
-- ArrayData and MatrixData does not require classtag for creation 
+- ArrayData and MatrixData does not require classtag for creation
 - Admin routes for setting log level and getting log level are now available via gateway
 - JSON contracts for location and command service added in paradox documentation
 
@@ -144,13 +145,13 @@ See [here](https://tmtsoftware.github.io/csw/1.1.0-RC1/) for a detailed document
 
 ### Changes
 - Simplified CommandResponseManager and removed auto-completion of commands
-- Prefix has Subsystem in constructor 
+- Prefix has Subsystem in constructor
 - Log statements have subsystem and prefix along with componentName
 - AlarmKey and ComponentKey is constructed from prefix instead of string
 - TcpLocation and HttpLocation has prefix along with AkkaLocation
-- ComponentType is displayed to snake_case from lowercase 
+- ComponentType is displayed to snake_case from lowercase
 - Subsystem is displayed in uppercase instead of lowercase
-- ArrayData and MatrixData does not require classtag for creation 
+- ArrayData and MatrixData does not require classtag for creation
 - Admin routes for setting log level and getting log level are now available via gateway
 - JSON contracts for location and command service added in paradox documentation
 
@@ -169,7 +170,7 @@ See [here](https://tmtsoftware.github.io/csw/1.1.0-RC1/) for a detailed document
 
 ## [CSW v1.0.0] - 2019-08-30
 
-This is the first major release of the TMT Common Software for project stakeholders. 
+This is the first major release of the TMT Common Software for project stakeholders.
 See [here](https://tmtsoftware.github.io/csw/1.0.0/) for a detailed documentation of this version of the CSW software.
 
 ### Changes
@@ -182,11 +183,11 @@ See [here](https://tmtsoftware.github.io/csw/1.0.0/) for a detailed documentatio
 
 ### Api changes
 - CommandService
-    - `submit` now returns its initial response (e.g. `Started`) instead of waiting for the final response 
+    - `submit` now returns its initial response (e.g. `Started`) instead of waiting for the final response
     - Added `submitAndWait` which will submit the command and wait for its final response
     - Rename `submitAll` to `submitAllAndWait` in Command service as it waits for final response of all commands
 - `Prefix` creation will throw `NoSuchElementException` if invalid subsystem is provided
-- Replaced `ActorRef` with ActorRef `URI` in `AkkaRegistration`  
+- Replaced `ActorRef` with ActorRef `URI` in `AkkaRegistration`
 
 ### Version Upgrades
 - Scala version upgrade to 2.13.0
@@ -220,7 +221,7 @@ See [here](https://tmtsoftware.github.io/csw/1.0.0-RC2/) for a detailed document
 
 ### Api changes
 - Command Service
-    - `submit` now returns its initial response (e.g. `Started`) instead of waiting for the final response 
+    - `submit` now returns its initial response (e.g. `Started`) instead of waiting for the final response
     - Added `submitAndWait` which will submit the command and wait for its final response
     - Rename `submitAll` to `submitAllAndWait` in Command service as it waits for final response of all submitted commands
 
@@ -246,7 +247,7 @@ See [here](https://tmtsoftware.github.io/csw/1.0.0-RC1/) for a detailed document
     - Rename `submit` api to `submitAndWait` in Command service as it waits for final response
     - Rename `submitAll` to `submitAllAndWait` in Command service as it waits for final response of all commands
     - Added `submit` api in Command service which will submit the command to component and return the SubmitResponse
- 
+
 - `Prefix` creation will throw `NoSuchElementException` if invalid subsystem is provided
 
 ### Version Upgrades
@@ -254,26 +255,26 @@ See [here](https://tmtsoftware.github.io/csw/1.0.0-RC1/) for a detailed document
 
 ## [CSW v0.7.0] - 2019-06-19
 
-This is the fourth release of the TMT Common Software for project stakeholders. 
+This is the fourth release of the TMT Common Software for project stakeholders.
 This release includes Time Service, Authentication and Authorization Service, Database Service and Logging Aggregator Service.
 See [here](https://tmtsoftware.github.io/csw/0.7.0/) for a detailed documentation of this version of the CSW software.
 
 #### New Features
 
 - **Time Service:** Provides APIs to access time in different timescales (UTC and TAI) with up to nano-second precision.
- Also provides scheduling APIs. 
+ Also provides scheduling APIs.
 - **Authentication and Authorization Service:** Suite of libraries/adapters provided to help build an ecosystem of
  client & server side applications that enforce authentication & authorization policies for TMT
 - **Database Service:** Provides a TMT-standard relational database and connection library
 - **Logging Aggregator Service:** Provides recommendation and configurations for aggregating logs from TMT applications
- written in Scala, java, Python, C, C++, system logs, Redis logs, Postgres logs, Elasticsearch logs, Keycloak logs 
+ written in Scala, java, Python, C, C++, system logs, Redis logs, Postgres logs, Elasticsearch logs, Keycloak logs
  for developer and production setup.
 - Replaced Protobuf serialisation by CBOR
 - Added Technical documentation for all the services
 - Support Unlocking of a component by Admin
 - Added authentication and authorization to config service admin rest endpoints
 - Integration of time service with event service and alarm service.
-- Added new APIs to `EventPublisher` allowing to provide `startTime` in `eventGenerator` APIs 
+- Added new APIs to `EventPublisher` allowing to provide `startTime` in `eventGenerator` APIs
 - Changed `EventPublisher` APIs with `eventGenerator` to allow optional publishing of events
 
 #### Version Upgrades
@@ -285,24 +286,24 @@ See [here](https://tmtsoftware.github.io/csw/0.7.0/) for a detailed documentatio
 
 ## [CSW v0.7.0-RC1] - 2019-03-25
 
-This is the release candidate 1 of the fourth release of the TMT Common Software for project stakeholders. 
+This is the release candidate 1 of the fourth release of the TMT Common Software for project stakeholders.
 This release includes Time Service, Authentication and Authorization Service, Database Service and Logging Aggregator Service.
 See [here](https://tmtsoftware.github.io/csw/0.7.0-RC1/) for a detailed documentation of this version of the CSW software.
 
 #### New Features
 
 - **Time Service:** Provides APIs to access time in different timescales (UTC and TAI) with up to nano-second precision.
- Also provides scheduling APIs. 
+ Also provides scheduling APIs.
 - **Authentication and Authorization Service:** Suite of libraries/adapters provided to help build an ecosystem of
  client & server side applications that enforce authentication & authorization policies for TMT
 - **Database Service:** Provides a TMT-standard relational database and connection library
 - **Logging Aggregator Service:** Provides recommendation and configurations for aggregating logs from TMT applications
- written in Scala, java, Python, C, C++, system logs, Redis logs, Postgres logs, Elasticsearch logs, Keycloak logs 
+ written in Scala, java, Python, C, C++, system logs, Redis logs, Postgres logs, Elasticsearch logs, Keycloak logs
  for developer and production setup.
 - Support Unlocking of a component by Admin
 - Added authentication and authorization to config service admin rest endpoints
 - Integration of time service with event service and alarm service.
-- Added new APIs to `EventPublisher` allowing to provide `startTime` in `eventGenerator` APIs 
+- Added new APIs to `EventPublisher` allowing to provide `startTime` in `eventGenerator` APIs
 - Changed `EventPublisher` APIs with `eventGenerator` to allow optional publishing of events
 
 #### Version Upgrades
@@ -314,9 +315,9 @@ See [here](https://tmtsoftware.github.io/csw/0.7.0-RC1/) for a detailed document
 
 ## [CSW v0.6.0] - 2018-11-28
 
-This is the version 0.6.0 release of the TMT Common Software for project stakeholders.  
+This is the version 0.6.0 release of the TMT Common Software for project stakeholders.
 This release includes csw test-kit, ordering guarantee in event publish api, enhancements to command service query api and bug fixes.
-  
+
 See [here](https://tmtsoftware.github.io/csw/0.6.0/) for a detailed documentation of this version of the CSW software. See also the csw [release](https://github.com/tmtsoftware/csw/releases) page.
 
 #### Changes
@@ -330,36 +331,36 @@ See [here](https://tmtsoftware.github.io/csw/0.6.0/) for a detailed documentatio
 - Package Name Changes
 
     - The top level package in all modules has changed from `csw.services` to `csw`.
-    
+
 - Command Service
 
     -  `ComponentHandlers` (Implementation classes for HCDs and Assemblies) now receive a single
        `CswContext` object containing references to all the CSW services (Previously the services were passed as separate arguments).
-    
+
     - `CommandService.submit()` now returns a future with the final response.
-        Previously it returned the initial response, which could be `Accepted` for a long running command. 
+        Previously it returned the initial response, which could be `Accepted` for a long running command.
         In csw-0.6.0 you can call `CommandService.query()` to get an initial `Started` response, if needed, after the call to `submit()`.
-    
+
     - `CommandService.query()` now waits for the initial command response, if it has not yet been received. Previously it returned `CommandNotAvailable` if called too early.
-    
+
     - There are now separate response types for submit, validation and query (Previously all used `CommandResponse`). A long running submit command now responds with `Started` (was `Accepted`).
-    
-    - The API for `ComponentHandlers` has changed. Now `onSubmit()` returns either `Started` for a 
+
+    - The API for `ComponentHandlers` has changed. Now `onSubmit()` returns either `Started` for a
       long running command that will complete later, or it can complete the command immediately and return the response, such as `Completed` or `Error`.
-    
+
     - The `csw-messages` dependency was renamed to `csw-params` and is now compiled for both
       the JVM and ScalaJS.
-          
+
 - Location Service
 
     - It is no longer necessary for components (HCDs, assemblies) and applications to join the
       location service cluster and no need to define any environment variables or system properties
-      before starting the components or applications (Previously `CLUSTER_SEEDS` and `INTERFACE_NAME` had to be defined). 
-      
-    - Location service access is now via an HTTP server running on each host 
+      before starting the components or applications (Previously `CLUSTER_SEEDS` and `INTERFACE_NAME` had to be defined).
+
+    - Location service access is now via an HTTP server running on each host
     (The HTTP servers form a cluster).
-    
-    - Command line applications now use the HTTP API for location service, resulting in much 
+
+    - Command line applications now use the HTTP API for location service, resulting in much
     faster startup times.
 
 - Event Service
@@ -375,7 +376,7 @@ See [here](https://tmtsoftware.github.io/csw/0.6.0/) for a detailed documentatio
 - New Template for Component Builders
 
     - Updated giter8 template. You can create a new HCD or assembly project with `sbt new tmtsoftware/csw.g8`.
-    
+
 - Test Kits
 
     - Test kits are now available that can start and stop CSW services inside tests so that
@@ -385,25 +386,25 @@ See [here](https://tmtsoftware.github.io/csw/0.6.0/) for a detailed documentatio
 
 ## [CSW v0.6.0-RC3] - 2018-11-21
 
-This is the release candidate 3 of the third release of the TMT Common Software for project stakeholders. 
-This release includes updated command service documentation and fix for `query` to return `Started` once the command execution starts. 
+This is the release candidate 3 of the third release of the TMT Common Software for project stakeholders.
+This release includes updated command service documentation and fix for `query` to return `Started` once the command execution starts.
 See [here](https://tmtsoftware.github.io/csw/0.6.0-RC3/) for a detailed documentation of this version of the CSW software.
 
 ## [CSW v0.6.0-RC2] - 2018-11-15
 
-This is the release candidate 2 of the third release of the TMT Common Software for project stakeholders. 
+This is the release candidate 2 of the third release of the TMT Common Software for project stakeholders.
 This release includes changes in command service and addition of testkit for CSW.
 See [here](https://tmtsoftware.github.io/csw/0.6.0-RC2/) for a detailed documentation of this version of the CSW software.
 
 ## [CSW v0.6.0-RC1] - 2018-10-23
 
-This is the release candidate 1 of the third release of the TMT Common Software for project stakeholders. 
+This is the release candidate 1 of the third release of the TMT Common Software for project stakeholders.
 This release includes event service.
 See [here](https://tmtsoftware.github.io/csw/0.6.0-RC1/) for a detailed documentation of this version of the CSW software.
 
 ## [CSW v0.5.0] - 2018-08-31
 
-This is version 0.5 the second release of the TMT Common Software for project stakeholders. 
+This is version 0.5 the second release of the TMT Common Software for project stakeholders.
 This release includes Event Service.
 See [here](https://tmtsoftware.github.io/csw/0.5.0/) for a detailed documentation of this version of the CSW software.
 
@@ -427,19 +428,19 @@ See [here](https://tmtsoftware.github.io/csw/0.5.0/) for a detailed documentatio
 
 ## [CSW v0.5.0-RC2] - 2018-08-24
 
-This is the release candidate 2 of the second release of the TMT Common Software for project stakeholders. 
+This is the release candidate 2 of the second release of the TMT Common Software for project stakeholders.
 This release includes event service and partial implementation of alarm service.
 See [here](https://tmtsoftware.github.io/csw/0.5.0-RC2/) for a detailed documentation of this version of the CSW software.
 
 ## [CSW v0.5.0-RC1] - 2018-08-01
 
-This is the release candidate 1 of the second release of the TMT Common Software for project stakeholders. 
+This is the release candidate 1 of the second release of the TMT Common Software for project stakeholders.
 This release includes event service.
 See [here](https://tmtsoftware.github.io/csw/0.5.0-RC1/) for a detailed documentation of this version of the CSW software.
 
 ## [CSW v0.4.0] - 2018-04-11
 
-This is the first early release of the TMT Common Software for project stakeholders. 
+This is the first early release of the TMT Common Software for project stakeholders.
 See [here](https://tmtsoftware.github.io/csw/0.4.0/) for a detailed description of this version of the CSW software.
 
 See the notes for [CSW v0.4.0-RC1] for release changes.
@@ -447,7 +448,7 @@ See the notes for [CSW v0.4.0-RC1] for release changes.
 
 ## [CSW v0.4.0-RC1] - 2018-04-04
 
-This is the release candidate 1 of the first release of the TMT Common Software for project stakeholders. 
+This is the release candidate 1 of the first release of the TMT Common Software for project stakeholders.
 See [here](https://tmtsoftware.github.io/csw/0.4.0-RC1/) for a detailed description of this version of the CSW software.
 
 ### Changed
@@ -465,7 +466,7 @@ See [here](https://tmtsoftware.github.io/csw/0.4.0-RC1/) for a detailed descript
 
 ## [CSW v0.3-FDR] - 2016-12-03
 
-This prototype version was provided as part of the CSW Final Design Review 
+This prototype version was provided as part of the CSW Final Design Review
 
 ### Added
 
@@ -493,16 +494,16 @@ This prototype version was provided as part of the CSW Final Design Review
 
 
 ### Added
-- Added [BlockingConfigManager](src/main/scala/csw/services/cs/core/BlockingConfigManager.scala) 
+- Added [BlockingConfigManager](src/main/scala/csw/services/cs/core/BlockingConfigManager.scala)
   (a blocking API to the Config Service)
 
 - Added [PrefixedActorLogging](src/main/scala/csw/services/log/PrefixedActorLogging.scala) to use in place
   of ActorLogging, to include a component's subsystem and prefix in log messages (subsystem is part of a component's prefix)
-  
-- Added [HcdControllerClient](src/main/scala/csw/services/ccs/HcdControllerClient.scala) 
+
+- Added [HcdControllerClient](src/main/scala/csw/services/ccs/HcdControllerClient.scala)
   and [AssemblyControllerClient](src/main/scala/csw/services/ccs/AssemblyControllerClient.scala) classes, as
   an alternative API that makes clear which methods can be call (or which messages can be sent to the actor)
-  
+
 - Add `get(path, date)` method to [ConfigManager](src/main/scala/csw/services/cs/core/ConfigManager.scala) and
   all Config Service APIs, so that you can get the version of a file for a given date
 
@@ -516,9 +517,9 @@ The main difference between Request and Submit is that Request can return a valu
 - Added Java APIs for most services (See the [javacsw](javacsw) and  [util](util) subprojects)
 
 ### Changed
-- Renamed the earlier Hornetq based `event` project to [event_old](event_old) 
-  and renamed the Redis based `kvs` project to [events](events). 
-  Classes with *KeyValueStore* in the name have been renamed to use *EventService*. 
+- Renamed the earlier Hornetq based `event` project to [event_old](event_old)
+  and renamed the Redis based `kvs` project to [events](events).
+  Classes with *KeyValueStore* in the name have been renamed to use *EventService*.
 
 - Renamed Config Service Java interfaces to start with I instead of J, to be more like the other Java APIs
 
@@ -543,4 +544,4 @@ The main difference between Request and Submit is that Request can return a valu
 
 ## [CSW v0.2-PDR] - 2015-11-19
 
-This prototype version was provided as part of the CSW Preliminary Design Review 
+This prototype version was provided as part of the CSW Preliminary Design Review

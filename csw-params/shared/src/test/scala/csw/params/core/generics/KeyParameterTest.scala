@@ -14,6 +14,7 @@ import org.scalatest.matchers.should.Matchers
 // DEOPSCSW-188: Efficient Serialization to/from JSON
 // DEOPSCSW-184: Change configurations - attributes and values
 // DEOPSCSW-196: Command Payloads for variable command content
+// DEOPS-CSW-MAINT-116: Restrict "[" , "]" and "/" chars in key name of Parameter model
 class KeyParameterTest extends AnyFunSpec with Matchers {
 
   private val s1: String = "encoder"
@@ -1234,6 +1235,16 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
       assert(i1.values.length == s1.length)
       assert(i1.units == meter)
       assert(i1(2) == 6)
+    }
+  }
+
+  // DEOPS-CSW-MAINT-116: Restrict "[" , "]" and "/" chars in key name of Parameter model
+  describe(" Restrict character from key name") {
+    it("should not allow [ ]  or /") {
+      a[IllegalArgumentException] shouldBe thrownBy(KeyType.SolarSystemCoordKey.make("test0]"))
+      a[IllegalArgumentException] shouldBe thrownBy(KeyType.BooleanKey.make("test[0"))
+      a[IllegalArgumentException] shouldBe thrownBy(KeyType.ChoiceKey.make("test[0]", "1"))
+      a[IllegalArgumentException] shouldBe thrownBy(KeyType.ChoiceKey.make("structKey1/someKey/a.b", "1"))
     }
   }
 }
