@@ -1,7 +1,6 @@
 package csw.config.server.http
 
 import akka.Done
-import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Route
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 import csw.aas.http.AuthorizationPolicy.RealmRolePolicy
@@ -9,6 +8,7 @@ import csw.aas.http.SecurityDirectives
 import csw.config.api.scaladsl.ConfigService
 import csw.config.models.codecs.ConfigCodecs
 import csw.config.server.ActorRuntime
+import csw.config.server.http.tapir.TapirRoutes
 import csw.config.server.svn.SvnConfigServiceFactory
 
 /**
@@ -35,48 +35,18 @@ class ConfigServiceRoute(
 
   private def configService(userName: String = UnknownUser): ConfigService = configServiceFactory.make(userName)
 
+  private val tapirRoutes = new TapirRoutes(configServiceFactory, securityDirectives)
+
   def route: Route =
     cors() {
       routeLogger {
         handleExceptions(configHandlers.jsonExceptionHandler) {
           handleRejections(configHandlers.jsonRejectionHandler) {
-
-            prefix("config") { filePath =>
-              (get & rejectEmptyResponse) { // fetch the file - http://{{hostname}}:{{port}}/config/{{path}}
-                (dateParam & idParam) {
-                  case (Some(date), _) => complete(configService().getByTime(filePath, date))
-                  case (_, Some(id))   => complete(configService().getById(filePath, id))
-                  case (_, _)          => complete(configService().getLatest(filePath))
-                }
-              } ~
-              head { // check if file exists - http://{{hostname}}:{{port}}/config/{{path}}
-                idParam { id =>
-                  complete {
-                    configService().exists(filePath, id).map { found => if (found) StatusCodes.OK else StatusCodes.NotFound }
-                  }
-                }
-              } ~
-              sPost(RealmRolePolicy(AdminRole)) {
-                token => // create file - http://{{hostname}}:{{port}}/config/{{path}}?annex=true&comment=abcd
-                  (configDataEntity & annexParam & commentParam) { (configData, annex, comment) =>
-                    complete(
-                      StatusCodes.Created -> configService(token.userOrClientName).create(filePath, configData, annex, comment)
-                    )
-                  }
-              } ~
-              sPut(RealmRolePolicy(AdminRole)) {
-                token => // update file - http://{{hostname}}:{{port}}/config/{{path}}?comment=abcd
-                  (configDataEntity & commentParam) { (configData, comment) =>
-                    complete(configService(token.userOrClientName).update(filePath, configData, comment))
-                  }
-              } ~
-              sDelete(RealmRolePolicy(AdminRole)) {
-                token => // delete file - http://{{hostname}}:{{port}}/config/{{path}}?comment=abcd
-                  commentParam { comment =>
-                    complete(configService(token.userOrClientName).delete(filePath, comment).map(_ => Done))
-                  }
-              }
-            } ~
+            tapirRoutes.getConfig ~
+            tapirRoutes.exist ~
+            tapirRoutes.create ~
+            tapirRoutes.put ~
+            tapirRoutes.delete ~
             (prefix("active-config") & get & rejectEmptyResponse) { filePath =>
               dateParam { // fetch the currently active file - http://{{hostname}}:{{port}}/active-config/{{path}}
                 case Some(date) =>

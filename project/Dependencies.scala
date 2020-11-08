@@ -92,6 +92,10 @@ object Dependencies {
 
   val ConfigServer = Def.setting(
     Seq(
+      Tapir.tapir,
+      Tapir.`tapir-akka-http-server`,
+      Tapir.`tapir-openapi-circe-yaml`,
+      Tapir.`tapir-openapi-docs`,
       Libs.`enumeratum`.value,
       Akka.`akka-stream`,
       Akka.`akka-stream-typed`,
@@ -437,13 +441,13 @@ object Dependencies {
 
   val Commons = Def.setting(
     Seq(
-      Akka.`akka-actor` % Provided,
-      Akka.`akka-actor-typed` % Provided,
-      AkkaHttp.`akka-http` % Provided,
-      Borer.`borer-compat-akka`% Provided,
+      Akka.`akka-actor`              % Provided,
+      Akka.`akka-actor-typed`        % Provided,
+      AkkaHttp.`akka-http`           % Provided,
+      Borer.`borer-compat-akka`      % Provided,
       Borer.`borer-derivation`.value % Provided,
-      Libs.`scalatest`.value % Test,
-      Libs.`embedded-redis`  % Test
+      Libs.`scalatest`.value         % Test,
+      Libs.`embedded-redis`          % Test
     )
   )
 

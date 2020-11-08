@@ -53,6 +53,17 @@ object Libs {
   val netty               = "io.netty"                      % "netty-all"       % "4.1.53.Final"
   val `case-app`          = "com.github.alexarchambault"   %% "case-app"        % "2.0.4"
   val `tmt-test-reporter` = "com.github.tmtsoftware"       %% "rtm"             % "fecc848abf7"
+
+}
+
+object Tapir {
+  val Version = "0.17.0-M8"
+
+  val tapir = "com.softwaremill.sttp.tapir" %% "tapir-core" % Version
+  val `tapir-akka-http-server` =
+    "com.softwaremill.sttp.tapir" %% "tapir-akka-http-server" % Version exclude ("com.typesafe.akka", "akka-stream_2.12")
+  val `tapir-openapi-docs`       = "com.softwaremill.sttp.tapir" %% "tapir-openapi-docs"       % Version
+  val `tapir-openapi-circe-yaml` = "com.softwaremill.sttp.tapir" %% "tapir-openapi-circe-yaml" % Version
 }
 
 object Borer {
