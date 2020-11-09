@@ -25,9 +25,12 @@ object Command {
       @HelpMessage("start auth/aas service")
       @Short("k")
       auth: Boolean = false,
-      @HelpMessage("name of the interface")
+      @HelpMessage("name of the inside interface")
       @Short("i")
-      interfaceName: Option[String]
+      insideInterfaceName: Option[String],
+      @HelpMessage("name of the outside interface")
+      @Short("o")
+      outsideInterfaceName: Option[String]
   ) extends Command
 
   object Start {
@@ -37,11 +40,13 @@ object Command {
         alarm: Boolean = false,
         database: Boolean = false,
         auth: Boolean = false,
-        interfaceName: Option[String] = None
+        insideInterfaceName: Option[String] = None,
+        outsideInterfaceName: Option[String] = None
     ): Start =
       // mark all flags=true when no option is provided to start command
-      if (config || event || alarm || database || auth) new Start(config, event, alarm, database, auth, interfaceName)
-      else new Start(true, true, true, true, true, interfaceName)
+      if (config || event || alarm || database || auth)
+        new Start(config, event, alarm, database, auth, insideInterfaceName, outsideInterfaceName)
+      else new Start(true, true, true, true, true, insideInterfaceName, outsideInterfaceName)
   }
 
 }
