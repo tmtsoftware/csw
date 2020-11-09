@@ -15,7 +15,7 @@ import csw.prefix.models.Prefix
  * @param delay         Number of milliseconds to wait for the app to start
  * @param noExit        For testing, prevents application from exiting after running the command
  * @param httpPath      For registering services as Http location with the given path
- * @param publicNetwork Optional. To register services using public network IP rather than default private network IP
+ * @param outsideNetwork Optional. To register services using outside network IP rather than default private network IP
  */
 case class Options(
     prefixes: List[Prefix] = Nil,
@@ -25,7 +25,7 @@ case class Options(
     delay: Option[Int] = None,
     noExit: Boolean = false,
     httpPath: Option[String] = None,
-    publicNetwork: Boolean = false
+    outsideNetwork: Boolean = false
 ) {
-  val networkType: NetworkType = if (publicNetwork) NetworkType.Outside else NetworkType.Inside
+  val networkType: NetworkType = if (outsideNetwork) NetworkType.Outside else NetworkType.Inside
 }

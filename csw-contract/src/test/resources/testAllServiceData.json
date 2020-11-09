@@ -33,7 +33,7 @@
             "port" : 2090,
             "path" : "somePath",
             "networkType" : {
-              "_type" : "Private"
+              "_type" : "Inside"
             },
             "metadata" : { }
           }

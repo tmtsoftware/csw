@@ -31,7 +31,7 @@ object Main {
     }
 
   private[server] def start(startLogging: Boolean, options: Options): (ServerBinding, ServerWiring) = {
-    val wiring = ServerWiring.make(options.clusterPort, options.publicNetwork)
+    val wiring = ServerWiring.make(options.clusterPort, options.outsideNetwork)
 
     import wiring._
     try {

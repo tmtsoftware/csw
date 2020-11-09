@@ -15,11 +15,11 @@ class ArgsParser(name: String) {
       c.copy(clusterPort = Some(x))
     } text "Optional: Port at which this cluster will run. Default is 3552"
 
-    opt[Unit]("publicNetwork")
-      .action((_, c) => c.copy(publicNetwork = true))
+    opt[Unit]("outsideNetwork")
+      .action((_, c) => c.copy(outsideNetwork = true))
       .text(
-        "Optional: Binds http location service to public network IP making it available to machines in the " +
-          "public network. This will also enable auth by default."
+        "Optional: Binds http location service to outside network IP making it available to machines in the " +
+          "outside network. This will also enable auth by default."
       )
 
     help("help")

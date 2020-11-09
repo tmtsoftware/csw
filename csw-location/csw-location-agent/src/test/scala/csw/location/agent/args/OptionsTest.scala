@@ -6,12 +6,12 @@ import org.scalatest.matchers.should.Matchers
 
 class OptionsTest extends AnyFunSuiteLike with Matchers {
 
-  test("should set networkType to NetworkType.Private by default when publicNetwork option not given | CSW-96") {
+  test("should set networkType to NetworkType.Inside by default when outsideNetwork option not given | CSW-96") {
     Options().networkType shouldBe NetworkType.Inside
   }
 
-  test("should set networkType to NetworkType.Public when publicNetwork is true | CSW-96") {
-    Options(publicNetwork = true).networkType shouldBe NetworkType.Outside
+  test("should set networkType to NetworkType.Outside when outsideNetwork is true | CSW-96") {
+    Options(outsideNetwork = true).networkType shouldBe NetworkType.Outside
   }
 
 }

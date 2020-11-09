@@ -135,7 +135,7 @@ At any point in time, `Assembly` can choose to cancel tracking. On cancellation,
 
 * By default when you start `Location Server`, it will start in `local-only` mode with AAS `Disabled` and bind to `127.0.0.1`.
 
-* Use `--publicNetwork` command line option when @ref:[starting location server](../../apps/cswlocationserver.md) to
+* Use `--outsideNetwork` command line option when @ref:[starting location server](../../apps/cswlocationserver.md) to
 start `Location Server` in `public mode` with AAS `enabled` and bind to @ref:[public IP](../../deployment/network-topology.md)
 
 ## Internals

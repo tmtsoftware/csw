@@ -39,7 +39,7 @@ class HttpServiceTest extends HTTPLocationService {
   /*
    * Tests can be run of different OS and each OS follow its own naming convention for interface names.
    * e.g. for Mac OS  interface names are like en0, en1 ,etc. For Linux they are eth0, eth1, etc. and so on.
-   * Hence, it is not feasible to set and use env variable - NetworkType.Public.envKey and NetworkType.Private.envKey
+   * Hence, it is not feasible to set and use env variable - NetworkType.Inside.envKey and NetworkType.Outside.envKey
    * in tests, as they are machine dependent.
    * Instead, a config property `csw-networks.hostname.automatic` is enabled in test scope to automatically detect
    * appropriate interface and hostname, which means Networks().hostname and Networks(NetworkType.Public.envKey)

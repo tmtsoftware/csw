@@ -70,7 +70,7 @@ and AAS `enabled`.
 
     ```bash
     // run location server
-    location-server --clusterPort=3552 --publicNetwork
+    location-server --clusterPort=3552 --outsideNetwork
     ``` `
 
 3.  Once the Akka cluster formation is done, start @ref:[AAS](../services/aas.md) 

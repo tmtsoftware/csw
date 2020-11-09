@@ -8,12 +8,12 @@ import csw.location.api.models.NetworkType;
  */
 public interface JNetworkType {
     /**
-     * Used to define an Private Network Type
+     * Used to define an Inside Network Type
      */
-    NetworkType Private = NetworkType.Inside$.MODULE$;
+    NetworkType Inside = NetworkType.Inside$.MODULE$;
 
     /**
-     * Used to define an Public Network Type
+     * Used to define an Outside Network Type
      */
-    NetworkType Public = NetworkType.Outside$.MODULE$;
+    NetworkType Outside = NetworkType.Outside$.MODULE$;
 }

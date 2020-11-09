@@ -16,7 +16,7 @@ class MainTest extends AnyFunSuiteLike with Matchers with ScalaFutures {
   private val httpPort                          = 7654
   private implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 100.millis)
 
-  test("when publicNetwork option NOT given, should bind to 127.0.0.1 with auth DISABLED | CSW-96, CSW-89") {
+  test("when outsideNetwork option NOT given, should bind to 127.0.0.1 with auth DISABLED | CSW-96, CSW-89") {
     val args              = Array("--clusterPort", s"${SocketUtils.getFreePort}")
     val options           = new ArgsParser("csw-location-server").parse(args.toList).get
     val `127.0.0.1`       = "127.0.0.1"
@@ -35,8 +35,8 @@ class MainTest extends AnyFunSuiteLike with Matchers with ScalaFutures {
     wiring.actorRuntime.shutdown().futureValue
   }
 
-  test("when publicNetwork option is given, should bind to Public Network IP with auth ENABLED | CSW-96, CSW-89") {
-    val args     = Array("--clusterPort", s"${SocketUtils.getFreePort}", "--publicNetwork")
+  test("when outsideNetwork option is given, should bind to Outside Network IP with auth ENABLED | CSW-96, CSW-89") {
+    val args     = Array("--clusterPort", s"${SocketUtils.getFreePort}", "--outsideNetwork")
     val options  = new ArgsParser("csw-location-server").parse(args.toList).get
     val hostname = Networks(NetworkType.Outside.envKey).hostname
 

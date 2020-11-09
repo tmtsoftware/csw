@@ -101,7 +101,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
 
         // When a service wants to register itself on Public network, it can provide JNetworkType.Public in httpRegistration
         HttpRegistration httpRegistrationOnPublicNetwork = new HttpRegistration(httpConnection, 8080, "path123",
-                JNetworkType.Public);
+                JNetworkType.Outside);
         httpRegResultonPublicNetwork = locationService.register(httpRegistrationOnPublicNetwork).get();
 
         // ************************************************************************************************************

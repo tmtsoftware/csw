@@ -46,16 +46,16 @@ class ArgsParserTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
     x should contain(Options(List(Prefix("csw.aas")), Some("sleep 5"), Some(port), None, None, httpPath = Some("testPath")))
   }
 
-  test("test parser for publicNetwork command line argument | CSW-96") {
+  test("test parser for outsideNetwork command line argument | CSW-96") {
     val services = "csw.aas"
     val args =
-      Array("--prefix", services, "--publicNetwork")
+      Array("--prefix", services, "--outsideNetwork")
 
     val x: Option[Options] = silentParse(args)
-    x should contain(Options(prefixes = List(Prefix(services)), publicNetwork = true))
+    x should contain(Options(prefixes = List(Prefix(services)), outsideNetwork = true))
   }
 
-  test("test parser when publicNetwork command line argument not provided | CSW-96") {
+  test("test parser when outsideNetwork command line argument not provided | CSW-96") {
     val services = "csw.aas"
     val args =
       Array("--prefix", services)
@@ -63,7 +63,7 @@ class ArgsParserTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
     val x: Option[Options] = silentParse(args)
     val `false`            = false
     x should contain(
-      Options(List(Prefix(services)), None, None, None, None, noExit = false, None, publicNetwork = `false`)
+      Options(List(Prefix(services)), None, None, None, None, noExit = false, None, outsideNetwork = `false`)
     )
   }
 

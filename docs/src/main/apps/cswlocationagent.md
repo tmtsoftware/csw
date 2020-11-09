@@ -30,7 +30,7 @@ Note: If you don't provide the version or SHA in above command, `location-agent`
 * **<app-config>** an optional config file in HOCON format. Will be automatically picked based on --names parameter (Options specified as: $name.command, $name.port, etc.)
 * **`--delay`** the number of milliseconds to wait for the app to start before registering itself with the Location Service (default: 1000)
 * **`--http`** is an optional parameter. To register services as HTTP with the provided path. (default: none, i.e Services will be registered as Tcp)
-* **`--publicNetwork`** is an optional parameter. To register service using public network IP. (default: false, i.e register service using private network IP)
+* **`--outsideNetwork`** is an optional parameter. To register service using public network IP. (default: false, i.e register service using private network IP)
 * **`--no-exit`** For testing: prevents application from exiting after running command
 * **`--help`** Prints the help message.
 * **`--version`** Prints the version of the application.
@@ -62,7 +62,7 @@ Note: If you don't provide the version or SHA in above command, `location-agent`
 
 5. Application will start a simple HTTP service on port 8080. This will register `CSW.myHttpServiceAsHttp` as a HTTP service with the provided path with the Location Service. It will register its public network ip with the Location Service.
     ```bash
-    location-agent --prefix "CSW.myHttpServiceAsHttp" --command "python -m SimpleHTTPServer 8080" --port 8080 --http "path" --publicNetwork
+    location-agent --prefix "CSW.myHttpServiceAsHttp" --command "python -m SimpleHTTPServer 8080" --port 8080 --http "path" --outsideNetwork
     ```  
  
 6. Prints help message.
