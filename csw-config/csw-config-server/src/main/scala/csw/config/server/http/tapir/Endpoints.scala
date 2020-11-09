@@ -92,7 +92,7 @@ object Endpoints {
       .in(Body.fileStream)
       .out(emptyOutput)
 
-  val deleteigEndpoint: Endpoint[(Path, String, String), Unit, Unit, Any] =
+  val deleteConfigEndpoint: Endpoint[(Path, String, String), Unit, Unit, Any] =
     configEndpoint.delete
       .summary("Delete Config")
       .description("Removes the configuration file from repository.")
