@@ -309,7 +309,7 @@ For development purposes [Docker compose](https://docs.docker.com/compose/) is u
 Hence, make sure that latest Docker setup is installed and running before starting the Elastic stack. The Docker container is responsible for aggregating logs
 generated in `tmp/tmt/logs/csw`. Hence, developers writing Scala/Java/Python/C++/C applications need to generate log files under `/tmp/tmt/logs/csw`. 
 
-Also, note that csw apps started via `csw-services.sh` will generate log files under `/tmp/tmt/logs/csw` and thus, it will be aggregated by the Elastic docker container.
+Also, note that csw apps started via `csw-services` application will generate log files under `/tmp/tmt/logs/csw` and thus, it will be aggregated by the Elastic docker container.
 To know more about setting up docker and starting Elastic, please refer to @ref:[Starting Elastic logging aggregator for Development](apps.md#starting-elastic-logging-aggregator-for-development). 
 
 @@@ note

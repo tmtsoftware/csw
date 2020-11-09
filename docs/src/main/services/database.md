@@ -76,7 +76,7 @@ for help with creating users, passwords, and roles in PostgreSQL.
 
 The [psql interactive CLI client](https://www.postgresql.org/docs/current/app-psql.html) is provided with PostgreSQL. It can
 be used to connect to PostgreSQL and create users (as well as many other maintenance commands). If the Database Service is started
-with csw-services.sh, the database server is started on port *5432*.
+with @ref:[csw-services](../apps/cswservices.md), the database server is started on port *5432*.
 
 Eventually, all TMT user logins will all have these environment variables set with the agreed upon read-only user and password.    
 @@@

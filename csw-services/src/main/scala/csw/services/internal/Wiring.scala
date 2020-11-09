@@ -21,7 +21,7 @@ class Wiring(startCmd: Start) {
   lazy implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol())
   lazy implicit val ec: ExecutionContext                            = actorSystem.executionContext
 
-  lazy val settings: Settings                     = Settings(startCmd.interfaceName)
+  lazy val settings: Settings                     = Settings(startCmd.insideInterfaceName)
   lazy val locationServiceClient: LocationService = HttpLocationServiceFactory.makeLocalClient
 
   lazy val environment   = new Environment(settings)

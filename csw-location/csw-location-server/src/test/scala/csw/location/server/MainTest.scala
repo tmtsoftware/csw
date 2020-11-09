@@ -38,7 +38,7 @@ class MainTest extends AnyFunSuiteLike with Matchers with ScalaFutures {
   test("when publicNetwork option is given, should bind to Public Network IP with auth ENABLED | CSW-96, CSW-89") {
     val args     = Array("--clusterPort", s"${SocketUtils.getFreePort}", "--publicNetwork")
     val options  = new ArgsParser("csw-location-server").parse(args.toList).get
-    val hostname = Networks(NetworkType.Public.envKey).hostname
+    val hostname = Networks(NetworkType.Outside.envKey).hostname
 
     val (binding, wiring) = Main.start(startLogging = false, options = options)
     //AAS location is registered here to make sure, it does not give AASResolution Failed error

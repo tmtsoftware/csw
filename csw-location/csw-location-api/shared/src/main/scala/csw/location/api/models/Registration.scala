@@ -93,10 +93,10 @@ final case class HttpRegistration(
 
   //Used for JAVA API
   def this(connection: HttpConnection, port: Int, path: String, metadata: Metadata) =
-    this(connection, port, path, NetworkType.Private, metadata)
+    this(connection, port, path, NetworkType.Inside, metadata)
 
   def this(connection: HttpConnection, port: Int, path: String) =
-    this(connection, port, path, NetworkType.Private, Metadata.empty)
+    this(connection, port, path, NetworkType.Inside, Metadata.empty)
 
   def this(connection: HttpConnection, port: Int, path: String, networkType: NetworkType) =
     this(connection, port, path, networkType, Metadata.empty)
@@ -113,7 +113,7 @@ final case class HttpRegistration(
 
 object HttpRegistration {
   def apply(connection: HttpConnection, port: Int, path: String, metadata: Metadata): HttpRegistration =
-    new HttpRegistration(connection, port, path, NetworkType.Private, metadata)
+    new HttpRegistration(connection, port, path, NetworkType.Inside, metadata)
 
   def apply(connection: HttpConnection, port: Int, path: String, networkType: NetworkType): HttpRegistration =
     new HttpRegistration(connection, port, path, networkType, Metadata.empty)
@@ -123,5 +123,5 @@ object HttpRegistration {
       port: Int,
       path: String
   ): HttpRegistration =
-    new HttpRegistration(connection, port, path, NetworkType.Private, Metadata.empty)
+    new HttpRegistration(connection, port, path, NetworkType.Inside, Metadata.empty)
 }

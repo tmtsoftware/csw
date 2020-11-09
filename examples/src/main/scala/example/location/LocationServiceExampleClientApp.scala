@@ -133,7 +133,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   val httpRegResult: RegistrationResult = Await.result(locationService.register(httpRegistration), 2.seconds)
 
   // When a service wants to register itself on Public network, it can provide NetworkType.Public in httpRegistration
-  val httpRegistrationOnPublicNetwork = HttpRegistration(httpConnection, httpPort, "path123", NetworkType.Public)
+  val httpRegistrationOnPublicNetwork = HttpRegistration(httpConnection, httpPort, "path123", NetworkType.Outside)
   val httpRegResultOnPublicNetwork: RegistrationResult =
     Await.result(locationService.register(httpRegistrationOnPublicNetwork), 2.seconds)
 

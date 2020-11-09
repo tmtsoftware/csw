@@ -12,6 +12,6 @@ class OptionsTest extends AnyFunSuiteLike with Matchers {
   }
 
   test("should set httpBindHost to Public network IP when publicNetwork is true | CSW-96, CSW-89") {
-    Options(publicNetwork = true).httpBindHost shouldBe Networks(NetworkType.Public.envKey).hostname
+    Options(publicNetwork = true).httpBindHost shouldBe Networks(NetworkType.Outside.envKey).hostname
   }
 }

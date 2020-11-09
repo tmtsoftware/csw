@@ -92,7 +92,7 @@ Java
 
 @@@ note
 
-You do not need to externally start any services like the Event Service, Config Service, Location Service etc. via `csw-services.sh` script.
+You do not need to externally start any services like the Event Service, Config Service, Location Service etc. via `csw-services` application.
 Testkits will start required services as a part of initialization. For the Event and Alarm service, it uses an instance of `embedded-redis`. 
 
 @@@

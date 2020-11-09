@@ -20,7 +20,7 @@ class LocationServiceImplTest extends AnyFunSuite with Matchers with MockitoSuga
   private val port           = 5003
 
   test("should select public hostname when network type is public | CSW-97") {
-    val registration = HttpRegistration(connection = httpConnection, port = port, path = "", NetworkType.Public)
+    val registration = HttpRegistration(connection = httpConnection, port = port, path = "", NetworkType.Outside)
 
     when(mockCswCluster.publicHostname) thenReturn ("some-public-ip")
 

@@ -338,6 +338,6 @@ To run using the deployment packaging, follow the steps below:
 
 @@@ note { title=Note }
 
-This assumes you still have the CSW Services running using the  `csw-services.sh` script as described in the
+This assumes you still have the CSW Services running using the  `csw-services` application as described in the 
 @ref:[Create a Component](./create-component.md#starting-csw-services) tutorial page.
 @@@

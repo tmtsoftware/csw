@@ -17,8 +17,8 @@ class ClusterSettingsTest extends AnyFunSuite with Matchers with BeforeAndAfterA
   override protected def afterAll(): Unit = {
     System.clearProperty("CLUSTER_SEEDS")
     // CSW-97
-    System.clearProperty(NetworkType.Private.envKey)
-    System.clearProperty(NetworkType.Public.envKey)
+    System.clearProperty(NetworkType.Inside.envKey)
+    System.clearProperty(NetworkType.Outside.envKey)
   }
 
   test("exception is thrown when settings are not found for a given cluster name") {
@@ -63,8 +63,8 @@ class ClusterSettingsTest extends AnyFunSuite with Matchers with BeforeAndAfterA
     val port   = 9001
     val ipList = List("10.10.10.10", "10.10.10.11", "10.10.10.12")
     val values = Map(
-      NetworkType.Private.envKey -> "en0",
-      NetworkType.Public.envKey  -> "en1",
+      NetworkType.Inside.envKey  -> "en0",
+      NetworkType.Outside.envKey -> "en1",
       "CLUSTER_SEEDS"            -> ipList.mkString(", "),
       "CLUSTER_PORT"             -> "9000"
     )
@@ -83,8 +83,8 @@ class ClusterSettingsTest extends AnyFunSuite with Matchers with BeforeAndAfterA
     val publicInterface = "eth1"
 
     System.setProperty("CLUSTER_SEEDS", systemSeeds.toString)
-    System.setProperty(NetworkType.Private.envKey, systemInterface)
-    System.setProperty(NetworkType.Public.envKey, publicInterface)
+    System.setProperty(NetworkType.Inside.envKey, systemInterface)
+    System.setProperty(NetworkType.Outside.envKey, publicInterface)
 
     val clusterSettings = ClusterSettings().onPort(systemPort)
 

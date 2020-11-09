@@ -468,28 +468,8 @@ Java
 
 ## Starting CSW Services
 
-Before we run our application, we must first start the Location Service and the Event Service. A script has been provided to simplify
-the starting and stopping of CSW services, and is included in the application bundle that comes with each release.  The
-application bundle is called 
-
-@@@vars
-
-csw-apps-$version$.zip 
-
-@@@
-
-and the script is named `csw-services.sh`. The script has been modified for CSW 2.0 to automatically pull in the correct
-dependencies it needs.
-
-To simplify usage, the script is now included as part of the giter8 template.  Therefore, if you are using the template, 
-you do not need to download the CSW apps bundle.
-
-The `csw-services.sh` script has two basic commands: `start` and `stop`.  The start command can start specific services using
-passed in flags, or all services without any.  Services are started on default ports but those ports can be overridden using
-command line arguments. It is important to pass in a network interface name that is appropriate for your system.  These
-can be obtained using `ifconfig` on Linux and Mac computers. `en0` typically, works for most machines. This can alternatively be set
-using the environment variable `INTERFACE_NAME`.  Setting the interface name at the command with this script also sets this 
-environment variable.
+Before we run our application, we must first start the Location Service and the Event Service. `csw-services` application has been provided to simplify
+the starting and stopping of CSW services. Refer @ref:[here](../apps/cswservices.md) to install `csw-services` and understand commands for starting the required services.
 
 @@@ note {title="Environment Variables used by CSW" }
 
@@ -498,18 +478,13 @@ The environment variables used by CSW services are specified @ref:[here](../depl
 
 @@@
 
-To get information on the arguments for the tool, use `csw-services.sh --help` or `csw-services.sh start --help`.
-
-
 #### *Tutorial: Developing an HCD*
 
-Let's go ahead and start our CSW Services using the script. Go into the `scripts` directory in your project and enter the command
+Let's go ahead and start our CSW Services using the `csw-services` application.
 
 ```
-./csw-services.sh start -i <iname>
+csw-services start
 ```
-
-where `<iname>` is your interface name (e.g. `en0`).
 
 ## Building and Running component in standalone mode
 

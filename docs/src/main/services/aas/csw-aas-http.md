@@ -31,7 +31,7 @@ To run an Akka HTTP server app, which uses this adapter, we need
 * An AAS instance running and registered with the Location Service
 
 The Location Service and AAS can be running on different machines. To start the Location Service and AAS 
-server on a local machine, you can make use of the csw-services.sh script.
+server on a local machine, you can make use of the @ref:[csw-services](../../apps/cswservices.md) application.
 
 ## Application Configurations
 

@@ -27,5 +27,5 @@ case class Options(
     httpPath: Option[String] = None,
     publicNetwork: Boolean = false
 ) {
-  val networkType: NetworkType = if (publicNetwork) NetworkType.Public else NetworkType.Private
+  val networkType: NetworkType = if (publicNetwork) NetworkType.Outside else NetworkType.Inside
 }

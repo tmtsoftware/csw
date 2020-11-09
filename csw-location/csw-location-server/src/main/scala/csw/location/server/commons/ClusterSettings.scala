@@ -52,8 +52,8 @@ import scala.jdk.CollectionConverters._
  */
 private[csw] case class ClusterSettings(clusterName: String = Constants.ClusterName, values: Map[String, Any] = Map.empty) {
   private val log: Logger            = LocationServiceLogger.getLogger
-  private val InterfaceNameKey       = NetworkType.Private.envKey
-  private val PublicInterfaceNameKey = NetworkType.Public.envKey
+  private val InterfaceNameKey       = NetworkType.Inside.envKey
+  private val PublicInterfaceNameKey = NetworkType.Outside.envKey
   private val ClusterSeedsKey        = "CLUSTER_SEEDS"
   private val ClusterPortKey         = "CLUSTER_PORT"
   private val ManagementPortKey      = "MANAGEMENT_PORT"

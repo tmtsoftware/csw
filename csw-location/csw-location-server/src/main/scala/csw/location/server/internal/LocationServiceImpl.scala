@@ -18,7 +18,7 @@ import csw.location.api.exceptions.{
 }
 import csw.location.api.models.ComponentType.{Assembly, HCD, Sequencer}
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
-import csw.location.api.models.NetworkType.Public
+import csw.location.api.models.NetworkType.Outside
 import csw.location.api.models._
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.server.commons.{CswCluster, LocationServiceLogger}
@@ -92,8 +92,8 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
 
   private[internal] def getLocation(registration: Registration) =
     registration match {
-      case HttpRegistration(_, _, _, Public, _) => registration.location(cswCluster.publicHostname)
-      case _                                    => registration.location(cswCluster.hostname)
+      case HttpRegistration(_, _, _, Outside, _) => registration.location(cswCluster.publicHostname)
+      case _                                     => registration.location(cswCluster.hostname)
     }
 
   /**

@@ -10,10 +10,10 @@ public interface JNetworkType {
     /**
      * Used to define an Private Network Type
      */
-    NetworkType Private = NetworkType.Private$.MODULE$;
+    NetworkType Private = NetworkType.Inside$.MODULE$;
 
     /**
      * Used to define an Public Network Type
      */
-    NetworkType Public = NetworkType.Public$.MODULE$;
+    NetworkType Public = NetworkType.Outside$.MODULE$;
 }

@@ -34,7 +34,7 @@ trait LocationData {
 
   val akkaRegistration: Registration       = AkkaRegistration(akkaConnection, uriPath, metadata)
   val httpRegistration: Registration       = HttpRegistration(httpConnection, port, pathString)
-  val publicHttpRegistration: Registration = HttpRegistration(httpConnection, port, pathString, NetworkType.Public)
+  val publicHttpRegistration: Registration = HttpRegistration(httpConnection, port, pathString, NetworkType.Outside)
   val tcpRegistration: Registration        = TcpRegistration(tcpConnection, port)
 
   val akkaLocation: Location = AkkaLocation(akkaConnection, uriPath, metadata)

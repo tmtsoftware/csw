@@ -27,7 +27,8 @@ To run a client app with AAS access, we need
 * A protected HTTP server running
 
 All of these can be running on different machines. To start a Location Service and AAS 
-server on a local machine, you can make use of the`csw-services.sh` script.
+server on a local machine, you can make use of the @ref:[csw-services](../../apps/cswservices.md) application.
+
 
 ## Application Configurations
 

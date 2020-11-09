@@ -60,7 +60,7 @@ class HttpService(
 
   private def bind() = {
 
-    val _host = Networks(NetworkType.Public.envKey).hostname
+    val _host = Networks(NetworkType.Outside.envKey).hostname
     val _port = settings.`service-port`
 
     Http().newServerAt(_host, _port).bind(configServiceRoute.route)
@@ -71,7 +71,7 @@ class HttpService(
       connection = ConfigServiceConnection.value,
       port = binding.localAddress.getPort,
       path = "",
-      NetworkType.Public
+      NetworkType.Outside
     )
     log.info(
       s"Registering Config Service HTTP Server with Location Service using registration: [${registration.toString}]"

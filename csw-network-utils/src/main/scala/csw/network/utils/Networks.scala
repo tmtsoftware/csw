@@ -69,12 +69,12 @@ object Networks {
 
   /**
    * Picks an appropriate ipv4 address from the network interface provided.
-   * If None interfaceName provided, it will try to read from env variable PUBLIC_INTERFACE_NAME
+   * If None interfaceName provided, it will try to read from env variable AAS_INTERFACE_NAME
    * In tests(csw-networks.hostname.automatic=on), If no specific network interface is provided, the first available
    * interface will be taken to pick address
    */
   def publicInterface(interfaceName: Option[String]): Networks =
-    getNetwork(interfaceName, fallbackEnvKey = "PUBLIC_INTERFACE_NAME")
+    getNetwork(interfaceName, fallbackEnvKey = "AAS_INTERFACE_NAME")
 
   private def getNetwork(interfaceName: Option[String], fallbackEnvKey: String): Networks =
     interfaceName match {

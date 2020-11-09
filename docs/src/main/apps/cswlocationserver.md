@@ -1,10 +1,10 @@
 # csw-location-server
 
-Note: Normally you will not need to start this application manually. The csw-services.sh script does this for you. 
+Note: Normally you will not need to start this application manually. The `csw-services` application does this for you, refer @ref:[here](cswservices.md). 
 
-This application will start a HTTP CSW Location Server on port 7654 which is required for all Location Service consumers who uses HTTP Location client.
-All components (HCD's, Assemblies, Services etc.) use a local HTTP Location client which expects the Location Server running at localhost:7654.
-In a production environment, it is required that all machines running components should have the HTTP Location Server running locally.
+This application will start a HTTP CSW Location Service on port 7654 which is required for all Location Service consumers who uses HTTP Location client.
+All components (HCD's, Assemblies, Services etc.) use a local HTTP Location client which expects the Location Service running at localhost:7654.
+In a production environment, it is required that all machines running components should have the HTTP Location Service running locally.
 
 @@@ note
 

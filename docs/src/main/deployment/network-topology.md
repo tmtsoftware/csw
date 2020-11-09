@@ -16,12 +16,6 @@ There are two network in this network topology.
 
 ## Examples
 
-* Gateway should be accessed in `Outside` network, hence it is auth enabled and its public IP is registered with location
+* Gateway should be accessed in `Outside` network, hence it is auth enabled and its outside IP is registered with location
  service.
-* HCD/Assembly should be accessed within `Inside` network only, hence their private IP is registered with location service
-
-## Terminologies
-
-* `Private` and `Inside` network means the same thing 
-* `Public` and `Outside` network means the same thing 
-
+* HCD/Assembly should be accessed within `Inside` network only, hence their inside IP is registered with location service

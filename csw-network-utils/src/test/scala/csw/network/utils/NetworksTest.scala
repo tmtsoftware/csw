@@ -63,7 +63,7 @@ class NetworksTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with
     val networkInterfaceNotProvided = intercept[NetworkInterfaceNotProvided] {
       Networks.publicInterface(None)
     }
-    networkInterfaceNotProvided.getMessage shouldBe "PUBLIC_INTERFACE_NAME env variable is not set."
+    networkInterfaceNotProvided.getMessage shouldBe "AAS_INTERFACE_NAME env variable is not set."
   }
 
   test("Should filter ipv6 addresses | ") {

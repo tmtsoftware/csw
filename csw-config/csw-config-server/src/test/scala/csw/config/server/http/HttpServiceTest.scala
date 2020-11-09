@@ -45,7 +45,7 @@ class HttpServiceTest extends HTTPLocationService {
    * appropriate interface and hostname, which means Networks().hostname and Networks(NetworkType.Public.envKey)
    * .hostname will be same in tests.
    */
-  private val hostname: String = Networks(NetworkType.Public.envKey).hostname
+  private val hostname: String = Networks(NetworkType.Outside.envKey).hostname
 
   test("should bind the http server and register it with location service | CSW-97") {
     val _servicePort = 4005
@@ -86,7 +86,7 @@ class HttpServiceTest extends HTTPLocationService {
     val serverWiring         = ServerWiring.make(Some(_servicePort))
     import serverWiring._
     locationService
-      .register(models.HttpRegistration(ConfigServiceConnection.value, _existingServicePort, "", NetworkType.Public))
+      .register(models.HttpRegistration(ConfigServiceConnection.value, _existingServicePort, "", NetworkType.Outside))
       .futureValue
     locationService.find(ConfigServiceConnection.value).futureValue.get.connection shouldBe ConfigServiceConnection.value
 
