@@ -55,9 +55,32 @@ pipeline {
                 sh "sbt -DenableFatalWarnings=true 'integration/multi-jvm:test'"
             }
         }
+
+        stage('Package') {
+            steps {
+                sh "./integration/scripts/package_integration.sh"
+            }
+        }
+
+        stage('Multi-NICs Docker') {
+            steps {
+                sh "./integration/scripts/multiple_nic_test.sh"
+            }
+        }
+
+        stage('Paradox Validate Links') {
+            steps {
+                sh "sbt docs/paradoxValidateLinks"
+            }
+        }
     }
     post {
         always {
+            // Generate RTM
+            sh "./scripts/coursier launch --channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/apps.json rtm:d1c8c7e -- target/RTM/testStoryMapping.txt tools/RTM/cswStoryToRequirementMap.csv target/RTM/testRequirementsMapping.txt"
+            // Upload RTM
+            archiveArtifacts artifacts: 'target/RTM/*.*'
+
             script {
                 sendNotification(currentBuild.result)
             }
