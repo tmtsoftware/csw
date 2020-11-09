@@ -22,7 +22,7 @@ object CommandKey {
 }
 
 // maps to command roles config file
-case class CommandRoles private (private[auth] val predefinedRoles: Map[CommandKey, Roles]) {
+case class CommandRoles private[csw] (private[auth] val predefinedRoles: Map[CommandKey, Roles]) {
   def hasAccess(cmdKey: CommandKey, subsystem: Subsystem, rolesFromToken: Roles): Boolean = {
     def subsystemRoleNotPresentIn(allowedRoles: Roles): Boolean =
       !allowedRoles.containsAnyRole(subsystem)
