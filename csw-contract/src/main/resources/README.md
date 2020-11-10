@@ -1,6 +1,6 @@
 # Service contracts
 
-This page describes possible ways of accessing various services via HTTP/Websocket and sample JSON representation of request body, response body and error body. 
+This page describes possible ways of accessing various services via HTTP/Websocket and sample JSON representation of request body, response body and error body.
 
 ### Http endpoint
 
@@ -17,8 +17,8 @@ Make sure to replace the `host` and `port` of the running location service on lo
 ## JSON Contract
 * Request sample, response types and error types for every endpoints of all service is described in `allServiceData.json`
 * `allServiceData.json` contains the single page summary of all services i.e. location-service, command-service, etc.
-* Also Samples describing how to create requests, possible responses and possible errors can be found in same file.     
+* Also Samples describing how to create requests, possible responses and possible errors can be found in same file.
 
 ## Change
 
-This is the base version - 1
+This is the base version - 3

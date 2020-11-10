@@ -29,5 +29,5 @@
 8. Exclude projects from `build.sbt` which you do not want to release
 9. Run `release.sh $VERSION$` script by providing version number argument (This triggers release workflow)
 
-    **Note:** `PROD=true` environment varibale needs to be set before running `release.sh`
+    **Note:** `PROD=true` environment variable needs to be set before running `release.sh`
 

@@ -9,7 +9,7 @@ The product is in a new repository: [csw](https://github.com/tmtsoftware/csw).
 
 All notable changes to this project will be documented in this file.
 
-## [CSW upcoming version]
+## [CSW v3.0.0-RC1] - 2020-11-10
 - `->` method on a Key now takes a single parameter instead of varargs. For varargs, please use `set` method.
 - `->` method on a Key that took an array of values has been removed. Please use `setAll` method instead.
 - `->` Removed usage of client-role and used realm-role instead in location server and config server routes.
@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file.
 - Changed the installation of csw-apps, coursier to be used to install applications instead of downloading apps.zip from release page.
 - logging-aggregator-<some-version>.zip will be available on the release page.
 - Added Restrictions while creating Parameter key. It cannot have `[`, `]` or `/` characters in the key name.
+- Changed Naming convention for network interface names from  `Public` and `Private` to `Outside` and `Inside` respectively.
 
 ## [CSW v3.0.0-M1] - 2020-09-24
 - `->` method on a Key now takes a single parameter instead of varargs. For varargs, please use `set` method.

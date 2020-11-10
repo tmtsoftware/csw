@@ -1,9 +1,6 @@
 package csw.params.core.generics
 
-import java.util.regex.Pattern
-
 import csw.params.core.models.Units
-
 import scala.annotation.varargs
 import scala.collection.mutable
 import scala.reflect.ClassTag
