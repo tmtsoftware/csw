@@ -18,8 +18,8 @@ import scala.runtime.ScalaRunTime._
  * @param units applicable units
  */
 case class Key[S: ClassTag] private[generics] (keyName: String, keyType: KeyType[S], units: Units) {
-  private val invalidKeyName: Boolean = Pattern.compile("[\\[\\]/]").matcher(keyName).find()
-  require(!invalidKeyName, "Invalid Key name: Key cannot have '[' , ']' or '/' in its name")
+  private val invalidKeyName = List("[", "]", "/")
+  require(!invalidKeyName.exists(keyName.contains), "Invalid Key name: Key cannot have '[' , ']' or '/' in its name")
 
   /**
    * Set values against this key
