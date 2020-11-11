@@ -9,7 +9,7 @@ It provides following libraries (aka adapters). For information on _using_ these
 
 - @ref:[Akka HTTP Adapter - csw-aas-http](../../services/aas/csw-aas-http.md) - This is adapter which enables security for akka http server applications 
 - @ref:[Installed Auth Adapter - csw-aas-installed](../../services/aas/csw-aas-installed.md) - This is adapter which enables security for cli applications 
-- @extref[Javascript Adapter - ESW-TS](esw_ts:aas/auth-components) - This is adapter which enables security for javascript react applications
+- @extref[Javascript Adapter - ESW-TS](esw_ts:aas/auth-components.html) - This is adapter which enables security for javascript react applications
 
 These adapters are written on top of [client adapters](https://www.keycloak.org/docs/latest/securing_apps/index.html#what-are-client-adapters) provided by keycloak.
 
@@ -19,4 +19,4 @@ For more information on internals of these adapters, refer to following sections
 
 - @ref:[Akka HTTP Adapter - csw-aas-http](./csw-aas-http.md) 
 - @ref:[Installed Auth Adapter - csw-aas-installed](./csw-aas-installed.md) 
-- @extref[Javascript Adapter - ESW-TS](esw_ts:aas/auth-components) 
+- @extref[Javascript Adapter - ESW-TS](esw_ts:aas/auth-components.html)
