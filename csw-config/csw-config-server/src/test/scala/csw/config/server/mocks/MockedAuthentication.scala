@@ -25,7 +25,7 @@ trait MockedAuthentication {
   when(authConfig.getDeployment).thenReturn(keycloakDeployment)
 
   val roleMissingTokenStr = "rolemissing"
-  val validTokenStr       = "valid"
+  val validTokenStr       = "validToken"
   val invalidTokenStr     = "invalid"
 
   val preferredUserName = "root"
