@@ -19,7 +19,7 @@ private[testkit] trait MockedAuthentication extends MockitoSugar {
   private val authConfig: AuthConfig = mock[AuthConfig]
   when(authConfig.getDeployment).thenReturn(keycloakDeployment)
 
-  private val validTokenStr           = "valid"
+  private val validTokenStr           = "validToken"
   private val validToken: AccessToken = mock[AccessToken]
 
   val tokenValidator: TokenValidator = {
@@ -33,6 +33,9 @@ private[testkit] trait MockedAuthentication extends MockitoSugar {
   when(validToken.hasRealmRole("config-admin")).thenReturn(true)
   when(validToken.preferred_username).thenReturn(Some("test"))
   when(validToken.userOrClientName).thenReturn("test")
+
+  private val AdminRole = "location-admin"
+  when(validToken.hasRealmRole(AdminRole)).thenReturn(true)
 
   private val factory: TokenFactory = mock[TokenFactory]
   when(factory.getToken).thenReturn(validTokenStr)

@@ -3,9 +3,10 @@ package csw.testkit
 import akka.http.scaladsl.Http
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
+import csw.aas.http.SecurityDirectives
 import csw.location.server.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.location.server.internal.{ServerWiring, Settings}
-import csw.testkit.internal.TestKitUtils
+import csw.testkit.internal.{MockedAuthentication, TestKitUtils}
 
 /**
  * LocationTestKit supports starting HTTP Location Server backed by Akka cluster and Distributed Data
@@ -22,7 +23,7 @@ import csw.testkit.internal.TestKitUtils
  *
  * }}}
  */
-final class LocationTestKit private (testKitSettings: TestKitSettings, enableAuth: Boolean) {
+final class LocationTestKit private (testKitSettings: TestKitSettings, enableAuth: Boolean) extends MockedAuthentication {
   private lazy val locationWiring =
     if (enableAuth) {
       new ServerWiring(enableAuth) {
@@ -30,6 +31,7 @@ final class LocationTestKit private (testKitSettings: TestKitSettings, enableAut
           override val clusterPort: Int = testKitSettings.LocationAuthClusterPort
           override val httpPort: Int    = testKitSettings.LocationAuthHttpPort
         }
+        override lazy val securityDirectives: SecurityDirectives = _securityDirectives
         override lazy val clusterSettings: ClusterSettings =
           ClusterAwareSettings.joinLocal(testKitSettings.LocationClusterPort)
       }
