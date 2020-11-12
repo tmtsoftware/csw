@@ -69,7 +69,7 @@ class LocationRequestHandlerTest
   private val locationAdminRolePolicy = RealmRolePolicy("location-admin")
   private val accessTokenDirective    = BasicDirectives.extract(_ => accessToken)
 
-  test("register must check if user has location admin role and delegate to locationService.register") {
+  test("register must check if user has location admin role and delegate to locationService.register | CSW-98") {
     when(registrationResult.location).thenReturn(location)
     when(securityDirectives.sPost(locationAdminRolePolicy)).thenReturn(accessTokenDirective)
     when(locationService.register(registration)).thenReturn(Future.successful(registrationResult))
@@ -81,7 +81,7 @@ class LocationRequestHandlerTest
     }
   }
 
-  test("unregisterAll must check if user has location admin role and delegate to locationService.unregisterAll") {
+  test("unregisterAll must check if user has location admin role and delegate to locationService.unregisterAll | CSW-98 ") {
     when(securityDirectives.sPost(locationAdminRolePolicy)).thenReturn(accessTokenDirective)
     when(locationService.unregisterAll()).thenReturn(Future.successful(Done))
 
@@ -92,7 +92,7 @@ class LocationRequestHandlerTest
     }
   }
 
-  test("unregister must check if user has location admin role and delegate to locationService.unregister") {
+  test("unregister must check if user has location admin role and delegate to locationService.unregister | CSW-98") {
     when(securityDirectives.sPost(locationAdminRolePolicy)).thenReturn(accessTokenDirective)
     when(locationService.unregister(connection)).thenReturn(Future.successful(Done))
 
@@ -103,7 +103,7 @@ class LocationRequestHandlerTest
     }
   }
 
-  test("Find must delegate to locationService.find") {
+  test("Find must delegate to locationService.find | CSW-98") {
     val maybeLocation = Some(location)
     when(locationService.find(connection)).thenReturn(Future.successful(maybeLocation))
 
@@ -113,7 +113,7 @@ class LocationRequestHandlerTest
     }
   }
 
-  test("Resolve must delegate to locationService.Resolve") {
+  test("Resolve must delegate to locationService.Resolve | CSW-98") {
     val maybeLocation = Some(location)
     when(locationService.resolve(connection, timeout)).thenReturn(Future.successful(maybeLocation))
 
@@ -123,7 +123,7 @@ class LocationRequestHandlerTest
     }
   }
 
-  test("ListByComponentType must delegate to locationService.list") {
+  test("ListByComponentType must delegate to locationService.list | CSW-98") {
     when(locationService.list(componentType)).thenReturn(Future.successful(locations))
 
     Post("/post-endpoint", ListByComponentType(componentType).narrow) ~> route ~> check {
@@ -132,7 +132,7 @@ class LocationRequestHandlerTest
     }
   }
 
-  test("ListByConnectionType must delegate to locationService.list") {
+  test("ListByConnectionType must delegate to locationService.list | CSW-98") {
     val connectionType = RandomUtils.randomFrom(ConnectionType.values)
     when(locationService.list(connectionType)).thenReturn(Future.successful(locations))
 
@@ -142,7 +142,7 @@ class LocationRequestHandlerTest
     }
   }
 
-  test("ListByHostname must delegate to locationService.list") {
+  test("ListByHostname must delegate to locationService.list | CSW-98") {
     when(locationService.list(hostname)).thenReturn(Future.successful(locations))
 
     Post("/post-endpoint", ListByHostname(hostname).narrow) ~> route ~> check {
@@ -151,7 +151,7 @@ class LocationRequestHandlerTest
     }
   }
 
-  test("ListByPrefix must delegate to locationService.listByPrefix") {
+  test("ListByPrefix must delegate to locationService.listByPrefix | CSW-98") {
     val prefixStr = prefix.toString
     when(locationService.listByPrefix(prefixStr)).thenReturn(Future.successful(locations))
 
