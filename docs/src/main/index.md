@@ -228,15 +228,16 @@ Common Software are included in the 1.0.0 release and subsequent releases. Relea
 primary deliverable of the CSW construction work package.
 CSW is now in the maintenance phase. During the maintenance phase we expect twice per year maintenance releases of CSW.
 
+Version 2 of CSW was released in March, 2020. Version 3 of CSW was released in December, 2020.
+
 Members of TMT work packages can add issues at the internal maintenance [site](/login.jsp?os_destination=%2Fsecure%2FRapidBoard.jspa%3FrapidView%3D57).    
 
-**What to expect from releases after 1.0.0?**
+**What to expect from releases after Release 3?**
 
-- Upgrade to Scala 2.13
-- Upgrade to Akka 2.6 
-- Updates of dependencies
+- Upgrade to Scala 3.0/Dotty
+- Updates of dependencies as needed
 - Bug fixes and improvements based on user input
-- Any changes needed to support ESW
+- Any changes needed to support ESW/DMS development
 
 ## HTTP-based services API documentation
 **Documentation for HTTP based services could be found [here](swagger/index.html).**
