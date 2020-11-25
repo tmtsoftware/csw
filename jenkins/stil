@@ -17,8 +17,8 @@ pipeline {
 
         stage('Build') {
             steps {
+                sh "sbt clean"
                 sh "sbt scalafmtCheck"
-                // sh "sbt clean makeSite"
                 sh "sbt -DenableFatalWarnings=true ';set every Seq(scalafmtOnCompile := false); scalastyle; test:compile; multi-jvm:compile;'"
             }
         }
