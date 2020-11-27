@@ -1240,7 +1240,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
 
   // DEOPS-CSW-MAINT-116: Restrict "[" , "]" and "/" chars in key name of Parameter model
   describe(" Restrict character from key name") {
-    it("should not allow [ ]  or /") {
+    it("should not allow [ ]  or / | DEOPS-CSW-MAINT-116") {
       a[IllegalArgumentException] shouldBe thrownBy(KeyType.SolarSystemCoordKey.make("test0]"))
       a[IllegalArgumentException] shouldBe thrownBy(KeyType.BooleanKey.make("test[0"))
       a[IllegalArgumentException] shouldBe thrownBy(KeyType.ChoiceKey.make("test[0]", "1"))
