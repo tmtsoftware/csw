@@ -53,7 +53,7 @@ class LocationAuthTestWithKeycloak
   }
 
   test(
-    "unregisterAll (protected route) should return 401 when client does not provide token | CSW-89"
+    "unregisterAll (protected route) should return 401 when client does not provide token | CSW-98, CSW-89"
   ) {
     val locationClientWithoutToken = HttpLocationServiceFactory.make("localhost", httpPort)
     val exception                  = intercept[Exception](locationClientWithoutToken.unregisterAll().futureValue)
