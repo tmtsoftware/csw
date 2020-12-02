@@ -58,7 +58,7 @@ pipeline {
 
         stage('Package') {
             steps {
-                sh "./integration/scripts/package_integration.sh"
+                sh "./integration/scripts/bootstrap_standalone_jars.sh"
             }
         }
 
