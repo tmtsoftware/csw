@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                sh "git checkout tags/$VERSION"
+                sh "git checkout $VERSION"
             }
         }
 
