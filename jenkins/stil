@@ -27,10 +27,10 @@ pipeline {
         stage('Unit and Component Tests') {
             steps {
                 // Run all tests except csw-time tests
-                sh "sbt -DenableFatalWarnings=true -DenableCoverage=true -DdisableTimeTests 'test:test'"
+                sh "sbt -DenableFatalWarnings=true -Dakka.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true -DdisableTimeTests 'test:test'"
 
                 // Run csw-time module tests
-                sh "sbt -DenableFatalWarnings=true -DenableCoverage=true 'csw-time/test:test'"
+                sh "sbt -DenableFatalWarnings=true -Dakka.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true 'csw-time/test:test'"
             }
             post {
                 always {
