@@ -17,7 +17,7 @@ ORANGE='\033[0;33m'
 PURPLE='\033[0;35m'
 NC='\033[0m' # No Color
 
-HOST_DIR_MAPPING="-v$(pwd):/source/csw"
+HOST_DIR_MAPPING="-v"$(pwd)":/source/csw:z"
 echo "${HOST_DIR_MAPPING}"
 
 SBT_IMG_TAG="hseeberger/scala-sbt:11.0.6_1.3.8_2.13.1"
