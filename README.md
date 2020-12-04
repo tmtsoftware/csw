@@ -50,6 +50,7 @@ You can find the Scala API documentation for CSW [here](https://tmtsoftware.gith
 
 The Java API docs are [here](https://tmtsoftware.github.io/csw/api/java/?/index.html).
 
+
 ## Build Instructions
 
 To build everything, including the documentation, run:
