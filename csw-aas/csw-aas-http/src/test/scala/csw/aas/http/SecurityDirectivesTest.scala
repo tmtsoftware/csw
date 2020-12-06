@@ -2,20 +2,15 @@ package csw.aas.http
 
 import java.net.URI
 
-import akka.http.javadsl.server.AuthenticationFailedRejection
-import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
-import akka.http.scaladsl.server.{Directives, Route}
+import akka.http.scaladsl.model.HttpMethods._
+import akka.http.scaladsl.server.Directives
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import com.typesafe.config.ConfigValueFactory
 import csw.aas.core.commons.AASConnection
-import csw.aas.http.AuthorizationPolicy.{CustomPolicy, RealmRolePolicy}
 import csw.location.api.models.Connection.HttpConnection
 import csw.location.api.models.{HttpLocation, Metadata}
 import csw.location.api.scaladsl.LocationService
-import msocket.security.AccessControllerFactory
-import msocket.security.api.TokenValidator
-import msocket.security.models.AccessToken
+import msocket.security.api.AuthorizationPolicy
 import org.mockito.ArgumentMatchersSugar._
 import org.mockito.MockitoSugar
 import org.scalatest.funsuite.AnyFunSuite
@@ -27,127 +22,54 @@ import scala.concurrent.duration.FiniteDuration
 //DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
 class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
-  test("secure using customPolicy should return 200 OK when policy matches | DEOPSCSW-579") {
-    val tokenValidator     = mock[TokenValidator]
-    val securityDirectives = new SecurityDirectives(new AccessControllerFactory(tokenValidator, true), "TMT")
-    import securityDirectives._
+  test("sGet should call validate with GET and policy | DEOPSCSW-579") {
+    val policyValidator    = mock[PolicyValidator]
+    val policy             = mock[AuthorizationPolicy]
+    val securityDirectives = new SecurityDirectives(policyValidator)
 
-    val validTokenWithPolicyMatchStr    = "validTokenWithPolicyMatch"
-    val validTokenWithPolicyMatchHeader = Authorization(OAuth2BearerToken(validTokenWithPolicyMatchStr))
+    securityDirectives.sGet(policy)
 
-    val validTokenWithPolicyMatch = mock[AccessToken]
-
-    when(tokenValidator.validate(validTokenWithPolicyMatchStr)).thenReturn(Future.successful(validTokenWithPolicyMatch))
-
-    val route: Route = post {
-      secure(CustomPolicy(_ => true)) { _ => complete("OK") }
-    }
-
-    Post("/").addHeader(validTokenWithPolicyMatchHeader) ~> route ~> check {
-      status shouldBe StatusCodes.OK
-    }
+    verify(policyValidator).validate(GET, policy)
   }
 
-  test("secure using customPolicy should return 200 OK when token not passed and auth is disabled | DEOPSCSW-579") {
-    val tokenValidator     = mock[TokenValidator]
-    val securityDirectives = new SecurityDirectives(new AccessControllerFactory(tokenValidator, false), "TMT")
-    import securityDirectives._
+  test("sPost should call validate with POST and policy | DEOPSCSW-579") {
+    val policyValidator    = mock[PolicyValidator]
+    val policy             = mock[AuthorizationPolicy]
+    val securityDirectives = new SecurityDirectives(policyValidator)
 
-    val route: Route = post {
-      secure(CustomPolicy(_ => false)) { _ => complete("OK") }
-    }
+    securityDirectives.sPost(policy)
 
-    Post("/") ~> route ~> check {
-      status shouldBe StatusCodes.OK
-    }
+    verify(policyValidator).validate(POST, policy)
   }
 
-  test("sGet using customPolicy should return 200 OK when policy matches | DEOPSCSW-579") {
-    val tokenValidator     = mock[TokenValidator]
-    val securityDirectives = new SecurityDirectives(new AccessControllerFactory(tokenValidator, true), "TMT")
-    import securityDirectives._
+  test("sDelete should call validate with DELETE and policy | DEOPSCSW-579") {
+    val policyValidator    = mock[PolicyValidator]
+    val policy             = mock[AuthorizationPolicy]
+    val securityDirectives = new SecurityDirectives(policyValidator)
 
-    val validTokenWithPolicyMatchStr    = "validTokenWithPolicyMatch"
-    val validTokenWithPolicyMatchHeader = Authorization(OAuth2BearerToken(validTokenWithPolicyMatchStr))
+    securityDirectives.sDelete(policy)
 
-    val validTokenWithPolicyMatch = mock[AccessToken]
-
-    when(tokenValidator.validate(validTokenWithPolicyMatchStr)).thenReturn(Future.successful(validTokenWithPolicyMatch))
-
-    val route: Route = sGet(CustomPolicy(_ => true)) { _ => complete("OK") }
-
-    Get("/").addHeader(validTokenWithPolicyMatchHeader) ~> route ~> check {
-      status shouldBe StatusCodes.OK
-    }
+    verify(policyValidator).validate(DELETE, policy)
   }
 
-  test("sPost using realmRole should return 200 OK when token is valid & has realmRole | DEOPSCSW-579") {
-    val tokenValidator     = mock[TokenValidator]
-    val securityDirectives = new SecurityDirectives(new AccessControllerFactory(tokenValidator, true), "TMT")
-    import securityDirectives._
+  test("sHead should call validate with DELETE and policy | DEOPSCSW-579") {
+    val policyValidator    = mock[PolicyValidator]
+    val policy             = mock[AuthorizationPolicy]
+    val securityDirectives = new SecurityDirectives(policyValidator)
 
-    val validTokenWithRealmRoleStr    = "validTokenWithRealmRoleStr"
-    val validTokenWithRealmRole       = mock[AccessToken]
-    val validTokenWithRealmRoleHeader = Authorization(OAuth2BearerToken(validTokenWithRealmRoleStr))
-    when(validTokenWithRealmRole.hasRealmRole("admin")).thenReturn(true)
+    securityDirectives.sHead(policy)
 
-    when(tokenValidator.validate(validTokenWithRealmRoleStr)).thenReturn(Future.successful(validTokenWithRealmRole))
-
-    val route: Route = sPost(RealmRolePolicy("admin")) { _ => complete("OK") }
-
-    Post("/").addHeader(validTokenWithRealmRoleHeader) ~> route ~> check {
-      status shouldBe StatusCodes.OK
-    }
+    verify(policyValidator).validate(HEAD, policy)
   }
 
-  test("sDelete using realmRole should return 200 OK when token is valid & has realmRole | DEOPSCSW-579") {
-    val tokenValidator     = mock[TokenValidator]
-    val securityDirectives = new SecurityDirectives(new AccessControllerFactory(tokenValidator, true), "TMT")
-    import securityDirectives._
+  test("sPatch should call validate with PATCH and policy | DEOPSCSW-579") {
+    val policyValidator    = mock[PolicyValidator]
+    val policy             = mock[AuthorizationPolicy]
+    val securityDirectives = new SecurityDirectives(policyValidator)
 
-    val validTokenWithRealmRoleStr    = "validTokenWithRealmRoleStr"
-    val validTokenWithRealmRole       = mock[AccessToken]
-    val validTokenWithRealmRoleHeader = Authorization(OAuth2BearerToken(validTokenWithRealmRoleStr))
-    when(validTokenWithRealmRole.hasRealmRole("admin")).thenReturn(true)
+    securityDirectives.sPatch(policy)
 
-    when(tokenValidator.validate(validTokenWithRealmRoleStr)).thenReturn(Future.successful(validTokenWithRealmRole))
-
-    val route: Route = sDelete(RealmRolePolicy("admin")) { _ => complete("OK") }
-
-    Delete("/").addHeader(validTokenWithRealmRoleHeader) ~> route ~> check {
-      status shouldBe StatusCodes.OK
-    }
-  }
-
-  test("sHead using realmRole should return 200 OK when token is valid & has realmRole | DEOPSCSW-579") {
-    val tokenValidator     = mock[TokenValidator]
-    val securityDirectives = new SecurityDirectives(new AccessControllerFactory(tokenValidator, true), "TMT")
-    import securityDirectives._
-
-    val validTokenWithRealmRoleStr    = "validTokenWithRealmRoleStr"
-    val validTokenWithRealmRole       = mock[AccessToken]
-    val validTokenWithRealmRoleHeader = Authorization(OAuth2BearerToken(validTokenWithRealmRoleStr))
-    when(validTokenWithRealmRole.hasRealmRole("admin")).thenReturn(true)
-
-    when(tokenValidator.validate(validTokenWithRealmRoleStr)).thenReturn(Future.successful(validTokenWithRealmRole))
-
-    val route: Route = sHead(RealmRolePolicy("admin")) { _ => complete("OK") }
-
-    Head("/").addHeader(validTokenWithRealmRoleHeader) ~> route ~> check {
-      status shouldBe StatusCodes.OK
-    }
-  }
-
-  test("sPatch using customPolicy should return AuthenticationFailedRejection when token is not present | DEOPSCSW-579") {
-    val tokenValidator     = mock[TokenValidator]
-    val securityDirectives = new SecurityDirectives(new AccessControllerFactory(tokenValidator, true), "TMT")
-    import securityDirectives._
-
-    val route: Route = sPatch(CustomPolicy(_ => false)) { _ => complete("OK") }
-
-    Patch("/") ~> route ~> check {
-      rejection shouldBe a[AuthenticationFailedRejection]
-    }
+    verify(policyValidator).validate(PATCH, policy)
   }
 
   test("apply should not resolve AAS location when auth param is disabled | DEOPSCSW-579") {

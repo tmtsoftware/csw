@@ -1,7 +1,7 @@
 package csw.testkit.internal
 
 import csw.aas.core.deployment.AuthConfig
-import csw.aas.http.SecurityDirectives
+import csw.aas.http.{PolicyValidator, SecurityDirectives}
 import csw.config.api.TokenFactory
 import msocket.security.AccessControllerFactory
 import msocket.security.api.TokenValidator
@@ -26,9 +26,9 @@ private[testkit] trait MockedAuthentication extends MockitoSugar {
     case `validTokenStr` => Future.successful(validToken)
     case token           => Future.failed(new RuntimeException(s"unexpected token $token"))
   }
-
+  val policyValidator = new PolicyValidator(new AccessControllerFactory(tokenValidator, true), keycloakDeployment.getRealm)
   val _securityDirectives =
-    new SecurityDirectives(new AccessControllerFactory(tokenValidator, true), keycloakDeployment.getRealm)
+    new SecurityDirectives(policyValidator)
 
   when(validToken.hasRealmRole("config-admin")).thenReturn(true)
   when(validToken.preferred_username).thenReturn(Some("test"))

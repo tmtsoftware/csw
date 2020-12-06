@@ -1,6 +1,7 @@
 package csw.aas.http
 
 import akka.http.javadsl.server.{AuthenticationFailedRejection, AuthorizationFailedRejection}
+import akka.http.scaladsl.model.HttpMethods.GET
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
 import akka.http.scaladsl.server.{Directives, Route}
@@ -19,8 +20,8 @@ import scala.concurrent.Future
 class CustomPolicyTest extends AnyFunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
   test("custom policy should return AuthenticationFailedRejection when token is invalid | DEOPSCSW-579") {
-    val tokenValidator     = mock[TokenValidator]
-    val securityDirectives = new SecurityDirectives(new AccessControllerFactory(tokenValidator, true), "TMT")
+    val tokenValidator  = mock[TokenValidator]
+    val policyValidator = new PolicyValidator(new AccessControllerFactory(tokenValidator, true), "TMT")
 
     val invalidTokenStr    = "invalid"
     val invalidTokenHeader = Authorization(OAuth2BearerToken(invalidTokenStr))
@@ -28,7 +29,7 @@ class CustomPolicyTest extends AnyFunSuite with MockitoSugar with Directives wit
     when(tokenValidator.validate(invalidTokenStr)).thenReturn(Future.failed(new RuntimeException("invalid")))
 
     val route: Route =
-      securityDirectives.secure(CustomPolicy(token => token.given_name.contains("John"))) { at =>
+      policyValidator.validate(GET, CustomPolicy(token => token.given_name.contains("John"))) { at =>
         get {
           complete("OK")
         }
@@ -40,10 +41,10 @@ class CustomPolicyTest extends AnyFunSuite with MockitoSugar with Directives wit
   }
 
   test("custom policy should return AuthenticationFailedRejection when token is not present | DEOPSCSW-579") {
-    val tokenValidator     = mock[TokenValidator]
-    val securityDirectives = new SecurityDirectives(new AccessControllerFactory(tokenValidator, true), "TMT")
+    val tokenValidator  = mock[TokenValidator]
+    val policyValidator = new PolicyValidator(new AccessControllerFactory(tokenValidator, true), "TMT")
 
-    val route: Route = securityDirectives.secure(CustomPolicy(_ => false)) { at =>
+    val route: Route = policyValidator.validate(GET, CustomPolicy(_ => false)) { at =>
       get {
         complete("OK")
       }
@@ -55,8 +56,8 @@ class CustomPolicyTest extends AnyFunSuite with MockitoSugar with Directives wit
   }
 
   test("custom policy should return AuthorizationFailedRejection when policy does not match | DEOPSCSW-579") {
-    val tokenValidator     = mock[TokenValidator]
-    val securityDirectives = new SecurityDirectives(new AccessControllerFactory(tokenValidator, true), "TMT")
+    val tokenValidator  = mock[TokenValidator]
+    val policyValidator = new PolicyValidator(new AccessControllerFactory(tokenValidator, true), "TMT")
 
     val validTokenWithPolicyViolationStr    = "validTokenWithPolicyViolation"
     val validTokenWithPolicyViolationHeader = Authorization(OAuth2BearerToken(validTokenWithPolicyViolationStr))
@@ -65,7 +66,7 @@ class CustomPolicyTest extends AnyFunSuite with MockitoSugar with Directives wit
 
     when(tokenValidator.validate(validTokenWithPolicyViolationStr)).thenReturn(Future.successful(validTokenWithPolicyViolation))
 
-    val route: Route = securityDirectives.secure(CustomPolicy(_ => false)) { at =>
+    val route: Route = policyValidator.validate(GET, CustomPolicy(_ => false)) { at =>
       get {
         complete("OK")
       }
@@ -77,8 +78,8 @@ class CustomPolicyTest extends AnyFunSuite with MockitoSugar with Directives wit
   }
 
   test("custom policy should return 200 OK when policy matches | DEOPSCSW-579") {
-    val tokenValidator     = mock[TokenValidator]
-    val securityDirectives = new SecurityDirectives(new AccessControllerFactory(tokenValidator, true), "TMT")
+    val tokenValidator  = mock[TokenValidator]
+    val policyValidator = new PolicyValidator(new AccessControllerFactory(tokenValidator, true), "TMT")
 
     val validTokenWithPolicyMatchStr    = "validTokenWithPolicyMatch"
     val validTokenWithPolicyMatchHeader = Authorization(OAuth2BearerToken(validTokenWithPolicyMatchStr))
@@ -87,7 +88,7 @@ class CustomPolicyTest extends AnyFunSuite with MockitoSugar with Directives wit
 
     when(tokenValidator.validate(validTokenWithPolicyMatchStr)).thenReturn(Future.successful(validTokenWithPolicyMatch))
 
-    val route: Route = securityDirectives.secure(CustomPolicy(_ => true)) { at =>
+    val route: Route = policyValidator.validate(GET, CustomPolicy(_ => true)) { at =>
       get {
         complete("OK")
       }

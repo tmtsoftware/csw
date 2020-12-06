@@ -1,13 +1,7 @@
 package csw.aas.http
 
-import akka.http.scaladsl.model.HttpMethod
 import akka.http.scaladsl.model.HttpMethods._
-import akka.http.scaladsl.model.headers.{HttpChallenges, OAuth2BearerToken}
-import akka.http.scaladsl.server.AuthenticationFailedRejection.{CredentialsMissing, CredentialsRejected}
-import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server._
-import akka.http.scaladsl.server.directives.BasicDirectives.provide
-import akka.http.scaladsl.server.directives.RouteDirectives.reject
 import com.typesafe.config.Config
 import csw.aas.core.TokenVerifier
 import csw.aas.core.commons.AuthLogger
@@ -16,52 +10,18 @@ import csw.aas.core.token.TokenFactory
 import csw.aas.core.utils.ConfigExt._
 import csw.location.api.models.HttpLocation
 import csw.location.api.scaladsl.LocationService
+import msocket.security.AccessControllerFactory
 import msocket.security.api.AuthorizationPolicy
-import msocket.security.models.{AccessStatus, AccessToken}
-import msocket.security.{AccessControllerFactory, models}
+import msocket.security.models.AccessToken
 
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.implicitConversions
 
-class SecurityDirectives private[csw] (accessControllerFactory: AccessControllerFactory, realm: String) {
+class SecurityDirectives private[csw] (policyValidator: PolicyValidator) {
   implicit def toRouteFunction(route: Route): AccessToken => Route                            = _ => route
   implicit def toBooleanFunction(bool: Boolean): AccessToken => Boolean                       = _ => bool
   implicit def toBooleanFutureFunction(bool: Future[Boolean]): AccessToken => Future[Boolean] = _ => bool
-
-  /**
-   * Rejects all un-authorized requests
-   *
-   * @param authorizationPolicy Authorization policy to use for filtering requests.
-   *                            There are different types of authorization policies. See [[csw.aas.http.AuthorizationPolicy]]
-   */
-  def secure(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] = {
-    extractStringToken.flatMap { maybeToken =>
-      extractRequestContext.flatMap { rc =>
-        import rc.executionContext
-        val accessController     = accessControllerFactory.make(maybeToken)
-        val eventualAccessStatus = accessController.authenticateAndAuthorize(Some(authorizationPolicy))
-        onSuccess(eventualAccessStatus).flatMap(getAccessToken)
-      }
-    }
-  }
-
-  private def extractStringToken: Directive1[Option[String]] = {
-    extractCredentials.map {
-      case Some(OAuth2BearerToken(token)) => Some(token)
-      case _                              => None
-    }
-  }
-
-  private def getAccessToken(accessStatus: AccessStatus): Directive1[AccessToken] = {
-    lazy val challenge = HttpChallenges.oAuth2(realm)
-    accessStatus match {
-      case models.AccessStatus.Authorized(accessToken) => provide(accessToken)
-      case models.AccessStatus.TokenMissing()          => reject(AuthenticationFailedRejection(CredentialsMissing, challenge))
-      case models.AccessStatus.AuthenticationFailed(_) => reject(AuthenticationFailedRejection(CredentialsRejected, challenge))
-      case models.AccessStatus.AuthorizationFailed(_)  => reject(AuthorizationFailedRejection)
-    }
-  }
 
   /**
    * Rejects all un-authorized and non-POST requests
@@ -69,7 +29,8 @@ class SecurityDirectives private[csw] (accessControllerFactory: AccessController
    * @param authorizationPolicy Authorization policy to use for filtering requests.
    *                            There are different types of authorization policies. See [[csw.aas.http.AuthorizationPolicy]]
    */
-  def sPost(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] = sMethod(POST, authorizationPolicy)
+  def sPost(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] =
+    policyValidator.validate(POST, authorizationPolicy)
 
   /**
    * Rejects all un-authorized and non-GET requests
@@ -77,7 +38,7 @@ class SecurityDirectives private[csw] (accessControllerFactory: AccessController
    * @param authorizationPolicy Authorization policy to use for filtering requests.
    *                            There are different types of authorization policies. See [[csw.aas.http.AuthorizationPolicy]]
    */
-  def sGet(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] = sMethod(GET, authorizationPolicy)
+  def sGet(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] = policyValidator.validate(GET, authorizationPolicy)
 
   /**
    * Rejects all un-authorized and non-GET requests
@@ -85,7 +46,7 @@ class SecurityDirectives private[csw] (accessControllerFactory: AccessController
    * @param authorizationPolicy Authorization policy to use for filtering requests.
    *                            There are different types of authorization policies. See [[csw.aas.http.AuthorizationPolicy]]
    */
-  def sPut(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] = sMethod(PUT, authorizationPolicy)
+  def sPut(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] = policyValidator.validate(PUT, authorizationPolicy)
 
   /**
    * Rejects all un-authorized and non-PUT requests
@@ -93,7 +54,8 @@ class SecurityDirectives private[csw] (accessControllerFactory: AccessController
    * @param authorizationPolicy Authorization policy to use for filtering requests.
    *                            There are different types of authorization policies. See [[csw.aas.http.AuthorizationPolicy]]
    */
-  def sDelete(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] = sMethod(DELETE, authorizationPolicy)
+  def sDelete(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] =
+    policyValidator.validate(DELETE, authorizationPolicy)
 
   /**
    * Rejects all un-authorized and non-PATCH requests
@@ -101,7 +63,8 @@ class SecurityDirectives private[csw] (accessControllerFactory: AccessController
    * @param authorizationPolicy Authorization policy to use for filtering requests.
    *                            There are different types of authorization policies. See [[csw.aas.http.AuthorizationPolicy]]
    */
-  def sPatch(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] = sMethod(PATCH, authorizationPolicy)
+  def sPatch(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] =
+    policyValidator.validate(PATCH, authorizationPolicy)
 
   /**
    * Rejects all un-authorized and non-HEAD requests
@@ -109,7 +72,8 @@ class SecurityDirectives private[csw] (accessControllerFactory: AccessController
    * @param authorizationPolicy Authorization policy to use for filtering requests.
    *                            There are different types of authorization policies. See [[csw.aas.http.AuthorizationPolicy]]
    */
-  def sHead(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] = sMethod(HEAD, authorizationPolicy)
+  def sHead(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] =
+    policyValidator.validate(HEAD, authorizationPolicy)
 
   /**
    * Rejects all un-authorized and non-CONNECT requests
@@ -117,10 +81,9 @@ class SecurityDirectives private[csw] (accessControllerFactory: AccessController
    * @param authorizationPolicy Authorization policy to use for filtering requests.
    *                            There are different types of authorization policies. See [[csw.aas.http.AuthorizationPolicy]]
    */
-  def sConnect(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] = sMethod(CONNECT, authorizationPolicy)
+  def sConnect(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] =
+    policyValidator.validate(CONNECT, authorizationPolicy)
 
-  private def sMethod(httpMethod: HttpMethod, authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] =
-    method(httpMethod) & secure(authorizationPolicy)
 }
 
 /**
@@ -171,7 +134,8 @@ object SecurityDirectives {
       )
     }
     val accessControllerFactory = new AccessControllerFactory(tokenFactory, securityEnabled)
-    new SecurityDirectives(accessControllerFactory, keycloakDeployment.getRealm)
+    val policyValidator         = new PolicyValidator(accessControllerFactory, keycloakDeployment.getRealm)
+    new SecurityDirectives(policyValidator)
   }
 
   private def enableAuthUsing(config: Config): Boolean =
