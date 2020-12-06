@@ -72,6 +72,26 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
     verify(policyValidator).validate(PATCH, policy)
   }
 
+  test("sPut should call validate with PUT and policy | DEOPSCSW-579") {
+    val policyValidator    = mock[PolicyValidator]
+    val policy             = mock[AuthorizationPolicy]
+    val securityDirectives = new SecurityDirectives(policyValidator)
+
+    securityDirectives.sPut(policy)
+
+    verify(policyValidator).validate(PUT, policy)
+  }
+
+  test("sConnect should call validate with CONNECT and policy | DEOPSCSW-579") {
+    val policyValidator    = mock[PolicyValidator]
+    val policy             = mock[AuthorizationPolicy]
+    val securityDirectives = new SecurityDirectives(policyValidator)
+
+    securityDirectives.sConnect(policy)
+
+    verify(policyValidator).validate(CONNECT, policy)
+  }
+
   test("apply should not resolve AAS location when auth param is disabled | DEOPSCSW-579") {
     val locationService: LocationService = mock[LocationService]
     SecurityDirectives(system.settings.config, locationService, enableAuth = false)
