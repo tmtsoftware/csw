@@ -1,0 +1,31 @@
+## CSW - TMT Common Software v3.0.0
+
+This is release v3.0.0 of the TMT Common Software.
+
+See [CHANGELOG.md](CHANGELOG.md) for details of all releases.
+
+### Changes
+
+- Changed behaviour of `->` method of Parameter Key class.
+- Used Realm-roles instead of Client-roles in Location server and Config server.
+- Added `metadata` field in `Location` and `Registration` model to associate additional information with `Registration`.
+- Removed `RegistrationFactory`. Use `AkkaRegistrationFactory` from Scala and `JAkkaRegistrationFactory` Java instead.
+- `initialize` and `onShutdown` handlers of ComponentHandler's are blocking now.
+- Using Coursier to for installation of CSW apps.
+- Restricted use of `[`, `]` or `/` characters in Parameter Key name.
+- Using `Outside`/`Inside` instead of `Public`/`Private` for network interface naming
+
+### Version Upgrades
+
+- Scala version upgrade to 2.13.3
+- SBT version upgrade to 1.4.2
+- Borer version upgrade to 1.6.2
+- Akka version upgrade 2.6.10
+- Akka-http version upgrade 10.2.1
+- Keycloak version upgrade 11.0.2
+- Lettuce version upgrade 6.0.1.RELEASE
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/3.0.0/
+- Scaladoc: https://tmtsoftware.github.io/csw/3.0.0/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/3.0.0/api/java/index.html
