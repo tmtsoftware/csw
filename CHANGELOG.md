@@ -9,6 +9,40 @@ The product is in a new repository: [csw](https://github.com/tmtsoftware/csw).
 
 All notable changes to this project will be documented in this file.
 
+## [CSW v3.0.0] - 2020-12-07
+
+This is the third major release of the TMT Common Software for project stakeholders.
+See [here](https://tmtsoftware.github.io/csw/3.0.0/) for a detailed documentation of this version of the CSW software.
+
+### Changes
+- `->` method on a Key now takes a single parameter instead of varargs. For varargs, please use `set` method.
+- `->` method on a Key that took an array of values has been removed. Please use `setAll` method instead.
+- `->` Removed usage of client-role and used realm-role instead in location server and config server routes.
+- Contract change for location service API for example `registration` and `location` model incorporate metadata.
+  `Metadata` is additional information associated with `registration`.
+- Removed `RegistrationFactory` from `location-server` module. Instead, following should be used by Scala and Java users to instantiate `AkkaRegistration`
+    - For Scala users, `AkkaRegistrationFactory` API change to expect actorRef instead of URI of remote actorRef
+    - For Java users, `JAkkaRegistrationFactory` is added.
+- Contract change for ComponentHandlers `initialize` and `onShutdown` method, return type changed from `Future[Unit]` to `Unit` i.e. from non-blocking to blocking.
+- Changed the installation of csw-apps, coursier to be used to install applications instead of downloading apps.zip from release page.
+- logging-aggregator-<some-version>.zip will be available on the release page.
+- Added Restrictions while creating Parameter key. It cannot have `[`, `]` or `/` characters in the key name.
+- Changed Naming convention for network interface names from  `Public` and `Private` to `Outside` and `Inside` respectively.
+
+### Version Upgrades
+- Scala version upgrade to 2.13.3
+- SBT version upgrade to 1.4.2
+- Borer version upgrade to 1.6.2
+- Akka version upgrade 2.6.10
+- Akka-http version upgrade 10.2.1
+- Keycloak version upgrade 11.0.2
+- Lettuce version upgrade 6.0.1.RELEASE
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/3.0.0/
+- Scaladoc: https://tmtsoftware.github.io/csw/3.0.0/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/3.0.0/api/java/index.html
+
 ## [CSW v3.0.0-RC1] - 2020-11-10
 - `->` method on a Key now takes a single parameter instead of varargs. For varargs, please use `set` method.
 - `->` method on a Key that took an array of values has been removed. Please use `setAll` method instead.

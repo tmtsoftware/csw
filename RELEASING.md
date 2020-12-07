@@ -27,7 +27,7 @@
 6. Add changes mention in `CHANGELOG.md` of `csw-contract` in top-level `README.md`
 7. Bump up the `csw-contract` version (if needed)
 8. Exclude projects from `build.sbt` which you do not want to release
-8. Update versions in `release.ym'` for other repos like `ESW_TS_VERSION` etc. which we will be releasing next. (These versions are used to create parameterized links in documentation)
+8. Update versions in `release.yml'` for other repos like `ESW_TS_VERSION` etc. which we will be releasing next. (These versions are used to create parameterized links in documentation)
 9. Run `release.sh $VERSION$` script by providing version number argument (This triggers release workflow)
 
     **Note:** `PROD=true` environment variable needs to be set before running `release.sh`

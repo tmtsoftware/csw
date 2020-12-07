@@ -9,11 +9,11 @@ See [CHANGELOG.md](CHANGELOG.md) for details of all releases.
 - Changed behaviour of `->` method of Parameter Key class.
 - Used Realm-roles instead of Client-roles in Location server and Config server.
 - Added `metadata` field in `Location` and `Registration` model to associate additional information with `Registration`.
-- Removed `RegistrationFactory`. Use `AkkaRegistrationFactory` from Scala and `JAkkaRegistrationFactory` Java instead.
-- `initialize` and `onShutdown` handlers of ComponentHandler's are blocking now.
-- Using Coursier to for installation of CSW apps.
+- Removed `RegistrationFactory`. Use `AkkaRegistrationFactory` from Scala and `JAkkaRegistrationFactory` from Java.
+- `initialize` and `onShutdown` handlers of ComponentHandler are blocking now.
+- Used Coursier for installation of CSW apps instead of downloading apps.zip from release page.
 - Restricted use of `[`, `]` or `/` characters in Parameter Key name.
-- Using `Outside`/`Inside` instead of `Public`/`Private` for network interface naming
+- Using `Outside`/`Inside` instead of `Public`/`Private` for network interface naming.
 
 ### Version Upgrades
 
