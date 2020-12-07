@@ -23,11 +23,22 @@ class AuthorizationPolicyTest
 
   private implicit val patience: PatienceConfig = PatienceConfig(1.seconds, 100.millis)
 
-  test("RealmRolePolicy authorize should check for realm role | DEOPSCSW-579") {
-    val realmRolePolicy = RealmRolePolicy("some-role")
+  test("RealmRolePolicy authorize should return true if token has realm role | DEOPSCSW-579") {
     val accessToken     = mock[AccessToken]
+    val realmRolePolicy = RealmRolePolicy("some-role")
+    when(accessToken.hasRealmRole("some-role")).thenReturn(true)
 
-    realmRolePolicy.authorize(accessToken)
+    realmRolePolicy.authorize(accessToken).futureValue shouldBe true
+
+    verify(accessToken).hasRealmRole("some-role")
+  }
+
+  test("RealmRolePolicy authorize should return false if token does not has realm role | DEOPSCSW-579") {
+    val accessToken     = mock[AccessToken]
+    val realmRolePolicy = RealmRolePolicy("some-role")
+    when(accessToken.hasRealmRole("some-role")).thenReturn(false)
+
+    realmRolePolicy.authorize(accessToken).futureValue shouldBe false
 
     verify(accessToken).hasRealmRole("some-role")
   }
