@@ -14,7 +14,7 @@ object Settings {
     ) ++
     addCommandAlias(
       "compileAll",
-      ";set scalafmtCheck; scalastyle; test:compile; multi-jvm:compile"
+      "; scalafmtCheck; scalastyle; test:compile; multi-jvm:compile"
     ) ++
     addCommandAlias(
       "buildAll",
