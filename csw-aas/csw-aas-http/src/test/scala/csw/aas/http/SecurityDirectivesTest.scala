@@ -22,7 +22,7 @@ import scala.concurrent.duration.FiniteDuration
 //DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
 class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
-  test("sGet should call validate with GET and policy | DEOPSCSW-579") {
+  test("sGet should call validate with HttpMethod GET and policy | DEOPSCSW-579") {
     val policyValidator    = mock[PolicyValidator]
     val policy             = mock[AuthorizationPolicy]
     val securityDirectives = new SecurityDirectives(policyValidator)
@@ -32,7 +32,7 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
     verify(policyValidator).validate(GET, policy)
   }
 
-  test("sPost should call validate with POST and policy | DEOPSCSW-579") {
+  test("sPost should call validate with HttpMethod POST and policy | DEOPSCSW-579") {
     val policyValidator    = mock[PolicyValidator]
     val policy             = mock[AuthorizationPolicy]
     val securityDirectives = new SecurityDirectives(policyValidator)
@@ -42,7 +42,7 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
     verify(policyValidator).validate(POST, policy)
   }
 
-  test("sDelete should call validate with DELETE and policy | DEOPSCSW-579") {
+  test("sDelete should call validate with HttpMethod DELETE and policy | DEOPSCSW-579") {
     val policyValidator    = mock[PolicyValidator]
     val policy             = mock[AuthorizationPolicy]
     val securityDirectives = new SecurityDirectives(policyValidator)
@@ -52,7 +52,7 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
     verify(policyValidator).validate(DELETE, policy)
   }
 
-  test("sHead should call validate with DELETE and policy | DEOPSCSW-579") {
+  test("sHead should call validate with HttpMethod HEAD and policy | DEOPSCSW-579") {
     val policyValidator    = mock[PolicyValidator]
     val policy             = mock[AuthorizationPolicy]
     val securityDirectives = new SecurityDirectives(policyValidator)
@@ -62,7 +62,7 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
     verify(policyValidator).validate(HEAD, policy)
   }
 
-  test("sPatch should call validate with PATCH and policy | DEOPSCSW-579") {
+  test("sPatch should call validate with HttpMethod PATCH and policy | DEOPSCSW-579") {
     val policyValidator    = mock[PolicyValidator]
     val policy             = mock[AuthorizationPolicy]
     val securityDirectives = new SecurityDirectives(policyValidator)
@@ -72,7 +72,7 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
     verify(policyValidator).validate(PATCH, policy)
   }
 
-  test("sPut should call validate with PUT and policy | DEOPSCSW-579") {
+  test("sPut should call validate with HttpMethod PUT and policy | DEOPSCSW-579") {
     val policyValidator    = mock[PolicyValidator]
     val policy             = mock[AuthorizationPolicy]
     val securityDirectives = new SecurityDirectives(policyValidator)
@@ -82,7 +82,7 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
     verify(policyValidator).validate(PUT, policy)
   }
 
-  test("sConnect should call validate with CONNECT and policy | DEOPSCSW-579") {
+  test("sConnect should call validate with HttpMethod CONNECT and policy | DEOPSCSW-579") {
     val policyValidator    = mock[PolicyValidator]
     val policy             = mock[AuthorizationPolicy]
     val securityDirectives = new SecurityDirectives(policyValidator)

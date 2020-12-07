@@ -11,7 +11,7 @@ import msocket.security.api.AuthorizationPolicy
 import msocket.security.models.{AccessStatus, AccessToken}
 import msocket.security.{AccessControllerFactory, models}
 
-private[http] class PolicyValidator(accessControllerFactory: AccessControllerFactory, realm: String) {
+private[csw] class PolicyValidator(accessControllerFactory: AccessControllerFactory, realm: String) {
 
   /**
    * Rejects all un-authorized requests
