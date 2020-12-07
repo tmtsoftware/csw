@@ -10,7 +10,6 @@ import csw.aas.http.AuthorizationPolicy.{CustomPolicy, RealmRolePolicy}
 import msocket.security.AccessControllerFactory
 import msocket.security.api.TokenValidator
 import msocket.security.models.AccessToken
-import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
@@ -20,7 +19,7 @@ import scala.concurrent.Future
 //DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
 class PolicyValidatorTest extends AnyFunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
-  test("validate using customPolicy should return 200 OK when policy matches | DEOPSCSW-579, CSW-98") {
+  test("validate should return 200 OK when policy matches | DEOPSCSW-579, CSW-98") {
     val tokenValidator  = mock[TokenValidator]
     val policyValidator = new PolicyValidator(new AccessControllerFactory(tokenValidator, true), "TMT")
 
@@ -28,11 +27,12 @@ class PolicyValidatorTest extends AnyFunSuite with MockitoSugar with Directives 
     val validTokenWithPolicyMatchHeader = Authorization(OAuth2BearerToken(validTokenWithPolicyMatchStr))
 
     val validTokenWithPolicyMatch = mock[AccessToken]
+    when(validTokenWithPolicyMatch.hasRealmRole("some-role")).thenReturn(true)
 
     when(tokenValidator.validate(validTokenWithPolicyMatchStr)).thenReturn(Future.successful(validTokenWithPolicyMatch))
 
     val route: Route = post {
-      policyValidator.validate(POST, CustomPolicy(_ => true)) { _ => complete("OK") }
+      policyValidator.validate(POST, RealmRolePolicy("some-role")) { _ => complete("OK") }
     }
 
     Post("/").addHeader(validTokenWithPolicyMatchHeader) ~> route ~> check {
@@ -40,12 +40,12 @@ class PolicyValidatorTest extends AnyFunSuite with MockitoSugar with Directives 
     }
   }
 
-  test("validate using customPolicy should return 200 OK when token not passed and auth is disabled | DEOPSCSW-579") {
+  test("validate should return 200 OK when token not passed and auth is disabled | DEOPSCSW-579, CSW-98") {
     val tokenValidator  = mock[TokenValidator]
     val policyValidator = new PolicyValidator(new AccessControllerFactory(tokenValidator, false), "TMT")
 
     val route: Route = post {
-      policyValidator.validate(POST, CustomPolicy(_ => true)) { _ => complete("OK") }
+      policyValidator.validate(POST, RealmRolePolicy("some-role")) { _ => complete("OK") }
     }
 
     Post("/") ~> route ~> check {
@@ -96,7 +96,7 @@ class PolicyValidatorTest extends AnyFunSuite with MockitoSugar with Directives 
     val tokenWithoutRoleHeader = Authorization(OAuth2BearerToken(tokenWithoutRoleStr))
 
     val tokenWithoutRole = mock[AccessToken]
-    when(tokenWithoutRole.hasRealmRole(any[String])).thenReturn(false)
+    when(tokenWithoutRole.hasRealmRole("some-role")).thenReturn(false)
     when(tokenValidator.validate(tokenWithoutRoleStr)).thenReturn(Future.successful(tokenWithoutRole))
 
     val route: Route = post {
