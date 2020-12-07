@@ -9,6 +9,8 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 
+import scala.concurrent.duration.DurationInt
+
 //DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
 class PolicyExpressionTest
     extends AnyFunSuite
@@ -19,6 +21,8 @@ class PolicyExpressionTest
     with ScalaFutures {
 
   case class TestCase(left: Boolean, operator: String, right: Boolean, expectedOutcome: Boolean)
+
+  private implicit val patience: PatienceConfig = PatienceConfig(1.seconds, 100.millis)
 
   val testCases = List(
     //AND truth table

@@ -11,7 +11,7 @@ import msocket.security.api.AuthorizationPolicy
 import msocket.security.models.{AccessStatus, AccessToken}
 import msocket.security.{AccessControllerFactory, models}
 
-class PolicyValidator private[csw] (accessControllerFactory: AccessControllerFactory, realm: String) {
+private[http] class PolicyValidator(accessControllerFactory: AccessControllerFactory, realm: String) {
 
   /**
    * Rejects all un-authorized requests
@@ -30,7 +30,7 @@ class PolicyValidator private[csw] (accessControllerFactory: AccessControllerFac
     }
   }
 
-  private[csw] def validate(httpMethod: HttpMethod, authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] =
+  def validate(httpMethod: HttpMethod, authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] =
     method(httpMethod) & validatePolicy(authorizationPolicy)
 
   private def extractStringToken: Directive1[Option[String]] = {
