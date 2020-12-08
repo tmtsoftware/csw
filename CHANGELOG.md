@@ -9,7 +9,7 @@ The product is in a new repository: [csw](https://github.com/tmtsoftware/csw).
 
 All notable changes to this project will be documented in this file.
 
-## [CSW v3.0.0] - 2020-12-07
+## [CSW v3.0.0] - UP-COMING
 
 This is the third major release of the TMT Common Software for project stakeholders.
 See [here](https://tmtsoftware.github.io/csw/3.0.0/) for a detailed documentation of this version of the CSW software.
@@ -43,7 +43,26 @@ See [here](https://tmtsoftware.github.io/csw/3.0.0/) for a detailed documentatio
 - Scaladoc: https://tmtsoftware.github.io/csw/3.0.0/api/scala/index.html
 - Javadoc: https://tmtsoftware.github.io/csw/3.0.0/api/java/index.html
 
+## [CSW v3.0.0-RC2] - 2020-12-08
+
+This is the release candidate 2 for the third major release of the TMT Common Software for project stakeholders.
+See [here](https://tmtsoftware.github.io/csw/3.0.0-RC2/) for a detailed documentation of this version of the CSW software.
+
+### Changes
+
+- Minor fixes in STIL pipeline
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/3.0.0-RC2/
+- Scaladoc: https://tmtsoftware.github.io/csw/3.0.0-RC2/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/3.0.0-RC2/api/java/index.html
+
 ## [CSW v3.0.0-RC1] - 2020-11-10
+This is the release candidate 1 for the third major release of the TMT Common Software for project stakeholders.
+See [here](https://tmtsoftware.github.io/csw/3.0.0-RC1/) for a detailed documentation of this version of the CSW software.
+
+
+### Changes
 - `->` method on a Key now takes a single parameter instead of varargs. For varargs, please use `set` method.
 - `->` method on a Key that took an array of values has been removed. Please use `setAll` method instead.
 - `->` Removed usage of client-role and used realm-role instead in location server and config server routes.
@@ -58,7 +77,17 @@ See [here](https://tmtsoftware.github.io/csw/3.0.0/) for a detailed documentatio
 - Added Restrictions while creating Parameter key. It cannot have `[`, `]` or `/` characters in the key name.
 - Changed Naming convention for network interface names from  `Public` and `Private` to `Outside` and `Inside` respectively.
 
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/3.0.0-RC1/
+- Scaladoc: https://tmtsoftware.github.io/csw/3.0.0-RC1/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/3.0.0-RC1/api/java/index.html
+
+
 ## [CSW v3.0.0-M1] - 2020-09-24
+This is the milestone 1 for the third major release of the TMT Common Software for project stakeholders.
+See [here](https://tmtsoftware.github.io/csw/3.0.0-M1/) for a detailed documentation of this version of the CSW software.
+
+### Changes
 - `->` method on a Key now takes a single parameter instead of varargs. For varargs, please use `set` method.
 - `->` method on a Key that took an array of values has been removed. Please use `setAll` method instead.
 - `->` Removed usage of client-role and used realm-role instead in location server and config server routes.
@@ -68,6 +97,11 @@ See [here](https://tmtsoftware.github.io/csw/3.0.0/) for a detailed documentatio
     - For Scala users, `AkkaRegistrationFactory` API change to expect actorRef instead of URI of remote actorRef
     - For Java users, `JAkkaRegistrationFactory` is added.
 - Contract change for ComponentHandlers `initialize` and `onShutdown` method, return type changed from `Future[Unit]` to `Unit` i.e. from non-blocking to blocking.
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/3.0.0-M1/
+- Scaladoc: https://tmtsoftware.github.io/csw/3.0.0-M1/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/3.0.0-M1/api/java/index.html
 
 ## [CSW v2.0.1] - 2020-03-20
 
