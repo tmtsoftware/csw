@@ -7,7 +7,7 @@ on:
 
 jobs:
   release:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     env:
       ESW_TS_VERSION: "0.1.0-RC1"
     steps:
@@ -28,8 +28,6 @@ jobs:
 
       - name: Configure ntp time
         run: |
-          sudo apt-get update -y
-          curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
           sudo apt-get install ntp -y
           sudo ntptime -T 37
 
