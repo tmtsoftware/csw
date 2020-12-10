@@ -25,7 +25,7 @@ object Main {
       val command = Command.parse(options)
       log.info(s"commandText: ${command.commandText}, command: ${command.toString}")
 
-      val locationAgent = new LocationAgent(options.prefixes, command, options.networkType, wiring)
+      val locationAgent = new LocationAgent(options.prefixes, command, options.networkType, wiring, options.agentPrefix)
       val process       = locationAgent.run()
       (process, wiring)
     }

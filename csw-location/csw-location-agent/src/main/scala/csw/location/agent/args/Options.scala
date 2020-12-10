@@ -21,6 +21,7 @@ case class Options(
     prefixes: List[Prefix] = Nil,
     command: Option[String] = None,
     port: Option[Int] = None,
+    agentPrefix: Option[Prefix] = None,
     appConfigFile: Option[File] = None,
     delay: Option[Int] = None,
     noExit: Boolean = false,

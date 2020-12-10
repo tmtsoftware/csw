@@ -61,10 +61,7 @@ class ArgsParserTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
       Array("--prefix", services)
 
     val x: Option[Options] = silentParse(args)
-    val `false`            = false
-    x should contain(
-      Options(List(Prefix(services)), None, None, None, None, noExit = false, None, outsideNetwork = `false`)
-    )
+    x should contain(Options(List(Prefix(services))))
   }
 
   test("test parser with invalid service name combinations | ") {

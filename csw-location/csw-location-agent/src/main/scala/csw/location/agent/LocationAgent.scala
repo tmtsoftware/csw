@@ -21,7 +21,13 @@ import scala.util.control.NonFatal
 /**
  * Starts a given external program ([[Connection.TcpConnection]]), registers it with the location service and unregisters it when the program exits.
  */
-class LocationAgent(prefixes: List[Prefix], command: Command, networkType: NetworkType, wiring: Wiring) {
+class LocationAgent(
+    prefixes: List[Prefix],
+    command: Command,
+    networkType: NetworkType,
+    wiring: Wiring,
+    agentPrefix: Option[Prefix]
+) {
   private val log: Logger = LocationAgentLogger.getLogger
 
   private val timeout: FiniteDuration = 10.seconds
@@ -42,8 +48,8 @@ class LocationAgent(prefixes: List[Prefix], command: Command, networkType: Netwo
 
       //Register all connections as Http or Tcp
       val results = command.httpPath match {
-        case Some(path) => Await.result(Future.traverse(prefixes)(registerHttpName(_, path)), timeout)
-        case None       => Await.result(Future.traverse(prefixes)(registerTcpName), timeout)
+        case Some(path) => Await.result(Future.traverse(prefixes)(registerHttpName(_, path, agentPrefix)), timeout)
+        case None       => Await.result(Future.traverse(prefixes)(registerTcpName(_, agentPrefix)), timeout)
       }
 
       unregisterOnTermination(results)
@@ -57,17 +63,19 @@ class LocationAgent(prefixes: List[Prefix], command: Command, networkType: Netwo
   // ================= INTERNAL API =================
 
   // Registers a single service as a TCP service
-  private def registerTcpName(prefix: Prefix): Future[RegistrationResult] = {
+  private def registerTcpName(prefix: Prefix, agentPrefix: Option[Prefix]): Future[RegistrationResult] = {
     val componentId = ComponentId(prefix, ComponentType.Service)
+    val metadata    = agentPrefix.fold(Metadata())(Metadata().withAgentPrefix(_))
     val connection  = TcpConnection(componentId)
-    locationService.register(TcpRegistration(connection, command.port))
+    locationService.register(TcpRegistration(connection, command.port, metadata))
   }
 
   // Registers a single service as a HTTP service with provided path
-  private def registerHttpName(prefix: Prefix, path: String): Future[RegistrationResult] = {
+  private def registerHttpName(prefix: Prefix, path: String, agentPrefix: Option[Prefix]): Future[RegistrationResult] = {
     val componentId = models.ComponentId(prefix, ComponentType.Service)
     val connection  = HttpConnection(componentId)
-    locationService.register(HttpRegistration(connection, command.port, path, networkType))
+    val metadata    = agentPrefix.fold(Metadata())(Metadata().withAgentPrefix(_))
+    locationService.register(HttpRegistration(connection, command.port, path, networkType, metadata))
   }
 
   // Registers a shutdownHook to handle service un-registration during abnormal exit
