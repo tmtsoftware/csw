@@ -48,8 +48,8 @@ class LocationAgent(
 
       //Register all connections as Http or Tcp
       val results = command.httpPath match {
-        case Some(path) => Await.result(Future.traverse(prefixes)(registerHttpName(_, path, agentPrefix)), timeout)
-        case None       => Await.result(Future.traverse(prefixes)(registerTcpName(_, agentPrefix)), timeout)
+        case Some(path) => Await.result(Future.traverse(prefixes)(registerHttpName(_, path, process.pid(), agentPrefix)), timeout)
+        case None       => Await.result(Future.traverse(prefixes)(registerTcpName(_, process.pid(), agentPrefix)), timeout)
       }
 
       unregisterOnTermination(results)
@@ -62,19 +62,29 @@ class LocationAgent(
 
   // ================= INTERNAL API =================
 
+  private def getMetadata(pid: Long, agentPrefix: Option[Prefix]): Metadata = {
+    val metadata = Metadata().withPid(ProcessHandle.current().pid())
+    agentPrefix.fold(metadata)(metadata.withAgentPrefix)
+  }
+
   // Registers a single service as a TCP service
-  private def registerTcpName(prefix: Prefix, agentPrefix: Option[Prefix]): Future[RegistrationResult] = {
+  private def registerTcpName(prefix: Prefix, pid: Long, agentPrefix: Option[Prefix]): Future[RegistrationResult] = {
     val componentId = ComponentId(prefix, ComponentType.Service)
-    val metadata    = agentPrefix.fold(Metadata())(Metadata().withAgentPrefix(_))
+    val metadata    = getMetadata(pid, agentPrefix)
     val connection  = TcpConnection(componentId)
     locationService.register(TcpRegistration(connection, command.port, metadata))
   }
 
   // Registers a single service as a HTTP service with provided path
-  private def registerHttpName(prefix: Prefix, path: String, agentPrefix: Option[Prefix]): Future[RegistrationResult] = {
+  private def registerHttpName(
+      prefix: Prefix,
+      path: String,
+      pid: Long,
+      agentPrefix: Option[Prefix]
+  ): Future[RegistrationResult] = {
     val componentId = models.ComponentId(prefix, ComponentType.Service)
     val connection  = HttpConnection(componentId)
-    val metadata    = agentPrefix.fold(Metadata())(Metadata().withAgentPrefix(_))
+    val metadata    = getMetadata(pid, agentPrefix)
     locationService.register(HttpRegistration(connection, command.port, path, networkType, metadata))
   }
 
