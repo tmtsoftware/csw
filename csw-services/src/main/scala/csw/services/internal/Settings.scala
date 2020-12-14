@@ -13,22 +13,22 @@ case class Settings(
     alarmPort: String,
     sentinelPort: String,
     logHome: String,
-    insideInterfaceName: String,
+    interfaceName: String,
     outsideInterfaceName: String,
     keycloakPort: String,
     configAdminUsername: String,
     configAdminPassword: String
 ) {
-  val hostName: String = Networks.interface(Some(insideInterfaceName)).hostname
+  val hostName: String = Networks.interface(Some(interfaceName)).hostname
 }
 
 object Settings {
-  def apply(insideInterface: Option[String] = None, outsideInterface: Option[String] = None): Settings = {
+  def apply(interface: Option[String] = None, outsideInterface: Option[String] = None): Settings = {
     val config = ConfigFactory.load().getConfig("csw")
 
     // automatically determine correct interface if INTERFACE_NAME env variable not set or -i command line option not provided
-    val insideInterfaceName  = insideInterface.getOrElse((sys.env ++ sys.props).getOrElse("INTERFACE_NAME", ""))
-    val outsideInterfaceName = outsideInterface.getOrElse(insideInterfaceName)
+    val interfaceName        = interface.getOrElse((sys.env ++ sys.props).getOrElse("INTERFACE_NAME", ""))
+    val outsideInterfaceName = outsideInterface.getOrElse(interfaceName)
 
     new Settings(
       config.getString("clusterPort"),
@@ -40,7 +40,7 @@ object Settings {
       config.getString("alarmPort"),
       config.getString("sentinelPort"),
       config.getString("logHome"),
-      insideInterfaceName,
+      interfaceName,
       outsideInterfaceName,
       config.getString("keycloakPort"),
       config.getString("configAdminUsername"),

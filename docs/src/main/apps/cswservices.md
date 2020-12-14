@@ -48,7 +48,7 @@ csw-services start
 
 `start` command support following additional options:
 
-- --inside-interface-name | -i if provided, helps you set the inside interface name.
+- --interface-name | -i if provided, helps you set the inside interface name.
 
     ```bash
     // This starts all the services and sets the inside interface name to en0.

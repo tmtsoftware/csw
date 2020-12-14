@@ -27,7 +27,7 @@ object Command {
       auth: Boolean = false,
       @HelpMessage("name of the inside interface")
       @Short("i")
-      insideInterfaceName: Option[String],
+      interfaceName: Option[String],
       @HelpMessage("name of the outside interface")
       @Short("o")
       outsideInterfaceName: Option[String]
