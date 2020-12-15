@@ -54,7 +54,7 @@ csw-services start
     // This starts all the services and sets the inside interface name to en0.
     csw-services start -i en0
     ```  
-- --outside-interface-name | -o if provided, helps you set the outside interface name.
+- --outside-interface-name | -o if provided, helps you set the outside interface name, if not provided will fallback to --interface-name
 
     ```bash
     // This starts all the services and sets the outside interface name to en0.
