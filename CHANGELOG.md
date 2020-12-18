@@ -9,7 +9,7 @@ The product is in a new repository: [csw](https://github.com/tmtsoftware/csw).
 
 All notable changes to this project will be documented in this file.
 
-## [CSW v3.0.0] - UP-COMING
+## [CSW v3.0.0] - 2020-12-18
 
 This is the third major release of the TMT Common Software for project stakeholders.
 See [here](https://tmtsoftware.github.io/csw/3.0.0/) for a detailed documentation of this version of the CSW software.
