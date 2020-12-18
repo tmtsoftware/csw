@@ -36,7 +36,7 @@ class TMTTimeHelperTest extends AnyFunSuite with Matchers {
   // This test is sufficient to show code works in both Scala and Java
   // since TaiTime.value.atZone is used in both languages.
 
-  test("should access parts of TAI time | DEOPSCSW-533, DEOPSCSW-549") {
+  test("should access parts of TAI time | DEOPSCSW-536, DEOPSCSW-549") {
     val taiTime       = TAITime(instant)
     val zonedDateTime = TMTTimeHelper.atZone(taiTime, ZoneOffset.UTC)
 

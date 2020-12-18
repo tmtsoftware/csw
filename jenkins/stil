@@ -52,7 +52,7 @@ pipeline {
         // These tests cover the scenario of multiple components in multiple containers on same machine.
         stage('Multi-Jvm Test') {
             steps {
-                sh "sbt -DenableFatalWarnings=true 'integration/multi-jvm:test'"
+                sh "sbt -DenableFatalWarnings=true -DgenerateStoryReport=true 'integration/multi-jvm:test'"
             }
         }
 
