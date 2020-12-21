@@ -20,7 +20,13 @@ class CommandTest extends AnyFunSuite with Matchers {
 
   test("testParse with options should return executable command") {
     val opt =
-      Options(List("csw.Alarm, csw.Event, csw.Telemetry").map(Prefix(_)), Some("ls"), Some(8080), None, Some(9999), noExit = true)
+      Options(
+        List("csw.Alarm, csw.Event, csw.Telemetry").map(Prefix(_)),
+        Some("ls"),
+        Some(8080),
+        delay = Some(9999),
+        noExit = true
+      )
     val c: Command = Command.parse(opt)
 
     c.commandText shouldBe "ls"
@@ -31,7 +37,7 @@ class CommandTest extends AnyFunSuite with Matchers {
 
   test("testParse with config file should honour config options") {
     val configFile = ResourceReader.copyToTmp("/redisTest.conf").toFile
-    val opt        = Options(List(Prefix("csw.redisTest")), None, None, Option(configFile))
+    val opt        = Options(List(Prefix("csw.redisTest")), None, None, appConfigFile = Option(configFile))
     val c: Command = Command.parse(opt)
 
     c.commandText shouldBe "redis-server --port 7777"
@@ -42,7 +48,7 @@ class CommandTest extends AnyFunSuite with Matchers {
 
   test("testParse with config file but undefined value") {
     val configFile = ResourceReader.copyToTmp("/redisTest.conf").toFile
-    val opt        = Options(List(Prefix("csw.redisTest_misSpelledKey")), None, None, Option(configFile))
+    val opt        = Options(List(Prefix("csw.redisTest_misSpelledKey")), appConfigFile = Option(configFile))
     val c: Command = Command.parse(opt)
 
     //due to mis-spelled key, false command is returned. which upon execution does nothing.
@@ -51,7 +57,7 @@ class CommandTest extends AnyFunSuite with Matchers {
 
   test("testParse with config file port, command parameters are overridable from command line") {
     val configFile = ResourceReader.copyToTmp("/redisTest.conf").toFile
-    val opt        = Options(List(Prefix("csw.redisTest")), Some("sleep"), Some(8888), Option(configFile))
+    val opt        = Options(List(Prefix("csw.redisTest")), Some("sleep"), Some(8888), appConfigFile = Option(configFile))
     val c: Command = Command.parse(opt)
 
     c.commandText shouldBe "sleep"

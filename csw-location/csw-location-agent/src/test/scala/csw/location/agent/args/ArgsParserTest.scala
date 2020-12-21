@@ -34,6 +34,7 @@ class ArgsParserTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
     x should contain(
       Options(List("csw.redis", "csw.alarm", "csw.watchdog").map(Prefix(_)), Some("sleep 5"), Some(port), None, None)
     )
+
   }
 
   // DEOPSCSW-628: Add support for registering service as HTTP in location agent
@@ -61,10 +62,7 @@ class ArgsParserTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
       Array("--prefix", services)
 
     val x: Option[Options] = silentParse(args)
-    val `false`            = false
-    x should contain(
-      Options(List(Prefix(services)), None, None, None, None, noExit = false, None, outsideNetwork = `false`)
-    )
+    x should contain(Options(List(Prefix(services))))
   }
 
   test("test parser with invalid service name combinations | ") {
@@ -124,5 +122,17 @@ class ArgsParserTest extends AnyFunSuite with Matchers with BeforeAndAfterEach {
     val x: Option[Options] = silentParse(args)
 
     x shouldEqual None
+  }
+
+  test("test parser with the --agentPrefix  argument | ") {
+    val port        = 5555
+    val service     = "csw.aas"
+    val agentPrefix = "esw.agent1"
+    val args        = Array("--prefix", service, "--port", port.toString, "--agentPrefix", agentPrefix, "--command", "sleep 5")
+
+    val x: Option[Options] = silentParse(args)
+    x should contain(
+      Options(List(Prefix("csw.aas")), Some("sleep 5"), Some(port), Some(Prefix(agentPrefix)), None, None)
+    )
   }
 }

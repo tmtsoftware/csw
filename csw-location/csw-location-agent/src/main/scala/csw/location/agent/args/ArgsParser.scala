@@ -27,6 +27,10 @@ class ArgsParser(name: String) {
       c.copy(command = Some(x))
     } text "The parameter is optional. The command that starts the target application. Use use %port to specify the port number. If parameter is not provided value $name.command from config file will be picked up. If value in config file is not found, the service names provided will be registered with Location Service."
 
+    opt[String]('a', "agentPrefix") valueName "<prefix>" action { (x, c) =>
+      c.copy(agentPrefix = Some(Prefix(x)))
+    } text "The parameter is optional. Agent prefix on which command will run"
+
     opt[Int]('p', "port") valueName "<number>" action { (x, c) =>
       c.copy(port = Some(x))
     } text "Optional port number the application listens on (default: use value of prefix.port from config file, or use a random, free port.)"
