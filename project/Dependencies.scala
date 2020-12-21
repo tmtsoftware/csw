@@ -521,7 +521,8 @@ object Dependencies {
       AkkaHttp.`akka-http`,
       Akka.`akka-multi-node-testkit`,
       Libs.`embedded-keycloak`,
-      Libs.`lettuce`
+      Libs.`lettuce`,
+      Libs.`tmt-test-reporter`
     )
   )
 
