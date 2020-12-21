@@ -7,6 +7,13 @@ object AutoMultiJvm extends AutoPlugin {
   import sbtassembly.AssemblyKeys._
   import sbtassembly.MergeStrategy
 
+  private val storyReport: Boolean = sys.props.get("generateStoryReport").contains("true")
+
+  private val reporterOptions: Seq[String] =
+    // -C - to give fully qualified name of the custom reporter
+    if (storyReport) Seq("-C", "tmt.test.reporter.TestReporter")
+    else Seq.empty
+
   lazy val reverseConcat: MergeStrategy = new MergeStrategy {
     override def name: String = "reverseConcat"
 
@@ -17,6 +24,7 @@ object AutoMultiJvm extends AutoPlugin {
   override def projectSettings: Seq[Setting[_]] =
     SbtMultiJvm.multiJvmSettings ++ Seq(
       multiNodeHosts in MultiJvm := multiNodeHostNames,
+      scalatestOptions in MultiJvm ++= reporterOptions,
       assemblyMergeStrategy in assembly in MultiJvm := {
         case "application.conf"                            => reverseConcat
         case x if x.contains("versions.properties")        => MergeStrategy.discard
