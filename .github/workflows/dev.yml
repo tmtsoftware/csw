@@ -83,7 +83,7 @@ jobs:
           path: target/RTM
 
   slack-success:
-    needs: [ unit-tests, multi-jvm-tests ]
+    needs: [ unit-tests, multi-jvm-tests, rtm ]
     if: success()
     runs-on: ubuntu-18.04
     steps:
@@ -94,7 +94,7 @@ jobs:
           channel: ci-dev
 
   slack-failure:
-    needs: [ unit-tests, multi-jvm-tests ]
+    needs: [ unit-tests, multi-jvm-tests, rtm ]
     if: failure()
     runs-on: ubuntu-18.04
     steps:
@@ -105,7 +105,7 @@ jobs:
           channel: ci-dev
 
   slack-cancelled:
-    needs: [ unit-tests, multi-jvm-tests ]
+    needs: [ unit-tests, multi-jvm-tests, rtm ]
     if: cancelled()
     runs-on: ubuntu-18.04
     steps:
