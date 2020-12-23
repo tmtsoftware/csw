@@ -43,6 +43,36 @@ See [here](https://tmtsoftware.github.io/csw/3.0.0/) for a detailed documentatio
 - Scaladoc: https://tmtsoftware.github.io/csw/3.0.0/api/scala/index.html
 - Javadoc: https://tmtsoftware.github.io/csw/3.0.0/api/java/index.html
 
+## [CSW v3.0.0-RC4] - 2020-12-23
+
+This is the release candidate 4 for the third major release of the TMT Common Software for project stakeholders.
+See [here](https://tmtsoftware.github.io/csw/3.0.0-RC4/) for a detailed documentation of this version of the CSW software.
+
+### Changes
+
+- Add support for test story report generation in multi jvm test plugin
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/3.0.0-RC4/
+- Scaladoc: https://tmtsoftware.github.io/csw/3.0.0-RC4/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/3.0.0-RC4/api/java/index.html
+
+## [CSW v3.0.0-RC3] - 2020-12-19
+
+This is the release candidate 3 for the third major release of the TMT Common Software for project stakeholders.
+See [here](https://tmtsoftware.github.io/csw/3.0.0-RC3/) for a detailed documentation of this version of the CSW software.
+
+### Changes
+
+- Ensure test report is generated for multi-jvm tests
+- Fixed incorrect story id label in test
+- Removed obsolete requirement linkage for DEOPSCSW-205
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/3.0.0-RC3/
+- Scaladoc: https://tmtsoftware.github.io/csw/3.0.0-RC3/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/3.0.0-RC3/api/java/index.html
+
 ## [CSW v3.0.0-RC2] - 2020-12-08
 
 This is the release candidate 2 for the third major release of the TMT Common Software for project stakeholders.
