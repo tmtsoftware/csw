@@ -3,7 +3,7 @@
 ## Introduction
 
 The Configuration Service maintains all the configuration files in version control system ([Subversion](https://wiki.svnkit.com/Subversion) repository) which tracks the history of file and directory changes over time.
-We access [Subversion](https://wiki.svnkit.com/Subversion) programmatically using [SVNKit](https://wiki.svnkit.com) which is a pure Java Subversion client library.
+We access [Subversion](https://wiki.svnkit.com/Subversion) programmatically using [SVNKit](https://svnkit.com) which is a pure Java Subversion client library.
 
 For information on _using_ the Configuration Service, see these sections:
 
