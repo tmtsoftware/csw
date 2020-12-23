@@ -38,6 +38,18 @@ jobs:
           sbt -DenableCoverage=true coverageReport
           sbtn coverageAggregate
 
+      - name: Generate RTM
+        if: always()
+        run: |
+          cs launch --channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/apps.json rtm:d1c8c7e -- target/RTM/testStoryMapping.txt tools/RTM/cswStoryToRequirementMap.csv target/RTM/testRequirementsMapping.txt
+
+      - name: Upload RTM
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: RTM
+          path: target/RTM
+
       - uses: actions/upload-artifact@v2
         with:
           name: Coverage Report
@@ -64,12 +76,6 @@ jobs:
       - name: Multi-Jvm Tests
         run: sbt -DenableFatalWarnings=true -DgenerateStoryReport=true 'integration/multi-jvm:test'
 
-  rtm:
-    needs: [ unit-tests, multi-jvm-tests ]
-    if: success()
-    runs-on: ubuntu-18.04
-
-    steps:
       - name: Generate RTM
         if: always()
         run: |
@@ -79,11 +85,11 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: RTM
+          name: RTM-multi-jvm
           path: target/RTM
 
   slack-success:
-    needs: [ unit-tests, multi-jvm-tests, rtm ]
+    needs: [ unit-tests, multi-jvm-tests ]
     if: success()
     runs-on: ubuntu-18.04
     steps:
@@ -94,7 +100,7 @@ jobs:
           channel: ci-dev
 
   slack-failure:
-    needs: [ unit-tests, multi-jvm-tests, rtm ]
+    needs: [ unit-tests, multi-jvm-tests ]
     if: failure()
     runs-on: ubuntu-18.04
     steps:
@@ -105,7 +111,7 @@ jobs:
           channel: ci-dev
 
   slack-cancelled:
-    needs: [ unit-tests, multi-jvm-tests, rtm ]
+    needs: [ unit-tests, multi-jvm-tests ]
     if: cancelled()
     runs-on: ubuntu-18.04
     steps:
