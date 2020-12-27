@@ -16,6 +16,7 @@ import scala.collection.immutable.Seq
 import scala.compat.java8.FutureConverters.CompletionStageOps
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.concurrent.{Await, Future}
+import scala.io.Source
 import scala.util.control.NonFatal
 
 /**
@@ -39,9 +40,24 @@ class LocationAgent(
   def run(): Process =
     try {
       log.info(s"Executing specified command: ${command.commandText}")
+
+      val process = Runtime.getRuntime.exec(command.commandText)
+
       // TODO revert changes later
-      val process = new ProcessBuilder(command.commandText).inheritIO().start()
+      Future {
+        Source
+          .fromInputStream(process.getErrorStream)
+          .getLines()
+          .foreach(line => println(s"[Loc-Agent] " + line))
+
+        Source
+          .fromInputStream(process.getInputStream)
+          .getLines()
+          .foreach(line => println(s"[Loc-Agent] " + line))
+      }
+
       log.info("using inheritIO for checking the logs of the subprocess")
+
       // shutdown location agent on termination of external program started using provided command
       process.onExit().toScala.onComplete(_ => shutdown())
 
