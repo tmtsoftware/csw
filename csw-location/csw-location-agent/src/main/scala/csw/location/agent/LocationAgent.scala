@@ -39,7 +39,9 @@ class LocationAgent(
   def run(): Process =
     try {
       log.info(s"Executing specified command: ${command.commandText}")
-      val process = Runtime.getRuntime.exec(command.commandText)
+      // TODO revert changes later
+      val process = new ProcessBuilder(command.commandText).inheritIO().start()
+      log.info("using inheritIO for checking the logs of the subprocess")
       // shutdown location agent on termination of external program started using provided command
       process.onExit().toScala.onComplete(_ => shutdown())
 
