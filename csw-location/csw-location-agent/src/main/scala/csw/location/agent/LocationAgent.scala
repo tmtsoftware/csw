@@ -56,8 +56,6 @@ class LocationAgent(
           .foreach(line => println(s"[Loc-Agent] " + line))
       }
 
-      log.info("using inheritIO for checking the logs of the subprocess")
-
       // shutdown location agent on termination of external program started using provided command
       process.onExit().toScala.onComplete(_ => shutdown())
 
