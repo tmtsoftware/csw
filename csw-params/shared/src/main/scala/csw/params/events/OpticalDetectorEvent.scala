@@ -1,21 +1,19 @@
 package csw.params.events
 
-import csw.params.core.generics.KeyType.{BooleanKey, IntKey, LongKey, StringKey}
+import csw.params.core.generics.KeyType.{LongKey, StringKey}
 import csw.params.core.generics.Parameter
 import csw.params.core.models.ObsId
-import csw.params.events.IRDetectorEvent.findValues
 import csw.prefix.models.Prefix
-import enumeratum.EnumEntry
-import enumeratum.Enum
+import enumeratum.{Enum, EnumEntry}
 
 sealed trait OpticalDetectorEvent extends EnumEntry
 
-sealed trait ObserveEvents extends OpticalDetectorEvent {
+sealed trait OpticalObserveEvents extends OpticalDetectorEvent {
   def create(sourcePrefix: String, obsId: ObsId): ObserveEvent =
     ObserveEvent(Prefix(sourcePrefix), EventName(this.entryName))
 }
 
-sealed trait ObserveEventsWithExposureId extends OpticalDetectorEvent {
+sealed trait OpticalObserveEventsWithExposureId extends OpticalDetectorEvent {
   def create(sourcePrefix: String, obsId: ObsId, exposureId: String): ObserveEvent =
     ObserveEvent(Prefix(sourcePrefix), EventName(this.entryName))
 }
@@ -23,17 +21,17 @@ sealed trait ObserveEventsWithExposureId extends OpticalDetectorEvent {
 object OpticalDetectorEvent extends Enum[OpticalDetectorEvent] {
   override def values: IndexedSeq[OpticalDetectorEvent] = findValues
 
-  case object ObserveStart extends ObserveEvents
-  case object ObserveEnd   extends ObserveEvents
+  case object ObserveStart extends OpticalObserveEvents
+  case object ObserveEnd   extends OpticalObserveEvents
 
-  case object PrepareStart    extends ObserveEventsWithExposureId
-  case object ExposureStart   extends ObserveEventsWithExposureId
-  case object ExposureEnd     extends ObserveEventsWithExposureId
-  case object ReadoutEnd      extends ObserveEventsWithExposureId
-  case object ReadoutFailed   extends ObserveEventsWithExposureId
-  case object DataWriteStart  extends ObserveEventsWithExposureId
-  case object DataWriteEnd    extends ObserveEventsWithExposureId
-  case object ExposureAborted extends ObserveEventsWithExposureId
+  case object PrepareStart    extends OpticalObserveEventsWithExposureId
+  case object ExposureStart   extends OpticalObserveEventsWithExposureId
+  case object ExposureEnd     extends OpticalObserveEventsWithExposureId
+  case object ReadoutEnd      extends OpticalObserveEventsWithExposureId
+  case object ReadoutFailed   extends OpticalObserveEventsWithExposureId
+  case object DataWriteStart  extends OpticalObserveEventsWithExposureId
+  case object DataWriteEnd    extends OpticalObserveEventsWithExposureId
+  case object ExposureAborted extends OpticalObserveEventsWithExposureId
 
   case object OpticalDetectorExposureState extends OpticalDetectorEvent with ExposureState
 
