@@ -1,11 +1,10 @@
 package csw.params.events
 
-import csw.params.core.generics.KeyType.{BooleanKey, IntKey, LongKey, StringKey}
+import csw.params.core.generics.KeyType.{IntKey, LongKey, StringKey}
 import csw.params.core.generics.Parameter
 import csw.params.core.models.ObsId
 import csw.prefix.models.Prefix
-import enumeratum.EnumEntry
-import enumeratum.Enum
+import enumeratum.{Enum, EnumEntry}
 
 sealed trait IRDetectorEvent extends EnumEntry
 
@@ -33,9 +32,9 @@ object IRDetectorEvent extends Enum[IRDetectorEvent] {
   case object DataWriteEnd    extends IRObserveEventWithExposureId
   case object ExposureAborted extends IRObserveEventWithExposureId
 
-  case object IrDetectorExposureState extends IRDetectorEvent with ExposureState
+  case object IRDetectorExposureState extends IRDetectorEvent with ExposureState
 
-  case object IrDetectorExposureData extends IRDetectorEvent {
+  case object IRDetectorExposureData extends IRDetectorEvent {
     def create(
         sourcePrefix: String,
         obsId: ObsId,
@@ -59,4 +58,18 @@ object IRDetectorEvent extends Enum[IRDetectorEvent] {
       ObserveEvent(Prefix(sourcePrefix), EventName(this.entryName), params)
     }
   }
+}
+
+object JIRDetectorEvent {
+  val ObserveStart            = IRDetectorEvent.ObserveStart
+  val ObserveEnd              = IRDetectorEvent.ObserveEnd
+  val ExposureStart           = IRDetectorEvent.ExposureStart
+  val ExposureEnd             = IRDetectorEvent.ExposureEnd
+  val ReadoutEnd              = IRDetectorEvent.ReadoutEnd
+  val ReadoutFailed           = IRDetectorEvent.ReadoutFailed
+  val DataWriteStart          = IRDetectorEvent.DataWriteStart
+  val DataWriteEnd            = IRDetectorEvent.DataWriteEnd
+  val ExposureAborted         = IRDetectorEvent.ExposureAborted
+  val IRDetectorExposureState = IRDetectorEvent.IRDetectorExposureState
+  val IRDetectorExposureData  = IRDetectorEvent.IRDetectorExposureData
 }

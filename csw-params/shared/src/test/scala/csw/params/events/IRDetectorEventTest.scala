@@ -1,7 +1,6 @@
 package csw.params.events
 
 import csw.params.core.generics.KeyType.{BooleanKey, IntKey, LongKey, StringKey}
-import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.ObsId
 import csw.params.events.IRDetectorEvent._
 import csw.prefix.models.Prefix
@@ -44,7 +43,7 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
     }
 
     it("should create exposure state event | CSW-118") {
-      val state = IrDetectorExposureState.create(
+      val state = IRDetectorExposureState.create(
         sourcePrefix,
         obsId,
         detector,
@@ -56,7 +55,7 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
       )
 
       state.source shouldBe Prefix(sourcePrefix)
-      state.eventName.name shouldBe IrDetectorExposureState.entryName
+      state.eventName.name shouldBe IRDetectorExposureState.entryName
       state.paramSet shouldBe Set(
         StringKey.make("detector").set(detector),
         BooleanKey.make("exposureInProgress").set(true),
@@ -75,7 +74,7 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
       val exposureTime          = 1000L
       val remainingExposureTime = 20L
 
-      val event = IrDetectorExposureData.create(
+      val event = IRDetectorExposureData.create(
         sourcePrefix,
         obsId,
         detector,
@@ -88,7 +87,7 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
       )
 
       event.source shouldBe Prefix(sourcePrefix)
-      event.eventName.name shouldBe IrDetectorExposureData.entryName
+      event.eventName.name shouldBe IRDetectorExposureData.entryName
       event.paramSet shouldBe Set(
         StringKey.make("detector").set(detector),
         IntKey.make("readsInRamp").set(readsInRamp),

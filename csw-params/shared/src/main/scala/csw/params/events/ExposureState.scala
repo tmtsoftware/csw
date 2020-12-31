@@ -15,7 +15,7 @@ trait ExposureState extends EnumEntry {
       abortInProgress: Boolean,
       isAborted: Boolean,
       errorMessage: String,
-      operationalState: OperationalState
+      operationalState: OperationalState.Value
   ): ObserveEvent = {
     val params: Set[Parameter[_]] = Set(
       StringKey.make("detector").set(detector),
