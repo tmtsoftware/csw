@@ -9,12 +9,12 @@ import enumeratum.Enum
 
 sealed trait IRDetectorEvent extends EnumEntry
 
-sealed trait ObserveEvents extends IRDetectorEvent {
+sealed trait IRObserveEvent extends IRDetectorEvent {
   def create(sourcePrefix: String, obsId: ObsId): ObserveEvent =
     ObserveEvent(Prefix(sourcePrefix), EventName(this.entryName))
 }
 
-sealed trait ObserveEventsWithExposureId extends IRDetectorEvent {
+sealed trait IRObserveEventWithExposureId extends IRDetectorEvent {
   def create(sourcePrefix: String, obsId: ObsId, exposureId: String): ObserveEvent =
     ObserveEvent(Prefix(sourcePrefix), EventName(this.entryName))
 }
@@ -22,16 +22,16 @@ sealed trait ObserveEventsWithExposureId extends IRDetectorEvent {
 object IRDetectorEvent extends Enum[IRDetectorEvent] {
   override def values: IndexedSeq[IRDetectorEvent] = findValues
 
-  case object ObserveStart extends ObserveEvents
-  case object ObserveEnd   extends ObserveEvents
+  case object ObserveStart extends IRObserveEvent
+  case object ObserveEnd   extends IRObserveEvent
 
-  case object ExposureStart   extends ObserveEventsWithExposureId
-  case object ExposureEnd     extends ObserveEventsWithExposureId
-  case object ReadoutEnd      extends ObserveEventsWithExposureId
-  case object ReadoutFailed   extends ObserveEventsWithExposureId
-  case object DataWriteStart  extends ObserveEventsWithExposureId
-  case object DataWriteEnd    extends ObserveEventsWithExposureId
-  case object ExposureAborted extends ObserveEventsWithExposureId
+  case object ExposureStart   extends IRObserveEventWithExposureId
+  case object ExposureEnd     extends IRObserveEventWithExposureId
+  case object ReadoutEnd      extends IRObserveEventWithExposureId
+  case object ReadoutFailed   extends IRObserveEventWithExposureId
+  case object DataWriteStart  extends IRObserveEventWithExposureId
+  case object DataWriteEnd    extends IRObserveEventWithExposureId
+  case object ExposureAborted extends IRObserveEventWithExposureId
 
   case object IrDetectorExposureState extends IRDetectorEvent with ExposureState
 

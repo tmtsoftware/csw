@@ -8,12 +8,12 @@ import enumeratum.{Enum, EnumEntry}
 
 sealed trait OpticalDetectorEvent extends EnumEntry
 
-sealed trait OpticalObserveEvents extends OpticalDetectorEvent {
+sealed trait OpticalObserveEvent extends OpticalDetectorEvent {
   def create(sourcePrefix: String, obsId: ObsId): ObserveEvent =
     ObserveEvent(Prefix(sourcePrefix), EventName(this.entryName))
 }
 
-sealed trait OpticalObserveEventsWithExposureId extends OpticalDetectorEvent {
+sealed trait OpticalObserveEventWithExposureId extends OpticalDetectorEvent {
   def create(sourcePrefix: String, obsId: ObsId, exposureId: String): ObserveEvent =
     ObserveEvent(Prefix(sourcePrefix), EventName(this.entryName))
 }
@@ -21,17 +21,17 @@ sealed trait OpticalObserveEventsWithExposureId extends OpticalDetectorEvent {
 object OpticalDetectorEvent extends Enum[OpticalDetectorEvent] {
   override def values: IndexedSeq[OpticalDetectorEvent] = findValues
 
-  case object ObserveStart extends OpticalObserveEvents
-  case object ObserveEnd   extends OpticalObserveEvents
+  case object ObserveStart extends OpticalObserveEvent
+  case object ObserveEnd   extends OpticalObserveEvent
 
-  case object PrepareStart    extends OpticalObserveEventsWithExposureId
-  case object ExposureStart   extends OpticalObserveEventsWithExposureId
-  case object ExposureEnd     extends OpticalObserveEventsWithExposureId
-  case object ReadoutEnd      extends OpticalObserveEventsWithExposureId
-  case object ReadoutFailed   extends OpticalObserveEventsWithExposureId
-  case object DataWriteStart  extends OpticalObserveEventsWithExposureId
-  case object DataWriteEnd    extends OpticalObserveEventsWithExposureId
-  case object ExposureAborted extends OpticalObserveEventsWithExposureId
+  case object PrepareStart    extends OpticalObserveEventWithExposureId
+  case object ExposureStart   extends OpticalObserveEventWithExposureId
+  case object ExposureEnd     extends OpticalObserveEventWithExposureId
+  case object ReadoutEnd      extends OpticalObserveEventWithExposureId
+  case object ReadoutFailed   extends OpticalObserveEventWithExposureId
+  case object DataWriteStart  extends OpticalObserveEventWithExposureId
+  case object DataWriteEnd    extends OpticalObserveEventWithExposureId
+  case object ExposureAborted extends OpticalObserveEventWithExposureId
 
   case object OpticalDetectorExposureState extends OpticalDetectorEvent with ExposureState
 
