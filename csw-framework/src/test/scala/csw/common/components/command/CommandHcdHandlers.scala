@@ -10,8 +10,9 @@ import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandIssue.OtherIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
-import csw.params.core.models.Id
+import csw.params.core.models.{Id, ObsId}
 import csw.params.core.states.{CurrentState, StateName}
+import csw.params.events.{IRDetectorEvent, OpticalDetectorEvent, WFSDetectorEvent}
 import csw.time.core.models.UTCTime
 
 class CommandHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext) extends ComponentHandlers(ctx, cswCtx) {
@@ -28,6 +29,18 @@ class CommandHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCon
     // Publish the CurrentState using parameter set created using a sample Choice parameter
     currentStatePublisher.publish(CurrentState(filterHcdPrefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
     //#currentStatePublisher
+
+    //#CSW-118 : publishing observe events for IR, Optical & WFS detectors
+    val obsId      = ObsId("scala_obs_id")
+    val exposureId = "some_exposure_id"
+
+    val observeStart   = IRDetectorEvent.ObserveStart.create(filterHcdPrefix.toString, obsId)
+    val exposureStart  = OpticalDetectorEvent.ExposureStart.create(filterHcdPrefix.toString, obsId, exposureId)
+    val publishSuccess = WFSDetectorEvent.PublishSuccess.create(filterHcdPrefix.toString)
+    eventService.defaultPublisher.publish(observeStart)
+    eventService.defaultPublisher.publish(exposureStart)
+    eventService.defaultPublisher.publish(publishSuccess)
+    //#CSW-118
   }
 
   override def onGoOffline(): Unit =

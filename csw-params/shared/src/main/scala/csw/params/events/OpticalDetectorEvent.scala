@@ -53,3 +53,18 @@ object OpticalDetectorEvent extends Enum[OpticalDetectorEvent] {
   }
 
 }
+
+object JOpticalDetectorEvent {
+  val ObserveStart                 = OpticalDetectorEvent.ObserveStart
+  val ObserveEnd                   = OpticalDetectorEvent.ObserveEnd
+  val PrepareStart                 = OpticalDetectorEvent.PrepareStart
+  val ExposureStart                = OpticalDetectorEvent.ExposureStart
+  val ExposureEnd                  = OpticalDetectorEvent.ExposureEnd
+  val ReadoutEnd                   = OpticalDetectorEvent.ReadoutEnd
+  val ReadoutFailed                = OpticalDetectorEvent.ReadoutFailed
+  val DataWriteStart               = OpticalDetectorEvent.DataWriteStart
+  val DataWriteEnd                 = OpticalDetectorEvent.DataWriteEnd
+  val ExposureAborted              = OpticalDetectorEvent.ExposureAborted
+  val OpticalDetectorExposureState = OpticalDetectorEvent.OpticalDetectorExposureState
+  val OpticalDetectorExposureData  = OpticalDetectorEvent.OpticalDetectorExposureData
+}

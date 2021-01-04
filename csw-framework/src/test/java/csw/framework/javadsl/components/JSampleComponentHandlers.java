@@ -16,23 +16,27 @@ import csw.framework.models.JCswContext;
 import csw.location.api.models.TrackingEvent;
 import csw.logging.api.javadsl.ILogger;
 import csw.params.commands.*;
-import csw.params.commands.CommandResponse.*;
+import csw.params.commands.CommandResponse.Completed;
+import csw.params.commands.CommandResponse.Started;
+import csw.params.commands.CommandResponse.SubmitResponse;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.Id;
-import csw.params.javadsl.JUnits;
-import csw.prefix.models.Prefix;
+import csw.params.core.models.ObsId;
 import csw.params.core.states.CurrentState;
 import csw.params.core.states.StateName;
-import csw.params.events.EventName;
-import csw.params.events.SystemEvent;
+import csw.params.events.*;
 import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JUnits;
 import csw.prefix.javadsl.JSubsystem;
+import csw.prefix.models.Prefix;
 import csw.time.core.models.UTCTime;
 
 import java.time.Duration;
 import java.util.Optional;
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static csw.common.components.command.ComponentStateForCommand.*;
 
@@ -68,6 +72,19 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         CurrentState initState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.initChoice()));
         currentStatePublisher.publish(initState);
         //#currentStatePublisher
+
+      //#CSW-118 : publishing observe events for IR, Optical & WFS detectors
+      ObsId obsId      = new ObsId("java_obs_id");
+      String exposureId = "some_exposure_id";
+      Prefix filterHcdPrefix = new Prefix(JSubsystem.WFOS, "blue.filter.hcd");
+
+      ObserveEvent observeStart  = JIRDetectorEvent.ObserveStart().create(filterHcdPrefix.toString(), obsId);
+      ObserveEvent exposureStart = JOpticalDetectorEvent.ExposureStart().create(filterHcdPrefix.toString(), obsId, exposureId);
+      ObserveEvent publishSuccess = JWFSDetectorEvent.PublishSuccess().create(filterHcdPrefix.toString());
+      eventService.defaultPublisher().publish(observeStart);
+      eventService.defaultPublisher().publish(exposureStart);
+      eventService.defaultPublisher().publish(publishSuccess);
+      //#CSW-118
     }
 
     @Override
