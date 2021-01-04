@@ -18,6 +18,7 @@ trait ExposureState extends EnumEntry {
       operationalState: OperationalState.Value
   ): ObserveEvent = {
     val params: Set[Parameter[_]] = Set(
+      StringKey.make("obsId").set(obsId.obsId),
       StringKey.make("detector").set(detector),
       StringKey.make("operationalState").set(operationalState.toString),
       StringKey.make("errorMessage").set(errorMessage),

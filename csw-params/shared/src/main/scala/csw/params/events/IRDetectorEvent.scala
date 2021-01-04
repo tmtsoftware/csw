@@ -9,13 +9,20 @@ import enumeratum.{Enum, EnumEntry}
 sealed trait IRDetectorEvent extends EnumEntry
 
 sealed trait IRObserveEvent extends IRDetectorEvent {
-  def create(sourcePrefix: String, obsId: ObsId): ObserveEvent =
-    ObserveEvent(Prefix(sourcePrefix), EventName(this.entryName))
+  def create(sourcePrefix: String, obsId: ObsId): ObserveEvent = {
+    val params: Set[Parameter[_]] = Set(StringKey.make("obsId").set(obsId.obsId))
+    ObserveEvent(Prefix(sourcePrefix), EventName(this.entryName), params)
+  }
 }
 
 sealed trait IRObserveEventWithExposureId extends IRDetectorEvent {
-  def create(sourcePrefix: String, obsId: ObsId, exposureId: String): ObserveEvent =
-    ObserveEvent(Prefix(sourcePrefix), EventName(this.entryName))
+  def create(sourcePrefix: String, obsId: ObsId, exposureId: String): ObserveEvent = {
+    val params: Set[Parameter[_]] = Set(
+      StringKey.make("obsId").set(obsId.obsId),
+      StringKey.make("exposureId").set(exposureId)
+    )
+    ObserveEvent(Prefix(sourcePrefix), EventName(this.entryName), params)
+  }
 }
 
 object IRDetectorEvent extends Enum[IRDetectorEvent] {
@@ -47,6 +54,7 @@ object IRDetectorEvent extends Enum[IRDetectorEvent] {
         remainingExposureTime: Long
     ): ObserveEvent = {
       val params: Set[Parameter[_]] = Set(
+        StringKey.make("obsId").set(obsId.obsId),
         StringKey.make("detector").set(detector),
         IntKey.make("readsInRamp").set(readsInRamp),
         IntKey.make("readsComplete").set(readsComplete),

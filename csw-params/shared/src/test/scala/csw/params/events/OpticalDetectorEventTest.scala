@@ -9,34 +9,39 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks.Table
 
 class OpticalDetectorEventTest extends AnyFunSpec with Matchers {
-  describe("OpticalDetectorEvent.scala") {
+  describe("OpticalDetectorEvent") {
 
     it("create Observe Events with obsId | ESW-81") {
       Table(
-        ("Observe Event", "Event Name", "Prefix"),
-        (ObserveStart.create("ESW.test", ObsId("some-id")), "ObserveStart", "ESW.test"),
-        (ObserveEnd.create("ESW.test", ObsId("some-id")), "ObserveEnd", "ESW.test")
-      ).forEvery((observeEvent, expectedEventName, expectedPrefixStr) => {
+        ("Observe Event", "Event Name"),
+        (ObserveStart.create("ESW.test", ObsId("some-id")), "ObserveStart"),
+        (ObserveEnd.create("ESW.test", ObsId("some-id")), "ObserveEnd")
+      ).forEvery((observeEvent, expectedEventName) => {
         observeEvent.eventName shouldBe EventName(expectedEventName)
-        observeEvent.source shouldBe Prefix(expectedPrefixStr)
+        observeEvent.source shouldBe Prefix("ESW.test")
+        observeEvent.paramSet shouldBe Set(StringKey.make("obsId").set("some-id"))
       })
 
     }
 
     it("create Observe Events with obsId and exposure id | ESW-81") {
       Table(
-        ("Observe Event", "Event Name", "Prefix"),
-        (PrepareStart.create("ESW.test", ObsId("some-id"), "exp-id"), "PrepareStart", "ESW.test"),
-        (ExposureStart.create("ESW.test", ObsId("some-id"), "exp-id"), "ExposureStart", "ESW.test"),
-        (ExposureEnd.create("ESW.test", ObsId("some-id"), "exp-id"), "ExposureEnd", "ESW.test"),
-        (ReadoutEnd.create("ESW.test", ObsId("some-id"), "exp-id"), "ReadoutEnd", "ESW.test"),
-        (ReadoutFailed.create("ESW.test", ObsId("some-id"), "exp-id"), "ReadoutFailed", "ESW.test"),
-        (DataWriteStart.create("ESW.test", ObsId("some-id"), "exp-id"), "DataWriteStart", "ESW.test"),
-        (DataWriteEnd.create("ESW.test", ObsId("some-id"), "exp-id"), "DataWriteEnd", "ESW.test"),
-        (ExposureAborted.create("ESW.test", ObsId("some-id"), "exp-id"), "ExposureAborted", "ESW.test")
-      ).forEvery((observeEvent, expectedEventName, expectedPrefixStr) => {
+        ("Observe Event", "Event Name"),
+        (PrepareStart.create("ESW.test", ObsId("some-id"), "exp-id"), "PrepareStart"),
+        (ExposureStart.create("ESW.test", ObsId("some-id"), "exp-id"), "ExposureStart"),
+        (ExposureEnd.create("ESW.test", ObsId("some-id"), "exp-id"), "ExposureEnd"),
+        (ReadoutEnd.create("ESW.test", ObsId("some-id"), "exp-id"), "ReadoutEnd"),
+        (ReadoutFailed.create("ESW.test", ObsId("some-id"), "exp-id"), "ReadoutFailed"),
+        (DataWriteStart.create("ESW.test", ObsId("some-id"), "exp-id"), "DataWriteStart"),
+        (DataWriteEnd.create("ESW.test", ObsId("some-id"), "exp-id"), "DataWriteEnd"),
+        (ExposureAborted.create("ESW.test", ObsId("some-id"), "exp-id"), "ExposureAborted")
+      ).forEvery((observeEvent, expectedEventName) => {
         observeEvent.eventName shouldBe EventName(expectedEventName)
-        observeEvent.source shouldBe Prefix(expectedPrefixStr)
+        observeEvent.source shouldBe Prefix("ESW.test")
+        observeEvent.paramSet shouldBe Set(
+          StringKey.make("obsId").set("some-id"),
+          StringKey.make("exposureId").set("exp-id")
+        )
       })
     }
 
@@ -59,6 +64,7 @@ class OpticalDetectorEventTest extends AnyFunSpec with Matchers {
       observeEvent.source shouldBe Prefix(sourcePrefix)
       observeEvent.paramSet shouldBe Set(
         StringKey.make("detector").set(detector),
+        StringKey.make("obsId").set("some-id"),
         StringKey.make("operationalState").set("BUSY"),
         StringKey.make("errorMessage").set(""),
         BooleanKey.make("exposureInProgress").set(true),
@@ -85,6 +91,7 @@ class OpticalDetectorEventTest extends AnyFunSpec with Matchers {
       observeEvent.source shouldBe Prefix(sourcePrefix)
       observeEvent.paramSet shouldBe Set(
         StringKey.make("detector").set(detector),
+        StringKey.make("obsId").set(obsId.obsId),
         LongKey.make("exposureTime").set(exposureTime),
         LongKey.make("remainingExposureTime").set(remainingExposureTime)
       )

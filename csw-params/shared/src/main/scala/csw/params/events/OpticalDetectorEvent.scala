@@ -9,13 +9,20 @@ import enumeratum.{Enum, EnumEntry}
 sealed trait OpticalDetectorEvent extends EnumEntry
 
 sealed trait OpticalObserveEvent extends OpticalDetectorEvent {
-  def create(sourcePrefix: String, obsId: ObsId): ObserveEvent =
-    ObserveEvent(Prefix(sourcePrefix), EventName(this.entryName))
+  def create(sourcePrefix: String, obsId: ObsId): ObserveEvent = {
+    val params: Set[Parameter[_]] = Set(StringKey.make("obsId").set(obsId.obsId))
+    ObserveEvent(Prefix(sourcePrefix), EventName(this.entryName), params)
+  }
 }
 
 sealed trait OpticalObserveEventWithExposureId extends OpticalDetectorEvent {
-  def create(sourcePrefix: String, obsId: ObsId, exposureId: String): ObserveEvent =
-    ObserveEvent(Prefix(sourcePrefix), EventName(this.entryName))
+  def create(sourcePrefix: String, obsId: ObsId, exposureId: String): ObserveEvent = {
+    val params: Set[Parameter[_]] = Set(
+      StringKey.make("obsId").set(obsId.obsId),
+      StringKey.make("exposureId").set(exposureId)
+    )
+    ObserveEvent(Prefix(sourcePrefix), EventName(this.entryName), params)
+  }
 }
 
 object OpticalDetectorEvent extends Enum[OpticalDetectorEvent] {
@@ -44,6 +51,7 @@ object OpticalDetectorEvent extends Enum[OpticalDetectorEvent] {
         remainingExposureTime: Long
     ): ObserveEvent = {
       val params: Set[Parameter[_]] = Set(
+        StringKey.make("obsId").set(obsId.obsId),
         StringKey.make("detector").set(detector),
         LongKey.make("exposureTime").set(exposureTime),
         LongKey.make("remainingExposureTime").set(remainingExposureTime)

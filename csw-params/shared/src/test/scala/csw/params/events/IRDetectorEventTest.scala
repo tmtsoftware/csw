@@ -58,6 +58,7 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
       state.eventName.name shouldBe IRDetectorExposureState.entryName
       state.paramSet shouldBe Set(
         StringKey.make("detector").set(detector),
+        StringKey.make("obsId").set(obsId.obsId),
         BooleanKey.make("exposureInProgress").set(true),
         BooleanKey.make("abortInProgress").set(false),
         BooleanKey.make("isAborted").set(true),
@@ -90,6 +91,7 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
       event.eventName.name shouldBe IRDetectorExposureData.entryName
       event.paramSet shouldBe Set(
         StringKey.make("detector").set(detector),
+        StringKey.make("obsId").set(obsId.obsId),
         IntKey.make("readsInRamp").set(readsInRamp),
         IntKey.make("readsComplete").set(readsComplete),
         IntKey.make("rampsInExposure").set(rampsInExposure),
