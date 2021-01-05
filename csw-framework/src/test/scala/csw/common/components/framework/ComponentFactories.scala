@@ -4,7 +4,7 @@ import akka.actor.typed.scaladsl.ActorContext
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.command.client.messages.TopLevelActorMessage
-import csw.common.components.command.{CommandAssemblyHandlers, CommandHcdHandlers}
+import csw.common.components.command.{CommandAssemblyHandlers, CommandHcdHandlers, DetectorHcdHandlers}
 
 class SampleComponentBehaviorFactory extends ComponentBehaviorFactory {
   protected override def handlers(
@@ -25,6 +25,13 @@ class CommandHcdBehaviorFactory extends ComponentBehaviorFactory {
       ctx: ActorContext[TopLevelActorMessage],
       cswCtx: CswContext
   ): ComponentHandlers = new CommandHcdHandlers(ctx, cswCtx)
+}
+
+class DetectorHcdBehaviorFactory extends ComponentBehaviorFactory {
+  protected override def handlers(
+      ctx: ActorContext[TopLevelActorMessage],
+      cswCtx: CswContext
+  ): ComponentHandlers = new DetectorHcdHandlers(ctx, cswCtx)
 }
 
 class ComponentBehaviorFactoryToSimulateFailure extends ComponentBehaviorFactory {

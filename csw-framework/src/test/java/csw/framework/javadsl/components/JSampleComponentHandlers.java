@@ -72,25 +72,10 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         CurrentState initState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.initChoice()));
         currentStatePublisher.publish(initState);
         //#currentStatePublisher
-
-      //#CSW-118 : publishing observe events for IR, Optical & WFS detectors
-      ObsId obsId      = new ObsId("java_obs_id");
-      String exposureId = "some_exposure_id";
-      Prefix filterHcdPrefix = new Prefix(JSubsystem.WFOS, "blue.filter.hcd");
-
-      ObserveEvent observeStart  = JIRDetectorEvent.ObserveStart().create(filterHcdPrefix.toString(), obsId);
-      ObserveEvent exposureStart = JOpticalDetectorEvent.ExposureStart().create(filterHcdPrefix.toString(), obsId, exposureId);
-      ObserveEvent publishSuccess = JWFSDetectorEvent.PublishSuccess().create(filterHcdPrefix.toString());
-      eventService.defaultPublisher().publish(observeStart);
-      eventService.defaultPublisher().publish(exposureStart);
-      eventService.defaultPublisher().publish(publishSuccess);
-      //#CSW-118
     }
 
     @Override
-    public void onLocationTrackingEvent(TrackingEvent trackingEvent) {
-
-    }
+    public void onLocationTrackingEvent(TrackingEvent trackingEvent) { }
 
     @Override
     public CommandResponse.ValidateCommandResponse validateCommand(Id runId, ControlCommand controlCommand) {

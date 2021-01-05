@@ -30,17 +30,6 @@ class CommandHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCon
     currentStatePublisher.publish(CurrentState(filterHcdPrefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
     //#currentStatePublisher
 
-    //#CSW-118 : publishing observe events for IR, Optical & WFS detectors
-    val obsId      = ObsId("scala_obs_id")
-    val exposureId = "some_exposure_id"
-
-    val observeStart   = IRDetectorEvent.ObserveStart.create(filterHcdPrefix.toString, obsId)
-    val exposureStart  = OpticalDetectorEvent.ExposureStart.create(filterHcdPrefix.toString, obsId, exposureId)
-    val publishSuccess = WFSDetectorEvent.PublishSuccess.create(filterHcdPrefix.toString)
-    eventService.defaultPublisher.publish(observeStart)
-    eventService.defaultPublisher.publish(exposureStart)
-    eventService.defaultPublisher.publish(publishSuccess)
-    //#CSW-118
   }
 
   override def onGoOffline(): Unit =
