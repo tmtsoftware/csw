@@ -11,16 +11,16 @@ import org.scalatestplus.junit.JUnitSuite;
 
 import java.util.*;
 
-import static csw.params.events.JIRDetectorEvent.*;
+import static csw.params.events.JOpticalDetectorEvent.*;
 
-public class JIRDetectorEventTest extends JUnitSuite {
+public class JOpticalDetectorEventTest extends JUnitSuite {
     String sourcePrefix = "ESW.filter.wheel";
     Prefix prefix = new Prefix(JSubsystem.ESW, "filter.wheel");
     ObsId obsId = new ObsId("someObsId");
     String exposureId = "some-exposure-id";
-    String detector = "ir-detector";
-    Parameter<String> exposureIdParam = JKeyType.StringKey().make("exposureId").set(exposureId);
+    String detector = "optical-detector";
     Parameter<String> obsIdParam = JKeyType.StringKey().make("obsId").set(obsId.obsId());
+    Parameter<String> exposureIdParam = JKeyType.StringKey().make("exposureId").set(exposureId);
 
     @Test
     public void shouldCreateIrDetectorObserveEventWithObsId__CSW_118() {
@@ -42,13 +42,15 @@ public class JIRDetectorEventTest extends JUnitSuite {
     @Test
     public void shouldCreateIrDetectorObserveEventWithObsIdAndExposureId__CSW_118() {
         List<TestData> testData = new ArrayList(Arrays.asList(
+                new TestData(PrepareStart().create(sourcePrefix, obsId, exposureId), PrepareStart().entryName()),
                 new TestData(ExposureStart().create(sourcePrefix, obsId, exposureId), ExposureStart().entryName()),
                 new TestData(ExposureEnd().create(sourcePrefix, obsId, exposureId), ExposureEnd().entryName()),
                 new TestData(ReadoutEnd().create(sourcePrefix, obsId, exposureId), ReadoutEnd().entryName()),
                 new TestData(ReadoutFailed().create(sourcePrefix, obsId, exposureId), ReadoutFailed().entryName()),
                 new TestData(DataWriteStart().create(sourcePrefix, obsId, exposureId), DataWriteStart().entryName()),
                 new TestData(DataWriteEnd().create(sourcePrefix, obsId, exposureId), DataWriteEnd().entryName()),
-                new TestData(ExposureAborted().create(sourcePrefix, obsId, exposureId), ExposureAborted().entryName())));
+                new TestData(ExposureAborted().create(sourcePrefix, obsId, exposureId), ExposureAborted().entryName())
+        ));
 
         Set<Parameter<?>> paramSet = new HashSet<>(10);
         paramSet.add(obsIdParam);
@@ -64,7 +66,7 @@ public class JIRDetectorEventTest extends JUnitSuite {
     public void shouldCreateIrDetectorExposureStateEvent__CSW_118() {
         Set<Parameter<?>> paramSet = getParamSetForExposureStateEvent();
 
-        ObserveEvent event = JIRDetectorEvent.IRDetectorExposureState().create(
+        ObserveEvent event = JOpticalDetectorEvent.OpticalDetectorExposureState().create(
                 sourcePrefix,
                 obsId,
                 detector,
@@ -72,60 +74,31 @@ public class JIRDetectorEventTest extends JUnitSuite {
                 false,
                 true,
                 "",
-                OperationalState.BUSY()
+                OperationalState.READY()
         );
 
         Assert.assertEquals(paramSet, event.jParamSet());
-        Assert.assertEquals("IRDetectorExposureState", event.eventName().name());
+        Assert.assertEquals("OpticalDetectorExposureState", event.eventName().name());
         Assert.assertEquals(prefix, event.source());
     }
 
     @Test
-    public void shouldCreateIrDetectorExposureDataEvent__CSW_118() {
-        int readsInRamp = 1;
-        int readsComplete = 20;
-        int rampsInExposure = 40;
-        int rampsComplete = 50;
+    public void shouldCreateOpticalDetectorExposureDataEvent__CSW_118() {
         long exposureTime = 1000L;
         long remainingExposureTime = 20L;
-        Set<Parameter<?>> paramSet = getParamSetForExposureDataEvent(readsInRamp, readsComplete, rampsInExposure, rampsComplete, exposureTime, remainingExposureTime);
+        Set<Parameter<?>> paramSet = getParamSetForExposureDataEvent(exposureTime, remainingExposureTime);
 
-        ObserveEvent event = JIRDetectorEvent.IRDetectorExposureData().create(
+        ObserveEvent event = JOpticalDetectorEvent.OpticalDetectorExposureData().create(
                 sourcePrefix,
                 obsId,
                 detector,
-                readsInRamp,
-                readsComplete,
-                rampsInExposure,
-                rampsComplete,
                 exposureTime,
                 remainingExposureTime
         );
 
         Assert.assertEquals(paramSet, event.jParamSet());
-        Assert.assertEquals("IRDetectorExposureData", event.eventName().name());
+        Assert.assertEquals("OpticalDetectorExposureData", event.eventName().name());
         Assert.assertEquals(prefix, event.source());
-    }
-
-    private Set<Parameter<?>> getParamSetForExposureDataEvent(int readsInRamp, int readsComplete, int rampsInExposure, int rampsComplete, long exposureTime, long remainingExposureTime) {
-        Parameter<String> detectorParam = JKeyType.StringKey().make("detector").set(detector);
-        Parameter<Integer> readsInRampParam = JKeyType.IntKey().make("readsInRamp").set(readsInRamp);
-        Parameter<Integer> readsCompleteParam = JKeyType.IntKey().make("readsComplete").set(readsComplete);
-        Parameter<Integer> rampsInExposureParam = JKeyType.IntKey().make("rampsInExposure").set(rampsInExposure);
-        Parameter<Integer> rampsCompleteParam = JKeyType.IntKey().make("rampsComplete").set(rampsComplete);
-        Parameter<Long> exposureTimeParam = JKeyType.LongKey().make("exposureTime").set(exposureTime);
-        Parameter<Long> remainingExposureTimeParam = JKeyType.LongKey().make("remainingExposureTime").set(remainingExposureTime);
-
-        Set<Parameter<?>> paramSet = new HashSet<>(10);
-        paramSet.add(obsIdParam);
-        paramSet.add(detectorParam);
-        paramSet.add(readsInRampParam);
-        paramSet.add(readsCompleteParam);
-        paramSet.add(rampsInExposureParam);
-        paramSet.add(rampsCompleteParam);
-        paramSet.add(exposureTimeParam);
-        paramSet.add(remainingExposureTimeParam);
-        return paramSet;
     }
 
     private Set<Parameter<?>> getParamSetForExposureStateEvent() {
@@ -134,7 +107,7 @@ public class JIRDetectorEventTest extends JUnitSuite {
         Parameter<Boolean> abortInProgress = JKeyType.BooleanKey().make("abortInProgress").set(false);
         Parameter<Boolean> isAborted = JKeyType.BooleanKey().make("isAborted").set(true);
         Parameter<String> errorMessage = JKeyType.StringKey().make("errorMessage").set("");
-        Parameter<String> operationalState = JKeyType.StringKey().make("operationalState").set("BUSY");
+        Parameter<String> operationalState = JKeyType.StringKey().make("operationalState").set("READY");
 
         Set<Parameter<?>> paramSet = new HashSet<>(10);
         paramSet.add(obsIdParam);
@@ -144,6 +117,19 @@ public class JIRDetectorEventTest extends JUnitSuite {
         paramSet.add(isAborted);
         paramSet.add(errorMessage);
         paramSet.add(operationalState);
+        return paramSet;
+    }
+
+    private Set<Parameter<?>> getParamSetForExposureDataEvent(long exposureTime, long remainingExposureTime) {
+        Parameter<String> detectorParam = JKeyType.StringKey().make("detector").set(detector);
+        Parameter<Long> exposureTimeParam = JKeyType.LongKey().make("exposureTime").set(exposureTime);
+        Parameter<Long> remainingExposureTimeParam = JKeyType.LongKey().make("remainingExposureTime").set(remainingExposureTime);
+
+        Set<Parameter<?>> paramSet = new HashSet<>(10);
+        paramSet.add(obsIdParam);
+        paramSet.add(detectorParam);
+        paramSet.add(exposureTimeParam);
+        paramSet.add(remainingExposureTimeParam);
         return paramSet;
     }
 
