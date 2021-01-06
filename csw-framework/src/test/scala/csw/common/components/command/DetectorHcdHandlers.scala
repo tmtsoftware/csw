@@ -7,11 +7,9 @@ import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.TrackingEvent
 import csw.logging.api.scaladsl.Logger
-import csw.params.commands.CommandIssue.OtherIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
 import csw.params.core.models.{Id, ObsId}
-import csw.params.core.states.{CurrentState, StateName}
 import csw.params.events.{IRDetectorEvent, OpticalDetectorEvent, WFSDetectorEvent}
 import csw.time.core.models.UTCTime
 

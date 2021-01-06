@@ -8,8 +8,8 @@ import csw.framework.models.JCswContext;
 
 public class JDetectorComponentBehaviorFactory extends JComponentBehaviorFactory {
 
-  @Override
-  public JComponentHandlers jHandlers(ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
-    return new JDetectorComponentHandlers(ctx, cswCtx);
-  }
+    @Override
+    public JComponentHandlers jHandlers(ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
+        return new JDetectorComponentHandlers(ctx, cswCtx);
+    }
 }

@@ -1,10 +1,10 @@
 package csw.framework.javadsl.components;
 
 import akka.actor.typed.javadsl.ActorContext;
+import csw.command.client.messages.TopLevelActorMessage;
 import csw.framework.javadsl.JComponentBehaviorFactory;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
-import csw.command.client.messages.TopLevelActorMessage;
 
 public class JSampleComponentBehaviorFactory extends JComponentBehaviorFactory {
 

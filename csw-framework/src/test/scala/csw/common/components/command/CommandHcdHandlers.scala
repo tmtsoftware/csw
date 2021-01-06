@@ -10,9 +10,8 @@ import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandIssue.OtherIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
-import csw.params.core.models.{Id, ObsId}
+import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
-import csw.params.events.{IRDetectorEvent, OpticalDetectorEvent, WFSDetectorEvent}
 import csw.time.core.models.UTCTime
 
 class CommandHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext) extends ComponentHandlers(ctx, cswCtx) {

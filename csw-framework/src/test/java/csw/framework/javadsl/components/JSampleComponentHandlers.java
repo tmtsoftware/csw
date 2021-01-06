@@ -22,10 +22,10 @@ import csw.params.commands.CommandResponse.SubmitResponse;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.Id;
-import csw.params.core.models.ObsId;
 import csw.params.core.states.CurrentState;
 import csw.params.core.states.StateName;
-import csw.params.events.*;
+import csw.params.events.EventName;
+import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
 import csw.params.javadsl.JUnits;
 import csw.prefix.javadsl.JSubsystem;
@@ -75,7 +75,8 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     }
 
     @Override
-    public void onLocationTrackingEvent(TrackingEvent trackingEvent) { }
+    public void onLocationTrackingEvent(TrackingEvent trackingEvent) {
+    }
 
     @Override
     public CommandResponse.ValidateCommandResponse validateCommand(Id runId, ControlCommand controlCommand) {
