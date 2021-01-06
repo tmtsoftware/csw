@@ -4,7 +4,6 @@ import csw.params.core.generics.KeyType.{BooleanKey, StringKey}
 import csw.params.core.generics.Parameter
 import csw.params.core.models.ObsId
 import csw.prefix.models.Prefix
-import enumeratum.EnumEntry
 
 trait ExposureState {
   def create(
