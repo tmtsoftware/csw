@@ -72,7 +72,7 @@ public class JIRDetectorEventTest extends JUnitSuite {
                 false,
                 true,
                 "",
-                OperationalState.BUSY()
+                JOperationalState.BUSY()
         );
 
         Assert.assertEquals(paramSet, event.jParamSet());

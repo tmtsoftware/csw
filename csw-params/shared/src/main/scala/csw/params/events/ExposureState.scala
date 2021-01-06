@@ -15,7 +15,7 @@ trait ExposureState {
       abortInProgress: Boolean,
       isAborted: Boolean,
       errorMessage: String,
-      operationalState: OperationalState.Value
+      operationalState: OperationalState
   ): ObserveEvent = {
     val params: Set[Parameter[_]] = Set(
       StringKey.make("obsId").set(obsId.obsId),

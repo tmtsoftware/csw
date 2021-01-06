@@ -74,7 +74,7 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
                 false,
                 true,
                 "",
-                OperationalState.READY()
+                JOperationalState.READY()
         );
 
         Assert.assertEquals(paramSet, event.jParamSet());
