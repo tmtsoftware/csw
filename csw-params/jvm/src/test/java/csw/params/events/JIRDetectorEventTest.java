@@ -25,8 +25,8 @@ public class JIRDetectorEventTest extends JUnitSuite {
     @Test
     public void shouldCreateIrDetectorObserveEventWithObsId__CSW_118() {
         List<TestData> testData = new ArrayList(Arrays.asList(
-                new TestData(ObserveStart().create(sourcePrefix, obsId), ObserveStart().entryName()),
-                new TestData(ObserveEnd().create(sourcePrefix, obsId), ObserveEnd().entryName())
+                new TestData(ObserveStart().create(sourcePrefix, obsId), "ObserveStart"),
+                new TestData(ObserveEnd().create(sourcePrefix, obsId), "ObserveEnd")
         ));
 
         Set<Parameter<?>> paramSet = new HashSet<>(10);
@@ -42,13 +42,13 @@ public class JIRDetectorEventTest extends JUnitSuite {
     @Test
     public void shouldCreateIrDetectorObserveEventWithObsIdAndExposureId__CSW_118() {
         List<TestData> testData = new ArrayList(Arrays.asList(
-                new TestData(ExposureStart().create(sourcePrefix, obsId, exposureId), ExposureStart().entryName()),
-                new TestData(ExposureEnd().create(sourcePrefix, obsId, exposureId), ExposureEnd().entryName()),
-                new TestData(ReadoutEnd().create(sourcePrefix, obsId, exposureId), ReadoutEnd().entryName()),
-                new TestData(ReadoutFailed().create(sourcePrefix, obsId, exposureId), ReadoutFailed().entryName()),
-                new TestData(DataWriteStart().create(sourcePrefix, obsId, exposureId), DataWriteStart().entryName()),
-                new TestData(DataWriteEnd().create(sourcePrefix, obsId, exposureId), DataWriteEnd().entryName()),
-                new TestData(ExposureAborted().create(sourcePrefix, obsId, exposureId), ExposureAborted().entryName())));
+                new TestData(ExposureStart().create(sourcePrefix, obsId, exposureId), "ExposureStart"),
+                new TestData(ExposureEnd().create(sourcePrefix, obsId, exposureId), "ExposureEnd"),
+                new TestData(ReadoutEnd().create(sourcePrefix, obsId, exposureId), "ReadoutEnd"),
+                new TestData(ReadoutFailed().create(sourcePrefix, obsId, exposureId), "ReadoutFailed"),
+                new TestData(DataWriteStart().create(sourcePrefix, obsId, exposureId), "DataWriteStart"),
+                new TestData(DataWriteEnd().create(sourcePrefix, obsId, exposureId), "DataWriteEnd"),
+                new TestData(ExposureAborted().create(sourcePrefix, obsId, exposureId), "ExposureAborted")));
 
         Set<Parameter<?>> paramSet = new HashSet<>(10);
         paramSet.add(obsIdParam);

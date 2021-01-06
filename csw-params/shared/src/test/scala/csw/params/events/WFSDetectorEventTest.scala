@@ -11,7 +11,7 @@ class WFSDetectorEventTest extends AnyFunSpec with Matchers {
       val sourcePrefix = "ESW.filter.wheel"
       val event        = PublishSuccess.create(sourcePrefix)
 
-      event.eventName.name shouldBe PublishSuccess.entryName
+      event.eventName.name shouldBe "PublishSuccess"
       event.source shouldBe Prefix(sourcePrefix)
     }
 
@@ -19,7 +19,7 @@ class WFSDetectorEventTest extends AnyFunSpec with Matchers {
       val sourcePrefix = "ESW.filter.wheel"
       val event        = PublishFail.create(sourcePrefix)
 
-      event.eventName.name shouldBe PublishFail.entryName
+      event.eventName.name shouldBe "PublishFail"
       event.source shouldBe Prefix(sourcePrefix)
     }
   }

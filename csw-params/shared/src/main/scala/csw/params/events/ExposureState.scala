@@ -6,7 +6,7 @@ import csw.params.core.models.ObsId
 import csw.prefix.models.Prefix
 import enumeratum.EnumEntry
 
-trait ExposureState extends EnumEntry {
+trait ExposureState {
   def create(
       sourcePrefix: String,
       obsId: ObsId,
@@ -26,6 +26,9 @@ trait ExposureState extends EnumEntry {
       BooleanKey.make("abortInProgress").set(abortInProgress),
       BooleanKey.make("isAborted").set(isAborted)
     )
-    ObserveEvent(Prefix(sourcePrefix), EventName(this.entryName), params)
+    ObserveEvent(Prefix(sourcePrefix), EventName(name), params)
   }
+
+  private def name = getClass.getSimpleName.dropRight(1)
+
 }

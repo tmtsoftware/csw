@@ -4,14 +4,15 @@ import csw.params.core.generics.KeyType.{IntKey, LongKey, StringKey}
 import csw.params.core.generics.Parameter
 import csw.params.core.models.ObsId
 import csw.prefix.models.Prefix
-import enumeratum.{Enum, EnumEntry}
 
-sealed trait IRDetectorEvent extends EnumEntry
+sealed trait IRDetectorEvent {
+  protected def eventName: EventName = EventName(this.getClass.getSimpleName.dropRight(1))
+}
 
 sealed trait IRObserveEvent extends IRDetectorEvent {
   def create(sourcePrefix: String, obsId: ObsId): ObserveEvent = {
     val params: Set[Parameter[_]] = Set(StringKey.make("obsId").set(obsId.obsId))
-    ObserveEvent(Prefix(sourcePrefix), EventName(this.entryName), params)
+    ObserveEvent(Prefix(sourcePrefix), eventName, params)
   }
 }
 
@@ -21,12 +22,11 @@ sealed trait IRObserveEventWithExposureId extends IRDetectorEvent {
       StringKey.make("obsId").set(obsId.obsId),
       StringKey.make("exposureId").set(exposureId)
     )
-    ObserveEvent(Prefix(sourcePrefix), EventName(this.entryName), params)
+    ObserveEvent(Prefix(sourcePrefix), eventName, params)
   }
 }
 
-object IRDetectorEvent extends Enum[IRDetectorEvent] {
-  override def values: IndexedSeq[IRDetectorEvent] = findValues
+object IRDetectorEvent {
 
   case object ObserveStart extends IRObserveEvent
   case object ObserveEnd   extends IRObserveEvent
@@ -63,7 +63,7 @@ object IRDetectorEvent extends Enum[IRDetectorEvent] {
         LongKey.make("exposureTime").set(exposureTime),
         LongKey.make("remainingExposureTime").set(remainingExposureTime)
       )
-      ObserveEvent(Prefix(sourcePrefix), EventName(this.entryName), params)
+      ObserveEvent(Prefix(sourcePrefix), eventName, params)
     }
   }
 }

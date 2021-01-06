@@ -18,13 +18,13 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
     it("should create observe event with obsId and exposure id parameters | CSW-118") {
       Table(
         ("Observe event", "event name", "prefix"),
-        (ExposureStart.create(sourcePrefix, obsId, exposureId), ExposureStart.entryName, sourcePrefix),
-        (ExposureEnd.create(sourcePrefix, obsId, exposureId), ExposureEnd.entryName, sourcePrefix),
-        (ReadoutEnd.create(sourcePrefix, obsId, exposureId), ReadoutEnd.entryName, sourcePrefix),
-        (ReadoutFailed.create(sourcePrefix, obsId, exposureId), ReadoutFailed.entryName, sourcePrefix),
-        (DataWriteStart.create(sourcePrefix, obsId, exposureId), DataWriteStart.entryName, sourcePrefix),
-        (DataWriteEnd.create(sourcePrefix, obsId, exposureId), DataWriteEnd.entryName, sourcePrefix),
-        (ExposureAborted.create(sourcePrefix, obsId, exposureId), ExposureAborted.entryName, sourcePrefix)
+        (ExposureStart.create(sourcePrefix, obsId, exposureId), "ExposureStart", sourcePrefix),
+        (ExposureEnd.create(sourcePrefix, obsId, exposureId), "ExposureEnd", sourcePrefix),
+        (ReadoutEnd.create(sourcePrefix, obsId, exposureId), "ReadoutEnd", sourcePrefix),
+        (ReadoutFailed.create(sourcePrefix, obsId, exposureId), "ReadoutFailed", sourcePrefix),
+        (DataWriteStart.create(sourcePrefix, obsId, exposureId), "DataWriteStart", sourcePrefix),
+        (DataWriteEnd.create(sourcePrefix, obsId, exposureId), "DataWriteEnd", sourcePrefix),
+        (ExposureAborted.create(sourcePrefix, obsId, exposureId), "ExposureAborted", sourcePrefix)
       ).forEvery((observeEvent, eventName, sourcePrefix) => {
         observeEvent.eventName.name shouldBe eventName
         observeEvent.source shouldBe Prefix(sourcePrefix)
@@ -34,8 +34,8 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
     it("should create observe event with obsId | CSW-118") {
       Table(
         ("Observe event", "event name", "prefix"),
-        (ObserveStart.create(sourcePrefix, obsId), ObserveStart.entryName, sourcePrefix),
-        (ObserveEnd.create(sourcePrefix, obsId), ObserveEnd.entryName, sourcePrefix)
+        (ObserveStart.create(sourcePrefix, obsId), "ObserveStart", sourcePrefix),
+        (ObserveEnd.create(sourcePrefix, obsId), "ObserveEnd", sourcePrefix)
       ).forEvery((observeEvent, eventName, sourcePrefix) => {
         observeEvent.eventName.name shouldBe eventName
         observeEvent.source shouldBe Prefix(sourcePrefix)
@@ -55,7 +55,7 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
       )
 
       state.source shouldBe Prefix(sourcePrefix)
-      state.eventName.name shouldBe IRDetectorExposureState.entryName
+      state.eventName.name shouldBe "IRDetectorExposureState"
       state.paramSet shouldBe Set(
         StringKey.make("detector").set(detector),
         StringKey.make("obsId").set(obsId.obsId),
@@ -88,7 +88,7 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
       )
 
       event.source shouldBe Prefix(sourcePrefix)
-      event.eventName.name shouldBe IRDetectorExposureData.entryName
+      event.eventName.name shouldBe "IRDetectorExposureData"
       event.paramSet shouldBe Set(
         StringKey.make("detector").set(detector),
         StringKey.make("obsId").set(obsId.obsId),

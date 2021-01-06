@@ -1,20 +1,16 @@
 package csw.params.events
 
 import csw.prefix.models.Prefix
-import enumeratum.{Enum, EnumEntry}
 
-sealed trait WFSDetectorEvent extends EnumEntry
+sealed trait WFSDetectorEvent {
+  protected def eventName: EventName = EventName(this.getClass.getSimpleName.dropRight(1))
 
-sealed trait WFSObserveEvent extends WFSDetectorEvent {
-  def create(sourcePrefix: String): ObserveEvent =
-    ObserveEvent(Prefix(sourcePrefix), EventName(this.entryName))
+  def create(sourcePrefix: String): ObserveEvent = ObserveEvent(Prefix(sourcePrefix), eventName)
 }
 
-object WFSDetectorEvent extends Enum[WFSDetectorEvent] {
-  override def values: IndexedSeq[WFSDetectorEvent] = findValues
-
-  case object PublishSuccess extends WFSObserveEvent
-  case object PublishFail    extends WFSObserveEvent
+object WFSDetectorEvent {
+  case object PublishSuccess extends WFSDetectorEvent
+  case object PublishFail    extends WFSDetectorEvent
 }
 
 object JWFSDetectorEvent {

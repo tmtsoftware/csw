@@ -4,14 +4,15 @@ import csw.params.core.generics.KeyType.{LongKey, StringKey}
 import csw.params.core.generics.Parameter
 import csw.params.core.models.ObsId
 import csw.prefix.models.Prefix
-import enumeratum.{Enum, EnumEntry}
 
-sealed trait OpticalDetectorEvent extends EnumEntry
+sealed trait OpticalDetectorEvent {
+  protected def eventName: EventName = EventName(this.getClass.getSimpleName.dropRight(1))
+}
 
 sealed trait OpticalObserveEvent extends OpticalDetectorEvent {
   def create(sourcePrefix: String, obsId: ObsId): ObserveEvent = {
     val params: Set[Parameter[_]] = Set(StringKey.make("obsId").set(obsId.obsId))
-    ObserveEvent(Prefix(sourcePrefix), EventName(this.entryName), params)
+    ObserveEvent(Prefix(sourcePrefix), (eventName), params)
   }
 }
 
@@ -21,13 +22,11 @@ sealed trait OpticalObserveEventWithExposureId extends OpticalDetectorEvent {
       StringKey.make("obsId").set(obsId.obsId),
       StringKey.make("exposureId").set(exposureId)
     )
-    ObserveEvent(Prefix(sourcePrefix), EventName(this.entryName), params)
+    ObserveEvent(Prefix(sourcePrefix), (eventName), params)
   }
 }
 
-object OpticalDetectorEvent extends Enum[OpticalDetectorEvent] {
-  override def values: IndexedSeq[OpticalDetectorEvent] = findValues
-
+object OpticalDetectorEvent {
   case object ObserveStart extends OpticalObserveEvent
   case object ObserveEnd   extends OpticalObserveEvent
 
@@ -56,10 +55,9 @@ object OpticalDetectorEvent extends Enum[OpticalDetectorEvent] {
         LongKey.make("exposureTime").set(exposureTime),
         LongKey.make("remainingExposureTime").set(remainingExposureTime)
       )
-      ObserveEvent(Prefix(sourcePrefix), EventName(this.entryName), params)
+      ObserveEvent(Prefix(sourcePrefix), eventName, params)
     }
   }
-
 }
 
 object JOpticalDetectorEvent {
