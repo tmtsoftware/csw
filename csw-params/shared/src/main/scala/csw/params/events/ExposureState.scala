@@ -28,6 +28,9 @@ trait ExposureState {
     ObserveEvent(Prefix(sourcePrefix), EventName(name), params)
   }
 
-  private def name = getClass.getSimpleName.dropRight(1)
+  private def name = {
+    val simpleName = getClass.getSimpleName
+    if (simpleName.last == '$') simpleName.dropRight(1) else simpleName
+  }
 
 }
