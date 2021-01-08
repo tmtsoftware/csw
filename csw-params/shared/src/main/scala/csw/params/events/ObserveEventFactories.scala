@@ -1,6 +1,5 @@
 package csw.params.events
 
-import csw.params.Utils
 import csw.params.core.generics.Parameter
 import csw.params.core.models.ObsId
 import csw.prefix.models.Prefix
@@ -25,10 +24,14 @@ trait ObserveEventFactories {
     create(sourcePrefix, obsId, exposureId, "ExposureAborted")
 
   private def create(sourcePrefix: String, obsId: ObsId, eventName: String): ObserveEvent =
-    ObserveEvent(Prefix(sourcePrefix), EventName(eventName), Set(Utils.obsIdParam(obsId)))
+    ObserveEvent(Prefix(sourcePrefix), EventName(eventName), Set(ParamFactories.obsIdParam(obsId)))
 
   private[params] def create(sourcePrefix: String, obsId: ObsId, exposureId: String, eventName: String): ObserveEvent =
-    ObserveEvent(Prefix(sourcePrefix), EventName(eventName), Set(Utils.obsIdParam(obsId), Utils.exposureIdParam(exposureId)))
+    ObserveEvent(
+      Prefix(sourcePrefix),
+      EventName(eventName),
+      Set(ParamFactories.obsIdParam(obsId), ParamFactories.exposureIdParam(exposureId))
+    )
 
   private[params] def createExposureState(
       sourcePrefix: String,
@@ -42,13 +45,13 @@ trait ObserveEventFactories {
       eventName: String
   ): ObserveEvent = {
     val params: Set[Parameter[_]] = Set(
-      Utils.obsIdParam(obsId),
-      Utils.detectorParam(detector),
-      Utils.operationalStateParam(operationalState),
-      Utils.errorMessageParam(errorMessage),
-      Utils.exposureInProgressParam(exposureInProgress),
-      Utils.abortInProgressParam(abortInProgress),
-      Utils.isAbortedParam(isAborted)
+      ParamFactories.obsIdParam(obsId),
+      ParamFactories.detectorParam(detector),
+      ParamFactories.operationalStateParam(operationalState),
+      ParamFactories.errorMessageParam(errorMessage),
+      ParamFactories.exposureInProgressParam(exposureInProgress),
+      ParamFactories.abortInProgressParam(abortInProgress),
+      ParamFactories.isAbortedParam(isAborted)
     )
     ObserveEvent(Prefix(sourcePrefix), EventName(eventName), params)
   }

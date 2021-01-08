@@ -1,16 +1,10 @@
-package csw.params
+package csw.params.events
 
 import csw.params.core.generics.KeyType.{BooleanKey, IntKey, LongKey, StringKey}
 import csw.params.core.generics.Parameter
 import csw.params.core.models.ObsId
-import csw.params.events.OperationalState
 
-object Utils {
-  def getClassName[T](v: T): String = {
-    val simpleName = v.getClass.getSimpleName
-    if (simpleName.last == '$') simpleName.dropRight(1) else simpleName
-  }
-
+object ParamFactories {
   // commonly used params factories
   def obsIdParam(obsId: ObsId): Parameter[String]            = StringKey.make("obsId").set(obsId.obsId)
   def exposureIdParam(exposureId: String): Parameter[String] = StringKey.make("exposureId").set(exposureId)
