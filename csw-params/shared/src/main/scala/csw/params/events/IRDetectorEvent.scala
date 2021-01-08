@@ -1,15 +1,13 @@
 package csw.params.events
 
+import csw.params.Utils
 import csw.params.core.generics.KeyType.{IntKey, LongKey, StringKey}
 import csw.params.core.generics.Parameter
 import csw.params.core.models.ObsId
 import csw.prefix.models.Prefix
 
 sealed trait IRDetectorEvent {
-  protected def eventName: EventName = {
-    val simpleName = this.getClass.getSimpleName
-    EventName(if (simpleName.last == '$') simpleName.dropRight(1) else simpleName)
-  }
+  protected def eventName: EventName = EventName(Utils.getClassName(this))
 }
 
 sealed trait IRObserveEvent extends IRDetectorEvent {

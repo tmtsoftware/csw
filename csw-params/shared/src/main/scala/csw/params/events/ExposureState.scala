@@ -1,5 +1,6 @@
 package csw.params.events
 
+import csw.params.Utils
 import csw.params.core.generics.KeyType.{BooleanKey, StringKey}
 import csw.params.core.generics.Parameter
 import csw.params.core.models.ObsId
@@ -25,12 +26,7 @@ trait ExposureState {
       BooleanKey.make("abortInProgress").set(abortInProgress),
       BooleanKey.make("isAborted").set(isAborted)
     )
-    ObserveEvent(Prefix(sourcePrefix), EventName(name), params)
-  }
-
-  private def name = {
-    val simpleName = getClass.getSimpleName
-    if (simpleName.last == '$') simpleName.dropRight(1) else simpleName
+    ObserveEvent(Prefix(sourcePrefix), EventName(Utils.getClassName(this)), params)
   }
 
 }

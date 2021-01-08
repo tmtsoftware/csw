@@ -1,13 +1,11 @@
 package csw.params.events
 
+import csw.params.Utils
 import csw.prefix.models.Prefix
 
 sealed trait WFSDetectorEvent {
 
-  protected def eventName: EventName = {
-    val simpleName = this.getClass.getSimpleName
-    EventName(if (simpleName.last == '$') simpleName.dropRight(1) else simpleName)
-  }
+  protected def eventName: EventName = EventName(Utils.getClassName(this))
 
   def create(sourcePrefix: String): ObserveEvent = ObserveEvent(Prefix(sourcePrefix), eventName)
 }
