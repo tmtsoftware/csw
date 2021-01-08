@@ -4,29 +4,7 @@ import csw.params.core.generics.Parameter
 import csw.params.core.models.ObsId
 import csw.prefix.models.Prefix
 
-object IRDetectorEvent extends ObserveEventFactories {
-  def exposureState(
-      sourcePrefix: String,
-      obsId: ObsId,
-      detector: String,
-      exposureInProgress: Boolean,
-      abortInProgress: Boolean,
-      isAborted: Boolean,
-      errorMessage: String,
-      operationalState: OperationalState
-  ): ObserveEvent =
-    createExposureState(
-      sourcePrefix,
-      obsId,
-      detector,
-      exposureInProgress,
-      abortInProgress,
-      isAborted,
-      errorMessage,
-      operationalState,
-      "IRDetectorExposureState"
-    )
-
+object IRDetectorEvent extends DetectorEvent("IRDetector") {
   def exposureData(
       sourcePrefix: String,
       obsId: ObsId,
