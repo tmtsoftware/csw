@@ -24,9 +24,9 @@ class DetectorHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCo
     val obsId      = ObsId("scala_obs_id")
     val exposureId = "some_exposure_id"
 
-    val observeStart   = IRDetectorEvent.ObserveStart.create(filterHcdPrefix.toString, obsId)
-    val exposureStart  = OpticalDetectorEvent.ExposureStart.create(filterHcdPrefix.toString, obsId, exposureId)
-    val publishSuccess = WFSDetectorEvent.PublishSuccess.create(filterHcdPrefix.toString)
+    val observeStart   = IRDetectorEvent.observeStart(filterHcdPrefix.toString, obsId)
+    val exposureStart  = OpticalDetectorEvent.exposureStart(filterHcdPrefix.toString, obsId, exposureId)
+    val publishSuccess = WFSDetectorEvent.publishSuccess(filterHcdPrefix.toString)
     eventService.defaultPublisher.publish(observeStart)
     eventService.defaultPublisher.publish(exposureStart)
     eventService.defaultPublisher.publish(publishSuccess)

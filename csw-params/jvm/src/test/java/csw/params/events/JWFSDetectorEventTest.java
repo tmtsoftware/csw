@@ -12,8 +12,7 @@ public class JWFSDetectorEventTest extends JUnitSuite {
 
     @Test
     public void shouldCreatePublishSuccessEvent__CSW_118() {
-        ObserveEvent event = JWFSDetectorEvent.PublishSuccess().create(sourcePrefix);
-
+        ObserveEvent event = WFSDetectorEvent.publishSuccess(sourcePrefix);
 
         Assert.assertEquals(prefix, event.source());
         Assert.assertEquals("PublishSuccess", event.eventName().name());
@@ -21,8 +20,7 @@ public class JWFSDetectorEventTest extends JUnitSuite {
 
     @Test
     public void shouldCreatePublishFailEvent__CSW_118() {
-        ObserveEvent event = JWFSDetectorEvent.PublishFail().create(sourcePrefix);
-
+        ObserveEvent event = WFSDetectorEvent.publishFail(sourcePrefix);
 
         Assert.assertEquals(prefix, event.source());
         Assert.assertEquals("PublishFail", event.eventName().name());

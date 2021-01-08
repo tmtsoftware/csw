@@ -11,8 +11,6 @@ import org.scalatestplus.junit.JUnitSuite;
 
 import java.util.*;
 
-import static csw.params.events.JIRDetectorEvent.*;
-
 public class JIRDetectorEventTest extends JUnitSuite {
     String sourcePrefix = "ESW.filter.wheel";
     Prefix prefix = new Prefix(JSubsystem.ESW, "filter.wheel");
@@ -25,8 +23,8 @@ public class JIRDetectorEventTest extends JUnitSuite {
     @Test
     public void shouldCreateIrDetectorObserveEventWithObsId__CSW_118() {
         List<TestData> testData = new ArrayList(Arrays.asList(
-                new TestData(ObserveStart().create(sourcePrefix, obsId), "ObserveStart"),
-                new TestData(ObserveEnd().create(sourcePrefix, obsId), "ObserveEnd")
+                new TestData(IRDetectorEvent.observeStart(sourcePrefix, obsId), "ObserveStart"),
+                new TestData(IRDetectorEvent.observeEnd(sourcePrefix, obsId), "ObserveEnd")
         ));
 
         Set<Parameter<?>> paramSet = new HashSet<>(10);
@@ -42,13 +40,13 @@ public class JIRDetectorEventTest extends JUnitSuite {
     @Test
     public void shouldCreateIrDetectorObserveEventWithObsIdAndExposureId__CSW_118() {
         List<TestData> testData = new ArrayList(Arrays.asList(
-                new TestData(ExposureStart().create(sourcePrefix, obsId, exposureId), "ExposureStart"),
-                new TestData(ExposureEnd().create(sourcePrefix, obsId, exposureId), "ExposureEnd"),
-                new TestData(ReadoutEnd().create(sourcePrefix, obsId, exposureId), "ReadoutEnd"),
-                new TestData(ReadoutFailed().create(sourcePrefix, obsId, exposureId), "ReadoutFailed"),
-                new TestData(DataWriteStart().create(sourcePrefix, obsId, exposureId), "DataWriteStart"),
-                new TestData(DataWriteEnd().create(sourcePrefix, obsId, exposureId), "DataWriteEnd"),
-                new TestData(ExposureAborted().create(sourcePrefix, obsId, exposureId), "ExposureAborted")));
+                new TestData(IRDetectorEvent.exposureStart(sourcePrefix, obsId, exposureId), "ExposureStart"),
+                new TestData(IRDetectorEvent.exposureEnd(sourcePrefix, obsId, exposureId), "ExposureEnd"),
+                new TestData(IRDetectorEvent.readoutEnd(sourcePrefix, obsId, exposureId), "ReadoutEnd"),
+                new TestData(IRDetectorEvent.readoutFailed(sourcePrefix, obsId, exposureId), "ReadoutFailed"),
+                new TestData(IRDetectorEvent.dataWriteStart(sourcePrefix, obsId, exposureId), "DataWriteStart"),
+                new TestData(IRDetectorEvent.dataWriteEnd(sourcePrefix, obsId, exposureId), "DataWriteEnd"),
+                new TestData(IRDetectorEvent.exposureAborted(sourcePrefix, obsId, exposureId), "ExposureAborted")));
 
         Set<Parameter<?>> paramSet = new HashSet<>(10);
         paramSet.add(obsIdParam);
@@ -64,7 +62,7 @@ public class JIRDetectorEventTest extends JUnitSuite {
     public void shouldCreateIrDetectorExposureStateEvent__CSW_118() {
         Set<Parameter<?>> paramSet = getParamSetForExposureStateEvent();
 
-        ObserveEvent event = JIRDetectorEvent.IRDetectorExposureState().create(
+        ObserveEvent event = IRDetectorEvent.exposureState(
                 sourcePrefix,
                 obsId,
                 detector,
@@ -90,7 +88,7 @@ public class JIRDetectorEventTest extends JUnitSuite {
         long remainingExposureTime = 20L;
         Set<Parameter<?>> paramSet = getParamSetForExposureDataEvent(readsInRamp, readsComplete, rampsInExposure, rampsComplete, exposureTime, remainingExposureTime);
 
-        ObserveEvent event = JIRDetectorEvent.IRDetectorExposureData().create(
+        ObserveEvent event = IRDetectorEvent.exposureData(
                 sourcePrefix,
                 obsId,
                 detector,

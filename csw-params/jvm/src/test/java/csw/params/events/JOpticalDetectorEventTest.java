@@ -11,8 +11,6 @@ import org.scalatestplus.junit.JUnitSuite;
 
 import java.util.*;
 
-import static csw.params.events.JOpticalDetectorEvent.*;
-
 public class JOpticalDetectorEventTest extends JUnitSuite {
     String sourcePrefix = "ESW.filter.wheel";
     Prefix prefix = new Prefix(JSubsystem.ESW, "filter.wheel");
@@ -25,8 +23,8 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
     @Test
     public void shouldCreateIrDetectorObserveEventWithObsId__CSW_118() {
         List<TestData> testData = new ArrayList(Arrays.asList(
-                new TestData(ObserveStart().create(sourcePrefix, obsId), "ObserveStart"),
-                new TestData(ObserveEnd().create(sourcePrefix, obsId), "ObserveEnd")
+                new TestData(OpticalDetectorEvent.observeStart(sourcePrefix, obsId), "ObserveStart"),
+                new TestData(OpticalDetectorEvent.observeEnd(sourcePrefix, obsId), "ObserveEnd")
         ));
 
         Set<Parameter<?>> paramSet = new HashSet<>(10);
@@ -42,14 +40,14 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
     @Test
     public void shouldCreateIrDetectorObserveEventWithObsIdAndExposureId__CSW_118() {
         List<TestData> testData = new ArrayList(Arrays.asList(
-                new TestData(PrepareStart().create(sourcePrefix, obsId, exposureId), "PrepareStart"),
-                new TestData(ExposureStart().create(sourcePrefix, obsId, exposureId), "ExposureStart"),
-                new TestData(ExposureEnd().create(sourcePrefix, obsId, exposureId), "ExposureEnd"),
-                new TestData(ReadoutEnd().create(sourcePrefix, obsId, exposureId), "ReadoutEnd"),
-                new TestData(ReadoutFailed().create(sourcePrefix, obsId, exposureId), "ReadoutFailed"),
-                new TestData(DataWriteStart().create(sourcePrefix, obsId, exposureId), "DataWriteStart"),
-                new TestData(DataWriteEnd().create(sourcePrefix, obsId, exposureId), "DataWriteEnd"),
-                new TestData(ExposureAborted().create(sourcePrefix, obsId, exposureId), "ExposureAborted")
+                new TestData(OpticalDetectorEvent.prepareStart(sourcePrefix, obsId, exposureId), "PrepareStart"),
+                new TestData(OpticalDetectorEvent.exposureStart(sourcePrefix, obsId, exposureId), "ExposureStart"),
+                new TestData(OpticalDetectorEvent.exposureEnd(sourcePrefix, obsId, exposureId), "ExposureEnd"),
+                new TestData(OpticalDetectorEvent.readoutEnd(sourcePrefix, obsId, exposureId), "ReadoutEnd"),
+                new TestData(OpticalDetectorEvent.readoutFailed(sourcePrefix, obsId, exposureId), "ReadoutFailed"),
+                new TestData(OpticalDetectorEvent.dataWriteStart(sourcePrefix, obsId, exposureId), "DataWriteStart"),
+                new TestData(OpticalDetectorEvent.dataWriteEnd(sourcePrefix, obsId, exposureId), "DataWriteEnd"),
+                new TestData(OpticalDetectorEvent.exposureAborted(sourcePrefix, obsId, exposureId), "ExposureAborted")
         ));
 
         Set<Parameter<?>> paramSet = new HashSet<>(10);
@@ -66,7 +64,7 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
     public void shouldCreateIrDetectorExposureStateEvent__CSW_118() {
         Set<Parameter<?>> paramSet = getParamSetForExposureStateEvent();
 
-        ObserveEvent event = JOpticalDetectorEvent.OpticalDetectorExposureState().create(
+        ObserveEvent event = OpticalDetectorEvent.exposureState(
                 sourcePrefix,
                 obsId,
                 detector,
@@ -88,7 +86,7 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
         long remainingExposureTime = 20L;
         Set<Parameter<?>> paramSet = getParamSetForExposureDataEvent(exposureTime, remainingExposureTime);
 
-        ObserveEvent event = JOpticalDetectorEvent.OpticalDetectorExposureData().create(
+        ObserveEvent event = OpticalDetectorEvent.exposureData(
                 sourcePrefix,
                 obsId,
                 detector,

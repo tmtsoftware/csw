@@ -20,8 +20,8 @@ import csw.params.core.states.CurrentState;
 import csw.params.core.states.StateName;
 import csw.params.events.JIRDetectorEvent;
 import csw.params.events.JOpticalDetectorEvent;
-import csw.params.events.JWFSDetectorEvent;
 import csw.params.events.ObserveEvent;
+import csw.params.events.WFSDetectorEvent;
 import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
 import csw.time.core.models.UTCTime;
@@ -60,7 +60,7 @@ public class JDetectorComponentHandlers extends JComponentHandlers {
 
         ObserveEvent observeStart = JIRDetectorEvent.ObserveStart().create(filterHcdPrefix.toString(), obsId);
         ObserveEvent exposureStart = JOpticalDetectorEvent.ExposureStart().create(filterHcdPrefix.toString(), obsId, exposureId);
-        ObserveEvent publishSuccess = JWFSDetectorEvent.PublishSuccess().create(filterHcdPrefix.toString());
+        ObserveEvent publishSuccess = WFSDetectorEvent.publishSuccess(filterHcdPrefix.toString());
         eventService.defaultPublisher().publish(observeStart);
         eventService.defaultPublisher().publish(exposureStart);
         eventService.defaultPublisher().publish(publishSuccess);
