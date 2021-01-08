@@ -6,7 +6,10 @@ import csw.params.core.models.ObsId
 import csw.prefix.models.Prefix
 
 sealed trait IRDetectorEvent {
-  protected def eventName: EventName = EventName(this.getClass.getSimpleName.dropRight(1))
+  protected def eventName: EventName = {
+    val simpleName = this.getClass.getSimpleName
+    EventName(if (simpleName.last == '$') simpleName.dropRight(1) else simpleName)
+  }
 }
 
 sealed trait IRObserveEvent extends IRDetectorEvent {
