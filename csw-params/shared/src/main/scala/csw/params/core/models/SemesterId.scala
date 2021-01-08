@@ -15,13 +15,14 @@ object Semester extends Enum[Semester] {
   case object B extends Semester
 }
 
-case class SemesterId(year: Year, semester: Semester) {
+case class SemesterId private (year: Year, semester: Semester) {
   override def toString: String = s"$year$semester"
 }
 
 object SemesterId {
   def apply(semesterId: String): SemesterId = {
     val (yearStr, semesterStr) = semesterId.splitAt(semesterId.length - 1)
-    SemesterId(Year.parse(yearStr), Semester.withNameInsensitive(semesterStr))
+    require(yearStr.toIntOption.isDefined, s"$yearStr should be valid year")
+    SemesterId(Year.of(yearStr.toInt), Semester.withNameInsensitive(semesterStr))
   }
 }
