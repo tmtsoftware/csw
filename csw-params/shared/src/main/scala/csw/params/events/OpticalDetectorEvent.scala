@@ -19,10 +19,7 @@ sealed trait OpticalObserveEvent extends OpticalDetectorEvent {
 
 sealed trait OpticalObserveEventWithExposureId extends OpticalDetectorEvent {
   def create(sourcePrefix: String, obsId: ObsId, exposureId: String): ObserveEvent = {
-    val params: Set[Parameter[_]] = Set(
-      StringKey.make("obsId").set(obsId.obsId),
-      StringKey.make("exposureId").set(exposureId)
-    )
+    val params: Set[Parameter[_]] = Set(Utils.obsIdParam(obsId), Utils.exposureIdParam(exposureId))
     ObserveEvent(Prefix(sourcePrefix), (eventName), params)
   }
 }
