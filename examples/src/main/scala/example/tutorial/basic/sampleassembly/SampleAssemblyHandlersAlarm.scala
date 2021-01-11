@@ -63,7 +63,7 @@ class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCt
 
     // Construct Setup command
     val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(5000).withUnits(Units.millisecond)
-    val setupCommand                    = Setup(componentInfo.prefix, hcdSleep, Some(ObsId("2018A-001"))).add(sleepTimeParam)
+    val setupCommand                    = Setup(componentInfo.prefix, hcdSleep, Some(ObsId("2020A-P001-O123"))).add(sleepTimeParam)
 
     // Submit command, and handle validation response. Final response is returned as a Future
     val submitCommandResponseF: Future[SubmitResponse] = hcd.submitAndWait(setupCommand).flatMap {

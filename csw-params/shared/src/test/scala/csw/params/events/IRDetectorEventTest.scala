@@ -10,7 +10,7 @@ import org.scalatest.prop.TableDrivenPropertyChecks._
 class IRDetectorEventTest extends AnyFunSpec with Matchers {
   describe("IR detector") {
     val sourcePrefix = "ESW.filter.wheel"
-    val obsId        = ObsId("someObsId")
+    val obsId        = ObsId("2020A-P001-O123")
     val exposureId   = "12345"
     val detector     = "ir-detector"
 
@@ -57,7 +57,7 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
       state.eventName.name shouldBe "IRDetectorExposureState"
       state.paramSet shouldBe Set(
         StringKey.make("detector").set(detector),
-        StringKey.make("obsId").set(obsId.obsId),
+        StringKey.make("obsId").set(obsId.toString),
         BooleanKey.make("exposureInProgress").set(true),
         BooleanKey.make("abortInProgress").set(false),
         BooleanKey.make("isAborted").set(true),
@@ -90,7 +90,7 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
       event.eventName.name shouldBe "IRDetectorExposureData"
       event.paramSet shouldBe Set(
         StringKey.make("detector").set(detector),
-        StringKey.make("obsId").set(obsId.obsId),
+        StringKey.make("obsId").set(obsId.toString),
         IntKey.make("readsInRamp").set(readsInRamp),
         IntKey.make("readsComplete").set(readsComplete),
         IntKey.make("rampsInExposure").set(rampsInExposure),

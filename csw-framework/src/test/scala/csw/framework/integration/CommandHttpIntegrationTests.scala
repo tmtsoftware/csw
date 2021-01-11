@@ -45,7 +45,7 @@ class CommandHttpIntegrationTests extends FrameworkIntegrationSuite {
   private val filterHCDConnection       = HttpConnection(models.ComponentId(Prefix(Subsystem.WFOS, "FilterHCD"), HCD))
   implicit private val containerActorSystem: ActorSystem[SpawnProtocol.Command] =
     ActorSystemFactory.remote(SpawnProtocol(), "container-system")
-  val obsId                         = Some(ObsId("Obs001"))
+  val obsId                         = Some(ObsId("2020A-P001-O123"))
   implicit val timeout: Timeout     = 12.seconds
   implicit val ec: ExecutionContext = containerActorSystem.executionContext
 

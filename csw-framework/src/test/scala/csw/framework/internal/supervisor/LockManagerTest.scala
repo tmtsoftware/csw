@@ -30,8 +30,8 @@ class LockManagerTest extends AnyFunSuite with MockitoSugar with Matchers {
   implicit val testKitSettings: TestKitSettings        = TestKitSettings(typedSystem)
 
   private val intParam: Parameter[Int] = KeyType.IntKey.make("intKey").set(1, 2, 3)
-  private val setup: Setup             = Setup(prefix, CommandName("move"), Some(ObsId("obs1001")), Set(intParam))
-  private val invalidSetup: Setup      = Setup(invalidPrefix, CommandName("move"), Some(ObsId("obs1001")), Set(intParam))
+  private val setup: Setup             = Setup(prefix, CommandName("move"), Some(ObsId("2020A-P001-O123")), Set(intParam))
+  private val invalidSetup: Setup      = Setup(invalidPrefix, CommandName("move"), Some(ObsId("2020A-P001-O123")), Set(intParam))
   private val mockedLoggerFactory      = mock[LoggerFactory]
   private val mockedLogger             = mock[Logger]
   when(mockedLoggerFactory.getLogger).thenReturn(mockedLogger)
@@ -151,7 +151,7 @@ class LockManagerTest extends AnyFunSuite with MockitoSugar with Matchers {
     val lockManager = new LockManager(lockPrefix = Some(prefix), mockedLoggerFactory)
     lockManager.isLocked shouldBe true
 
-    val nonAdminCmd: Setup = Setup(nonAdminPrefix, CommandName("move"), Some(ObsId("obs1001")), Set(intParam))
+    val nonAdminCmd: Setup = Setup(nonAdminPrefix, CommandName("move"), Some(ObsId("2020A-P001-O123")), Set(intParam))
     lockManager.allowCommand(Submit(nonAdminCmd, replyTo)) shouldBe false
 
     val probe               = TestProbe[LockingResponse]()

@@ -46,11 +46,13 @@ class LongRunningCommandTest(ignore: Int)
   implicit val scheduler: Scheduler         = typedSystem.scheduler
   implicit val testkit: TestKitSettings     = TestKitSettings(typedSystem)
 
-  test("should be able to send long running commands asynchronously and get the response | DEOPSCSW-194, DEOPSCSW-227, DEOPSCSW-228, DEOPSCSW-233") {
+  test(
+    "should be able to send long running commands asynchronously and get the response | DEOPSCSW-194, DEOPSCSW-227, DEOPSCSW-228, DEOPSCSW-233"
+  ) {
     runOn(seed) {
       // cluster seed is running on jvm-1
       enterBarrier("spawned")
-      val obsId = ObsId("Obs001")
+      val obsId = ObsId("2020A-P001-O123")
 
       // resolve assembly running in jvm-2 and send setup command expecting immediate command completion response
       val assemblyLocF =

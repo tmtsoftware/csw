@@ -32,7 +32,7 @@ class InterOperabilityTest extends AnyFunSuite with Matchers with BeforeAndAfter
   implicit val timeout: Timeout = Timeout(5.seconds)
 
   private val prefixStr    = "wfos.red.detector"
-  private val obsId: ObsId = ObsId("Obs001")
+  private val obsId: ObsId = ObsId("2020A-P001-O123")
   private val intKey       = KeyType.IntKey.make("intKey")
   private val stringKey    = KeyType.StringKey.make("stringKey")
   private val intParam     = intKey.set(22, 33)

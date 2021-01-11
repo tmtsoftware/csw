@@ -116,7 +116,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar with A
     val runningComponent          = new RunningComponent(supervisorProbe, commandStatusServiceProbe)
     import runningComponent._
 
-    val obsId: ObsId = ObsId("Obs001")
+    val obsId: ObsId = ObsId("2020A-P001-O123")
     val sc1 = Setup(Prefix("wfos.prog.cloudcover"), CommandName("wfos.prog.cloudcover"), Some(obsId))
       .add(KeyType.IntKey.make("encoder").set(22))
 
@@ -144,7 +144,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar with A
     val runningComponent          = new RunningComponent(supervisorProbe, commandStatusServiceProbe)
     import runningComponent._
 
-    val obsId: ObsId = ObsId("Obs001")
+    val obsId: ObsId = ObsId("2020A-P001-O123")
     val sc1 = Observe(Prefix("wfos.prog.cloudcover"), CommandName("wfos.prog.cloudcover"), Some(obsId))
       .add(KeyType.IntKey.make("encoder").set(22))
 
@@ -175,7 +175,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar with A
     val runningComponent          = new RunningComponent(supervisorProbe, commandStatusServiceProbe)
     import runningComponent._
 
-    val obsId: ObsId = ObsId("Obs001")
+    val obsId: ObsId = ObsId("2020A-P001-O123")
     val sc1 = Setup(Prefix("wfos.prog.cloudcover"), CommandName("wfos.prog.cloudcover"), Some(obsId))
       .add(KeyType.IntKey.make("encoder").set(22))
 
@@ -201,7 +201,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar with A
     val runningComponent          = new RunningComponent(supervisorProbe, commandStatusServiceProbe)
     import runningComponent._
 
-    val obsId: ObsId = ObsId("Obs001")
+    val obsId: ObsId = ObsId("2020A-P001-O123")
     val sc1 = Observe(Prefix("wfos.prog.cloudcover"), CommandName("wfos.prog.cloudcover"), Some(obsId))
       .add(KeyType.IntKey.make("encoder").set(22))
 

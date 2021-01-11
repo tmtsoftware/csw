@@ -37,7 +37,7 @@ trait CommandData {
   val locked: Locked   = Locked(id)
   val started: Started = Started(id)
 
-  val obsId: ObsId             = ObsId("obs001")
+  val obsId: ObsId             = ObsId("2020A-P001-O123")
   val commandName: CommandName = CommandName("move")
 
   val observe: ControlCommand             = Observe(prefix, commandName, Some(obsId))

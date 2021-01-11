@@ -47,7 +47,7 @@ class ImageDeSerializationBenchmark {
     system = ActorSystem(Behaviors.empty, "example")
     serialization = SerializationExtension(system)
     prefixStr = "wfos.prog.cloudcover"
-    obsId = ObsId("Obs001")
+    obsId = ObsId("2020A-P001-O123")
 
     img_32k_tuple = serializeImage("/images/32k_image.bin")
     img_128k_tuple = serializeImage("/images/128k_image.bin")
