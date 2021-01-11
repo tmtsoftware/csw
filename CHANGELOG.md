@@ -15,24 +15,24 @@ This is the third major release of the TMT Common Software for project stakehold
 See [here](https://tmtsoftware.github.io/csw/3.0.0/) for a detailed documentation of this version of the CSW software.
 
 ### Changes
-- `->` method on a Key now takes a single parameter instead of varargs. For varargs, please use `set` method.<sup>[1](#m3.0.0-1)</sup>
-- `->` method on a Key that took an array of values has been removed. Please use `setAll` method instead.<sup>[1](#m3.0.0-1)</sup>
-- `->` Removed usage of client-role and used realm-role instead in location server and config server routes.<sup>[1](#m3.0.0-1)</sup>
+- `->` method on a Key now takes a single parameter instead of varargs. For varargs, please use `set` method.<sup>[1](#3-0-0-1)</sup>
+- `->` method on a Key that took an array of values has been removed. Please use `setAll` method instead.<sup>[1](#3-0-0-1)</sup>
+- `->` Removed usage of client-role and used realm-role instead in location server and config server routes.<sup>[1](#3-0-0-1)</sup>
 - Contract change for location service API for example `registration` and `location` model incorporate metadata.
-  `Metadata` is additional information associated with `registration`.<sup>[1](#m3.0.0-1)</sup>
-- Removed `RegistrationFactory` from `location-server` module. Instead, following should be used by Scala and Java users to instantiate `AkkaRegistration`<sup>[1](#m3.0.0-1)</sup>
+  `Metadata` is additional information associated with `registration`.<sup>[1](#3-0-0-1)</sup>
+- Removed `RegistrationFactory` from `location-server` module. Instead, following should be used by Scala and Java users to instantiate `AkkaRegistration`<sup>[1](#3-0-0-1)</sup>
     - For Scala users, `AkkaRegistrationFactory` API change to expect actorRef instead of URI of remote actorRef
     - For Java users, `JAkkaRegistrationFactory` is added.
-- Contract change for ComponentHandlers `initialize` and `onShutdown` method, return type changed from `Future[Unit]` to `Unit` i.e. from non-blocking to blocking.<sup>[1](#m3.0.0-1)</sup>
-- Changed the installation of csw-apps, coursier to be used to install applications instead of downloading apps.zip from release page.<sup>[2](#m3.0.0-2)</sup>
-- logging-aggregator-<some-version>.zip will be available on the release page.<sup>[2](#m3.0.0-2)</sup>
-- Added Restrictions while creating Parameter key. It cannot have `[`, `]` or `/` characters in the key name.<sup>[2](#m3.0.0-2)</sup>
-- Changed Naming convention for network interface names from  `Public` and `Private` to `Outside` and `Inside` respectively.<sup>[2](#m3.0.0-2)</sup>
-- Minor fixes in STIL pipeline<sup>[3](#m3.0.0-3)</sup>
-- Ensure test report is generated for multi-jvm tests<sup>[4](#m3.0.0-4)</sup>
-- Fixed incorrect story id label in test<sup>[4](#m3.0.0-4)</sup>
-- Removed obsolete requirement linkage for DEOPSCSW-205<sup>[4](#m3.0.0-4)</sup>
-- Add support for test story report generation in multi jvm test plugin<sup>[5](#m3.0.0-5)</sup>
+- Contract change for ComponentHandlers `initialize` and `onShutdown` method, return type changed from `Future[Unit]` to `Unit` i.e. from non-blocking to blocking.<sup>[1](#3-0-0-1)</sup>
+- Changed the installation of csw-apps, coursier to be used to install applications instead of downloading apps.zip from release page.<sup>[2](#3.0.0-2)</sup>
+- logging-aggregator-<some-version>.zip will be available on the release page.<sup>[2](#3-0-0-2)</sup>
+- Added Restrictions while creating Parameter key. It cannot have `[`, `]` or `/` characters in the key name.<sup>[2](#3-0-0-2)</sup>
+- Changed Naming convention for network interface names from  `Public` and `Private` to `Outside` and `Inside` respectively.<sup>[2](#3-0-0-2)</sup>
+- Minor fixes in STIL pipeline<sup>[3](#3-0-0-3)</sup>
+- Ensure test report is generated for multi-jvm tests<sup>[4](#3-0-0-4)</sup>
+- Fixed incorrect story id label in test<sup>[4](#3-0-0-4)</sup>
+- Removed obsolete requirement linkage for DEOPSCSW-205<sup>[4](#3-0-0-4)</sup>
+- Add support for test story report generation in multi jvm test plugin<sup>[5](#3-0-0-5)</sup>
 
 ### Version Upgrades
 - Scala version upgrade to 2.13.3
@@ -48,13 +48,18 @@ See [here](https://tmtsoftware.github.io/csw/3.0.0/) for a detailed documentatio
 - Scaladoc: https://tmtsoftware.github.io/csw/3.0.0/api/scala/index.html
 - Javadoc: https://tmtsoftware.github.io/csw/3.0.0/api/java/index.html
 
-#### Supporting Releases
+### Supporting Releases
 
-<a name="3.0.0-1">1</a>: [CSW v3.0.0-M1] - 2020-11-10
-<a name="3.0.0-2">2</a>: [CSW v3.0.0-RC1] - 2020-12-08
-<a name="3.0.0-3">3</a>: [CSW v3.0.0-RC2] - 2020-09-24
-<a name="3.0.0-4">4</a>: [CSW v3.0.0-RC3] - 2020-12-19
-<a name="3.0.0-5">5</a>: [CSW v3.0.0-RC4] - 2020-12-23
+<a name="3-0-0-1"></a>
+##### 1: CSW v3.0.0-M1 - 2020-11-10
+<a name="3-0-0-2"></a>
+##### 2: CSW v3.0.0-RC1 - 2020-12-08
+<a name="3-0-0-3"></a>
+##### 3: CSW v3.0.0-RC2 - 2020-09-24
+<a name="3-0-0-4"></a>
+##### 4: CSW v3.0.0-RC3 - 2020-12-19
+<a name="3-0-0-5"></a>
+##### 5: CSW v3.0.0-RC4 - 2020-12-23
 
 ## [CSW v2.0.1] - 2020-03-20
 
