@@ -34,6 +34,21 @@ class RolesTest extends AnyFunSuite with Matchers {
     roles.containsUserRole(randomSubsystem) shouldBe false
   }
 
+  test("containsEngRole should give true if eng role for given subsystem is present") {
+    val subsystem = RandomUtils.randomFrom(Subsystem.values)
+    val roles     = Roles(Set(s"$subsystem-eng"))
+
+    roles.containsEngRole(subsystem) shouldBe true
+  }
+
+  test("containsEngRole should give false if eng role for given subsystem is not present") {
+    val subsystems      = Subsystem.values.toList
+    val roles           = Roles(Set(s"${subsystems.head}-eng"))
+    val randomSubsystem = RandomUtils.randomFrom(subsystems.tail) //random subsystem other than the one present in roles
+
+    roles.containsEngRole(randomSubsystem) shouldBe false
+  }
+
   test("containsAnyRole should give true if roles contain any role of given subsystem") {
     val subsystem1 = RandomUtils.randomFrom(Subsystem.values)
     val subsystem2 = RandomUtils.randomFrom(Subsystem.values)

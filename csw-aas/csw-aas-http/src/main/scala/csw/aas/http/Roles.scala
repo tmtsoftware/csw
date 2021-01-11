@@ -6,6 +6,7 @@ import msocket.security.models.AccessToken
 case class Roles private (roles: Set[String]) {
   def intersect(that: Roles): Set[String]             = this.roles.intersect(that.roles)
   def containsUserRole(subsystem: Subsystem): Boolean = roles.contains(subsystem.name.toLowerCase + "-user")
+  def containsEngRole(subsystem: Subsystem): Boolean  = roles.contains(subsystem.name.toLowerCase + "-eng")
   def containsAnyRole(subsystem: Subsystem): Boolean  = roles.exists(_.contains(subsystem.name.toLowerCase))
 }
 object Roles {
