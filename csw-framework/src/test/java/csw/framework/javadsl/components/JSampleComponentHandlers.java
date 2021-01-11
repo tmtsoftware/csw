@@ -16,23 +16,27 @@ import csw.framework.models.JCswContext;
 import csw.location.api.models.TrackingEvent;
 import csw.logging.api.javadsl.ILogger;
 import csw.params.commands.*;
-import csw.params.commands.CommandResponse.*;
+import csw.params.commands.CommandResponse.Completed;
+import csw.params.commands.CommandResponse.Started;
+import csw.params.commands.CommandResponse.SubmitResponse;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.Id;
-import csw.params.javadsl.JUnits;
-import csw.prefix.models.Prefix;
 import csw.params.core.states.CurrentState;
 import csw.params.core.states.StateName;
 import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JUnits;
 import csw.prefix.javadsl.JSubsystem;
+import csw.prefix.models.Prefix;
 import csw.time.core.models.UTCTime;
 
 import java.time.Duration;
 import java.util.Optional;
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static csw.common.components.command.ComponentStateForCommand.*;
 
@@ -72,7 +76,6 @@ public class JSampleComponentHandlers extends JComponentHandlers {
 
     @Override
     public void onLocationTrackingEvent(TrackingEvent trackingEvent) {
-
     }
 
     @Override

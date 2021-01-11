@@ -16,14 +16,17 @@ import csw.location.api.models.Connection.AkkaConnection
 import csw.params.commands
 import csw.params.commands.CommandName
 import csw.params.core.states.{CurrentState, StateName}
+import csw.params.events.{Event, ObserveEvent}
 import csw.prefix.models.{Prefix, Subsystem}
+import org.scalatest.concurrent.Eventually
 import redis.embedded.{RedisSentinel, RedisServer}
 
+import scala.collection.mutable
 import scala.concurrent.duration.DurationLong
 
 //DEOPSCSW-395: Provide EventService handle to component developers
 //CSW-82: ComponentInfo should take prefix
-class EventServiceIntegrationTest extends FrameworkIntegrationSuite {
+class EventServiceIntegrationTest extends FrameworkIntegrationSuite with Eventually {
   import testWiring._
 
   private val masterId: String        = ConfigFactory.load().getString("csw-event.redis.masterId")
@@ -71,5 +74,34 @@ class EventServiceIntegrationTest extends FrameworkIntegrationSuite {
 
     states.size shouldBe 2 //inclusive of latest event
     states should contain(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(eventReceivedChoice))))
+  }
+
+  test(
+    "should be able to publish and subscribe to observe events coming from IR, Optical & WFS detector (Both java and scala) | CSW-118"
+  ) {
+    Container.spawn(ConfigFactory.load("observe_event_container.conf"), wiring).await
+
+    val eventService = wiring.eventServiceFactory.make(wiring.locationService)(wiring.actorSystem)
+    val subscriber   = eventService.defaultSubscriber
+
+    val subscriptionEventList = mutable.ListBuffer[Event]()
+    subscriber.pSubscribeCallback(
+      Subsystem.WFOS,
+      "*",
+      { ev => subscriptionEventList.append(ev) }
+    )
+
+    // events count should be equal to published events count
+    eventually(timeout = timeout(5.seconds), interval = interval(100.millis)) {
+      val events = subscriptionEventList.toList.filter {
+        case _: ObserveEvent => true
+        case _               => false
+      }
+
+      events.size shouldBe 6
+      events.count(_.eventName.name === "ObserveStart") shouldBe 2
+      events.count(_.eventName.name === "ExposureStart") shouldBe 2
+      events.count(_.eventName.name === "PublishSuccess") shouldBe 2
+    }
   }
 }
