@@ -18,9 +18,9 @@ import csw.params.core.models.Id;
 import csw.params.core.models.ObsId;
 import csw.params.core.states.CurrentState;
 import csw.params.core.states.StateName;
-import csw.params.events.JIRDetectorEvent;
-import csw.params.events.JOpticalDetectorEvent;
+import csw.params.events.IRDetectorEvent;
 import csw.params.events.ObserveEvent;
+import csw.params.events.OpticalDetectorEvent;
 import csw.params.events.WFSDetectorEvent;
 import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
@@ -58,8 +58,8 @@ public class JDetectorComponentHandlers extends JComponentHandlers {
         String exposureId = "some_exposure_id";
         Prefix filterHcdPrefix = new Prefix(JSubsystem.WFOS, "blue.filter.hcd");
 
-        ObserveEvent observeStart = JIRDetectorEvent.ObserveStart().create(filterHcdPrefix.toString(), obsId);
-        ObserveEvent exposureStart = JOpticalDetectorEvent.ExposureStart().create(filterHcdPrefix.toString(), obsId, exposureId);
+        ObserveEvent observeStart = IRDetectorEvent.observeStart(filterHcdPrefix.toString(), obsId);
+        ObserveEvent exposureStart = OpticalDetectorEvent.exposureStart(filterHcdPrefix.toString(), obsId, exposureId);
         ObserveEvent publishSuccess = WFSDetectorEvent.publishSuccess(filterHcdPrefix.toString());
         eventService.defaultPublisher().publish(observeStart);
         eventService.defaultPublisher().publish(exposureStart);
