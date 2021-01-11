@@ -95,7 +95,7 @@ public class JSampleHandlers extends JComponentHandlers {
         Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime", JUnits.millisecond);
         Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L);
 
-        Setup setupCommand = new Setup(cswCtx.componentInfo().prefix(), new CommandName("sleep"), Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
+        Setup setupCommand = new Setup(cswCtx.componentInfo().prefix(), new CommandName("sleep"), Optional.of(ObsId.apply("2018A-P001-O123"))).add(sleepTimeParam);
 
         Timeout commandResponseTimeout = new Timeout(10, TimeUnit.SECONDS);
 
@@ -126,7 +126,7 @@ public class JSampleHandlers extends JComponentHandlers {
         Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime", JUnits.millisecond);
         Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L);
 
-        Setup setupCommand = new Setup(cswCtx.componentInfo().prefix(), new CommandName("sleep"), Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
+        Setup setupCommand = new Setup(cswCtx.componentInfo().prefix(), new CommandName("sleep"), Optional.of(ObsId.apply("2018A-P001-O123"))).add(sleepTimeParam);
 
         Timeout submitTimeout = new Timeout(1, TimeUnit.SECONDS);
         Timeout commandResponseTimeout = new Timeout(10, TimeUnit.SECONDS);

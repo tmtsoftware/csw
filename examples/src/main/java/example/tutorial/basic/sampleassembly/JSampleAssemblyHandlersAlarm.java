@@ -100,7 +100,7 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
         Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime");
         Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond);
 
-        Setup setupCommand = new Setup(cswCtx.componentInfo().prefix(), hcdSleep, Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
+        Setup setupCommand = new Setup(cswCtx.componentInfo().prefix(), hcdSleep, Optional.of(ObsId.apply("2018A-P001-O003"))).add(sleepTimeParam);
 
         Timeout submitTimeout = new Timeout(1, TimeUnit.SECONDS);
         Timeout commandResponseTimeout = new Timeout(10, TimeUnit.SECONDS);

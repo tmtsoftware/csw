@@ -25,7 +25,7 @@ class JsonTest extends AnyFunSpec {
 
   private val ck = Prefix("wfos.blue.filter")
 
-  private val obsId: ObsId = ObsId("Obs001")
+  private val obsId: ObsId = ObsId("2020A-P001-O123")
 
   describe("Test Subsystem JSON") {
     val wfos: Subsystem = Subsystem.WFOS
