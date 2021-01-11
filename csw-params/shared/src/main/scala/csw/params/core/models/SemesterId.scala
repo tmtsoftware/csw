@@ -2,7 +2,7 @@ package csw.params.core.models
 
 import java.time.Year
 
-import enumeratum.{EnumEntry, Enum}
+import enumeratum.{Enum, EnumEntry}
 
 import scala.collection.immutable.IndexedSeq
 
@@ -15,7 +15,13 @@ object Semester extends Enum[Semester] {
   case object B extends Semester
 }
 
-case class SemesterId private (year: Year, semester: Semester) {
+/**
+ * Represents a unique semester id
+ *
+ * @param year year for semester
+ * @param semester observing semester
+ */
+case class SemesterId private[csw] (year: Year, semester: Semester) {
   override def toString: String = s"$year$semester"
 }
 
@@ -23,6 +29,8 @@ object SemesterId {
   def apply(semesterId: String): SemesterId = {
     val (yearStr, semesterStr) = semesterId.splitAt(semesterId.length - 1)
     require(yearStr.toIntOption.isDefined, s"$yearStr should be valid year")
+//    fixme: Is following validation needed
+//    require(ValueRange.of(2000L, 4000L).isValidIntValue(yearStr.toInt), s"$yearStr should be valid year between")
     SemesterId(Year.of(yearStr.toInt), Semester.withNameInsensitive(semesterStr))
   }
 }

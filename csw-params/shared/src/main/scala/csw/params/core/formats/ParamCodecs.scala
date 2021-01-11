@@ -117,7 +117,7 @@ trait ParamCodecsBase extends CommonCodecs {
 
   // ************************ Command Codecs ********************
   implicit lazy val commandNameCodec: Codec[CommandName]         = deriveCodec
-  implicit lazy val obsIdCodec: Codec[ObsId]                     = deriveCodec
+  implicit lazy val obsIdCodec: Codec[ObsId]                     = Codec.bimap[String, ObsId](_.toString, ObsId(_))
   implicit lazy val controlCommandCodec: Codec[ControlCommand]   = deriveAllCodecs
   implicit lazy val sequenceCommandCodec: Codec[SequenceCommand] = deriveAllCodecs
   implicit lazy val sequenceCodec: Codec[Sequence]               = deriveCodec

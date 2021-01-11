@@ -14,10 +14,10 @@ import java.util.*;
 public class JOpticalDetectorEventTest extends JUnitSuite {
     String sourcePrefix = "ESW.filter.wheel";
     Prefix prefix = new Prefix(JSubsystem.ESW, "filter.wheel");
-    ObsId obsId = new ObsId("someObsId");
+    ObsId obsId = ObsId.apply("2020A-P001-O123");
     String exposureId = "some-exposure-id";
     String detector = "optical-detector";
-    Parameter<String> obsIdParam = JKeyType.StringKey().make("obsId").set(obsId.obsId());
+    Parameter<String> obsIdParam = JKeyType.StringKey().make("obsId").set(obsId.toString());
     Parameter<String> exposureIdParam = JKeyType.StringKey().make("exposureId").set(exposureId);
 
     @Test

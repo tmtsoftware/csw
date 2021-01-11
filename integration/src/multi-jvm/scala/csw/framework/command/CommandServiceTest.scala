@@ -58,7 +58,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
  * 4. Commanding Assembly starts state matcher
  * 5. Assembly (JVM-3) keeps publishing its current state
  * 6. Commanding Assembly marks status of Command as Completed when demand state matches with current state=
-  **/
+ */
 class CommandServiceTestMultiJvm1 extends CommandServiceTest(0)
 
 class CommandServiceTestMultiJvm2 extends CommandServiceTest(0)
@@ -120,7 +120,7 @@ class CommandServiceTest(ignore: Int)
       val submitResponseProbe = TestProbe[SubmitResponse]()
 
       // try to send a command to assembly which is already locked
-      val assemblyObserve = Observe(invalidPrefix, acceptedCmd, Some(ObsId("Obs001")))
+      val assemblyObserve = Observe(invalidPrefix, acceptedCmd, Some(ObsId("2020A-P001-O123")))
       assemblyRef ! Submit(assemblyObserve, submitResponseProbe.ref)
       submitResponseProbe.expectMessageType[Locked]
 
@@ -128,7 +128,7 @@ class CommandServiceTest(ignore: Int)
     }
 
     runOn(member1) {
-      val obsId = Some(ObsId("Obs001"))
+      val obsId = Some(ObsId("2020A-P001-O123"))
 
       // spawn single assembly running in Standalone mode in jvm-2
       val wiring        = FrameworkWiring.make(typedSystem, locationService, mock[RedisClient])

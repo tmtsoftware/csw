@@ -14,11 +14,11 @@ import java.util.*;
 public class JIRDetectorEventTest extends JUnitSuite {
     String sourcePrefix = "ESW.filter.wheel";
     Prefix prefix = new Prefix(JSubsystem.ESW, "filter.wheel");
-    ObsId obsId = new ObsId("someObsId");
+    ObsId obsId = ObsId.apply("2020A-P001-O123");
     String exposureId = "some-exposure-id";
     String detector = "ir-detector";
     Parameter<String> exposureIdParam = JKeyType.StringKey().make("exposureId").set(exposureId);
-    Parameter<String> obsIdParam = JKeyType.StringKey().make("obsId").set(obsId.obsId());
+    Parameter<String> obsIdParam = JKeyType.StringKey().make("obsId").set(obsId.toString());
 
     @Test
     public void shouldCreateIrDetectorObserveEventWithObsId__CSW_118() {

@@ -17,7 +17,7 @@ import org.scalatest.matchers.should.Matchers
 class CommandsTest extends AnyFunSpec with Matchers {
 
   //#obsid
-  val obsId: ObsId = ObsId("Obs001")
+  val obsId: ObsId = ObsId("2020A-P001-O123")
   //#obsid
 
   describe("Examples of Prefix") {

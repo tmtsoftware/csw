@@ -58,7 +58,7 @@ class ImageSerializationBenchmark {
     system = ActorSystem(Behaviors.empty, "example")
     serialization = SerializationExtension(system)
     prefixStr = "wfos.prog.cloudcover"
-    obsId = ObsId("Obs001")
+    obsId = ObsId("2020A-P001-O123")
   }
 
   @TearDown(Level.Trial)

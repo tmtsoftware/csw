@@ -5,9 +5,9 @@ import csw.params.core.generics._
 import csw.params.core.models.Units.{NoUnits, degree, meter}
 import csw.params.core.models.{ArrayData, ObsId}
 import csw.prefix.models.Prefix
+import org.scalatest.funspec.AnyFunSpec
 
 import scala.util.Try
-import org.scalatest.funspec.AnyFunSpec
 
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-185: Easy to Use Syntax/Api
@@ -19,7 +19,7 @@ class CommandsTest extends AnyFunSpec {
   private val ck3         = "wfos.red.detector"
   private val commandName = CommandName("move")
 
-  private val obsId: ObsId = ObsId("Obs001")
+  private val obsId: ObsId = ObsId("2020A-P001-O123")
   describe("Setup config tests") {
     val k1    = KeyType.IntKey.make("encoder")
     val k2    = KeyType.StringKey.make("stringThing")

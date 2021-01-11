@@ -14,7 +14,7 @@ class IdTest extends AnyFunSuite with Matchers {
     // Create 10 setup commands. For each command created, fetch the runId and add it in a Set[RunId].
     // Since Set can contain only unique values, asserting 10 runIds in set determines the uniquely created runId for all 10 setup commands.
     1 to 10 foreach { _ =>
-      val setup = Setup(Prefix("wfos.move.window"), CommandName("test"), Some(ObsId("Obs001")), Set.empty)
+      val setup = Setup(Prefix("wfos.move.window"), CommandName("test"), Some(ObsId("2020A-P001-O123")), Set.empty)
       runIds = runIds + setup.runId // runId is available in created setup command
     }
 
@@ -28,7 +28,7 @@ class IdTest extends AnyFunSuite with Matchers {
     // Create 10 observe commands. For each command created, fetch the runId and add it in a Set[RunId].
     // Since Set can contain only unique values, asserting 10 runIds in set determines the uniquely created runId for all 10 observe commands.
     1 to 10 foreach { _ =>
-      val observe = Observe(Prefix("wfos.move.window"), CommandName("test"), Some(ObsId("Obs001")), Set.empty)
+      val observe = Observe(Prefix("wfos.move.window"), CommandName("test"), Some(ObsId("2020A-P001-O123")), Set.empty)
       runIds = runIds + observe.runId // runId is available in created observe command
     }
 
@@ -42,7 +42,7 @@ class IdTest extends AnyFunSuite with Matchers {
     // Create 10 wait commands. For each command created, fetch the runId and add it in a Set[RunId].
     // Since Set can contain only unique values, asserting 10 runIds in set determines the uniquely created runId for all 10 wait commands.
     1 to 10 foreach { _ =>
-      val wait = Wait(Prefix("wfos.move.window"), CommandName("test"), Some(ObsId("Obs001")), Set.empty)
+      val wait = Wait(Prefix("wfos.move.window"), CommandName("test"), Some(ObsId("2020A-P001-O123")), Set.empty)
       runIds = runIds + wait.runId // runId is available in created wait command
     }
 
