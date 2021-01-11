@@ -31,7 +31,7 @@ object ObsId {
   private val SEPARATOR = '-'
   def apply(obsId: String): ObsId = {
     require(
-      obsId.count(char => char == SEPARATOR) == 2,
+      obsId.count(_ == SEPARATOR) == 2,
       s"ObsId must form with semsterId, programNumer, observationNumber separated with \'$SEPARATOR\' ex: 2020A-P001-O123"
     )
     val Array(semesterId, programNumber, observationNumber) = obsId.split(s"\\$SEPARATOR", 3)
