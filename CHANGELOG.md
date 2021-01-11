@@ -50,16 +50,11 @@ See [here](https://tmtsoftware.github.io/csw/3.0.0/) for a detailed documentatio
 
 ### Supporting Releases
 
-<a name="3-0-0-1"></a>
-##### 1: CSW v3.0.0-M1 - 2020-11-10
-<a name="3-0-0-2"></a>
-##### 2: CSW v3.0.0-RC1 - 2020-12-08
-<a name="3-0-0-3"></a>
-##### 3: CSW v3.0.0-RC2 - 2020-09-24
-<a name="3-0-0-4"></a>
-##### 4: CSW v3.0.0-RC3 - 2020-12-19
-<a name="3-0-0-5"></a>
-##### 5: CSW v3.0.0-RC4 - 2020-12-23
+<a name="3-0-0-1"></a>1: CSW v3.0.0-M1 - 2020-11-10<br>
+<a name="3-0-0-2"></a>2: CSW v3.0.0-RC1 - 2020-12-08<br>
+<a name="3-0-0-3"></a>3: CSW v3.0.0-RC2 - 2020-09-24<br>
+<a name="3-0-0-4"></a>4: CSW v3.0.0-RC3 - 2020-12-19<br>
+<a name="3-0-0-5"></a>5: CSW v3.0.0-RC4 - 2020-12-23
 
 ## [CSW v2.0.1] - 2020-03-20
 
