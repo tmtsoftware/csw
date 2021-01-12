@@ -12,7 +12,7 @@ on:
       - "notes/**"
 
 jobs:
-  unit-tests:
+  tests:
     runs-on: ubuntu-18.04
 
     steps:
@@ -70,7 +70,7 @@ jobs:
           path: target/scala-2.13/scoverage-report
 
   slack-success:
-    needs: [ unit-tests, multi-jvm-tests ]
+    needs: [ tests ]
     if: success()
     runs-on: ubuntu-latest
     steps:
@@ -81,7 +81,7 @@ jobs:
           channel: ci-dev
 
   slack-failure:
-    needs: [ unit-tests, multi-jvm-tests ]
+    needs: [ tests ]
     if: failure()
     runs-on: ubuntu-latest
     steps:
@@ -92,7 +92,7 @@ jobs:
           channel: ci-dev
 
   slack-cancelled:
-    needs: [ unit-tests, multi-jvm-tests ]
+    needs: [ tests ]
     if: cancelled()
     runs-on: ubuntu-latest
     steps:
