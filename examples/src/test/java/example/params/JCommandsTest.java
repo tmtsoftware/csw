@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 public class JCommandsTest extends JUnitSuite {
     //#obsid
-    ObsId obsId = ObsId.apply("2020A-P001-O123");
+    ObsId obsId = ObsId.apply("2020A-001-123");
     //#obsid
 
     @Test

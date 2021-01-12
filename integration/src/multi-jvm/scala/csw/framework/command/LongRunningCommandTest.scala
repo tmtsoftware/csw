@@ -52,7 +52,7 @@ class LongRunningCommandTest(ignore: Int)
     runOn(seed) {
       // cluster seed is running on jvm-1
       enterBarrier("spawned")
-      val obsId = ObsId("2020A-P001-O123")
+      val obsId = ObsId("2020A-001-123")
 
       // resolve assembly running in jvm-2 and send setup command expecting immediate command completion response
       val assemblyLocF =

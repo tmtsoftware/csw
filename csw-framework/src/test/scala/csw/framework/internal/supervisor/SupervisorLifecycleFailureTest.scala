@@ -175,7 +175,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     val failureRestartExMsg = "testing FailureRestart"
     val unexpectedMessage   = "Unexpected message :[Running"
 
-    val obsId: ObsId          = ObsId("2020A-P001-O123")
+    val obsId: ObsId          = ObsId("2020A-001-123")
     val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(22)
     val setup: Setup          = Setup(prefix, CommandName("move"), Some(obsId), Set(param))
 

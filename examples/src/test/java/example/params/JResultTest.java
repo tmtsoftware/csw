@@ -88,7 +88,7 @@ public class JResultTest extends JUnitSuite {
         Parameter<MatrixData<Double>> i1 = k1.set(m1);
 
         //ObsId
-        ObsId obsId = ObsId.apply("2020A-P001-O123");
+        ObsId obsId = ObsId.apply("2020A-001-123");
 
         //prefix
         Prefix prefix = Prefix.apply(JSubsystem.WFOS, "prog.cloudcover");
@@ -118,7 +118,7 @@ public class JResultTest extends JUnitSuite {
         Key<Integer> miscKey = JKeyType.IntKey().make("misc.", JUnits.NoUnits);
 
         //ObsId
-        ObsId obsId = ObsId.apply("2020A-P001-O123");
+        ObsId obsId = ObsId.apply("2020A-001-123");
 
         //prefix
         Prefix prefix = Prefix.apply(JSubsystem.WFOS, "blue.filter");

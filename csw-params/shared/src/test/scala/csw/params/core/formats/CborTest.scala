@@ -15,7 +15,7 @@ class CborTest extends AnyFunSuite with Matchers {
   private val prefix      = Prefix("wfos.blue.filter")
   private val eventName   = EventName("filter wheel")
   private val commandName = CommandName("filter wheel")
-  private val maybeObsId  = Some(ObsId("2020A-P001-O123"))
+  private val maybeObsId  = Some(ObsId("2020A-001-123"))
 
   test("should encode and decode event with paramSet having all key-types") {
     val event       = ObserveEvent(prefix, eventName, ParamSetData.paramSet)

@@ -14,7 +14,7 @@ import java.util.*;
 public class JIRDetectorEventTest extends JUnitSuite {
     String sourcePrefix = "ESW.filter.wheel";
     Prefix prefix = new Prefix(JSubsystem.ESW, "filter.wheel");
-    ObsId obsId = ObsId.apply("2020A-P001-O123");
+    ObsId obsId = ObsId.apply("2020A-001-123");
     String exposureId = "some-exposure-id";
     String detector = "ir-detector";
     Parameter<String> exposureIdParam = JKeyType.StringKey().make("exposureId").set(exposureId);

@@ -120,7 +120,7 @@ class CommandServiceTest(ignore: Int)
       val submitResponseProbe = TestProbe[SubmitResponse]()
 
       // try to send a command to assembly which is already locked
-      val assemblyObserve = Observe(invalidPrefix, acceptedCmd, Some(ObsId("2020A-P001-O123")))
+      val assemblyObserve = Observe(invalidPrefix, acceptedCmd, Some(ObsId("2020A-001-123")))
       assemblyRef ! Submit(assemblyObserve, submitResponseProbe.ref)
       submitResponseProbe.expectMessageType[Locked]
 
@@ -128,7 +128,7 @@ class CommandServiceTest(ignore: Int)
     }
 
     runOn(member1) {
-      val obsId = Some(ObsId("2020A-P001-O123"))
+      val obsId = Some(ObsId("2020A-001-123"))
 
       // spawn single assembly running in Standalone mode in jvm-2
       val wiring        = FrameworkWiring.make(typedSystem, locationService, mock[RedisClient])

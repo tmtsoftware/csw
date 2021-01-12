@@ -111,7 +111,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         compStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
         lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
-        val obsId: ObsId          = ObsId("2020A-P001-O123")
+        val obsId: ObsId          = ObsId("2020A-001-123")
         val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(22)
         val setup: Setup          = Setup(prefix, CommandName("move.success"), Some(obsId), Set(param))
 
@@ -189,7 +189,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         compStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
         lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
-        val obsId: ObsId          = ObsId("2020A-P001-O123")
+        val obsId: ObsId          = ObsId("2020A-001-123")
         val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(22)
         val setup: Setup          = Setup(prefix, CommandName("move.success"), Some(obsId), Set(param))
 
@@ -265,7 +265,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         compStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
         lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
-        val obsId: ObsId          = ObsId("2020A-P001-O123")
+        val obsId: ObsId          = ObsId("2020A-001-123")
         val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(22)
         // setup to receive Success in validation result
         val setup: Setup = Setup(prefix, CommandName("move.failure"), Some(obsId), Set(param))

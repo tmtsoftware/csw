@@ -90,7 +90,7 @@ class BasicSampleHcdTest
     // Helper to get units set
     def setSleepTime(setup: Setup, milli: Long): Setup = setup.add(sleepTimeKey.set(milli).withUnits(Units.millisecond))
 
-    val setupCommand = setSleepTime(Setup(testPrefix, hcdSleep, Some(ObsId("2020A-P001-O123"))), 5000)
+    val setupCommand = setSleepTime(Setup(testPrefix, hcdSleep, Some(ObsId("2020A-001-123"))), 5000)
 
     val connection = AkkaConnection(ComponentId(Prefix(Subsystem.CSW, "samplehcd"), ComponentType.HCD))
 
@@ -115,7 +115,7 @@ class BasicSampleHcdTest
     // Helper to get units set
     def setSleepTime(milli: Long): Parameter[Long] = sleepTimeKey.set(milli).withUnits(Units.millisecond)
 
-    val setupCommand = Setup(testPrefix, hcdSleep, Some(ObsId("2020A-P001-O123"))).add(setSleepTime(5000))
+    val setupCommand = Setup(testPrefix, hcdSleep, Some(ObsId("2020A-001-123"))).add(setSleepTime(5000))
 
     val connection = AkkaConnection(ComponentId(Prefix(Subsystem.CSW, "samplehcd"), ComponentType.HCD))
 

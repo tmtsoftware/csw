@@ -86,7 +86,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     val commandName1  = CommandName("move.Client1.success")
     val source2Prefix = Prefix("wfos.prog.cloudcover.source2")
     val commandName2  = CommandName("move.Client2.success")
-    val obsId         = ObsId("2020A-P001-O123")
+    val obsId         = ObsId("2020A-001-123")
 
     val mocks = frameworkTestMocks()
     import mocks._
@@ -137,7 +137,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
     val sourcePrefix = Prefix("wfos.prog.cloudcover.source")
     val commandName  = CommandName("move.Client1.success")
-    val obsId        = ObsId("2020A-P001-O123")
+    val obsId        = ObsId("2020A-001-123")
 
     val mocks = frameworkTestMocks()
     import mocks._
@@ -169,7 +169,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     val source1Prefix = Prefix("wfos.prog.cloudcover.Client1.success")
     val source2Prefix = Prefix("wfos.prog.cloudcover.source2.success")
     val commandName   = CommandName("success.move")
-    val obsId         = ObsId("2020A-P001-O123")
+    val obsId         = ObsId("2020A-001-123")
 
     val mocks = frameworkTestMocks()
     import mocks._

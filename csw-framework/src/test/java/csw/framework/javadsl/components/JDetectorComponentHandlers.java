@@ -54,7 +54,7 @@ public class JDetectorComponentHandlers extends JComponentHandlers {
         log.debug("Initializing Sample component");
 
         //#CSW-118 : publishing observe events for IR, Optical & WFS detectors
-        ObsId obsId = ObsId.apply("2020A-P001-O123");
+        ObsId obsId = ObsId.apply("2020A-001-123");
         String exposureId = "some_exposure_id";
         Prefix filterHcdPrefix = new Prefix(JSubsystem.WFOS, "blue.filter.hcd");
 

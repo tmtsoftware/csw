@@ -87,7 +87,7 @@ class ModerateSampleHcdTest
 
     // Construct Setup command
     val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(3000).withUnits(Units.millisecond)
-    val setupCommand                    = Setup(Prefix("csw.move"), hcdSleep, Some(ObsId("2020A-P001-O123"))).add(sleepTimeParam)
+    val setupCommand                    = Setup(Prefix("csw.move"), hcdSleep, Some(ObsId("2020A-001-123"))).add(sleepTimeParam)
 
     val connection = AkkaConnection(ComponentId(Prefix(Subsystem.CSW, "samplehcd"), ComponentType.HCD))
 
@@ -129,7 +129,7 @@ class ModerateSampleHcdTest
 
     // Construct Setup command
     val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(4000).withUnits(Units.millisecond)
-    val setupCommand                    = Setup(Prefix("csw.move"), hcdSleep, Some(ObsId("2020A-P001-O123"))).add(sleepTimeParam)
+    val setupCommand                    = Setup(Prefix("csw.move"), hcdSleep, Some(ObsId("2020A-001-123"))).add(sleepTimeParam)
 
     val connection = AkkaConnection(ComponentId(Prefix(Subsystem.CSW, "samplehcd"), ComponentType.HCD))
 

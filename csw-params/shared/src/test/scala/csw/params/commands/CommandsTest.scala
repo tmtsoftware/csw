@@ -19,7 +19,7 @@ class CommandsTest extends AnyFunSpec {
   private val ck3         = "wfos.red.detector"
   private val commandName = CommandName("move")
 
-  private val obsId: ObsId = ObsId("2020A-P001-O123")
+  private val obsId: ObsId = ObsId("2020A-001-123")
   describe("Setup config tests") {
     val k1    = KeyType.IntKey.make("encoder")
     val k2    = KeyType.StringKey.make("stringThing")

@@ -175,7 +175,7 @@ class ContainerCmdTest(ignore: Int)
 
       import csw.common.components.framework.SampleComponentState._
 
-      val obsId: ObsId          = ObsId("2020A-P001-O123")
+      val obsId: ObsId          = ObsId("2020A-001-123")
       val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(22)
       // setup to receive Success in validation result
       val setupSuccess: Setup = Setup(successPrefix, CommandName("move.success"), Some(obsId), Set(param))

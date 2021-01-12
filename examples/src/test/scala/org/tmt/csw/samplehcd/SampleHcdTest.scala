@@ -84,7 +84,7 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
     // Construct Setup command
     val sleepTimeKey: Key[Long]         = KeyType.LongKey.make("SleepTime")
     val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(5000).withUnits(Units.millisecond)
-    val setupCommand                    = Setup(Prefix("csw.move"), CommandName("sleep"), Some(ObsId("2020A-P001-O123"))).add(sleepTimeParam)
+    val setupCommand                    = Setup(Prefix("csw.move"), CommandName("sleep"), Some(ObsId("2020A-001-123"))).add(sleepTimeParam)
 
     val connection = AkkaConnection(ComponentId(Prefix(CSW, "samplehcd"), ComponentType.HCD))
 
@@ -106,7 +106,7 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
     // Construct Setup command
     val sleepTimeKey: Key[Long]         = KeyType.LongKey.make("SleepTime")
     val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(5000).withUnits(Units.millisecond)
-    val setupCommand                    = Setup(Prefix("csw.move"), CommandName("sleep"), Some(ObsId("2020A-P001-O123"))).add(sleepTimeParam)
+    val setupCommand                    = Setup(Prefix("csw.move"), CommandName("sleep"), Some(ObsId("2020A-001-123"))).add(sleepTimeParam)
 
     val connection = AkkaConnection(ComponentId(Prefix(CSW, "samplehcd"), ComponentType.HCD))
 

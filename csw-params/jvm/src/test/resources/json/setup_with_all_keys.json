@@ -2,7 +2,7 @@
   "_type": "Setup",
   "source": "WFOS.blue.filter",
   "commandName": "move",
-  "maybeObsId": "2020A-P001-O123",
+  "maybeObsId": "2020A-001-123",
   "paramSet": [
     {
       "LongKey": {
