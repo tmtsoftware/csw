@@ -8,7 +8,9 @@ import java.util.Optional
  * @param programId represents program Id
  * @param observationNumber Unique observation number in pattern O followed by 3 digit number
  */
-case class ObsId(programId: ProgramId, observationNumber: String) {
+case class ObsId(programId: ProgramId, observationNumber: Int) {
+
+  require(observationNumber >= 1 && observationNumber <= 999, "Program Number should be integer in the range of 1 to 999")
 
   /**
    * Returns the ObsId in form of Option
@@ -24,7 +26,7 @@ case class ObsId(programId: ProgramId, observationNumber: String) {
    */
   def asOptional: Optional[ObsId] = Optional.of(new ObsId(programId, observationNumber))
 
-  override def toString: String = s"$programId-$observationNumber"
+  override def toString: String = s"$programId-${observationNumber.formatted("%03d")}"
 }
 
 object ObsId {
@@ -32,15 +34,13 @@ object ObsId {
   def apply(obsId: String): ObsId = {
     require(
       obsId.count(_ == SEPARATOR) == 2,
-      s"ObsId must form with semsterId, programNumer, observationNumber separated with \'$SEPARATOR\' ex: 2020A-P001-O123"
+      s"ObsId must form with semsterId, programNumer, observationNumber separated with \'$SEPARATOR\' ex: 2020A-001-123"
     )
     val Array(semesterId, programNumber, observationNumber) = obsId.split(s"\\$SEPARATOR", 3)
-    val (fixedPart, number)                                 = observationNumber.splitAt(1)
-    require(fixedPart == "O", "Observation Number should start with letter 'O'")
     require(
-      number.toIntOption.isDefined && number.length == 3,
-      "Observation Number should be valid three digit integer prefixed with letter 'O' ex: O123, O001 etc"
+      observationNumber.toIntOption.isDefined,
+      "Observation Number should be valid integer prefixed ex: 123, 001 etc"
     )
-    ObsId(ProgramId(SemesterId(semesterId), programNumber), observationNumber)
+    ObsId(ProgramId(SemesterId(semesterId), programNumber.toInt), observationNumber.toInt)
   }
 }

@@ -21,7 +21,7 @@ class DetectorHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCo
   override def initialize(): Unit = {
     log.info("Initializing HCD Component TLA")
     //#CSW-118 : publishing observe events for IR, Optical & WFS detectors
-    val obsId      = ObsId("2020A-P001-O123")
+    val obsId      = ObsId("2020A-001-123")
     val exposureId = "some_exposure_id"
 
     val observeStart   = IRDetectorEvent.observeStart(filterHcdPrefix.toString, obsId)

@@ -51,7 +51,7 @@ public class JStateVariableTest extends JUnitSuite {
     @Test
     public void shouldAbleToCreateCurrentStateFromSetup__DEOPSCSW_183_DEOPSCSW_185() {
         Prefix source = prefix;
-        Setup setup = new Setup(source, new CommandName("move"), Optional.of(ObsId.apply("2020A-P001-O123"))).add(encoderParam).add(epochStringParam);
+        Setup setup = new Setup(source, new CommandName("move"), Optional.of(ObsId.apply("2020A-001-123"))).add(encoderParam).add(epochStringParam);
         CurrentState currentState = new CurrentState(new StateName("testStateName"), setup);
 
         // typeName and prefix
@@ -87,7 +87,7 @@ public class JStateVariableTest extends JUnitSuite {
     @Test
     public void shouldAbleToCreateDemandStateFromSetup__DEOPSCSW_183_DEOPSCSW_185() {
         Prefix source = prefix;
-        Setup setup = new Setup(source, new CommandName("move"), Optional.of(ObsId.apply("2020A-P001-O123"))).add(encoderParam).add(epochStringParam);
+        Setup setup = new Setup(source, new CommandName("move"), Optional.of(ObsId.apply("2020A-001-123"))).add(encoderParam).add(epochStringParam);
         DemandState demandState = new DemandState(new StateName("testStateName"), setup);
 
         // typeName and prefix

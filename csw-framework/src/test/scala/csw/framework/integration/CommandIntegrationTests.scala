@@ -43,7 +43,7 @@ class CommandIntegrationTests extends FrameworkIntegrationSuite {
   private val filterHCDConnection      = AkkaConnection(models.ComponentId(Prefix(Subsystem.WFOS, "FilterHCD"), HCD))
   private implicit val containerActorSystem: ActorSystem[SpawnProtocol.Command] =
     ActorSystemFactory.remote(SpawnProtocol(), "container-system")
-  val obsId                         = Some(ObsId("2020A-P001-O123"))
+  val obsId                         = Some(ObsId("2020A-001-123"))
   implicit val timeout: Timeout     = 12.seconds
   implicit val ec: ExecutionContext = containerActorSystem.executionContext
 

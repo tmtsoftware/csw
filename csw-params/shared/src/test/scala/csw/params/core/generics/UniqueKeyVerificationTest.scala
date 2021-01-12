@@ -37,7 +37,7 @@ class UniqueKeyVerificationTest extends AnyFunSpec with Matchers {
         Setup(
           prefix,
           CommandName("move"),
-          Some(ObsId("2020A-P001-O123")),
+          Some(ObsId("2020A-001-123")),
           Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3)
         )
       setup.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
@@ -59,7 +59,7 @@ class UniqueKeyVerificationTest extends AnyFunSpec with Matchers {
         Observe(
           prefix,
           CommandName("move"),
-          Some(ObsId("2020A-P001-O123")),
+          Some(ObsId("2020A-001-123")),
           Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3)
         )
       observe.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
@@ -81,7 +81,7 @@ class UniqueKeyVerificationTest extends AnyFunSpec with Matchers {
         Wait(
           prefix,
           CommandName("move"),
-          Some(ObsId("2020A-P001-O123")),
+          Some(ObsId("2020A-001-123")),
           Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3)
         )
       wait.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)

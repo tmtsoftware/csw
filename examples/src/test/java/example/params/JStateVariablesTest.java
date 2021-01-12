@@ -44,7 +44,7 @@ public class JStateVariablesTest extends JUnitSuite {
 
 
         //#obsid
-        ObsId obsId = ObsId.apply("2020A-P001-O123");
+        ObsId obsId = ObsId.apply("2020A-001-123");
 
         //parameters
         Parameter<Character> charParam = charKey.set('A', 'B', 'C').withUnits(NoUnits);
@@ -106,7 +106,7 @@ public class JStateVariablesTest extends JUnitSuite {
 
 
         //#obsid
-        ObsId obsId = ObsId.apply("2020A-P001-O123");
+        ObsId obsId = ObsId.apply("2020A-001-123");
 
         //parameters
         Parameter<Character> charParam = charKey.set('A', 'B', 'C').withUnits(NoUnits);

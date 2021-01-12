@@ -10,7 +10,7 @@ import org.scalatest.prop.TableDrivenPropertyChecks._
 class IRDetectorEventTest extends AnyFunSpec with Matchers {
   describe("IR detector") {
     val sourcePrefix = "ESW.filter.wheel"
-    val obsId        = ObsId("2020A-P001-O123")
+    val obsId        = ObsId("2020A-001-123")
     val exposureId   = "12345"
     val detector     = "ir-detector"
 

@@ -48,7 +48,7 @@ class CancellableCommandTest(ignore: Int)
     }
 
     runOn(member) {
-      val obsId         = Some(ObsId("2020A-P001-O123"))
+      val obsId         = Some(ObsId("2020A-001-123"))
       val cancelCmdId   = KeyType.StringKey.make("cancelCmdId")
       val cancelCmdName = KeyType.StringKey.make(name = "cancelCmdName")
 

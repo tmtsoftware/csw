@@ -32,7 +32,7 @@ public class JCommandsTest extends JUnitSuite {
     private final Parameter<String> epochStringParam = epochStringKey.set("A", "B");
     private final Parameter<Integer> epochIntParam = epochIntKey.set(44, 55);
 
-    private final ObsId obsId = ObsId.apply("2020A-P001-O123");
+    private final ObsId obsId = ObsId.apply("2020A-001-123");
     private final Prefix prefix = Prefix.apply(JSubsystem.WFOS, "red.detector");
     private final CommandName commandName = new CommandName("move");
 
