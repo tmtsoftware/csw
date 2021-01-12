@@ -40,6 +40,13 @@ jobs:
           sbt -DenableFatalWarnings=true -Dakka.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true 'csw-time/test:test'
           sbt -DenableFatalWarnings=true -Dakka.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true -DdisableTimeTests 'test:test'
 
+      - name: Multi-Jvm Tests
+        run: sbt -DenableFatalWarnings=true -DgenerateStoryReport=true 'integration/multi-jvm:test'
+
+      - name: Docs Check
+        run: |
+          sbtn makeSite
+
       - name: Coverage Report
         run: |
           sbt -DenableCoverage=true coverageReport
@@ -61,31 +68,6 @@ jobs:
         with:
           name: Coverage Report
           path: target/scala-2.13/scoverage-report
-
-  multi-jvm-tests:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
-      - uses: laughedelic/coursier-setup@v1
-        with:
-          jvm: 11
-          apps: sbt sbtn
-      - uses: coursier/cache-action@v5
-
-      - name: Compile
-       run: |
-         sbtn clean
-         sbtn scalafmtCheck
-         sbtn scalastyle
-         sbt -DenableFatalWarnings=true ';set every Seq(scalafmtOnCompile := false); multi-jvm:compile;'
-
-      - name: Docs Check
-        run: |
-          sbtn makeSite
-
-      - name: Multi-Jvm Tests
-        run: sbt -DenableFatalWarnings=true -DgenerateStoryReport=true 'integration/multi-jvm:test'
 
   slack-success:
     needs: [ unit-tests, multi-jvm-tests ]
