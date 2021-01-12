@@ -12,28 +12,7 @@ on:
       - "notes/**"
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
-      - uses: laughedelic/coursier-setup@v1
-        with:
-          jvm: 11
-          apps: sbt sbtn
-      - uses: coursier/cache-action@v5
-
-      - name: Docs Check
-        run: |
-          sbtn clean
-          sbtn scalafmtCheck
-          sbtn scalastyle
-          sbtn makeSite
-          sbt -DenableFatalWarnings=true ';set every Seq(scalafmtOnCompile := false); test:compile; multi-jvm:compile;'
-
-
   unit-tests:
-    needs: [ build ]
     runs-on: ubuntu-18.04
 
     steps:
@@ -48,6 +27,13 @@ jobs:
         run: |
           sudo apt-get install ntp -y
           sudo ntptime -T 37
+
+      - name: Compile
+        run: |
+          sbtn clean
+          sbtn scalafmtCheck
+          sbtn scalastyle
+          sbt -DenableFatalWarnings=true ';set every Seq(scalafmtOnCompile := false); test:compile;'
 
       - name: Tests
         run: |
@@ -77,7 +63,6 @@ jobs:
           path: target/scala-2.13/scoverage-report
 
   multi-jvm-tests:
-    needs: [ build ]
     runs-on: ubuntu-latest
 
     steps:
@@ -87,6 +72,17 @@ jobs:
           jvm: 11
           apps: sbt sbtn
       - uses: coursier/cache-action@v5
+
+      - name: Compile
+       run: |
+         sbtn clean
+         sbtn scalafmtCheck
+         sbtn scalastyle
+         sbt -DenableFatalWarnings=true ';set every Seq(scalafmtOnCompile := false); multi-jvm:compile;'
+
+      - name: Docs Check
+        run: |
+          sbtn makeSite
 
       - name: Multi-Jvm Tests
         run: sbt -DenableFatalWarnings=true -DgenerateStoryReport=true 'integration/multi-jvm:test'
