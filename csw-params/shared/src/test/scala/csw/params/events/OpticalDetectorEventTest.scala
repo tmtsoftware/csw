@@ -10,7 +10,7 @@ import org.scalatest.prop.TableDrivenPropertyChecks.Table
 class OpticalDetectorEventTest extends AnyFunSpec with Matchers {
   describe("OpticalDetectorEvent") {
 
-    it("create Observe Events with obsId | ESW-81") {
+    it("create Observe Events with obsId | ESW-118") {
       Table(
         ("Observe Event", "Event Name"),
         (OpticalDetectorEvent.observeStart("ESW.test", ObsId("2020A-001-123")), "ObserveStart"),
@@ -22,7 +22,7 @@ class OpticalDetectorEventTest extends AnyFunSpec with Matchers {
       })
     }
 
-    it("create Observe Events with obsId and exposure id | ESW-81") {
+    it("create Observe Events with obsId and exposure id | ESW-118") {
       Table(
         ("Observe Event", "Event Name"),
         (OpticalDetectorEvent.prepareStart("ESW.test", ObsId("2020A-001-123"), "exp-id"), "PrepareStart"),
@@ -43,7 +43,7 @@ class OpticalDetectorEventTest extends AnyFunSpec with Matchers {
       })
     }
 
-    it("create OpticalDetectorExposureState event | ESW-81") {
+    it("create OpticalDetectorExposureState event | ESW-118") {
       val detector     = "my-detector"
       val sourcePrefix = "ESW.test"
       val obsId        = ObsId("2020A-001-123")
@@ -71,7 +71,7 @@ class OpticalDetectorEventTest extends AnyFunSpec with Matchers {
       )
     }
 
-    it("create OpticalDetectorExposureData event | ESW-81") {
+    it("create OpticalDetectorExposureData event | ESW-118") {
       val exposureTime          = 23923L
       val remainingExposureTime = 324335L
       val detector              = "my-detector"

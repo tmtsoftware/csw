@@ -7,7 +7,7 @@ import org.scalatest.matchers.should.Matchers
 
 class WFSDetectorEventTest extends AnyFunSpec with Matchers {
   describe("WFS Detector") {
-    it("should create publish success observe event") {
+    it("should create publish success observe event | CSW-118") {
       val sourcePrefix = "ESW.filter.wheel"
       val event        = WFSDetectorEvent.publishSuccess(sourcePrefix)
 
@@ -15,7 +15,7 @@ class WFSDetectorEventTest extends AnyFunSpec with Matchers {
       event.source shouldBe Prefix(sourcePrefix)
     }
 
-    it("should create publish fail observe event") {
+    it("should create publish fail observe event | CSW-118") {
       val sourcePrefix = "ESW.filter.wheel"
       val event        = WFSDetectorEvent.publishFail(sourcePrefix)
 
@@ -23,7 +23,7 @@ class WFSDetectorEventTest extends AnyFunSpec with Matchers {
       event.source shouldBe Prefix(sourcePrefix)
     }
 
-    it("should create exposure state observe event") {
+    it("should create exposure state observe event | CSW-118") {
       val sourcePrefix = "ESW.filter.wheel"
       val detector     = "my-detector"
       val event = WFSDetectorEvent.exposureState(
