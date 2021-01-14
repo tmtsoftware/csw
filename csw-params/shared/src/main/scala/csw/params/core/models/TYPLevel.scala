@@ -49,8 +49,8 @@ case class TYPLevel(typ: TYP, calibrationLevel: CalibrationLevel) {
 }
 
 object TYPLevel {
-  private def validCalibrationLevel(calibrationLevel: String): CalibrationLevel =
-    try (CalibrationLevel.values(calibrationLevel.toInt))
+  private def parseCalibrationLevel(calibrationLevel: String): CalibrationLevel =
+    try CalibrationLevel.values(calibrationLevel.toInt)
     catch {
       case ex: Exception =>
         throw new IllegalArgumentException(s"Failed to parse calibration level $calibrationLevel: ${ex.getMessage}")
@@ -58,7 +58,7 @@ object TYPLevel {
 
   def apply(typLevel: String): TYPLevel = {
     val (typ, calibrationLevel) = typLevel.splitAt(typLevel.length - 1)
-    val level                   = validCalibrationLevel(calibrationLevel)
+    val level                   = parseCalibrationLevel(calibrationLevel)
     TYPLevel(TYP.withNameInsensitive(typ), level)
   }
 }

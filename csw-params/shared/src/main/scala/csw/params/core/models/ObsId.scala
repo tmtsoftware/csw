@@ -30,17 +30,13 @@ case class ObsId(programId: ProgramId, observationNumber: Int) {
 }
 
 object ObsId {
-  private val SEPARATOR = '-'
-  def apply(obsId: String): ObsId = {
-    require(
-      obsId.count(_ == SEPARATOR) == 2,
-      s"ObsId must form with semsterId, programNumer, observationNumber separated with \'$SEPARATOR\' ex: 2020A-001-123"
-    )
-    val Array(semesterId, programNumber, observationNumber) = obsId.split(s"\\$SEPARATOR", 3)
-    require(
-      observationNumber.toIntOption.isDefined,
-      "Observation Number should be valid integer prefixed ex: 123, 001 etc"
-    )
-    ObsId(ProgramId(s"$semesterId$SEPARATOR$programNumber"), observationNumber.toInt)
-  }
+  def apply(obsId: String): ObsId =
+    obsId.split(Separator.Hyphen) match {
+      case Array(semesterId, programNumber, obsNumber) if obsNumber.toIntOption.isDefined =>
+        ObsId(ProgramId(Separator.hyphenate(semesterId, programNumber)), obsNumber.toInt)
+      case _ =>
+        throw new IllegalArgumentException(
+          s"requirement failed: ObsId must form with semesterId, programNumber, observationNumber separated with '${Separator.Hyphen}' ex: 2020A-001-123"
+        )
+    }
 }

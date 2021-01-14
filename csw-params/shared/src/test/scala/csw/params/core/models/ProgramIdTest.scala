@@ -25,7 +25,7 @@ class ProgramIdTest extends AnyFunSpec with Matchers {
     it("should throw exception if program id is invalid") {
       val exception = intercept[IllegalArgumentException](ProgramId("2020A"))
       exception.getMessage should ===(
-        "requirement failed: ProgramId must form with semsterId, programNumer separated with '-' ex: 2020A-001"
+        "requirement failed: ProgramId must form with semesterId, programNumber separated with '-' ex: 2020A-001"
       )
     }
   }
