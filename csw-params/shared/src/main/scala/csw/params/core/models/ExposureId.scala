@@ -26,14 +26,14 @@ object ExposureId {
     )
   }
 
-  private def validateExposureId(exposureId: String) = {
+  private def validateExposureId(exposureId: String): Unit = {
     require(
       exposureId.matches(s"$regexForSeparatingObsId(.*)"),
       "Invalid exposure Id: ObsId format should be [Year][Semester]-XXX-XXX e.g. 2020A-001-123"
     )
 
     require(
-      exposureId.count(_ == SEPARATOR).equals(6),
+      exposureId.count(_ == SEPARATOR) >= 6,
       s"Invalid exposure Id: ExposureId should be $SEPARATOR string composing SemesterId-ProgramId-ObservationNumber-Subsystem-DET-TyPLevel-ExposureNumber"
     )
   }

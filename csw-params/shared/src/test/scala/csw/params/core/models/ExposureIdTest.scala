@@ -12,6 +12,14 @@ class ExposureIdTest extends AnyFunSpec with Matchers {
       exposureId should ===(ExposureId(ObsId("2020A-001-123"), Subsystem.CSW, "IMG1", TYPLevel("SCI0"), ExposureNumber("0001")))
     }
 
+    it("should create valid ExposureId with subArray in exposure number") {
+      val exposureId = ExposureId("2020A-001-123-CSW-IMG1-SCI0-0001-01")
+      exposureId.toString should ===("2020A-001-123-CSW-IMG1-SCI0-0001-01")
+      exposureId should ===(
+        ExposureId(ObsId("2020A-001-123"), Subsystem.CSW, "IMG1", TYPLevel("SCI0"), ExposureNumber("0001-01"))
+      )
+    }
+
     it("should throw exception if invalid obsId in exposure Id") {
       val exception = intercept[IllegalArgumentException](ExposureId("2020A-ABC-123-CSW-IMG1-SCI0-0001"))
       exception.getMessage should ===(

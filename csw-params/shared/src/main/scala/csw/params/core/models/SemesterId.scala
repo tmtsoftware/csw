@@ -29,8 +29,6 @@ object SemesterId {
   def apply(semesterId: String): SemesterId = {
     val (yearStr, semesterStr) = semesterId.splitAt(semesterId.length - 1)
     require(yearStr.toIntOption.isDefined, s"$yearStr should be valid year")
-//    fixme: Is following validation needed
-//    require(ValueRange.of(2000L, 4000L).isValidIntValue(yearStr.toInt), s"$yearStr should be valid year between")
     SemesterId(Year.of(yearStr.toInt), Semester.withNameInsensitive(semesterStr))
   }
 }
