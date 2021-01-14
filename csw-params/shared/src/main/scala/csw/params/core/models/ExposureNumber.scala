@@ -9,25 +9,22 @@ case class ExposureNumber(exposureNumber: Int, subArray: Option[Int] = None) {
 }
 
 object ExposureNumber {
-  val SEPARATOR = '-'
-  private def validate(exposureNo: String, allowedLength: Int): Int = {
+  private def parseToInt(exposureNo: String, allowedLength: Int): Int = {
     require(
       exposureNo.length == allowedLength && exposureNo.toIntOption.isDefined,
-      s"Invalid exposure number ${exposureNo}: exposure number should be provided ${allowedLength} digit." +
+      s"Invalid exposure number $exposureNo: exposure number should be provided $allowedLength digit." +
         " ExposureNumber should be 4 digit number and optional 2 digit sub array in format XXXX-XX or XXXX"
     )
     exposureNo.toInt
   }
 
-  def apply(exposureNumber: String): ExposureNumber = {
-    if (exposureNumber.count(_ == SEPARATOR) == 1) {
-      val Array(exposureArrayStr, exposureNoSubArrayStr) = exposureNumber.split("-")
-      val exposureArray                                  = validate(exposureArrayStr, allowedLength = 4)
-      val subArray                                       = validate(exposureNoSubArrayStr, allowedLength = 2)
-      ExposureNumber(exposureArray, Some(subArray))
+  def apply(exposureNumber: String): ExposureNumber =
+    exposureNumber.split(Separator.Hyphen) match {
+      case Array(exposureArrayStr, exposureNoSubArrayStr) =>
+        val exposureArray = parseToInt(exposureArrayStr, allowedLength = 4)
+        val subArray      = parseToInt(exposureNoSubArrayStr, allowedLength = 2)
+        ExposureNumber(exposureArray, Some(subArray))
+      case _ => ExposureNumber(parseToInt(exposureNumber, allowedLength = 4))
     }
-    else {
-      ExposureNumber(validate(exposureNumber, allowedLength = 4))
-    }
-  }
+
 }

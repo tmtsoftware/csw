@@ -25,7 +25,7 @@ class ObsIdTest extends AnyFunSpec with Matchers {
     it("should throw exception if observation id is invalid") {
       val exception = intercept[IllegalArgumentException](ObsId("2020A-001"))
       exception.getMessage should ===(
-        "requirement failed: ObsId must form with semsterId, programNumer, observationNumber separated with '-' ex: 2020A-001-123"
+        "requirement failed: ObsId must form with semesterId, programNumber, observationNumber separated with '-' ex: 2020A-001-123"
       )
     }
   }

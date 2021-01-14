@@ -23,14 +23,15 @@ class ExposureIdTest extends AnyFunSpec with Matchers {
     it("should throw exception if invalid obsId in exposure Id") {
       val exception = intercept[IllegalArgumentException](ExposureId("2020A-ABC-123-CSW-IMG1-SCI0-0001"))
       exception.getMessage should ===(
-        "requirement failed: Invalid exposure Id: ObsId format should be [Year][Semester]-XXX-XXX e.g. 2020A-001-123"
+        "requirement failed: ProgramId must form with semesterId, programNumber separated with '-' ex: 2020A-001"
       )
     }
 
     it("should throw exception if invalid exposure Id: typLevel is missing") {
       val exception = intercept[IllegalArgumentException](ExposureId("2020A-001-123-CSW-IMG1-0001"))
       exception.getMessage should ===(
-        "requirement failed: Invalid exposure Id: ExposureId should be - string composing SemesterId-ProgramId-ObservationNumber-Subsystem-DET-TyPLevel-ExposureNumber"
+        "requirement failed: Invalid exposure Id: ExposureId should be - string composing " +
+          "SemesterId-ProgramId-ObservationNumber-Subsystem-DET-TYPLevel-ExposureNumber"
       )
 
       val exception1 = intercept[NoSuchElementException](ExposureId("2020A-001-123-CSW-IMG1-0001-01"))
