@@ -20,14 +20,24 @@ class ExposureNumberTest extends AnyFunSpec with Matchers {
     it("should throw exception if ExposureNumber is invalid") {
       val exception = intercept[IllegalArgumentException](ExposureNumber("10000"))
       exception.getMessage should ===(
-        "requirement failed: Invalid exposure number 10000: exposure number should be provided 4 digit with value between 0001 to 1000"
+        "requirement failed: Invalid exposure number 10000: exposure number should be provided 4 digit. " +
+          "ExposureNumber should be 4 digit number and optional 2 digit sub array in format XXXX-XX or XXXX"
       )
     }
 
     it("should throw exception if subarray in exposure number is invalid") {
       val exception = intercept[IllegalArgumentException](ExposureNumber("0002-123"))
       exception.getMessage should ===(
-        "requirement failed: Invalid subArray 123 SubArray for exposure number should be provided 2 digit with value between 01 to 10"
+        "requirement failed: Invalid exposure number 123: exposure number should be provided 2 digit. " +
+          "ExposureNumber should be 4 digit number and optional 2 digit sub array in format XXXX-XX or XXXX"
+      )
+    }
+
+    it("should throw exception if exposure number contains more than one '-' ") {
+      val exception = intercept[IllegalArgumentException](ExposureNumber("0001-01-hhhs"))
+      exception.getMessage should ===(
+        "requirement failed: Invalid exposure number 0001-01-hhhs: exposure number should be provided 4 digit. " +
+          "ExposureNumber should be 4 digit number and optional 2 digit sub array in format XXXX-XX or XXXX"
       )
     }
   }
