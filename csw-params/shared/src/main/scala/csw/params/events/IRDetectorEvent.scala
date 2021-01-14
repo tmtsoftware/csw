@@ -2,7 +2,6 @@ package csw.params.events
 
 import csw.params.core.generics.Parameter
 import csw.params.core.models.ObsId
-import csw.prefix.models.Prefix
 
 object IRDetectorEvent extends DetectorEvent("IRDetector") {
   def exposureData(
@@ -17,6 +16,7 @@ object IRDetectorEvent extends DetectorEvent("IRDetector") {
       remainingExposureTime: Long
   ): ObserveEvent = {
     val params: Set[Parameter[_]] = Set(
+      ParamFactories.sourcePrefix(sourcePrefix),
       ParamFactories.obsIdParam(obsId),
       ParamFactories.detectorParam(detector),
       ParamFactories.readsInRampParam(readsInRamp),
@@ -26,6 +26,6 @@ object IRDetectorEvent extends DetectorEvent("IRDetector") {
       ParamFactories.exposureTimeParam(exposureTime),
       ParamFactories.remainingExposureTimeParam(remainingExposureTime)
     )
-    ObserveEvent(Prefix(sourcePrefix), EventName("IRDetectorExposureData"), params)
+    ObserveEvent(observeEventPrefix, EventName("IRDetectorExposureData"), params)
   }
 }

@@ -6,6 +6,7 @@ import csw.params.core.models.ObsId
 
 object ParamFactories {
   // commonly used params factories
+  def sourcePrefix(sourcePrefix: String): Parameter[String]  = StringKey.make("sourcePrefix").set(sourcePrefix)
   def obsIdParam(obsId: ObsId): Parameter[String]            = StringKey.make("obsId").set(obsId.toString)
   def exposureIdParam(exposureId: String): Parameter[String] = StringKey.make("exposureId").set(exposureId)
   def detectorParam(detector: String): Parameter[String]     = StringKey.make("detector").set(detector)

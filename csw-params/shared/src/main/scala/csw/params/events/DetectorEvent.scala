@@ -3,8 +3,11 @@ package csw.params.events
 import csw.params.core.generics.Parameter
 import csw.params.core.models.ObsId
 import csw.prefix.models.Prefix
+import csw.prefix.models.Subsystem.ESW
 
 private[events] class DetectorEvent(detectorName: String) {
+  val observeEventPrefix: Prefix = Prefix(ESW, "ObserveEvent")
+
   def observeStart(sourcePrefix: String, obsId: ObsId): ObserveEvent = create(sourcePrefix, obsId, "ObserveStart")
   def observeEnd(sourcePrefix: String, obsId: ObsId): ObserveEvent   = create(sourcePrefix, obsId, "ObserveEnd")
 
@@ -34,6 +37,7 @@ private[events] class DetectorEvent(detectorName: String) {
       operationalState: OperationalState
   ): ObserveEvent = {
     val params: Set[Parameter[_]] = Set(
+      ParamFactories.sourcePrefix(sourcePrefix),
       ParamFactories.obsIdParam(obsId),
       ParamFactories.detectorParam(detector),
       ParamFactories.operationalStateParam(operationalState),
@@ -42,17 +46,21 @@ private[events] class DetectorEvent(detectorName: String) {
       ParamFactories.abortInProgressParam(abortInProgress),
       ParamFactories.isAbortedParam(isAborted)
     )
-    ObserveEvent(Prefix(sourcePrefix), EventName(s"${detectorName}ExposureState"), params)
+    ObserveEvent(observeEventPrefix, EventName(s"${detectorName}ExposureState"), params)
   }
 
   private def create(sourcePrefix: String, obsId: ObsId, eventName: String): ObserveEvent =
-    ObserveEvent(Prefix(sourcePrefix), EventName(eventName), Set(ParamFactories.obsIdParam(obsId)))
+    ObserveEvent(
+      observeEventPrefix,
+      EventName(eventName),
+      Set(ParamFactories.sourcePrefix(sourcePrefix), ParamFactories.obsIdParam(obsId))
+    )
 
   private[events] def create(sourcePrefix: String, obsId: ObsId, exposureId: String, eventName: String): ObserveEvent =
     ObserveEvent(
-      Prefix(sourcePrefix),
+      observeEventPrefix,
       EventName(eventName),
-      Set(ParamFactories.obsIdParam(obsId), ParamFactories.exposureIdParam(exposureId))
+      Set(ParamFactories.sourcePrefix(sourcePrefix), ParamFactories.obsIdParam(obsId), ParamFactories.exposureIdParam(exposureId))
     )
 
 }

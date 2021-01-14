@@ -2,7 +2,7 @@ package csw.params.events
 
 import csw.params.core.generics.KeyType.{BooleanKey, LongKey, StringKey}
 import csw.params.core.models.ObsId
-import csw.prefix.models.Prefix
+import csw.params.events.IRDetectorEvent.observeEventPrefix
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks.Table
@@ -10,43 +10,50 @@ import org.scalatest.prop.TableDrivenPropertyChecks.Table
 class OpticalDetectorEventTest extends AnyFunSpec with Matchers {
   describe("OpticalDetectorEvent") {
 
-    it("create Observe Events with obsId | ESW-118") {
-      Table(
-        ("Observe Event", "Event Name"),
-        (OpticalDetectorEvent.observeStart("ESW.test", ObsId("2020A-001-123")), "ObserveStart"),
-        (OpticalDetectorEvent.observeEnd("ESW.test", ObsId("2020A-001-123")), "ObserveEnd")
-      ).forEvery((observeEvent, expectedEventName) => {
-        observeEvent.eventName shouldBe EventName(expectedEventName)
-        observeEvent.source shouldBe Prefix("ESW.test")
-        observeEvent.paramSet shouldBe Set(StringKey.make("obsId").set("2020A-001-123"))
-      })
-    }
+    val obsId        = ObsId("2020A-001-123")
+    val sourcePrefix = "ESW.test"
 
-    it("create Observe Events with obsId and exposure id | ESW-118") {
+    it("create Observe Events with obsId | ESW-118, CSW-119") {
       Table(
         ("Observe Event", "Event Name"),
-        (OpticalDetectorEvent.prepareStart("ESW.test", ObsId("2020A-001-123"), "exp-id"), "PrepareStart"),
-        (OpticalDetectorEvent.exposureStart("ESW.test", ObsId("2020A-001-123"), "exp-id"), "ExposureStart"),
-        (OpticalDetectorEvent.exposureEnd("ESW.test", ObsId("2020A-001-123"), "exp-id"), "ExposureEnd"),
-        (OpticalDetectorEvent.readoutEnd("ESW.test", ObsId("2020A-001-123"), "exp-id"), "ReadoutEnd"),
-        (OpticalDetectorEvent.readoutFailed("ESW.test", ObsId("2020A-001-123"), "exp-id"), "ReadoutFailed"),
-        (OpticalDetectorEvent.dataWriteStart("ESW.test", ObsId("2020A-001-123"), "exp-id"), "DataWriteStart"),
-        (OpticalDetectorEvent.dataWriteEnd("ESW.test", ObsId("2020A-001-123"), "exp-id"), "DataWriteEnd"),
-        (OpticalDetectorEvent.exposureAborted("ESW.test", ObsId("2020A-001-123"), "exp-id"), "ExposureAborted")
+        (OpticalDetectorEvent.observeStart(sourcePrefix, obsId), "ObserveStart"),
+        (OpticalDetectorEvent.observeEnd(sourcePrefix, obsId), "ObserveEnd")
       ).forEvery((observeEvent, expectedEventName) => {
         observeEvent.eventName shouldBe EventName(expectedEventName)
-        observeEvent.source shouldBe Prefix("ESW.test")
+        observeEvent.source shouldBe observeEventPrefix
         observeEvent.paramSet shouldBe Set(
-          StringKey.make("obsId").set("2020A-001-123"),
-          StringKey.make("exposureId").set("exp-id")
+          StringKey.make("sourcePrefix").set(sourcePrefix),
+          StringKey.make("obsId").set(obsId.toString)
         )
       })
     }
 
-    it("create OpticalDetectorExposureState event | ESW-118") {
-      val detector     = "my-detector"
-      val sourcePrefix = "ESW.test"
-      val obsId        = ObsId("2020A-001-123")
+    it("create Observe Events with obsId and exposure id | ESW-118, CSW-119") {
+      val exposureId = "exp-id"
+
+      Table(
+        ("Observe Event", "Event Name"),
+        (OpticalDetectorEvent.prepareStart(sourcePrefix, obsId, exposureId), "PrepareStart"),
+        (OpticalDetectorEvent.exposureStart(sourcePrefix, obsId, exposureId), "ExposureStart"),
+        (OpticalDetectorEvent.exposureEnd(sourcePrefix, obsId, exposureId), "ExposureEnd"),
+        (OpticalDetectorEvent.readoutEnd(sourcePrefix, obsId, exposureId), "ReadoutEnd"),
+        (OpticalDetectorEvent.readoutFailed(sourcePrefix, obsId, exposureId), "ReadoutFailed"),
+        (OpticalDetectorEvent.dataWriteStart(sourcePrefix, obsId, exposureId), "DataWriteStart"),
+        (OpticalDetectorEvent.dataWriteEnd(sourcePrefix, obsId, exposureId), "DataWriteEnd"),
+        (OpticalDetectorEvent.exposureAborted(sourcePrefix, obsId, exposureId), "ExposureAborted")
+      ).forEvery((observeEvent, expectedEventName) => {
+        observeEvent.eventName shouldBe EventName(expectedEventName)
+        observeEvent.source shouldBe observeEventPrefix
+        observeEvent.paramSet shouldBe Set(
+          StringKey.make("sourcePrefix").set(sourcePrefix),
+          StringKey.make("obsId").set(obsId.toString),
+          StringKey.make("exposureId").set(exposureId)
+        )
+      })
+    }
+
+    it("create OpticalDetectorExposureState event | ESW-118, CSW-119") {
+      val detector = "my-detector"
       val observeEvent = OpticalDetectorEvent.exposureState(
         sourcePrefix,
         obsId,
@@ -59,8 +66,9 @@ class OpticalDetectorEventTest extends AnyFunSpec with Matchers {
       )
 
       observeEvent.eventName shouldBe EventName("OpticalDetectorExposureState")
-      observeEvent.source shouldBe Prefix(sourcePrefix)
+      observeEvent.source shouldBe observeEventPrefix
       observeEvent.paramSet shouldBe Set(
+        StringKey.make("sourcePrefix").set(sourcePrefix),
         StringKey.make("detector").set(detector),
         StringKey.make("obsId").set("2020A-001-123"),
         StringKey.make("operationalState").set("BUSY"),
@@ -71,12 +79,10 @@ class OpticalDetectorEventTest extends AnyFunSpec with Matchers {
       )
     }
 
-    it("create OpticalDetectorExposureData event | ESW-118") {
+    it("create OpticalDetectorExposureData event | ESW-118, CSW-119") {
       val exposureTime          = 23923L
       val remainingExposureTime = 324335L
       val detector              = "my-detector"
-      val sourcePrefix          = "ESW.test"
-      val obsId                 = ObsId("2020A-001-123")
       val observeEvent = OpticalDetectorEvent.exposureData(
         sourcePrefix,
         obsId,
@@ -86,8 +92,9 @@ class OpticalDetectorEventTest extends AnyFunSpec with Matchers {
       )
 
       observeEvent.eventName shouldBe EventName("OpticalDetectorExposureData")
-      observeEvent.source shouldBe Prefix(sourcePrefix)
+      observeEvent.source shouldBe observeEventPrefix
       observeEvent.paramSet shouldBe Set(
+        StringKey.make("sourcePrefix").set(sourcePrefix),
         StringKey.make("detector").set(detector),
         StringKey.make("obsId").set(obsId.toString),
         LongKey.make("exposureTime").set(exposureTime),

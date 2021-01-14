@@ -77,7 +77,7 @@ class EventServiceIntegrationTest extends FrameworkIntegrationSuite with Eventua
   }
 
   test(
-    "should be able to publish and subscribe to observe events coming from IR, Optical & WFS detector (Both java and scala) | CSW-118"
+    "should be able to publish and subscribe to observe events coming from IR, Optical & WFS detector (Both java and scala) | CSW-118, CSW-119"
   ) {
     Container.spawn(ConfigFactory.load("observe_event_container.conf"), wiring).await
 
@@ -86,8 +86,8 @@ class EventServiceIntegrationTest extends FrameworkIntegrationSuite with Eventua
 
     val subscriptionEventList = mutable.ListBuffer[Event]()
     subscriber.pSubscribeCallback(
-      Subsystem.WFOS,
-      "*",
+      Subsystem.ESW,
+      "ObserveEvent.*",
       { ev => subscriptionEventList.append(ev) }
     )
 

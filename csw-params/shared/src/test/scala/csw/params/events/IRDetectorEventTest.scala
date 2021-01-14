@@ -2,7 +2,7 @@ package csw.params.events
 
 import csw.params.core.generics.KeyType.{BooleanKey, IntKey, LongKey, StringKey}
 import csw.params.core.models.ObsId
-import csw.prefix.models.Prefix
+import csw.params.events.IRDetectorEvent.observeEventPrefix
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks._
@@ -14,7 +14,7 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
     val exposureId   = "12345"
     val detector     = "ir-detector"
 
-    it("should create observe event with obsId and exposure id parameters | CSW-118") {
+    it("should create observe event with obsId and exposure id parameters | CSW-118, CSW-119") {
       Table(
         ("Observe event", "event name", "prefix"),
         (IRDetectorEvent.exposureStart(sourcePrefix, obsId, exposureId), "ExposureStart", sourcePrefix),
@@ -26,22 +26,31 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
         (IRDetectorEvent.exposureAborted(sourcePrefix, obsId, exposureId), "ExposureAborted", sourcePrefix)
       ).forEvery((observeEvent, eventName, sourcePrefix) => {
         observeEvent.eventName.name shouldBe eventName
-        observeEvent.source shouldBe Prefix(sourcePrefix)
+        observeEvent.source shouldBe observeEventPrefix
+        observeEvent.paramSet shouldBe Set(
+          StringKey.make("sourcePrefix").set(sourcePrefix),
+          StringKey.make("obsId").set(obsId.toString),
+          StringKey.make("exposureId").set(exposureId)
+        )
       })
     }
 
-    it("should create observe event with obsId | CSW-118") {
+    it("should create observe event with obsId | CSW-118, CSW-119") {
       Table(
         ("Observe event", "event name", "prefix"),
         (IRDetectorEvent.observeStart(sourcePrefix, obsId), "ObserveStart", sourcePrefix),
         (IRDetectorEvent.observeEnd(sourcePrefix, obsId), "ObserveEnd", sourcePrefix)
       ).forEvery((observeEvent, eventName, sourcePrefix) => {
         observeEvent.eventName.name shouldBe eventName
-        observeEvent.source shouldBe Prefix(sourcePrefix)
+        observeEvent.source shouldBe observeEventPrefix
+        observeEvent.paramSet shouldBe Set(
+          StringKey.make("sourcePrefix").set(sourcePrefix),
+          StringKey.make("obsId").set(obsId.toString)
+        )
       })
     }
 
-    it("should create exposure state event | CSW-118") {
+    it("should create exposure state event | CSW-118, CSW-119") {
       val state = IRDetectorEvent.exposureState(
         sourcePrefix,
         obsId,
@@ -53,9 +62,10 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
         OperationalState.BUSY
       )
 
-      state.source shouldBe Prefix(sourcePrefix)
+      state.source shouldBe observeEventPrefix
       state.eventName.name shouldBe "IRDetectorExposureState"
       state.paramSet shouldBe Set(
+        StringKey.make("sourcePrefix").set(sourcePrefix),
         StringKey.make("detector").set(detector),
         StringKey.make("obsId").set(obsId.toString),
         BooleanKey.make("exposureInProgress").set(true),
@@ -66,7 +76,7 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
       )
     }
 
-    it("should create exposure data event | CSW-118") {
+    it("should create exposure data event | CSW-118, CSW-119") {
       val readsInRamp           = 1
       val readsComplete         = 20
       val rampsInExposure       = 40
@@ -86,9 +96,10 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
         remainingExposureTime
       )
 
-      event.source shouldBe Prefix(sourcePrefix)
+      event.source shouldBe observeEventPrefix
       event.eventName.name shouldBe "IRDetectorExposureData"
       event.paramSet shouldBe Set(
+        StringKey.make("sourcePrefix").set(sourcePrefix),
         StringKey.make("detector").set(detector),
         StringKey.make("obsId").set(obsId.toString),
         IntKey.make("readsInRamp").set(readsInRamp),
