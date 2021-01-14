@@ -41,6 +41,6 @@ object ObsId {
       observationNumber.toIntOption.isDefined,
       "Observation Number should be valid integer prefixed ex: 123, 001 etc"
     )
-    ObsId(ProgramId(SemesterId(semesterId), programNumber.toInt), observationNumber.toInt)
+    ObsId(ProgramId(s"$semesterId$SEPARATOR$programNumber"), observationNumber.toInt)
   }
 }

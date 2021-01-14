@@ -44,8 +44,8 @@ object TYP extends Enum[TYP] {
   case object SKY extends TYP("Sky background exposure")
 }
 
-case class TYPLevel(tYP: TYP, calibrationLevel: CalibrationLevel) {
-  override def toString: String = s"${tYP.entryName}${CalibrationLevel.indexOf(calibrationLevel)}"
+case class TYPLevel(typ: TYP, calibrationLevel: CalibrationLevel) {
+  override def toString: String = s"${typ.entryName}${CalibrationLevel.indexOf(calibrationLevel)}"
 }
 
 object TYPLevel {
@@ -56,8 +56,8 @@ object TYPLevel {
         throw new IllegalArgumentException(s"Failed to parse calibration level $calibrationLevel: ${ex.getMessage}")
     }
 
-  def apply(tYPLevel: String): TYPLevel = {
-    val (typ, calibrationLevel) = tYPLevel.splitAt(tYPLevel.length - 1)
+  def apply(typLevel: String): TYPLevel = {
+    val (typ, calibrationLevel) = typLevel.splitAt(typLevel.length - 1)
     val level                   = validCalibrationLevel(calibrationLevel)
     TYPLevel(TYP.withNameInsensitive(typ), level)
   }

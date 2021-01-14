@@ -27,7 +27,7 @@ class ExposureIdTest extends AnyFunSpec with Matchers {
       )
     }
 
-    it("should throw exception if invalid exposure Id: tYPLevel is missing") {
+    it("should throw exception if invalid exposure Id: typLevel is missing") {
       val exception = intercept[IllegalArgumentException](ExposureId("2020A-001-123-CSW-IMG1-0001"))
       exception.getMessage should ===(
         "requirement failed: Invalid exposure Id: ExposureId should be - string composing SemesterId-ProgramId-ObservationNumber-Subsystem-DET-TyPLevel-ExposureNumber"

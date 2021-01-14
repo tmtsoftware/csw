@@ -6,9 +6,9 @@ import org.scalatest.matchers.should.Matchers
 class TYPLevelTest extends AnyFunSpec with Matchers {
   describe("create TYPLevel") {
     it("should create TYPLevel") {
-      val tYPLevel = TYPLevel("SCI0")
-      tYPLevel.toString should ===("SCI0")
-      tYPLevel should ===(TYPLevel(TYP.SCI, CalibrationLevel.Raw))
+      val typLevel = TYPLevel("SCI0")
+      typLevel.toString should ===("SCI0")
+      typLevel should ===(TYPLevel(TYP.SCI, CalibrationLevel.Raw))
     }
 
     it("should throw exception if invalid TYP") {

@@ -3,9 +3,9 @@ package csw.params.core.models
 import csw.params.core.models.ExposureId.SEPARATOR
 import csw.prefix.models.Subsystem
 
-case class ExposureId(obsId: ObsId, subsystem: Subsystem, DET: String, tYPLevel: TYPLevel, exposureNumber: ExposureNumber) {
+case class ExposureId(obsId: ObsId, subsystem: Subsystem, det: String, tyPLevel: TYPLevel, exposureNumber: ExposureNumber) {
 
-  override def toString: String = s"$obsId$SEPARATOR$subsystem$SEPARATOR$DET$SEPARATOR$tYPLevel$SEPARATOR$exposureNumber"
+  override def toString: String = s"$obsId$SEPARATOR$subsystem$SEPARATOR$det$SEPARATOR$tyPLevel$SEPARATOR$exposureNumber"
 }
 
 object ExposureId {
@@ -16,12 +16,12 @@ object ExposureId {
 
     val Array(_, secondPart)                            = exposureId.split(regexForSeparatingObsId)
     val firstPart: String                               = exposureId.dropRight(secondPart.length)
-    val Array(subsystem, det, tYPLevel, exposureNumber) = secondPart.split("-", 4)
+    val Array(subsystem, det, typLevel, exposureNumber) = secondPart.split("-", 4)
     ExposureId(
       ObsId(firstPart.dropRight(1)),
       Subsystem.withNameInsensitive(subsystem),
       det,
-      TYPLevel(tYPLevel),
+      TYPLevel(typLevel),
       ExposureNumber(exposureNumber)
     )
   }

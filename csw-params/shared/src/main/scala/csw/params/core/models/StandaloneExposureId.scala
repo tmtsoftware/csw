@@ -10,12 +10,12 @@ import csw.time.core.models.UTCTime
 case class StandaloneExposureId(
     utcTime: UTCTime,
     subsystem: Subsystem,
-    DET: String,
-    tYPLevel: TYPLevel,
+    det: String,
+    typLevel: TYPLevel,
     exposureNumber: ExposureNumber
 ) {
   val utcTimeStr: String        = new SimpleDateFormat("YYYYMMDD-HHmmss").format(Date.from(utcTime.value))
-  override def toString: String = s"$utcTimeStr$SEPARATOR$subsystem$SEPARATOR$DET$SEPARATOR$TYPLevel$SEPARATOR$ExposureNumber"
+  override def toString: String = s"$utcTimeStr$SEPARATOR$subsystem$SEPARATOR$det$SEPARATOR$TYPLevel$SEPARATOR$ExposureNumber"
 }
 
 object StandaloneExposureId {
@@ -25,12 +25,12 @@ object StandaloneExposureId {
       exposureIdRemainingStr.count(_ == SEPARATOR) >= 3,
       s"Invalid StandaloneExposureId Id: StandaloneExposureId should be $SEPARATOR string composing YYYYMMDD-HHMMSS-Subsystem-DET-TyPLevel-ExposureNumber"
     )
-    val Array(subsystem, det, tYPLevel, exposureNumber) = exposureIdRemainingStr.split("-", 4)
+    val Array(subsystem, det, typLevel, exposureNumber) = exposureIdRemainingStr.split("-", 4)
     StandaloneExposureId(
       utcTime,
       Subsystem.withNameInsensitive(subsystem),
       det,
-      TYPLevel(tYPLevel),
+      TYPLevel(typLevel),
       ExposureNumber(exposureNumber)
     )
   }
