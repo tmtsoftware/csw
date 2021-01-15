@@ -1,7 +1,7 @@
 package csw.logging.client.scaladsl
 
 import java.io.ByteArrayOutputStream
-import java.nio.file.Paths
+import java.nio.file.{Files, Paths}
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.time.{ZoneId, ZoneOffset, ZonedDateTime}
@@ -17,14 +17,15 @@ import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.utils.FileUtils
 import csw.logging.models.Level
 import csw.logging.models.Level.{DEBUG, ERROR, INFO, TRACE}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 import play.api.libs.json.{JsObject, Json}
 
 import scala.collection.mutable
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
-import org.scalatest.funsuite.AnyFunSuite
-import org.scalatest.matchers.should.Matchers
+import scala.reflect.io.File
 
 // DEOPSCSW-122: Allow local component logs to be output to STDOUT
 // DEOPSCSW-123: Allow local component logs to be output to a file
@@ -49,6 +50,8 @@ class LoggingConfigurationTest extends AnyFunSuite with Matchers with BeforeAndA
 
   override protected def beforeAll(): Unit = {
     FileUtils.deleteRecursively(logFileDir)
+    File(logFileDir).createDirectory()
+    File(testLogFilePathWithServiceName).createFile()
   }
 
   override protected def afterEach(): Unit = {
@@ -367,7 +370,7 @@ class LoggingConfigurationTest extends AnyFunSuite with Matchers with BeforeAndA
     }
     loggingSystem.getAppenders shouldBe List(StdOutAppender)
 
-    val expectedOneLineLog = " INFO   (LoggingConfigurationTest.scala 102) - Sample log message"
+    val expectedOneLineLog = " INFO   (LoggingConfigurationTest.scala 105) - Sample log message"
 
     val (timestamp, message) = os.toString.trim.splitAt(24)
 
