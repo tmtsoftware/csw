@@ -25,7 +25,6 @@ import play.api.libs.json.{JsObject, Json}
 import scala.collection.mutable
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
-import scala.reflect.io.File
 
 // DEOPSCSW-122: Allow local component logs to be output to STDOUT
 // DEOPSCSW-123: Allow local component logs to be output to a file
@@ -50,8 +49,6 @@ class LoggingConfigurationTest extends AnyFunSuite with Matchers with BeforeAndA
 
   override protected def beforeAll(): Unit = {
     FileUtils.deleteRecursively(logFileDir)
-    File(logFileDir).createDirectory()
-    File(testLogFilePathWithServiceName).createFile()
   }
 
   override protected def afterEach(): Unit = {
@@ -133,7 +130,7 @@ class LoggingConfigurationTest extends AnyFunSuite with Matchers with BeforeAndA
     val expectedTimestamp = ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC))
 
     doLogging()
-    Thread.sleep(300)
+    Thread.sleep(1000)
 
     // Reading common logger file
     val fileLogBuffer = FileUtils.read(testLogFilePathWithServiceName)
@@ -370,7 +367,7 @@ class LoggingConfigurationTest extends AnyFunSuite with Matchers with BeforeAndA
     }
     loggingSystem.getAppenders shouldBe List(StdOutAppender)
 
-    val expectedOneLineLog = " INFO   (LoggingConfigurationTest.scala 105) - Sample log message"
+    val expectedOneLineLog = " INFO   (LoggingConfigurationTest.scala 102) - Sample log message"
 
     val (timestamp, message) = os.toString.trim.splitAt(24)
 
