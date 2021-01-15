@@ -14,7 +14,6 @@ case class ProgramId(semesterId: SemesterId, programNumber: Int) {
 object ProgramId {
   def apply(programId: String): ProgramId =
     programId.split(Separator.Hyphen) match {
-      // require(programNumber.toIntOption.isDefined, "Program Number should be valid integer ex: 123, 001 etc")
       case Array(semesterId, programNumber) if programNumber.toIntOption.isDefined =>
         ProgramId(SemesterId(semesterId), programNumber.toInt)
       case _ =>

@@ -26,9 +26,18 @@ case class SemesterId private[csw] (year: Year, semester: Semester) {
 }
 
 object SemesterId {
+  private def parseSemester(semesterStr: String): Semester =
+    try {
+      Semester.withNameInsensitive(semesterStr)
+    }
+    catch {
+      case ex: Exception => throw new IllegalArgumentException(s"Failed to parse semester $semesterStr: ${ex.getMessage}")
+    }
+
   def apply(semesterId: String): SemesterId = {
     val (yearStr, semesterStr) = semesterId.splitAt(semesterId.length - 1)
     require(yearStr.toIntOption.isDefined, s"$yearStr should be valid year")
-    SemesterId(Year.of(yearStr.toInt), Semester.withNameInsensitive(semesterStr))
+    val semester = parseSemester(semesterStr)
+    SemesterId(Year.of(yearStr.toInt), semester)
   }
 }

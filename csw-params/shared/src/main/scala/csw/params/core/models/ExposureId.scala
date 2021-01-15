@@ -21,7 +21,7 @@ object ExposureId {
       case _ =>
         throw new IllegalArgumentException(
           s"requirement failed: Invalid exposure Id: ExposureId should be ${Separator.Hyphen} string " +
-            s"composing SemesterId-ProgramId-ObservationNumber-Subsystem-DET-TYPLevel-ExposureNumber"
+            s"composing SemesterId-ProgramNumber-ObservationNumber-Subsystem-DET-TYPLevel-ExposureNumber"
         )
     }
 }

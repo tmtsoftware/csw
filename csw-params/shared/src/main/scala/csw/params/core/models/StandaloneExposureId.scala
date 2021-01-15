@@ -14,7 +14,7 @@ case class StandaloneExposureId(
     exposureNumber: ExposureNumber
 ) {
   val utcTimeStr: String        = new SimpleDateFormat("YYYYMMDD-HHmmss").format(Date.from(utcTime.value))
-  override def toString: String = Separator.hyphenate(s"$utcTimeStr", s"$subsystem", s"$det", s"$TYPLevel", s"$ExposureNumber")
+  override def toString: String = Separator.hyphenate(s"$utcTimeStr", s"$subsystem", s"$det", s"$typLevel", s"$exposureNumber")
 }
 
 object StandaloneExposureId {
