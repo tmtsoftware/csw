@@ -1,7 +1,7 @@
 package csw.logging.client.scaladsl
 
 import java.io.ByteArrayOutputStream
-import java.nio.file.{Files, Paths}
+import java.nio.file.Paths
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.time.{ZoneId, ZoneOffset, ZonedDateTime}
