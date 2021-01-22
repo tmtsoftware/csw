@@ -18,18 +18,20 @@
 
 ### csw
 
-1. Update release notes (`notes/<version>.markdown`) in `csw` repo and link the migration guide
+1. Create a branch named `branch-<major>.<minor>.x` if not already exists from `master`. Example branch name `branch-3.0.x`.
+   All subsequent release for this release cycle should be done on this branch. All further steps are to be done on this branch.
+2. Update release notes (`notes/<version>.markdown`) in `csw` repo and link the migration guide
  **Note** - The version in `notes` should be of format `v1.0.0`
-2. Update top-level `CHANGELOG.md`
-3. Update top-level `README.md`
-4. Add changes mention in `CHANGELOG.md` of `csw-contract` in top-level `CHANGELOG.md`
-5. Add changes mention in `CHANGELOG.md` of `csw-contract` in the change section of `README.md` of `csw-contract`
-6. Add changes mention in `CHANGELOG.md` of `csw-contract` in top-level `README.md`
-7. Bump up the `csw-contract` version (if needed)
-8. Exclude projects from `build.sbt` which you do not want to release
-8. Update versions in `release.yml'` for other repos like `ESW_TS_VERSION` etc. which we will be releasing next. (These versions are used to create parameterized links in documentation)
-9. Commit and push the changes to master branch.
-10. Run `release.sh $VERSION$` script by providing version number argument (This triggers release workflow)
+3. Update top-level `CHANGELOG.md`
+4. Update top-level `README.md`
+5. Add changes mention in `CHANGELOG.md` of `csw-contract` in top-level `CHANGELOG.md`
+6. Add changes mention in `CHANGELOG.md` of `csw-contract` in the change section of `README.md` of `csw-contract`
+7. Add changes mention in `CHANGELOG.md` of `csw-contract` in top-level `README.md`
+8. Bump up the `csw-contract` version (if needed)
+9. Exclude projects from `build.sbt` which you do not want to release
+10. Update versions in `release.yml'` for other repos like `ESW_TS_VERSION` etc. which we will be releasing next. (These versions are used to create parameterized links in documentation)
+11. Commit and push the changes to `branch-<major>.<minor>.x` branch.
+12. Run `release.sh $VERSION$` script by providing version number argument (This triggers release workflow)
 
     **Note:** `PROD=true` environment variable needs to be set before running `release.sh`
 
