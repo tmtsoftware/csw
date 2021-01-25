@@ -26,7 +26,7 @@ final case class ComponentInfo(
     componentType: ComponentType,
     behaviorFactoryClassName: String,
     locationServiceUsage: LocationServiceUsage,
-    registerAs:           Set[ConnectionType] = Set(AkkaType),
+    registerAs: Set[ConnectionType] = Set(AkkaType),
     connections: Set[Connection] = Set.empty,
     initializeTimeout: FiniteDuration = 10.seconds
 ) {

@@ -52,10 +52,9 @@ class MyFrameworkMocks {
   }
 }
 
-
 class Supervisor2LockTests extends ScalaTestWithActorTestKit with AnyFunSuiteLike with MockitoSugar with BeforeAndAfterAll {
-  private val clientPrefix:Prefix = Prefix(ESW, "engUI")
-  private val invalidPrefix = Prefix("wfos.invalid.engUI")
+  private val clientPrefix: Prefix = Prefix(ESW, "engUI")
+  private val invalidPrefix        = Prefix("wfos.invalid.engUI")
 
   val assemblyInfo: ComponentInfo = ComponentInfo(
     Prefix("WFOS.SampleAssembly"),
@@ -67,16 +66,18 @@ class Supervisor2LockTests extends ScalaTestWithActorTestKit with AnyFunSuiteLik
 
   override def afterAll(): Unit = testKit.shutdownTestKit()
 
-  private val mockedLoggerFactory      = mock[LoggerFactory]
-  private val mockedLogger             = mock[Logger]
+  private val mockedLoggerFactory = mock[LoggerFactory]
+  private val mockedLogger        = mock[Logger]
   when(mockedLoggerFactory.getLogger).thenReturn(mockedLogger)
 
   test("should be unlocked when prefix is not available | DEOPSCSW-222, DEOPSCSW-301") {
 
-    val testMocks = new MyFrameworkMocks()
+    val testMocks  = new MyFrameworkMocks()
     val cswContext = testMocks.createContext(assemblyInfo)
     val testSuper =
-      spawn(SupervisorBehavior2(command.TestComponent(cswContext), testMocks.frameworkTestMocks().registrationFactory, cswContext))
+      spawn(
+        SupervisorBehavior2(command.TestComponent(cswContext), testMocks.frameworkTestMocks().registrationFactory, cswContext)
+      )
 
     val testProbe = TestProbe[SupervisorMessage]()
     //val isLockedProbe = testKit.createTestProbe[LockManager2Response]
@@ -91,7 +92,6 @@ class Supervisor2LockTests extends ScalaTestWithActorTestKit with AnyFunSuiteLik
 
     testSuper ! GetSupervisorLifecycleState(lifecycleStateProbe.ref)
     lifecycleStateProbe.expectMessage(Running)
-
 
     // Check for unhandled
     //lm ! LockPrefix(lockManager2ReponseProbe.ref)

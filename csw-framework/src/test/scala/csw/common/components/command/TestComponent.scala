@@ -19,24 +19,26 @@ object TestComponent {
   def apply(cswCtx: CswContext): Behavior[InitializeMessage] = {
     Behaviors.setup { context: ActorContext[InitializeMessage] =>
       println("TLA YES")
-      Behaviors.receiveMessage[InitializeMessage] {
-        case Initialize(ref) =>
-          context.log.debug("Initializing")
-          println(s"Initializing for: $ref")
-          //throw MyFailure("WTF")
-          //val runningActor: ActorRef[RunningMessages] = context.spawn(running(cswCtx), "runner")
-          val returnvalue = running(cswCtx, MyInitState("kim", "gillies"))
-          ref ! InitializeSuccess(returnvalue)
-          println(s"Send Initialize Success to: $ref")
-          Behaviors.same
-        case _ =>
-          println("Got something else")
-          Behaviors.same
-      }.receiveSignal {
-        case (_, signal) =>
-          println(s"++++++++++++++++++++++Init actor got signal: $signal")
-          Behaviors.same
-      }
+      Behaviors
+        .receiveMessage[InitializeMessage] {
+          case Initialize(ref) =>
+            context.log.debug("Initializing")
+            println(s"Initializing for: $ref")
+            //throw MyFailure("WTF")
+            //val runningActor: ActorRef[RunningMessages] = context.spawn(running(cswCtx), "runner")
+            val returnvalue = running(cswCtx, MyInitState("kim", "gillies"))
+            ref ! InitializeSuccess(returnvalue)
+            println(s"Send Initialize Success to: $ref")
+            Behaviors.same
+          case _ =>
+            println("Got something else")
+            Behaviors.same
+        }
+        .receiveSignal {
+          case (_, signal) =>
+            println(s"++++++++++++++++++++++Init actor got signal: $signal")
+            Behaviors.same
+        }
     }
   }
 
@@ -59,8 +61,8 @@ object TestComponent {
       case Submit2(runId, cmd, svr) =>
         println(s"Submit 2 Command name: $runId, $cmd")
         cmd.commandName match {
-          case `immediateCmd`=>
-            svr ! Completed (runId)
+          case `immediateCmd` =>
+            svr ! Completed(runId)
           case `longRunningCmd` =>
             println("Waiting for 3")
             cswCtx.timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plusSeconds(3))) {
@@ -93,10 +95,9 @@ object TestComponent {
         Behaviors.same
     }
   }.receiveSignal {
-       case (context: ActorContext[RunningMessage], PostStop) =>
-         println(s"-------------------------------------------------PostStop signal for TLA received")
-         Behaviors.same
-     }
-
+    case (context: ActorContext[RunningMessage], PostStop) =>
+      println(s"-------------------------------------------------PostStop signal for TLA received")
+      Behaviors.same
+  }
 
 }

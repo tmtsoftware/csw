@@ -62,8 +62,8 @@ class MyFrameworkMocks {
 }
 
 class NewTests extends ScalaTestWithActorTestKit with AnyFunSuiteLike with BeforeAndAfterEach {
-  private val clientPrefix:Prefix = Prefix(ESW, "engUI")
-  private val invalidPrefix = Prefix("wfos.invalid.engUI")
+  private val clientPrefix: Prefix = Prefix(ESW, "engUI")
+  private val invalidPrefix        = Prefix("wfos.invalid.engUI")
 
   val assemblyInfo: ComponentInfo = ComponentInfo(
     Prefix("WFOS.SampleAssembly"),
@@ -78,20 +78,25 @@ class NewTests extends ScalaTestWithActorTestKit with AnyFunSuiteLike with Befor
 
     val cswContext = testMocks.createContext(assemblyInfo)
     val testSuper =
-      spawn(SupervisorBehavior2(command.TestComponent(cswContext), testMocks.frameworkTestMocks().registrationFactory, cswContext))
+      spawn(
+        SupervisorBehavior2(command.TestComponent(cswContext), testMocks.frameworkTestMocks().registrationFactory, cswContext)
+      )
 
-    val testProbe = TestProbe[SupervisorMessage]
-    val testState = TestProbe[SupervisorLifecycleState]
+    val testProbe        = TestProbe[SupervisorMessage]
+    val testState        = TestProbe[SupervisorLifecycleState]
     val stateChangeProbe = TestProbe[LifecycleStateChanged]
 
     testSuper ! LifecycleStateSubscription2(stateChangeProbe.ref)
 
-   // println("Sending state request")
-  //  testSuper ! GetSupervisorLifecycleState(testState.ref)
+    // println("Sending state request")
+    //  testSuper ! GetSupervisorLifecycleState(testState.ref)
 
     stateChangeProbe.expectMessage(8.seconds, LifecycleStateChanged(testSuper, SupervisorLifecycleState.Idle))
     println("Got the damn Idle")
-    stateChangeProbe.expectMessage(4.seconds, LifecycleStateChanged(testSuper, SupervisorLifecycleState.Registering(cswContext.componentInfo.prefix)))
+    stateChangeProbe.expectMessage(
+      4.seconds,
+      LifecycleStateChanged(testSuper, SupervisorLifecycleState.Registering(cswContext.componentInfo.prefix))
+    )
 
     println("Waiting 15 seconds")
     stateChangeProbe.expectMessage(15.seconds, LifecycleStateChanged(testSuper, SupervisorLifecycleState.Running))
@@ -105,7 +110,13 @@ class NewTests extends ScalaTestWithActorTestKit with AnyFunSuiteLike with Befor
 
     val cswContext = testMocks.createContext(assemblyInfo)
     val testSuper =
-      spawn(SupervisorBehavior2(command.TestCompInitFailureRestart(cswContext), testMocks.frameworkTestMocks().registrationFactory, cswContext))
+      spawn(
+        SupervisorBehavior2(
+          command.TestCompInitFailureRestart(cswContext),
+          testMocks.frameworkTestMocks().registrationFactory,
+          cswContext
+        )
+      )
 
 //    val testProbe = TestProbe[SupervisorMessage]
 //    val testState = TestProbe[SupervisorLifecycleState]
@@ -128,23 +139,27 @@ class NewTests extends ScalaTestWithActorTestKit with AnyFunSuiteLike with Befor
     println("DONE")
   }
 
-
   test("Lock/unlock the component") {
-    val longDuration = 5.seconds
+    val longDuration         = 5.seconds
     val lockingResponseProbe = testKit.createTestProbe[LockingResponse]
-    val lifecycleStateProbe = testKit.createTestProbe[SupervisorLifecycleState]
-    val stateChangeProbe = TestProbe[LifecycleStateChanged]
+    val lifecycleStateProbe  = testKit.createTestProbe[SupervisorLifecycleState]
+    val stateChangeProbe     = TestProbe[LifecycleStateChanged]
 
     val testMocks = new MyFrameworkMocks()
 
     val cswContext = testMocks.createContext(assemblyInfo)
     val testSuper =
-      spawn(SupervisorBehavior2(command.TestComponent(cswContext), testMocks.frameworkTestMocks().registrationFactory, cswContext))
+      spawn(
+        SupervisorBehavior2(command.TestComponent(cswContext), testMocks.frameworkTestMocks().registrationFactory, cswContext)
+      )
 
     testSuper ! LifecycleStateSubscription2(stateChangeProbe.ref)
     stateChangeProbe.expectMessage(LifecycleStateChanged(testSuper, SupervisorLifecycleState.Idle))
 
-    stateChangeProbe.expectMessage(4.seconds, LifecycleStateChanged(testSuper, SupervisorLifecycleState.Registering(cswContext.componentInfo.prefix)))
+    stateChangeProbe.expectMessage(
+      4.seconds,
+      LifecycleStateChanged(testSuper, SupervisorLifecycleState.Registering(cswContext.componentInfo.prefix))
+    )
 
     stateChangeProbe.expectMessage(LifecycleStateChanged(testSuper, SupervisorLifecycleState.Running))
     testSuper ! GetSupervisorLifecycleState(lifecycleStateProbe.ref)
@@ -176,10 +191,12 @@ class NewTests extends ScalaTestWithActorTestKit with AnyFunSuiteLike with Befor
 
     val cswContext = testMocks.createContext(assemblyInfo)
     val testSuper =
-      spawn(SupervisorBehavior2(command.TestComponent(cswContext), testMocks.frameworkTestMocks().registrationFactory, cswContext))
+      spawn(
+        SupervisorBehavior2(command.TestComponent(cswContext), testMocks.frameworkTestMocks().registrationFactory, cswContext)
+      )
 
 //    val setup    = Setup(clientPrefix, CommandName("setup-test"), None)
-    val longRunningSetup    = Setup(clientPrefix, longRunningCmd, None)
+    val longRunningSetup     = Setup(clientPrefix, longRunningCmd, None)
     val submitResponseProbe1 = testKit.createTestProbe[SubmitResponse]
 
     println("Now test long running submit")
@@ -222,9 +239,11 @@ class NewTests extends ScalaTestWithActorTestKit with AnyFunSuiteLike with Befor
 
     val cswContext = testMocks.createContext(assemblyInfo)
     val testSuper =
-      spawn(SupervisorBehavior2(command.TestComponent(cswContext), testMocks.frameworkTestMocks().registrationFactory, cswContext))
+      spawn(
+        SupervisorBehavior2(command.TestComponent(cswContext), testMocks.frameworkTestMocks().registrationFactory, cswContext)
+      )
 
-    val setup    = Setup(clientPrefix, CommandName("setup-test"), None)
+    val setup = Setup(clientPrefix, CommandName("setup-test"), None)
 
     val validateResponseProbe = testKit.createTestProbe[ValidateResponse]
 
@@ -258,7 +277,7 @@ class NewTests extends ScalaTestWithActorTestKit with AnyFunSuiteLike with Befor
     println("Oneway Done")
 
     println("Now test long running submit")
-    val longRunningSetup    = Setup(clientPrefix, longRunningCmd, None)
+    val longRunningSetup = Setup(clientPrefix, longRunningCmd, None)
 
     testSuper ! Submit(longRunningSetup, submitResponseProbe.ref)
 
@@ -271,14 +290,16 @@ class NewTests extends ScalaTestWithActorTestKit with AnyFunSuiteLike with Befor
   }
 
   test("send a command to a locked component and test commands") {
-    val longDuration = 5.seconds
+    val longDuration         = 5.seconds
     val lockingResponseProbe = testKit.createTestProbe[LockingResponse]
 
     val testMocks = new MyFrameworkMocks()
 
     val cswContext = testMocks.createContext(assemblyInfo)
     val testSuper =
-      spawn(SupervisorBehavior2(command.TestComponent(cswContext), testMocks.frameworkTestMocks().registrationFactory, cswContext))
+      spawn(
+        SupervisorBehavior2(command.TestComponent(cswContext), testMocks.frameworkTestMocks().registrationFactory, cswContext)
+      )
 
     println("Sending lock request")
     testSuper ! Lock(clientPrefix, lockingResponseProbe.ref, longDuration)
@@ -325,10 +346,12 @@ class NewTests extends ScalaTestWithActorTestKit with AnyFunSuiteLike with Befor
 
     val cswContext = testMocks.createContext(assemblyInfo)
     val testSuper =
-      spawn(SupervisorBehavior2(command.TestComponent(cswContext), testMocks.frameworkTestMocks().registrationFactory, cswContext))
+      spawn(
+        SupervisorBehavior2(command.TestComponent(cswContext), testMocks.frameworkTestMocks().registrationFactory, cswContext)
+      )
 
-    val testProbe = TestProbe[SupervisorMessage]
-    val testState = TestProbe[SupervisorLifecycleState]
+    val testProbe        = TestProbe[SupervisorMessage]
+    val testState        = TestProbe[SupervisorLifecycleState]
     val stateChangeProbe = TestProbe[LifecycleStateChanged]
 
     testSuper ! LifecycleStateSubscription2(stateChangeProbe.ref)
@@ -338,14 +361,20 @@ class NewTests extends ScalaTestWithActorTestKit with AnyFunSuiteLike with Befor
 
     stateChangeProbe.expectMessage(4.seconds, LifecycleStateChanged(testSuper, SupervisorLifecycleState.Idle))
     println("Got the damn Idle")
-    stateChangeProbe.expectMessage(4.seconds, LifecycleStateChanged(testSuper, SupervisorLifecycleState.Registering(cswContext.componentInfo.prefix)))
+    stateChangeProbe.expectMessage(
+      4.seconds,
+      LifecycleStateChanged(testSuper, SupervisorLifecycleState.Registering(cswContext.componentInfo.prefix))
+    )
     println("Waiting 15 seconds")
     stateChangeProbe.expectMessage(4.seconds, LifecycleStateChanged(testSuper, SupervisorLifecycleState.Running))
     println("Got the damn Running")
     Thread.sleep(2000)
     println("Sending Shutdown")
     testSuper ! SupervisorContainerCommonMessages.Shutdown
-    stateChangeProbe.expectMessage(4.seconds, LifecycleStateChanged(testSuper, SupervisorLifecycleState.Unregistering(cswContext.componentInfo.prefix)))
+    stateChangeProbe.expectMessage(
+      4.seconds,
+      LifecycleStateChanged(testSuper, SupervisorLifecycleState.Unregistering(cswContext.componentInfo.prefix))
+    )
     stateChangeProbe.expectMessage(4.seconds, LifecycleStateChanged(testSuper, SupervisorLifecycleState.Shutdown))
 
     Thread.sleep(4000)
@@ -357,10 +386,12 @@ class NewTests extends ScalaTestWithActorTestKit with AnyFunSuiteLike with Befor
 
     val cswContext = testMocks.createContext(assemblyInfo)
     val testSuper =
-      spawn(SupervisorBehavior2(command.TestComponent(cswContext), testMocks.frameworkTestMocks().registrationFactory, cswContext))
+      spawn(
+        SupervisorBehavior2(command.TestComponent(cswContext), testMocks.frameworkTestMocks().registrationFactory, cswContext)
+      )
 
-    val testProbe = TestProbe[SupervisorMessage]
-    val testState = TestProbe[SupervisorLifecycleState]
+    val testProbe        = TestProbe[SupervisorMessage]
+    val testState        = TestProbe[SupervisorLifecycleState]
     val stateChangeProbe = TestProbe[LifecycleStateChanged]
 
     testSuper ! LifecycleStateSubscription2(stateChangeProbe.ref)
@@ -370,15 +401,20 @@ class NewTests extends ScalaTestWithActorTestKit with AnyFunSuiteLike with Befor
 
     stateChangeProbe.expectMessage(4.seconds, LifecycleStateChanged(testSuper, SupervisorLifecycleState.Idle))
     println("Got the damn Idle")
-    stateChangeProbe.expectMessage(4.seconds, LifecycleStateChanged(testSuper, SupervisorLifecycleState.Registering(cswContext.componentInfo.prefix)))
+    stateChangeProbe.expectMessage(
+      4.seconds,
+      LifecycleStateChanged(testSuper, SupervisorLifecycleState.Registering(cswContext.componentInfo.prefix))
+    )
     stateChangeProbe.expectMessage(4.seconds, LifecycleStateChanged(testSuper, SupervisorLifecycleState.Running))
     println("Got the damn Running")
     Thread.sleep(2000)
     println("Sending Restart")
     testSuper ! SupervisorContainerCommonMessages.Restart
-    stateChangeProbe.expectMessage(4.seconds, LifecycleStateChanged(testSuper, SupervisorLifecycleState.Unregistering(cswContext.componentInfo.prefix)))
+    stateChangeProbe.expectMessage(
+      4.seconds,
+      LifecycleStateChanged(testSuper, SupervisorLifecycleState.Unregistering(cswContext.componentInfo.prefix))
+    )
     stateChangeProbe.expectMessage(4.seconds, LifecycleStateChanged(testSuper, SupervisorLifecycleState.Restart))
-
 
     Thread.sleep(8000)
     println("DONE")
@@ -389,10 +425,12 @@ class NewTests extends ScalaTestWithActorTestKit with AnyFunSuiteLike with Befor
 
     val cswContext = testMocks.createContext(assemblyInfo)
     val testSuper =
-      spawn(SupervisorBehavior2(command.TestComponent(cswContext), testMocks.frameworkTestMocks().registrationFactory, cswContext))
+      spawn(
+        SupervisorBehavior2(command.TestComponent(cswContext), testMocks.frameworkTestMocks().registrationFactory, cswContext)
+      )
 
-    val testProbe = TestProbe[SupervisorMessage]
-    val testState = TestProbe[SupervisorLifecycleState]
+    val testProbe        = TestProbe[SupervisorMessage]
+    val testState        = TestProbe[SupervisorLifecycleState]
     val stateChangeProbe = TestProbe[LifecycleStateChanged]
 
     testSuper ! LifecycleStateSubscription2(stateChangeProbe.ref)
@@ -401,7 +439,10 @@ class NewTests extends ScalaTestWithActorTestKit with AnyFunSuiteLike with Befor
     //  testSuper ! GetSupervisorLifecycleState(testState.ref)
 
     stateChangeProbe.expectMessage(8.seconds, LifecycleStateChanged(testSuper, SupervisorLifecycleState.Idle))
-    stateChangeProbe.expectMessage(4.seconds, LifecycleStateChanged(testSuper, SupervisorLifecycleState.Registering(cswContext.componentInfo.prefix)))
+    stateChangeProbe.expectMessage(
+      4.seconds,
+      LifecycleStateChanged(testSuper, SupervisorLifecycleState.Registering(cswContext.componentInfo.prefix))
+    )
     stateChangeProbe.expectMessage(15.seconds, LifecycleStateChanged(testSuper, SupervisorLifecycleState.Running))
     println("Got the damn Running")
 

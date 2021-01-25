@@ -14,6 +14,8 @@ import csw.framework.models.CswContext
 import csw.framework.scaladsl.RegistrationFactory
 import csw.location.api.models.ComponentType.Assembly
 import csw.location.api.models.ConnectionType.{AkkaType, HttpType}
+import csw.location.client.ActorSystemFactory
+import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.prefix.models.Prefix
 import csw.prefix.models.Subsystem.ESW
@@ -32,6 +34,7 @@ class NewIntegrationTest extends ScalaTestWithActorTestKit(TestApp.typedSystem) 
 
   private val clientPrefix: Prefix = Prefix(ESW, "engUI")
   private val invalidPrefix        = Prefix("wfos.invalid.engUI")
+  private var loggingSystem: LoggingSystem = _
 
   val assemblyInfo: ComponentInfo = ComponentInfo(
     Prefix("WFOS.SampleAssembly"),
@@ -60,6 +63,12 @@ class NewIntegrationTest extends ScalaTestWithActorTestKit(TestApp.typedSystem) 
       )
     }
   }
+
+  override protected def beforeAll(): Unit = {
+    super.beforeAll()
+    loggingSystem = new LoggingSystem("standalone", "1.0", "localhost", typedSystem)
+  }
+
 
   override def afterAll(): Unit = {
     testKit.internalSystem.terminate()

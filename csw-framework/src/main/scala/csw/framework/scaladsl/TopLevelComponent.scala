@@ -10,33 +10,32 @@ object TopLevelComponent {
 
   sealed trait TopLevelComponentMessage extends akka.actor.NoSerializationVerificationNeeded
 
-  sealed trait InitializeMessage extends TopLevelComponentMessage
+  sealed trait InitializeMessage                                     extends TopLevelComponentMessage
   final case class Initialize(replyTo: ActorRef[InitializeResponse]) extends InitializeMessage
 
-  sealed trait InitializeResponse extends TopLevelComponentMessage
+  sealed trait InitializeResponse                                       extends TopLevelComponentMessage
   final case class InitializeSuccess(running: Behavior[RunningMessage]) extends InitializeResponse
   final case object InitializeFailureStop                               extends InitializeResponse
   final case object InitializeFailureRestart                            extends InitializeResponse
 
-  sealed trait ShutdownResponse extends TopLevelComponentMessage
+  sealed trait ShutdownResponse        extends TopLevelComponentMessage
   final case object ShutdownSuccessful extends ShutdownResponse
-  final case object ShutdownFailed extends ShutdownResponse
+  final case object ShutdownFailed     extends ShutdownResponse
 
-  sealed trait RunningMessage extends TopLevelComponentMessage
+  sealed trait RunningMessage                                                                        extends TopLevelComponentMessage
   final case class Validate2(runId: Id, cmd: ControlCommand, svr: ActorRef[ValidateCommandResponse]) extends RunningMessage
-  final case class Oneway2(runId: Id, cmd: ControlCommand) extends RunningMessage
-  final case class Submit2(runId: Id, cmd: ControlCommand, svr: ActorRef[SubmitResponse]) extends RunningMessage
-  final case class Shutdown2(svr: ActorRef[ShutdownResponse]) extends RunningMessage
-  final case class TrackingEventReceived2(trackingEvent: TrackingEvent) extends RunningMessage
+  final case class Oneway2(runId: Id, cmd: ControlCommand)                                           extends RunningMessage
+  final case class Submit2(runId: Id, cmd: ControlCommand, svr: ActorRef[SubmitResponse])            extends RunningMessage
+  final case class Shutdown2(svr: ActorRef[ShutdownResponse])                                        extends RunningMessage
+  final case class TrackingEventReceived2(trackingEvent: TrackingEvent)                              extends RunningMessage
 
-
-  sealed trait OnlineResponse extends TopLevelComponentMessage
-  final case object OnlineSuccess extends OnlineResponse
-  final case object OnlineFailure extends OnlineResponse
+  sealed trait OnlineResponse      extends TopLevelComponentMessage
+  final case object OnlineSuccess  extends OnlineResponse
+  final case object OnlineFailure  extends OnlineResponse
   final case object OfflineSuccess extends OnlineResponse
   final case object OfflineFailure extends OnlineResponse
 
-  final case class GoOnline2(svr: ActorRef[OnlineResponse]) extends RunningMessage
+  final case class GoOnline2(svr: ActorRef[OnlineResponse])  extends RunningMessage
   final case class GoOffline2(svr: ActorRef[OnlineResponse]) extends RunningMessage
 
   /*

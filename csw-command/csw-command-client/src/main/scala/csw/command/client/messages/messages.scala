@@ -163,7 +163,7 @@ object SupervisorContainerCommonMessages {
 }
 ////////////////////
 
-private[csw] /*sealed*/ trait SupervisorMessage
+private[csw] sealed trait SupervisorMessage
 
 /**
  * Represents messages that a component can receive in it's whole lifecycle
@@ -204,6 +204,7 @@ object ComponentCommonMessage {
       extends ComponentCommonMessage
 
   case class LifecycleStateSubscription2(subscriberMessage: ActorRef[LifecycleStateChanged]) extends ComponentCommonMessage
+
   /**
    * Represents a message to create subscription for state changes of a component
    *

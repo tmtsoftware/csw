@@ -26,7 +26,7 @@ class SupervisorLifecycleTest extends ScalaTestWithActorTestKit with AnyFunSuite
 
   test("test create and default state") {
     val svrProbe = testKit.createTestProbe[SupervisorMessage]
-    val sl = testKit.spawn(LifecycleHandler(new LoggerFactory(Prefix("ESW.test")), svrProbe.ref))
+    val sl       = testKit.spawn(LifecycleHandler(new LoggerFactory(Prefix("ESW.test")), svrProbe.ref))
 
     val stateProbe = testKit.createTestProbe[StateResponse]
 
@@ -36,8 +36,8 @@ class SupervisorLifecycleTest extends ScalaTestWithActorTestKit with AnyFunSuite
   }
 
   test("change state") {
-    val svrProbe = testKit.createTestProbe[SupervisorMessage]
-    val sl = testKit.spawn(LifecycleHandler(new LoggerFactory(Prefix("ESW.test")), svrProbe.ref))
+    val svrProbe   = testKit.createTestProbe[SupervisorMessage]
+    val sl         = testKit.spawn(LifecycleHandler(new LoggerFactory(Prefix("ESW.test")), svrProbe.ref))
     val stateProbe = testKit.createTestProbe[StateResponse]
 
     // test that initial state is idle
@@ -53,8 +53,8 @@ class SupervisorLifecycleTest extends ScalaTestWithActorTestKit with AnyFunSuite
 
   test("subscribe test") {
     val svrProbe = testKit.createTestProbe[SupervisorMessage]
-    val sl = testKit.spawn(LifecycleHandler(new LoggerFactory(Prefix("ESW.test")), svrProbe.ref))
-    val s1 = testKit.createTestProbe[LifecycleStateChanged]
+    val sl       = testKit.spawn(LifecycleHandler(new LoggerFactory(Prefix("ESW.test")), svrProbe.ref))
+    val s1       = testKit.createTestProbe[LifecycleStateChanged]
 
     // s1 subscribes
     sl ! SubscribeState(s1.ref)
@@ -70,7 +70,6 @@ class SupervisorLifecycleTest extends ScalaTestWithActorTestKit with AnyFunSuite
     // s2 gets update from subscribing
     s2.expectMessage(LifecycleStateChanged(svrProbe.ref, Running))
 
-
     // Update again
     sl ! UpdateState(RunningOffline)
     // Both should get a message
@@ -81,8 +80,8 @@ class SupervisorLifecycleTest extends ScalaTestWithActorTestKit with AnyFunSuite
 
   test("unsubscribe test") {
     val svrProbe = testKit.createTestProbe[SupervisorMessage]
-    val sl = testKit.spawn(LifecycleHandler(new LoggerFactory(Prefix("ESW.test")), svrProbe.ref))
-    val s1 = testKit.createTestProbe[LifecycleStateChanged]
+    val sl       = testKit.spawn(LifecycleHandler(new LoggerFactory(Prefix("ESW.test")), svrProbe.ref))
+    val s1       = testKit.createTestProbe[LifecycleStateChanged]
 
     // s1 subscribes
     sl ! SubscribeState(s1.ref)

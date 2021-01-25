@@ -2,7 +2,15 @@ package csw.framework.internal.supervisor
 
 import akka.actor.testkit.typed.scaladsl.ActorTestKit
 import csw.command.client.models.framework.LockingResponse
-import csw.command.client.models.framework.LockingResponse.{AcquiringLockFailed, LockAcquired, LockAlreadyReleased, LockExpired, LockExpiringShortly, LockReleased, ReleasingLockFailed}
+import csw.command.client.models.framework.LockingResponse.{
+  AcquiringLockFailed,
+  LockAcquired,
+  LockAlreadyReleased,
+  LockExpired,
+  LockExpiringShortly,
+  LockReleased,
+  ReleasingLockFailed
+}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
 import csw.prefix.models.{Prefix, Subsystem}
@@ -12,23 +20,22 @@ import org.scalatest.funsuite.AnyFunSuite
 
 import scala.concurrent.duration.DurationDouble
 
-
 class LockManager2Test extends AnyFunSuite with MockitoSugar with BeforeAndAfterAll {
   import LockManager2._
 
   private val testKit = ActorTestKit()
 
   override def afterAll(): Unit = testKit.shutdownTestKit()
-  private val prefix        = Prefix("wfos.eng.ui")
-  private val invalidPrefix = Prefix("iris.eng.ui")
-  private val longDuration = 5.seconds
+  private val prefix            = Prefix("wfos.eng.ui")
+  private val invalidPrefix     = Prefix("iris.eng.ui")
+  private val longDuration      = 5.seconds
 
-  private val mockedLoggerFactory      = mock[LoggerFactory]
-  private val mockedLogger             = mock[Logger]
+  private val mockedLoggerFactory = mock[LoggerFactory]
+  private val mockedLogger        = mock[Logger]
   when(mockedLoggerFactory.getLogger).thenReturn(mockedLogger)
 
   test("should be unlocked when prefix is not available | DEOPSCSW-222, DEOPSCSW-301") {
-    val isLockedProbe = testKit.createTestProbe[LockManager2Response]
+    val isLockedProbe             = testKit.createTestProbe[LockManager2Response]
     val lockManager2ResponseProbe = testKit.createTestProbe[LockManager2Response]
 
     val lm = testKit.spawn(LockManager2(mockedLoggerFactory))
@@ -42,7 +49,7 @@ class LockManager2Test extends AnyFunSuite with MockitoSugar with BeforeAndAfter
   }
 
   test("should be locked when prefix is available | DEOPSCSW-222, DEOPSCSW-301") {
-    val lockingResponseProbe = testKit.createTestProbe[LockingResponse]
+    val lockingResponseProbe      = testKit.createTestProbe[LockingResponse]
     val lockManager2ResponseProbe = testKit.createTestProbe[LockManager2Response]
 
     // Create unlocked and check
@@ -51,7 +58,7 @@ class LockManager2Test extends AnyFunSuite with MockitoSugar with BeforeAndAfter
     lockManager2ResponseProbe.expectMessage(Unlocked)
 
     // Lock with prefix, acquire sent to client
-    lm ! LockComponent(prefix, lockingResponseProbe.ref, lockManager2ResponseProbe. ref, longDuration)
+    lm ! LockComponent(prefix, lockingResponseProbe.ref, lockManager2ResponseProbe.ref, longDuration)
     lockingResponseProbe.expectMessage(LockAcquired)
     //lockManager2ResponseProbe.expectMessage(Locked)
     // No message needed since locking can't fail from running
@@ -67,7 +74,7 @@ class LockManager2Test extends AnyFunSuite with MockitoSugar with BeforeAndAfter
   }
 
   test("lockPrefix should able to reacquire lock | DEOPSCSW-222, DEOPSCSW-301") {
-    val lockingResponseProbe = testKit.createTestProbe[LockingResponse]
+    val lockingResponseProbe      = testKit.createTestProbe[LockingResponse]
     val lockManager2ResponseProbe = testKit.createTestProbe[LockManager2Response]
 
     // Create unlocked
@@ -77,7 +84,7 @@ class LockManager2Test extends AnyFunSuite with MockitoSugar with BeforeAndAfter
     lockManager2ResponseProbe.expectMessage(Unlocked)
 
     // Lock with prefix
-    lm ! LockComponent(prefix, lockingResponseProbe.ref, lockManager2ResponseProbe. ref, longDuration)
+    lm ! LockComponent(prefix, lockingResponseProbe.ref, lockManager2ResponseProbe.ref, longDuration)
     lockingResponseProbe.expectMessage(LockAcquired)
 
     // No message needed since locking can't fail from running
@@ -87,14 +94,14 @@ class LockManager2Test extends AnyFunSuite with MockitoSugar with BeforeAndAfter
     lockManager2ResponseProbe.expectMessage(Locked)
 
     // Try locking again with same prefix
-    lm ! LockComponent(prefix, lockingResponseProbe.ref, lockManager2ResponseProbe. ref, longDuration)
+    lm ! LockComponent(prefix, lockingResponseProbe.ref, lockManager2ResponseProbe.ref, longDuration)
     lockingResponseProbe.expectMessage(LockAcquired)
     // No message needed
     lockManager2ResponseProbe.expectNoMessage()
   }
 
   test("should not acquire lock when invalid prefix is provided | DEOPSCSW-222, DEOPSCSW-301") {
-    val lockingResponseProbe = testKit.createTestProbe[LockingResponse]
+    val lockingResponseProbe      = testKit.createTestProbe[LockingResponse]
     val lockManager2ResponseProbe = testKit.createTestProbe[LockManager2Response]
 
     val lm = testKit.spawn(LockManager2(mockedLoggerFactory))
@@ -122,7 +129,7 @@ class LockManager2Test extends AnyFunSuite with MockitoSugar with BeforeAndAfter
   }
 
   test("should be able to unlock | DEOPSCSW-222, DEOPSCSW-301") {
-    val lockingResponseProbe = testKit.createTestProbe[LockingResponse]
+    val lockingResponseProbe     = testKit.createTestProbe[LockingResponse]
     val lockManager2ReponseProbe = testKit.createTestProbe[LockManager2Response]
 
     val lm = testKit.spawn(LockManager2(mockedLoggerFactory))
@@ -144,7 +151,7 @@ class LockManager2Test extends AnyFunSuite with MockitoSugar with BeforeAndAfter
   }
 
   test("should not be able to unlock with invalid prefix | DEOPSCSW-222, DEOPSCSW-301") {
-    val lockingResponseProbe = testKit.createTestProbe[LockingResponse]
+    val lockingResponseProbe      = testKit.createTestProbe[LockingResponse]
     val lockManager2ResponseProbe = testKit.createTestProbe[LockManager2Response]
 
     val lm = testKit.spawn(LockManager2(mockedLoggerFactory))
@@ -166,7 +173,7 @@ class LockManager2Test extends AnyFunSuite with MockitoSugar with BeforeAndAfter
   }
 
   test("should not result in failure when tried to unlock already unlocked component | DEOPSCSW-222, DEOPSCSW-301") {
-    val lockingResponseProbe = testKit.createTestProbe[LockingResponse]
+    val lockingResponseProbe      = testKit.createTestProbe[LockingResponse]
     val lockManager2ResponseProbe = testKit.createTestProbe[LockManager2Response]
 
     val lm = testKit.spawn(LockManager2(mockedLoggerFactory))
@@ -181,7 +188,7 @@ class LockManager2Test extends AnyFunSuite with MockitoSugar with BeforeAndAfter
   }
 
   test("should get correct protocol for timeouts") {
-    val lockingResponseProbe = testKit.createTestProbe[LockingResponse]
+    val lockingResponseProbe      = testKit.createTestProbe[LockingResponse]
     val lockManager2ResponseProbe = testKit.createTestProbe[LockManager2Response]
 
     val lm = testKit.spawn(LockManager2(mockedLoggerFactory))
@@ -198,7 +205,7 @@ class LockManager2Test extends AnyFunSuite with MockitoSugar with BeforeAndAfter
   }
 
   test("should relock and grow timeouts") {
-    val lockingResponseProbe = testKit.createTestProbe[LockingResponse]
+    val lockingResponseProbe      = testKit.createTestProbe[LockingResponse]
     val lockManager2ResponseProbe = testKit.createTestProbe[LockManager2Response]
 
     val lm = testKit.spawn(LockManager2(mockedLoggerFactory))
@@ -221,7 +228,7 @@ class LockManager2Test extends AnyFunSuite with MockitoSugar with BeforeAndAfter
 
   // DEOPSCSW-302: Support Unlocking by Admin
   test("should allow unlocking any locked component by admin | DEOPSCSW-222, DEOPSCSW-301, DEOPSCSW-302") {
-    val lockingResponseProbe = testKit.createTestProbe[LockingResponse]
+    val lockingResponseProbe      = testKit.createTestProbe[LockingResponse]
     val lockManager2ResponseProbe = testKit.createTestProbe[LockManager2Response]
 
     val lm = testKit.spawn(LockManager2(mockedLoggerFactory))

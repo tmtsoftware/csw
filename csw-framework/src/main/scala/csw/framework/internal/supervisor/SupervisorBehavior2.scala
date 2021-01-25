@@ -6,11 +6,7 @@ import csw.command.client.MiniCRM
 import csw.command.client.MiniCRM.MiniCRMMessage
 import csw.command.client.MiniCRM.MiniCRMMessage.Print
 import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
-import csw.command.client.messages.ComponentCommonMessage.{
-  GetSupervisorLifecycleState,
-  LifecycleStateSubscription2,
-  TrackingEventReceived
-}
+import csw.command.client.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription2, TrackingEventReceived}
 import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
@@ -30,12 +26,13 @@ import csw.params.commands.CommandResponse
 import csw.params.commands.CommandResponse.{SubmitResponse, ValidateCommandResponse}
 import csw.params.core.models.Id
 import csw.prefix.models.Prefix
+import csw.serializable.CommandSerializable
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
 object SupervisorBehavior2 {
 
-  sealed trait Supervisor2Message
+  sealed trait Supervisor2Message extends akka.actor.NoSerializationVerificationNeeded
   case object test extends Supervisor2Message
 
   private val InitializeTimerKey = "initialize-timer"
@@ -48,9 +45,9 @@ object SupervisorBehavior2 {
   private final case class TlATerminated(tlaBehavior: Behavior[InitializeMessage], retryCount: Int, delayBetween: FiniteDuration)
       extends Supervisor2Message
   private[framework] final case class TLAStart(
-                                                tlaBehavior: Behavior[InitializeMessage],
-                                                retryCount: Int,
-                                                delayBetween: FiniteDuration
+      tlaBehavior: Behavior[InitializeMessage],
+      retryCount: Int,
+      delayBetween: FiniteDuration
   )                                                        extends Supervisor2Message
   private final case class CommandHelperTerminated(id: Id) extends Supervisor2Message
   final case object PrintCRM                               extends Supervisor2Message
@@ -68,12 +65,14 @@ object SupervisorBehavior2 {
   private final case class WrappedOnlineResponse(response: OnlineResponse)                         extends Supervisor2Message
   private final case class WrappedTopLevelActorCommonMessage(response: TopLevelActorCommonMessage) extends Supervisor2Message
   private final case class WrappedString(response: String)                                         extends Supervisor2Message
-  private final case class WrappedSupervisorMessage(response: SupervisorMessage)                   extends Supervisor2Message with akka.actor.NoSerializationVerificationNeeded
+  private final case class WrappedSupervisorMessage(response: SupervisorMessage)
+      extends Supervisor2Message
+      with akka.actor.NoSerializationVerificationNeeded
 
   def apply(
-             tlaInitBehavior: Behavior[InitializeMessage],
-             registrationFactory: RegistrationFactory,
-             cswCtx: CswContext
+      tlaInitBehavior: Behavior[InitializeMessage],
+      registrationFactory: RegistrationFactory,
+      cswCtx: CswContext
   ): Behavior[SupervisorMessage] = {
     Behaviors.setup { ctx =>
       println("Yes")
@@ -82,6 +81,7 @@ object SupervisorBehavior2 {
       //Behaviors.withStash(capacity = 10) { buffer =>
       val svrBehavior: Behavior[Supervisor2Message] = make(tlaInitBehavior, registrationFactory, cswCtx, ctx.self)
       val newSuper                                  = ctx.spawn(svrBehavior, "newSuper")
+      newSuper ! TLAStart(tlaInitBehavior, 0, 2.seconds)
 
       Behaviors.receiveMessage { msg =>
         println(s"---------------------------------Proxy received: $msg")
@@ -92,31 +92,31 @@ object SupervisorBehavior2 {
   }
 
   def make(
-            tlaInitBehavior: Behavior[InitializeMessage],
-            registrationFactory: RegistrationFactory,
-            cswCtx: CswContext,
-            svr: ActorRef[SupervisorMessage]
+      tlaInitBehavior: Behavior[InitializeMessage],
+      registrationFactory: RegistrationFactory,
+      cswCtx: CswContext,
+      svr: ActorRef[SupervisorMessage]
   ): Behavior[Supervisor2Message] = {
 
-    Behaviors.setup { superCtx: ActorContext[Supervisor2Message] =>
-      val log: Logger = cswCtx.loggerFactory.getLogger
-      log.info("DEBUGGER IS WORKING DAMN IT")
+    val log: Logger = cswCtx.loggerFactory.getLogger
+    // Stash here saves commands issued during initialization.  They are played back when entering Running
+    Behaviors.withStash(capacity = 10) { buffer =>
+      Behaviors.setup { superCtx: ActorContext[Supervisor2Message] =>
+        log.info("DEBUGGER IS WORKING DAMN IT")
 
-      // Stash here saves commands issued during initialization.  They are played back when entering Running
-      Behaviors.withStash(capacity = 10) { buffer =>
         println("Sending TLAStart")
-        superCtx.self ! TLAStart(tlaInitBehavior, 0, 2.seconds)
+//        superCtx.self ! TLAStart(tlaInitBehavior, 0, 2.seconds)
         new SupervisorBehavior2(tlaInitBehavior, registrationFactory, cswCtx, svr, superCtx).starting(buffer)
       }
     }
   }
 
   private class SupervisorBehavior2(
-                                     tlaInitBehavior: Behavior[InitializeMessage],
-                                     registrationFactory: RegistrationFactory,
-                                     cswCtx: CswContext,
-                                     svr: ActorRef[SupervisorMessage],
-                                     superCtx: ActorContext[Supervisor2Message]
+      tlaInitBehavior: Behavior[InitializeMessage],
+      registrationFactory: RegistrationFactory,
+      cswCtx: CswContext,
+      svr: ActorRef[SupervisorMessage],
+      superCtx: ActorContext[Supervisor2Message]
   ) {
     val initResponseMapper: ActorRef[TopLevelComponent.InitializeResponse] =
       superCtx.messageAdapter(rsp => WrappedInitializeResponse(rsp))
@@ -189,8 +189,8 @@ object SupervisorBehavior2 {
     }
 
     def initializing(
-                      tlaInit: ActorRef[InitializeMessage],
-                      buffer: StashBuffer[Supervisor2Message]
+        tlaInit: ActorRef[InitializeMessage],
+        buffer: StashBuffer[Supervisor2Message]
     ): Behavior[Supervisor2Message] = {
       log.debug("Initialzing")
       println("Initializing")

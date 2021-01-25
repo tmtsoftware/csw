@@ -21,8 +21,8 @@ object SupervisorLifecycleState extends Enum[SupervisorLifecycleState] {
   case object Idle extends SupervisorLifecycleState
 
   /**
-  * Indicates that the component has initialized and is registering with Location Service
-  */
+   * Indicates that the component has initialized and is registering with Location Service
+   */
   case class Registering(prefix: Prefix) extends SupervisorLifecycleState
 
   /**
