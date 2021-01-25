@@ -6,7 +6,11 @@ import csw.command.client.MiniCRM
 import csw.command.client.MiniCRM.MiniCRMMessage
 import csw.command.client.MiniCRM.MiniCRMMessage.Print
 import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
-import csw.command.client.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription2, TrackingEventReceived}
+import csw.command.client.messages.ComponentCommonMessage.{
+  GetSupervisorLifecycleState,
+  LifecycleStateSubscription2,
+  TrackingEventReceived
+}
 import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
@@ -33,7 +37,7 @@ import scala.concurrent.duration.{DurationInt, FiniteDuration}
 object SupervisorBehavior2 {
 
   sealed trait Supervisor2Message extends akka.actor.NoSerializationVerificationNeeded
-  case object test extends Supervisor2Message
+  case object test                extends Supervisor2Message
 
   private val InitializeTimerKey = "initialize-timer"
   private val ShutdownTimerKey   = "shutdown-timer"
@@ -81,7 +85,7 @@ object SupervisorBehavior2 {
       //Behaviors.withStash(capacity = 10) { buffer =>
       val svrBehavior: Behavior[Supervisor2Message] = make(tlaInitBehavior, registrationFactory, cswCtx, ctx.self)
       val newSuper                                  = ctx.spawn(svrBehavior, "newSuper")
-      newSuper ! TLAStart(tlaInitBehavior, 0, 2.seconds)
+//      newSuper ! TLAStart(tlaInitBehavior, 0, 2.seconds)
 
       Behaviors.receiveMessage { msg =>
         println(s"---------------------------------Proxy received: $msg")
@@ -98,14 +102,14 @@ object SupervisorBehavior2 {
       svr: ActorRef[SupervisorMessage]
   ): Behavior[Supervisor2Message] = {
 
-    val log: Logger = cswCtx.loggerFactory.getLogger
-    // Stash here saves commands issued during initialization.  They are played back when entering Running
-    Behaviors.withStash(capacity = 10) { buffer =>
-      Behaviors.setup { superCtx: ActorContext[Supervisor2Message] =>
-        log.info("DEBUGGER IS WORKING DAMN IT")
+    Behaviors.setup { superCtx: ActorContext[Supervisor2Message] =>
+      val log: Logger = cswCtx.loggerFactory.getLogger
+      log.info("DEBUGGER IS WORKING DAMN IT")
 
+      // Stash here saves commands issued during initialization.  They are played back when entering Running
+      Behaviors.withStash(capacity = 10) { buffer =>
         println("Sending TLAStart")
-//        superCtx.self ! TLAStart(tlaInitBehavior, 0, 2.seconds)
+        superCtx.self ! TLAStart(tlaInitBehavior, 0, 2.seconds)
         new SupervisorBehavior2(tlaInitBehavior, registrationFactory, cswCtx, svr, superCtx).starting(buffer)
       }
     }
