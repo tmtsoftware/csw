@@ -8,6 +8,7 @@ import csw.framework.models.ContainerMode.{Container, Standalone}
 import csw.framework.models.{ContainerBootstrapInfo, ContainerInfo, HostBootstrapInfo}
 import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.location.api.models.Connection
+import csw.location.api.models.ConnectionType.AkkaType
 import csw.prefix.models.Prefix
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
@@ -28,6 +29,7 @@ class ConfigParserTest extends AnyFunSuite with Matchers {
     Assembly,
     "csw.pkgDemo.assembly1.Assembly1",
     DoNotRegister,
+    Set(AkkaType),
     Set(Connection.from("TCS.HCD2A-HCD-akka"), Connection.from("tcs.HCD2C-HCD-akka")),
     5.seconds
   )

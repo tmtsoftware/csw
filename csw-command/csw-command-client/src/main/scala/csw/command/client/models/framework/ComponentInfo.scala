@@ -1,6 +1,7 @@
 package csw.command.client.models.framework
 
-import csw.location.api.models.{ComponentType, Connection}
+import csw.location.api.models.ConnectionType.AkkaType
+import csw.location.api.models.{ComponentType, Connection, ConnectionType}
 import csw.prefix.models.Prefix
 
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
@@ -25,6 +26,7 @@ final case class ComponentInfo(
     componentType: ComponentType,
     behaviorFactoryClassName: String,
     locationServiceUsage: LocationServiceUsage,
+    registerAs:           Set[ConnectionType] = Set(AkkaType),
     connections: Set[Connection] = Set.empty,
     initializeTimeout: FiniteDuration = 10.seconds
 ) {

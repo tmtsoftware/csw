@@ -8,6 +8,9 @@ import csw.prefix.models.Prefix;
 
 import java.time.Duration;
 import java.util.Collections;
+import java.util.Set;
+
+import static csw.location.api.javadsl.JConnectionType.AkkaType;
 
 
 public class JComponentInfos {
@@ -17,6 +20,7 @@ public class JComponentInfos {
             JComponentType.HCD,
             "csw.framework.javadsl.components.JSampleComponentBehaviorFactory",
             LocationServiceUsage.JRegisterOnly(),
+            Set.of(AkkaType),
             Collections.emptySet(),
             Duration.ofSeconds(10)
     );
@@ -26,6 +30,7 @@ public class JComponentInfos {
             JComponentType.HCD,
             "csw.framework.javadsl.components.JSampleComponentBehaviorFactory",
             LocationServiceUsage.JRegisterOnly(),
+            Set.of(AkkaType),
             Collections.emptySet(),
             Duration.ofMillis(50)
     );

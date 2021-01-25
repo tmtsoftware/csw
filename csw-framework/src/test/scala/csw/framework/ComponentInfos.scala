@@ -4,6 +4,7 @@ import csw.command.client.models.framework.ComponentInfo
 import csw.command.client.models.framework.LocationServiceUsage.{DoNotRegister, RegisterOnly}
 import csw.framework.models.ContainerInfo
 import csw.location.api.models.ComponentType.{Assembly, HCD}
+import csw.location.api.models.ConnectionType.{AkkaType, HttpType}
 import csw.prefix.models.Prefix
 
 import scala.concurrent.duration.DurationDouble
@@ -14,6 +15,7 @@ object ComponentInfos {
     Assembly,
     "csw.common.components.framework.SampleComponentBehaviorFactory",
     DoNotRegister,
+    Set.empty,
     Set.empty
   )
 
@@ -22,6 +24,7 @@ object ComponentInfos {
     Assembly,
     "csw.common.components.framework.ComponentBehaviorFactoryToSimulateFailure",
     DoNotRegister,
+    Set.empty,
     Set.empty
   )
 
@@ -30,6 +33,7 @@ object ComponentInfos {
     HCD,
     "csw.common.components.framework.SampleComponentBehaviorFactory",
     RegisterOnly,
+    Set(AkkaType, HttpType),
     Set.empty
   )
 
@@ -38,6 +42,7 @@ object ComponentInfos {
     HCD,
     "csw.common.components.framework.SampleComponentBehaviorFactory",
     RegisterOnly,
+    Set(AkkaType, HttpType),
     Set.empty,
     50.millis
   )
@@ -47,6 +52,7 @@ object ComponentInfos {
     HCD,
     "csw.common.components.framework.SampleComponentBehaviorFactory",
     RegisterOnly,
+    Set(AkkaType, HttpType),
     Set.empty,
     5.seconds
   )

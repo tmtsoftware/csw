@@ -2,9 +2,8 @@ package csw.framework.javadsl
 
 import java.time.Duration
 import java.util
-
 import csw.command.client.models.framework.{ComponentInfo, LocationServiceUsage}
-import csw.location.api.models.{ComponentType, Connection}
+import csw.location.api.models.{ComponentType, Connection, ConnectionType}
 import csw.prefix.models.Prefix
 
 import scala.compat.java8.DurationConverters.DurationOps
@@ -22,6 +21,7 @@ object JComponentInfo {
    * @param componentType the type of the component as defined by [[csw.location.api.models.ComponentType]]
    * @param className specifies the component to be created by name of the class of it's factory
    * @param locationServiceUsage specifies component's usage of location service
+   * @param registerAs specifies the connection types the component should register with
    * @param connections set of connections that will be used by this component for interaction
    * @param initializeTimeout the timeout value used while initializing a component
    * @return an instance of ComponentInfo
@@ -31,6 +31,7 @@ object JComponentInfo {
       componentType: ComponentType,
       className: String,
       locationServiceUsage: LocationServiceUsage,
+      registerAs: util.Set[ConnectionType],
       connections: util.Set[Connection],
       initializeTimeout: Duration
   ): ComponentInfo =
@@ -39,6 +40,7 @@ object JComponentInfo {
       componentType,
       className,
       locationServiceUsage,
+      registerAs.asScala.toSet,
       connections.asScala.toSet,
       initializeTimeout.toScala
     )
