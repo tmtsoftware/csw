@@ -17,22 +17,22 @@ See [here](https://tmtsoftware.github.io/csw/3.0.0/) for a detailed documentatio
 ### Changes
 - `->` method on a Key now takes a single parameter instead of varargs. For varargs, please use `set` method.<sup>[1](#3-0-0-1)</sup>
 - `->` method on a Key that took an array of values has been removed. Please use `setAll` method instead.<sup>[1](#3-0-0-1)</sup>
-- `->` Removed usage of client-role and used realm-role instead in location server and config server routes.<sup>[1](#3-0-0-1)</sup>
-- Contract change for location service API for example `registration` and `location` model incorporate metadata.
+- Removed usage of client-roles in favor of realm-roles in location server and config server HTTP routes.<sup>[1](#3-0-0-1)</sup>
+- Contract change for Location Service API for `registration` and `location` models to incorporate metadata.
   `Metadata` is additional information associated with `registration`.<sup>[1](#3-0-0-1)</sup>
-- Removed `RegistrationFactory` from `location-server` module. Instead, following should be used by Scala and Java users to instantiate `AkkaRegistration`<sup>[1](#3-0-0-1)</sup>
-    - For Scala users, `AkkaRegistrationFactory` API change to expect actorRef instead of URI of remote actorRef
-    - For Java users, `JAkkaRegistrationFactory` is added.
-- Contract change for ComponentHandlers `initialize` and `onShutdown` method, return type changed from `Future[Unit]` to `Unit` i.e. from non-blocking to blocking.<sup>[1](#3-0-0-1)</sup>
-- Changed the installation of csw-apps, coursier to be used to install applications instead of downloading apps.zip from release page.<sup>[2](#3.0.0-2)</sup>
-- logging-aggregator-<some-version>.zip will be available on the release page.<sup>[2](#3-0-0-2)</sup>
-- Added Restrictions while creating Parameter key. It cannot have `[`, `]` or `/` characters in the key name.<sup>[2](#3-0-0-2)</sup>
-- Changed Naming convention for network interface names from  `Public` and `Private` to `Outside` and `Inside` respectively.<sup>[2](#3-0-0-2)</sup>
+- Removed `RegistrationFactory` from `location-server` module. Instead, the following should be used by Scala and Java users to instantiate `AkkaRegistration`<sup>[1](#3-0-0-1)</sup>
+    - For Scala, use `AkkaRegistrationFactory`.  It has an API change to expect an `actorRef` instead of the URI of `actorRef`
+    - For Java, use the new`JAkkaRegistrationFactory`.
+- Contract change for ComponentHandlers `initialize` and `onShutdown` methods, where the return type was changed from `Future[Unit]` to `Unit` i.e. from non-blocking to blocking.<sup>[1](#3-0-0-1)</sup>
+- Changed the installation of `csw-apps`. The `coursier` program to be used to install applications instead of downloading apps from release page.<sup>[2](#3.0.0-2)</sup>
+- `logging-aggregator-<some-version>.zip` will be available on the release page.<sup>[2](#3-0-0-2)</sup>
+- Added new restrictions on Parameter Key naming. It cannot have `[`, `]` or `/` characters in the key name.<sup>[2](#3-0-0-2)</sup>
+- Changed naming convention for network interface names from  `Public` and `Private` to `Outside` and `Inside` respectively.<sup>[2](#3-0-0-2)</sup>
 - Minor fixes in STIL pipeline<sup>[3](#3-0-0-3)</sup>
-- Ensure test report is generated for multi-jvm tests<sup>[4](#3-0-0-4)</sup>
+- Ensured test report is generated for multi-jvm tests<sup>[4](#3-0-0-4)</sup>
 - Fixed incorrect story id label in test<sup>[4](#3-0-0-4)</sup>
 - Removed obsolete requirement linkage for DEOPSCSW-205<sup>[4](#3-0-0-4)</sup>
-- Add support for test story report generation in multi jvm test plugin<sup>[5](#3-0-0-5)</sup>
+- Added support for test story report generation in multi jvm test plugin<sup>[5](#3-0-0-5)</sup>
 
 ### Version Upgrades
 - Scala version upgrade to 2.13.3
