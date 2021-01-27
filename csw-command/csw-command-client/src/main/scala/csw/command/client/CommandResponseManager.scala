@@ -66,7 +66,7 @@ class CommandResponseManager(val commandResponseManagerActor: ActorRef[MiniCRM.C
 
 object CommandResponseManager {
 
-  trait OverallResponse {
+  sealed trait OverallResponse {
     def responses: Set[SubmitResponse]
 
     /**

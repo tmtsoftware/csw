@@ -23,8 +23,12 @@ import scala.concurrent.Await
 import scala.concurrent.duration.{DurationLong, FiniteDuration}
 
 class MultiNodeTestConfig extends NMembersAndSeed(2) {
-  val keycloak: RoleName           = seed
-  val Vector(configServer, client) = members
+  val keycloak: RoleName = seed
+  val (configServer, client) = members match {
+    case Vector(configServer, client) => (configServer, client)
+    case x                            => throw new MatchError(x)
+  }
+
 }
 
 class ConfigCliAuthTestMultiJvmNode1 extends ConfigCliAuthTest(0)
@@ -121,7 +125,8 @@ class ConfigCliAuthTest(ignore: Int)
       try {
         System.setIn(stream)
         runner.login(Options(console = true))
-      } finally {
+      }
+      finally {
         System.setIn(stdIn)
       }
 

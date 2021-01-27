@@ -5,5 +5,9 @@ import csw.location.helpers.NMembersAndSeed
 
 class OneClientAndServer extends NMembersAndSeed(1) {
   val server: RoleName = seed
-  val Vector(client)   = members
+  val client: RoleName = members match {
+    case Vector(client) => client
+    case x              => throw new MatchError(x)
+  }
+
 }

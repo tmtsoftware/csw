@@ -131,11 +131,13 @@ object Coords {
           case ras: String => Angle.parseRa(ras)
           case rad: Double => Angle.double2angle(rad).degree
           case raa: Angle  => raa
+          case x           => throw new MatchError(x)
         },
         dec match {
           case des: String => Angle.parseDe(des)
           case ded: Double => Angle.double2angle(ded).degree
           case dea: Angle  => dea
+          case x           => throw new MatchError(x)
         },
         ICRS,
         catalogName,

@@ -55,7 +55,7 @@ class ConcurrencyInCallbacksExample(publisher: EventPublisher)(implicit actorSys
 }
 
 case class Temperature(degrees: Int)
-trait TemperatureMessage
+sealed trait TemperatureMessage
 object TemperatureMessage {
   case class GetTemperature(ref: ActorRef[Temperature]) extends TemperatureMessage
   case object PublishTemperature                        extends TemperatureMessage

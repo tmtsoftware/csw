@@ -65,6 +65,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
         {
           case r @ LWWRegister(Some(`location`) | None) => r.withValueOf(Some(location))
           case LWWRegister(Some(otherLocation))         => throw logException(new OtherLocationIsRegistered(location, otherLocation))
+          case x                                        => throw new MatchError(x)
         },
         await(initialValue)
       )

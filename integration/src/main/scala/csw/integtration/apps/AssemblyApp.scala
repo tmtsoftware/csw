@@ -30,7 +30,7 @@ object AssemblyApp extends App {
   private val registrationResult = locationService.register(registration).await
 
   def behavior: Behaviors.Receive[String] =
-    Behaviors.receiveMessage[String] {
+    Behaviors.receiveMessagePartial[String] {
       case "Unregister" =>
         registrationResult.unregister()
         Behaviors.same

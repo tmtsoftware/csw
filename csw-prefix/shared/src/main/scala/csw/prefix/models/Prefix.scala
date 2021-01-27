@@ -32,7 +32,9 @@ object Prefix {
    */
   def apply(value: String): Prefix = {
     require(value.contains(SEPARATOR), s"prefix must have a '$SEPARATOR' separator")
-    val Array(subsystem, componentName) = value.split(s"\\$SEPARATOR", 2)
-    Prefix(Subsystem.withNameInsensitive(subsystem), componentName)
+    value.split(s"\\$SEPARATOR", 2) match {
+      case Array(subsystem, componentName) => Prefix(Subsystem.withNameInsensitive(subsystem), componentName)
+      case x                               => throw new MatchError(x)
+    }
   }
 }
