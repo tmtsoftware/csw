@@ -5,7 +5,7 @@ import akka.actor.typed.{ActorRef, Behavior}
 import csw.config.api.ConfigData
 import example.framework.components.assembly.WorkerActorMsgs.{GetStatistics, InitialState}
 
-trait WorkerActorMsg
+sealed trait WorkerActorMsg
 object WorkerActorMsgs {
   case class InitialState(replyTo: ActorRef[Int])      extends WorkerActorMsg
   case class JInitialState(replyTo: ActorRef[Integer]) extends WorkerActorMsg
@@ -22,6 +22,7 @@ object WorkerActor {
         Behaviors.receiveMessage {
           case _: InitialState  => receive(0) // do something and return new behavior with the changed state
           case _: GetStatistics => receive(1) // do something else
+          case _                => Behaviors.same
         }
 
       receive(-1)

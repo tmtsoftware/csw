@@ -172,7 +172,7 @@ object MiniCRM {
     def append(sr: T): SizedList[T] = {
       // If the list is at the maximum, remove 1 and add the new one
       if (list.size == max) {
-        list.trimStart(1)
+        list.dropInPlace(1)
       }
       list.append(sr)
       this

@@ -34,9 +34,16 @@ class NMembersAndSeed(n: Int) extends MultiNodeConfig {
 }
 
 class OneMemberAndSeed extends NMembersAndSeed(1) {
-  val Vector(member) = members
+  val member: RoleName = members match {
+    case Vector(member) => member
+    case x              => throw new MatchError(x)
+  }
+
 }
 
 class TwoMembersAndSeed extends NMembersAndSeed(2) {
-  val Vector(member1, member2) = members
+  val (member1, member2) = members match {
+    case Vector(member1, member2) => (member1, member2)
+    case x                        => throw new MatchError(x)
+  }
 }

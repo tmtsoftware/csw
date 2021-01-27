@@ -236,6 +236,7 @@ object Angle {
       case r3(ra, de)                  => (parseRa(ra), parseDe(de))
       case r4(ra, de)                  => (ra.toDouble.arcHour, de.toDouble.degree)
       case r5(ra, de)                  => (ra.toDouble.degree, de.toDouble.degree)
+      case x                           => throw new MatchError(x)
     }
 
   }

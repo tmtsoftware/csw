@@ -53,7 +53,7 @@ private[logging] class Slf4jAppender[E]() extends UnsynchronizedAppenderBase[E] 
         val msg =
           LogSlf4j(level, e.getTimeStamp, frame.getClassName, e.getFormattedMessage, frame.getLineNumber, frame.getFileName, ex)
         MessageHandler.sendMsg(msg)
-      case x: Any =>
+      case x =>
         log.warn(s"UNEXPECTED LOGBACK EVENT:${event.getClass}:$event")(() => DefaultSourceLocation)
     }
 }

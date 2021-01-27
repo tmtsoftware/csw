@@ -13,7 +13,6 @@ import pdi.jwt.{Jwt, JwtOptions}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
-import scala.util.control.NonFatal
 
 /**
  * Verifies & decodes the access token into [[msocket.security.models.AccessToken]]
@@ -41,10 +40,9 @@ class TokenVerifier private[aas] (keycloakTokenVerifier: KeycloakTokenVerifier, 
     Try {
       val claim = Jwt.decodeRaw(token, JwtOptions(signature = false, expiration = false, notBefore = false)).get
       Json.decode(claim.getBytes()).to[AccessToken].value.copy(value = token)
-    }.toEither.left.map {
-      case NonFatal(e) =>
-        logger.error("token verification failed", ex = e)
-        InvalidToken(e.getMessage)
+    }.toEither.left.map { ex =>
+      logger.error("token verification failed", ex = ex)
+      InvalidToken(ex.getMessage)
     }
 
   /**

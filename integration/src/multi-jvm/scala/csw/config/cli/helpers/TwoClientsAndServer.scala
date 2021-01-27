@@ -8,6 +8,10 @@ class TwoClientsAndServer extends NMembersAndSeed(2) {
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(Slf4JLoggerFactory.INSTANCE)
 
-  val server: RoleName         = seed
-  val Vector(client1, client2) = members
+  val server: RoleName = seed
+  val (client1, client2) = members match {
+    case Vector(client1, client2) => (client1, client2)
+    case x                        => throw new MatchError(x)
+  }
+
 }
