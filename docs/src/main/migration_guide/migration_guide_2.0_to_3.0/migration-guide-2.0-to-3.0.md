@@ -25,8 +25,8 @@ val paramWithShorts3: Parameter[Short] = k2.setAll(Array[Short](1, 2, 3, 4))
 - Additionally, Parameter `Key` names can no longer contain the characters `[`, `]` or `/`.
 
 ## Location Service
-- The `RegistrationFactory` class has been removed from `location-server` module.  However, in most cases, `AkkaRegistrationFactory`
- would have been used to create an `AkkaRegistration`, so this change should affect most users.  
+- The `RegistrationFactory` class has been removed from `location-server` module.  In most cases, `AkkaRegistrationFactory`
+ would have been used to create an `AkkaRegistration`, so this change should not affect most users.  
  However, there has been a small API change to the usage of this class.  
     - For Scala users, `AkkaRegistrationFactory` now takes an `actorRef` instead of URI of the `actorRef` being registered.
     - For Java users, a new `JAkkaRegistrationFactory` has been created which should be used.
@@ -67,7 +67,7 @@ The metadata is primarily used for internal OSW tasks, such as allowing the ESW 
 Since the affected models are typically created by factory methods, it shouldn't impact component developers.
 
 ## Other
-- The component framework code has been modified in way that should simplify component development.  The return type of
+- The component framework code has been modified in a way that should simplify component development.  The return type of
 handler methods `initialize` and `onShutdown` was changed from `Future[Unit]` to `Unit`.  Since both of these methods are
 now blocking, developers should minimize the time to complete these tasks.  However, we feel that it is appropriate to be 
 blocking in these methods since nothing much can be done while these methods are in progress.
