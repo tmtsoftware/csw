@@ -9,6 +9,19 @@ The product is in a new repository: [csw](https://github.com/tmtsoftware/csw).
 
 All notable changes to this project will be documented in this file.
 
+## [CSW v3.0.1] - 2021-01-28
+
+This is patch release over v3.0.0 of the TMT Common Software for project stakeholders.
+See [here](https://tmtsoftware.github.io/csw/3.0.1/) for a detailed documentation of this version of the CSW software.
+
+### Changes
+- Added migration guide for v2.0 -> v3.0
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/3.0.1/
+- Scaladoc: https://tmtsoftware.github.io/csw/3.0.1/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/3.0.1/api/java/index.html
+
 ## [CSW v3.0.0] - 2021-01-22
 
 This is the third major release of the TMT Common Software for project stakeholders.
