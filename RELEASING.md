@@ -24,15 +24,16 @@
  **Note** - The version in `notes` should be of format `v1.0.0`
 3. Update top-level `CHANGELOG.md`
 4. Update top-level `README.md`
-5. Add changes mention in `CHANGELOG.md` of `csw-contract` in top-level `CHANGELOG.md`
-6. Add changes mention in `CHANGELOG.md` of `csw-contract` in the change section of `README.md` of `csw-contract`
-7. Add changes mention in `CHANGELOG.md` of `csw-contract` in top-level `README.md`
-8. Add migration guide to `docs/src/main/migration_guide` if this is the final release.
-8. Bump up the `csw-contract` version (if needed)
-9. Exclude projects from `build.sbt` which you do not want to release
-10. Update versions in `release.yml'` for other repos like `ESW_TS_VERSION` etc. which we will be releasing next. (These versions are used to create parameterized links in the documentation)
-11. Commit and push the changes to `branch-<major>.<minor>.x` branch.
-12. Run `release.sh $VERSION$` script by providing version number argument (This triggers release workflow)
+5. Update top-level `INSTALL.md`
+6. Add changes mention in `CHANGELOG.md` of `csw-contract` in top-level `CHANGELOG.md`
+7. Add changes mention in `CHANGELOG.md` of `csw-contract` in the change section of `README.md` of `csw-contract`
+8. Add changes mention in `CHANGELOG.md` of `csw-contract` in top-level `README.md`
+9. Add migration guide to `docs/src/main/migration_guide` if this is the final release.
+10. Bump up the `csw-contract` version (if needed)
+11. Exclude projects from `build.sbt` which you do not want to release
+12. Update versions in `release.yml'` for other repos like `ESW_TS_VERSION` etc. which we will be releasing next. (These versions are used to create parameterized links in the documentation)
+13. Commit and push the changes to `branch-<major>.<minor>.x` branch.
+14. Run `release.sh $VERSION$` script by providing version number argument (This triggers release workflow)
 
     **Note:** `PROD=true` environment variable needs to be set before running `release.sh`
 

@@ -16,7 +16,7 @@ To publish CSW locally, run:
 
     sbt publishLocal
 
-After publishing, you can run CSW apps using coursier as described [here](https://tmtsoftware.github.io/csw/3.0.0/commons/apps.html)
+After publishing, you can run CSW apps using coursier as described [here](https://tmtsoftware.github.io/csw/3.0.1/commons/apps.html)
 
 ## Generating the documentation
 
@@ -26,7 +26,7 @@ The CSW [paradox](https://developer.lightbend.com/docs/paradox/current/index.htm
 
 This puts the documentation under `target/site` with the entry point at `target/site/csw/0.1.0-SNAPSHOT/index.html`.
 
-For more details on the sbt tasks, see the [online documentation](https://tmtsoftware.github.io/csw/3.0.0/commons/sbt-tasks.html).
+For more details on the sbt tasks, see the [online documentation](https://tmtsoftware.github.io/csw/3.0.1/commons/sbt-tasks.html).
 
 For information about making a CSW release, see [here](RELEASING.md).
 
