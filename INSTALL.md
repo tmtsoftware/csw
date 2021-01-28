@@ -12,21 +12,24 @@ which is also available for [Linux](https://adoptopenjdk.net/installation.html?v
 
 ## Building the Software
 
-To compile and install CSW locally, run:
+Note: Unless you are using the latest snapshot version of CSW, it is normally not necessary to
+build it yourself, since the dependencies will be automatically downloaded.
 
-    sbt publishLocal stage
+To publish CSW dependencies locally, run:
 
-This installs the software under `target/universal/stage`.
+    sbt publishLocal
 
-## Installing the documentation
+After publishing, you can run CSW apps using coursier as described [here](https://tmtsoftware.github.io/csw/commons/apps.html)
 
-The CSW [paradox](https://developer.lightbend.com/docs/paradox/current/index.html) documentation can be installed with:
+## Generating the documentation
+
+The CSW [paradox](https://developer.lightbend.com/docs/paradox/current/index.html) documentation can be generated with:
 
     sbt clean makeSite
 
 This puts the documentation under `target/site` with the entry point at `target/site/csw/0.1.0-SNAPSHOT/index.html`.
 
-For more details on the sbt tasks, see the [online documentation](https://tmtsoftware.github.io/csw/1.0.0/commons/sbt-tasks.html).
+For more details on the sbt tasks, see the [online documentation](https://tmtsoftware.github.io/csw/commons/sbt-tasks.html).
 
 For information about making a CSW release, see [here](RELEASING.md).
 
