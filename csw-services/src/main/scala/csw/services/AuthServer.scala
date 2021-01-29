@@ -32,6 +32,12 @@ class AuthServer(locationService: LocationService, settings: Settings)(implicit 
     "config-user1"
   )
 
+  private val eswUser: ApplicationUser = ApplicationUser(
+    "esw-user",
+    "esw-user",
+    realmRoles = Set("esw-user", configAdminRole)
+  )
+
   private val applicationUser: ApplicationUser = ApplicationUser(
     "dummy-user",
     "dummy-user",
@@ -49,12 +55,8 @@ class AuthServer(locationService: LocationService, settings: Settings)(implicit 
         Realm(
           "TMT",
           clients = Set(`csw-config-cli`),
-          users = Set(
-            configAdminUser,
-            configUser,
-            applicationUser
-          ),
-          realmRoles = Set(configAdminRole, personRole, exampleAdminRole)
+          users = Set(eswUser, configAdminUser, configUser, applicationUser),
+          realmRoles = Set(configAdminRole, personRole, exampleAdminRole, "esw-user")
         )
       )
     )
