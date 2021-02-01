@@ -36,7 +36,7 @@ trait SeedData extends HTTPLocationService with Matchers with BeforeAndAfterEach
   override def beforeAll(): Unit = {
     super.beforeAll()
     val (_, sentinel: RedisSentinel, server: RedisServer) =
-      withSentinel(masterId = ConfigFactory.load().getString("csw-event.redis.masterId")) { (sentinelPort, _) =>
+      withSentinel(masterId = ConfigFactory.load().getString("csw-event.redis.masterId"), keyspace = true) { (sentinelPort, _) =>
         locationService.register(TcpRegistration(EventServiceConnection.value, sentinelPort)).await
       }
     redisSentinel = sentinel

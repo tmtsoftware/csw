@@ -11,7 +11,8 @@ import csw.prefix.models.{Prefix, Subsystem}
 import csw.event.client.internal.kafka.KafkaTestProps
 import csw.event.client.internal.redis.RedisTestProps
 import csw.event.client.internal.wiring.BaseProperties
-import csw.params.events.{Event, EventKey, EventName, SystemEvent}
+import csw.params.core.models.ObsId
+import csw.params.events.{Event, EventKey, EventName, IRDetectorEvent, OpticalDetectorEvent, SystemEvent, WFSDetectorEvent}
 import org.scalatest.concurrent.Eventually
 import org.scalatestplus.testng.TestNGSuite
 import org.testng.annotations._
@@ -360,6 +361,39 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     subscription5.unsubscribe().await
   }
 
+  // Pattern subscription doesn't work with embedded kafka hence not running it with the suite
+  @Test(dataProvider = "redis-provider")
+  def should_be_able_to_subscribe_all_observe_events__CSW_119(redisProps: RedisTestProps): Unit = {
+    import redisProps._
+
+    val obsId          = ObsId("2020A-001-123")
+    val irDetObsStart  = IRDetectorEvent.observeStart("IRIS.det", obsId)
+    val irDetObsEnd    = IRDetectorEvent.observeEnd("IRIS.det", obsId)
+    val publishSuccess = WFSDetectorEvent.publishSuccess("WFOS.test")
+    val optDetObsStart = OpticalDetectorEvent.observeStart("WFOS.det", obsId)
+
+    val testEvent = makeEventWithPrefix(1, Prefix("csw.prefix"))
+    val buffer    = mutable.ArrayBuffer.empty[Event]
+
+    val subscription = subscriber
+      .subscribeObserveEvents()
+      .wireTap(e => buffer.addOne(e))
+      .toMat(Sink.ignore)(Keep.left)
+      .run()
+    subscription.ready().await
+    Thread.sleep(500)
+
+    publisher.publish(irDetObsStart).await
+    publisher.publish(irDetObsEnd).await
+    publisher.publish(testEvent).await
+    publisher.publish(publishSuccess).await
+    publisher.publish(optDetObsStart).await
+    // verify all the obs events received except testEvent
+    eventually(buffer.toList shouldBe List(irDetObsStart, irDetObsEnd, publishSuccess, optDetObsStart))
+
+    subscription.unsubscribe().await
+  }
+
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_make_independent_subscriptions__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395(
       baseProperties: BaseProperties
@@ -420,7 +454,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     import baseProperties._
     val eventKey = EventKey("csw.a.b.c")
 
-    val (subscription, seqF) = subscriber.subscribe(Set(eventKey)).take(1).toMat(Sink.seq)(Keep.both).run()
+    val (_, seqF) = subscriber.subscribe(Set(eventKey)).take(1).toMat(Sink.seq)(Keep.both).run()
 
     seqF.await shouldBe Seq(Event.invalidEvent(eventKey))
   }
@@ -440,7 +474,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     publisher.publish(distinctEvent1).await
     Thread.sleep(500)
 
-    val (subscription, seqF) = subscriber.subscribe(Set(eventKey1, eventKey2)).take(2).toMat(Sink.seq)(Keep.both).run()
+    val (_, seqF) = subscriber.subscribe(Set(eventKey1, eventKey2)).take(2).toMat(Sink.seq)(Keep.both).run()
 
     seqF.await.toSet shouldBe Set(Event.invalidEvent(eventKey2), distinctEvent1)
   }

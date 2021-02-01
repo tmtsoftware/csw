@@ -24,9 +24,10 @@ trait EmbeddedRedis {
   def withSentinel[T](
       sentinelPort: Int = getFreePort,
       serverPort: Int = getFreePort,
-      masterId: String
+      masterId: String,
+      keyspace: Boolean = false
   )(f: (SentinelPort, ServerPort) => T): (T, RedisSentinel, RedisServer) = {
-    val (sentinel, server) = startSentinel(sentinelPort, serverPort, masterId)
+    val (sentinel, server) = startSentinel(sentinelPort, serverPort, masterId, keyspace)
     val result             = f(sentinelPort, serverPort)
     (result, sentinel, server)
   }
@@ -41,9 +42,11 @@ trait EmbeddedRedis {
   def startSentinel(
       sentinelPort: Int = getFreePort,
       serverPort: Int = getFreePort,
-      masterId: String
+      masterId: String,
+      keyspace: Boolean = false
   ): (RedisSentinel, RedisServer) = {
-    val redisServer = RedisServer.builder().port(serverPort).setting("notify-keyspace-events K$x").build()
+    val builder     = RedisServer.builder().port(serverPort)
+    val redisServer = if (keyspace) builder.setting("notify-keyspace-events K$x").build() else builder.build()
 
     val redisSentinel: RedisSentinel = RedisSentinel
       .builder()

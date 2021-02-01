@@ -32,7 +32,7 @@ trait AlarmCliTestSetup extends HTTPLocationService with EmbeddedRedis with Even
   override def beforeAll(): Unit = {
     super.beforeAll()
     val (_, sentinel: RedisSentinel, server: RedisServer) =
-      withSentinel(masterId = ConfigFactory.load().getString("csw-alarm.redis.masterId")) { (sentinelPort, _) =>
+      withSentinel(masterId = ConfigFactory.load().getString("csw-alarm.redis.masterId"), keyspace = true) { (sentinelPort, _) =>
         locationService
           .register(TcpRegistration(AlarmServiceConnection.value, sentinelPort))
           .futureValue

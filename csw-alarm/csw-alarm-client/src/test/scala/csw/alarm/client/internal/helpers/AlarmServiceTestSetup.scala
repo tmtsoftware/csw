@@ -37,7 +37,7 @@ class AlarmServiceTestSetup
 
   val (sentinelPort, serverPort) = (getFreePort, getFreePort)
 
-  private val (sentinel, server) = startSentinel(sentinelPort, serverPort, masterId = alarmServer)
+  private val (sentinel, server) = startSentinel(sentinelPort, serverPort, masterId = alarmServer, keyspace = true)
 
   private val resolver = new AlarmServiceHostPortResolver(hostname, sentinelPort)
 

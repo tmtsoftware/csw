@@ -101,16 +101,13 @@ private[event] class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[S
       mode: SubscriptionMode
   ): EventSubscription = subscribeCallback(eventKeys, eventSubscriberUtil.actorCallback(actorRef), every, mode)
 
-  override def pSubscribe(subsystem: Subsystem, pattern: String): Source[Event, EventSubscription] = {
-    val keyPattern   = s"${subsystem.entryName}.*${Utils.globToRegex(pattern)}"
-    val subscription = Subscriptions.topicPattern(keyPattern)
-
-    getEventStream(Future.successful(subscription))
-      .mapMaterializedValue(control => eventSubscription(control, Future.successful(Done)))
-  }
+  override def pSubscribe(subsystem: Subsystem, pattern: String): Source[Event, EventSubscription] =
+    pSubscribe(s"${subsystem.entryName}.*${Utils.globToRegex(pattern)}")
 
   override def pSubscribeCallback(subsystem: Subsystem, pattern: String, callback: Event => Unit): EventSubscription =
     eventSubscriberUtil.pSubscribe(pSubscribe(subsystem, pattern), callback)
+
+  override def subscribeObserveEvents(): Source[Event, EventSubscription] = pSubscribe(".*.ObserveEvent.*")
 
   override def get(eventKeys: Set[EventKey]): Future[Set[Event]] = {
     val (subscription, eventsF) = subscribe(eventKeys).take(eventKeys.size).toMat(Sink.seq)(Keep.both).run()
@@ -124,6 +121,13 @@ private[event] class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[S
   }
 
   override def get(eventKey: EventKey): Future[Event] = get(Set(eventKey)).map(_.head)
+
+  private def pSubscribe(pattern: String) = {
+    val subscription = Subscriptions.topicPattern(pattern)
+    getEventStream(Future.successful(subscription)).mapMaterializedValue(control =>
+      eventSubscription(control, Future.successful(Done))
+    )
+  }
 
   private def getEventStream(subscription: Future[Subscription]): Source[Event, Future[scaladsl.Consumer.Control]] = {
     val future = subscription.flatMap(s => consumerSettings.map(c => scaladsl.Consumer.plainSource(c, s)))

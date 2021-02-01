@@ -84,6 +84,9 @@ class JEventSubscriber(eventSubscriber: EventSubscriber) extends IEventSubscribe
   def pSubscribeCallback(subsystem: Subsystem, pattern: String, callback: Consumer[Event]): IEventSubscription =
     eventSubscriber.pSubscribeCallback(subsystem, pattern, e => callback.accept(e)).asJava
 
+  def subscribeObserveEvents(): Source[Event, IEventSubscription] =
+    eventSubscriber.subscribeObserveEvents().mapMaterializedValue(_.asJava).asJava
+
   def get(eventKeys: util.Set[EventKey]): CompletableFuture[util.Set[Event]] =
     eventSubscriber.get(eventKeys.asScala.toSet).toJava.toCompletableFuture.thenApply(_.asJava)
 

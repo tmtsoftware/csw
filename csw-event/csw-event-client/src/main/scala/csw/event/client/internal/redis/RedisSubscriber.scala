@@ -92,18 +92,13 @@ private[event] class RedisSubscriber(redisURI: Future[RedisURI], redisClient: Re
       mode: SubscriptionMode
   ): EventSubscription = subscribeCallback(eventKeys, eventSubscriberUtil.actorCallback(actorRef), every, mode)
 
-  override def pSubscribe(subsystem: Subsystem, pattern: String): Source[Event, EventSubscription] = {
-    val keyPattern = s"${subsystem.name}.$pattern"
-    log.info(s"Subscribing to event key pattern: $keyPattern")
-
-    val patternSubscriptionApi: RedisSubscriptionApi[String, Event] = subscriptionApi()
-    val redisStream: Source[Event, RedisSubscription] =
-      patternSubscriptionApi.psubscribe(List(keyPattern), OverflowStrategy.LATEST).map(_.value)
-    eventStream(keyPattern, redisStream)
-  }
+  override def pSubscribe(subsystem: Subsystem, pattern: String): Source[Event, EventSubscription] =
+    pSubscribe(s"${subsystem.name}.$pattern")
 
   override def pSubscribeCallback(subsystem: Subsystem, pattern: String, callback: Event => Unit): EventSubscription =
     eventSubscriberUtil.pSubscribe(pSubscribe(subsystem, pattern), callback)
+
+  override def subscribeObserveEvents(): Source[Event, EventSubscription] = pSubscribe("*.ObserveEvent.*")
 
   override def get(eventKeys: Set[EventKey]): Future[Set[Event]] = Future.sequence(eventKeys.map(get))
 
@@ -113,6 +108,15 @@ private[event] class RedisSubscriber(redisURI: Future[RedisURI], redisClient: Re
       val event = await(recoverWithError(asyncApi.get(eventKey)))
       event.getOrElse(Event.invalidEvent(eventKey))
     }
+
+  private def pSubscribe(pattern: String) = {
+    log.info(s"Subscribing to event key pattern: $pattern")
+
+    val patternSubscriptionApi: RedisSubscriptionApi[String, Event] = subscriptionApi()
+    val redisStream: Source[Event, RedisSubscription] =
+      patternSubscriptionApi.psubscribe(List(pattern), OverflowStrategy.LATEST).map(_.value)
+    eventStream(pattern, redisStream)
+  }
 
   private def eventStream[T](
       eventKeys: T,

@@ -1,15 +1,15 @@
 package csw.event.api.javadsl
 
-import java.time.Duration
-import java.util
-import java.util.concurrent.CompletableFuture
-import java.util.function.Consumer
-
 import akka.actor.typed.ActorRef
 import akka.stream.javadsl.Source
 import csw.event.api.scaladsl.SubscriptionMode
 import csw.params.events.{Event, EventKey}
 import csw.prefix.models.Subsystem
+
+import java.time.Duration
+import java.util
+import java.util.concurrent.CompletableFuture
+import java.util.function.Consumer
 
 /**
  * An EventSubscriber interface to subscribe events. The events can be subscribed on [[csw.params.events.EventKey]]. All events
@@ -203,6 +203,23 @@ trait IEventSubscriber {
    * @return an [[csw.event.api.javadsl.IEventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
    */
   def pSubscribeCallback(subsystem: Subsystem, pattern: String, callback: Consumer[Event]): IEventSubscription
+
+  /**
+   * ************ IMPORTANT ************
+   * This API uses redis pattern subscription. Having many live pattern subscriptions causes overall latency degradation.
+   * Prefer [[subscribe]] API over this whenever possible.
+   * *********** ********* ************
+   *
+   * Subscribe to all the observe events
+   *
+   * At the time of invocation, in case the underlying server is not available, [[csw.event.api.exceptions.EventServerNotAvailable]] exception is thrown
+   * and the subscription is stopped after logging appropriately. [[csw.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine this
+   * state. In all other cases of exception, the subscription resumes to receive remaining elements.
+   *
+   * @return a [[akka.stream.scaladsl.Source]] of [[csw.params.events.Event]]. The materialized value of the source provides
+   *         an [[csw.event.api.scaladsl.EventSubscription]] which can be used to unsubscribe from observe events subscription
+   */
+  def subscribeObserveEvents(): Source[Event, IEventSubscription]
 
   /**
    * Get latest events for multiple Event Keys. The latest events available for the given Event Keys will be received first.

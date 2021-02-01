@@ -9,11 +9,14 @@ import akka.stream.javadsl.Sink;
 import csw.event.api.javadsl.IEventSubscription;
 import csw.event.api.scaladsl.SubscriptionModes;
 import csw.event.client.helpers.Utils;
+import csw.event.client.internal.kafka.KafkaTestProps;
 import csw.event.client.internal.redis.RedisTestProps;
 import csw.event.client.internal.wiring.BaseProperties;
+import csw.logging.client.utils.Eventually;
+import csw.params.core.models.ObsId;
 import csw.params.events.*;
-import csw.prefix.models.Prefix;
 import csw.prefix.javadsl.JSubsystem;
+import csw.prefix.models.Prefix;
 import org.scalatestplus.testng.TestNGSuite;
 import org.testng.Assert;
 import org.testng.annotations.AfterSuite;
@@ -25,8 +28,6 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Supplier;
-
-import csw.event.client.internal.kafka.KafkaTestProps;
 
 //DEOPSCSW-331: Event Service Accessible to all CSW component builders
 //DEOPSCSW-334: Publish an event
@@ -329,6 +330,34 @@ public class JEventSubscriberTest extends TestNGSuite {
         subscription3.unsubscribe().get(10, TimeUnit.SECONDS);
         subscription4.unsubscribe().get(10, TimeUnit.SECONDS);
         subscription5.unsubscribe().get(10, TimeUnit.SECONDS);
+    }
+
+    // Pattern subscription doesn't work with embedded kafka hence not running it with the suite
+    @Test(dataProvider = "redis-provider")
+    public void should_be_able_to_subscribe_all_observe_events_CSW_119(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
+        ObsId obsId = ObsId.apply("2020A-001-123");
+        Event irDetObsStart = IRDetectorEvent.observeStart("IRIS.det", obsId);
+        Event irDetObsEnd = IRDetectorEvent.observeEnd("IRIS.det", obsId);
+        Event publishSuccess = WFSDetectorEvent.publishSuccess("WFOS.test");
+        Event optDetObsStart = OpticalDetectorEvent.observeStart("WFOS.det", obsId);
+        Event testEvent = Utils.makeEventWithPrefix(1, Prefix.apply(JSubsystem.CSW, "prefix"));
+
+        List<Event> receivedEvents = new ArrayList<>();
+
+        IEventSubscription subscription =
+                baseProperties.jSubscriber().subscribeObserveEvents().to(Sink.foreach(receivedEvents::add))
+                        .withAttributes(baseProperties.attributes()).run(baseProperties.actorSystem());
+
+        subscription.ready().get(10, TimeUnit.SECONDS);
+
+        baseProperties.jPublisher().publish(irDetObsStart).get(10, TimeUnit.SECONDS);
+        baseProperties.jPublisher().publish(irDetObsEnd).get(10, TimeUnit.SECONDS);
+        baseProperties.jPublisher().publish(publishSuccess).get(10, TimeUnit.SECONDS);
+        baseProperties.jPublisher().publish(optDetObsStart).get(10, TimeUnit.SECONDS);
+        baseProperties.jPublisher().publish(testEvent).get(10, TimeUnit.SECONDS);
+
+        Eventually.eventually(Duration.ofSeconds(5), () -> Assert.assertEquals(receivedEvents, List.of(irDetObsStart, irDetObsEnd, publishSuccess, optDetObsStart)));
+        subscription.unsubscribe().get(10, TimeUnit.SECONDS);
     }
 
     @Test(dataProvider = "event-service-provider")

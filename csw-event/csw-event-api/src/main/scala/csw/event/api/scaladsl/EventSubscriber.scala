@@ -209,6 +209,23 @@ trait EventSubscriber {
   def pSubscribeCallback(subsystem: Subsystem, pattern: String, callback: Event => Unit): EventSubscription
 
   /**
+   * ************ IMPORTANT ************
+   * This API uses redis pattern subscription. Having many live pattern subscriptions causes overall latency degradation.
+   * Prefer [[subscribe]] API over this whenever possible.
+   * *********** ********* ************
+   *
+   * Subscribe to all the observe events
+   *
+   * At the time of invocation, in case the underlying server is not available, [[csw.event.api.exceptions.EventServerNotAvailable]] exception is thrown
+   * and the subscription is stopped after logging appropriately. [[csw.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine this
+   * state. In all other cases of exception, the subscription resumes to receive remaining elements.
+   *
+   * @return a [[akka.stream.scaladsl.Source]] of [[csw.params.events.Event]]. The materialized value of the source provides
+   *         an [[csw.event.api.scaladsl.EventSubscription]] which can be used to unsubscribe from observe events subscription
+   */
+  def subscribeObserveEvents(): Source[Event, EventSubscription]
+
+  /**
    * Get latest events for multiple Event Keys. The latest events available for the given Event Keys will be received first.
    * If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
    *
