@@ -87,7 +87,7 @@ public class JSampleHcdHandlers extends JComponentHandlers {
     private Optional<Cancellable> maybePublishingGenerator = Optional.empty();
 
     @Override
-    public void jInitialize() {
+    public void initialize() {
         log.info("In HCD initialize");
         maybePublishingGenerator = Optional.of(publishCounter());
     }
@@ -98,7 +98,7 @@ public class JSampleHcdHandlers extends JComponentHandlers {
     }
 
     @Override
-    public void jOnShutdown() {
+    public void onShutdown() {
         log.info("HCD is shutting down");
     }
     //#initialize

@@ -65,7 +65,7 @@ public class JHcdComponentHandlers extends JComponentHandlers {
 
     //#jInitialize-handler
     @Override
-    public void jInitialize() {
+    public void initialize() {
 
         // fetch config (preferably from configuration service)
         try {
@@ -152,7 +152,7 @@ public class JHcdComponentHandlers extends JComponentHandlers {
 
     //#onShutdown-handler
     @Override
-    public void jOnShutdown() {
+    public void onShutdown() {
         // clean up resources
     }
     //#onShutdown-handler
