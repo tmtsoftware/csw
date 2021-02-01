@@ -4,8 +4,8 @@ import csw.params.core.generics.KeyType.{BooleanKey, IntKey, LongKey, StringKey}
 import csw.params.core.generics.Parameter
 import csw.params.core.models.ObsId
 
+// commonly used params factories
 object ParamFactories {
-  // commonly used params factories
   def obsIdParam(obsId: ObsId): Parameter[String]            = StringKey.make("obsId").set(obsId.toString)
   def exposureIdParam(exposureId: String): Parameter[String] = StringKey.make("exposureId").set(exposureId)
   def detectorParam(detector: String): Parameter[String]     = StringKey.make("detector").set(detector)

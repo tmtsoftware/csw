@@ -11,19 +11,19 @@ public class JWFSDetectorEventTest extends JUnitSuite {
     Prefix prefix = new Prefix(JSubsystem.ESW, "filter.wheel");
 
     @Test
-    public void shouldCreatePublishSuccessEvent__CSW_118() {
+    public void shouldCreatePublishSuccessEvent__CSW_118_CSW_119() {
         ObserveEvent event = WFSDetectorEvent.publishSuccess(sourcePrefix);
 
         Assert.assertEquals(prefix, event.source());
-        Assert.assertEquals("PublishSuccess", event.eventName().name());
+        Assert.assertEquals("ObserveEvent.PublishSuccess", event.eventName().name());
     }
 
     @Test
-    public void shouldCreatePublishFailEvent__CSW_118() {
+    public void shouldCreatePublishFailEvent__CSW_118_CSW_119() {
         ObserveEvent event = WFSDetectorEvent.publishFail(sourcePrefix);
 
         Assert.assertEquals(prefix, event.source());
-        Assert.assertEquals("PublishFail", event.eventName().name());
+        Assert.assertEquals("ObserveEvent.PublishFail", event.eventName().name());
     }
 }
 

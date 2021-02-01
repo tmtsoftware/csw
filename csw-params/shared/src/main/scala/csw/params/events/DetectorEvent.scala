@@ -4,24 +4,25 @@ import csw.params.core.generics.Parameter
 import csw.params.core.models.ObsId
 import csw.prefix.models.Prefix
 
-private[events] class DetectorEvent(detectorName: String) {
-  def observeStart(sourcePrefix: String, obsId: ObsId): ObserveEvent = create(sourcePrefix, obsId, "ObserveStart")
-  def observeEnd(sourcePrefix: String, obsId: ObsId): ObserveEvent   = create(sourcePrefix, obsId, "ObserveEnd")
+private[events] class DetectorEvent(detectorExpStateName: EventName) {
+
+  def observeStart(sourcePrefix: String, obsId: ObsId): ObserveEvent = create(sourcePrefix, obsId, ObserveEventNames.ObserveStart)
+  def observeEnd(sourcePrefix: String, obsId: ObsId): ObserveEvent   = create(sourcePrefix, obsId, ObserveEventNames.ObserveEnd)
 
   def exposureStart(sourcePrefix: String, obsId: ObsId, exposureId: String): ObserveEvent =
-    create(sourcePrefix, obsId, exposureId, "ExposureStart")
+    create(sourcePrefix, obsId, exposureId, ObserveEventNames.ExposureStart)
   def exposureEnd(sourcePrefix: String, obsId: ObsId, exposureId: String): ObserveEvent =
-    create(sourcePrefix, obsId, exposureId, "ExposureEnd")
+    create(sourcePrefix, obsId, exposureId, ObserveEventNames.ExposureEnd)
   def readoutEnd(sourcePrefix: String, obsId: ObsId, exposureId: String): ObserveEvent =
-    create(sourcePrefix, obsId, exposureId, "ReadoutEnd")
+    create(sourcePrefix, obsId, exposureId, ObserveEventNames.ReadoutEnd)
   def readoutFailed(sourcePrefix: String, obsId: ObsId, exposureId: String): ObserveEvent =
-    create(sourcePrefix, obsId, exposureId, "ReadoutFailed")
+    create(sourcePrefix, obsId, exposureId, ObserveEventNames.ReadoutFailed)
   def dataWriteStart(sourcePrefix: String, obsId: ObsId, exposureId: String): ObserveEvent =
-    create(sourcePrefix, obsId, exposureId, "DataWriteStart")
+    create(sourcePrefix, obsId, exposureId, ObserveEventNames.DataWriteStart)
   def dataWriteEnd(sourcePrefix: String, obsId: ObsId, exposureId: String): ObserveEvent =
-    create(sourcePrefix, obsId, exposureId, "DataWriteEnd")
+    create(sourcePrefix, obsId, exposureId, ObserveEventNames.DataWriteEnd)
   def exposureAborted(sourcePrefix: String, obsId: ObsId, exposureId: String): ObserveEvent =
-    create(sourcePrefix, obsId, exposureId, "ExposureAborted")
+    create(sourcePrefix, obsId, exposureId, ObserveEventNames.ExposureAborted)
 
   def exposureState(
       sourcePrefix: String,
@@ -42,17 +43,16 @@ private[events] class DetectorEvent(detectorName: String) {
       ParamFactories.abortInProgressParam(abortInProgress),
       ParamFactories.isAbortedParam(isAborted)
     )
-    ObserveEvent(Prefix(sourcePrefix), EventName(s"${detectorName}ExposureState"), params)
+    ObserveEvent(Prefix(sourcePrefix), detectorExpStateName, params)
   }
 
-  private def create(sourcePrefix: String, obsId: ObsId, eventName: String): ObserveEvent =
-    ObserveEvent(Prefix(sourcePrefix), EventName(eventName), Set(ParamFactories.obsIdParam(obsId)))
+  private def create(sourcePrefix: String, obsId: ObsId, eventName: EventName): ObserveEvent =
+    ObserveEvent(Prefix(sourcePrefix), eventName, Set(ParamFactories.obsIdParam(obsId)))
 
-  private[events] def create(sourcePrefix: String, obsId: ObsId, exposureId: String, eventName: String): ObserveEvent =
+  private[events] def create(sourcePrefix: String, obsId: ObsId, exposureId: String, eventName: EventName): ObserveEvent =
     ObserveEvent(
       Prefix(sourcePrefix),
-      EventName(eventName),
+      eventName,
       Set(ParamFactories.obsIdParam(obsId), ParamFactories.exposureIdParam(exposureId))
     )
-
 }

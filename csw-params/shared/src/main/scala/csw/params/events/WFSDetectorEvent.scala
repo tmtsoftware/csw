@@ -4,11 +4,10 @@ import csw.params.core.generics.Parameter
 import csw.prefix.models.Prefix
 
 object WFSDetectorEvent {
-  private def create(sourcePrefix: String, eventName: String): ObserveEvent =
-    ObserveEvent(Prefix(sourcePrefix), EventName(eventName))
+  private def create(sourcePrefix: String, eventName: EventName): ObserveEvent = ObserveEvent(Prefix(sourcePrefix), eventName)
 
-  def publishSuccess(sourcePrefix: String): ObserveEvent = create(sourcePrefix, "PublishSuccess")
-  def publishFail(sourcePrefix: String): ObserveEvent    = create(sourcePrefix, "PublishFail")
+  def publishSuccess(sourcePrefix: String): ObserveEvent = create(sourcePrefix, ObserveEventNames.PublishSuccess)
+  def publishFail(sourcePrefix: String): ObserveEvent    = create(sourcePrefix, ObserveEventNames.PublishFail)
   def exposureState(
       sourcePrefix: String,
       detector: String,
@@ -26,6 +25,6 @@ object WFSDetectorEvent {
       ParamFactories.abortInProgressParam(abortInProgress),
       ParamFactories.isAbortedParam(isAborted)
     )
-    ObserveEvent(Prefix(sourcePrefix), EventName("wfsDetectorExposureState"), params)
+    ObserveEvent(Prefix(sourcePrefix), ObserveEventNames.WfsDetectorExposureState, params)
   }
 }

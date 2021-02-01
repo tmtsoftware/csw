@@ -4,7 +4,7 @@ import csw.params.core.generics.Parameter
 import csw.params.core.models.ObsId
 import csw.prefix.models.Prefix
 
-object IRDetectorEvent extends DetectorEvent("IRDetector") {
+object IRDetectorEvent extends DetectorEvent(ObserveEventNames.IRDetectorExposureState) {
   def exposureData(
       sourcePrefix: String,
       obsId: ObsId,
@@ -26,6 +26,6 @@ object IRDetectorEvent extends DetectorEvent("IRDetector") {
       ParamFactories.exposureTimeParam(exposureTime),
       ParamFactories.remainingExposureTimeParam(remainingExposureTime)
     )
-    ObserveEvent(Prefix(sourcePrefix), EventName("IRDetectorExposureData"), params)
+    ObserveEvent(Prefix(sourcePrefix), ObserveEventNames.IRDetectorExposureData, params)
   }
 }

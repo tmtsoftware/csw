@@ -14,34 +14,34 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
     val exposureId   = "12345"
     val detector     = "ir-detector"
 
-    it("should create observe event with obsId and exposure id parameters | CSW-118") {
+    it("should create observe event with obsId and exposure id parameters | CSW-118, CSW-119") {
       Table(
         ("Observe event", "event name", "prefix"),
-        (IRDetectorEvent.exposureStart(sourcePrefix, obsId, exposureId), "ExposureStart", sourcePrefix),
-        (IRDetectorEvent.exposureEnd(sourcePrefix, obsId, exposureId), "ExposureEnd", sourcePrefix),
-        (IRDetectorEvent.readoutEnd(sourcePrefix, obsId, exposureId), "ReadoutEnd", sourcePrefix),
-        (IRDetectorEvent.readoutFailed(sourcePrefix, obsId, exposureId), "ReadoutFailed", sourcePrefix),
-        (IRDetectorEvent.dataWriteStart(sourcePrefix, obsId, exposureId), "DataWriteStart", sourcePrefix),
-        (IRDetectorEvent.dataWriteEnd(sourcePrefix, obsId, exposureId), "DataWriteEnd", sourcePrefix),
-        (IRDetectorEvent.exposureAborted(sourcePrefix, obsId, exposureId), "ExposureAborted", sourcePrefix)
+        (IRDetectorEvent.exposureStart(sourcePrefix, obsId, exposureId), "ObserveEvent.ExposureStart", sourcePrefix),
+        (IRDetectorEvent.exposureEnd(sourcePrefix, obsId, exposureId), "ObserveEvent.ExposureEnd", sourcePrefix),
+        (IRDetectorEvent.readoutEnd(sourcePrefix, obsId, exposureId), "ObserveEvent.ReadoutEnd", sourcePrefix),
+        (IRDetectorEvent.readoutFailed(sourcePrefix, obsId, exposureId), "ObserveEvent.ReadoutFailed", sourcePrefix),
+        (IRDetectorEvent.dataWriteStart(sourcePrefix, obsId, exposureId), "ObserveEvent.DataWriteStart", sourcePrefix),
+        (IRDetectorEvent.dataWriteEnd(sourcePrefix, obsId, exposureId), "ObserveEvent.DataWriteEnd", sourcePrefix),
+        (IRDetectorEvent.exposureAborted(sourcePrefix, obsId, exposureId), "ObserveEvent.ExposureAborted", sourcePrefix)
       ).forEvery((observeEvent, eventName, sourcePrefix) => {
         observeEvent.eventName.name shouldBe eventName
         observeEvent.source shouldBe Prefix(sourcePrefix)
       })
     }
 
-    it("should create observe event with obsId | CSW-118") {
+    it("should create observe event with obsId | CSW-118, CSW-119") {
       Table(
         ("Observe event", "event name", "prefix"),
-        (IRDetectorEvent.observeStart(sourcePrefix, obsId), "ObserveStart", sourcePrefix),
-        (IRDetectorEvent.observeEnd(sourcePrefix, obsId), "ObserveEnd", sourcePrefix)
+        (IRDetectorEvent.observeStart(sourcePrefix, obsId), "ObserveEvent.ObserveStart", sourcePrefix),
+        (IRDetectorEvent.observeEnd(sourcePrefix, obsId), "ObserveEvent.ObserveEnd", sourcePrefix)
       ).forEvery((observeEvent, eventName, sourcePrefix) => {
         observeEvent.eventName.name shouldBe eventName
         observeEvent.source shouldBe Prefix(sourcePrefix)
       })
     }
 
-    it("should create exposure state event | CSW-118") {
+    it("should create exposure state event | CSW-118, CSW-119") {
       val state = IRDetectorEvent.exposureState(
         sourcePrefix,
         obsId,
@@ -54,7 +54,7 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
       )
 
       state.source shouldBe Prefix(sourcePrefix)
-      state.eventName.name shouldBe "IRDetectorExposureState"
+      state.eventName.name shouldBe "ObserveEvent.IRDetectorExposureState"
       state.paramSet shouldBe Set(
         StringKey.make("detector").set(detector),
         StringKey.make("obsId").set(obsId.toString),
@@ -66,7 +66,7 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
       )
     }
 
-    it("should create exposure data event | CSW-118") {
+    it("should create exposure data event | CSW-118, CSW-119") {
       val readsInRamp           = 1
       val readsComplete         = 20
       val rampsInExposure       = 40
@@ -87,7 +87,7 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
       )
 
       event.source shouldBe Prefix(sourcePrefix)
-      event.eventName.name shouldBe "IRDetectorExposureData"
+      event.eventName.name shouldBe "ObserveEvent.IRDetectorExposureData"
       event.paramSet shouldBe Set(
         StringKey.make("detector").set(detector),
         StringKey.make("obsId").set(obsId.toString),

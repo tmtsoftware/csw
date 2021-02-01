@@ -21,10 +21,10 @@ public class JIRDetectorEventTest extends JUnitSuite {
     Parameter<String> obsIdParam = JKeyType.StringKey().make("obsId").set(obsId.toString());
 
     @Test
-    public void shouldCreateIrDetectorObserveEventWithObsId__CSW_118() {
+    public void shouldCreateIrDetectorObserveEventWithObsId__CSW_118_CSW_119() {
         List<TestData> testData = new ArrayList(Arrays.asList(
-                new TestData(IRDetectorEvent.observeStart(sourcePrefix, obsId), "ObserveStart"),
-                new TestData(IRDetectorEvent.observeEnd(sourcePrefix, obsId), "ObserveEnd")
+                new TestData(IRDetectorEvent.observeStart(sourcePrefix, obsId), "ObserveEvent.ObserveStart"),
+                new TestData(IRDetectorEvent.observeEnd(sourcePrefix, obsId), "ObserveEvent.ObserveEnd")
         ));
 
         Set<Parameter<?>> paramSet = new HashSet<>(10);
@@ -38,15 +38,15 @@ public class JIRDetectorEventTest extends JUnitSuite {
 
 
     @Test
-    public void shouldCreateIrDetectorObserveEventWithObsIdAndExposureId__CSW_118() {
+    public void shouldCreateIrDetectorObserveEventWithObsIdAndExposureId__CSW_118_CSW_119() {
         List<TestData> testData = new ArrayList(Arrays.asList(
-                new TestData(IRDetectorEvent.exposureStart(sourcePrefix, obsId, exposureId), "ExposureStart"),
-                new TestData(IRDetectorEvent.exposureEnd(sourcePrefix, obsId, exposureId), "ExposureEnd"),
-                new TestData(IRDetectorEvent.readoutEnd(sourcePrefix, obsId, exposureId), "ReadoutEnd"),
-                new TestData(IRDetectorEvent.readoutFailed(sourcePrefix, obsId, exposureId), "ReadoutFailed"),
-                new TestData(IRDetectorEvent.dataWriteStart(sourcePrefix, obsId, exposureId), "DataWriteStart"),
-                new TestData(IRDetectorEvent.dataWriteEnd(sourcePrefix, obsId, exposureId), "DataWriteEnd"),
-                new TestData(IRDetectorEvent.exposureAborted(sourcePrefix, obsId, exposureId), "ExposureAborted")));
+                new TestData(IRDetectorEvent.exposureStart(sourcePrefix, obsId, exposureId), "ObserveEvent.ExposureStart"),
+                new TestData(IRDetectorEvent.exposureEnd(sourcePrefix, obsId, exposureId), "ObserveEvent.ExposureEnd"),
+                new TestData(IRDetectorEvent.readoutEnd(sourcePrefix, obsId, exposureId), "ObserveEvent.ReadoutEnd"),
+                new TestData(IRDetectorEvent.readoutFailed(sourcePrefix, obsId, exposureId), "ObserveEvent.ReadoutFailed"),
+                new TestData(IRDetectorEvent.dataWriteStart(sourcePrefix, obsId, exposureId), "ObserveEvent.DataWriteStart"),
+                new TestData(IRDetectorEvent.dataWriteEnd(sourcePrefix, obsId, exposureId), "ObserveEvent.DataWriteEnd"),
+                new TestData(IRDetectorEvent.exposureAborted(sourcePrefix, obsId, exposureId), "ObserveEvent.ExposureAborted")));
 
         Set<Parameter<?>> paramSet = new HashSet<>(10);
         paramSet.add(obsIdParam);
@@ -59,7 +59,7 @@ public class JIRDetectorEventTest extends JUnitSuite {
     }
 
     @Test
-    public void shouldCreateIrDetectorExposureStateEvent__CSW_118() {
+    public void shouldCreateIrDetectorExposureStateEvent__CSW_118_CSW_119() {
         Set<Parameter<?>> paramSet = getParamSetForExposureStateEvent();
 
         ObserveEvent event = IRDetectorEvent.exposureState(
@@ -74,12 +74,12 @@ public class JIRDetectorEventTest extends JUnitSuite {
         );
 
         Assert.assertEquals(paramSet, event.jParamSet());
-        Assert.assertEquals("IRDetectorExposureState", event.eventName().name());
+        Assert.assertEquals("ObserveEvent.IRDetectorExposureState", event.eventName().name());
         Assert.assertEquals(prefix, event.source());
     }
 
     @Test
-    public void shouldCreateIrDetectorExposureDataEvent__CSW_118() {
+    public void shouldCreateIrDetectorExposureDataEvent__CSW_118_CSW_119() {
         int readsInRamp = 1;
         int readsComplete = 20;
         int rampsInExposure = 40;
@@ -101,7 +101,7 @@ public class JIRDetectorEventTest extends JUnitSuite {
         );
 
         Assert.assertEquals(paramSet, event.jParamSet());
-        Assert.assertEquals("IRDetectorExposureData", event.eventName().name());
+        Assert.assertEquals("ObserveEvent.IRDetectorExposureData", event.eventName().name());
         Assert.assertEquals(prefix, event.source());
     }
 
