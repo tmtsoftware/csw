@@ -58,7 +58,7 @@ class OpticalDetectorEventTest extends AnyFunSpec with Matchers {
         OperationalState.BUSY
       )
 
-      observeEvent.eventName shouldBe EventName("ObserveEvent.OpticalDetectorExposureState, CSW-119")
+      observeEvent.eventName shouldBe EventName("ObserveEvent.OpticalDetectorExposureState")
       observeEvent.source shouldBe Prefix(sourcePrefix)
       observeEvent.paramSet shouldBe Set(
         StringKey.make("detector").set(detector),

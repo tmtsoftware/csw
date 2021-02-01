@@ -77,7 +77,7 @@ class EventServiceIntegrationTest extends FrameworkIntegrationSuite with Eventua
   }
 
   test(
-    "should be able to publish and subscribe to observe events coming from IR, Optical & WFS detector (Both java and scala) | CSW-118"
+    "should be able to publish and subscribe to observe events coming from IR, Optical & WFS detector (Both java and scala) | CSW-118, CSW-119"
   ) {
     Container.spawn(ConfigFactory.load("observe_event_container.conf"), wiring).await
 
@@ -99,9 +99,9 @@ class EventServiceIntegrationTest extends FrameworkIntegrationSuite with Eventua
       }
 
       events.size shouldBe 6
-      events.count(_.eventName.name === "ObserveStart") shouldBe 2
-      events.count(_.eventName.name === "ExposureStart") shouldBe 2
-      events.count(_.eventName.name === "PublishSuccess") shouldBe 2
+      events.count(_.eventName.name === "ObserveEvent.ObserveStart") shouldBe 2
+      events.count(_.eventName.name === "ObserveEvent.ExposureStart") shouldBe 2
+      events.count(_.eventName.name === "ObserveEvent.PublishSuccess") shouldBe 2
     }
   }
 }
