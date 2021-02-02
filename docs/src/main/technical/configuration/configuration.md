@@ -2,8 +2,8 @@
 
 ## Introduction
 
-The Configuration Service maintains all the configuration files in version control system ([Subversion](https://wiki.svnkit.com/Subversion) repository) which tracks the history of file and directory changes over time.
-We access [Subversion](https://wiki.svnkit.com/Subversion) programmatically using [SVNKit](https://wiki.svnkit.com) which is a pure Java Subversion client library.
+The Configuration Service maintains all the configuration files in version control system ([Subversion](https://subversion.apache.org/) repository) which tracks the history of file and directory changes over time.
+We access Subversion programmatically using [SVNKit](https://svnkit.com) which is a pure Java Subversion client library.
 
 For information on _using_ the Configuration Service, see these sections:
 
@@ -66,7 +66,7 @@ These routes are read only and not protected. Anyone with valid HTTP request can
 
 ### SVN Service/Repo
 
-Primary store for small or normal configuration files is [Subversion](https://wiki.svnkit.com/Subversion). [SVNKit](https://wiki.svnkit.com) is used to perform all the read's and write's operations programmatically.
+Primary store for small or normal configuration files is Subversion. [SVNKit](https://svnkit.com) is used to perform all the read's and write's operations programmatically.
 
 There is a notion of active files in configuration service. Whenever user creates new file using *create* API provided by service, there are following two files gets created in svn behind the scenes.
 
@@ -98,7 +98,7 @@ Important classes involved in configuration service are:
 
 - [SvnConfigService]($github.base_url$/csw-config/csw-config-server/src/main/scala/csw/config/server/svn/SvnConfigService.scala): responsible for all the interactions with SvnRepo and AnnexFileService to perform CRUD operations 
 
-- [SvnRepo]($github.base_url$/csw-config/csw-config-server/src/main/scala/csw/config/server/svn/SvnRepo.scala): responsible for all the CRUD operations on svn repository using [SVNKit](https://wiki.svnkit.com)
+- [SvnRepo]($github.base_url$/csw-config/csw-config-server/src/main/scala/csw/config/server/svn/SvnRepo.scala): responsible for all the CRUD operations on svn repository using [SVNKit](https://svnkit.com)
 
 - [AnnexFileService]($github.base_url$/csw-config/csw-config-server/src/main/scala/csw/config/server/files/AnnexFileService.scala): responsible for calculating SHA1 based on file content and interacting with AnnexFileRepo to perform CRUD operations
 

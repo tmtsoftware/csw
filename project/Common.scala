@@ -7,8 +7,8 @@ import sbtunidoc.GenJavadocPlugin.autoImport.unidocGenjavadocVersion
 
 object Common {
   private val enableFatalWarnings: Boolean = sys.props.get("enableFatalWarnings").contains("true")
-  private val storyReport: Boolean         = sys.props.get("generateStoryReport").contains("true")
   private val enableCoverage: Boolean      = sys.props.get("enableCoverage").contains("true")
+  val storyReport: Boolean                 = sys.props.get("generateStoryReport").contains("true")
 
   private val reporterOptions: Seq[Tests.Argument] =
     // "-oDF" - show full stack traces and test case durations

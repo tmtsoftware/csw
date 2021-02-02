@@ -7,11 +7,9 @@ object AutoMultiJvm extends AutoPlugin {
   import sbtassembly.AssemblyKeys._
   import sbtassembly.MergeStrategy
 
-  private val storyReport: Boolean = sys.props.get("generateStoryReport").contains("true")
-
   private val reporterOptions: Seq[String] =
     // -C - to give fully qualified name of the custom reporter
-    if (storyReport) Seq("-C", "tmt.test.reporter.TestReporter")
+    if (Common.storyReport) Seq("-C", "tmt.test.reporter.TestReporter")
     else Seq.empty
 
   lazy val reverseConcat: MergeStrategy = new MergeStrategy {
