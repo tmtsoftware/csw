@@ -1,12 +1,14 @@
 package csw.framework.integration
 
 import akka.actor.testkit.typed.scaladsl.{TestInbox, TestProbe}
+import akka.stream.scaladsl.{Keep, Sink}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
 import csw.command.client.models.framework.ContainerLifecycleState
 import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.common.components.framework.SampleComponentState._
+import csw.event.api.scaladsl.EventSubscription
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.internal.commons.EventServiceConnection
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
@@ -85,12 +87,12 @@ class EventServiceIntegrationTest extends FrameworkIntegrationSuite with Eventua
     val subscriber   = eventService.defaultSubscriber
 
     val subscriptionEventList = mutable.ListBuffer[Event]()
-    subscriber.pSubscribeCallback(
-      Subsystem.WFOS,
-      "*",
-      { ev => subscriptionEventList.append(ev) }
-    )
-
+    val value1 = subscriber
+      .subscribeObserveEvents()
+      .wireTap(e => subscriptionEventList.append(e))
+      .toMat(Sink.ignore)(Keep.left)
+      .run()
+    value1.ready().await
     // events count should be equal to published events count
     eventually(timeout = timeout(5.seconds), interval = interval(100.millis)) {
       val events = subscriptionEventList.toList.filter {
@@ -103,5 +105,6 @@ class EventServiceIntegrationTest extends FrameworkIntegrationSuite with Eventua
       events.count(_.eventName.name === "ObserveEvent.ExposureStart") shouldBe 2
       events.count(_.eventName.name === "ObserveEvent.PublishSuccess") shouldBe 2
     }
+    value1.unsubscribe().await
   }
 }
