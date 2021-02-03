@@ -207,7 +207,7 @@ trait IEventSubscriber {
   /**
    * ************ IMPORTANT ************
    * This API uses redis pattern subscription. Having many live pattern subscriptions causes overall latency degradation.
-   * Prefer [[subscribe]] API over this whenever possible.
+   * Prefer subscribe API over this whenever possible.
    * *********** ********* ************
    *
    * Subscribe to all the observe events
