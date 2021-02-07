@@ -5,14 +5,19 @@ import akka.actor.typed.{ActorRef, SpawnProtocol}
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
+import csw.command.client.models.framework.LocationServiceUsage
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
+import csw.framework.scaladsl.ComponentBehaviorFactory
+import csw.location.api.models.{ComponentType, Connection}
 import csw.location.client.ActorSystemFactory
-import csw.testkit.internal.TestKitUtils
+import csw.prefix.models.Prefix
+import csw.testkit.internal.{SpawnComponent, TestKitUtils}
 import csw.testkit.scaladsl.CSWService
 import csw.testkit.scaladsl.CSWService._
 
 import scala.annotation.varargs
 import scala.concurrent.ExecutionContext
+import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
 /**
  * FrameworkTestKit supports starting one or more services from [[csw.testkit.scaladsl.CSWService]]
@@ -100,6 +105,70 @@ final class FrameworkTestKit private (
    */
   def spawnContainer(config: Config): ActorRef[ContainerMessage] =
     TestKitUtils.await(Container.spawn(config, frameworkWiring), timeout)
+
+  /**
+   * Use this to start hcd in standalone mode
+   *
+   * @param prefix prefix of the hcd
+   * @param behaviorFactory behavior factory for the hcd
+   * @param locationServiceUsage location service usages of the hcd
+   * @param connections connections to track for the hcd
+   * @param initializeTimeout initialize timeout for the hcd
+   * @return actorRef of spawned hcd
+   * @note before calling this, make sure you have started location server and other pre-requisite services
+   *       use one of [FrameworkTestKit#startAll] or [FrameworkTestKit#start] method to start services
+   */
+  def spawnHCD(
+      prefix: Prefix,
+      behaviorFactory: ComponentBehaviorFactory,
+      locationServiceUsage: LocationServiceUsage = LocationServiceUsage.RegisterOnly,
+      connections: Set[Connection] = Set.empty,
+      initializeTimeout: FiniteDuration = 10.seconds
+  ): ActorRef[ComponentMessage] =
+    TestKitUtils.await(
+      SpawnComponent.spawnComponent(
+        frameworkWiring,
+        prefix,
+        ComponentType.HCD,
+        behaviorFactory,
+        locationServiceUsage,
+        connections,
+        initializeTimeout
+      ),
+      timeout
+    )
+
+  /**
+   * Use this to start assembly in standalone mode
+   *
+   * @param prefix prefix of the assembly
+   * @param behaviorFactory behavior factory for the assembly
+   * @param locationServiceUsage location service usages of the assembly
+   * @param connections connections to track for the assembly
+   * @param initializeTimeout initialize timeout for the assembly
+   * @return actorRef of spawned assembly
+   * @note before calling this, make sure you have started location server and other pre-requisite services
+   *       use one of [FrameworkTestKit#startAll] or [FrameworkTestKit#start] method to start services
+   */
+  def spawnAssembly(
+      prefix: Prefix,
+      behaviorFactory: ComponentBehaviorFactory,
+      locationServiceUsage: LocationServiceUsage = LocationServiceUsage.RegisterOnly,
+      connections: Set[Connection] = Set.empty,
+      initializeTimeout: FiniteDuration = 10.seconds
+  ): ActorRef[ComponentMessage] =
+    TestKitUtils.await(
+      SpawnComponent.spawnComponent(
+        frameworkWiring,
+        prefix,
+        ComponentType.Assembly,
+        behaviorFactory,
+        locationServiceUsage,
+        connections,
+        initializeTimeout
+      ),
+      timeout
+    )
 
   /**
    * Shutdown all testkits which are started.

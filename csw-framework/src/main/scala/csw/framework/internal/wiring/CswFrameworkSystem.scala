@@ -15,7 +15,7 @@ import scala.concurrent.duration.DurationDouble
  * system is to `restart` the underlying actor but we want the default supervision strategy of `stopping` the actor
  * as provided in the `typed` actor world.
  */
-private[framework] class CswFrameworkSystem(val system: ActorSystem[SpawnProtocol.Command]) {
+private[csw] class CswFrameworkSystem(val system: ActorSystem[SpawnProtocol.Command]) {
   implicit val scheduler: Scheduler = system.scheduler
   implicit val timeout: Timeout     = Timeout(2.seconds)
   def spawnTyped[T](behavior: Behavior[T], name: String, props: Props = Props.empty): Future[ActorRef[T]] =

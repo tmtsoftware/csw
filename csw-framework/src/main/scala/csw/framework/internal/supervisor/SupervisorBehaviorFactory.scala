@@ -9,7 +9,7 @@ import csw.framework.scaladsl.{ComponentBehaviorFactory, RegistrationFactory}
 /**
  * The factory for creating [[akka.actor.typed.scaladsl.AbstractBehavior]] of the supervisor of a component
  */
-private[framework] object SupervisorBehaviorFactory {
+private[csw] object SupervisorBehaviorFactory {
 
   def make(
       containerRef: Option[ActorRef[ContainerIdleMessage]],
