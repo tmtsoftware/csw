@@ -2,7 +2,7 @@ package example.teskit
 
 import com.typesafe.config.ConfigFactory
 import csw.location.api.models.ComponentId
-import csw.location.api.models.ComponentType.Assembly
+import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
@@ -13,6 +13,8 @@ import io.netty.util.internal.logging.{InternalLoggerFactory, Slf4JLoggerFactory
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{BeforeAndAfterAll, OptionValues}
+import org.tmt.csw.sample.SampleHandlers
+import org.tmt.csw.samplehcd.SampleHcdHandlers
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
@@ -51,6 +53,25 @@ class TestKitsExampleTest extends AnyFunSuiteLike with BeforeAndAfterAll with Ma
     val connection       = AkkaConnection(ComponentId(Prefix(Subsystem.CSW, "sample"), Assembly))
     val assemblyLocation = Await.result(locationService.resolve(connection, 5.seconds), 10.seconds)
     assemblyLocation.value.connection shouldBe connection
+  }
+
+  test("framework testkit example for spawning hcd and assembly without config") {
+
+    //#spawn-assembly
+    frameworkTestKit.spawnAssembly(Prefix("TCS.sampleAssembly"), (ctx, cswCtx) => new SampleHandlers(ctx, cswCtx))
+    //#spawn-assembly
+
+    val assemblyConnection = AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "sampleAssembly"), Assembly))
+    val assemblyLocation   = Await.result(locationService.resolve(assemblyConnection, 5.seconds), 10.seconds)
+    assemblyLocation.value.connection shouldBe assemblyConnection
+
+    //#spawn-hcd
+    frameworkTestKit.spawnHCD(Prefix("TCS.sampleHcd"), (ctx, cswCtx) => new SampleHcdHandlers(ctx, cswCtx))
+    //#spawn-hcd
+
+    val hcdConnection = AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "sampleHcd"), HCD))
+    val hcdLocation   = Await.result(locationService.resolve(hcdConnection, 5.seconds), 10.seconds)
+    hcdLocation.value.connection shouldBe hcdConnection
   }
 
 }

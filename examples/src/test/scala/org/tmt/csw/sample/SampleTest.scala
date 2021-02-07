@@ -1,9 +1,10 @@
 package org.tmt.csw.sample
 
+import csw.location.api.models.ComponentType.Assembly
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{ComponentId, ComponentType}
-import csw.prefix.models.Prefix
 import csw.prefix.models.Subsystem.CSW
+import csw.prefix.models.{Prefix, Subsystem}
 import csw.testkit.scaladsl.CSWService.{AlarmServer, EventServer}
 import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
 import org.scalatest.funsuite.AnyFunSuiteLike
@@ -31,4 +32,15 @@ class SampleTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) wit
     akkaLocation.connection shouldBe connection
   }
   //#locate
+
+  test("should be able to spawn a hcd without providing config file") {
+
+    //#spawn-assembly
+    spawnAssembly(Prefix("TCS.sampleAssembly"), (ctx, cswCtx) => new SampleHandlers(ctx, cswCtx))
+    //#spawn-assembly
+
+    val assemblyConnection = AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "sampleAssembly"), Assembly))
+    val assemblyLocation   = Await.result(locationService.resolve(assemblyConnection, 5.seconds), 10.seconds)
+    assemblyLocation.value.connection shouldBe assemblyConnection
+  }
 }
