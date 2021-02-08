@@ -13,7 +13,7 @@ import scala.concurrent.duration.DurationLong
 
 //#component-handlers-class
 class TCSHcdCompHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
-  extends DefaultComponentHandlers(ctx, cswCtx) {
+    extends DefaultComponentHandlers(ctx, cswCtx) {
 //#component-handlers-class
 
   /**

@@ -123,8 +123,7 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
   }
   //#exception
 
-
-  test("should be able to spawn a hcd without providing config file"){
+  test("should be able to spawn a hcd without providing config file") {
     //#spawn-hcd
     spawnHCD(Prefix("TCS.sampleHcd"), (ctx, cswCtx) => new SampleHcdHandlers(ctx, cswCtx))
     //#spawn-hcd
