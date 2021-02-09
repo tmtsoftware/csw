@@ -18,8 +18,8 @@ addSbtPlugin("com.github.cb372"                  % "sbt-explicit-dependencies" %
 addSbtPlugin("com.dwijnand"                      % "sbt-project-graph"         % "0.4.0")
 addSbtPlugin("com.timushev.sbt"                  % "sbt-rewarn"                % "0.1.2")
 
-resolvers += Resolver.bintrayRepo("twtmt", "sbt-plugins")
-addSbtPlugin("com.github.tmtsoftware" % "sbt-docs" % "0.2.0")
+resolvers += "jitpack" at "https://jitpack.io"
+libraryDependencies += "com.github.tmtsoftware" % "sbt-docs" % "9fe4596ff8"
 
 classpathTypes += "maven-plugin"
 
