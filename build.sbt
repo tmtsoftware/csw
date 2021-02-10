@@ -76,7 +76,6 @@ lazy val multiJvmProjects: Seq[ProjectReference] = Seq(
 lazy val `csw` = project
   .in(file("."))
   .enablePlugins(NoPublish, UnidocSitePlugin, GithubPublishPlugin, GitBranchPrompt, GithubRelease, ContractPlugin)
-  .disablePlugins(BintrayPlugin)
   .aggregate(aggregatedProjects: _*)
   .settings(DocSettings.makeSiteMappings(docs))
   .settings(Settings.addAliases)
@@ -110,7 +109,6 @@ lazy val `csw-contract` = project
 
 lazy val `csw-prefix` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
-  .enablePlugins(PublishBintray)
   .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
   .jsSettings(jsTestArg)
   .settings(fork := false)
@@ -131,7 +129,6 @@ lazy val `csw-location` = project
 lazy val `csw-location-api` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .in(file("csw-location/csw-location-api"))
-  .enablePlugins(PublishBintray)
   .jvmConfigure(_.dependsOn(`csw-commons`))
   .dependsOn(`csw-prefix`)
   .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
@@ -163,7 +160,7 @@ lazy val `csw-location-client` = project
     `csw-location-api`.jvm,
     `csw-network-utils`
   )
-  .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
+  .enablePlugins(GenJavadocPlugin, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.LocationClient.value
   )
@@ -195,7 +192,6 @@ lazy val `csw-config` = project
 lazy val `csw-config-models` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
   .in(file("csw-config/csw-config-models"))
-  .enablePlugins(PublishBintray)
   .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
   .jsSettings(jsTestArg)
   .dependsOn(`csw-params`)
@@ -204,7 +200,7 @@ lazy val `csw-config-models` = crossProject(JSPlatform, JVMPlatform)
 
 lazy val `csw-config-api` = project
   .in(file("csw-config/csw-config-api"))
-  .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
+  .enablePlugins(GenJavadocPlugin, MaybeCoverage)
   .dependsOn(`csw-logging-api`, `csw-config-models`.jvm, `csw-commons` % "test->test")
   .settings(
     libraryDependencies ++= Dependencies.ConfigApi.value
@@ -232,7 +228,7 @@ lazy val `csw-config-client` = project
     `csw-commons`       % "compile->compile;test->test",
     `csw-config-server` % "test->test"
   )
-  .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
+  .enablePlugins(GenJavadocPlugin, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.ConfigClient.value
   )
@@ -272,7 +268,6 @@ lazy val `csw-logging-macros` = project
 lazy val `csw-logging-models` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
   .in(file("csw-logging/csw-logging-models"))
-  .enablePlugins(PublishBintray)
   .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
   .jsSettings(jsTestArg)
   .settings(fork := false)
@@ -287,12 +282,12 @@ lazy val `csw-logging-api` = project
   .settings(
     libraryDependencies += Libs.`enumeratum`.value
   )
-  .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
+  .enablePlugins(GenJavadocPlugin, MaybeCoverage)
 
 lazy val `csw-logging-client` = project
   .in(file("csw-logging/csw-logging-client"))
   .dependsOn(`csw-commons` % "compile->compile;test->test", `csw-logging-macros`, `csw-logging-api`, `csw-prefix`.jvm)
-  .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
+  .enablePlugins(GenJavadocPlugin, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.LoggingClient.value
   )
@@ -302,7 +297,6 @@ lazy val `csw-params` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .dependsOn(`csw-time-core`, `csw-prefix`)
   .jvmConfigure(_.dependsOn(`csw-commons` % "test->test"))
-  .enablePlugins(PublishBintray)
   .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
   .jsSettings(jsTestArg)
   .settings(
@@ -331,7 +325,7 @@ lazy val `csw-framework` = project
     `csw-location-server` % "test->test",
     `csw-commons`         % "test->test"
   )
-  .enablePlugins(PublishBintray, GenJavadocPlugin, CswBuildInfo, MaybeCoverage)
+  .enablePlugins(GenJavadocPlugin, CswBuildInfo, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.Framework.value
   )
@@ -352,7 +346,6 @@ lazy val `csw-command-api` = crossProject(JSPlatform, JVMPlatform)
     `csw-params`,
     `csw-location-api`
   )
-  .enablePlugins(PublishBintray)
   .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
   .settings(libraryDependencies ++= Dependencies.CommandApi.value)
   //  the following setting was required by IntelliJ as it can not handle cross-compiled Akka types
@@ -371,7 +364,7 @@ lazy val `csw-command-client` = project
     `csw-location-server` % "test->test",
     `csw-commons`         % "compile->compile;test->test"
   )
-  .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
+  .enablePlugins(GenJavadocPlugin, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.CommandClient.value)
 
 /* ================= Event Service ============== */
@@ -387,7 +380,7 @@ lazy val `csw-event` = project
 lazy val `csw-event-api` = project
   .in(file("csw-event/csw-event-api"))
   .dependsOn(`csw-params`.jvm)
-  .enablePlugins(PublishBintray, GenJavadocPlugin)
+  .enablePlugins(GenJavadocPlugin)
   .settings(libraryDependencies ++= Dependencies.EventApi.value)
 
 lazy val `csw-event-client` = project
@@ -400,7 +393,7 @@ lazy val `csw-event-client` = project
     `csw-location-server` % "test->test",
     `csw-commons`         % "test->test"
   )
-  .enablePlugins(PublishBintray, GenJavadocPlugin, AutoMultiJvm, MaybeCoverage)
+  .enablePlugins(GenJavadocPlugin, AutoMultiJvm, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.EventClient.value)
 
 lazy val `csw-event-cli` = project
@@ -429,7 +422,6 @@ lazy val `csw-alarm-models` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
   .in(file("csw-alarm/csw-alarm-models"))
   .dependsOn(`csw-prefix`, `csw-time-core`)
-  .enablePlugins(PublishBintray)
   .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
   .jvmConfigure(_.enablePlugins(MaybeCoverage))
   .jsSettings(jsTestArg)
@@ -439,7 +431,7 @@ lazy val `csw-alarm-models` = crossProject(JSPlatform, JVMPlatform)
 lazy val `csw-alarm-api` = project
   .in(file("csw-alarm/csw-alarm-api"))
   .dependsOn(`csw-alarm-models`.jvm)
-  .enablePlugins(PublishBintray, GenJavadocPlugin)
+  .enablePlugins(GenJavadocPlugin)
   .settings(libraryDependencies ++= Dependencies.AlarmApi.value)
 
 lazy val `csw-alarm-client` = project
@@ -453,7 +445,7 @@ lazy val `csw-alarm-client` = project
     `csw-commons`         % "test->test",
     `csw-location-server` % "test->compile;test->test"
   )
-  .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
+  .enablePlugins(GenJavadocPlugin, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.AlarmClient.value)
 
 lazy val `csw-alarm-cli` = project
@@ -488,7 +480,6 @@ lazy val `csw-time` = project
 lazy val `csw-time-clock` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Dummy)
   .in(file("csw-time/csw-time-clock"))
-  .enablePlugins(PublishBintray)
   .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
   .jvmSettings(libraryDependencies ++= Dependencies.TimeClockJvm.value)
   .jsSettings(libraryDependencies += Libs.`scalajs-java-time`.value)
@@ -499,7 +490,6 @@ lazy val `csw-time-core` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .in(file("csw-time/csw-time-core"))
   .dependsOn(`csw-time-clock`)
-  .enablePlugins(PublishBintray)
   .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
   .jsSettings(jsTestArg)
   .jvmSettings(libraryDependencies += Libs.`junit-4-12` % Test)
@@ -515,7 +505,7 @@ lazy val `csw-time-scheduler` = project
     `csw-logging-client`,
     `csw-commons` % "test->test"
   )
-  .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
+  .enablePlugins(GenJavadocPlugin, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.TimeScheduler.value)
 
 lazy val `csw-testkit` = project
@@ -525,7 +515,7 @@ lazy val `csw-testkit` = project
     `csw-framework`,
     `csw-commons` % "test->test"
   )
-  .enablePlugins(PublishBintray, GenJavadocPlugin)
+  .enablePlugins(GenJavadocPlugin)
   .settings(
     libraryDependencies ++= Dependencies.Testkit.value
   )
@@ -538,25 +528,23 @@ lazy val `csw-database` = project
     `csw-commons`         % "test->test",
     `csw-location-server` % "test->compile;test->test"
   )
-  .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
+  .enablePlugins(GenJavadocPlugin, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.DatabaseClient.value)
 
 /* =============== Common Utilities ============ */
 lazy val `csw-network-utils` = project
-  .enablePlugins(PublishBintray, MaybeCoverage)
+  .enablePlugins(MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.NetworkUtils.value
   )
 
 lazy val `csw-commons` = project
-  .enablePlugins(PublishBintray)
   .settings(
     libraryDependencies ++= Dependencies.Commons.value
   )
 
 /* ==== Lettuce(Redis Driver) Scala Wrapper ==== */
 lazy val `romaine` = project
-  .enablePlugins(PublishBintray)
   .settings(
     libraryDependencies ++= Dependencies.Romaine.value
   )
@@ -614,7 +602,6 @@ lazy val `csw-benchmark` = project
     `csw-framework`       % "compile->compile;test->test"
   )
   .enablePlugins(NoPublish, JmhPlugin)
-  .disablePlugins(BintrayPlugin)
   .settings(
     libraryDependencies ++= Dependencies.Benchmark.value
   )
