@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [ master ]
   push:
-    branches: [ master, branch-3.0.x ]
+    branches: [ master, branch-3.0.x, mausam/jitpack-for-plugins ]
     paths-ignore:
       - "scripts/**"
       - "tools/**"
@@ -27,6 +27,11 @@ jobs:
         run: |
           sudo apt-get install ntp -y
           sudo ntptime -T 37
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          sudo: false
 
       - name: Tests
         run: |
