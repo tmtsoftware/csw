@@ -46,6 +46,8 @@ object TYP extends Enum[TYP] {
 
 case class TYPLevel(typ: TYP, calibrationLevel: CalibrationLevel) {
   override def toString: String = s"${typ.entryName}${CalibrationLevel.indexOf(calibrationLevel)}"
+
+  def calibrationLevelNumber: Int = CalibrationLevel.indexOf(calibrationLevel)
 }
 
 object TYPLevel {
