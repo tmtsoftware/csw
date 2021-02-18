@@ -28,6 +28,7 @@ class TYPLevelTest extends AnyFunSpec with Matchers {
     it("should throw exception if no calibrationLevel | CSW-121") {
       val exception = intercept[IllegalArgumentException](TYPLevel("SCI"))
       //TODO: This should be improved with a parse error for missing calibration level
+      println(s"This is the current exception: $exception")
     }
   }
 }
