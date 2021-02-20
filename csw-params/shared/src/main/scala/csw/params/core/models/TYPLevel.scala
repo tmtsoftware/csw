@@ -55,10 +55,13 @@ object TYPLevel {
     try CalibrationLevel.values(calibrationLevel.toInt)
     catch {
       case ex: Exception =>
-        throw new IllegalArgumentException(s"Failed to parse calibration level $calibrationLevel: ${ex.getMessage}")
+        throw new IllegalArgumentException(
+          s"Failed to parse calibration level $calibrationLevel: ${ex.getMessage}. Calibration level should be a digit."
+        )
     }
 
   def apply(typLevel: String): TYPLevel = {
+    require(typLevel.length == 4, "TYPLevel must be a 3 character TYP followed by a calibration level")
     val (typ, calibrationLevel) = typLevel.splitAt(typLevel.length - 1)
     val level                   = parseCalibrationLevel(calibrationLevel)
     TYPLevel(TYP.withNameInsensitive(typ), level)
