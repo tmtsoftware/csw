@@ -14,21 +14,29 @@ class TYPLevelTest extends AnyFunSpec with Matchers {
     }
 
     it("should throw exception if invalid TYP | CSW-121") {
-      val exception = intercept[NoSuchElementException](TYPLevel("INVALID0"))
+      val exception = intercept[NoSuchElementException](TYPLevel("XYZ0"))
       exception.getMessage should ===(
-        "INVALID is not a member of Enum (SCI, CAL, ARC, IDP, DRK, MDK, FFD, NFF, BIA, TEL, FLX, SKY)"
+        "XYZ is not a member of Enum (SCI, CAL, ARC, IDP, DRK, MDK, FFD, NFF, BIA, TEL, FLX, SKY)"
       )
     }
 
     it("should throw exception if invalid calibrationLevel | CSW-121") {
       val exception = intercept[IllegalArgumentException](TYPLevel("SCI5"))
-      exception.getMessage should ===("Failed to parse calibration level 5: 5 is out of bounds (min 0, max 4)")
+      exception.getMessage should ===(
+        "Failed to parse calibration level 5: 5 is out of bounds (min 0, max 4). Calibration level should be a digit."
+      )
     }
 
     it("should throw exception if no calibrationLevel | CSW-121") {
       val exception = intercept[IllegalArgumentException](TYPLevel("SCI"))
-      //TODO: This should be improved with a parse error for missing calibration level
-      println(s"This is the current exception: $exception")
+      exception.getMessage should ===("requirement failed: TYPLevel must be a 3 character TYP followed by a calibration level")
+    }
+
+    it("should throw exception if calibrationLevel is char | CSW-121") {
+      val exception = intercept[IllegalArgumentException](TYPLevel("SCIC"))
+      exception.getMessage should ===(
+        "Failed to parse calibration level C: For input string: \"C\". Calibration level should be a digit."
+      )
     }
   }
 }
