@@ -8,13 +8,13 @@ class StandaloneExposureIdTest extends AnyFunSpec with Matchers {
   describe("create StandaloneExposureId") {
     val utcTimeStr: String = "20200114-122334"
 
-    it("should create valid StandaloneExposureId") {
+    it("should create valid StandaloneExposureId | CSW-121") {
       val exposureId = StandaloneExposureId(s"$utcTimeStr-CSW-IMG1-SCI0-0001")
       exposureId.toString should ===(s"$utcTimeStr-CSW-IMG1-SCI0-0001")
       exposureId should ===(StandaloneExposureId(utcTimeStr, Subsystem.CSW, "IMG1", TYPLevel("SCI0"), ExposureNumber("0001")))
     }
 
-    it("should create valid StandaloneExposureId with subArray in exposure number") {
+    it("should create valid StandaloneExposureId with subArray in exposure number | CSW-121") {
       val exposureId = StandaloneExposureId(s"$utcTimeStr-CSW-IMG1-SCI0-0001-01")
       exposureId.toString should ===(s"$utcTimeStr-CSW-IMG1-SCI0-0001-01")
       exposureId should ===(
@@ -22,7 +22,7 @@ class StandaloneExposureIdTest extends AnyFunSpec with Matchers {
       )
     }
 
-    it("should throw exception if invalid StandaloneExposureId: typLevel is missing") {
+    it("should throw exception if invalid StandaloneExposureId: typLevel is missing | CSW-121") {
       val exception =
         intercept[IllegalArgumentException](StandaloneExposureId(s"$utcTimeStr-CSW-IMG1-0001"))
       exception.getMessage should ===(
