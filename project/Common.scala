@@ -31,10 +31,7 @@ object Common {
     organizationName := "TMT Org",
     scalaVersion := Libs.ScalaVersion,
     homepage := Some(url("https://github.com/tmtsoftware/csw")),
-    resolvers ++= Seq(
-      "jitpack" at "https://jitpack.io",
-      "bintray" at "https://jcenter.bintray.com"
-    ),
+    resolvers += "jitpack" at "https://jitpack.io",
     scmInfo := Some(
       ScmInfo(url("https://github.com/tmtsoftware/csw"), "git@github.com:tmtsoftware/csw.git")
     ),
