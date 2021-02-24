@@ -14,6 +14,7 @@ object Main extends CommandApp[Command] {
   override def appName: String    = getClass.getSimpleName.dropRight(1) // remove $ from class name
   override def appVersion: String = BuildInfo.version
   override def progName: String   = BuildInfo.name
+  println(s"starting $progName-$appVersion")
 
   override def run(command: Command, remainingArgs: RemainingArgs): Unit =
     command match {
