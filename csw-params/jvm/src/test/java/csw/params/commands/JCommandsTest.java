@@ -6,17 +6,14 @@ import csw.params.core.generics.ParameterSetType;
 import csw.params.core.models.ObsId;
 import csw.params.javadsl.JKeyType;
 import csw.params.javadsl.JUnits;
+import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
 import org.junit.Assert;
 import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
-import csw.prefix.javadsl.JSubsystem;
 
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-185: Easy to Use Syntax/Api
@@ -62,6 +59,8 @@ public class JCommandsTest extends JUnitSuite {
 
         // parameter
         Assert.assertEquals(epochStringParam, command.parameter(epochStringKey));
+        Exception ex = Assert.assertThrows(NoSuchElementException.class, () -> command.parameter(notUsedKey));
+        Assert.assertEquals(ex.getMessage(), "Parameter set does not contain key: "+notUsedKey.keyName());
 
         // jMissingKeys
         Set<String> expectedMissingKeys = Set.of(notUsedKey.keyName());
@@ -169,7 +168,7 @@ public class JCommandsTest extends JUnitSuite {
 
     /*
     @Test
-    public void shoulRdAbleToCloneAnExistingCommand__DEOPSCSW_183_DEOPSCSW_185_DEOPSCSW_320() {
+    public void shouldAbleToCloneAnExistingCommand__DEOPSCSW_183_DEOPSCSW_185_DEOPSCSW_320() {
         Setup setup = new Setup(prefix, commandName, Optional.of(obsId)).add(encoderParam).add(epochStringParam);
         Setup setup2 = setup.cloneCommand();
         Assert.assertNotEquals(setup.runId(), setup2.runId());

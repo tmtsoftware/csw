@@ -40,7 +40,13 @@ class EventsTest extends AnyFunSpec with Matchers {
       assert(sc1.exists(k2))
       assert(sc1(k1).head == 22)
       assert(sc1(k2).head == 44)
+      assert(sc1.parameter(k1).head == 22)
+      assert(sc1.parameter(k2).head == 44)
       assert(sc1.missingKeys(k1, k2, k3) == Set(k3.keyName))
+      val ex = intercept[NoSuchElementException](sc1(k4))
+      ex.getMessage shouldBe s"Parameter set does not contain key: ${k4.keyName}"
+      val ex2 = intercept[NoSuchElementException](sc1.parameter(k3))
+      ex2.getMessage shouldBe s"Parameter set does not contain key: ${k3.keyName}"
     }
 
     it(
@@ -144,7 +150,13 @@ class EventsTest extends AnyFunSpec with Matchers {
       assert(sc1.exists(k2))
       assert(sc1(k1).head == 22)
       assert(sc1(k2).head == 44)
+      assert(sc1.parameter(k1).head == 22)
+      assert(sc1.parameter(k2).head == 44)
       assert(sc1.missingKeys(k1, k2, k3) == Set(k3.keyName))
+      val ex = intercept[NoSuchElementException](sc1(k4))
+      ex.getMessage shouldBe s"Parameter set does not contain key: ${k4.keyName}"
+      val ex2 = intercept[NoSuchElementException](sc1.parameter(k3))
+      ex2.getMessage shouldBe s"Parameter set does not contain key: ${k3.keyName}"
     }
 
     it(

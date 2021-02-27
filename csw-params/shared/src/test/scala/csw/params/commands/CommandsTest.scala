@@ -71,6 +71,11 @@ class CommandsTest extends AnyFunSpec {
       assert(v1.values === Array(22))
       assert(v2.values === Array("C"))
       assert(sc1(k2)(0) == "C")
+      val ex = intercept[NoSuchElementException](sc1(k3))
+      assert(ex.getMessage == s"Parameter set does not contain key: ${k3.keyName}")
+      val ex2 = intercept[NoSuchElementException](sc1.parameter(k3))
+      assert(ex2.getMessage == s"Parameter set does not contain key: ${k3.keyName}")
+
     }
 
     // DEOPSCSW-190: Implement Unit Support
@@ -166,6 +171,7 @@ class CommandsTest extends AnyFunSpec {
 
     val k1 = KeyType.IntKey.make("repeat")
     val k2 = KeyType.IntKey.make("expTime")
+    val k3 = KeyType.IntKey.make("notUsed")
     it("Should allow adding keys | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320") {
       val i1  = k1.set(22)
       val i2  = k2.set(44)
@@ -199,6 +205,10 @@ class CommandsTest extends AnyFunSpec {
       assert(oc1.get(k2).isDefined)
       assert(v1.values === Array(22))
       assert(v2.head == 44)
+      val ex = intercept[NoSuchElementException](oc1(k3))
+      assert(ex.getMessage == s"Parameter set does not contain key: ${k3.keyName}")
+      val ex2 = intercept[NoSuchElementException](oc1.parameter(k3))
+      assert(ex2.getMessage == s"Parameter set does not contain key: ${k3.keyName}")
     }
 
     it("should update for the same key with set | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320") {
@@ -251,6 +261,7 @@ class CommandsTest extends AnyFunSpec {
 
     val k1 = KeyType.IntKey.make("repeat")
     val k2 = KeyType.IntKey.make("expTime")
+    val k3 = KeyType.IntKey.make("unused")
     it("Should allow adding keys | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320") {
       val i1  = k1.set(22)
       val i2  = k2.set(44)
@@ -284,6 +295,11 @@ class CommandsTest extends AnyFunSpec {
       assert(wc1.get(k2).isDefined)
       assert(v1.values === Array(22))
       assert(v2.head == 44)
+      val ex = intercept[NoSuchElementException](wc1(k3))
+      assert(ex.getMessage == s"Parameter set does not contain key: ${k3.keyName}")
+      val ex2 = intercept[NoSuchElementException](wc1.parameter(k3))
+      assert(ex2.getMessage == s"Parameter set does not contain key: ${k3.keyName}")
+
     }
 
     it("should update for the same key with set | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-196, DEOPSCSW-320") {

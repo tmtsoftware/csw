@@ -183,7 +183,7 @@ object Dependencies {
   val ParamsJvm = Def.setting(
     Seq(
       Libs.`play-json`,
-      Libs.`junit-4-12` % Test
+      Libs.`junit-4-13` % Test
     )
   )
 
