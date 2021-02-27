@@ -3,18 +3,18 @@ import sbt.Def.{setting => dep}
 import sbt._
 
 object Libs {
-  val ScalaVersion = "2.13.4"
+  val ScalaVersion = "2.13.5"
 
   val `scala-java8-compat` = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.1"    //BSD 3-clause "New" or "Revised" License
   val `scala-async`        = "org.scala-lang.modules" %% "scala-async"        % "1.0.0-M1" //BSD 3-clause "New" or "Revised" License
   val `scopt`              = "com.github.scopt"       %% "scopt"              % "4.0.0"    //MIT License
-  val `mockito-scala`      = "org.mockito"            %% "mockito-scala"      % "1.16.15"
+  val `mockito-scala`      = "org.mockito"            %% "mockito-scala"      % "1.16.29"
 
   //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
   val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.2.3"
 
   val `embedded-keycloak`            = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak"            % "0.2.0"      //Apache 2.0
-  val `akka-management-cluster-http` = "com.lightbend.akka.management"            %% "akka-management-cluster-http" % "1.0.9"
+  val `akka-management-cluster-http` = "com.lightbend.akka.management"            %% "akka-management-cluster-http" % "1.0.10"
   val `svnkit`                       = "org.tmatesoft.svnkit"                      % "svnkit"                       % "1.10.1"     //TMate Open Source License
   val `commons-codec`                = "commons-codec"                             % "commons-codec"                % "1.15"       //Apache 2.0š
   val `scala-reflect`                = "org.scala-lang"                            % "scala-reflect"                % ScalaVersion //BSD-3
@@ -27,9 +27,9 @@ object Libs {
 
   val `jwt-core`          = "com.pauldijou"           %% "jwt-core"          % "5.0.0"
   val `lettuce`           = "io.lettuce"               % "lettuce-core"      % "6.0.2.RELEASE"
-  val `reactor-core`      = "io.projectreactor"        % "reactor-core"      % "3.4.2"
+  val `reactor-core`      = "io.projectreactor"        % "reactor-core"      % "3.4.3"
   val `reactive-streams`  = "org.reactivestreams"      % "reactive-streams"  % "1.0.3"
-  val `akka-stream-kafka` = "com.typesafe.akka"       %% "akka-stream-kafka" % "2.0.6"
+  val `akka-stream-kafka` = "com.typesafe.akka"       %% "akka-stream-kafka" % "2.0.7"
   val `embedded-kafka`    = "io.github.embeddedkafka" %% "embedded-kafka"    % "2.7.0"
   val `embedded-redis`    = "com.github.kstyrc"        % "embedded-redis"    % "0.6"
   val `scala-compiler`    = "org.scala-lang"           % "scala-compiler"    % ScalaVersion
@@ -38,19 +38,19 @@ object Libs {
   val `junit-4-12`        = "org.scalatestplus"       %% "junit-4-12"        % "3.2.2.0"
   val `testng-6-7`        = "org.scalatestplus"       %% "testng-6-7"        % "3.2.2.0"
 
-  val `scala-csv`             = "com.github.tototoshi" %% "scala-csv"             % "1.3.6"
+  val `scala-csv`             = "com.github.tototoshi" %% "scala-csv"             % "1.3.7"
   val `json-schema-validator` = "com.github.fge"        % "json-schema-validator" % "2.2.14" //LGPL/ASL
 
-  val `jna`               = "net.java.dev.jna"              % "jna"             % "5.6.0"
-  val `postgresql`        = "org.postgresql"                % "postgresql"      % "42.2.18"
-  val `hikaricp`          = "com.zaxxer"                    % "HikariCP"        % "4.0.1" //Apache License 2.0
+  val `jna`               = "net.java.dev.jna"              % "jna"             % "5.7.0"
+  val `postgresql`        = "org.postgresql"                % "postgresql"      % "42.2.19"
+  val `hikaricp`          = "com.zaxxer"                    % "HikariCP"        % "4.0.2" //Apache License 2.0
   val `otj-pg-embedded`   = "com.opentable.components"      % "otj-pg-embedded" % "0.13.3"
   val httpclient          = "org.apache.httpcomponents"     % "httpclient"      % "4.5.13"
   val `jboss-logging`     = "org.jboss.logging"             % "jboss-logging"   % "3.4.1.Final"
   val `config`            = "com.typesafe"                  % "config"          % "1.4.1"
-  val `os-lib`            = "com.lihaoyi"                  %% "os-lib"          % "0.7.2"
-  val `caffeine`          = "com.github.ben-manes.caffeine" % "caffeine"        % "2.8.8"
-  val netty               = "io.netty"                      % "netty-all"       % "4.1.58.Final"
+  val `os-lib`            = "com.lihaoyi"                  %% "os-lib"          % "0.7.3"
+  val `caffeine`          = "com.github.ben-manes.caffeine" % "caffeine"        % "3.0.0"
+  val netty               = "io.netty"                      % "netty-all"       % "4.1.59.Final"
   val `case-app`          = "com.github.alexarchambault"   %% "case-app"        % "2.0.4"
   val `tmt-test-reporter` = "com.github.tmtsoftware"       %% "rtm"             % "fecc848abf7"
 }
@@ -73,7 +73,7 @@ object Jackson {
 }
 
 object Akka {
-  val Version = "2.6.11" //all akka is Apache License 2.0
+  val Version = "2.6.13" //all akka is Apache License 2.0
 
   val `akka-stream`              = "com.typesafe.akka" %% "akka-stream"              % Version
   val `akka-stream-typed`        = "com.typesafe.akka" %% "akka-stream-typed"        % Version
@@ -93,7 +93,7 @@ object Akka {
 }
 
 object AkkaHttp {
-  val Version = "10.2.3"
+  val Version = "10.2.4"
 
   val `akka-http`            = "com.typesafe.akka" %% "akka-http"            % Version //ApacheV2
   val `akka-http-testkit`    = "com.typesafe.akka" %% "akka-http-testkit"    % Version //ApacheV2
@@ -103,7 +103,7 @@ object AkkaHttp {
 }
 
 object Keycloak {
-  val Version = "12.0.2"
+  val Version = "12.0.3"
 
   val `keycloak-adapter-core` = "org.keycloak" % "keycloak-adapter-core"      % Version
   val `keycloak-core`         = "org.keycloak" % "keycloak-core"              % Version
@@ -112,7 +112,7 @@ object Keycloak {
 }
 
 object Jooq {
-  val Version = "3.14.6"
+  val Version = "3.14.8"
 
   val `jooq`         = "org.jooq" % "jooq"         % Version
   val `jooq-meta`    = "org.jooq" % "jooq-meta"    % Version
@@ -120,7 +120,7 @@ object Jooq {
 }
 
 object MSocket {
-  val Version = "d9a78d83ba"
+  val Version = "95b8cf2"
 
   val `msocket-api`      = dep("com.github.tmtsoftware.msocket" %%% "msocket-api" % Version)
   val `msocket-security` = "com.github.tmtsoftware.msocket" %% "msocket-security" % Version
