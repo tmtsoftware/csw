@@ -15,7 +15,7 @@ import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.models._
 import csw.framework.scaladsl.RegistrationFactory
 import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.models.{AkkaRegistration, ComponentId, ComponentType}
+import csw.location.api.models.{AkkaRegistration, ComponentId, ComponentType, Metadata}
 import csw.location.api.scaladsl.LocationService
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
@@ -49,11 +49,12 @@ private[framework] final class ContainerBehavior(
 ) extends AbstractBehavior[ContainerActorMessage](ctx) {
 
   import ctx.executionContext
-  private val log: Logger     = loggerFactory.getLogger(ctx)
-  private val containerPrefix = containerInfo.prefix
-  private val akkaConnection  = AkkaConnection(ComponentId(containerPrefix, ComponentType.Container))
+  private val log: Logger                = loggerFactory.getLogger(ctx)
+  private val containerPrefix            = containerInfo.prefix
+  private val akkaConnection             = AkkaConnection(ComponentId(containerPrefix, ComponentType.Container))
+  private val locationMetadata: Metadata = Metadata().withPid(ProcessHandle.current().pid())
   private val akkaRegistration: AkkaRegistration =
-    registrationFactory.akkaTyped(akkaConnection, ctx.self)
+    registrationFactory.akkaTyped(akkaConnection, ctx.self, locationMetadata)
 
   // Set of successfully created supervisors for components
   var supervisors: Set[SupervisorInfo] = Set.empty
@@ -103,6 +104,7 @@ private[framework] final class ContainerBehavior(
     case PostStop =>
       log.warn(s"Un-registering container from location service")
       locationService.unregister(akkaConnection)
+      supervisors.foreach(_.component.supervisor ! Shutdown)
       this
   }
 
