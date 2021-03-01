@@ -35,7 +35,7 @@ import csw.framework.models.CswContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, RegistrationFactory}
 import csw.location.api.models
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
-import csw.location.api.models.{AkkaRegistration, ComponentId}
+import csw.location.api.models.{AkkaRegistration, ComponentId, Metadata}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.LogAdminUtil
 import csw.params.commands.CommandResponse.Locked
@@ -83,7 +83,8 @@ private[framework] final class SupervisorBehavior(
   private val componentActorName: String         = s"$prefix-$ComponentActorNameSuffix"
   private val akkaConnection: AkkaConnection     = AkkaConnection(ComponentId(prefix, componentInfo.componentType))
   private val httpConnection: HttpConnection     = HttpConnection(models.ComponentId(prefix, componentInfo.componentType))
-  private val akkaRegistration: AkkaRegistration = registrationFactory.akkaTyped(akkaConnection, ctx.self)
+  private val locationMetadata: Metadata         = Metadata().withPid(ProcessHandle.current().pid())
+  private val akkaRegistration: AkkaRegistration = registrationFactory.akkaTyped(akkaConnection, ctx.self, locationMetadata)
   private val route: Route                       = CommandServiceRoutesFactory.createRoutes(ctx.self)(ctx.system)
   private val httpService                        = new HttpService(locationService, route, log, httpConnection)(ctx.system)
   private val isStandalone: Boolean              = maybeContainerRef.isEmpty
