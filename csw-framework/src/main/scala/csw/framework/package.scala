@@ -124,33 +124,5 @@ package csw
  *    connections = []
  *
  * }}}
- *
- * - `HostConfig`
- * : This is just a helper to create host configuration application.
- * This support starting multiple containers on a given host machine and each container will have single/multiple components.
- *
- * === Example of Host Config file ===
- *
- * {{{
- *
- *    # This is a host configuration file which contains list of containers to be spawned by host configuration app
- *    containers: [
- *        {
- *          # mode can be one of Container or Standalone
- *          mode: "Container"
- *          # path of individual container configuration file
- *          configFilePath: "/resources/assemblyContainer.conf"
- *          # provide 'Remote' if file needs to fetched from config service else
- *          # provide 'Local' to fetch file from local machine
- *          configFileLocation: "Local"
- *        },
- *        {
- *          mode: "Standalone"
- *          configFilePath: "/resources/hcdStandalone.conf"
- *          configFileLocation: "Local"
- *        }
- *    ]
- *
- * }}}
  */
 package object framework {}

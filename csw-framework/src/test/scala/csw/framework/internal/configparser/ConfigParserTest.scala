@@ -203,33 +203,4 @@ class ConfigParserTest extends AnyFunSuite with Matchers {
     }
   }
   // ################### End : Standalone Parsing ##################
-
-  // DEOPSCSW-173: Host Configuration in file format
-  // DEOPSCSW-175: Starting multiple containers from command Line
-  // ################### Start : Host Parsing ######################
-  test("should able to parse host config | DEOPSCSW-167, DEOPSCSW-170, DEOPSCSW-172, DEOPSCSW-283, DEOPSCSW-173, DEOPSCSW-175") {
-    val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/hostconfig/valid_hostconfig.conf")
-    ConfigParser.parseHost(config) shouldEqual hostBootstrapInfo
-  }
-
-  test(
-    "should able to throw error when provided mode is invalid in host config | DEOPSCSW-167, DEOPSCSW-170, DEOPSCSW-172, DEOPSCSW-283, DEOPSCSW-173, DEOPSCSW-175"
-  ) {
-    val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/hostconfig/invalid_mode.conf")
-
-    intercept[java.lang.RuntimeException] {
-      ConfigParser.parseHost(config)
-    }
-  }
-
-  test(
-    "should able to throw error when provided location is invalid in host config | DEOPSCSW-167, DEOPSCSW-170, DEOPSCSW-172, DEOPSCSW-283, DEOPSCSW-173, DEOPSCSW-175"
-  ) {
-    val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/hostconfig/invalid_location.conf")
-
-    intercept[java.lang.RuntimeException] {
-      ConfigParser.parseHost(config)
-    }
-  }
-  // ################### End : Host Parsing ######################
 }
