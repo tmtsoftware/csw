@@ -11,7 +11,6 @@
 * [csw-config-cli](../apps/cswconfigcli.md): Application to perform administrative functions on the Configuration Service.
 * [csw-event-cli](../apps/csweventcli.md): Application to publish an event or subscribe to an event.
 * [csw-alarm-cli](../apps/cswalarmcli.md): Application to perform administrative functions on the Alarm Service.
-* [csw-host-config](../apps/hostconfig.md): Framework for creating host configuration applications, used to start multiple containers on a machine.
 @@@
 
 ## Starting Elastic Logging Aggregator for Development

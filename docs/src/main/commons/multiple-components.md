@@ -294,7 +294,7 @@ Java
 
 ### Pre-requisite
 
-A project, for example with the name `sample-deploy`, contains applications (ContainerCmd and HostConfig coming from `csw-framework`) to run components. Make sure that the necessary 
+A project, for example with the name `sample-deploy`, contains applications (ContainerCmd coming from `csw-framework`) to run components. Make sure that the necessary 
 dependencies are added in the `sample-deploy`.
 
 ### Run
@@ -331,10 +331,8 @@ To run using the deployment packaging, follow the steps below:
 - Run `sbt sample-deploy/universal:packageBin`, this will create self contained zip in `sample-deploy/target/universal` directory.
 - Unzip the generated zip file and enter into `bin` directory.
 - You will see four scripts in the `bin` directory (two bash scripts and two windows scripts).
-- If you want to start multiple containers on a host machine, follow this guide @ref:[here](../apps/hostconfig.md#examples).
 - If you want to start multiple components in container mode or single component in standalone mode, follow this guide @ref:[here](../framework/deploying-components.md).
 - Example to run container:    `./sample-container-cmd-app --local ../../../../sample-deploy/src/main/resources/SampleContainer.conf`
-- Example to run host config:  `./sample-host-config-app --local ../../../../sample-deploy/src/main/resources/SampleHostConfig.conf -s ./sample-container-cmd-app`
 
 @@@ note { title=Note }
 

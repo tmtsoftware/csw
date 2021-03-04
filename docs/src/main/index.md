@@ -217,8 +217,7 @@ its features, please refer to this [link](https://www.jooq.org/learn/).
 
 ### @ref:[Framework](commons/framework.md)
 The framework provides templates for @ref:[creating](./commons/create-component.md) and running the kind of software components 
-defined by OMOA as well as service access interfaces for these components. It also provides @ref:[application](./apps/hostconfig.md) support
-for running multiple components on a host machine.
+defined by OMOA as well as service access interfaces for these components.
 
 The framework also contains the structures that are common to components, such as commands and event structures.
 

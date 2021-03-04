@@ -171,8 +171,7 @@ The name of the Component Information File can be passed as a command line argum
 [ContainerCmd]($github.base_url$/csw-framework/src/main/scala/csw/framework/deploy/containercmd/ContainerCmd.scala)
 class to @ref:[deploy](../../framework/deploying-components.md) the component.
 
-In a production environment, it is planned that components will be started at boot time using a @ref:[HostConfig](../../apps/hostconfig.md) based
-application.
+In a production environment, it is planned that components will be started at boot time using ESW agent.
 
 Since Akka Typed is used throughout the TMT framework, there are seperate messages understood by Container, Supervisor, Top level Actor and other actors
 of the CSW framework. The architecture/relations of and between messages can be found [here]($github.base_url$/csw-command/csw-command-client/src/main/scala/csw/command/client/messages/MessagesArchitecture.scala). 
