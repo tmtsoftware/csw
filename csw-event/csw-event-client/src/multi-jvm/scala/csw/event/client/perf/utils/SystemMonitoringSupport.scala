@@ -32,13 +32,6 @@ trait SystemMonitoringSupport { multiNodeSpec: MultiNodeSpec =>
   def plotLatencyHistogram(inputFilesPath: String, publishFreq: String): Process =
     executeCmd(s"$perfScriptsDir/hist_plot.sh", inputFilesPath, publishFreq)
 
-  /**
-   * Make sure you have followed below steps before plotting:
-   *  1. git clone https://github.com/kpritam/jstatplot.git
-   *  2. sbt stage
-   *  3. update value of jstatPlotPath from SystemMontoringSupport class with the generated path
-   *      ex. $HOME/jstatplot/target/universal/stage/bin/jstatplot
-   */
   def plotJstat(): Option[Process] = {
     if (exist(jstatPlotPath)) {
       val originalFile = new File(jstatResultsPath)

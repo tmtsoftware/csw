@@ -491,7 +491,7 @@ csw-services start
 Once the component is ready, it is started using the `ContainerCmd` object in a standalone mode. 
 The details for starting the `ContainerCmd` in a standalone mode can be found @ref:[here](../framework/deploying-components.md).
 
-There are various ways to build and run the project.  A simple way during development is to to use sbt to run it. 
+There are various ways to build and run the project.  A simple way during development is to use sbt to run it. 
 The sbt command `runMain` can be used to specify an application with a main method and run it with arguments specified at the command line.  When this
 command is executed, sbt will take care of any downloading of dependencies, compiling, or building necessary to run
 your application. 
@@ -522,11 +522,8 @@ sbt "sample-deploy/runMain org.tmt.csw.sampledeploy.SampleContainerCmdApp --loca
 
 To run the component using the deployment package, perform the following steps:
 
--   Run `sbt <project>/universal:packageBin`, where `<project>` is your deployment module (e.g. `sample-deploy`). This will create self-contained zip in `<project>/target/universal` directory
--   Unzip generated zip file and enter into bin directory
--   Run the `./<project>-cmd-app --local --standalone <path-to-local-config-file-to-start-the-component>`
-
-Alternatively, you can run `sbt stage`, which installs the application under target/universal/stage/bin.
+-   Run `sbt publishLocal`. This will publish the project on local (with version 0.0.1 if defaults are used)
+-   Run `cs launch com.github.tmtsoftware.sample::csw-sampledeploy:0.0.1 -M csw.sampledeploy.SampleContainerCmdApp -- --local --standalone <path-to-local-config-file-to-start-the-component>`
 
 ## Enhanced Tutorial Versions
 There are three supplemental versions of the tutorial Assembly and HCD called: basic, moderate, and full. The

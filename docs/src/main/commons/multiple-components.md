@@ -324,15 +324,11 @@ Java
 sbt "sample-deploy/runMain org.tmt.csw.sampledeploy.SampleContainerCmdApp --local src/main/resources/JSampleContainer.conf"
 ```
 
-Like with the HCD, the `sbt stage` command can also be used to create binaries in the `target/universal/stage/bin` directories of the root project.
-
 To run using the deployment packaging, follow the steps below:
 
-- Run `sbt sample-deploy/universal:packageBin`, this will create self contained zip in `sample-deploy/target/universal` directory.
-- Unzip the generated zip file and enter into `bin` directory.
-- You will see four scripts in the `bin` directory (two bash scripts and two windows scripts).
+- Run `sbt publishLocal`. This will publish the project on local (with version 0.0.1 if defaults are used)
+- Run `cs launch com.github.tmtsoftware.sample::csw-sampledeploy:0.0.1 -M csw.sampledeploy.SampleContainerCmdApp -- --local ../../../../sample-deploy/src/main/resources/SampleContainer.conf`
 - If you want to start multiple components in container mode or single component in standalone mode, follow this guide @ref:[here](../framework/deploying-components.md).
-- Example to run container:    `./sample-container-cmd-app --local ../../../../sample-deploy/src/main/resources/SampleContainer.conf`
 
 @@@ note { title=Note }
 

@@ -11,7 +11,8 @@ package csw
  * === Config Server Application ===
  *
  * Before starting the config server, the ''location server application'' should be running on a known port and IP address.
- * You can start the config server with the `csw-config-server` command (found under target/universal/stage/bin) by passing command line arguments.
+ * You can install config server executable with the `cs install config-server:<version | SHA>` command. Then config server can
+ * be run with command line arguments. For example, `config-server --initRepo --port 4001`
  * The locations of the repositories are defined in resources/application.conf.
  * You can also override the values with system properties. For example:
  *
@@ -161,8 +162,8 @@ package csw
  * The config service also supports the concept of *active versions* of files. In this case a file named
  * *file.\$active* is checked in behind the scenes and contains the id of the active version of the file.
  *
- * The config service can be started as a standalone application. *sbt stage* installs the command under
- * target/universal/stage/bin.
+ * The config service can be started as a standalone application using coursier.
+ * Config server executable can be installed using command: cs install config-server
  * The standalone configs service registers itself with the location service so that it
  * can be found by other applications.
  *
