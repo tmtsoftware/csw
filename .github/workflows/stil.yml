@@ -2,7 +2,7 @@ name: stil
 
 on:
   schedule:
-    - cron: "30 18 * * *" # run at 00:00 AM IST
+    - cron: "30 18 * * *" # run at 4:00 PM IST
 
 jobs:
   unit-tests:
