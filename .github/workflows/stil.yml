@@ -1,8 +1,9 @@
 name: stil
 
 on:
+  workflow_dispatch:
   schedule:
-    - cron: "30 18 * * *" # run at 4:00 PM IST
+    - cron: "30 18 * * *" # run at 00:00 AM IST
 
 jobs:
   unit-tests:
