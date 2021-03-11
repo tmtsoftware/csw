@@ -48,7 +48,7 @@ object CswContext {
   private val PubSubComponentActor            = "pub-sub-component"
   private val CommandResponseManagerActorName = "command-response-manager"
 
-  private[framework] def make(
+  private[csw] def make(
       locationService: LocationService,
       eventServiceFactory: EventServiceFactory,
       alarmServiceFactory: AlarmServiceFactory,

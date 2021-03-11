@@ -59,6 +59,18 @@ Scala
 Java
 :   @@snip [TestKitsExampleTest.scala](../../../../examples/src/test/java/example/testkit/JTestKitsExampleTest.java) { #spawn-using-testkit }
 
+Other ways to spawn Assembly and HCD in the standalone mode using Framework testkit.
+
+Spawning a HCD
+
+Scala
+:   @@snip [TestKitsExampleTest.scala](../../../../examples/src/test/scala/example/teskit/TestKitsExampleTest.scala) { #spawn-assembly }
+
+Spawning an Assembly
+
+Scala
+:   @@snip [TestKitsExampleTest.scala](../../../../examples/src/test/scala/example/teskit/TestKitsExampleTest.scala) { #spawn-hcd }
+
 Full source at GitHub
 
 * [Scala]($github.base_url$/examples/src/test/scala/example/teskit/TestKitsExampleTest.scala)

@@ -50,7 +50,7 @@ public class JDetectorComponentHandlers extends JComponentHandlers {
     }
 
     @Override
-    public void jInitialize() {
+    public void initialize() {
         log.debug("Initializing Sample component");
 
         //#CSW-118 : publishing observe events for IR, Optical & WFS detectors
@@ -92,7 +92,7 @@ public class JDetectorComponentHandlers extends JComponentHandlers {
 
 
     @Override
-    public void jOnShutdown() {
+    public void onShutdown() {
     }
 
     @Override

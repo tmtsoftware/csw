@@ -3,6 +3,7 @@ package org.tmt.csw.samplehcd
 import akka.actor.typed.ActorSystem
 import akka.util.Timeout
 import csw.command.client.CommandServiceFactory
+import csw.location.api.models.ComponentType.HCD
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{ComponentId, ComponentType}
 import csw.params.commands.CommandResponse.Completed
@@ -10,8 +11,8 @@ import csw.params.commands.{CommandName, Setup}
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.{ObsId, Units}
 import csw.params.events.{Event, EventKey, EventName, SystemEvent}
-import csw.prefix.models.Prefix
 import csw.prefix.models.Subsystem.CSW
+import csw.prefix.models.{Prefix, Subsystem}
 import csw.testkit.scaladsl.CSWService.{AlarmServer, EventServer}
 import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
 import org.scalatest.BeforeAndAfterEach
@@ -121,4 +122,14 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
     }
   }
   //#exception
+
+  test("should be able to spawn a hcd without providing config file") {
+    //#spawn-hcd
+    spawnHCD(Prefix("TCS.sampleHcd"), (ctx, cswCtx) => new SampleHcdHandlers(ctx, cswCtx))
+    //#spawn-hcd
+
+    val hcdConnection = AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "sampleHcd"), HCD))
+    val hcdLocation   = Await.result(locationService.resolve(hcdConnection, 5.seconds), 10.seconds)
+    hcdLocation.value.connection shouldBe hcdConnection
+  }
 }

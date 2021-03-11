@@ -62,7 +62,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     }
 
     @Override
-    public void jInitialize() {
+    public void initialize() {
         log.debug("Initializing Sample component");
         try {
             Thread.sleep(100);
@@ -233,7 +233,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     }
 
     @Override
-    public void jOnShutdown() {
+    public void onShutdown() {
         CurrentState shutdownState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.shutdownChoice()));
         currentStatePublisher.publish(shutdownState);
     }

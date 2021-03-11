@@ -135,14 +135,14 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
     private Optional<IEventSubscription> maybeEventSubscription = Optional.empty();
 
     @Override
-    public void jInitialize() {
+    public void initialize() {
         log.info("In Assembly initialize");
         maybeEventSubscription = Optional.of(subscribeToHcd());
         //initialization
     }
 
     @Override
-    public void jOnShutdown() {
+    public void onShutdown() {
         log.info("Assembly is shutting down.");
     }
     //#initialize

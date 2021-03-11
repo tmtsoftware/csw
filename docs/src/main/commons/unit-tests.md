@@ -133,5 +133,25 @@ Scala
 Java
 :   @@snip [JSampleHcdTest.java](../../../../examples/src/test/java/example/tutorial/basic/JSampleHcdTest.java) { #exception }
 
+###Other ways to spawn Assembly and HCD in the standalone mode using CSW Test Kit.
 
+Spawning a HCD
 
+Scala
+:   @@snip [SampleHcdTest.scala](../../../../examples/src/test/scala/org/tmt/csw/samplehcd/SampleHcdTest.scala) { #spawn-hcd }
+
+Spawning an Assembly
+
+Scala
+:   @@snip [AssemblyTest.scala](../../../../examples/src/test/scala/org/tmt/csw/sample/SampleTest.scala) { #spawn-assembly }
+
+###Spawning a Component using DefaultComponentHandlers
+
+Scala
+:   @@snip [AssemblyTest.scala](../../../../examples/src/test/scala/org/tmt/csw/sample/SampleTest.scala) { #spawn-assembly-with-default-handlers }
+
+Full source at GitHub
+
+* [For Assembly Scala]($github.base_url$/examples/src/test/scala/org/tmt/csw/sample/SampleTest.scala)
+* [For HCD Scala]($github.base_url$/examples/src/test/scala/org/tmt/csw/samplehcd/SampleHcdTest.scala)
+* [Java]($github.base_url$/examples/src/test/java/org/tmt/csw/sample/JSampleTest.java)

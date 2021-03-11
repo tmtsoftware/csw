@@ -34,7 +34,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     }
 
     @Override
-    public void jInitialize() {
+    public void initialize() {
         //#dbFactory-access
         dbFactory = new DatabaseServiceFactory(ctx.getSystem());
 
@@ -57,7 +57,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     }
 
     @Override
-    public void jOnShutdown() {
+    public void onShutdown() {
     }
 
     @Override

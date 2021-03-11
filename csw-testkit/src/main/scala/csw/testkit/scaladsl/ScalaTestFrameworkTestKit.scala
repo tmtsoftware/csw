@@ -3,7 +3,13 @@ package csw.testkit.scaladsl
 import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
 import com.typesafe.config.Config
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
+import csw.command.client.models.framework.LocationServiceUsage
+import csw.framework.scaladsl.ComponentBehaviorFactory
+import csw.location.api.models.Connection
+import csw.prefix.models.Prefix
 import csw.testkit._
+
+import scala.concurrent.duration.FiniteDuration
 
 /**
  * A ScalaTest base class for the [[FrameworkTestKit]], making it possible to have ScalaTest manage the lifecycle of the testkit.
@@ -38,6 +44,26 @@ abstract class ScalaTestFrameworkTestKit(val frameworkTestKit: FrameworkTestKit,
 
   /** Delegate to framework testkit */
   def spawnStandalone(config: Config): ActorRef[ComponentMessage] = frameworkTestKit.spawnStandalone(config)
+
+  /** Delegate to framework testkit */
+  def spawnHCD(
+      prefix: Prefix,
+      behaviorFactory: ComponentBehaviorFactory,
+      locationServiceUsage: LocationServiceUsage = LocationServiceUsage.RegisterOnly,
+      connections: Set[Connection] = Set.empty,
+      initializeTimeout: FiniteDuration = frameworkTestKit.timeout.duration
+  ): ActorRef[ComponentMessage] =
+    frameworkTestKit.spawnHCD(prefix, behaviorFactory, locationServiceUsage, connections, initializeTimeout)
+
+  /** Delegate to framework testkit */
+  def spawnAssembly(
+      prefix: Prefix,
+      behaviorFactory: ComponentBehaviorFactory,
+      locationServiceUsage: LocationServiceUsage = LocationServiceUsage.RegisterOnly,
+      connections: Set[Connection] = Set.empty,
+      initializeTimeout: FiniteDuration = frameworkTestKit.timeout.duration
+  ): ActorRef[ComponentMessage] =
+    frameworkTestKit.spawnAssembly(prefix, behaviorFactory, locationServiceUsage, connections, initializeTimeout)
 
   /**
    * Start FrameworkTestKit. If override be sure to call super.beforeAll

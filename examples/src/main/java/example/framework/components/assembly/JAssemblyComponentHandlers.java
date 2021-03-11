@@ -77,7 +77,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
     //#jInitialize-handler
     @Override
-    public void jInitialize() {
+    public void initialize() {
 
         // fetch config (preferably from configuration service)
         // create a worker actor which is used by this assembly
@@ -181,7 +181,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
     //#onShutdown-handler
     @Override
-    public void jOnShutdown() {
+    public void onShutdown() {
         // clean up resources
     }
     //#onShutdown-handler
