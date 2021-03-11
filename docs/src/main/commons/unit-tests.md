@@ -145,7 +145,7 @@ Spawning an Assembly
 Scala
 :   @@snip [AssemblyTest.scala](../../../../examples/src/test/scala/org/tmt/csw/sample/SampleTest.scala) { #spawn-assembly }
 
-#Spawning a Component using DefaultComponentHandlers
+###Spawning a Component using DefaultComponentHandlers
 
 Scala
 :   @@snip [AssemblyTest.scala](../../../../examples/src/test/scala/org/tmt/csw/sample/SampleTest.scala) { #spawn-assembly-with-default-handlers }
