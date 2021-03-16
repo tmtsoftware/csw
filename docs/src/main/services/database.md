@@ -16,6 +16,56 @@ its features, please refer to this [link](https://www.jooq.org/learn/).
 The Database Service requires `PostgreSQL` server to be running on a machine. To start the PostgreSQL server for development
 and testing purposes, refer to @ref:[Starting Apps for Development](../apps/cswservices.md).
 
+@@@ note
+Postgres is started by csw-services and should not be running before that. 
+If it is, you might get this error message:
+```
+cannot create children while terminating or terminated
+Failed to start Database Service!
+```
+
+Particularly on Linux systems, make sure that Postgres is not started at boot time,
+for example with this command:
+```
+systemctl status postgresql
+systemctl disable postgresql
+```
+
+Also, the Postgres data directory, pointed to by the required PGDATA environment variable, should belong to
+the user running csw-services (or at least have read/write access). 
+The Linux system version of this directory will normally belong to the Postgres user 
+and so should not be used for the database service.
+It is recommended to create a data directory especially for use with the Database Service.
+(Versions installed on MacOS with `brew` run under the user's name, so it is not a problem there.)
+
+The Database Service requires a Postgres version of 8.2 or greater (Currently version 13.x).
+The data directory (pointed to by the PGDATA environment variable) needs to match the
+Postgres version and can be initialized with 
+the command: 
+
+```
+initdb $PGDATA -E utf8
+```
+
+A user can be created by running `psql postgres -h localhost` and enterring:
+```
+CREATE USER <username>;
+ALTER USER <username> WITH PASSWORD '<mypassword>';
+```
+
+On Linux systems it may be necessary to edit the `pg_hba.conf` temp file used by the Database Service to allow
+logging in without a password long enough to create a user and assign a password. 
+Assuming the Database Service is running (after running `csw-services start`), edit `/tmp/pg_hba.conf*.tmp`
+and replace `password` with `trust`. Then get the process id of the postgres process and send it the HUP signal:
+```
+ps auwx | grep postgres
+kill -HUP <postgresPid>
+```
+After that you should be able to use the above psql command to login and create a user.
+
+On MacOS, when Postgres is installed with `brew`, a Postgres user with your user name is automatically created.
+@@@
+
 Once the PostgreSQL database is up and running, the Database Service can be used to connect and access data. It is assumed that there
 will be more than one user type registered with PostgreSQL i.e. for read access, for write access, for admin access, etc.
 

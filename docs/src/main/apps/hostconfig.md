@@ -1,10 +1,9 @@
 # csw-host-config
 
 This is just a helper to create a host configuration application.
-A component/subsystem can create their own host configuration application using this helper;
-to be more precise, every Github repository should have one host configuration application.
-The reason for having one app per repo is, when you run `universal:publish` task,
-it will generate a zip file which will be self contained (will have all the required dependencies) and can be deployed independently on any machine.
+A component/subsystem developer can create a custom host configuration application using this helper.
+To be more precise, every Github repository should have one host configuration application.
+The reason for having one application per repo is that it will have all the required dependencies and can be deployed independently on any machine.
 
 This application will start multiple containers on a given host machine and each container will have single/multiple components.
 
@@ -18,7 +17,7 @@ Java
 
 @@@ note
 
-It is not necessary to have the name of the application as HostConfigApp/JHostConfigApp, the user can choose this name.
+It is not necessary to have the name of the application be HostConfigApp/ or JHostConfigApp: The user can choose the name.
 
 @@@
 
