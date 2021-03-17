@@ -9,7 +9,7 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 
 class JMetadataTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach with TripleEqualsSupport {
 
-  test("should be able to get value from metadata for given key with Java APIs | CSW-108") {
+  test("should be able to get value from metadata for given key with Java APIs | CSW-108, CSW-133") {
     val customKey = "customKey1"
     val value     = "value1"
     val metadata  = Metadata().add(customKey, value)
@@ -19,6 +19,7 @@ class JMetadataTest extends AnyFunSuite with Matchers with BeforeAndAfterAll wit
     metadata.jGet("invalidKey").isEmpty should ===(true)
     metadata.jGetAgentPrefix.isEmpty should ===(true)
     metadata.jGetPid.isEmpty should ===(true)
+    metadata.jGetSequenceComponentPrefix.isEmpty should ===(true)
   }
 
   test("should be able to get pid from metadata| CSW-108") {
@@ -34,5 +35,13 @@ class JMetadataTest extends AnyFunSuite with Matchers with BeforeAndAfterAll wit
     val metadata = Metadata().withAgentPrefix(agentPrefix)
 
     metadata.jGetAgentPrefix.get() should ===(agentPrefix)
+  }
+
+  test("should be able to get sequence component prefix from metadata| CSW-133") {
+    val sequenceComponentPrefix = Prefix(ESW, "comp1")
+
+    val metadata = Metadata().withSequenceComponentPrefix(sequenceComponentPrefix)
+
+    metadata.jGetSequenceComponentPrefix.get() should ===(sequenceComponentPrefix)
   }
 }
