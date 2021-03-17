@@ -53,7 +53,7 @@ class MetadataTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with
     metadata.getPid.get should ===(pid)
   }
 
-  test("should return None from metadata for invalid keys | CSW-108") {
+  test("should return None from metadata for invalid keys | CSW-108, CSW-133") {
     val customKey = "customKey1"
     val value     = "value1"
     val metadata  = Metadata().add(customKey, value)
@@ -61,5 +61,15 @@ class MetadataTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with
     metadata.get("invalidKey") should ===(None)
     metadata.getAgentPrefix should ===(None)
     metadata.getPid should ===(None)
+    metadata.getSequenceComponentPrefix should ===(None)
+  }
+
+  test("should be able to create metadata with sequence component prefix | CSW-133") {
+    val sequenceComponentPrefix = Prefix(ESW, "seqcomp1")
+
+    val metadata = Metadata().withSequenceComponentPrefix(sequenceComponentPrefix)
+
+    metadata.value should ===(Map("sequenceComponentPrefix" -> sequenceComponentPrefix.toString))
+    metadata.getSequenceComponentPrefix should ===(Some(sequenceComponentPrefix))
   }
 }
