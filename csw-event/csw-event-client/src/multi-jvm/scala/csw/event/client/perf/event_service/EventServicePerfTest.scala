@@ -9,6 +9,7 @@ import com.typesafe.config.ConfigFactory
 import csw.event.client.perf.BasePerfSuite
 import csw.event.client.perf.commons.{EventsSetting, PerfPublisher, PerfSubscriber}
 import csw.event.client.perf.reporter._
+import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.prefix.models.Prefix
 
 import scala.collection.immutable
@@ -46,7 +47,7 @@ class EventServicePerfTest extends BasePerfSuite(EventServiceMultiNodeConfig) {
 
   import testConfigs._
   import testWiring._
-
+  LoggingSystemFactory.forTestingOnly()(actorSystem)
   var publisherNodes: immutable.Seq[RoleName]  = roles.take(roles.size / 2)
   var subscriberNodes: immutable.Seq[RoleName] = roles.takeRight(roles.size / 2)
 

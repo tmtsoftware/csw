@@ -268,8 +268,7 @@ object Dependencies {
       Libs.`embedded-redis`           % Test,
       Libs.`embedded-kafka`           % Test,
       Libs.`testng-6-7`               % Test,
-      Esw.`esw-gateway-api`           % Test,
-      Esw.`esw-testkit`               % Test
+      Esw.`esw-gateway-api`           % Test
     )
   )
 

@@ -6,7 +6,6 @@ import java.util.concurrent.{ExecutorService, Executors}
 
 import akka.Done
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.actor.typed.scaladsl.adapter._
 import akka.remote.testkit.{MultiNodeConfig, MultiNodeSpec, MultiNodeSpecCallbacks}
 import akka.testkit.ImplicitSender
 import csw.event.api.scaladsl.{EventPublisher, EventSubscriber}
@@ -33,9 +32,9 @@ class BasePerfSuite(config: MultiNodeConfig)
     with SystemMonitoringSupport
     with BeforeAndAfterAll {
 
-  private val typedSystem = ActorSystem(SpawnProtocol(),"typed-actor-system")
-  val testConfigs = new TestConfigs(system.settings.config)
-  val testWiring  = new TestWiring(typedSystem)
+  private val typedSystem = ActorSystem(SpawnProtocol(), "typed-actor-system")
+  val testConfigs         = new TestConfigs(system.settings.config)
+  val testWiring          = new TestWiring(typedSystem)
 
   import testWiring._
 
@@ -49,7 +48,7 @@ class BasePerfSuite(config: MultiNodeConfig)
   var latencyPlots: LatencyPlots               = LatencyPlots()
   var initialLatencyPlots: InitialLatencyPlots = InitialLatencyPlots()
 
-  val defaultTimeout: Duration   = 1.minute
+  val defaultTimeout: Duration   = 30.minute
   val maxTimeout: FiniteDuration = 1.hour
 
   override def initialParticipants: Int = roles.size
