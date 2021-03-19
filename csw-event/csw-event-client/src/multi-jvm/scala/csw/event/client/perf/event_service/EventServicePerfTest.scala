@@ -193,7 +193,7 @@ class EventServicePerfTest extends BasePerfSuite(EventServiceMultiNodeConfig) {
   for (scenario <- scenarios) {
     val scenarioName = scenario.name
     for (currentTest <- scenario.testSettings)
-      test(s"Perf results must be great for ${currentTest.testName} with payloadSize = ${currentTest.payloadSize}") {
+      ignore(s"Perf results must be great for ${currentTest.testName} with payloadSize = ${currentTest.payloadSize}") {
         testScenario(scenarioName, currentTest)
       }
   }

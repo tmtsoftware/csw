@@ -68,9 +68,9 @@ class Scenarios(testConfigs: TestConfigs) {
 //        singlePublisher = false
 //      ),
       TestSettings(
-        testName = "tcs.size_512_200000_messages",
-        totalTestMsgs = adjustedTotalMessages(200000),
-        payloadSize = 512,
+        testName = "tcs.size_128_100000_messages",
+        totalTestMsgs = adjustedTotalMessages(100000),
+        payloadSize = 128,
         publisherSubscriberPairs = 10,
         singlePublisher = false
       )

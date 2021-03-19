@@ -37,7 +37,7 @@ class PerfSubscriber(
   private val subscriber: EventSubscriber =
     if (testConfigs.shareConnection) sharedSubscriber else testWiring.subscriber
 
-  private lazy val ocsGatewayClient = new GatewayClient("172.31.57.227", 8090, subId)
+  private lazy val ocsGatewayClient = new GatewayClient(subId)
 
   val histogram: Histogram   = new Histogram(SECONDS.toNanos(10), 3)
   private val resultReporter = new ResultReporter(prefix.toString, actorSystem)
