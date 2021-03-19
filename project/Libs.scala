@@ -129,6 +129,6 @@ object MSocket {
 
 object Esw {
   val Org     = "com.github.tmtsoftware.esw"
-  val Version = "0.1.0-SNAPSHOT"
+  val Version = "d57dcc3eab6"
   val `esw-gateway-api` = Org %% "esw-gateway-api" % Version
 }
