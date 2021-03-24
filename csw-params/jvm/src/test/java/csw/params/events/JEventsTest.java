@@ -68,6 +68,8 @@ public class JEventsTest extends JUnitSuite {
 
         // parameter
         Assert.assertEquals(epochStringParam, event.parameter(epochStringKey));
+        Exception ex = Assert.assertThrows(NoSuchElementException.class, () -> event.parameter(notUsedKey));
+        Assert.assertEquals(ex.getMessage(), "Parameter set does not contain key: "+notUsedKey.keyName());
 
         // jMissingKeys
         var expectedMissingKeys = Set.of(notUsedKey.keyName());

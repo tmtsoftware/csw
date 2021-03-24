@@ -1,9 +1,9 @@
 package csw.params.core.generics
 
 import java.util
-
 import csw.params.extensions.OptionConverters.RichOption
 
+import java.util.NoSuchElementException
 import scala.annotation.varargs
 import scala.jdk.CollectionConverters._
 
@@ -135,7 +135,7 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] { self: T =>
    * @tparam S the Scala value type
    * @return the parameter associated with the Key or a NoSuchElementException if the key does not exist
    */
-  final def apply[S](key: Key[S]): Parameter[S] = get(key).get
+  final def apply[S](key: Key[S]): Parameter[S] = getWithExceptionMessage(key)
 
   /**
    * Returns the actual parameter associated with a key
@@ -144,7 +144,10 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] { self: T =>
    * @tparam S the Scala value type
    * @return the parameter associated with the key or a NoSuchElementException if the key does not exist
    */
-  final def parameter[S](key: Key[S]): Parameter[S] = get(key).get
+  final def parameter[S](key: Key[S]): Parameter[S] = getWithExceptionMessage(key)
+
+  private def getWithExceptionMessage[S](key: Key[S]): Parameter[S] =
+    get(key).getOrElse(throw new NoSuchElementException(s"Parameter set does not contain key: ${key.keyName}"))
 
   /**
    * Returns true if the key exists in the parameter set

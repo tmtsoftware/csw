@@ -31,7 +31,7 @@ object Dependencies {
       AkkaHttp.`akka-http-spray-json`, // akka-cluster-management uses lower version, to avoid conflict, this needs to be overridden
       MSocket.`msocket-http`,
       Libs.`scalatest`.value          % Test,
-      Libs.`junit-4-12`               % Test,
+      Libs.`junit-4-13`               % Test,
       Libs.`mockito-scala`            % Test,
       Akka.`akka-actor-testkit-typed` % Test,
       Libs.`jboss-logging`            % Test,
@@ -54,7 +54,7 @@ object Dependencies {
       Libs.`scala-java8-compat`,
       MSocket.`msocket-http`,
       Libs.`scalatest`.value % Test,
-      Libs.`junit-4-12`      % Test
+      Libs.`junit-4-13`      % Test
     )
   )
 
@@ -121,7 +121,7 @@ object Dependencies {
       Libs.`scala-async`,
       Libs.`scala-java8-compat`,
       Libs.`scalatest`.value % Test,
-      Libs.`junit-4-12`      % Test,
+      Libs.`junit-4-13`      % Test,
       Libs.`mockito-scala`   % Test
     )
   )
@@ -156,7 +156,7 @@ object Dependencies {
       Akka.`akka-actor`,
       Akka.`akka-actor-typed`,
       Libs.`scalatest`.value % Test,
-      Libs.`junit-4-12`      % Test,
+      Libs.`junit-4-13`      % Test,
       Borer.`borer-core`.value,
       Libs.`gson` % Test
     )
@@ -183,7 +183,7 @@ object Dependencies {
   val ParamsJvm = Def.setting(
     Seq(
       Libs.`play-json`,
-      Libs.`junit-4-12` % Test
+      Libs.`junit-4-13` % Test
     )
   )
 
@@ -202,7 +202,7 @@ object Dependencies {
       Akka.`akka-actor-testkit-typed` % Test,
       Akka.`akka-stream-testkit`      % Test,
       Libs.`scalatest`.value          % Test,
-      Libs.`junit-4-12`               % Test,
+      Libs.`junit-4-13`               % Test,
       Libs.`mockito-scala`            % Test
     )
   )
@@ -224,7 +224,7 @@ object Dependencies {
       Akka.`akka-actor-testkit-typed` % Test,
       Akka.`akka-stream-testkit`      % Test,
       Libs.`scalatest`.value          % Test,
-      Libs.`junit-4-12`               % Test,
+      Libs.`junit-4-13`               % Test,
       Libs.`mockito-scala`            % Test
     )
   )
@@ -263,7 +263,7 @@ object Dependencies {
       Akka.`akka-multi-node-testkit`  % Test,
       Akka.`akka-actor-testkit-typed` % Test,
       Libs.`scalatest`.value          % Test,
-      Libs.`junit-4-12`               % Test,
+      Libs.`junit-4-13`               % Test,
       Libs.`mockito-scala`            % Test,
       Libs.`embedded-redis`           % Test,
       Libs.`embedded-kafka`           % Test,
@@ -320,7 +320,7 @@ object Dependencies {
       Akka.`akka-stream`,
       Akka.`akka-stream-typed`,
       Libs.`scalatest`.value % Test,
-      Libs.`junit-4-12`      % Test,
+      Libs.`junit-4-13`      % Test,
       Libs.`mockito-scala`   % Test
     )
   )
@@ -355,7 +355,7 @@ object Dependencies {
       //TODO: make this as provided deps
       Libs.`scalatest`.value,
       Libs.`embedded-redis`,
-      Libs.`junit-4-12`,
+      Libs.`junit-4-13`,
       Libs.`mockito-scala`
     )
   )
@@ -364,7 +364,7 @@ object Dependencies {
     Seq(
       Libs.`jna`,
       Libs.`scalatest`.value % Test,
-      Libs.`junit-4-12`      % Test
+      Libs.`junit-4-13`      % Test
     )
   )
 
@@ -389,7 +389,7 @@ object Dependencies {
       Jooq.`jooq-meta`,
       Jooq.`jooq-codegen`,
       Libs.`scalatest`.value % Test,
-      Libs.`junit-4-12`      % Test,
+      Libs.`junit-4-13`      % Test,
       Akka.`akka-actor`      % Test,
       Libs.`otj-pg-embedded` % Test
     )
@@ -486,7 +486,7 @@ object Dependencies {
       AkkaHttp.`akka-http-cors`,
       Akka.`akka-actor-testkit-typed`,
       Libs.`scalatest`.value % Test,
-      Libs.`junit-4-12`      % Test
+      Libs.`junit-4-13`      % Test
     )
   )
 
@@ -504,14 +504,14 @@ object Dependencies {
       Jackson.`jackson-databind`,
       Akka.`akka-actor-testkit-typed`,
       Libs.`scalatest`.value % Test,
-      Libs.`junit-4-12`      % Test
+      Libs.`junit-4-13`      % Test
     )
   )
 
   val Integration = Def.setting(
     Seq(
       Libs.`scalatest`.value,
-      Libs.`junit-4-12`,
+      Libs.`junit-4-13`,
       Libs.`mockito-scala`,
       Akka.`akka-actor`,
       Akka.`akka-actor-typed`,
