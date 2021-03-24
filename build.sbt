@@ -492,7 +492,7 @@ lazy val `csw-time-core` = crossProject(JSPlatform, JVMPlatform)
   .dependsOn(`csw-time-clock`)
   .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
   .jsSettings(jsTestArg)
-  .jvmSettings(libraryDependencies += Libs.`junit-4-12` % Test)
+  .jvmSettings(libraryDependencies += Libs.`junit-4-13` % Test)
   .settings(
     libraryDependencies += Libs.`scalatest`.value % Test,
     fork := false
