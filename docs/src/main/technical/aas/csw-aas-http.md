@@ -26,7 +26,7 @@ When request comes to secure akka http server, it performs following steps.
 - Authentication 
 
 Authentication involves token verification and decoding. Secure http endpoints expect access token to be provided in request header. 
-For verification, it uses api provided by keycloak-adapter-core. For decoding csw-aas-http uses third party library - [jwt-play-json](https://github.com/pauldijou/jwt-scala).
+For verification, it uses api provided by keycloak-adapter-core. For decoding csw-aas-http uses third party library - [jwt-core](https://github.com/jwt-scala/jwt-scala).
 Authentication process verifies access token string and decode 
 it into `AccessToken` domain model. 
 
