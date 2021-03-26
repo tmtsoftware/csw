@@ -460,7 +460,6 @@ lazy val `csw-alarm-cli` = project
   )
   .enablePlugins(CswBuildInfo, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.AlarmCli.value)
-  .settings(fork := false) // fixme: CLIAppTest fails when fork = true
 
 /* ================= Time Service ============== */
 
