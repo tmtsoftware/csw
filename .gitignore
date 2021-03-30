@@ -39,3 +39,4 @@ shared/.jvm
 bin/
 *.rdb
 .bloop
+metals.sbt
