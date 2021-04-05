@@ -21,9 +21,9 @@ object AutoMultiJvm extends AutoPlugin {
 
   override def projectSettings: Seq[Setting[_]] =
     SbtMultiJvm.multiJvmSettings ++ Seq(
-      multiNodeHosts in MultiJvm := multiNodeHostNames,
-      scalatestOptions in MultiJvm ++= reporterOptions,
-      assemblyMergeStrategy in assembly in MultiJvm := {
+      MultiJvm / multiNodeHosts := multiNodeHostNames,
+      MultiJvm / scalatestOptions ++= reporterOptions,
+      MultiJvm / assembly / assemblyMergeStrategy := {
         case "application.conf"                            => reverseConcat
         case x if x.contains("versions.properties")        => MergeStrategy.discard
         case x if x.contains("mailcap.default")            => MergeStrategy.last
@@ -32,7 +32,7 @@ object AutoMultiJvm extends AutoPlugin {
         case x if x.contains("ScalaTestBundle.properties") => MergeStrategy.concat
         case x if x.contains("version.conf")               => MergeStrategy.first
         case x =>
-          val oldStrategy = (assemblyMergeStrategy in assembly in MultiJvm).value
+          val oldStrategy = (MultiJvm / assembly / assemblyMergeStrategy).value
           oldStrategy(x)
       }
     )

@@ -473,7 +473,7 @@ lazy val `csw-time` = project
     `csw-time-scheduler`
   )
   .settings(
-    aggregate in test := !sys.props.contains("disableTimeTests")
+    test / aggregate := !sys.props.contains("disableTimeTests")
   )
 
 lazy val `csw-time-clock` = crossProject(JSPlatform, JVMPlatform)

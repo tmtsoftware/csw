@@ -20,7 +20,7 @@ object Common {
     else Seq(Tests.Argument("-oDF"))
 
   val MaybeCoverage: Plugins = if (enableCoverage) Coverage else Plugins.empty
-  val jsTestArg              = testOptions in Test := Seq(Tests.Argument("-oDF"))
+  val jsTestArg              = Test / testOptions := Seq(Tests.Argument("-oDF"))
 
   lazy val CommonSettings: Seq[Setting[_]] = Seq(
     docsRepo := "https://github.com/tmtsoftware/tmtsoftware.github.io.git",
@@ -52,10 +52,10 @@ object Common {
       "-Xasync"
       // -Y options are rarely needed, please look for -W equivalents
     ),
-    javacOptions in (Compile, doc) ++= Seq("-Xdoclint:none"),
-    javacOptions in doc ++= Seq("--ignore-source-errors"),
-    testOptions in Test ++= reporterOptions,
-    publishArtifact in (Test, packageBin) := true,
+    Compile /  doc / javacOptions ++= Seq("-Xdoclint:none"),
+    doc / javacOptions ++= Seq("--ignore-source-errors"),
+    Test / testOptions ++= reporterOptions,
+    Test / packageBin / publishArtifact := true,
     version := {
       sys.props.get("prod.publish") match {
         case Some("true") => version.value
@@ -64,7 +64,7 @@ object Common {
     },
     isSnapshot := !sys.props.get("prod.publish").contains("true"),
     fork := true,
-    javaOptions in Test ++= Seq("-Dakka.actor.serialize-messages=on"),
+    Test / javaOptions ++= Seq("-Dakka.actor.serialize-messages=on"),
     autoCompilerPlugins := true,
     cancelable in Global := true, // allow ongoing test(or any task) to cancel with ctrl + c and still remain inside sbt
     scalafmtOnCompile := true,
