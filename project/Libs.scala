@@ -48,9 +48,9 @@ object Libs {
   val httpclient          = "org.apache.httpcomponents"     % "httpclient"      % "4.5.13"
   val `jboss-logging`     = "org.jboss.logging"             % "jboss-logging"   % "3.4.1.Final"
   val `config`            = "com.typesafe"                  % "config"          % "1.4.1"
-  val `os-lib`            = "com.lihaoyi"                  %% "os-lib"          % "0.7.3"
+  val `os-lib`            = "com.lihaoyi"                  %% "os-lib"          % "0.7.4"
   val `caffeine`          = "com.github.ben-manes.caffeine" % "caffeine"        % "3.0.1"
-  val netty               = "io.netty"                      % "netty-all"       % "4.1.61.Final"
+  val netty               = "io.netty"                      % "netty-all"       % "4.1.63.Final"
   val `case-app`          = "com.github.alexarchambault"   %% "case-app"        % "2.0.4"
   val `tmt-test-reporter` = "com.github.tmtsoftware"       %% "rtm"             % "fecc848abf7"
 }
@@ -120,7 +120,7 @@ object Jooq {
 }
 
 object MSocket {
-  val Version = "95b8cf2"
+  val Version = "6f42d41"
 
   val `msocket-api`      = dep("com.github.tmtsoftware.msocket" %%% "msocket-api" % Version)
   val `msocket-security` = "com.github.tmtsoftware.msocket" %% "msocket-security" % Version
