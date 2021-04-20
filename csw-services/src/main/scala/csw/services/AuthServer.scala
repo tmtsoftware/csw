@@ -2,6 +2,7 @@ package csw.services
 
 import csw.aas.core.deployment.AuthServiceLocation
 import csw.location.api.scaladsl.LocationService
+import csw.prefix.models.Subsystem
 import csw.services.internal.FutureExt._
 import csw.services.internal.{ManagedService, Settings}
 import org.tmt.embedded_keycloak.KeycloakData.{ApplicationUser, Client, Realm}
@@ -18,6 +19,8 @@ class AuthServer(locationService: LocationService, settings: Settings)(implicit 
   private val configAdminRole  = "config-admin"
   private val personRole       = "person-role"
   private val exampleAdminRole = "example-admin-role"
+  private val oswUserRoles: Set[String] =
+    Subsystem.values.map(subsystem => s"${subsystem.name.toLowerCase}-user").toSet + "osw-user"
 
   private val `csw-config-cli` = Client(
     "tmt-frontend-app",
@@ -38,6 +41,12 @@ class AuthServer(locationService: LocationService, settings: Settings)(implicit 
     realmRoles = Set("esw-user", configAdminRole)
   )
 
+  private val testUser1: ApplicationUser = ApplicationUser(
+    username = "test-user1",
+    password = "test-user1",
+    realmRoles = oswUserRoles
+  )
+
   private val applicationUser: ApplicationUser = ApplicationUser(
     "dummy-user",
     "dummy-user",
@@ -55,8 +64,8 @@ class AuthServer(locationService: LocationService, settings: Settings)(implicit 
         Realm(
           "TMT",
           clients = Set(`csw-config-cli`),
-          users = Set(eswUser, configAdminUser, configUser, applicationUser),
-          realmRoles = Set(configAdminRole, personRole, exampleAdminRole, "esw-user")
+          users = Set(eswUser, configAdminUser, configUser, applicationUser, testUser1),
+          realmRoles = Set(configAdminRole, personRole, exampleAdminRole) ++ oswUserRoles
         )
       )
     )
