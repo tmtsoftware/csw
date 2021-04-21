@@ -47,6 +47,12 @@ class AuthServer(locationService: LocationService, settings: Settings)(implicit 
     realmRoles = oswUserRoles
   )
 
+  private val irisUser1: ApplicationUser = ApplicationUser(
+    "iris-user1",
+    "iris-user1",
+    realmRoles = Set("iris-user")
+  )
+
   private val applicationUser: ApplicationUser = ApplicationUser(
     "dummy-user",
     "dummy-user",
@@ -58,13 +64,14 @@ class AuthServer(locationService: LocationService, settings: Settings)(implicit 
     configAdminPassword,
     realmRoles = Set(configAdminRole)
   )
+
   private val embeddedKeycloak = new EmbeddedKeycloak(
     KeycloakData(
       realms = Set(
         Realm(
           "TMT",
           clients = Set(`csw-config-cli`),
-          users = Set(eswUser1, configAdminUser, configUser, applicationUser, oswUser1),
+          users = Set(eswUser1, configAdminUser, configUser, applicationUser, oswUser1, irisUser1),
           realmRoles = Set(configAdminRole, personRole, exampleAdminRole) ++ oswUserRoles
         )
       )
