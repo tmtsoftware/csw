@@ -119,3 +119,21 @@ By default `csw-services` application runs services in the foreground, you can p
 // The below command starts all the services offered by CSW
 sbt "csw-services/run start"
 ```
+
+##Predefined Users:
+Authentication service started using csw-services has predefined users as mentioned below. All have password same as the username.
+
+@@@ note
+
+Authentication service started using csw-services should be used only for testing and shouldn't be used in production.
+
+@@@
+
+| Username | Roles |
+| :---: | --- |
+| osw-user1 | osw-user, All subsystems roles |
+| esw-user1 | esw-user, config-admin |
+| iris-user1 | iris-user |
+| tcs-user1 | tcs-user |
+| wfos-user1 | wfos-user |
+| dummy-user | person-role, example-admin-role |
