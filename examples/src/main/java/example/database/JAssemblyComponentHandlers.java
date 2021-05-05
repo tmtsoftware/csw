@@ -112,6 +112,8 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         ResultQuery<Record> selectQuery = dsl.resultQuery("SELECT id, name FROM films WHERE id = ?", 1);
         CompletableFuture<List<Films>> selectResultF = JooqHelper.fetchAsync(selectQuery, Films.class);
         selectResultF.thenAccept(names -> System.out.println("Fetched names of films " + names));
+        // Alternatively, you can block and wait for the future result to complete:
+        // System.out.println("Fetched names of films " + selectResultF.get());
         //#dsl-fetch
 
         //#dsl-function
