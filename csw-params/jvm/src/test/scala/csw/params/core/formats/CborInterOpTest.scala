@@ -20,10 +20,19 @@ class CborInterOpTest extends AnyFunSuite with Matchers {
 
   test("should decode java Integers to scala ints") {
     val jIntKey: Key[Integer]     = JKeyType.IntKey.make("ints")
-    val param: Parameter[Integer] = jIntKey.setAll(Array(1, 2, 3).map(x => Integer.valueOf(x)))
+    val param: Parameter[Integer] = jIntKey.setAll(Array(1, 2, 3))
     val bytes: Array[Byte]        = Cbor.encode(param).toByteArray
 
     val parsedParam = Cbor.decode(bytes).to[Parameter[Int]].value
+    parsedParam shouldEqual param
+  }
+
+  test("should decode java Characters to scala Chars") {
+    val jCharKey: Key[Character]    = JKeyType.CharKey.make("char")
+    val param: Parameter[Character] = jCharKey.setAll(Array('A', 'B', 'C'))
+    val bytes: Array[Byte]          = Cbor.encode(param).toByteArray
+
+    val parsedParam = Cbor.decode(bytes).to[Parameter[Char]].value
     parsedParam shouldEqual param
   }
 }

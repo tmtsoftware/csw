@@ -44,8 +44,10 @@ trait ParamCodecsBase extends CommonCodecs {
       str => if (str.length == 1) str.charAt(0) else throw new RuntimeException(s"Unable to parse $str, char was expected")
     )
 
-  implicit lazy val charEnc: Encoder[Char] = charCodec.encoder
-  implicit lazy val charDec: Decoder[Char] = charCodec.decoder
+  implicit lazy val charEnc: Encoder[Char]           = charCodec.encoder
+  implicit lazy val charDec: Decoder[Char]           = charCodec.decoder
+  implicit lazy val characterEnc: Encoder[Character] = charCodec.encoder.asInstanceOf[Encoder[Character]]
+  implicit lazy val characterDec: Decoder[Character] = charCodec.decoder.asInstanceOf[Decoder[Character]]
 
   // ************************ Base Type Codecs ********************
   implicit lazy val choiceCodec: Codec[Choice] = deriveCodec

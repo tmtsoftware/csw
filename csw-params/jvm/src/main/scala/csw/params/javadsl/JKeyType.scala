@@ -8,7 +8,9 @@ object JSimpleKeyType {
   import csw.params.core.formats.ParamCodecs.{javaByteArrayDec, javaByteArrayEnc}
 
   case object BooleanKey extends SimpleKeyTypeWithUnits[java.lang.Boolean](NoUnits)
-  case object CharKey    extends SimpleKeyType[java.lang.Character]
+
+  import csw.params.core.formats.ParamCodecs.{characterEnc, characterDec}
+  case object CharKey extends SimpleKeyType[java.lang.Character]
 
   case object ByteKey   extends SimpleKeyType[java.lang.Byte]
   case object ShortKey  extends SimpleKeyType[java.lang.Short]
