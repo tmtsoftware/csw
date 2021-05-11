@@ -2,7 +2,6 @@ package csw.event.client.internal.kafka;
 
 import akka.actor.Cancellable;
 import akka.actor.testkit.typed.javadsl.TestProbe;
-import akka.actor.typed.javadsl.Adapter;
 import akka.stream.javadsl.Source;
 import csw.event.api.exceptions.PublishFailure;
 import csw.event.api.javadsl.IEventPublisher;
@@ -10,7 +9,7 @@ import csw.event.client.helpers.Utils;
 import csw.params.events.Event;
 import csw.time.core.models.TMTTime;
 import csw.time.core.models.UTCTime;
-import net.manub.embeddedkafka.EmbeddedKafka$;
+import io.github.embeddedkafka.EmbeddedKafka$;
 import org.apache.kafka.common.errors.RecordTooLargeException;
 import org.junit.*;
 import org.junit.rules.ExpectedException;

@@ -16,7 +16,7 @@ import csw.location.client.extensions.LocationServiceExt.RichLocationService
 import csw.location.server.http.HTTPLocationServiceOnPorts
 import csw.network.utils.Networks
 import csw.network.utils.SocketUtils.getFreePort
-import net.manub.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
+import io.github.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.StringSerializer
 
