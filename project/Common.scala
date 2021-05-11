@@ -52,7 +52,7 @@ object Common {
       "-Xasync"
       // -Y options are rarely needed, please look for -W equivalents
     ),
-    Compile /  doc / javacOptions ++= Seq("-Xdoclint:none"),
+    Compile / doc / javacOptions ++= Seq("-Xdoclint:none"),
     doc / javacOptions ++= Seq("--ignore-source-errors"),
     Test / testOptions ++= reporterOptions,
     Test / packageBin / publishArtifact := true,
@@ -66,7 +66,7 @@ object Common {
     fork := true,
     Test / javaOptions ++= Seq("-Dakka.actor.serialize-messages=on"),
     autoCompilerPlugins := true,
-    cancelable in Global := true, // allow ongoing test(or any task) to cancel with ctrl + c and still remain inside sbt
+    Global / cancelable := true, // allow ongoing test(or any task) to cancel with ctrl + c and still remain inside sbt
     scalafmtOnCompile := true,
     unidocGenjavadocVersion := "0.17",
     commands += Command.command("openSite") { state =>

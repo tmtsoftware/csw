@@ -14,7 +14,7 @@ import csw.event.client.internal.redis.{InitializationEvent, RedisTestProps}
 import csw.event.client.internal.wiring._
 import csw.params.events.{Event, EventKey}
 import csw.time.core.models.UTCTime
-import net.manub.embeddedkafka.EmbeddedKafka
+import io.github.embeddedkafka.EmbeddedKafka
 import org.scalatest.concurrent.Eventually
 import org.scalatestplus.testng.TestNGSuite
 import org.testng.annotations._
