@@ -67,12 +67,6 @@ pipeline {
                 sh "./integration/scripts/multiple_nic_test.sh"
             }
         }
-
-        stage('Paradox Validate Links') {
-            steps {
-                sh "sbt docs/paradoxValidateLinks"
-            }
-        }
     }
     post {
         always {
@@ -119,5 +113,5 @@ def sendNotification(String buildStatus = 'STARTED') {
         )
     }
 
-    slackSend(channel: "#stil-csw-acceptance", color: colorCode, message: summary)
+    slackSend(channel: "#ci-nightly", color: colorCode, message: summary)
 }
