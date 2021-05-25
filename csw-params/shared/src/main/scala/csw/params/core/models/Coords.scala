@@ -1,12 +1,9 @@
 package csw.params.core.models
-import java.util
-
 import csw.params.core.models.Coords.EqFrame.ICRS
 import csw.params.core.models.Coords._
 import enumeratum._
 
 import scala.collection.immutable
-import scala.jdk.CollectionConverters._
 
 object Coords {
 
@@ -18,19 +15,17 @@ object Coords {
   case class Tag(name: String) {
     override def toString: String = name
   }
-  val BASE                      = Tag("BASE")
-  val OIWFS1                    = Tag("OIWFS1")
-  val OIWFS2                    = Tag("OIWFS2")
-  val OIWFS3                    = Tag("OIWFS3")
-  val OIWFS4                    = Tag("OIWFS4")
-  val ODGW1                     = Tag("ODGW1")
-  val ODGW2                     = Tag("ODGW2")
-  val ODGW3                     = Tag("ODGW3")
-  val ODGW4                     = Tag("ODGW4")
-  val GUIDER1                   = Tag("GUIDER1")
-  val GUIDER2                   = Tag("GUIDER2")
-  val allTags: Set[Tag]         = Set(BASE, OIWFS1, OIWFS2, OIWFS3, OIWFS4, ODGW1, ODGW2, ODGW3, ODGW4, GUIDER1, GUIDER2)
-  val allTagsNames: Set[String] = allTags.map(_.name)
+  val BASE    = Tag("BASE")
+  val OIWFS1  = Tag("OIWFS1")
+  val OIWFS2  = Tag("OIWFS2")
+  val OIWFS3  = Tag("OIWFS3")
+  val OIWFS4  = Tag("OIWFS4")
+  val ODGW1   = Tag("ODGW1")
+  val ODGW2   = Tag("ODGW2")
+  val ODGW3   = Tag("ODGW3")
+  val ODGW4   = Tag("ODGW4")
+  val GUIDER1 = Tag("GUIDER1")
+  val GUIDER2 = Tag("GUIDER2")
 
   sealed trait EqFrame extends EnumEntry
   object EqFrame extends Enum[EqFrame] {
@@ -223,8 +218,6 @@ object JCoords {
   val Uranus: SolarSystemObject  = SolarSystemObject.Uranus
   val Pluto: SolarSystemObject   = SolarSystemObject.Pluto
 
-  def allTags: util.Set[Tag]        = Coords.allTags.asJava
-  def allTagNames: util.Set[String] = Coords.allTagsNames.asJava
 }
 
 object JEqCoord {

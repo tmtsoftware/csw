@@ -16,7 +16,8 @@ class CoordsTests extends AnyFunSpec with Matchers {
   import KeyType._
   import csw.params.core.formats.ParamCodecs._
 
-  private val src = Prefix("esw.ocs.seq")
+  private val src         = Prefix("esw.ocs.seq")
+  private val allTestTags = Set(BASE, OIWFS1, OIWFS2, OIWFS3, OIWFS4, ODGW1, ODGW2, ODGW3, ODGW4, GUIDER1, GUIDER2)
 
   describe("Basic Eq Coordinate Tests") {
 
@@ -182,7 +183,7 @@ class CoordsTests extends AnyFunSpec with Matchers {
       val c2 = EqCoord("12:32:03.1", "45:15:02.22", tag = OIWFS2)
 
       def findAllTags(setup: Setup): Set[Tag] =
-        allTags.flatMap(tag => setup.get(CoordKey.make(tag.name)).map(_ => tag))
+        allTestTags.flatMap(tag => setup.get(CoordKey.make(tag.name)).map(_ => tag))
 
       val obsMode = obsModeKey.set("IRIS LGS Mode 1")
       val setup = Setup(src, CommandName("slewAndFollow"), None).madd(
@@ -225,7 +226,7 @@ class CoordsTests extends AnyFunSpec with Matchers {
 
       // This version looks for tags that are present
       def findAllTags(p: Parameter[Coord]): Set[Tag] =
-        allTags.flatMap(t => findTagInParameter(p, t).map(_ => t))
+        allTestTags.flatMap(t => findTagInParameter(p, t).map(_ => t))
 
       // Small function to extract a specific position
       def findTagInParameter(param: Parameter[Coord], tag: Tag): Option[Coord] = {
