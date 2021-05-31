@@ -46,8 +46,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
             None,
             new SampleComponentBehaviorFactory,
             registrationFactory,
-            cswCtx.copy(compInfo),
-            None
+            cswCtx.copy(compInfo)
           )
         )
     )

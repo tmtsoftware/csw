@@ -57,8 +57,7 @@ private[csw] abstract class FrameworkTestSuite extends AnyFunSuite with Matchers
         cswCtx.currentStatePublisher,
         commandResponseManager,
         componentInfo
-      ),
-      None
+      )
     )
 
     // it creates a supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA

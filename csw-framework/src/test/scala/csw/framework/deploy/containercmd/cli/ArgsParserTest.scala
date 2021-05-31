@@ -1,6 +1,5 @@
 package csw.framework.deploy.containercmd.cli
 
-import csw.prefix.models.Prefix
 import org.scalatest
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.should.Matchers
@@ -29,9 +28,9 @@ class ArgsParserTest extends scalatest.funsuite.AnyFunSuite with Matchers with B
     }
 
   test("should parse arguments when all arguments are provided") {
-    val args                     = Array("--standalone", "--local", inputFilePath, "--agent-prefix", agentPrefix)
+    val args                     = Array("--standalone", "--local", inputFilePath)
     val options: Option[Options] = silentParse(args)
-    options should contain(Options(standalone = true, local = true, Some(Paths.get(inputFilePath)), Some(Prefix(agentPrefix))))
+    options should contain(Options(standalone = true, local = true, Some(Paths.get(inputFilePath))))
   }
 
   test("should parse arguments with default value of false when standalone option is not provided") {
@@ -49,6 +48,6 @@ class ArgsParserTest extends scalatest.funsuite.AnyFunSuite with Matchers with B
   test("should parse arguments with default value of None when agent-prefix option is not provided") {
     val args                     = Array("--standalone", "--local", inputFilePath)
     val options: Option[Options] = silentParse(args)
-    options should contain(Options(standalone = true, local = true, Some(Paths.get(inputFilePath)), None))
+    options should contain(Options(standalone = true, local = true, Some(Paths.get(inputFilePath))))
   }
 }
