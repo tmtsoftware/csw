@@ -19,7 +19,6 @@ import csw.location.api.models.{AkkaRegistration, ComponentId, ComponentType, Me
 import csw.location.api.scaladsl.LocationService
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
-import csw.prefix.models.Prefix
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
@@ -46,20 +45,14 @@ private[framework] final class ContainerBehavior(
     eventServiceFactory: EventServiceFactory,
     alarmServiceFactory: AlarmServiceFactory,
     loggerFactory: LoggerFactory,
-    actorRefResolver: ActorRefResolver,
-    agentPrefix: Option[Prefix]
+    actorRefResolver: ActorRefResolver
 ) extends AbstractBehavior[ContainerActorMessage](ctx) {
 
   import ctx.executionContext
-  private val log: Logger     = loggerFactory.getLogger(ctx)
-  private val containerPrefix = containerInfo.prefix
-  private val akkaConnection  = AkkaConnection(ComponentId(containerPrefix, ComponentType.Container))
-  private val locationMetadata: Metadata =
-    agentPrefix
-      .map(Metadata().withAgentPrefix(_))
-      .getOrElse(Metadata.empty)
-      .withPid(ProcessHandle.current().pid())
-
+  private val log: Logger                = loggerFactory.getLogger(ctx)
+  private val containerPrefix            = containerInfo.prefix
+  private val akkaConnection             = AkkaConnection(ComponentId(containerPrefix, ComponentType.Container))
+  private val locationMetadata: Metadata = Metadata().withPid(ProcessHandle.current().pid())
   private val akkaRegistration: AkkaRegistration =
     registrationFactory.akkaTyped(akkaConnection, ctx.self, locationMetadata)
 
@@ -171,15 +164,7 @@ private[framework] final class ContainerBehavior(
     log.info(s"Container is creating following components :[${componentInfos.map(_.prefix.toString).mkString(", ")}]")
     Future
       .traverse(componentInfos) { ci =>
-        supervisorInfoFactory.make(
-          ctx.self,
-          ci,
-          locationService,
-          eventServiceFactory,
-          alarmServiceFactory,
-          registrationFactory,
-          agentPrefix
-        )
+        supervisorInfoFactory.make(ctx.self, ci, locationService, eventServiceFactory, alarmServiceFactory, registrationFactory)
       }
       .foreach(infos => {
         val infosWithRemoteRefs = infos.flatten(_.map(treatSupervisorRefAsRemote))

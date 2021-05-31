@@ -1,8 +1,8 @@
 package csw.framework.deploy.containercmd.cli
 
 import java.nio.file.Paths
+
 import csw.framework.BuildInfo
-import csw.prefix.models.Prefix
 import scopt.OptionParser
 
 /**
@@ -24,10 +24,6 @@ private[containercmd] class ArgsParser(name: String) {
     arg[String]("<file>").required() action { (x, c) =>
       c.copy(inputFilePath = Some(Paths.get(x)))
     } text "specifies config file path which gets fetched from config service or local file system based on other options"
-
-    opt[String]('a', "agent-prefix") action { (x, c) =>
-      c.copy(agentPrefix = Some(Prefix(x)))
-    } text "Optional: prefix of agent which will spawn container"
 
     help("help")
     version("version")

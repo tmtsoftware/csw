@@ -231,8 +231,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
         currentStatePublisher,
         commandResponseManager,
         hcdInfo
-      ),
-      None
+      )
     )
 
     // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA

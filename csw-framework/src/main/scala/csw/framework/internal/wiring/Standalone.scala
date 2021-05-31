@@ -5,7 +5,6 @@ import csw.command.client.messages.ComponentMessage
 import csw.framework.internal.configparser.ConfigParser
 import csw.framework.internal.supervisor.SupervisorBehaviorFactory
 import csw.framework.models.CswContext
-import csw.prefix.models.Prefix
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Future
@@ -20,14 +19,9 @@ object Standalone {
    *
    * @param config represents the componentInfo data
    * @param wiring represents the class for initializing necessary instances to run a component(s)
-   * @param agentPrefix represents the agent which will spawn the component(s)
    * @return a Future that completes with actor ref of spawned component
    */
-  def spawn(
-      config: com.typesafe.config.Config,
-      wiring: FrameworkWiring,
-      agentPrefix: Option[Prefix] = None
-  ): Future[ActorRef[ComponentMessage]] = {
+  def spawn(config: com.typesafe.config.Config, wiring: FrameworkWiring): Future[ActorRef[ComponentMessage]] = {
     import wiring._
     import actorRuntime._
 
@@ -35,7 +29,7 @@ object Standalone {
     val richSystem    = new CswFrameworkSystem(actorRuntime.actorSystem)
     async {
       val cswCtxF            = CswContext.make(locationService, eventServiceFactory, alarmServiceFactory, componentInfo)(richSystem)
-      val supervisorBehavior = SupervisorBehaviorFactory.make(None, registrationFactory, await(cswCtxF), agentPrefix)
+      val supervisorBehavior = SupervisorBehaviorFactory.make(None, registrationFactory, await(cswCtxF))
       await(richSystem.spawnTyped(supervisorBehavior, componentInfo.prefix.toString))
     }
   }

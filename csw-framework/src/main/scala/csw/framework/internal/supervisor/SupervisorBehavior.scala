@@ -71,24 +71,19 @@ private[framework] final class SupervisorBehavior(
     maybeContainerRef: Option[ActorRef[ContainerIdleMessage]],
     componentBehaviorFactory: ComponentBehaviorFactory,
     registrationFactory: RegistrationFactory,
-    cswCtx: CswContext,
-    agentPrefix: Option[Prefix]
+    cswCtx: CswContext
 ) extends AbstractBehavior[SupervisorMessage](ctx) {
 
   import SupervisorBehavior._
   import cswCtx._
   import ctx.executionContext
 
-  private val log: Logger                    = loggerFactory.getLogger(ctx)
-  private val prefix: Prefix                 = componentInfo.prefix
-  private val componentActorName: String     = s"$prefix-$ComponentActorNameSuffix"
-  private val akkaConnection: AkkaConnection = AkkaConnection(ComponentId(prefix, componentInfo.componentType))
-  private val httpConnection: HttpConnection = HttpConnection(models.ComponentId(prefix, componentInfo.componentType))
-  private val locationMetadata: Metadata =
-    agentPrefix
-      .map(Metadata().withAgentPrefix(_))
-      .getOrElse(Metadata.empty)
-      .withPid(ProcessHandle.current().pid())
+  private val log: Logger                        = loggerFactory.getLogger(ctx)
+  private val prefix: Prefix                     = componentInfo.prefix
+  private val componentActorName: String         = s"$prefix-$ComponentActorNameSuffix"
+  private val akkaConnection: AkkaConnection     = AkkaConnection(ComponentId(prefix, componentInfo.componentType))
+  private val httpConnection: HttpConnection     = HttpConnection(models.ComponentId(prefix, componentInfo.componentType))
+  private val locationMetadata: Metadata         = Metadata().withPid(ProcessHandle.current().pid())
   private val akkaRegistration: AkkaRegistration = registrationFactory.akkaTyped(akkaConnection, ctx.self, locationMetadata)
   private val route: Route                       = CommandServiceRoutesFactory.createRoutes(ctx.self)(ctx.system)
   private val httpService                        = new HttpService(locationService, route, log, httpConnection)(ctx.system)
