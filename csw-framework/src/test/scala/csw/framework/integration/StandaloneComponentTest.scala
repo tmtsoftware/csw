@@ -64,8 +64,10 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
   test(
     "should start a component in standalone mode and register with location service | DEOPSCSW-167, DEOPSCSW-177, DEOPSCSW-216, DEOPSCSW-181, DEOPSCSW-153, DEOPSCSW-180, CSW-132"
   ) {
+    // start component in standalone mode
+    val agentPrefix             = Some(Prefix("TCS.machine1"))
     val wiring: FrameworkWiring = FrameworkWiring.make(standaloneComponentActorSystem, mock[RedisClient])
-    Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring)
+    Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring, agentPrefix)
 
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]("supervisor-lifecycle-state-probe")
     val supervisorStateProbe          = TestProbe[CurrentState]("supervisor-state-probe")
@@ -77,6 +79,7 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
     maybeLocation.isDefined shouldBe true
     val resolvedAkkaLocation = maybeLocation.get
     resolvedAkkaLocation.connection shouldBe akkaConnection
+    resolvedAkkaLocation.metadata.getAgentPrefix shouldBe agentPrefix
 
     val supervisorRef = resolvedAkkaLocation.componentRef
     assertThatSupervisorIsRunning(supervisorRef, supervisorLifecycleStateProbe, 5.seconds)

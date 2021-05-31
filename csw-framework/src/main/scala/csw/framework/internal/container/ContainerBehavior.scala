@@ -15,10 +15,11 @@ import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.models._
 import csw.framework.scaladsl.RegistrationFactory
 import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.models.{AkkaRegistration, ComponentId, ComponentType}
+import csw.location.api.models.{AkkaRegistration, ComponentId, ComponentType, Metadata}
 import csw.location.api.scaladsl.LocationService
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
+import csw.prefix.models.Prefix
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
@@ -45,16 +46,22 @@ private[framework] final class ContainerBehavior(
     eventServiceFactory: EventServiceFactory,
     alarmServiceFactory: AlarmServiceFactory,
     loggerFactory: LoggerFactory,
-    actorRefResolver: ActorRefResolver
+    actorRefResolver: ActorRefResolver,
+    agentPrefix: Option[Prefix]
 ) extends AbstractBehavior[ContainerActorMessage](ctx) {
 
   import ctx.executionContext
   private val log: Logger     = loggerFactory.getLogger(ctx)
   private val containerPrefix = containerInfo.prefix
   private val akkaConnection  = AkkaConnection(ComponentId(containerPrefix, ComponentType.Container))
+  private val locationMetadata: Metadata =
+    agentPrefix
+      .map(Metadata().withAgentPrefix(_))
+      .getOrElse(Metadata.empty)
+      .withPid(ProcessHandle.current().pid())
 
   private val akkaRegistration: AkkaRegistration =
-    registrationFactory.akkaTyped(akkaConnection, ctx.self)
+    registrationFactory.akkaTyped(akkaConnection, ctx.self, locationMetadata)
 
   // Set of successfully created supervisors for components
   var supervisors: Set[SupervisorInfo] = Set.empty
@@ -170,7 +177,8 @@ private[framework] final class ContainerBehavior(
           locationService,
           eventServiceFactory,
           alarmServiceFactory,
-          registrationFactory
+          registrationFactory,
+          agentPrefix
         )
       }
       .foreach(infos => {

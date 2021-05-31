@@ -10,6 +10,7 @@ import csw.framework.models.ContainerInfo
 import csw.framework.scaladsl.RegistrationFactory
 import csw.location.api.scaladsl.LocationService
 import csw.logging.client.scaladsl.LoggerFactory
+import csw.prefix.models.Prefix
 
 /**
  * Factory for creating [[akka.actor.typed.scaladsl.AbstractBehavior]] of a container component
@@ -20,7 +21,8 @@ private[framework] object ContainerBehaviorFactory {
       locationService: LocationService,
       eventServiceFactory: EventServiceFactory,
       alarmServiceFactory: AlarmServiceFactory,
-      registrationFactory: RegistrationFactory
+      registrationFactory: RegistrationFactory,
+      agentPrefix: Option[Prefix]
   ): Behavior[ContainerActorMessage] = {
     val supervisorFactory = new SupervisorInfoFactory(containerInfo.prefix)
     val loggerFactory     = new LoggerFactory(containerInfo.prefix)
@@ -34,7 +36,8 @@ private[framework] object ContainerBehaviorFactory {
         eventServiceFactory,
         alarmServiceFactory,
         loggerFactory,
-        ActorRefResolver(ctx.system)
+        ActorRefResolver(ctx.system),
+        agentPrefix
       )
     )
   }
