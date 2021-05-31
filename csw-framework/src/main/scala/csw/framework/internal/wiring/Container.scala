@@ -5,6 +5,7 @@ import com.typesafe.config.Config
 import csw.command.client.messages.{ContainerActorMessage, ContainerMessage}
 import csw.framework.internal.configparser.ConfigParser
 import csw.framework.internal.container.ContainerBehaviorFactory
+import csw.prefix.models.Prefix
 
 import scala.concurrent.Future
 
@@ -12,7 +13,7 @@ import scala.concurrent.Future
  * Start a container actor in it's own actor system, using the container information provided in a configuration file
  */
 private[csw] object Container {
-  def spawn(config: Config, wiring: FrameworkWiring): Future[ActorRef[ContainerMessage]] = {
+  def spawn(config: Config, wiring: FrameworkWiring, agentPrefix: Option[Prefix] = None): Future[ActorRef[ContainerMessage]] = {
     import wiring._
     val containerInfo = ConfigParser.parseContainer(config)
     val containerBehavior: Behavior[ContainerActorMessage] =
@@ -21,7 +22,8 @@ private[csw] object Container {
         locationService,
         eventServiceFactory,
         alarmServiceFactory,
-        registrationFactory
+        registrationFactory,
+        agentPrefix
       )
     val cswFrameworkSystem = new CswFrameworkSystem(actorSystem)
     cswFrameworkSystem.spawnTyped(containerBehavior, containerInfo.prefix.toString)

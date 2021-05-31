@@ -25,6 +25,7 @@ import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaRegistration, Metadata}
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.client.ActorSystemFactory
+import csw.prefix.models.Prefix
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
@@ -69,7 +70,8 @@ class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar 
           any[LocationService],
           any[EventServiceFactory],
           any[AlarmServiceFactory],
-          any[RegistrationFactory]
+          any[RegistrationFactory],
+          any[Option[Prefix]]
         )
     ).thenAnswer((_: ActorRef[ContainerIdleMessage], ci: ComponentInfo) => answer(ci))
     when(actorRefResolver.resolveActorRef(any[String])).thenReturn(TestProbe().ref)
@@ -97,7 +99,8 @@ class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar 
           eventService,
           alarmService,
           mocks.loggerFactory,
-          actorRefResolver
+          actorRefResolver,
+          None
         )
       )
     )

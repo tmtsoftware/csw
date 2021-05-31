@@ -47,7 +47,7 @@ private[framework] class ContainerCmd(
   def start(args: Array[String]): ActorRef[_] =
     new ArgsParser(name).parse(args.toList) match {
       case None => throw UnableToParseOptions
-      case Some(Options(standalone, isLocal, inputFilePath)) =>
+      case Some(Options(standalone, isLocal, inputFilePath, agentPrefix)) =>
         LocationServerStatus.requireUpLocally()
 
         if (startLogging) wiring.actorRuntime.startLogging(name)
@@ -55,7 +55,7 @@ private[framework] class ContainerCmd(
         log.debug(s"$name started with following arguments [${args.mkString(",")}]")
 
         try {
-          val actorRef = Await.result(createF(standalone, isLocal, inputFilePath, defaultConfig), 30.seconds)
+          val actorRef = Await.result(createF(standalone, isLocal, inputFilePath, defaultConfig, agentPrefix), 30.seconds)
           log.info(s"Component is successfully created with actor actorRef $actorRef")
           actorRef
         }
@@ -72,11 +72,12 @@ private[framework] class ContainerCmd(
       standalone: Boolean,
       isLocal: Boolean,
       inputFilePath: Option[Path],
-      defaultConfig: Option[Config]
+      defaultConfig: Option[Config],
+      agentPrefix: Option[Prefix]
   ): Future[ActorRef[_]] =
     async {
       val config   = await(wiring.configUtils.getConfig(isLocal, inputFilePath, defaultConfig))
-      val actorRef = await(createComponent(standalone, wiring, config))
+      val actorRef = await(createComponent(standalone, wiring, config, agentPrefix))
       log.info(s"Component is successfully created with actor actorRef $actorRef")
       actorRef
     }
@@ -84,10 +85,11 @@ private[framework] class ContainerCmd(
   private def createComponent(
       standalone: Boolean,
       wiring: FrameworkWiring,
-      config: Config
+      config: Config,
+      agentPrefix: Option[Prefix]
   ): Future[ActorRef[_]] =
-    if (standalone) Standalone.spawn(config, wiring)
-    else Container.spawn(config, wiring)
+    if (standalone) Standalone.spawn(config, wiring, agentPrefix)
+    else Container.spawn(config, wiring, agentPrefix)
 
   private def shutdown(): Done = Await.result(wiring.actorRuntime.shutdown(), 10.seconds)
 }

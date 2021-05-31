@@ -41,7 +41,7 @@ private[testkit] object SpawnComponent {
           )
         )
       val supervisorBehavior =
-        SupervisorBehaviorFactory.make(None, frameworkWiring.registrationFactory, behaviorFactory, cswCtx)
+        SupervisorBehaviorFactory.make(None, frameworkWiring.registrationFactory, behaviorFactory, cswCtx, None)
 
       await(richSystem.spawnTyped(supervisorBehavior, componentInfo.prefix.toString))
     }
