@@ -5,7 +5,6 @@ import akka.actor.typed.{ActorRef, Behavior}
 import csw.command.client.messages.{ComponentMessage, ContainerIdleMessage, SupervisorMessage}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, RegistrationFactory}
-import csw.prefix.models.Prefix
 
 /**
  * The factory for creating [[akka.actor.typed.scaladsl.AbstractBehavior]] of the supervisor of a component
@@ -15,8 +14,7 @@ private[csw] object SupervisorBehaviorFactory {
   def make(
       containerRef: Option[ActorRef[ContainerIdleMessage]],
       registrationFactory: RegistrationFactory,
-      cswCtx: CswContext,
-      agentPrefix: Option[Prefix]
+      cswCtx: CswContext
   ): Behavior[ComponentMessage] = {
     val componentWiringClass = Class.forName(cswCtx.componentInfo.behaviorFactoryClassName)
     val componentBehaviorFactory =
@@ -26,8 +24,7 @@ private[csw] object SupervisorBehaviorFactory {
       containerRef,
       registrationFactory,
       componentBehaviorFactory,
-      cswCtx,
-      agentPrefix
+      cswCtx
     )
   }
 
@@ -36,22 +33,13 @@ private[csw] object SupervisorBehaviorFactory {
       containerRef: Option[ActorRef[ContainerIdleMessage]],
       registrationFactory: RegistrationFactory,
       componentBehaviorFactory: ComponentBehaviorFactory,
-      cswCtx: CswContext,
-      agentPrefix: Option[Prefix]
+      cswCtx: CswContext
   ): Behavior[ComponentMessage] = {
     Behaviors
       .withTimers[SupervisorMessage](timerScheduler =>
         Behaviors
           .setup[SupervisorMessage](ctx =>
-            new SupervisorBehavior(
-              ctx,
-              timerScheduler,
-              containerRef,
-              componentBehaviorFactory,
-              registrationFactory,
-              cswCtx,
-              agentPrefix
-            )
+            new SupervisorBehavior(ctx, timerScheduler, containerRef, componentBehaviorFactory, registrationFactory, cswCtx)
           )
       )
       .narrow

@@ -1,7 +1,5 @@
 package csw.framework.deploy.containercmd.cli
 
-import csw.prefix.models.Prefix
-
 import java.nio.file.Path
 
 /**
@@ -15,6 +13,5 @@ import java.nio.file.Path
 private[containercmd] case class Options(
     standalone: Boolean = false,
     local: Boolean = false,
-    inputFilePath: Option[Path] = None,
-    agentPrefix: Option[Prefix] = None
+    inputFilePath: Option[Path] = None
 )
