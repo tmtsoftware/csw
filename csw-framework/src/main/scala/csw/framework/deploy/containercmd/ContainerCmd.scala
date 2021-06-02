@@ -1,5 +1,7 @@
 package csw.framework.deploy.containercmd
 
+import java.nio.file.Path
+
 import akka.Done
 import akka.actor.typed.ActorRef
 import com.typesafe.config.Config
@@ -11,7 +13,6 @@ import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
 import csw.prefix.models.{Prefix, Subsystem}
 
-import java.nio.file.Path
 import scala.async.Async.{async, await}
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, Future}
@@ -47,7 +48,7 @@ private[framework] class ContainerCmd(
   def start(args: Array[String]): ActorRef[_] =
     new ArgsParser(name).parse(args.toList) match {
       case None => throw UnableToParseOptions
-      case Some(Options(standalone, isLocal, inputFilePath, agentPrefix)) =>
+      case Some(Options(standalone, isLocal, inputFilePath)) =>
         LocationServerStatus.requireUpLocally()
 
         if (startLogging) wiring.actorRuntime.startLogging(name)
@@ -55,7 +56,7 @@ private[framework] class ContainerCmd(
         log.debug(s"$name started with following arguments [${args.mkString(",")}]")
 
         try {
-          val actorRef = Await.result(createF(standalone, isLocal, inputFilePath, defaultConfig, agentPrefix), 30.seconds)
+          val actorRef = Await.result(createF(standalone, isLocal, inputFilePath, defaultConfig), 30.seconds)
           log.info(s"Component is successfully created with actor actorRef $actorRef")
           actorRef
         }
@@ -72,24 +73,18 @@ private[framework] class ContainerCmd(
       standalone: Boolean,
       isLocal: Boolean,
       inputFilePath: Option[Path],
-      defaultConfig: Option[Config],
-      agentPrefix: Option[Prefix]
+      defaultConfig: Option[Config]
   ): Future[ActorRef[_]] =
     async {
       val config   = await(wiring.configUtils.getConfig(isLocal, inputFilePath, defaultConfig))
-      val actorRef = await(createComponent(standalone, wiring, config, agentPrefix))
+      val actorRef = await(createComponent(standalone, wiring, config))
       log.info(s"Component is successfully created with actor actorRef $actorRef")
       actorRef
     }
 
-  private def createComponent(
-      standalone: Boolean,
-      wiring: FrameworkWiring,
-      config: Config,
-      agentPrefix: Option[Prefix]
-  ): Future[ActorRef[_]] =
-    if (standalone) Standalone.spawn(config, wiring, agentPrefix)
-    else Container.spawn(config, wiring, agentPrefix)
+  private def createComponent(standalone: Boolean, wiring: FrameworkWiring, config: Config): Future[ActorRef[_]] =
+    if (standalone) Standalone.spawn(config, wiring)
+    else Container.spawn(config, wiring)
 
   private def shutdown(): Done = Await.result(wiring.actorRuntime.shutdown(), 10.seconds)
 }

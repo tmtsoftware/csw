@@ -18,11 +18,11 @@ import csw.framework.internal.wiring.FrameworkWiring;
 import csw.framework.internal.wiring.Standalone;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.api.javadsl.JComponentType;
+import csw.location.client.ActorSystemFactory;
+import csw.location.client.javadsl.JHttpLocationServiceFactory;
 import csw.location.api.models.AkkaLocation;
 import csw.location.api.models.ComponentId;
 import csw.location.api.models.Connection.AkkaConnection;
-import csw.location.client.ActorSystemFactory;
-import csw.location.client.javadsl.JHttpLocationServiceFactory;
 import csw.location.server.http.JHTTPLocationService;
 import csw.params.commands.CommandIssue;
 import csw.params.commands.CommandResponse;
@@ -37,8 +37,8 @@ import csw.params.core.states.DemandState;
 import csw.params.core.states.StateName;
 import csw.params.javadsl.JKeyType;
 import csw.params.javadsl.JUnits;
-import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
+import csw.prefix.javadsl.JSubsystem;
 import io.lettuce.core.RedisClient;
 import msocket.api.Subscription;
 import org.junit.AfterClass;
@@ -100,7 +100,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
     private static AkkaLocation getLocation() throws Exception {
         RedisClient redisClient = null;
         FrameworkWiring wiring = FrameworkWiring.make(hcdActorSystem, redisClient);
-        Await.result(Standalone.spawn(ConfigFactory.load("aps_hcd_java.conf"), wiring, scala.Option.empty()), new FiniteDuration(5, TimeUnit.SECONDS));
+        Await.result(Standalone.spawn(ConfigFactory.load("aps_hcd_java.conf"), wiring), new FiniteDuration(5, TimeUnit.SECONDS));
 
         AkkaConnection akkaConnection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.IRIS, "Test_Component_Running_Long_Command_Java"), JComponentType.HCD));
         CompletableFuture<Optional<AkkaLocation>> eventualLocation = locationService.resolve(akkaConnection, java.time.Duration.ofSeconds(5));
