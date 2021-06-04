@@ -13,7 +13,7 @@ class CommandServiceStreamRequestHandler(commandService: CommandService)
 
   override def handle(request: CommandServiceStreamRequest): Future[StreamResponse] =
     request match {
-      case QueryFinal(runId, timeout)   => future(commandService.queryFinal(runId)(timeout))
+      case QueryFinal(runId, timeout)   => response(commandService.queryFinal(runId)(timeout))
       case SubscribeCurrentState(names) => stream(commandService.subscribeCurrentState(names))
     }
 }
