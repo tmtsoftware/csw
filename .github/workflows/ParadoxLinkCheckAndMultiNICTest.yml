@@ -1,4 +1,4 @@
-name: Paradox Link Check and Other Tasks
+name: Paradox Link Check and Multi-NIC test
 
 on:
   workflow_dispatch:
