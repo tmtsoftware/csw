@@ -250,16 +250,15 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
   }
 
   private def createAnswers(compStateProbe: TestProbe[CurrentState]): Unit = {
-    initializeAnswer = _ =>
-      Future {
-        // small sleep is required in order for test probe to subscribe for component state and lifecycle state
-        // before component actually gets initialized
-        Thread.sleep(200)
-        compStateProbe.ref ! CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice)))
-      }
+    initializeAnswer = _ => {
+      // small sleep is required in order for test probe to subscribe for component state and lifecycle state
+      // before component actually gets initialized
+      Thread.sleep(200)
+      compStateProbe.ref ! CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice)))
+    }
 
     shutdownAnswer = _ =>
-      Future.successful(compStateProbe.ref ! CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))
+      compStateProbe.ref ! CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice)))
   }
 }
 
