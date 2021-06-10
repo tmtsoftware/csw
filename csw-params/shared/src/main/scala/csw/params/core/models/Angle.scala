@@ -11,7 +11,7 @@ import scala.language.implicitConversions
 /**
  * An wrapper for angle. Normally angle would be stored in double
  * as radians, but this introduces rounding errors.
- * This class stores value in microarc seconds to prevent rounding errors.
+ * This class stores value in microarcseconds to prevent rounding errors.
  * <p>
  * Usage examples:
  * <code>
@@ -55,10 +55,10 @@ case class Angle(uas: Long) extends /*AnyVal with*/ Serializable with Ordered[An
   /** returns angle value in degrees */
   def toDegree: Double = Angle.Uas2D * uas
 
-  /** returns angle value in mili arc seconds */
+  /** returns angle value in milliarcseconds */
   def toMas: Double = uas * 1e-3
 
-  /** returns angle value in arc seconds */
+  /** returns angle value in arcseconds */
   def toArcSec: Double = 1e-6 * uas
 
   /** returns Angle with value normalized between 0 to 2*PI */
@@ -122,9 +122,9 @@ object Angle {
    *
    * @param deSign   signum (ie + or -)
    * @param deDegree declination in degrees
-   * @param deMin    remaining part in arc minutes
-   * @param deSec    remaining part in arc seconds
-   * @return declination in Micro Arc Seconds
+   * @param deMin    remaining part in arcminutes
+   * @param deSec    remaining part in arcseconds
+   * @return declination in microarcseconds
    */
   def parseDe(deSign: String, deDegree: String, deMin: String, deSec: String): Angle = {
     val sign: Int = if ("-".equals(deSign.trim)) -1 else 1
@@ -166,7 +166,7 @@ object Angle {
    * @param raHour ra hours value as String
    * @param raMin ra minutes value as String
    * @param raSec ra seconds value as String
-   * @return result in micro arc seconds
+   * @return result in microarcseconds
    */
   def parseRa(raHour: String, raMin: String, raSec: String): Angle = {
     import java.math.BigDecimal
@@ -358,22 +358,22 @@ object Angle {
   /** multiply to convert radians to degrees */
   val R2D: Double = 1d / D2R
 
-  /** multiply to convert degrees to arc hours */
+  /** multiply to convert degrees to archours */
   val D2H: Double = 1d / 15d
 
-  /** multiply to convert arc hour to degrees */
+  /** multiply to convert archour to degrees */
   val H2D: Double = 1d / D2H
 
-  /** multiply to convert degrees to arc minute */
+  /** multiply to convert degrees to arcminute */
   val D2M: Int = 60
 
-  /** multiply to convert arc minute  to toDegree */
+  /** multiply to convert arcminute  to toDegree */
   val M2D: Double = 1d / D2M
 
-  /** multiply to convert degrees to arc second */
+  /** multiply to convert degrees to arcsecond */
   val D2S: Int = 3600
 
-  /** multiply to convert arc second to toDegree */
+  /** multiply to convert arcsecond to toDegree */
   val S2D: Double = 1d / D2S
 
   /** multiply to convert hours to radians */
@@ -388,52 +388,52 @@ object Angle {
   /** multiply to convert minutes to radians */
   val M2R: Double = 1d / R2M
 
-  /** multiply to convert milli arc seconds to radians */
+  /** multiply to convert milliarcseconds to radians */
   val Mas2R: Double = D2R / 3600000d
 
-  /** multiply to convert micro arc seconds to radians */
+  /** multiply to convert microarcseconds to radians */
   val Uas2R: Double = D2R / 3600000000d
 
-  /** multiply to convert radians to mili arc seconds */
+  /** multiply to convert radians to milliarcseconds */
   val R2Mas: Double = 1d / Mas2R
 
-  /** multiply to convert radians to micro arc seconds */
+  /** multiply to convert radians to microarcseconds */
   val R2Uas: Double = 1d / Uas2R
 
-  /** multiply to convert hours to mili arc seconds */
+  /** multiply to convert hours to milliarcseconds */
   val H2Mas: Int = 15 * 60 * 60 * 1000
 
-  /** multiply to convert time minutes to mili arc seconds */
+  /** multiply to convert time minutes to milliarcseconds */
   val HMin2Mas: Int = 15 * 60 * 1000
 
-  /** multiply to convert time seconds to mili arc seconds */
+  /** multiply to convert time seconds to milliarcseconds */
   val HSec2Mas: Int = 15 * 1000
 
-  /** multiply to convert hours to micro arc seconds */
+  /** multiply to convert hours to microarcseconds */
   val H2Uas: Long = 15L * 60L * 60L * 1000L * 1000L
 
-  /** multiply to convert time minutes to micro arc seconds */
+  /** multiply to convert time minutes to microarcseconds */
   val HMin2Uas: Long = 15L * 60L * 1000L * 1000L
 
-  /** multiply to convert time seconds to micro arc seconds */
+  /** multiply to convert time seconds to microarcseconds */
   val HSec2Uas: Long = 15L * 1000L * 1000L
 
-  /** multiply to convert degrees to mili arc seconds */
+  /** multiply to convert degrees to milliarcseconds */
   val D2Mas: Int = 60 * 60 * 1000
 
-  /** multiply to convert minutes to mili arc seconds */
+  /** multiply to convert minutes to milliarcseconds */
   val M2Mas: Int = 60 * 1000
 
-  /** multiply to convert Seconds to mili arc seconds */
+  /** multiply to convert Seconds to milliarcseconds */
   val S2Mas: Int = 1000
 
-  /** multiply to convert degrees to micro arc seconds */
+  /** multiply to convert degrees to microarcseconds */
   val D2Uas: Long = 60L * 60L * 1000L * 1000L
 
-  /** multiply to convert minutes to micro arc seconds */
+  /** multiply to convert minutes to microarcseconds */
   val M2Uas: Long = 60L * 1000L * 1000L
 
-  /** multiply to convert Seconds to micro arc seconds */
+  /** multiply to convert Seconds to microarcseconds */
   val S2Uas: Long = 1000L * 1000L
 
   /** multiply to convert UAS to degrees */
@@ -445,10 +445,10 @@ object Angle {
   /** multiply to convert UAS to Seconds */
   val Uas2S: Double = 1d / S2Uas
 
-  /** multiply to convert  arc seconds to radians */
+  /** multiply to convert  arcseconds to radians */
   val S2R: Double = D2R / 3600d
 
-  /** multiply to convert radians to  arc seconds */
+  /** multiply to convert radians to arcseconds */
   val R2S: Double = 1d / S2R
 
   /** round circle which marks degrees */
