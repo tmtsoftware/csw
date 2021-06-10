@@ -12,6 +12,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 sh "git checkout $VERSION"
+                sh "git pull"
             }
         }
 
