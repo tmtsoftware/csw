@@ -106,10 +106,10 @@ object Angle {
   implicit def double2angle(d: Double): AngleWrapperDouble = new AngleWrapperDouble(d)
 
   /** returns random angle with value between 0 and 2*PI */
-  def randomRa(): Angle = new Angle((CIRCLE * math.random()).asInstanceOf[Int])
+  def randomRa(): Angle = new Angle((CIRCLE * math.random()).asInstanceOf[Long])
 
   /** returns random angle with value between -PI/2 and + PI/2 */
-  def randomDe(): Angle = new Angle((CIRCLE / 2 * math.random() - CIRCLE / 4).asInstanceOf[Int])
+  def randomDe(): Angle = new Angle((CIRCLE / 2 * math.random() - CIRCLE / 4).asInstanceOf[Long])
 
   /** returns maximal angle from two options */
   def max(a1: Angle, a2: Angle): Angle = if (a1 > a2) a1 else a2
