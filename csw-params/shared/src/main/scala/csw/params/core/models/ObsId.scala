@@ -36,7 +36,7 @@ object ObsId {
         ObsId(ProgramId(Separator.hyphenate(semesterId, programNumber)), obsNumber.toInt)
       case _ =>
         throw new IllegalArgumentException(
-          s"requirement failed: ObsId must form with semesterId, programNumber, observationNumber separated with '${Separator.Hyphen}' ex: 2020A-001-123"
+          s"requirement failed: ObsId must contain semesterId, programNumber, observationNumber, separated with '${Separator.Hyphen}' ex: 2020A-001-123"
         )
     }
 }
