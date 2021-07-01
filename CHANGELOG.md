@@ -9,11 +9,10 @@ The product is in a new repository: [csw](https://github.com/tmtsoftware/csw).
 
 All notable changes to this project will be documented in this file.
 
-## Upcoming version
-
-- Added JDefaultComponentHandlers and DefaultComponentHandlers
+## [CSW v4.0.0]
+- Added `JDefaultComponentHandlers` and `DefaultComponentHandlers` - default component handlers to create assembly or hcd in both scala and java 
 - Removed `allTags` and `allTagNames` method from `Coords` and `JCoords`
-
+  
 ## [CSW v3.0.1] - 2021-01-28
 
 This is patch release over v3.0.0 of the TMT Common Software for project stakeholders.
