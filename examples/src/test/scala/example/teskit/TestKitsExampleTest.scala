@@ -22,7 +22,7 @@ import scala.concurrent.duration.DurationLong
 class TestKitsExampleTest extends AnyFunSuiteLike with BeforeAndAfterAll with Matchers with OptionValues {
 
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
-  InternalLoggerFactory.setDefaultFactory(Slf4JLoggerFactory.INSTANCE)
+  InternalLoggerFactory.setDefaultFactory(InternalLoggerFactory.getDefaultFactory)
 
   //#framework-testkit
   // create instance of framework testkit
