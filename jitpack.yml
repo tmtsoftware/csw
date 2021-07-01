@@ -1,7 +1,7 @@
 jdk:
   - adoptopenjdk11
 before_install:
-  - wget https://repo1.maven.org/maven2/org/scala-sbt/sbt-launch/1.3.13/sbt-launch-1.3.13.jar
+  - wget https://repo1.maven.org/maven2/org/scala-sbt/sbt-launch/1.5.4/sbt-launch-1.5.4.jar
 install:
-  java -Xms2048m -Xmx2048m -XX:ReservedCodeCacheSize=512m -jar sbt-launch-1.3.13.jar -Dsbt.log.noformat=true -Dprod.publish=true clean publishM2
+  java -Xms2048m -Xmx2048m -XX:ReservedCodeCacheSize=512m -jar sbt-launch-1.5.4.jar -Dsbt.log.noformat=true -Dprod.publish=true clean publishM2
 
