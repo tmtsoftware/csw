@@ -1,8 +1,5 @@
 package csw.time.scheduler.api
 
-import java.time.Duration
-import java.util.concurrent.atomic.AtomicInteger
-
 import akka.actor.testkit.typed.scaladsl
 import akka.actor.testkit.typed.scaladsl.{ManualTime, ScalaTestWithActorTestKit}
 import akka.actor.typed
@@ -11,16 +8,17 @@ import akka.actor.typed.{ActorSystem, Scheduler, SpawnProtocol}
 import akka.testkit.TestProbe
 import csw.time.core.models.{TAITime, UTCTime}
 import csw.time.scheduler.TimeServiceSchedulerFactory
+import org.scalatest.funsuite.AnyFunSuiteLike
 
+import java.time.Duration
+import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, ExecutionContext}
-import org.scalatest.funsuite.AnyFunSuiteLike
 
 class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.config) with AnyFunSuiteLike {
 
   private val manualTime                    = ManualTime()(system)
-  private val jitter                        = 10
   private implicit val scheduler: Scheduler = system.scheduler
   private implicit val ec: ExecutionContext = system.executionContext
 
@@ -95,12 +93,8 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
     val cancellable  = timeService.scheduleOnce(startTime)(testProbe.ref ! UTCTime.now())
     val cancellable2 = timeService.scheduleOnce(startTime)(testProbe.ref ! UTCTime.now())
 
-    val utcTime1 = testProbe.expectMessageType[UTCTime]
-    val utcTime2 = testProbe.expectMessageType[UTCTime]
-
-    val expectedTimeSpread = startTime.value.toEpochMilli +- jitter
-    utcTime1.value.toEpochMilli shouldBe expectedTimeSpread
-    utcTime2.value.toEpochMilli shouldBe expectedTimeSpread
+    testProbe.expectMessageType[UTCTime]
+    testProbe.expectMessageType[UTCTime]
 
     cancellable.cancel()
     cancellable2.cancel()
@@ -124,22 +118,20 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
     val buffer: ArrayBuffer[Int] = ArrayBuffer.empty
 
     val atomicInt    = new AtomicInteger(0)
-    val startTime    = UTCTime.now()
-    val offset: Long = 100L // milliseconds
+    val offset: Long = 500L // milliseconds
     val cancellable: Cancellable = timeService.schedulePeriodically(Duration.ofMillis(offset)) {
       buffer += atomicInt.getAndIncrement()
       testProbe.ref ! UTCTime.now()
     }
 
-    val times = testProbe.receiveMessages(6, 590.milli).map { t: UTCTime => t }
+    val times = testProbe.receiveMessages(3, 1400.milli).map { t: UTCTime => t }
 
     cancellable.cancel()
 
     // Verify correct number and values
-    buffer shouldBe ArrayBuffer(0, 1, 2, 3, 4, 5)
+    buffer shouldBe ArrayBuffer(0, 1, 2)
 
-    times.size shouldBe 6
-    buffer.foreach { i => times(i).value.toEpochMilli shouldBe (startTime.value.toEpochMilli + offset * i) +- jitter }
+    times.size shouldBe 3
 
     system.terminate()
     Await.result(system.whenTerminated, 5.seconds)
@@ -160,21 +152,20 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
 
     val atomicInt    = new AtomicInteger(0)
     val startTime    = UTCTime(UTCTime.now().value.plusSeconds(1L))
-    val offset: Long = 100L // milliseconds
+    val offset: Long = 500L // milliseconds
     val cancellable: Cancellable = timeService.schedulePeriodically(startTime, Duration.ofMillis(offset)) {
       buffer += atomicInt.getAndIncrement()
       testProbe.ref ! UTCTime.now()
     }
 
-    val times = testProbe.receiveMessages(6, 1590.milli).map { case t: UTCTime => t }
+    val times = testProbe.receiveMessages(3, 2400.milli).map { case t: UTCTime => t }
 
     cancellable.cancel()
 
     // Verify correct number and values
-    buffer shouldBe ArrayBuffer(0, 1, 2, 3, 4, 5)
+    buffer shouldBe ArrayBuffer(0, 1, 2)
 
-    times.size shouldBe 6
-    buffer.foreach { i => times(i).value.toEpochMilli shouldBe (startTime.value.toEpochMilli + offset * i) +- jitter }
+    times.size shouldBe 3
 
     system.terminate()
     Await.result(system.whenTerminated, 5.seconds)
