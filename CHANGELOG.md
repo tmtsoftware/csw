@@ -12,7 +12,8 @@ All notable changes to this project will be documented in this file.
 ## [CSW v4.0.0]
 - Added `JDefaultComponentHandlers` and `DefaultComponentHandlers` - default component handlers to create assembly or hcd in both scala and java 
 - Removed `allTags` and `allTagNames` method from `Coords` and `JCoords`
-  
+- Updated app name's with `csw` prefix according to `apps.prod.json` in `osw-apps` repo.
+
 ## [CSW v3.0.1] - 2021-01-28
 
 This is patch release over v3.0.0 of the TMT Common Software for project stakeholders.
