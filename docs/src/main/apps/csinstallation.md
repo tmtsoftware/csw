@@ -54,9 +54,9 @@ The command `cs install <app-name>:<version | SHA>` installs an application `<ap
 ### Installing Alarm CLI v2.0.1
 
 ```bash
-// alarm-cli is the name of the application installed
+// csw-alarm-cli is the name of the application installed
 // 2.0.1 is the version of the application to be installed
-cs install alarm-cli:2.0.1
+cs install csw-alarm-cli:2.0.1
 ```
 
 ### Installing Alarm CLI Latest Version
@@ -65,5 +65,5 @@ If version number or SHA not provided in the `install` command, then the latest 
 
 ```bash
 // installs Alarm CLI with latest tagged version
-cs install alarm-cli
+cs install csw-alarm-cli
 ```

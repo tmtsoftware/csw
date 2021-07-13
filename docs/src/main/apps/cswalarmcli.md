@@ -14,15 +14,15 @@ This page assumes that you have already installed and setup @ref:[coursier](csin
 
 @@@
 
-## Install alarm-cli app
+## Install csw-alarm-cli app
 
-Following command creates an executable file named alarm-cli in the default installation directory.
+Following command creates an executable file named csw-alarm-cli in the default installation directory.
 
 ```bash
-cs install alarm-cli:<version | SHA>
+cs install csw-alarm-cli:<version | SHA>
 ```
 
-Note: If you don't provide the version or SHA in above command, `alarm-cli` will be installed with the latest tagged binary of `csw-alarm-cli`
+Note: If you don't provide the version or SHA in above command, `csw-alarm-cli` will be installed with the latest tagged binary of `csw-alarm-cli`
 
 ## Supported Commands
 
@@ -52,7 +52,7 @@ Loads the alarm data in the alarm store
 
 The command below clears the alarm store and loads alarm data to the alarm store from `/path/allAlarms.conf`, which is the path of a local file.
 ```bash
-alarm-cli init /path/allAlarms.conf --local --reset
+csw-alarm-cli init /path/allAlarms.conf --local --reset
 ```
 
 ## list
@@ -69,12 +69,12 @@ will be displayed.
 
 1.  Displays metadata, status and severity of alarm with name `tromboneAxisLowLimitAlarm` of component `trombone` and subsystem `nfiraos`.
     ```bash
-    alarm-cli list --subsystem nfiraos --component trombone --name tromboneAxisLowLimitAlarm
+    csw-alarm-cli list --subsystem nfiraos --component trombone --name tromboneAxisLowLimitAlarm
     ```
 
 2.  Displays metadata and status of all alarms which belong to the `nfiraos` subsystem.
     ```bash
-    alarm-cli list --subsystem nfiraos --metadata --status
+    csw-alarm-cli list --subsystem nfiraos --metadata --status
     ```
 
 ### Operations specific to an alarm
@@ -92,7 +92,7 @@ Sets the acknowledgement status of the alarm to `Acknowledged`
 
 Acknowledge the alarm with name `tromboneAxisLowLimitAlarm` of component `trombone` and subsystem `nfiraos`.
 ```bash
-alarm-cli acknowledge --subsystem nfiraos --component trombone --name tromboneAxisLowLimitAlarm
+csw-alarm-cli acknowledge --subsystem nfiraos --component trombone --name tromboneAxisLowLimitAlarm
 ```
 
 ## unacknowledge
@@ -102,7 +102,7 @@ Sets the acknowledgement status of the alarm to `Unacknowledged`
 
 Unacknowledge the alarm with name `tromboneAxisLowLimitAlarm` of component `trombone` and subsystem `nfiraos`.
 ```bash
-alarm-cli unacknowledge --subsystem nfiraos --component trombone --name tromboneAxisLowLimitAlarm
+csw-alarm-cli unacknowledge --subsystem nfiraos --component trombone --name tromboneAxisLowLimitAlarm
 ```
 
 ## activate
@@ -112,7 +112,7 @@ Sets the activation status of the alarm to `Active`
 
 Sets activation status to `Active` of the alarm with name `tromboneAxisLowLimitAlarm` of component `trombone` and subsystem `nfiraos`.
 ```bash
-alarm-cli activate --subsystem nfiraos --component trombone --name tromboneAxisLowLimitAlarm
+csw-alarm-cli activate --subsystem nfiraos --component trombone --name tromboneAxisLowLimitAlarm
 ```
 
 ## deactivate
@@ -122,7 +122,7 @@ Sets the activation status of the alarm to `Inactive`
 
 Sets activation status to `Inactive` of the alarm with name `tromboneAxisLowLimitAlarm` of component `trombone` and subsystem `nfiraos`.
 ```bash
-alarm-cli inactivate --subsystem nfiraos --component trombone --name tromboneAxisLowLimitAlarm
+csw-alarm-cli inactivate --subsystem nfiraos --component trombone --name tromboneAxisLowLimitAlarm
 ```
 
 ## shelve
@@ -132,7 +132,7 @@ Sets the shelve status of the alarm to `Shelved`
 
 Shelves the alarm with name `tromboneAxisLowLimitAlarm` of component `trombone` and subsystem `nfiraos`.
 ```bash
-alarm-cli shelve --subsystem nfiraos --component trombone --name tromboneAxisLowLimitAlarm
+csw-alarm-cli shelve --subsystem nfiraos --component trombone --name tromboneAxisLowLimitAlarm
 ```
 
 ## unshelve
@@ -142,7 +142,7 @@ Sets the shelve status of the alarm to `Unshelved`
 
 Unshelves the alarm with name `tromboneAxisLowLimitAlarm` of component `trombone` and subsystem `nfiraos`.
 ```bash
-alarm-cli unshelve --subsystem nfiraos --component trombone --name tromboneAxisLowLimitAlarm
+csw-alarm-cli unshelve --subsystem nfiraos --component trombone --name tromboneAxisLowLimitAlarm
 ```
 
 ## reset
@@ -153,7 +153,7 @@ severity of the alarm.
 
 Resets the alarm with name `tromboneAxisLowLimitAlarm` of component `trombone` and subsystem `nfiraos`.
 ```bash
-alarm-cli reset --subsystem nfiraos --component trombone --name tromboneAxisLowLimitAlarm
+csw-alarm-cli reset --subsystem nfiraos --component trombone --name tromboneAxisLowLimitAlarm
 ```
 
 ## severity
@@ -178,12 +178,12 @@ For a single alarm, current severity will be displayed. For a system, subsystem 
 
 1.  Displays the severity of the alarm with name `tromboneAxisLowLimitAlarm` of component `trombone` and subsystem `nfiraos`.
     ```bash
-    alarm-cli severity get --subsystem nfiraos --component trombone --name tromboneAxisLowLimitAlarm
+    csw-alarm-cli severity get --subsystem nfiraos --component trombone --name tromboneAxisLowLimitAlarm
     ```
 
 2.  Displays the aggregated severity of the component with name `trombone` of subsystem `nfiraos`.
     ```bash
-    alarm-cli severity get --subsystem nfiraos --component trombone
+    csw-alarm-cli severity get --subsystem nfiraos --component trombone
     ```
 
 ### set
@@ -199,13 +199,13 @@ Sets the given severity for the specified alarm
 
 1.  Sets `Major` as the severity of the alarm with name `tromboneAxisLowLimitAlarm` of component `trombone` and subsystem `nfiraos`.
     ```bash
-    alarm-cli severity set major --subsystem nfiraos --component trombone --name tromboneAxisLowLimitAlarm
+    csw-alarm-cli severity set major --subsystem nfiraos --component trombone --name tromboneAxisLowLimitAlarm
     ```
 
 2.  Refresh `Major` as the severity of the alarm with name `tromboneAxisLowLimitAlarm` of component `trombone` and subsystem `nfiraos` 
 every 3 seconds.
     ```bash
-    alarm-cli severity set major --subsystem nfiraos --component trombone --name tromboneAxisLowLimitAlarm --refresh
+    csw-alarm-cli severity set major --subsystem nfiraos --component trombone --name tromboneAxisLowLimitAlarm --refresh
     ```
 
 ### subscribe
@@ -226,7 +226,7 @@ For a single alarm, the current severity will be displayed. For system, subsyste
 
 Subscribes to the aggregated severity of a component with name `trombone` and subsystem `nfiraos`.
 ```bash
-alarm-cli severity subscribe --subsystem nfiraos --component trombone
+csw-alarm-cli severity subscribe --subsystem nfiraos --component trombone
 ```
 
 ## health
@@ -252,7 +252,7 @@ For a single alarm, the current health will be displayed. For the system, subsys
 
 1.  Displays the health of the alarm with name `tromboneAxisLowLimitAlarm` of component `trombone` and subsystem `nfiraos`.
     ```bash
-    alarm-cli health get --subsystem nfiraos --component trombone --name tromboneAxisLowLimitAlarm
+    csw-alarm-cli health get --subsystem nfiraos --component trombone --name tromboneAxisLowLimitAlarm
     ```
 
 2.  Displays the aggregated health of the subsystem with name `nfiraos`.
@@ -260,7 +260,7 @@ For a single alarm, the current health will be displayed. For the system, subsys
     //cd to installation directory
     cd /tmt/apps
     
-    ./alarm-cli health get --subsystem nfiraos
+    ./csw-alarm-cli health get --subsystem nfiraos
     ```
 
 ### subscribe
@@ -280,19 +280,19 @@ For a single alarm, current health will be displayed. For the system, subsystem 
 
 Subscribes to the aggregated health of the subsystem with name `nfiraos`.
 ```bash
-alarm-cli health subscribe --subsystem nfiraos --component trombone
+csw-alarm-cli health subscribe --subsystem nfiraos --component trombone
 ```
 
 ## About this application
 
 Prints the help message.
 ```bash
-alarm-cli --help
+csw-alarm-cli --help
 ```
 
 Prints the version of the application.
 ```bash
-alarm-cli --version
+csw-alarm-cli --version
 ```
 
 @@@ note

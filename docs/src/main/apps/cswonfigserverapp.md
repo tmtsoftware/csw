@@ -13,15 +13,15 @@ This page assumes that you have already installed and setup @ref:[coursier](csin
 
 @@@
 
-## Install config-server app
+## Install csw-config-server app
 
-Following command creates an executable file named lconfig-server in the default installation directory.
+Following command creates an executable file named csw-config-server in the default installation directory.
 
 ```bash
-cs install config-server:<version | SHA>
+cs install csw-config-server:<version | SHA>
 ```
 
-Note: If you don't provide the version or SHA in above command, `config-server` will be installed with the latest tagged binary of `csw-config-server`
+Note: If you don't provide the version or SHA in above command, `csw-config-server` will be installed with the latest tagged binary of `csw-config-server`
 
 ## Command line parameter options
 
@@ -34,20 +34,20 @@ Note: If you don't provide the version or SHA in above command, `config-server` 
 
 1.  Start an HTTP server on default port 4000. Initialize the repository if it does not exist and register it with the Location Service.
     ```bash
-    config-server --initRepo
+    csw-config-server --initRepo
     ```  
 
 2.  Start an HTTP server on port 4001. Initialize the repository if it does not exist and register it with the Location Service.     
     ```bash
-    config-server --initRepo --port 4001
+    csw-config-server --initRepo --port 4001
     ```  
 
 3.  Prints help message
     ```bash
-    config-server --help
+    csw-config-server --help
     ```  
 
 4. Prints application version
     ```bash
-    config-server --version
+    csw-config-server --version
     ```

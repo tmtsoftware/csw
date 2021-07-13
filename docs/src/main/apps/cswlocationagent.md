@@ -12,15 +12,15 @@ This page assumes that you have already installed and setup @ref:[coursier](csin
 
 @@@
 
-## Install location-agent app
+## Install csw-location-agent app
 
-Following command creates an executable file named location-agent in the default installation directory.
+Following command creates an executable file named csw-location-agent in the default installation directory.
 
 ```bash
-cs install location-agent:<version | SHA>
+cs install csw-location-agent:<version | SHA>
 ```
 
-Note: If you don't provide the version or SHA in above command, `location-agent` will be installed with the latest tagged binary of `csw-location-agent`
+Note: If you don't provide the version or SHA in above command, `csw-location-agent` will be installed with the latest tagged binary of `csw-location-agent`
 
 ## Command line parameter options
 
@@ -40,37 +40,37 @@ Note: If you don't provide the version or SHA in above command, `location-agent`
  
 1. Application will start a Redis server on port 6379 (the default Redis port) and will register a TcpConnection for it with the Location Service
     ```bash
-    location-agent --prefix "csw.redis" --command "redis-server /usr/local/etc/redis.conf" --port 6379
+    csw-location-agent --prefix "csw.redis" --command "redis-server /usr/local/etc/redis.conf" --port 6379
     ```
  
 2. Application will sleep for 30 seconds. It will be registered as a service named `CSW.foo` on a random port with the Location Service. After the sleep is over in 30 seconds, it will unregister the `CSW.foo` service.
     ```bash
-    location-agent --prefix "CSW.foo" --command "sleep 30"
+    csw-location-agent --prefix "CSW.foo" --command "sleep 30"
     ```
 
 3. Application will start a simple HTTP service on port 8080. This will register `CSW.myHttpServiceAsTcp` as a TCP service with the Location Service.
 
     ```bash
-    location-agent --prefix "CSW.myHttpServiceAsTcp" --command "python -m SimpleHTTPServer 8080" --port 8080
+    csw-location-agent --prefix "CSW.myHttpServiceAsTcp" --command "python -m SimpleHTTPServer 8080" --port 8080
     ```  
 
 4. Application will start a simple HTTP service on port 8080. This will register `CSW.myHttpServiceAsHttp` as a HTTP service with the provided path with the Location Service. It will register its private network ip with the Location Service. 
     ```bash
-    location-agent --prefix "CSW.myHttpServiceAsHttp" --command "python -m SimpleHTTPServer 8080" --port 8080 --http "path"
+    csw-location-agent --prefix "CSW.myHttpServiceAsHttp" --command "python -m SimpleHTTPServer 8080" --port 8080 --http "path"
     ```  
 
 
 5. Application will start a simple HTTP service on port 8080. This will register `CSW.myHttpServiceAsHttp` as a HTTP service with the provided path with the Location Service. It will register its public network ip with the Location Service.
     ```bash
-    location-agent --prefix "CSW.myHttpServiceAsHttp" --command "python -m SimpleHTTPServer 8080" --port 8080 --http "path" --outsideNetwork
+    csw-location-agent --prefix "CSW.myHttpServiceAsHttp" --command "python -m SimpleHTTPServer 8080" --port 8080 --http "path" --outsideNetwork
     ```  
  
 6. Prints help message.
     ```bash
-    location-agent --help
+    csw-location-agent --help
     ```  
 
 7. Prints application version.
     ```bash
-    location-agent --version
+    csw-location-agent --version
     ```  

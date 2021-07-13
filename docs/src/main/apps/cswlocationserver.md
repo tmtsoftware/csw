@@ -12,15 +12,15 @@ This page assumes that you have already installed and setup @ref:[coursier](csin
 
 @@@
 
-## Install location-server app
+## Install csw-location-server app
 
-Following command creates an executable file named location-server in the default installation directory.
+Following command creates an executable file named csw-location-server in the default installation directory.
 
 ```bash
-cs install location-server:<version | SHA>
+cs install csw-location-server:<version | SHA>
 ```
 
-Note: If you don't provide the version or SHA in above command, `location-server` will be installed with the latest tagged binary of `csw-location-server`
+Note: If you don't provide the version or SHA in above command, `csw-location-server` will be installed with the latest tagged binary of `csw-location-server`
 
 Choose appropriate instructions from below based on requirement (i.e. single machine or multiple machines).
  
@@ -38,7 +38,7 @@ Make sure you set all necessary @ref[environment variables](../deployment/env-va
 This command starts the location server
 ```bash
 // run location server
-location-server --clusterPort=3552
+csw-location-server --clusterPort=3552
 ```
 
 ### Starting Location Server on multiple machines
@@ -62,7 +62,7 @@ mode and AAS `disabled`.
    
     ```bash
     // run location server
-    location-server --clusterPort=3552 
+    csw-location-server --clusterPort=3552 
     ```
 
 1.  Run this command on all machines where you want Location Server in `public mode`
@@ -70,7 +70,7 @@ and AAS `enabled`.
 
     ```bash
     // run location server
-    location-server --clusterPort=3552 --outsideNetwork
+    csw-location-server --clusterPort=3552 --outsideNetwork
     ``` `
 
 3.  Once the Akka cluster formation is done, start @ref:[AAS](../services/aas.md) 
@@ -91,12 +91,12 @@ cyclic dependency during startup of `public mode` location-server and AAS(keyclo
 Use the following command to get help on the options available with this app.
 
 ```bash
-   location-server --help
+   csw-location-server --help
 ```
 
 ### Version
 Use the following command to get version information for this app.
   
 ```bash
-   location-server --version
+   csw-location-server --version
 ```
