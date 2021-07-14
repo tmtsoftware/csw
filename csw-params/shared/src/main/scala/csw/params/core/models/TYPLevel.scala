@@ -30,17 +30,17 @@ sealed abstract class TYP(description: String) extends EnumEntry {
 object TYP extends Enum[TYP] {
   override def values: IndexedSeq[TYP] = findValues
 
-  case object SCI extends TYP("Science image")
-  case object CAL extends TYP("A calibration exposure")
-  case object ARC extends TYP("Calibration for wavelength determination")
-  case object IDP extends TYP("Instrumental Dispersion (discuss)")
+  case object SCI extends TYP("Science exposure")
+  case object CAL extends TYP("Calibration exposure")
+  case object ARC extends TYP("Wavelength calibration")
+  case object IDP extends TYP("Instrumental dispersion")
   case object DRK extends TYP("Dark")
-  case object MDK extends TYP("Master Dark")
-  case object FFD extends TYP("Flat Field")
-  case object NFF extends TYP("Normalized Flat Field (discuss)")
+  case object MDK extends TYP("Master dark")
+  case object FFD extends TYP("Flat field")
+  case object NFF extends TYP("Normalized flat field")
   case object BIA extends TYP("Bias exposure")
-  case object TEL extends TYP("Telluric Standard")
-  case object FLX extends TYP("Flux Standard")
+  case object TEL extends TYP("Telluric standard")
+  case object FLX extends TYP("Flux standard")
   case object SKY extends TYP("Sky background exposure")
 }
 

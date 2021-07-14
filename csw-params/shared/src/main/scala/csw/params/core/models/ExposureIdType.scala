@@ -1,21 +1,83 @@
 package csw.params.core.models
 
 import csw.prefix.models.Subsystem
+import csw.time.core.models.UTCTime
 
-sealed trait ExposureIdType
+import java.time.ZoneId
 
-case class ExposureId(obsId: ObsId, subsystem: Subsystem, det: String, typLevel: TYPLevel, exposureNumber: ExposureNumber)
-    extends ExposureIdType {
+sealed trait ExposureId {
+  def obsId: Option[ObsId]
+  def subsystem: Subsystem
+  def det: String
+  def typLevel: TYPLevel
+  def exposureNumber: ExposureNumber
+  def withObsId(obsId: ObsId): ExposureId
+  def withObsId(obsId: String): ExposureId
+}
+
+case class StandaloneExposureId(
+    utcTime: UTCTime,
+    subsystem: Subsystem,
+    det: String,
+    typLevel: TYPLevel,
+    exposureNumber: ExposureNumber
+) extends ExposureId {
+  import java.time.format.DateTimeFormatter
+
+  private val exposureIdPattern = "uMMdd-HHmmss"
+  private val dateTimeFormatter = DateTimeFormatter.ofPattern(exposureIdPattern).withZone(ZoneId.of("UTC"))
+
+  val obsId: Option[ObsId] = None
+
+  def withObsId(obsId: String): ExposureId =
+    ExposureIdWithObsId(Some(ObsId.apply(obsId)), subsystem, det, typLevel, exposureNumber)
+
+  def withObsId(obsId: ObsId): ExposureId =
+    ExposureIdWithObsId(Some(obsId), subsystem, det, typLevel, exposureNumber)
+
+  def atUTC(newUtcTime: UTCTime): StandaloneExposureId =
+    copy(utcTime = newUtcTime)
+
+  def utcAsString: String = dateTimeFormatter.format(utcTime.value)
+
   override def toString: String =
-    Separator.hyphenate(s"$obsId", s"$subsystem", s"$det", s"$typLevel", s"$exposureNumber")
+    Separator.hyphenate(s"$utcAsString", s"$subsystem", s"$det", s"$typLevel", s"$exposureNumber")
+}
+
+case class ExposureIdWithObsId(
+    obsId: Option[ObsId],
+    subsystem: Subsystem,
+    det: String,
+    typLevel: TYPLevel,
+    exposureNumber: ExposureNumber
+) extends ExposureId {
+
+  // Allows creating a new ExposureId with a different ObsId
+  def withObsId(newObsId: String): ExposureId =
+    this.copy(obsId = Some(ObsId.apply(newObsId)))
+
+  def withObsId(newObsId: ObsId): ExposureId =
+    copy(obsId = Some(newObsId))
+
+  override def toString: String =
+    Separator.hyphenate(s"${obsId.get}", s"$subsystem", s"$det", s"$typLevel", s"$exposureNumber")
+
 }
 
 object ExposureId {
   def apply(exposureId: String): ExposureId = {
     exposureId.split(Separator.Hyphen, 7) match {
       case Array(obs1, obs2, obs3, subsystemStr, detStr, typStr, expNumStr) =>
-        ExposureId(
-          ObsId(Separator.hyphenate(obs1, obs2, obs3)),
+        ExposureIdWithObsId(
+          Some(ObsId(Separator.hyphenate(obs1, obs2, obs3))),
+          Subsystem.withNameInsensitive(subsystemStr),
+          detStr,
+          TYPLevel(typStr),
+          ExposureNumber(expNumStr)
+        )
+      case Array(subsystemStr, detStr, typStr, expNumStr) =>
+        StandaloneExposureId(
+          UTCTime.now(),
           Subsystem.withNameInsensitive(subsystemStr),
           detStr,
           TYPLevel(typStr),
@@ -23,39 +85,15 @@ object ExposureId {
         )
       case _ =>
         throw new IllegalArgumentException(
-          s"requirement failed: Invalid exposure Id: ExposureId should be ${Separator.Hyphen} string " +
-            s"composing SemesterId-ProgramNumber-ObservationNumber-Subsystem-DET-TYPLevel-ExposureNumber"
+          s"requirement failed: An ExposureId must be a ${Separator.Hyphen} separated string of the form " +
+            "SemesterId-ProgramNumber-ObservationNumber-Subsystem-DET-TYPLevel-ExposureNumber"
         )
     }
   }
-}
 
-case class StandaloneExposureId(
-    utcTime: String,
-    subsystem: Subsystem,
-    det: String,
-    typLevel: TYPLevel,
-    exposureNumber: ExposureNumber
-) extends ExposureIdType {
-  override def toString: String = Separator.hyphenate(utcTime, s"$subsystem", det, s"$typLevel", s"$exposureNumber")
-}
+  def apply(subsystem: Subsystem, det: String, typLevel: TYPLevel, exposureNumber: ExposureNumber): ExposureId =
+    StandaloneExposureId(UTCTime.now(), subsystem: Subsystem, det: String, typLevel: TYPLevel, exposureNumber: ExposureNumber)
 
-object StandaloneExposureId {
-  def apply(standaloneExposureId: String): StandaloneExposureId = {
-    standaloneExposureId.split(Separator.Hyphen, 6) match {
-      case Array(date, time, subsystem, det, typLevel, exposureNumber) =>
-        StandaloneExposureId(
-          Separator.hyphenate(date, time),
-          Subsystem.withNameInsensitive(subsystem),
-          det,
-          TYPLevel(typLevel),
-          ExposureNumber(exposureNumber)
-        )
-      case _ =>
-        throw new IllegalArgumentException(
-          s"Invalid StandaloneExposureId Id: StandaloneExposureId should be ${Separator.Hyphen} string " +
-            s"composing YYYYMMDD-HHMMSS-Subsystem-DET-TYPLevel-ExposureNumber"
-        )
-    }
-  }
+  def apply(obsId: ObsId, subsystem: Subsystem, det: String, typLevel: TYPLevel, exposureNumber: ExposureNumber): ExposureId =
+    ExposureIdWithObsId(Some(obsId), subsystem: Subsystem, det: String, typLevel: TYPLevel, exposureNumber: ExposureNumber)
 }
