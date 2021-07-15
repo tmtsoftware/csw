@@ -1,7 +1,7 @@
 package csw.params.events
 
-import csw.params.core.generics.KeyType.{BooleanKey, LongKey, StringKey}
-import csw.params.core.models.ObsId
+import csw.params.core.generics.KeyType.{BooleanKey, ChoiceKey, LongKey, StringKey}
+import csw.params.core.models.{Choices, ObsId}
 import csw.prefix.models.Prefix
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
@@ -63,7 +63,7 @@ class OpticalDetectorEventTest extends AnyFunSpec with Matchers {
       observeEvent.paramSet shouldBe Set(
         StringKey.make("detector").set(detector),
         StringKey.make("obsId").set("2020A-001-123"),
-        StringKey.make("operationalState").set("BUSY"),
+        ChoiceKey.make("operationalState", Choices.fromChoices(OperationalState.toChoices: _*)).set("BUSY"),
         StringKey.make("errorMessage").set(""),
         BooleanKey.make("exposureInProgress").set(true),
         BooleanKey.make("abortInProgress").set(false),

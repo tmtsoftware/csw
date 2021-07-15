@@ -1,6 +1,8 @@
 package csw.params.events;
 
 import csw.params.core.generics.Parameter;
+import csw.params.core.models.Choice;
+import csw.params.core.models.Choices;
 import csw.params.core.models.ObsId;
 import csw.params.javadsl.JKeyType;
 import csw.prefix.javadsl.JSubsystem;
@@ -132,7 +134,8 @@ public class JIRDetectorEventTest extends JUnitSuite {
         Parameter<Boolean> abortInProgress = JKeyType.BooleanKey().make("abortInProgress").set(false);
         Parameter<Boolean> isAborted = JKeyType.BooleanKey().make("isAborted").set(true);
         Parameter<String> errorMessage = JKeyType.StringKey().make("errorMessage").set("");
-        Parameter<String> operationalState = JKeyType.StringKey().make("operationalState").set("BUSY");
+        HashSet<Choice> operationalStateChoices = ObserveEventUtil.getOperationalStateChoices();
+        Parameter<Choice> operationalState = JKeyType.ChoiceKey().make("operationalState",  Choices.fromChoices(operationalStateChoices)).set(new Choice(JOperationalState.BUSY().entryName()));
 
         Set<Parameter<?>> paramSet = new HashSet<>(10);
         paramSet.add(obsIdParam);

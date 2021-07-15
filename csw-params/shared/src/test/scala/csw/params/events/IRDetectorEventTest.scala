@@ -1,7 +1,7 @@
 package csw.params.events
 
-import csw.params.core.generics.KeyType.{BooleanKey, IntKey, LongKey, StringKey}
-import csw.params.core.models.ObsId
+import csw.params.core.generics.KeyType.{BooleanKey, ChoiceKey, IntKey, LongKey, StringKey}
+import csw.params.core.models.{Choices, ObsId}
 import csw.prefix.models.Prefix
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
@@ -62,7 +62,7 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
         BooleanKey.make("abortInProgress").set(false),
         BooleanKey.make("isAborted").set(true),
         StringKey.make("errorMessage").set(""),
-        StringKey.make("operationalState").set("BUSY")
+        ChoiceKey.make("operationalState", Choices.fromChoices(OperationalState.toChoices: _*)).set("BUSY")
       )
     }
 

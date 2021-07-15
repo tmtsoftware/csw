@@ -1,6 +1,8 @@
 package csw.params.events;
 
 import csw.params.core.generics.Parameter;
+import csw.params.core.models.Choice;
+import csw.params.core.models.Choices;
 import csw.params.core.models.ObsId;
 import csw.params.javadsl.JKeyType;
 import csw.prefix.javadsl.JSubsystem;
@@ -10,6 +12,8 @@ import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
 
 import java.util.*;
+
+import static csw.params.events.ObserveEventUtil.getOperationalStateChoices;
 
 public class JOpticalDetectorEventTest extends JUnitSuite {
     String sourcePrefix = "ESW.filter.wheel";
@@ -105,7 +109,9 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
         Parameter<Boolean> abortInProgress = JKeyType.BooleanKey().make("abortInProgress").set(false);
         Parameter<Boolean> isAborted = JKeyType.BooleanKey().make("isAborted").set(true);
         Parameter<String> errorMessage = JKeyType.StringKey().make("errorMessage").set("");
-        Parameter<String> operationalState = JKeyType.StringKey().make("operationalState").set("READY");
+        HashSet<Choice> operationalStateChoices = ObserveEventUtil.getOperationalStateChoices();
+        Parameter<Choice> operationalState = JKeyType.ChoiceKey().make("operationalState",  Choices.fromChoices(operationalStateChoices)).set(new Choice(JOperationalState.READY().entryName()));
+
 
         Set<Parameter<?>> paramSet = new HashSet<>(10);
         paramSet.add(obsIdParam);
@@ -117,6 +123,7 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
         paramSet.add(operationalState);
         return paramSet;
     }
+
 
     private Set<Parameter<?>> getParamSetForExposureDataEvent(long exposureTime, long remainingExposureTime) {
         Parameter<String> detectorParam = JKeyType.StringKey().make("detector").set(detector);
