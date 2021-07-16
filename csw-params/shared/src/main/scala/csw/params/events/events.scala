@@ -157,11 +157,6 @@ case class ObserveEvent private[csw] (
     with Event {
 
   /**
-   * A java helper to construct ObserveEvent
-   */
-  def this(source: Prefix, eventName: EventName) = this(Id(), source, eventName, UTCTime.now(), Set.empty)
-
-  /**
    * Create a new ObserveEvent instance when a parameter is added or removed
    *
    * @param data set of parameters

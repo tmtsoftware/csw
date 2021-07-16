@@ -37,22 +37,7 @@ Java
 
 ## Observe Event
 
-ObserveEvent are standardized events used to describe an activities within the data acquisition process. 
-These events are typically published by Science Detector Assemblies, which emit ObserveEvents during their exposures 
-to signal the occurrence of specific activities/actions during the acquisition of data. 
-
-@@@ note
-
-The example ObserveEvents do not match the descriptions of the ESW Phase 1 review. The model files and documents
-can be used to create standard ObserveEvents.
-
-@@@
-
-Scala
-:   @@snip [EventsTest.scala](../../../../examples/src/test/scala/example/params/EventsTest.scala) { #observeevent }
-
-Java
-:   @@snip [JEventsTest.java](../../../../examples/src/test/java/example/params/JEventsTest.java) { #observeevent }
+##TODO Update this section in story ESW-536
 
 
 
