@@ -1,7 +1,5 @@
 package csw.params.events
 
-import csw.params.core.generics.KeyType.{BooleanKey, ChoiceKey, StringKey}
-import csw.params.core.models.{Choices}
 import csw.prefix.models.Prefix
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers

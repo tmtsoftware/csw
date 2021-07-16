@@ -31,59 +31,6 @@ class EventsTest extends AnyFunSpec with Matchers {
 
   // DEOPSCSW-330: Include complex payloads - paramset in Event and ObserveEvent
   describe("Examples of Events") {
-    it("should show usages of ObserveEvent") {
-
-      //#observeevent
-      //keys
-      val k1: Key[Int]    = KeyType.IntKey.make("readoutsCompleted")
-      val k2: Key[Int]    = KeyType.IntKey.make("coaddsCompleted")
-      val k3: Key[String] = KeyType.StringKey.make("fileID")
-      val k4: Key[Int]    = KeyType.IntKey.make("notUsed")
-
-      //prefixes
-      val ck1   = Prefix("iris.ifu.detectorAssembly")
-      val name1 = EventName("readoutEnd")
-      val ck3   = Prefix("wfos.red.detector")
-      val name3 = EventName("exposureStarted")
-
-      //parameters
-      val p1: Parameter[Int]    = k1.set(4)
-      val p2: Parameter[Int]    = k2.set(2)
-      val p3: Parameter[String] = k3.set("WFOS-RED-0001")
-
-      //Create ObserveEvent using madd
-      val se1: ObserveEvent = ObserveEvent(ck1, name1).madd(p1, p2)
-      //Create ObserveEvent using apply
-      val se2: ObserveEvent = ObserveEvent(ck3, name3, Set(p1, p2))
-      //Create ObserveEvent and use add
-      val se3: ObserveEvent = ObserveEvent(ck3, name3).add(p1).add(p2).add(p3)
-
-      //access keys
-      val k1Exists: Boolean = se1.exists(k1) //true
-
-      //access Parameters
-      val p4: Option[Parameter[Int]] = se1.get(k1)
-
-      //access values
-      val v1: Array[Int] = se1(k1).values
-      val v2: Array[Int] = se2.parameter(k2).values
-      //k4 is missing
-      val missingKeys: Set[String] = se3.missingKeys(k1, k2, k3, k4)
-
-      //remove keys
-      val se4: ObserveEvent = se3.remove(k3)
-
-      //#observeevent
-
-      //validations
-      assert(k1Exists === true)
-      assert(p4.get === p1)
-      assert(v1 === p1.values)
-      assert(v2 === p2.values)
-      assert(missingKeys === Set(k4.keyName))
-      assert(se2 != se4)
-    }
-
     // DEOPSCSW-330: Include complex payloads - paramset in Event and ObserveEvent
     it("should show usages of SystemEvent") {
 
@@ -169,7 +116,7 @@ class EventsTest extends AnyFunSpec with Matchers {
       //parameter
       val i1: Parameter[MatrixData[Double]] = k1.set(m1)
       //events
-      val observeEvent: ObserveEvent = ObserveEvent(prefix, name1).add(i1)
+      val observeEvent: ObserveEvent = IRDetectorEvent.observeStart(prefix.toString, ObsId("12324-123-425")).madd(i1)
       val systemEvent: SystemEvent   = SystemEvent(prefix, name1).add(i1)
 
       //json support - write
@@ -265,7 +212,7 @@ class EventsTest extends AnyFunSpec with Matchers {
       val prefix = Prefix("tcs.pk")
       val name   = EventName("targetCoords")
       //events
-      val observeEvent: ObserveEvent = ObserveEvent(prefix, name).add(param)
+      val observeEvent: ObserveEvent = WFSDetectorEvent.publishSuccess(prefix.toString).add(param)
       val systemEvent1: SystemEvent  = SystemEvent(prefix, name).add(param)
       val systemEvent2: SystemEvent  = SystemEvent(prefix, name).add(param)
 

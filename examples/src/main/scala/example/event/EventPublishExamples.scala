@@ -5,7 +5,7 @@ import akka.actor.Cancellable
 import akka.stream.scaladsl.{Keep, Source}
 import csw.params.events._
 import csw.command.client.models.framework.ComponentInfo
-import csw.params.core.models.Id
+import csw.params.core.models.{Id, ObsId}
 import csw.event.api.exceptions.PublishFailure
 import csw.event.api.scaladsl.EventService
 import csw.logging.api.scaladsl.Logger
@@ -54,7 +54,7 @@ class EventPublishExamples(eventService: EventService, log: Logger) {
       def eventGenerator(): Option[Event] =
         baseEvent match {
           case e: SystemEvent  => Some(SystemEvent(e.source, e.eventName, e.paramSet))
-          case e: ObserveEvent => Some(ObserveEvent(e.source, e.eventName, e.paramSet))
+          case e: ObserveEvent => Some(IRDetectorEvent.observeStart(e.source.toString, ObsId("2020A-001-123")))
         }
 
       publisher.publish(eventGenerator(), interval)

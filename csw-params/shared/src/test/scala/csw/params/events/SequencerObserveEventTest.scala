@@ -1,22 +1,19 @@
 package csw.params.events
 
-import csw.commons.RandomUtils.{randomFrom, randomString}
 import csw.params.core.generics.KeyType.StringKey
 import csw.params.core.generics.Parameter
 import csw.params.core.models.{ExposureId, ObsId}
-import csw.prefix.models.{Prefix, Subsystem}
+import csw.prefix.models.Subsystem.ESW
+import csw.prefix.models.{Prefix}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks._
 
 class SequencerObserveEventTest extends AnyFunSpec with Matchers {
   describe("SequencerObserveEvents") {
-    val obsIds = List("2020A-001-123", "2021A-011-153", "2038A-034-193")
-    val exposureIds =
-      List("2020A-001-123-TCS-DET-SCI0-0001", "2022A-001-123-TCS-DET-FFD1-0001", "2021A-001-123-TCS-DET-SCI2-1234")
-    val obsId                         = randomFrom(obsIds)
-    val exposureId                    = randomFrom(exposureIds)
-    val prefix                        = Prefix(randomFrom(Subsystem.values.toList), randomString(5))
+    val obsId                         = "2020A-001-123"
+    val exposureId                    = "2020A-001-123-TCS-DET-SCI0-0001"
+    val prefix                        = Prefix(ESW, "filter.wheel")
     val obsIdParam: Parameter[_]      = ObserveEventKeys.obsId.set(obsId)
     val exposureIdParam: Parameter[_] = ObserveEventKeys.exposureId.set(exposureId)
     val sequencerObserveEvent         = new SequencerObserveEvent(prefix)

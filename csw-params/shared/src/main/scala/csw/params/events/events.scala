@@ -171,7 +171,7 @@ case class ObserveEvent private[csw] (
     copy(eventId = Id(), eventTime = UTCTime.now(), paramSet = data)
 }
 
-object ObserveEvent {
+private[csw] object ObserveEvent {
 
   /**
    * The apply method is used to create ObserveEvent command by end-user. eventId is not accepted and will be created internally to guarantee unique value.
