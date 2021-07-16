@@ -5,8 +5,10 @@ import csw.params.core.formats.JavaJsonSupport;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.MatrixData;
+import csw.params.core.models.ObsId;
 import csw.params.core.models.RaDec;
 import csw.params.events.EventName;
+import csw.params.events.IRDetectorEvent;
 import csw.params.events.ObserveEvent;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
@@ -104,56 +106,6 @@ public class JEventsTest extends JUnitSuite {
     }
 
     @Test
-    public void showUsageOfObserveEvent__DEOPSCSW_331() {
-        //#observeevent
-        //keys
-        Key<Integer> k1 = JKeyType.IntKey().make("readoutsCompleted", JUnits.NoUnits);
-        Key<Integer> k2 = JKeyType.IntKey().make("coaddsCompleted", JUnits.NoUnits);
-        Key<String> k3 = JKeyType.StringKey().make("fileID");
-        Key<Integer> k4 = JKeyType.IntKey().make("notUsed");
-
-        //prefixes
-        Prefix prefix1 = Prefix.apply(JSubsystem.IRIS, "ifu.detectorAssembly");
-        EventName name1 = new EventName("readoutEnd");
-        Prefix prefix2 = Prefix.apply(JSubsystem.WFOS, "red.detector");
-        EventName name2 = new EventName("exposureStarted");
-
-        //parameters
-        Parameter<Integer> p1 = k1.set(4);
-        Parameter<Integer> p2 = k2.set(2);
-        Parameter<String> p3 = k3.set("WFOS()-RED-0001");
-
-        //Create ObserveEvent using madd
-        ObserveEvent oc1 = new ObserveEvent(prefix1, name1).madd(p1, p2);
-        //Create ObserveEvent using add
-        ObserveEvent oc2 = new ObserveEvent(prefix2, name2).add(p1).add(p2);
-        //Create ObserveEvent and use add
-        ObserveEvent oc3 = new ObserveEvent(prefix2, name2).add(p1).add(p2).add(p3);
-
-        //access keys
-        boolean k1Exists = oc1.exists(k1); //true
-
-        //access Parameters
-        Optional<Parameter<Integer>> p4 = oc1.jGet(k1);
-
-        //access values
-        List<Integer> v1 = oc1.jGet(k1).orElseThrow().jValues();
-        List<Integer> v2 = oc2.parameter(k2).jValues();
-        //k4 is missing
-        Set<String> missingKeys = oc3.jMissingKeys(k1, k2, k3, k4);
-
-        //remove keys
-        ObserveEvent oc4 = oc3.remove(k3);
-        //#observeevent
-
-        Assert.assertTrue(k1Exists);
-        Assert.assertSame(p4.orElseThrow(), p1);
-        Assert.assertEquals(Set.of(4), Set.copyOf(v1));
-        Assert.assertEquals(Set.of(2), Set.copyOf(v2));
-        Assert.assertNotEquals(oc3.eventId(), oc4.eventId()); //Test unique id when parameters are removed
-    }
-
-    @Test
     public void showUsageOfJsonSerialization__DEOPSCSW_331() {
         //#json-serialization
         //key
@@ -172,7 +124,7 @@ public class JEventsTest extends JUnitSuite {
 
 
         //events
-        ObserveEvent observeEvent = new ObserveEvent(prefix1, name1).add(i1);
+        ObserveEvent observeEvent = IRDetectorEvent.observeStart(prefix1.toString(), ObsId.apply("1234A-123-124")).add(i1);
         SystemEvent systemEvent = new SystemEvent(prefix1, name1).add(i1);
 
         //json support - write
@@ -268,7 +220,7 @@ public class JEventsTest extends JUnitSuite {
         Parameter<RaDec> param = raDecKey.set(raDec1, raDec2).withUnits(JUnits.arcmin);
 
         //events
-        ObserveEvent observeEvent = new ObserveEvent(prefix1, name1).add(param);
+        ObserveEvent observeEvent = IRDetectorEvent.observeStart(prefix1.toString(), ObsId.apply("1234A-123-124")).add(param);
         SystemEvent systemEvent1 = new SystemEvent(prefix1, name1).add(param);
         SystemEvent systemEvent2 = new SystemEvent(prefix2, name2).add(param);
 

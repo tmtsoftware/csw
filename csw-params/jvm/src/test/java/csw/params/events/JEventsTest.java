@@ -3,6 +3,7 @@ package csw.params.events;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.generics.ParameterSetType;
+import csw.params.core.models.ObsId;
 import csw.params.javadsl.JKeyType;
 import csw.params.javadsl.JUnits;
 import csw.prefix.models.Prefix;
@@ -33,10 +34,9 @@ public class JEventsTest extends JUnitSuite {
 
     private final Prefix prefix = Prefix.apply(JSubsystem.WFOS, "red.detector");
 
-    private <T extends ParameterSetType & Event> void assertOnEventsAPI(T event) {
+    private <T extends ParameterSetType & Event> void assertOnEventsAPI(T event, EventName name) {
 
         // metadata (eventId, source, eventName, eventTime)
-        EventName name = new EventName("filter wheel");
         Assert.assertNotNull(event.eventId());
         Assert.assertEquals(prefix, event.source());
         Assert.assertEquals(name, event.eventName());
@@ -89,13 +89,7 @@ public class JEventsTest extends JUnitSuite {
     @Test
     public void shouldAbleToCreateAndAccessSystemEvent__DEOPSCSW_327_DEOPSCSW_328_DEOPSCSW_185_DEOPSCSW_329_DEOPSCSW_183() {
         SystemEvent systemEvent = new SystemEvent(prefix, new EventName("filter wheel")).add(encoderParam).add(epochStringParam);
-        assertOnEventsAPI(systemEvent);
-    }
-
-    @Test
-    public void shouldAbleToCreateAndAccessObserveEvent__DEOPSCSW_327_DEOPSCSW_328_DEOPSCSW_185_DEOPSCSW_329_DEOPSCSW_183() {
-        ObserveEvent observeEvent = new ObserveEvent(prefix, new EventName("filter wheel")).add(encoderParam).add(epochStringParam);
-        assertOnEventsAPI(observeEvent);
+        assertOnEventsAPI(systemEvent,new EventName("filter wheel"));
     }
 
     @Test
@@ -109,7 +103,7 @@ public class JEventsTest extends JUnitSuite {
 
     @Test
     public void shouldAbleToRemoveParamsInObserveEvent__DEOPSCSW_327_DEOPSCSW_328_DEOPSCSW_185_DEOPSCSW_329_DEOPSCSW_183() {
-        ObserveEvent observeEvent = new ObserveEvent(prefix, new EventName("filter wheel")).add(encoderParam).add(epochByteParam);
+        ObserveEvent observeEvent = WFSDetectorEvent.publishSuccess(prefix.toString()).add(encoderParam).add(epochByteParam);
         Assert.assertEquals(2, observeEvent.size());
         Assert.assertArrayEquals(new Byte[]{10, 20}, observeEvent.jGet(epochByteKey).orElseThrow().jValues().toArray());
         ObserveEvent mutatedEvent = observeEvent.remove(encoderParam);
@@ -122,7 +116,7 @@ public class JEventsTest extends JUnitSuite {
         SystemEvent systemEvent2 = systemEvent1.add(epochIntParam);
         SystemEvent systemEvent3 = systemEvent2.remove(epochIntKey);
 
-        assertOnEventsAPI(systemEvent1);
+        assertOnEventsAPI(systemEvent1, new EventName("filter wheel"));
         Assert.assertNotEquals(systemEvent1.eventId(), systemEvent2.eventId());
         Assert.assertEquals(systemEvent1.eventName(), systemEvent2.eventName());
         Assert.assertEquals(systemEvent1.source(), systemEvent2.source());
@@ -134,11 +128,11 @@ public class JEventsTest extends JUnitSuite {
 
     @Test
     public void shouldBeUniqueIdWhenParametersAreAddedOrRemovedForObserve__DEOPSCSW_327_DEOPSCSW_328_DEOPSCSW_185_DEOPSCSW_329_DEOPSCSW_183() {
-        ObserveEvent observeEvent1 = new ObserveEvent(prefix, new EventName("filter wheel")).add(encoderParam).add(epochStringParam);
+        ObserveEvent observeEvent1 = WFSDetectorEvent.publishSuccess(prefix.toString()).add(encoderParam).add(epochStringParam);
         ObserveEvent observeEvent2 = observeEvent1.add(epochIntParam);
         ObserveEvent observeEvent3 = observeEvent2.remove(epochIntKey);
-
-        assertOnEventsAPI(observeEvent1);
+        System.out.println(observeEvent1.paramSet());
+        assertOnEventsAPI(observeEvent1,new EventName("ObserveEvent.PublishSuccess"));
         Assert.assertNotEquals(observeEvent1.eventId(), observeEvent2.eventId());
         Assert.assertEquals(observeEvent1.eventName(), observeEvent2.eventName());
         Assert.assertEquals(observeEvent1.source(), observeEvent2.source());
