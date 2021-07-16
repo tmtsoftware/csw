@@ -1,7 +1,7 @@
 package csw.params.events
 
 import csw.params.core.generics.KeyType.{BooleanKey, ChoiceKey, StringKey}
-import csw.params.core.models.Choices
+import csw.params.core.models.{Choices}
 import csw.prefix.models.Prefix
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
@@ -40,12 +40,12 @@ class WFSDetectorEventTest extends AnyFunSpec with Matchers {
       event.eventName.name shouldBe "ObserveEvent.WfsDetectorExposureState"
       event.source shouldBe Prefix(sourcePrefix)
       event.paramSet shouldBe Set(
-        StringKey.make("detector").set(detector),
-        ChoiceKey.make("operationalState", Choices.fromChoices(OperationalState.toChoices: _*)).set("BUSY"),
-        StringKey.make("errorMessage").set(""),
-        BooleanKey.make("exposureInProgress").set(true),
-        BooleanKey.make("abortInProgress").set(true),
-        BooleanKey.make("isAborted").set(true)
+        ObserveEventKeys.detector.set(detector),
+        ObserveEventKeys.operationalState.set("BUSY"),
+        ObserveEventKeys.errorMessage.set(""),
+        ObserveEventKeys.exposureInProgress.set(true),
+        ObserveEventKeys.abortInProgress.set(true),
+        ObserveEventKeys.isAborted.set(true)
       )
     }
   }

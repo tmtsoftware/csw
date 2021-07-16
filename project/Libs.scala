@@ -52,7 +52,7 @@ object Libs {
   val `caffeine`          = "com.github.ben-manes.caffeine" % "caffeine"        % "3.0.2"
   val netty               = "io.netty"                      % "netty-all"       % "4.1.65.Final"
   val `case-app`          = "com.github.alexarchambault"   %% "case-app"        % "2.0.6"
-  val `tmt-test-reporter` = "com.github.tmtsoftware"       %% "rtm"             % "0.1.0"
+  val `tmt-test-reporter` = "com.github.tmtsoftware"       %% "rtm"             % "da9dc6cb"
 }
 
 object Borer {

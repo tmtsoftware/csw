@@ -61,13 +61,13 @@ class OpticalDetectorEventTest extends AnyFunSpec with Matchers {
       observeEvent.eventName shouldBe EventName("ObserveEvent.OpticalDetectorExposureState")
       observeEvent.source shouldBe Prefix(sourcePrefix)
       observeEvent.paramSet shouldBe Set(
-        StringKey.make("detector").set(detector),
-        StringKey.make("obsId").set("2020A-001-123"),
-        ChoiceKey.make("operationalState", Choices.fromChoices(OperationalState.toChoices: _*)).set("BUSY"),
-        StringKey.make("errorMessage").set(""),
-        BooleanKey.make("exposureInProgress").set(true),
-        BooleanKey.make("abortInProgress").set(false),
-        BooleanKey.make("isAborted").set(false)
+        ObserveEventKeys.detector.set(detector),
+        ObserveEventKeys.obsId.set("2020A-001-123"),
+        ObserveEventKeys.operationalState.set("BUSY"),
+        ObserveEventKeys.errorMessage.set(""),
+        ObserveEventKeys.exposureInProgress.set(true),
+        ObserveEventKeys.abortInProgress.set(false),
+        ObserveEventKeys.isAborted.set(false)
       )
     }
 
@@ -88,10 +88,10 @@ class OpticalDetectorEventTest extends AnyFunSpec with Matchers {
       observeEvent.eventName shouldBe EventName("ObserveEvent.OpticalDetectorExposureData")
       observeEvent.source shouldBe Prefix(sourcePrefix)
       observeEvent.paramSet shouldBe Set(
-        StringKey.make("detector").set(detector),
-        StringKey.make("obsId").set(obsId.toString),
-        LongKey.make("exposureTime").set(exposureTime),
-        LongKey.make("remainingExposureTime").set(remainingExposureTime)
+        ObserveEventKeys.detector.set(detector),
+        ObserveEventKeys.obsId.set(obsId.toString),
+        ObserveEventKeys.exposureTime.set(exposureTime),
+        ObserveEventKeys.remainingExposureTime.set(remainingExposureTime)
       )
     }
 

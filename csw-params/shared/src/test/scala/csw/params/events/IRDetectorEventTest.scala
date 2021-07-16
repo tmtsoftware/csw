@@ -56,13 +56,13 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
       state.source shouldBe Prefix(sourcePrefix)
       state.eventName.name shouldBe "ObserveEvent.IRDetectorExposureState"
       state.paramSet shouldBe Set(
-        StringKey.make("detector").set(detector),
-        StringKey.make("obsId").set(obsId.toString),
-        BooleanKey.make("exposureInProgress").set(true),
-        BooleanKey.make("abortInProgress").set(false),
-        BooleanKey.make("isAborted").set(true),
-        StringKey.make("errorMessage").set(""),
-        ChoiceKey.make("operationalState", Choices.fromChoices(OperationalState.toChoices: _*)).set("BUSY")
+        ObserveEventKeys.detector.set(detector),
+        ObserveEventKeys.obsId.set(obsId.toString),
+        ObserveEventKeys.exposureInProgress.set(true),
+        ObserveEventKeys.abortInProgress.set(false),
+        ObserveEventKeys.isAborted.set(true),
+        ObserveEventKeys.errorMessage.set(""),
+        ObserveEventKeys.operationalState.set("BUSY")
       )
     }
 
@@ -89,14 +89,14 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
       event.source shouldBe Prefix(sourcePrefix)
       event.eventName.name shouldBe "ObserveEvent.IRDetectorExposureData"
       event.paramSet shouldBe Set(
-        StringKey.make("detector").set(detector),
-        StringKey.make("obsId").set(obsId.toString),
-        IntKey.make("readsInRamp").set(readsInRamp),
-        IntKey.make("readsComplete").set(readsComplete),
-        IntKey.make("rampsInExposure").set(rampsInExposure),
-        IntKey.make("rampsComplete").set(rampsComplete),
-        LongKey.make("exposureTime").set(exposureTime),
-        LongKey.make("remainingExposureTime").set(remainingExposureTime)
+        ObserveEventKeys.detector.set(detector),
+        ObserveEventKeys.obsId.set(obsId.toString),
+        ObserveEventKeys.readsInRamp.set(readsInRamp),
+        ObserveEventKeys.readsComplete.set(readsComplete),
+        ObserveEventKeys.rampsInExposure.set(rampsInExposure),
+        ObserveEventKeys.rampsComplete.set(rampsComplete),
+        ObserveEventKeys.exposureTime.set(exposureTime),
+        ObserveEventKeys.remainingExposureTime.set(remainingExposureTime)
       )
     }
   }
