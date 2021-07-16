@@ -5,7 +5,7 @@ import csw.params.core.generics.Parameter
 import csw.params.core.models.{ExposureIdType, ObsId}
 import csw.prefix.models.Prefix
 
-class SequencerObserveEvent(prefix: Prefix) {
+case class SequencerObserveEvent(prefix: Prefix) {
 
   def presetStart(obsId: ObsId): ObserveEvent = createObserveEvent(ObserveEventNames.PresetStart, obsId)
 

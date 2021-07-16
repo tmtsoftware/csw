@@ -16,7 +16,7 @@ class SequencerObserveEventTest extends AnyFunSpec with Matchers {
     val prefix                        = Prefix(ESW, "filter.wheel")
     val obsIdParam: Parameter[_]      = ObserveEventKeys.obsId.set(obsId)
     val exposureIdParam: Parameter[_] = ObserveEventKeys.exposureId.set(exposureId)
-    val sequencerObserveEvent         = new SequencerObserveEvent(prefix)
+    val sequencerObserveEvent         = SequencerObserveEvent(prefix)
 
     it("create Observe Event with obsId parameters | CSW-125") {
       Table(

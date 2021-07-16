@@ -116,7 +116,7 @@ class EventsTest extends AnyFunSpec with Matchers {
       //parameter
       val i1: Parameter[MatrixData[Double]] = k1.set(m1)
       //events
-      val observeEvent: ObserveEvent = IRDetectorEvent.observeStart(prefix.toString, ObsId("12324-123-425")).madd(i1)
+      val observeEvent: ObserveEvent = IRDetectorEvent.observeStart(prefix.toString, ObsId("1232A-123-123")).madd(i1)
       val systemEvent: SystemEvent   = SystemEvent(prefix, name1).add(i1)
 
       //json support - write
