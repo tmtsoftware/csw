@@ -63,22 +63,21 @@ class CommandServiceHttpHandlerAuthTest
     (Oneway(command), _.oneway(command))
   )
 
-  forAll(authEnabledRequests) {
-    case (msg, action) =>
-      val name = msg.getClass.getSimpleName
+  forAll(authEnabledRequests) { case (msg, action) =>
+    val name = msg.getClass.getSimpleName
 
-      test(s"$name should check for auth if destination prefix is provided while creating handlers") {
-        val captor          = ArgCaptor[CustomPolicy]
-        val invalidResponse = Invalid(Id(), IdNotAvailableIssue(RandomUtils.randomString5()))
+    test(s"$name should check for auth if destination prefix is provided while creating handlers") {
+      val captor          = ArgCaptor[CustomPolicy]
+      val invalidResponse = Invalid(Id(), IdNotAvailableIssue(RandomUtils.randomString5()))
 
-        when(securityDirective.sPost(captor)).thenReturn(accessTokenDirective)
-        when(action(commandService)).thenReturn(Future.successful(invalidResponse))
+      when(securityDirective.sPost(captor)).thenReturn(accessTokenDirective)
+      when(action(commandService)).thenReturn(Future.successful(invalidResponse))
 
-        Post("/post-endpoint", msg.narrow) ~> route ~> check {
-          verify(securityDirective).sPost(any[CustomPolicy])
-          checkCapturedPolicy(captor)
-        }
+      Post("/post-endpoint", msg.narrow) ~> route ~> check {
+        verify(securityDirective).sPost(any[CustomPolicy])
+        checkCapturedPolicy(captor)
       }
+    }
   }
 
   test(s"query should not check for auth") {

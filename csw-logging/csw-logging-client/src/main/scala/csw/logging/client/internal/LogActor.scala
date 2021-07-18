@@ -78,10 +78,9 @@ private[logging] object LogActor {
           case LastAkkaMessage              => akka.event.Logging(ctx.system.toClassic, this).error("DIE"); Behaviors.same
           case StopLogging                  => Behaviors.stopped
         }
-        .receiveSignal {
-          case (_, PostStop) =>
-            done.success(())
-            Behaviors.same
+        .receiveSignal { case (_, PostStop) =>
+          done.success(())
+          Behaviors.same
         }
     }
 }

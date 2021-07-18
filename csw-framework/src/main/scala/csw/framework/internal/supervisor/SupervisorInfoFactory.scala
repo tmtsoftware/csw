@@ -42,17 +42,16 @@ private[framework] class SupervisorInfoFactory(containerPrefix: Prefix) {
       val supervisorBehavior = SupervisorBehaviorFactory.make(Some(containerRef), registrationFactory, await(cswCtxF))
       val actorRefF          = richSystem.spawnTyped(supervisorBehavior, componentInfo.prefix.toString)
       Some(SupervisorInfo(system, Component(await(actorRefF), componentInfo)))
-    } recoverWith {
-      case NonFatal(exception) =>
-        async {
-          log.error(
-            s"Exception :[${exception.getMessage}] occurred while spawning supervisor: [${componentInfo.prefix}]",
-            ex = exception
-          )
-          system.terminate()
-          await(system.whenTerminated)
-          None
-        }
+    } recoverWith { case NonFatal(exception) =>
+      async {
+        log.error(
+          s"Exception :[${exception.getMessage}] occurred while spawning supervisor: [${componentInfo.prefix}]",
+          ex = exception
+        )
+        system.terminate()
+        await(system.whenTerminated)
+        None
+      }
     }
   }
 }

@@ -38,16 +38,15 @@ private[logging] class TimeActor(tdone: Promise[Unit]) {
       def end(id: RequestId): Unit = {
         val key = s"${id.trackingId}\t${id.spanId}"
         items.get(key) map { timeItem =>
-          val jitems0 = timeItem.steps.toList map {
-            case (key1, timeStep) =>
-              val j1 = Json.obj("name" -> timeStep.name, "time0" -> timeStep.start)
-              val j2 = if (timeStep.end == 0) {
-                Json.obj()
-              }
-              else {
-                Json.obj("time1" -> timeStep.end, "total" -> (timeStep.end - timeStep.start))
-              }
-              j1 ++ j2
+          val jitems0 = timeItem.steps.toList map { case (key1, timeStep) =>
+            val j1 = Json.obj("name" -> timeStep.name, "time0" -> timeStep.start)
+            val j2 = if (timeStep.end == 0) {
+              Json.obj()
+            }
+            else {
+              Json.obj("time1" -> timeStep.end, "total" -> (timeStep.end - timeStep.start))
+            }
+            j1 ++ j2
           }
           val traceId             = Seq(id.trackingId, id.spanId).asJson
           val jitems              = jitems0.sortBy(_.getString("time0"))
@@ -99,10 +98,9 @@ private[logging] class TimeActor(tdone: Promise[Unit]) {
             closeAll()
             Behaviors.stopped
         }
-        .receiveSignal {
-          case (_, PostStop) =>
-            tdone.success(())
-            Behaviors.same
+        .receiveSignal { case (_, PostStop) =>
+          tdone.success(())
+          Behaviors.same
         }
     }
 }

@@ -56,8 +56,8 @@ class LocationAgent(settings: Settings) {
     }
 
   private val killAgent: Option[(Process, Wiring)] => Unit =
-    _.foreach {
-      case (process, wiring) => process.destroyForcibly(); wiring.actorRuntime.shutdown().await()
+    _.foreach { case (process, wiring) =>
+      process.destroyForcibly(); wiring.actorRuntime.shutdown().await()
     }
 
   private val sentinelConf: String =

@@ -36,8 +36,8 @@ private[framework] object PubSubBehavior {
 
       def notify(data: T, subscribers: Map[ActorRef[T], Set[StateName]]): Unit = {
         log.debug(s"Notifying subscribers :[${subscribers.mkString(",")}] with data :[$data]")
-        subscribers.foreach {
-          case (actorRef, names) => if (names.isEmpty || names.contains(nameableData.name(data))) actorRef ! data
+        subscribers.foreach { case (actorRef, names) =>
+          if (names.isEmpty || names.contains(nameableData.name(data))) actorRef ! data
         }
       }
 

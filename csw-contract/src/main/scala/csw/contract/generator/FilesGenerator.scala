@@ -9,12 +9,11 @@ object FilesGenerator extends ContractCodecs {
   val ReadmeName = "README.md"
 
   def generate(services: Services, outputPath: String): Unit = {
-    services.data.foreach {
-      case (serviceName, service) =>
-        writeData(s"$outputPath/$serviceName/", "http-contract", service.`http-contract`)
-        writeData(s"$outputPath/$serviceName/", "websocket-contract", service.`websocket-contract`)
-        writeData(s"$outputPath/$serviceName/", "models", service.models)
-        writeReadme(outputPath, serviceName, service.readme)
+    services.data.foreach { case (serviceName, service) =>
+      writeData(s"$outputPath/$serviceName/", "http-contract", service.`http-contract`)
+      writeData(s"$outputPath/$serviceName/", "websocket-contract", service.`websocket-contract`)
+      writeData(s"$outputPath/$serviceName/", "models", service.models)
+      writeReadme(outputPath, serviceName, service.readme)
     }
     generateEntireJson(services, outputPath)
     writeReadme(outputPath, "", Readme(ResourceFetcher.getResourceAsString(ReadmeName)))

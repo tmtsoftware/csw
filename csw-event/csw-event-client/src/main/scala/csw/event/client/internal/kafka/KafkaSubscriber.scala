@@ -55,9 +55,8 @@ private[event] class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[S
     eventStream
       .prepend(Source.futureSource(invalidEvents))
       .watchTermination()(Keep.both)
-      .mapMaterializedValue {
-        case (controlF, completionF) =>
-          eventSubscription(controlF, completionF)
+      .mapMaterializedValue { case (controlF, completionF) =>
+        eventSubscription(controlF, completionF)
       }
   }
 

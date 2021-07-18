@@ -60,8 +60,8 @@ class SequencerCommandServiceImplTest
 
   test("should submit sequence to the sequencer | CSW-110") {
     val submitResponse = mock[SubmitResponse]
-    withBehavior {
-      case SubmitSequence(`sequence`, replyTo) => replyTo ! submitResponse
+    withBehavior { case SubmitSequence(`sequence`, replyTo) =>
+      replyTo ! submitResponse
     } check { scs =>
       scs.submit(sequence).futureValue should ===(submitResponse)
     }
@@ -78,16 +78,16 @@ class SequencerCommandServiceImplTest
   }
 
   test("should query current state from the sequencer | CSW-110") {
-    withBehavior {
-      case Query(`id`, replyTo) => replyTo ! queryResponse
+    withBehavior { case Query(`id`, replyTo) =>
+      replyTo ! queryResponse
     } check { scs =>
       scs.query(id).futureValue should ===(queryResponse)
     }
   }
 
   test("should query final response from the sequencer | CSW-110") {
-    withBehavior {
-      case QueryFinal(`id`, replyTo) => replyTo ! queryFinalResponse
+    withBehavior { case QueryFinal(`id`, replyTo) =>
+      replyTo ! queryFinalResponse
     } check { scs =>
       scs.queryFinal(id).futureValue should ===(queryFinalResponse)
     }

@@ -33,11 +33,10 @@ private[event] class EventPublisherUtil(implicit actorSystem: ActorSystem[_]) {
 
   def streamTermination(f: Event => Future[Done]): Future[Done] =
     stream
-      .mapAsync(1) {
-        case (e, p) =>
-          f(e).map(p.trySuccess).recover {
-            case ex => p.tryFailure(ex)
-          }
+      .mapAsync(1) { case (e, p) =>
+        f(e).map(p.trySuccess).recover { case ex =>
+          p.tryFailure(ex)
+        }
       }
       .runForeach(_ => ())
 
@@ -73,10 +72,9 @@ private[event] class EventPublisherUtil(implicit actorSystem: ActorSystem[_]) {
       .run()
 
   private def publishWithRecovery(event: Event, publish: Event => Future[Done], maybeOnError: Option[PublishFailure => Unit]) =
-    publish(event).recover[Done] {
-      case failure @ PublishFailure(_, _) =>
-        maybeOnError.foreach(onError => onError(failure))
-        Done
+    publish(event).recover[Done] { case failure @ PublishFailure(_, _) =>
+      maybeOnError.foreach(onError => onError(failure))
+      Done
     }
 
   def logError(failure: PublishFailure): Unit = logger.error(failure.getMessage, ex = failure)
@@ -94,10 +92,9 @@ private[event] class EventPublisherUtil(implicit actorSystem: ActorSystem[_]) {
   private def withErrorLogging(eventGenerator: => Future[Option[Event]]): Future[Event] =
     eventGenerator
       .collect { case Some(event) => event }
-      .recover {
-        case NonFatal(ex) =>
-          logger.error(ex.getMessage, ex = ex)
-          throw ex
+      .recover { case NonFatal(ex) =>
+        logger.error(ex.getMessage, ex = ex)
+        throw ex
       }
 
 }

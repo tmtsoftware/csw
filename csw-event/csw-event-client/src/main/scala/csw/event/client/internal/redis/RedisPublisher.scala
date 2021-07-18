@@ -55,11 +55,10 @@ private[event] class RedisPublisher(redisURI: Future[RedisURI], redisClient: Red
       await(asyncApi.publish(event.eventKey.key, event))
       set(event, asyncApi) // set will run independent of publish
       Done
-    } recover {
-      case NonFatal(ex) =>
-        val failure = PublishFailure(event, ex)
-        eventPublisherUtil.logError(failure)
-        throw failure
+    } recover { case NonFatal(ex) =>
+      val failure = PublishFailure(event, ex)
+      eventPublisherUtil.logError(failure)
+      throw failure
     }
 
   override def publish[Mat](source: Source[Event, Mat]): Mat =

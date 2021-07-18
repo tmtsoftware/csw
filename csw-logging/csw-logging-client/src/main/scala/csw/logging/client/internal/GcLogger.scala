@@ -34,9 +34,8 @@ private[logging] class GcLogger {
             else if ("end of major GC".equals(gcaction)) "major"
             else "unknown"
           def getMem(mem: Map[String, MemoryUsage]): List[Map[String, Any]] = {
-            val m = mem map {
-              case (name, usage) =>
-                Map(name -> Map("used" -> usage.getUsed, "max" -> usage.getMax, "committed" -> usage.getCommitted))
+            val m = mem map { case (name, usage) =>
+              Map(name -> Map("used" -> usage.getUsed, "max" -> usage.getMax, "committed" -> usage.getCommitted))
             }
             m.toList
           }

@@ -149,8 +149,8 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
     context
       .actorOf(
         Props(new Actor {
-          override def receive: Receive = {
-            case "print" => log.info("hello world")
+          override def receive: Receive = { case "print" =>
+            log.info("hello world")
           }
         }),
         name = "my-actor-1"

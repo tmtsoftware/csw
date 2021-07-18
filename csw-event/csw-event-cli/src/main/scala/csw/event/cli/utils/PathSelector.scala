@@ -34,8 +34,8 @@ case class PathSelector(paths: List[List[String]]) {
 
     private def simpleItems: mutable.ArraySeq[_] = param.items.filterNot(_.isInstanceOf[Struct])
     private def structsItems: mutable.ArraySeq[StructCtx] =
-      param.items.collect {
-        case x: Struct => StructCtx(x, path)
+      param.items.collect { case x: Struct =>
+        StructCtx(x, path)
       }
 
     private def path: List[String] = parents :+ param.keyName

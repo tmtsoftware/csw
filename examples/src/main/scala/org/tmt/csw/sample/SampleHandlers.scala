@@ -92,8 +92,8 @@ class SampleHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext
         case _: CommandResponse.Completed => log.info("Command completed successfully")
         case _                            => log.error("Command failed")
       }
-    } recover {
-      case ex: RuntimeException => log.error(s"Command failed: ${ex.getMessage}")
+    } recover { case ex: RuntimeException =>
+      log.error(s"Command failed: ${ex.getMessage}")
     }
   }
 
@@ -111,8 +111,8 @@ class SampleHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext
         x
       case x =>
         x
-    } recover {
-      case ex: RuntimeException => CommandResponse.Error(runId, ex.getMessage)
+    } recover { case ex: RuntimeException =>
+      CommandResponse.Error(runId, ex.getMessage)
     }
 
     // Wait for final response, and log result

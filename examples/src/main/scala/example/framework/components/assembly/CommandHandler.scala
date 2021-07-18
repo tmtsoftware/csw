@@ -12,9 +12,8 @@ object CommandHandler {
     Behaviors.setup { ctx =>
       // setup required for actor
 
-      Behaviors.receiveMessage {
-        case _ => // Handle messages and return new behavior
-          Behaviors.same
+      Behaviors.receiveMessage { case _ => // Handle messages and return new behavior
+        Behaviors.same
       }
     }
 }

@@ -48,8 +48,8 @@ class CommandServiceImplTest extends AnyFunSuiteLike with Matchers with MockitoS
 
   test("should send validate message | CSW-110") {
     val validateResponse = mock[ValidateResponse]
-    withBehavior {
-      case Validate(`setup`, replyTo) => replyTo ! validateResponse
+    withBehavior { case Validate(`setup`, replyTo) =>
+      replyTo ! validateResponse
     } check { cs =>
       cs.validate(setup).futureValue should ===(validateResponse)
     }
@@ -68,8 +68,8 @@ class CommandServiceImplTest extends AnyFunSuiteLike with Matchers with MockitoS
 
   test("should submit command | CSW-110") {
     val submitResponse = mock[SubmitResponse]
-    withBehavior {
-      case Submit(`setup`, replyTo) => replyTo ! submitResponse
+    withBehavior { case Submit(`setup`, replyTo) =>
+      replyTo ! submitResponse
     } check { cs =>
       cs.submit(setup).futureValue should ===(submitResponse)
     }
@@ -88,8 +88,8 @@ class CommandServiceImplTest extends AnyFunSuiteLike with Matchers with MockitoS
 
   test("should send oneway command | CSW-110") {
     val onewayResponse = mock[OnewayResponse]
-    withBehavior {
-      case Oneway(`setup`, replyTo) => replyTo ! onewayResponse
+    withBehavior { case Oneway(`setup`, replyTo) =>
+      replyTo ! onewayResponse
     } check { cs =>
       cs.oneway(setup).futureValue should ===(onewayResponse)
     }
@@ -108,8 +108,8 @@ class CommandServiceImplTest extends AnyFunSuiteLike with Matchers with MockitoS
 
   test("should query current state from the sequencer | CSW-110") {
     val queryResponse = mock[SubmitResponse]
-    withBehavior {
-      case Query(`id`, replyTo) => replyTo ! queryResponse
+    withBehavior { case Query(`id`, replyTo) =>
+      replyTo ! queryResponse
     } check { cs =>
       cs.query(id).futureValue should ===(queryResponse)
     }
@@ -117,8 +117,8 @@ class CommandServiceImplTest extends AnyFunSuiteLike with Matchers with MockitoS
 
   test("should query final response from the sequencer | CSW-110") {
     val queryFinalResponse = mock[SubmitResponse]
-    withBehavior {
-      case QueryFinal(`id`, replyTo) => replyTo ! queryFinalResponse
+    withBehavior { case QueryFinal(`id`, replyTo) =>
+      replyTo ! queryFinalResponse
     } check { cs =>
       cs.queryFinal(id).futureValue should ===(queryFinalResponse)
     }

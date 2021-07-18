@@ -24,10 +24,9 @@ object Main {
   def main(args: Array[String]): Unit = start(args, startLogging = true)
 
   def start(args: Array[String], startLogging: Boolean = false): Option[(ServerBinding, ServerWiring)] =
-    new ArgsParser(name).parse(args.toList).map {
-      case options @ Options(_, _) =>
-        requiredClusterSeedsSet()
-        start(startLogging, options)
+    new ArgsParser(name).parse(args.toList).map { case options @ Options(_, _) =>
+      requiredClusterSeedsSet()
+      start(startLogging, options)
     }
 
   private[server] def start(startLogging: Boolean, options: Options): (ServerBinding, ServerWiring) = {

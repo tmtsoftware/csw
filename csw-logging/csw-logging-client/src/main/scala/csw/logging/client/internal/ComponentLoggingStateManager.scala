@@ -27,8 +27,8 @@ private[logging] object ComponentLoggingStateManager {
         .asScala
         .map { entry => (entry.getKey, ComponentLoggingState(Level(entry.getValue.unwrapped().toString))) }
         .toMap
-        .map[Prefix, ComponentLoggingState] {
-          case (k, v) => (Prefix(k), v)
+        .map[Prefix, ComponentLoggingState] { case (k, v) =>
+          (Prefix(k), v)
         }
     }.getOrElse(Map.empty)
     new ConcurrentHashMap(stringToState.asJava)

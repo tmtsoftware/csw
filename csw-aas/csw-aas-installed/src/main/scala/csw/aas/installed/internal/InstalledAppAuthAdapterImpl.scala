@@ -58,9 +58,8 @@ private[aas] class InstalledAppAuthAdapterImpl(
 
   override def getAccessToken(minValidity: FiniteDuration = 0.seconds): Option[AccessToken] = {
     def getNewToken: Option[AccessToken] = {
-      Try(refreshAccessToken()).recover {
-        case e: Exception =>
-          throw new RuntimeException(s"Error in refreshing token: try login before executing this command ${e.getMessage}")
+      Try(refreshAccessToken()).recover { case e: Exception =>
+        throw new RuntimeException(s"Error in refreshing token: try login before executing this command ${e.getMessage}")
       }
 
       accessTokenStr.flatMap(atr => tokenVerifier.verifyAndDecode(atr).block().toOption)

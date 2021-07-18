@@ -20,7 +20,7 @@ object ConfigServer {
   private def start(configPort: String): Option[(HttpService, ServerWiring)] =
     ConfigMain.start(Array("--port", configPort, initSvnRepo))
 
-  private val stop: Option[(HttpService, ServerWiring)] => Unit = _.foreach {
-    case (_, wiring) => wiring.actorRuntime.shutdown().await()
+  private val stop: Option[(HttpService, ServerWiring)] => Unit = _.foreach { case (_, wiring) =>
+    wiring.actorRuntime.shutdown().await()
   }
 }

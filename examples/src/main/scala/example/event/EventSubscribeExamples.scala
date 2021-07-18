@@ -50,9 +50,8 @@ class EventSubscribeExamples(eventService: EventService, hcd: AkkaLocation)(impl
     val behavior: Behavior[Event] = Behaviors.setup { ctx =>
       //setup required for the actor
 
-      Behaviors.receiveMessage {
-        case _ => //handle messages and return new behavior with changed state
-          Behaviors.same
+      Behaviors.receiveMessage { case _ => //handle messages and return new behavior with changed state
+        Behaviors.same
       }
     }
   }

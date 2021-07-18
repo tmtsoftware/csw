@@ -26,8 +26,8 @@ class RedisAsyncApi[K, V](redisAsyncCommands: Future[RedisAsyncCommands[K, V]])(
     )
 
   def get(key: K): Future[Option[V]] =
-    redisAsyncCommands.flatMap(_.get(key).toScala.map(Option(_))).recover {
-      case NonFatal(ex) => throw RedisServerNotAvailable(ex.getCause)
+    redisAsyncCommands.flatMap(_.get(key).toScala.map(Option(_))).recover { case NonFatal(ex) =>
+      throw RedisServerNotAvailable(ex.getCause)
     }
 
   def mget(keys: List[K]): Future[List[RedisResult[K, Option[V]]]] =

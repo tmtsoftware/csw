@@ -31,9 +31,8 @@ class RedisSubscriptionApi[K, V](reactiveApiFactory: () => Future[RedisPubSubRea
 
     redisKeyValueSource.cancellable
       .watchTermination()(Keep.both)
-      .mapMaterializedValue {
-        case (killSwitch, terminationSignal) =>
-          new RedisSubscriptionImpl(keys, connectedF, killSwitch, terminationSignal, reactiveApiF)
+      .mapMaterializedValue { case (killSwitch, terminationSignal) =>
+        new RedisSubscriptionImpl(keys, connectedF, killSwitch, terminationSignal, reactiveApiF)
       }
   }
 }

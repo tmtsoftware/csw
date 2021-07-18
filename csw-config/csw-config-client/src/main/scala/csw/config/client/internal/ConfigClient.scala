@@ -95,8 +95,8 @@ private[config] class ConfigClient(
       val response = await(Http().singleRequest(request))
 
       await(
-        handleResponse(response) {
-          case StatusCodes.OK => Unmarshal(response).to[ConfigId]
+        handleResponse(response) { case StatusCodes.OK =>
+          Unmarshal(response).to[ConfigId]
         }
       )
     }
@@ -146,8 +146,8 @@ private[config] class ConfigClient(
       val response = await(Http().singleRequest(request))
 
       await(
-        handleResponse(response) {
-          case StatusCodes.OK => Future.unit
+        handleResponse(response) { case StatusCodes.OK =>
+          Future.unit
         }
       )
     }
@@ -162,8 +162,8 @@ private[config] class ConfigClient(
       val response = await(Http().singleRequest(request))
 
       await(
-        handleResponse(response) {
-          case StatusCodes.OK => Unmarshal(response).to[List[ConfigFileInfo]]
+        handleResponse(response) { case StatusCodes.OK =>
+          Unmarshal(response).to[List[ConfigFileInfo]]
         }
       )
 
@@ -209,8 +209,8 @@ private[config] class ConfigClient(
       val response = await(Http().singleRequest(request))
 
       await(
-        handleResponse(response) {
-          case StatusCodes.OK => Unmarshal(response).to[ConfigMetadata]
+        handleResponse(response) { case StatusCodes.OK =>
+          Unmarshal(response).to[ConfigMetadata]
         }
       )
     }
@@ -224,8 +224,8 @@ private[config] class ConfigClient(
       val response = await(Http().singleRequest(request))
 
       await(
-        handleResponse(response) {
-          case StatusCodes.OK => Future.unit
+        handleResponse(response) { case StatusCodes.OK =>
+          Future.unit
         }
       )
     }
@@ -267,8 +267,8 @@ private[config] class ConfigClient(
       val response = await(Http().singleRequest(request))
 
       await(
-        handleResponse(response) {
-          case StatusCodes.OK => Unmarshal(response).to[List[ConfigFileRevision]]
+        handleResponse(response) { case StatusCodes.OK =>
+          Unmarshal(response).to[List[ConfigFileRevision]]
         }
       )
     }

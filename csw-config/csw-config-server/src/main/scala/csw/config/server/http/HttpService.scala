@@ -52,8 +52,8 @@ class HttpService(
 
     log.info(s"Server online at http://${binding.localAddress.getHostName}:${binding.localAddress.getPort}/")
     (binding, registrationResult)
-  } recoverWith {
-    case NonFatal(ex) => shutdown().map(_ => throw ex)
+  } recoverWith { case NonFatal(ex) =>
+    shutdown().map(_ => throw ex)
   }
 
   def shutdown(): Future[Done] = actorRuntime.shutdown()

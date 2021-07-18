@@ -56,8 +56,8 @@ private[command] class CommandServiceImpl(component: ActorRef[ComponentMessage])
   // components coming via this api will be removed from  subscriber's list after timeout
   override def query(commandRunId: Id): Future[SubmitResponse] = {
     val eventualResponse: Future[SubmitResponse] = component ? (Query(commandRunId, _))
-    eventualResponse recover {
-      case _: TimeoutException => Invalid(commandRunId, IdNotAvailableIssue(commandRunId.id))
+    eventualResponse recover { case _: TimeoutException =>
+      Invalid(commandRunId, IdNotAvailableIssue(commandRunId.id))
     }
   }
 

@@ -241,8 +241,8 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
 
   private def resolveWithin[L <: Location](connection: TypedConnection[L], waitTime: FiniteDuration): Future[Option[L]] =
     track(connection)
-      .collect {
-        case LocationUpdated(location) => location.asInstanceOf[L]
+      .collect { case LocationUpdated(location) =>
+        location.asInstanceOf[L]
       }
       .takeWithin(waitTime)
       .runWith(Sink.headOption)

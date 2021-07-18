@@ -102,8 +102,8 @@ private[client] trait SeverityServiceModule extends SeverityService {
 
       keySpaceApi
         .watchKeyspaceValue(activeSeverityKeys, OverflowStrategy.LATEST)
-        .scan(currentSeverities) {
-          case (data, RedisResult(severityKey, mayBeSeverity)) => data + (severityKey -> mayBeSeverity)
+        .scan(currentSeverities) { case (data, RedisResult(severityKey, mayBeSeverity)) =>
+          data + (severityKey -> mayBeSeverity)
         }
         .map(data => aggregratorByMax(data.values))
         .distinctUntilChanged

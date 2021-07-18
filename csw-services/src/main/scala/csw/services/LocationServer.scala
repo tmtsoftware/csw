@@ -21,8 +21,8 @@ object LocationServer {
   private def start(clusterPort: String): Option[(Http.ServerBinding, ServerWiring)] =
     LocationMain.start(Array("--clusterPort", clusterPort))
 
-  private val stop: Option[(Http.ServerBinding, ServerWiring)] => Unit = _.foreach {
-    case (_, wiring) => wiring.actorRuntime.shutdown().await()
+  private val stop: Option[(Http.ServerBinding, ServerWiring)] => Unit = _.foreach { case (_, wiring) =>
+    wiring.actorRuntime.shutdown().await()
   }
 
 }

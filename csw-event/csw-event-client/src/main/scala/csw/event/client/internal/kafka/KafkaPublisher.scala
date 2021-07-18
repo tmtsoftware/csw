@@ -42,8 +42,8 @@ private[event] class KafkaPublisher(producerSettings: Future[ProducerSettings[St
 
   private def publishInternal(event: Event): Future[Done] = {
     val p = Promise[Done]()
-    kafkaProducer.map(_.send(eventToProducerRecord(event), completePromise(event, p))).recover {
-      case NonFatal(ex) => p.failure(PublishFailure(event, ex))
+    kafkaProducer.map(_.send(eventToProducerRecord(event), completePromise(event, p))).recover { case NonFatal(ex) =>
+      p.failure(PublishFailure(event, ex))
     }: Any
     p.future
   }

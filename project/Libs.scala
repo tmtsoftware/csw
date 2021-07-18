@@ -3,7 +3,7 @@ import sbt.Def.{setting => dep}
 import sbt._
 
 object Libs {
-  val ScalaVersion = "2.13.5"
+  val ScalaVersion = "2.13.6"
 
   val `scala-java8-compat` = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.1"    //BSD 3-clause "New" or "Revised" License
   val `scala-async`        = "org.scala-lang.modules" %% "scala-async"        % "1.0.0-M1" //BSD 3-clause "New" or "Revised" License
@@ -13,8 +13,8 @@ object Libs {
   //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
   val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.2.3"
 
-  val `embedded-keycloak`            = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak"            % "0.4.0" //Apache 2.0
-  val `akka-management-cluster-http` = "com.lightbend.akka.management"            %% "akka-management-cluster-http" % "1.1.0"
+  val `embedded-keycloak`            = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak"            % "0.5.0"      //Apache 2.0
+  val `akka-management-cluster-http` = "com.lightbend.akka.management"            %% "akka-management-cluster-http" % "1.1.1"
   val `svnkit`                       = "org.tmatesoft.svnkit"                      % "svnkit"                       % "1.10.3"     //TMate Open Source License
   val `commons-codec`                = "commons-codec"                             % "commons-codec"                % "1.15"       //Apache 2.0š
   val `scala-reflect`                = "org.scala-lang"                            % "scala-reflect"                % ScalaVersion //BSD-3
@@ -88,8 +88,10 @@ object Akka {
   val `akka-cluster`             = "com.typesafe.akka" %% "akka-cluster"             % Version
   val `akka-cluster-typed`       = "com.typesafe.akka" %% "akka-cluster-typed"       % Version
   val `akka-slf4j`               = "com.typesafe.akka" %% "akka-slf4j"               % Version
-  val `cluster-sharding`         = "com.typesafe.akka" %% "akka-cluster-sharding"    % Version
-  val `akka-persistence`         = "com.typesafe.akka" %% "akka-persistence"         % Version
+  val `cluster-sharding` =
+    "com.typesafe.akka" %% "akka-cluster-sharding" % Version //required to maintaining the transitive dependency of akka-management-cluster-http
+  val `akka-persistence` =
+    "com.typesafe.akka" %% "akka-persistence" % Version //required to maintaining the transitive dependency of akka-cluster-sharding
 }
 
 object AkkaHttp {
@@ -120,7 +122,7 @@ object Jooq {
 }
 
 object MSocket {
-  val Version = "0.3.0"
+  val Version = "0.4.0"
 
   val `msocket-api`      = dep("com.github.tmtsoftware.msocket" %%% "msocket-api" % Version)
   val `msocket-security` = "com.github.tmtsoftware.msocket" %% "msocket-security" % Version

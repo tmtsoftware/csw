@@ -14,8 +14,8 @@ object FutureExtensions {
           case "OK" | "QUEUED" => Done
           case _               => throw RedisOperationFailed(reason)
         }
-        .recoverWith {
-          case NonFatal(ex) => throw RedisOperationFailed(reason, ex)
+        .recoverWith { case NonFatal(ex) =>
+          throw RedisOperationFailed(reason, ex)
         }
   }
 }

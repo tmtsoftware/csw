@@ -28,20 +28,19 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
   List(
     ("TAITime", () => TAITime(TAITime.now().value.plusSeconds(1))), // lazily evaluate time when tests are executed
     ("UTCTime", () => UTCTime(UTCTime.now().value.plusSeconds(1)))
-  ).foreach {
-    case (name, idealScheduleTime) =>
-      test(s"[$name] should schedule task at start time | DEOPSCSW-542") {
-        val testProbe = TestProbe()(system.toClassic)
-        val probeMsg  = "echo"
+  ).foreach { case (name, idealScheduleTime) =>
+    test(s"[$name] should schedule task at start time | DEOPSCSW-542") {
+      val testProbe = TestProbe()(system.toClassic)
+      val probeMsg  = "echo"
 
-        val cancellable = timeService.scheduleOnce(idealScheduleTime())(testProbe.ref ! probeMsg)
-        manualTime.timePasses(500.millis)
-        // check immediately after 5 millis, there should be no message
-        testProbe.expectNoMessage(0.millis)
-        manualTime.timePasses(500.millis)
-        testProbe.expectMsg(probeMsg)
-        cancellable.cancel()
-      }
+      val cancellable = timeService.scheduleOnce(idealScheduleTime())(testProbe.ref ! probeMsg)
+      manualTime.timePasses(500.millis)
+      // check immediately after 5 millis, there should be no message
+      testProbe.expectNoMessage(0.millis)
+      manualTime.timePasses(500.millis)
+      testProbe.expectMsg(probeMsg)
+      cancellable.cancel()
+    }
   }
 
   // DEOPSCSW-544: Schedule a task to be executed repeatedly

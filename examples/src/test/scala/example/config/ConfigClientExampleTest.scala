@@ -220,20 +220,19 @@ class ConfigClientExampleTest
     )
 
     //create config files at those paths
-    paths map {
-      case (path, fileType) =>
-        val createF = async {
-          await(
-            adminApi.create(path, ConfigData.fromString(defaultStrConf), Annex == fileType, "initial commit")
-          )
-        }
-        Await.result(createF, 2.seconds)
+    paths map { case (path, fileType) =>
+      val createF = async {
+        await(
+          adminApi.create(path, ConfigData.fromString(defaultStrConf), Annex == fileType, "initial commit")
+        )
+      }
+      Await.result(createF, 2.seconds)
     }
 
     val assertionF = async {
       //retrieve list of all files; for demonstration purpose show validate return values
-      await(adminApi.list()).map(info => info.path).toSet shouldBe paths.map {
-        case (path, _) => path
+      await(adminApi.list()).map(info => info.path).toSet shouldBe paths.map { case (path, _) =>
+        path
       }.toSet
 
       //retrieve list of files based on type; for demonstration purpose validate return values

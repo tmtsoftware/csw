@@ -36,9 +36,8 @@ class SchedulerExamples(ctx: ActorContext[UTCTime]) {
       Behaviors.setup { ctx =>
         //setup required for the actor
 
-        Behaviors.receiveMessage {
-          case _ => // handle the message to execute the task on scheduled time and return new behavior
-            Behaviors.same
+        Behaviors.receiveMessage { case _ => // handle the message to execute the task on scheduled time and return new behavior
+          Behaviors.same
         }
       }
   }

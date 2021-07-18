@@ -133,8 +133,8 @@ private[event] class RedisSubscriber(redisURI: Future[RedisURI], redisClient: Re
     }
 
   private def recoverWithError[T](f: Future[T]) =
-    f.recover {
-      case RedisServerNotAvailable(ex) => throw EventServerNotAvailable(ex)
+    f.recover { case RedisServerNotAvailable(ex) =>
+      throw EventServerNotAvailable(ex)
     }
 
 }

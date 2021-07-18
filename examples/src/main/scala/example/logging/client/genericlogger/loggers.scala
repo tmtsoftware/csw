@@ -21,9 +21,8 @@ object GenericActor {
       val log: Logger = GenericLoggerFactory.getLogger(context)
       // actor setup
 
-      Behaviors.receiveMessage {
-        case _ => // handle messages and return new behavior
-          Behaviors.same
+      Behaviors.receiveMessage { case _ => // handle messages and return new behavior
+        Behaviors.same
       }
     }
 }

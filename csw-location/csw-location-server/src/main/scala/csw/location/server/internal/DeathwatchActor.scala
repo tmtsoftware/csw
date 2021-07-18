@@ -45,30 +45,29 @@ private[location] class DeathwatchActor(locationService: LocationService)(implic
       }
       //all locations are now watched
       behavior(allLocations)
-    } receiveSignal {
-      case (ctx, Terminated(deadActorRef)) =>
-        val log: Logger = LocationServiceLogger.getLogger(ctx)
+    } receiveSignal { case (ctx, Terminated(deadActorRef)) =>
+      val log: Logger = LocationServiceLogger.getLogger(ctx)
 
-        log.warn(s"Un-watching terminated actor: ${deadActorRef.toString}")
-        //stop watching the terminated actor
-        ctx.unwatch(deadActorRef)
-        //Unregister the dead location and remove it from the list of watched locations
-        val maybeLocation = watchedLocations.find {
-          case AkkaLocation(_, actorRefUri, _) => deadActorRef == actorRefUri.toActorRef
-          case _                               => false
-        }
-        maybeLocation match {
-          case Some(location) =>
-            //if deadActorRef is mapped to a location, unregister it and remove it from watched locations
-            locationService.unregister(location.connection)
-            // unregister the http connection for an akka connection if present else do nothing, locationService.unregister is idempotent
-            val httpConnection = HttpConnection(location.connection.componentId)
-            locationService.unregister(httpConnection)
-            behavior(watchedLocations - location)
-          case None =>
-            //if deadActorRef does not match any location, don't change a thing!
-            Behaviors.same
-        }
+      log.warn(s"Un-watching terminated actor: ${deadActorRef.toString}")
+      //stop watching the terminated actor
+      ctx.unwatch(deadActorRef)
+      //Unregister the dead location and remove it from the list of watched locations
+      val maybeLocation = watchedLocations.find {
+        case AkkaLocation(_, actorRefUri, _) => deadActorRef == actorRefUri.toActorRef
+        case _                               => false
+      }
+      maybeLocation match {
+        case Some(location) =>
+          //if deadActorRef is mapped to a location, unregister it and remove it from watched locations
+          locationService.unregister(location.connection)
+          // unregister the http connection for an akka connection if present else do nothing, locationService.unregister is idempotent
+          val httpConnection = HttpConnection(location.connection.componentId)
+          locationService.unregister(httpConnection)
+          behavior(watchedLocations - location)
+        case None =>
+          //if deadActorRef does not match any location, don't change a thing!
+          Behaviors.same
+      }
     }
 }
 
@@ -86,8 +85,8 @@ private[location] object DeathwatchActor {
   def start(cswCluster: CswCluster, locationService: LocationService): ActorRef[Msg] = {
     log.debug("Starting Deathwatch actor")
     val behavior: Behavior[Msg] = new DeathwatchActor(locationService)(cswCluster.actorSystem).behavior(Set.empty)
-    val widenedBehaviour: Behavior[SubscribeResponse[AllServices.Value]] = behavior.transformMessages {
-      case x @ Changed(_) => x
+    val widenedBehaviour: Behavior[SubscribeResponse[AllServices.Value]] = behavior.transformMessages { case x @ Changed(_) =>
+      x
     }
     val actorRef: ActorRef[SubscribeResponse[AllServices.Value]] =
       cswCluster.actorSystem.spawn(

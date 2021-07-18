@@ -21,34 +21,33 @@ object Main {
   def main(args: Array[String]): Unit = start(args, startLogging = true)
 
   def start(args: Array[String], startLogging: Boolean = false): Option[(HttpService, ServerWiring)] =
-    new ArgsParser(name).parse(args.toList).map {
-      case Options(init, maybePort) =>
-        LocationServerStatus.requireUpLocally()
+    new ArgsParser(name).parse(args.toList).map { case Options(init, maybePort) =>
+      LocationServerStatus.requireUpLocally()
 
-        val wiring = ServerWiring.make(maybePort)
-        import wiring._
+      val wiring = ServerWiring.make(maybePort)
+      import wiring._
 
-        def shutdownAndLog(ex: Exception) = {
-          Await.result(actorRuntime.shutdown(), 10.seconds)
-          log.error(ex.getMessage, ex = ex)
-          throw ex
-        }
+      def shutdownAndLog(ex: Exception) = {
+        Await.result(actorRuntime.shutdown(), 10.seconds)
+        log.error(ex.getMessage, ex = ex)
+        throw ex
+      }
 
-        if (startLogging) actorRuntime.startLogging(name)
-        if (init) svnRepo.initSvnRepo()
+      if (startLogging) actorRuntime.startLogging(name)
+      if (init) svnRepo.initSvnRepo()
 
-        try {
-          // test if the svn repo can be accessed successfully
-          svnRepo.testConnection()
-          // start the config server and register it with location service
-          Await.result(httpService.registeredLazyBinding, 20.seconds)
-          (httpService, wiring)
-        }
-        catch {
-          case ex: SVNException =>
-            shutdownAndLog(new RuntimeException(s"Could not open repository located at : ${settings.svnUrl}", ex))
-          case ex: AASResolutionFailed => shutdownAndLog(ex)
-        }
+      try {
+        // test if the svn repo can be accessed successfully
+        svnRepo.testConnection()
+        // start the config server and register it with location service
+        Await.result(httpService.registeredLazyBinding, 20.seconds)
+        (httpService, wiring)
+      }
+      catch {
+        case ex: SVNException =>
+          shutdownAndLog(new RuntimeException(s"Could not open repository located at : ${settings.svnUrl}", ex))
+        case ex: AASResolutionFailed => shutdownAndLog(ex)
+      }
     }
 
 }
