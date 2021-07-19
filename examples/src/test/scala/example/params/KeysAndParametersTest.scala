@@ -6,7 +6,7 @@ import csw.params.core.models.Coords.EqFrame.FK5
 import csw.params.core.models.Coords.SolarSystemObject.Venus
 import csw.params.core.models.Units.NoUnits
 import csw.params.core.models._
-import csw.time.core.models.UTCTime
+import csw.time.core.models.{TAITime, UTCTime}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -271,7 +271,7 @@ class KeysAndParametersTest extends AnyFunSpec with Matchers {
       thirdKey.get shouldBe struct1.parameter(epoch)
     }
 
-    it("should show usage of units") {
+    it("should show usage of units | CSW-152") {
 
       //#units
       //declare keyname
@@ -287,8 +287,9 @@ class KeysAndParametersTest extends AnyFunSpec with Matchers {
       val bDefaultUnitSet: Boolean   = bParam.units === Units.NoUnits //true
 
       //default unit for UTCTimeKey
-      val tParam: Parameter[UTCTime] = KeyType.UTCTimeKey.make("now").set(UTCTime.now())
-      val defaultTimeUnit: Units     = tParam.units //is second
+      val utcParam: Parameter[UTCTime] = KeyType.UTCTimeKey.make("now").set(UTCTime.now())
+      //default unit for TAITimeKey
+      val taiParam: Parameter[TAITime] = KeyType.TAITimeKey.make("now").set(TAITime.now())
 
       //storing multiple values
       val paramOfShorts: Parameter[Short] = k2.set(1, 2, 3, 4)
@@ -306,7 +307,8 @@ class KeysAndParametersTest extends AnyFunSpec with Matchers {
 
       //validations
       assert(bDefaultUnitSet === true)
-      assert(defaultTimeUnit === Units.second)
+      assert(utcParam.units === Units.utc)
+      assert(taiParam.units === Units.tai)
       assert(paramWithUnits1.units === Units.NoUnits)
       assert(paramWithUnits2.units === Units.day)
       assert(paramWithUnits3.units === Units.meter)

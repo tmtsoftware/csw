@@ -874,7 +874,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
       "should test using one array with and without units | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-188, DEOPSCSW-184, DEOPSCSW-196"
     ) {
       var li2 = lk.set(a1) // Uses implicit to create from long array
-      li2.head should equal(la1)
+                                 li2.head should equal(la1)
       li2 = lk.set(a2).withUnits(degree)
       li2.units should be theSameInstanceAs degree
       li2.head should equal(la2)
@@ -965,10 +965,10 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
     }
 
     it(
-      "and second must be default Unit | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-188, DEOPSCSW-184, DEOPSCSW-196, DEOPSCSW-282, DEOPSCSW-661"
+      "and utc must be default Unit | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-188, DEOPSCSW-184, DEOPSCSW-196, DEOPSCSW-282, DEOPSCSW-661, CSW-152"
     ) {
       val li1: Parameter[UTCTime] = utcTimeKey.set(utcTimeValue)
-      li1.units should be(second)
+      li1.units should be(utc)
 
       //must respect overriding also
       val li2: Parameter[UTCTime] = utcTimeKey.set(utcTimeValue).withUnits(NoUnits)
@@ -996,7 +996,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
       "should work with list | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-188, DEOPSCSW-184, DEOPSCSW-196, DEOPSCSW-282, DEOPSCSW-661"
     ) {
       val li: Parameter[UTCTime] = utcTimeKey.setAll(listIn)
-      li.units should be(second)
+      li.units should be(utc)
       li.value(0) should equal(listIn(0))
       li.value(1) should equal(listIn(1))
       li.value(2) should equal(listIn(2))
@@ -1018,9 +1018,9 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
       li.get(0).get should equal(taiTimeValue)
     }
 
-    it("and second must be default Unit | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-188, DEOPSCSW-184, DEOPSCSW-196, DEOPSCSW-661") {
+    it("and tai must be default Unit | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-188, DEOPSCSW-184, DEOPSCSW-196, DEOPSCSW-661, CSW-152") {
       val li1: Parameter[TAITime] = taiTimeKey.set(taiTimeValue)
-      li1.units should be(second)
+      li1.units should be(tai)
 
       //must respect overriding also
       val li2: Parameter[TAITime] = taiTimeKey.set(taiTimeValue).withUnits(NoUnits)
@@ -1034,8 +1034,8 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
     )
 
     it("should work with list, withUnits | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-188, DEOPSCSW-184, DEOPSCSW-196, DEOPSCSW-661") {
-      val li = taiTimeKey.setAll(listIn).withUnits(second)
-      li.units should be(second)
+      val li = taiTimeKey.setAll(listIn)
+      li.units should be(tai)
       li.value(0) should equal(listIn(0))
       li.value(1) should equal(listIn(1))
       li.value(2) should equal(listIn(2))
@@ -1044,7 +1044,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
 
     it("should work with list | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-188, DEOPSCSW-184, DEOPSCSW-196, DEOPSCSW-661") {
       val li: Parameter[TAITime] = taiTimeKey.setAll(listIn)
-      li.units should be(second)
+      li.units should be(tai)
       li.value(0) should equal(listIn(0))
       li.value(1) should equal(listIn(1))
       li.value(2) should equal(listIn(2))

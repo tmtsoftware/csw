@@ -7,6 +7,7 @@ import csw.params.core.models.*;
 import csw.params.core.models.Coords.*;
 import csw.params.javadsl.JKeyType;
 import csw.params.javadsl.JUnits;
+import csw.time.core.models.TAITime;
 import csw.time.core.models.UTCTime;
 import org.junit.Assert;
 import org.junit.Test;
@@ -338,12 +339,18 @@ public class JKeysAndParametersTest extends JUnitSuite {
         Parameter<Boolean> bParam = k1.set(true);
         boolean bDefaultUnitSet = bParam.units() == JUnits.NoUnits; //true
 
-        //default unit for UTCTimeKey/TAITimeKey
-        Parameter<UTCTime> tParam = JKeyType
+        //default unit for UTCTimeKey
+        Parameter<UTCTime> utcParam = JKeyType
                 .UTCTimeKey()
                 .make("now")
                 .set(UTCTime.now());
-        Units defaultTimeUnit = tParam.units(); //is second
+
+        //default unit for TAITimeKey
+        Parameter<TAITime> taiParam = JKeyType
+                .TAITimeKey()
+                .make("now")
+                .set(TAITime.now());
+
 
         //storing multiple values
         Parameter<Short> paramOfShorts = k2.set(
@@ -366,7 +373,8 @@ public class JKeysAndParametersTest extends JUnitSuite {
 
         //validations
         Assert.assertTrue(bDefaultUnitSet);
-        Assert.assertSame(defaultTimeUnit, JUnits.second);
+        Assert.assertSame(utcParam.units(), JUnits.utc);
+        Assert.assertSame(taiParam.units(), JUnits.tai);
         Assert.assertSame(paramWithUnits1.units(), JUnits.NoUnits);
         Assert.assertSame(paramWithUnits2.units(), JUnits.day);
         Assert.assertSame(paramWithUnits3.units(), JUnits.meter);
