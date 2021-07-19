@@ -90,4 +90,8 @@ object Units extends Enum[Units] {
   case object encoder extends Units("enc", "encoder counts")
   case object count   extends Units("ct", "counts as for an encoder or detector")
   case object pix     extends Units("pix", "pixel")
+
+  //Time units
+  case object tai extends Units("TAI", "TAI time unit")
+  case object utc extends Units("UTC", "UTC time unit")
 }

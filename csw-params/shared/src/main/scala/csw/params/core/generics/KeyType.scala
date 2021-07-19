@@ -3,7 +3,7 @@ package csw.params.core.generics
 import csw.params.core.formats.ParamCodecs._
 import csw.params.core.formats.{ParamCodecs, ParamCore}
 import csw.params.core.models.Coords._
-import csw.params.core.models.Units.{NoUnits, second}
+import csw.params.core.models.Units.{NoUnits, tai, utc}
 import csw.params.core.models._
 import csw.time.core.models.{TAITime, UTCTime}
 import enumeratum.{Enum, EnumEntry}
@@ -101,8 +101,8 @@ object KeyType extends Enum[KeyType[_]] {
 
   case object StringKey  extends SimpleKeyType[String]
   case object StructKey  extends SimpleKeyType[Struct]
-  case object UTCTimeKey extends SimpleKeyTypeWithUnits[UTCTime](second)
-  case object TAITimeKey extends SimpleKeyTypeWithUnits[TAITime](second)
+  case object UTCTimeKey extends SimpleKeyTypeWithUnits[UTCTime](utc)
+  case object TAITimeKey extends SimpleKeyTypeWithUnits[TAITime](tai)
 
   case object RaDecKey            extends SimpleKeyType[RaDec]
   case object EqCoordKey          extends SimpleKeyType[EqCoord]
