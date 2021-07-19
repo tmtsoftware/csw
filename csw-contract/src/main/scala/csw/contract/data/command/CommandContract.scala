@@ -42,6 +42,7 @@ object CommandContract extends CommandData with CommandServiceCodecs {
       wrongParameterTypeIssue,
       wrongPrefixIssue,
       wrongUnitsIssue,
+      wrongCommandTypeIssue,
       otherIssue
     )
   )

@@ -72,6 +72,7 @@ trait CommandData {
   val wrongParameterTypeIssue: CommandIssue           = WrongParameterTypeIssue(reason)
   val wrongPrefixIssue: CommandIssue                  = WrongPrefixIssue(reason)
   val wrongUnitsIssue: CommandIssue                   = WrongUnitsIssue(reason)
+  val wrongCommandTypeIssue: CommandIssue             = WrongCommandTypeIssue(reason)
   val otherIssue: CommandIssue                        = OtherIssue(reason)
 
   val result: Result = Result(paramSet)

@@ -144,4 +144,10 @@ object CommandIssue {
    */
   final case class OtherIssue(reason: String) extends CommandIssue
 
+  /**
+   * Returned when some given command type is not expected
+   *
+   * @param reason describing the cause of this issue
+   */
+  final case class WrongCommandTypeIssue(reason: String) extends CommandIssue
 }
