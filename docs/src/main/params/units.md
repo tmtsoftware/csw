@@ -86,6 +86,11 @@ The default unit for `UTCTimeKey` and `TAITimeKey` (in Scala and Java both) is `
 | ounce      | oz                 | international avoirdupois ounce |
 | yard       | yd                 | international yard - 3 ft |
 
+## Datetime units
+| Name          | Abbreviation    | Description                                                                |
+| :-----------: |:--------------: | :--------------------------------------------------------------------------|
+| tai    | tai                | TAI Time unit |
+| utc    | utc                | UTC Time unit |
 
 ## Others - Engineering
 | Name          | Abbreviation    | Description                                                                |
@@ -94,12 +99,6 @@ The default unit for `UTCTimeKey` and `TAITimeKey` (in Scala and Java both) is `
 | encoder    | enc                | encoder counts |
 | count      | ct                 | counts as for an encoder or detector |
 | pix        | pix                | pixel |
-
-## Time units
-| Name          | Abbreviation    | Description                                                                |
-| :-----------: |:--------------: | :--------------------------------------------------------------------------|
-| tai    | tai              | TAI Time unit |
-| utc    | utc                | UTC Time unit |
 
 ## Usage Examples
 

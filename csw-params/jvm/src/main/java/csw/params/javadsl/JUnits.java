@@ -63,7 +63,7 @@ public interface JUnits {
     Units count   = Units.count$.MODULE$;
     Units pix     = Units.pix$.MODULE$;
 
-    // Time units
+    // Datetime units
     Units tai = Units.tai$.MODULE$;
     Units utc = Units.utc$.MODULE$;
 
