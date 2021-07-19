@@ -1,22 +1,21 @@
 package csw.params.core.formats
 
-import java.time.Instant
-
 import csw.params.commands.{CommandName, Observe, Setup, Wait}
 import csw.params.core.generics.KeyType
 import csw.params.core.generics.KeyType.{LongMatrixKey, StructKey}
-import csw.params.core.models.Units.{NoUnits, encoder, meter, second}
+import csw.params.core.models.Units.{NoUnits, encoder, meter}
 import csw.params.core.models._
 import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.params.events._
 import csw.params.testdata.ParamSetData
 import csw.prefix.models.Prefix
 import csw.time.core.models.UTCTime
-import play.api.libs.json.Json
-
-import scala.io.Source
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
+import play.api.libs.json.Json
+
+import java.time.Instant
+import scala.io.Source
 
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-188: Efficient Serialization to/from JSON
@@ -131,7 +130,7 @@ class JsonContractTest extends AnyFunSpec with Matchers {
   describe("Test State Variables") {
 
     it(
-      "should adhere to specified standard CurrentState json format | DEOPSCSW-183, DEOPSCSW-188, DEOPSCSW-282, DEOPSCSW-184, DEOPSCSW-423, DEOPSCSW-401"
+      "should adhere to specified standard CurrentState json format | DEOPSCSW-183, DEOPSCSW-188, DEOPSCSW-282, DEOPSCSW-184, DEOPSCSW-423, DEOPSCSW-401, CSW-152"
     ) {
       val charKey        = KeyType.CharKey.make("charKey")
       val intArrayKey    = KeyType.IntArrayKey.make("intArrayKey")
@@ -148,7 +147,6 @@ class JsonContractTest extends AnyFunSpec with Matchers {
             UTCTime(Instant.ofEpochMilli(0)),
             UTCTime(Instant.parse("2017-09-04T16:28:00.123456789Z"))
           )
-          .withUnits(second)
 
       val currentState       = CurrentState(prefix, stateName).madd(charParam, intArrayParam, utcTimeParam)
       val currentStateToJson = JsonSupport.writeStateVariable(currentState)

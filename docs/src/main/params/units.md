@@ -20,7 +20,7 @@ The set of supported Units will be modified as more required Units are discovere
 
 ## Default Units for Keys
 
-The default unit for `UTCTimeKey` and `TAITimeKey` (in Scala and Java both) is `second`. For all the remaining keys, default unit is NoUnits.  
+The default unit for `UTCTimeKey` and `TAITimeKey` (in Scala and Java both) is `utc` & `tai` respectively. For all the remaining keys, default unit is NoUnits.  
 
 ## SI Units
 
@@ -86,6 +86,11 @@ The default unit for `UTCTimeKey` and `TAITimeKey` (in Scala and Java both) is `
 | ounce      | oz                 | international avoirdupois ounce |
 | yard       | yd                 | international yard - 3 ft |
 
+## Datetime units
+| Name          | Abbreviation    | Description                                                                |
+| :-----------: |:--------------: | :--------------------------------------------------------------------------|
+| tai    | tai                | TAI Time unit |
+| utc    | utc                | UTC Time unit |
 
 ## Others - Engineering
 | Name          | Abbreviation    | Description                                                                |
