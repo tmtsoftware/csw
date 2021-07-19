@@ -90,8 +90,6 @@ object Akka {
   val `akka-slf4j`               = "com.typesafe.akka" %% "akka-slf4j"               % Version
   val `cluster-sharding` =
     "com.typesafe.akka" %% "akka-cluster-sharding" % Version //required to maintaining the transitive dependency of akka-management-cluster-http
-  val `akka-persistence` =
-    "com.typesafe.akka" %% "akka-persistence" % Version //required to maintaining the transitive dependency of akka-cluster-sharding
 }
 
 object AkkaHttp {

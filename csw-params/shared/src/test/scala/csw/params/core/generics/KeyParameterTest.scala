@@ -874,7 +874,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
       "should test using one array with and without units | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-188, DEOPSCSW-184, DEOPSCSW-196"
     ) {
       var li2 = lk.set(a1) // Uses implicit to create from long array
-                                 li2.head should equal(la1)
+      li2.head should equal(la1)
       li2 = lk.set(a2).withUnits(degree)
       li2.units should be theSameInstanceAs degree
       li2.head should equal(la2)
@@ -1018,7 +1018,9 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
       li.get(0).get should equal(taiTimeValue)
     }
 
-    it("and tai must be default Unit | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-188, DEOPSCSW-184, DEOPSCSW-196, DEOPSCSW-661, CSW-152") {
+    it(
+      "and tai must be default Unit | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-188, DEOPSCSW-184, DEOPSCSW-196, DEOPSCSW-661, CSW-152"
+    ) {
       val li1: Parameter[TAITime] = taiTimeKey.set(taiTimeValue)
       li1.units should be(tai)
 

@@ -24,8 +24,7 @@ object Dependencies {
       Libs.`scala-async`,
       Libs.`scopt`,
       Libs.`enumeratum`.value,
-      Akka.`cluster-sharding`,
-      Akka.`akka-persistence`,
+      Akka.`cluster-sharding`, // akka-management-cluster-http uses lower version, to avoid conflict, this needs to be overridden
       Libs.`akka-management-cluster-http`,
       AkkaHttp.`akka-http`,
       AkkaHttp.`akka-http-spray-json`, // akka-cluster-management uses lower version, to avoid conflict, this needs to be overridden
