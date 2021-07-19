@@ -1,21 +1,21 @@
 package csw.params.core.formats
 
-import java.time.Instant
 import csw.params.commands.{CommandName, Observe, Setup, Wait}
 import csw.params.core.generics.KeyType
 import csw.params.core.generics.KeyType.{LongMatrixKey, StructKey}
-import csw.params.core.models.Units.{NoUnits, encoder, meter, second, utc}
+import csw.params.core.models.Units.{NoUnits, encoder, meter}
 import csw.params.core.models._
 import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.params.events._
 import csw.params.testdata.ParamSetData
 import csw.prefix.models.Prefix
 import csw.time.core.models.UTCTime
-import play.api.libs.json.Json
-
-import scala.io.Source
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
+import play.api.libs.json.Json
+
+import java.time.Instant
+import scala.io.Source
 
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-188: Efficient Serialization to/from JSON

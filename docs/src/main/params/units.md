@@ -20,7 +20,7 @@ The set of supported Units will be modified as more required Units are discovere
 
 ## Default Units for Keys
 
-The default unit for `UTCTimeKey` and `TAITimeKey` (in Scala and Java both) is `second`. For all the remaining keys, default unit is NoUnits.  
+The default unit for `UTCTimeKey` and `TAITimeKey` (in Scala and Java both) is `utc` & `tai` respectively. For all the remaining keys, default unit is NoUnits.  
 
 ## SI Units
 
@@ -94,6 +94,12 @@ The default unit for `UTCTimeKey` and `TAITimeKey` (in Scala and Java both) is `
 | encoder    | enc                | encoder counts |
 | count      | ct                 | counts as for an encoder or detector |
 | pix        | pix                | pixel |
+
+## Time units
+| Name          | Abbreviation    | Description                                                                |
+| :-----------: |:--------------: | :--------------------------------------------------------------------------|
+| tai    | tai              | TAI Time unit |
+| utc    | utc                | UTC Time unit |
 
 ## Usage Examples
 
