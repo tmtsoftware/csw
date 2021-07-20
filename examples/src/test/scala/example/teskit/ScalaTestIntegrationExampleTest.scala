@@ -24,7 +24,7 @@ class ScalaTestIntegrationExampleTest extends ScalaTestFrameworkTestKit(AlarmSer
 class ScalaAlarmTestKitExampleTest extends ScalaTestFrameworkTestKit(AlarmServer) with AnyFunSuiteLike {
   import frameworkTestKit.alarmTestKit._
   test("test initializing alarms via config") {
-    initAlarms(ConfigFactory.load("valid-alarms.conf"))
+    initAlarms(ConfigFactory.parseResources("valid-alarms.conf"))
 
     // .. assertions etc.
   }
