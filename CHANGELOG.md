@@ -13,7 +13,9 @@ All notable changes to this project will be documented in this file.
 - Added `JDefaultComponentHandlers` and `DefaultComponentHandlers` - default component handlers to create assembly or hcd in both scala and java 
 - Removed `allTags` and `allTagNames` method from `Coords` and `JCoords`
 - Updated app name's with `csw` prefix according to `apps.prod.json` in `osw-apps` repo.
-- Add UTC & TAI unit for time parameters.
+- Added UTC & TAI entries in units list.
+- Changed default unit for `UTCTimeKey` & `TAITimeKey` from `second` to `utc` & `tai` respectively. 
+- Added new `WrongCommandTypeIssue` entry in `CommandIssue`.
 
 ## [CSW v3.0.1] - 2021-01-28
 
