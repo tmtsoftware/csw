@@ -7,8 +7,7 @@ import csw.prefix.models.{Prefix, Subsystem}
 import csw.testkit.scaladsl.CSWService.{AlarmServer, LocationServer}
 import org.scalatest.funsuite.AnyFunSuiteLike
 
-class AlarmTestkitTest extends ScalaTestFrameworkTestKit(LocationServer, AlarmServer)
-  with AnyFunSuiteLike {
+class AlarmTestkitTest extends ScalaTestFrameworkTestKit(LocationServer, AlarmServer) with AnyFunSuiteLike {
   private val alarmTestKit = frameworkTestKit.alarmTestKit
 
   test("should get severity for initialized alarms with alarm testkit | CSW-21") {

@@ -76,6 +76,16 @@ Full source at GitHub
 * [Scala]($github.base_url$/examples/src/test/scala/example/teskit/TestKitsExampleTest.scala)
 * [Java]($github.base_url$/examples/src/test/java/example/testkit/JTestKitsExampleTest.java)
 
+### Initializing alarms & Get severity of alarms
+
+The example below shows the usage `initAlarms` & `getCurrentSeverity` methods using `AlarmTestKit`.
+
+Scala
+: @@snip [ScalaTestExampleIntegrationTest.scala](../../../../examples/src/test/scala/example/teskit/ScalaTestIntegrationExampleTest.scala) { #scalatest-alarm-testkit }
+
+Java
+:   @@snip [JUnitIntegrationExampleTest.scala](../../../../examples/src/test/java/example/testkit/JUnitIntegrationExampleTest.java) { #junit-alarm-testkit }
+
 ## Test framework integration
 
 ### ScalaTest
