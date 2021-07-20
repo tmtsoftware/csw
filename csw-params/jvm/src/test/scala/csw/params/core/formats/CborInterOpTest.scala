@@ -9,7 +9,7 @@ import org.scalatest.matchers.should.Matchers
 
 class CborInterOpTest extends AnyFunSuite with Matchers {
 
-  test("should decode java bytes to scala bytes") {
+  test("should decode java bytes to scala bytes | CSW-144") {
     val jByteKey: Key[java.lang.Byte]    = JKeyType.ByteKey.make("bytes")
     val param: Parameter[java.lang.Byte] = jByteKey.setAll("abc".getBytes().map(x => x: java.lang.Byte))
     val bytes: Array[Byte]               = Cbor.encode(param).toByteArray
@@ -27,7 +27,7 @@ class CborInterOpTest extends AnyFunSuite with Matchers {
     parsedParam shouldEqual param
   }
 
-  test("should decode java Characters to scala Chars") {
+  test("should decode java Characters to scala Chars | CSW-144") {
     val jCharKey: Key[Character]    = JKeyType.CharKey.make("char")
     val param: Parameter[Character] = jCharKey.setAll(Array('A', 'B', 'C'))
     val bytes: Array[Byte]          = Cbor.encode(param).toByteArray
