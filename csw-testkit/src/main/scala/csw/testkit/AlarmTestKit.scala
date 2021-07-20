@@ -1,16 +1,24 @@
 package csw.testkit
 
-import java.util.Optional
-
+import akka.Done
 import akka.actor.typed
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.util.Timeout
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{Config, ConfigFactory}
+import csw.alarm.api.scaladsl.AlarmAdminService
+import csw.alarm.client.AlarmServiceFactory
 import csw.alarm.client.internal.commons.AlarmServiceConnection
-import csw.location.api.scaladsl.RegistrationResult
+import csw.alarm.models.FullAlarmSeverity
+import csw.alarm.models.Key.AlarmKey
 import csw.location.api.models.Connection.TcpConnection
+import csw.location.api.scaladsl.RegistrationResult
 import csw.network.utils.SocketUtils.getFreePort
 import csw.testkit.redis.RedisStore
+
+import java.util.Optional
+import java.util.concurrent.TimeUnit
+import scala.concurrent.Await
+import scala.concurrent.duration.FiniteDuration
 
 /**
  * AlarmTestKit supports starting Alarm server using embedded redis internally (sentinel + master)
@@ -31,14 +39,17 @@ import csw.testkit.redis.RedisStore
  */
 final class AlarmTestKit private (_system: ActorSystem[SpawnProtocol.Command], testKitSettings: TestKitSettings)
     extends RedisStore {
-
+  private lazy val hostname                                        = "localhost"
   override implicit val system: ActorSystem[SpawnProtocol.Command] = _system
   override implicit lazy val timeout: Timeout                      = testKitSettings.DefaultTimeout
   override protected lazy val masterId: String                     = system.settings.config.getString("csw-alarm.redis.masterId")
   override protected lazy val connection: TcpConnection            = AlarmServiceConnection.value
+  private val alarmServiceFactory: AlarmServiceFactory             = new AlarmServiceFactory()
+  private lazy val alarmService: AlarmAdminService                 = alarmServiceFactory.makeAdminApi(hostname, getSentinelPort)
 
   private def getSentinelPort: Int = testKitSettings.AlarmSentinelPort.getOrElse(getFreePort)
-  private def getMasterPort: Int   = testKitSettings.AlarmMasterPort.getOrElse(getFreePort)
+
+  private def getMasterPort: Int = testKitSettings.AlarmMasterPort.getOrElse(getFreePort)
 
   /**
    * Scala API to Start Alarm service
@@ -65,6 +76,31 @@ final class AlarmTestKit private (_system: ActorSystem[SpawnProtocol.Command], t
    * This will terminate actor system and stop redis sentinel and redis server.
    */
   def shutdownAlarmService(): Unit = shutdown()
+
+  /**
+   * Loads data for all alarms in alarm store i.e. metadata of alarms for e.g. subsystem, component, name, etc. and status of
+   * alarms for e.g. acknowledgement status, latch status, etc.
+   *
+   * @note severity of the alarm is not loaded in store and is by default inferred as Disconnected until component starts
+   *       updating severity
+   * @see [[csw.alarm.models.AlarmMetadata]],
+   *     [[csw.alarm.models.AlarmStatus]]
+   * @param config represents the data for all alarms to be loaded in alarm store
+   * @param reset the alarm store before loading the data
+   * @return Done when data is loaded successfully in alarm store or fails with
+   *         [[csw.alarm.api.exceptions.ConfigParseException]]
+   */
+  def initAlarms(config: Config, reset: Boolean = false): Done =
+    Await.result(alarmService.initAlarms(config, reset), new FiniteDuration(8, TimeUnit.SECONDS))
+
+  /**
+   * Fetches the severity of the given alarm from the alarm store
+   *
+   * @param alarmKey represents a unique alarm in alarm store
+   * @return the alarm severity or fails with [[csw.alarm.api.exceptions.KeyNotFoundException]]
+   */
+  def getCurrentSeverity(alarmKey: AlarmKey): FullAlarmSeverity =
+    Await.result(alarmService.getCurrentSeverity(alarmKey), new FiniteDuration(1, TimeUnit.SECONDS))
 }
 
 object AlarmTestKit {
