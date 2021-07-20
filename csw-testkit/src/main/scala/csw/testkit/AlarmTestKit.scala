@@ -11,9 +11,11 @@ import csw.alarm.client.internal.commons.AlarmServiceConnection
 import csw.alarm.models.FullAlarmSeverity
 import csw.alarm.models.Key.AlarmKey
 import csw.location.api.models.Connection.TcpConnection
-import csw.location.api.scaladsl.RegistrationResult
+import csw.location.api.scaladsl.{LocationService, RegistrationResult}
+import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.network.utils.SocketUtils.getFreePort
 import csw.testkit.redis.RedisStore
+import io.lettuce.core.RedisClient
 
 import java.util.Optional
 import java.util.concurrent.TimeUnit
@@ -37,15 +39,20 @@ import scala.concurrent.duration.FiniteDuration
  *
  * }}}
  */
-final class AlarmTestKit private (_system: ActorSystem[SpawnProtocol.Command], testKitSettings: TestKitSettings)
-    extends RedisStore {
-  private lazy val hostname                                        = "localhost"
+final class AlarmTestKit private (
+    redisClient: RedisClient,
+    _system: ActorSystem[SpawnProtocol.Command],
+    testKitSettings: TestKitSettings
+) extends RedisStore {
+
   override implicit val system: ActorSystem[SpawnProtocol.Command] = _system
   override implicit lazy val timeout: Timeout                      = testKitSettings.DefaultTimeout
   override protected lazy val masterId: String                     = system.settings.config.getString("csw-alarm.redis.masterId")
   override protected lazy val connection: TcpConnection            = AlarmServiceConnection.value
-  private val alarmServiceFactory: AlarmServiceFactory             = new AlarmServiceFactory()
-  private lazy val alarmService: AlarmAdminService                 = alarmServiceFactory.makeAdminApi(hostname, getSentinelPort)
+  lazy val locationService: LocationService                        = HttpLocationServiceFactory.makeLocalClient(system)
+
+  private val alarmServiceFactory: AlarmServiceFactory = new AlarmServiceFactory(redisClient)
+  private lazy val alarmService: AlarmAdminService     = alarmServiceFactory.makeAdminApi(locationService)
 
   private def getSentinelPort: Int = testKitSettings.AlarmSentinelPort.getOrElse(getFreePort)
 
@@ -115,8 +122,9 @@ object AlarmTestKit {
    */
   def apply(
       actorSystem: ActorSystem[SpawnProtocol.Command] = typed.ActorSystem(SpawnProtocol(), "alarm-testkit"),
+      redisClient: RedisClient = RedisClient.create(),
       testKitSettings: TestKitSettings = TestKitSettings(ConfigFactory.load())
-  ): AlarmTestKit = new AlarmTestKit(actorSystem, testKitSettings)
+  ): AlarmTestKit = new AlarmTestKit(redisClient, actorSystem, testKitSettings)
 
   /**
    * Java API to create a EventTestKit
@@ -132,5 +140,12 @@ object AlarmTestKit {
    * @return handle to AlarmTestKit which can be used to start and stop alarm service
    */
   def create(testKitSettings: TestKitSettings): AlarmTestKit = apply(testKitSettings = testKitSettings)
+
+  /**
+   * Java API to create a EventTestKit
+   *
+   * @return handle to EventTestKit which can be used to start and stop event service
+   */
+  def create(redisClient: RedisClient): AlarmTestKit = apply(redisClient = redisClient)
 
 }

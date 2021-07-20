@@ -7,7 +7,6 @@ import csw.prefix.models.Prefix
 import csw.prefix.models.Subsystem.NFIRAOS
 import csw.testkit.scaladsl.CSWService.{AlarmServer, EventServer}
 import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
-import net.bytebuddy.build.ToStringPlugin.Enhance.Prefix
 import org.scalatest.funsuite.AnyFunSuiteLike
 
 class ScalaTestIntegrationExampleTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with AnyFunSuiteLike {

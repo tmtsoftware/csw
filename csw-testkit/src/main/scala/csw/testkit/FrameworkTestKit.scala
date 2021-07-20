@@ -202,7 +202,7 @@ object FrameworkTestKit {
       LocationTestKit(testKitSettings),
       ConfigTestKit(actorSystem, testKitSettings = testKitSettings),
       EventTestKit(actorSystem, testKitSettings),
-      AlarmTestKit(actorSystem, testKitSettings)
+      AlarmTestKit(actorSystem = actorSystem, testKitSettings = testKitSettings)
     )
 
   /**
