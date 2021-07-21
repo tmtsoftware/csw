@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 - Added UTC & TAI entries in units list.
 - Changed default unit for `UTCTimeKey` & `TAITimeKey` from `second` to `utc` & `tai` respectively. 
 - Added new `WrongCommandTypeIssue` entry in `CommandIssue`.
+- Removed `RaDec` from `KeyType`.
 
 ## [CSW v3.0.1] - 2021-01-28
 
