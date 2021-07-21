@@ -156,36 +156,6 @@ class KeysAndParametersTest extends AnyFunSpec with Matchers {
       paramWithFoot.units should be(Units.foot)
     }
 
-    it("should show usage of radec") {
-      //#radec
-      //RaDec
-      val raDec1: RaDec = RaDec(1.0, 2.0)
-      val raDec2: RaDec = RaDec(3.0, 4.0)
-
-      //keys
-      val raDecKey: Key[RaDec] = KeyType.RaDecKey.make("raDecKey")
-
-      //store values
-      val p1: Parameter[RaDec] = raDecKey.set(raDec1)
-      val p2: Parameter[RaDec] = raDecKey.setAll(Array(raDec1, raDec2))
-
-      //add units
-      val paramWithDegree = p1.withUnits(Units.degree)
-
-      //default unit is NoUnits
-      assert(p2.units === Units.NoUnits)
-
-      //retrieving values
-      val head: RaDec          = p1.head
-      val values: Array[RaDec] = p2.values
-
-      //#radec
-      //validations
-      head should be(raDec1)
-      values should be(Array(raDec1, raDec2))
-      paramWithDegree.units should be(Units.degree)
-    }
-
     it("should show usage of coordinate types") {
       //#coords
       import Angle._

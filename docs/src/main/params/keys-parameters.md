@@ -86,8 +86,7 @@ Java
 ## Coordinate Types
 
 | Primitive       | Scala KeyType               | Java KeyType                   | 
-| :-------------: |:--------------------------: | :-----------------------------:|  
-| RaDec           | KeyType.RaDecKey            | JKeyType.RaDecKey             |
+| :-------------: |:--------------------------: | :-----------------------------:|
 | EqCoord         | KeyType.EqCoordKey          | JKeyType.EqCoordKey           |
 | SolarSystemCoord| KeyType.SolarSystemCoordKey | JKeyType.SolarSystemCoordKey  |
 | MinorPlanetCoord| KeyType.MinorPlanetCoordKey | JKeyType.MinorPlanetCoordKey  |

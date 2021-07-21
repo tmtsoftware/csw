@@ -1,6 +1,5 @@
 package csw.params.core.generics;
 
-import csw.params.core.models.RaDec;
 import csw.params.core.models.Struct;
 import csw.params.javadsl.JKeyType;
 import csw.time.core.models.TAITime;
@@ -304,36 +303,6 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(millisecond, parameterWithUnits.units());
 
         Assert.assertArrayEquals(paramData, (TAITime[]) parameterWithUnits.values());
-        Assert.assertEquals(paramData[0], parameterWithUnits.get(0).get());
-        Assert.assertEquals(paramData[1], parameterWithUnits.value(1));
-        Assert.assertEquals(paramData[0], parameterWithUnits.head());
-        Assert.assertEquals(paramData.length, parameterWithUnits.size());
-    }
-
-    @Test
-    public void testRaDecKeyParameter__DEOPSCSW_183_DEOPSCSW_185_DEOPSCSW_190_DEOPSCSW_184() {
-        String keyName = "RaDecKey";
-        Key<RaDec> key = JKeyType.RaDecKey().make(keyName, NoUnits);
-        Key<RaDec> keyUnits = JKeyType.RaDecKey().make(keyName, meter);
-        RaDec[] paramData = {RaDec.apply(10, 11.15), RaDec.apply(20.25, 21), RaDec.apply(30, 31)};
-        Assert.assertEquals(keyName, key.keyName());
-        Assert.assertEquals(JKeyType.RaDecKey(), key.keyType());
-
-        // key.set without Units
-        Parameter<RaDec> parameterWithoutUnits = key.setAll(paramData);
-
-        Assert.assertArrayEquals(paramData, (RaDec[]) parameterWithoutUnits.values());
-
-        Assert.assertEquals(paramData[0], parameterWithoutUnits.get(0).get());
-        Assert.assertEquals(paramData[1], parameterWithoutUnits.value(1));
-        Assert.assertEquals(paramData[0], parameterWithoutUnits.head());
-        Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
-
-        // key.set with Units
-        Parameter<RaDec> parameterWithUnits = keyUnits.setAll(paramData);
-        Assert.assertEquals(meter, parameterWithUnits.units());
-
-        Assert.assertArrayEquals(paramData, (RaDec[]) parameterWithUnits.values());
         Assert.assertEquals(paramData[0], parameterWithUnits.get(0).get());
         Assert.assertEquals(paramData[1], parameterWithUnits.value(1));
         Assert.assertEquals(paramData[0], parameterWithUnits.head());

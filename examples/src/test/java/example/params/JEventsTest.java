@@ -4,9 +4,10 @@ import csw.params.core.formats.EventCbor$;
 import csw.params.core.formats.JavaJsonSupport;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
+import csw.params.core.models.Coords;
+import csw.params.core.models.JCoords;
 import csw.params.core.models.MatrixData;
 import csw.params.core.models.ObsId;
-import csw.params.core.models.RaDec;
 import csw.params.events.EventName;
 import csw.params.events.IRDetectorEvent;
 import csw.params.events.ObserveEvent;
@@ -200,7 +201,7 @@ public class JEventsTest extends JUnitSuite {
     }
 
     @Test
-    public void showUsageOfCbor__DEOPSCSW_331() {
+    public void showUsageOfCbor__DEOPSCSW_331__CSW_147() {
         //#cbor
 
         //prefixes
@@ -210,14 +211,14 @@ public class JEventsTest extends JUnitSuite {
         EventName name2 = new EventName("guiderCoords");
 
         //Key
-        Key<RaDec> raDecKey = JKeyType.RaDecKey().make("raDecKey", JUnits.NoUnits);
+        Key<Coords.SolarSystemCoord> planets = JKeyType.SolarSystemCoordKey().make("planets", JUnits.NoUnits);
 
         //values
-        RaDec raDec1 = new RaDec(10.20, 40.20);
-        RaDec raDec2 = new RaDec(11.20, 50.20);
+        Coords.SolarSystemCoord planet1 = new Coords.SolarSystemCoord(new Coords.Tag("solar1"), JCoords.Jupiter());
+        Coords.SolarSystemCoord planet2 =  new Coords.SolarSystemCoord(new Coords.Tag("solar2"), JCoords.Venus());
 
         //parameters
-        Parameter<RaDec> param = raDecKey.set(raDec1, raDec2).withUnits(JUnits.arcmin);
+        Parameter<Coords.SolarSystemCoord> param = planets.set(planet1, planet2);
 
         //events
         ObserveEvent observeEvent = IRDetectorEvent.observeStart(prefix1.toString(), ObsId.apply("1234A-123-124")).add(param);

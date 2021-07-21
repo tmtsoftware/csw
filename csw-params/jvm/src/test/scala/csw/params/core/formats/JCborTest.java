@@ -56,8 +56,7 @@ public class JCborTest extends JUnitSuite {
 
         return Arrays.asList(new Object[][]{
                 {"JChoiceKey", JKeyType.ChoiceKey().make("choiceKey", Choices.from("A", "B", "C")).set(new Choice("A"))},
-                {"JRaDecKey", JKeyType.RaDecKey().make("raDecKey").set(new RaDec(10, 20))},
-                {"JStructKey", JKeyType.StructKey().make("structKey").set(new Struct().add(JKeyType.RaDecKey().make("raDecKey").set(new RaDec(10, 20))))},
+                {"JStructKey", JKeyType.StructKey().make("structKey").set(new Struct().add(JKeyType.SolarSystemCoordKey().make("solarKey").set(new Coords.SolarSystemCoord(new Coords.Tag("solar"), JCoords.Jupiter()))))},
                 {"JStringKey", JKeyType.StringKey().make("stringKey").set("str1", "str2")},
                 {"JUTCTimeKey", JKeyType.UTCTimeKey().make("UTCTimeKey").set(UTCTime.now())},
                 {"JTAITimeKey", JKeyType.UTCTimeKey().make("TAITimeKey").set(UTCTime.now())},
@@ -85,7 +84,7 @@ public class JCborTest extends JUnitSuite {
     }
 
     @Test
-    public void shouldAbleToConvertToAndFromParameterAndEvent__DEOPSCSW_495() {
+    public void shouldAbleToConvertToAndFromParameterAndEvent__DEOPSCSW_495__CSW_147() {
         // ===== Test Parameter SERDE =====
         byte[] byteArray = Cbor.encode(param, ParamCodecs$.MODULE$.paramEncExistential()).toByteArray();
         Parameter parameterFromBytes = Cbor.decode(byteArray, JInput.FromByteArrayProvider()).to(ParamCodecs$.MODULE$.paramDecExistential()).value();

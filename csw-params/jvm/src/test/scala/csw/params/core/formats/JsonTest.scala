@@ -264,28 +264,6 @@ class JsonTest extends AnyFunSpec {
     }
   }
 
-  describe("Test Custom RaDecItem") {
-    it("Should allow custom RaDecItem | DEOPSCSW-183, DEOPSCSW-188") {
-      val k1  = KeyType.RaDecKey.make("coords")
-      val c1  = RaDec(7.3, 12.1)
-      val c2  = RaDec(9.1, 2.9)
-      val i1  = k1.set(c1, c2)
-      val sc1 = Setup(ck, CommandName("move"), Some(obsId)).add(i1)
-      assert(sc1.get(k1).get.values.size == 2)
-      assert(sc1.get(k1).get.values(0) == c1)
-      assert(sc1.get(k1).get.values(1) == c2)
-
-      val sc1out = JsonSupport.writeSequenceCommand(sc1)
-      //        info("sc1out: " + sc1out.prettyPrint)
-
-      val sc1in = JsonSupport.readSequenceCommand[Setup](sc1out)
-      assert(sc1.equals(sc1in))
-      assert(sc1in.get(k1).get.values.size == 2)
-      assert(sc1in.get(k1).get.values(0) == c1)
-      assert(sc1in.get(k1).get.values(1) == c2)
-    }
-  }
-
   describe("Test Coordinate Types") {
     import Angle._
     import Coords._

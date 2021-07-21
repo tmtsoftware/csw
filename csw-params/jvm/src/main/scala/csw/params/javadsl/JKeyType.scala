@@ -43,7 +43,6 @@ object JSimpleKeyType {
 object JKeyType {
   val ChoiceKey = KeyType.ChoiceKey
 
-  val RaDecKey            = KeyType.RaDecKey
   val EqCoordKey          = KeyType.EqCoordKey
   val SolarSystemCoordKey = KeyType.SolarSystemCoordKey
   val MinorPlanetCoordKey = KeyType.MinorPlanetCoordKey

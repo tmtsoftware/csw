@@ -104,7 +104,6 @@ object KeyType extends Enum[KeyType[_]] {
   case object UTCTimeKey extends SimpleKeyTypeWithUnits[UTCTime](utc)
   case object TAITimeKey extends SimpleKeyTypeWithUnits[TAITime](tai)
 
-  case object RaDecKey            extends SimpleKeyType[RaDec]
   case object EqCoordKey          extends SimpleKeyType[EqCoord]
   case object SolarSystemCoordKey extends SimpleKeyType[SolarSystemCoord]
   case object MinorPlanetCoordKey extends SimpleKeyType[MinorPlanetCoord]

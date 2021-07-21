@@ -1,9 +1,10 @@
 package example.params
 
 import csw.params.core.formats.{EventCbor, JsonSupport}
-import csw.params.core.generics.KeyType.{DoubleMatrixKey, RaDecKey}
+import csw.params.core.generics.KeyType.DoubleMatrixKey
 import csw.params.core.generics.{Key, KeyType, Parameter}
-import csw.params.core.models.Units.arcmin
+import csw.params.core.models.Coords.SolarSystemObject.{Jupiter, Venus}
+import csw.params.core.models.Coords.{SolarSystemCoord, Tag}
 import csw.params.core.models._
 import csw.params.events._
 import csw.prefix.models.Prefix
@@ -197,17 +198,17 @@ class EventsTest extends AnyFunSpec with Matchers {
   }
 
   describe("Examples of Cbor") {
-    it("should show usage of converting events to/from cbor") {
+    it("should show usage of converting events to/from cbor | CSW-147") {
       //#cbor
       //Key
-      val raDecKey = RaDecKey.make("raDecKey")
+      val solarSystemKey = KeyType.SolarSystemCoordKey.make("planets")
 
       //values
-      val raDec1 = RaDec(10.20, 40.20)
-      val raDec2 = RaDec(11.20, 50.20)
+      val planet1 = SolarSystemCoord(Tag("planet"), Jupiter)
+      val planet2 = SolarSystemCoord(Tag("planet"), Venus)
 
       //parameters
-      val param = raDecKey.set(raDec1, raDec2).withUnits(arcmin)
+      val param = solarSystemKey.set(planet1, planet2)
 
       val prefix = Prefix("tcs.pk")
       val name   = EventName("targetCoords")

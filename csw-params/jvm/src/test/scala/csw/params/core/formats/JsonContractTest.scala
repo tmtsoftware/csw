@@ -3,6 +3,8 @@ package csw.params.core.formats
 import csw.params.commands.{CommandName, Observe, Setup, Wait}
 import csw.params.core.generics.KeyType
 import csw.params.core.generics.KeyType.{LongMatrixKey, StructKey}
+import csw.params.core.models.Coords.{SolarSystemCoord, Tag}
+import csw.params.core.models.Coords.SolarSystemObject.{Jupiter, Venus}
 import csw.params.core.models.Units.{NoUnits, encoder, meter}
 import csw.params.core.models._
 import csw.params.core.states.{CurrentState, DemandState, StateName}
@@ -35,14 +37,14 @@ class JsonContractTest extends AnyFunSpec with Matchers {
   describe("Test Sequence Commands") {
 
     it(
-      "should adhere to specified standard Setup json format | DEOPSCSW-183, DEOPSCSW-188, DEOPSCSW-282, DEOPSCSW-184, DEOPSCSW-423, DEOPSCSW-401"
+      "should adhere to specified standard Setup json format | DEOPSCSW-183, DEOPSCSW-188, DEOPSCSW-282, DEOPSCSW-184, DEOPSCSW-423, DEOPSCSW-401, CSW-147"
     ) {
-      val raDecKey   = KeyType.RaDecKey.make("coords")
-      val raDec1     = RaDec(7.3, 12.1)
-      val raDec2     = RaDec(9.1, 2.9)
-      val raDecParam = raDecKey.set(raDec1, raDec2)
+      val solarSystemKey   = KeyType.SolarSystemCoordKey.make("planets")
+      val planet1          = SolarSystemCoord(Tag("planet"), Jupiter)
+      val planet2          = SolarSystemCoord(Tag("planet"), Venus)
+      val solarSystemParam = solarSystemKey.set(planet1, planet2)
 
-      val setup       = Setup(prefix, CommandName("move"), Some(obsId)).add(raDecParam)
+      val setup       = Setup(prefix, CommandName("move"), Some(obsId)).add(solarSystemParam)
       val setupToJson = JsonSupport.writeSequenceCommand(setup)
 
       val expectedSetupJson =
@@ -185,7 +187,7 @@ class JsonContractTest extends AnyFunSpec with Matchers {
   // DEOPSCSW-661: Create UTCTimeKey and TAITimeKey replacing TimestampKey in Protobuf parameters
   describe("Exercise all types of keys") {
     it(
-      "should able to serialize and deserialize Setup command with all keys to and from json | DEOPSCSW-183, DEOPSCSW-188, DEOPSCSW-282, DEOPSCSW-184, DEOPSCSW-423, DEOPSCSW-401, DEOPSCSW-661"
+      "should able to serialize and deserialize Setup command with all keys to and from json | DEOPSCSW-183, DEOPSCSW-188, DEOPSCSW-282, DEOPSCSW-184, DEOPSCSW-423, DEOPSCSW-401, DEOPSCSW-661, CSW-147"
     ) {
       val setup         = Setup(prefix, CommandName("move"), Some(obsId), ParamSetData.paramSet)
       val setupToJson   = JsonSupport.writeSequenceCommand(setup)

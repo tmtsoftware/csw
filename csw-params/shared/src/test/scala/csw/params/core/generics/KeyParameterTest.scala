@@ -1100,36 +1100,6 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
     }
   }
 
-  describe("test raDecKey") {
-
-    val keyName  = "raDecKey"
-    val raDec1   = RaDec(1.0, 2.0)
-    val raDec2   = RaDec(3.0, 4.0)
-    val raDecKey = KeyType.RaDecKey.make(keyName, degree)
-
-    it("should allow single val | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-188, DEOPSCSW-184, DEOPSCSW-196") {
-      val ii = raDecKey.set(raDec1)
-      ii.values should be(Array(raDec1))
-      ii.get(0).get should equal(raDec1)
-    }
-
-    val listIn = Array(raDec1, raDec2)
-
-    it("should work with list, withUnits  | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-188, DEOPSCSW-184, DEOPSCSW-196") {
-      val ii = raDecKey.setAll(listIn).withUnits(degree)
-      ii.units should be(degree)
-      ii.value(1) should equal(listIn(1))
-      ii.values should equal(listIn)
-    }
-
-    it("should work with list") {
-      val ii = raDecKey.setAll(listIn)
-      ii.units should be(degree)
-      ii.value(1) should equal(listIn(1))
-      ii.values should equal(listIn)
-    }
-  }
-
   describe("Test Coordinate Types") {
     import Angle._
     import Coords._

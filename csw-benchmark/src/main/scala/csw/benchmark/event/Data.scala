@@ -1,12 +1,12 @@
 package csw.benchmark.event
 
-import java.time.Instant
-
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models._
 import csw.params.events.{EventName, SystemEvent}
 import csw.prefix.models.Prefix
 import csw.time.core.models.TAITime
+
+import java.time.Instant
 
 object Data {
   private val byteKey       = KeyType.ByteKey.make("bytes")
@@ -14,7 +14,6 @@ object Data {
   private val doubleKey     = KeyType.DoubleKey.make("doubles")
   private val floatKey      = KeyType.FloatKey.make("floats")
   private val stringKey     = KeyType.StringKey.make("strings")
-  private val radecKey      = KeyType.RaDecKey.make("radecs")
   private val choiceKey     = KeyType.ChoiceKey.make("choices", Choices(Set(Choice("100"))))
   private val taiTimeKey    = KeyType.TAITimeKey.make("tai-times")
   private val arrayDataKey  = KeyType.IntArrayKey.make("intarrays")
@@ -49,18 +48,6 @@ object Data {
       "100",
       "100",
       "100"
-    ),
-    radecKey.set(
-      RaDec(100, 100),
-      RaDec(100, 100),
-      RaDec(100, 100),
-      RaDec(100, 100),
-      RaDec(100, 100),
-      RaDec(100, 100),
-      RaDec(100, 100),
-      RaDec(100, 100),
-      RaDec(100, 100),
-      RaDec(100, 100)
     )
   )
   private val baseEvent       = SystemEvent(Prefix("a.b"), EventName("eventName1"))
@@ -70,7 +57,6 @@ object Data {
   val smallEvent: SystemEvent = baseEvent.copy(
     paramSet = Set(
       intKey.set(1, 2, 3),
-      radecKey.set(RaDec(100, 100)),
       choiceKey.set(Choice("100")),
       taiTimeKey.set(TAITime(Instant.ofEpochSecond(20, 20))),
       arrayDataKey.set(ArrayData(Array(10, 20, 30))),

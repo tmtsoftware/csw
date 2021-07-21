@@ -5,19 +5,21 @@
   "maybeObsId": "2020A-001-123",
   "paramSet": [
     {
-      "RaDecKey": {
-        "keyName": "coords",
+      "SolarSystemCoordKey": {
+        "units":"NoUnits",
+        "keyName": "planets",
         "values": [
           {
-            "ra": 7.3,
-            "dec": 12.1
+            "_type": "SolarSystemCoord",
+            "tag": "planet",
+            "body": "Jupiter"
           },
           {
-            "ra": 9.1,
-            "dec": 2.9
+            "_type": "SolarSystemCoord",
+            "tag": "planet",
+            "body": "Venus"
           }
-        ],
-        "units": "NoUnits"
+        ]
       }
     }
   ]

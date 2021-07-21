@@ -51,7 +51,6 @@ trait ParamCodecsBase extends CommonCodecs {
 
   // ************************ Base Type Codecs ********************
   implicit lazy val choiceCodec: Codec[Choice] = deriveCodec
-  implicit lazy val raDecCodec: Codec[RaDec]   = deriveCodec
 
   implicit lazy val tagCodec: Codec[Coords.Tag]            = deriveCodec
   implicit lazy val angleCodec: Codec[Angle]               = deriveCodec

@@ -15,18 +15,6 @@
       }
     },
     {
-      "RaDecKey": {
-        "keyName": "RaDecKey",
-        "values": [
-          {
-            "ra": 7.3,
-            "dec": 12.1
-          }
-        ],
-        "units": "NoUnits"
-      }
-    },
-    {
       "FloatKey": {
         "keyName": "FloatKey",
         "values": [

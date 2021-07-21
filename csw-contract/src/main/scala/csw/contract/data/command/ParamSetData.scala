@@ -47,8 +47,7 @@ object ParamSetData {
   private val p20 = IntMatrixKey.make("IntMatrix").set(MatrixData.fromArrays(Array(12, 13), Array(14, 15)))
   private val p21 = FloatMatrixKey.make("FloatMatrix").set(MatrixData.fromArrays(Array[Float](16, 17), Array[Float](18, 19)))
   private val p22 = DoubleMatrixKey.make("DoubleMatrix").set(MatrixData.fromArrays(Array[Double](20, 21), Array[Double](22, 23)))
-  // RaDec Key
-  private val p23 = RaDecKey.make("RaDecKey").set(RaDec(7.3, 12.1))
+
   // Choice Key
   private val p24 = ChoiceKey.make("ChoiceKey", NoUnits, Choices.from("First", "Second")).set("First", "Second")
   // Struct Key
@@ -87,7 +86,6 @@ object ParamSetData {
       p20,
       p21,
       p22,
-      p23,
       p24,
       p25,
       p26,

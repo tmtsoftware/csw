@@ -190,40 +190,6 @@ public class JKeysAndParametersTest extends JUnitSuite {
     }
 
     @Test
-    public void showUsageOfRaDec() {
-        //#radec
-        //RaDec
-        RaDec raDec1 = new RaDec(1.0, 2.0);
-        RaDec raDec2 = new RaDec(3.0, 4.0);
-
-        //keys
-        Key<RaDec> raDecKey = JKeyType.RaDecKey().make("raDecKey", JUnits.NoUnits);
-
-        //store values
-        Parameter<RaDec> p1 = raDecKey.set(raDec1);
-        Parameter<RaDec> p2 = raDecKey.set(raDec1, raDec2).withUnits(JUnits.degree);
-
-        //add units
-        Parameter<RaDec> paramWithDegree = p1.withUnits(JUnits.degree);
-
-        //default unit is NoUnits()
-        boolean bDefaultUnit = JUnits.NoUnits == p1.units();
-
-        //retrieving values
-        RaDec head = p1.head();
-        List<RaDec> values = p2.jValues();
-        //#radec
-
-        //validations
-        Assert.assertEquals(JUnits.NoUnits, p1.units());
-        Assert.assertEquals(JUnits.degree, p2.units());
-        Assert.assertEquals(JUnits.degree, paramWithDegree.units());
-        Assert.assertTrue(bDefaultUnit);
-        Assert.assertEquals(raDec1, head);
-        Assert.assertEquals(values, Arrays.asList(raDec1, raDec2));
-    }
-
-    @Test
     public void showUsageOfCoords() {
         //#coords
 
