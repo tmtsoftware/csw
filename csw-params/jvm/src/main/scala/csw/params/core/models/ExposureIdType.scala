@@ -26,7 +26,7 @@ sealed trait ExposureId {
  * @param typLevel exposure's [TYPLevel]
  * @param exposureNumber exposure's Exposure Number
  */
-private[csw] case class StandaloneExposureId(
+case class StandaloneExposureId private[csw] (
     utcTime: UTCTime,
     subsystem: Subsystem,
     det: String,
@@ -49,7 +49,7 @@ private[csw] case class StandaloneExposureId(
     Separator.hyphenate(s"$utcAsString", s"$subsystem", s"$det", s"$typLevel", s"$exposureNumber")
 }
 
-private case class ExposureIdWithObsId(
+case class ExposureIdWithObsId private[csw] (
     obsId: Option[ObsId],
     subsystem: Subsystem,
     det: String,
