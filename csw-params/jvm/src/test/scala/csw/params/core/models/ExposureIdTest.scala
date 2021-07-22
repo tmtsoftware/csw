@@ -16,19 +16,32 @@ class ExposureIdTest extends AnyFunSpec with Matchers {
       exposureId.subsystem shouldBe Subsystem.CSW
       exposureId.typLevel shouldBe TYPLevel("SCI0")
       exposureId.exposureNumber shouldBe ExposureNumber("0001")
-      // verify total equality ignoring time
       exposureId should ===(
         ExposureIdWithObsId(Some(ObsId("2020A-001-123")), Subsystem.CSW, "IMG1", TYPLevel("SCI0"), ExposureNumber("0001"))
       )
     }
 
+    it("should increment ExposureId exposure number | CSW-121") {
+      val exposureId = ExposureId("2020A-001-123-CSW-IMG1-SCI0-0001")
+
+      exposureId should ===(
+        ExposureIdWithObsId(Some(ObsId("2020A-001-123")), Subsystem.CSW, "IMG1", TYPLevel("SCI0"), ExposureNumber("0001"))
+      )
+
+      val exposureId2 = ExposureId.nextExposureNumber(exposureId)
+      exposureId2 should ===(
+        ExposureIdWithObsId(Some(ObsId("2020A-001-123")), Subsystem.CSW, "IMG1", TYPLevel("SCI0"), ExposureNumber("0002"))
+      )
+
+    }
+
     it("should create valid ExposureId with no ObsId | CSW-121") {
       val exposureId = ExposureId("CSW-IMG1-SCI0-0001")
-      // For testing only
+      // For testing only to get at UTC for equality test below
       val standaloneExpId = exposureId.asInstanceOf[StandaloneExposureId]
       exposureId.toString shouldBe (standaloneExpId.utcAsString + "-CSW-IMG1-SCI0-0001")
 
-      // Verify parts
+      // Verify parts are correct once
       exposureId.obsId shouldBe None
       exposureId.det shouldBe "IMG1"
       exposureId.subsystem shouldBe Subsystem.CSW
@@ -45,14 +58,14 @@ class ExposureIdTest extends AnyFunSpec with Matchers {
       val exposureId = ExposureId("CSW-IMG1-SCI0-0001")
       exposureId.obsId shouldBe None
 
-      val exposureIdWithObsId = exposureId.withObsId("2020B-100-456")
+      val exposureIdWithObsId = ExposureId.withObsId(exposureId, "2020B-100-456")
       // verify total equality
       exposureIdWithObsId should ===(
         ExposureIdWithObsId(Some(ObsId("2020B-100-456")), Subsystem.CSW, "IMG1", TYPLevel("SCI0"), ExposureNumber("0001"))
       )
 
       val obsId                = ObsId("2021B-200-007")
-      val exposureIdWithObsId2 = exposureId.withObsId(obsId)
+      val exposureIdWithObsId2 = ExposureId.withObsId(exposureId, obsId)
       exposureIdWithObsId2 should ===(
         ExposureIdWithObsId(Some(ObsId("2021B-200-007")), Subsystem.CSW, "IMG1", TYPLevel("SCI0"), ExposureNumber("0001"))
       )
