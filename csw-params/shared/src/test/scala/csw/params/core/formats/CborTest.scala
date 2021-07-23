@@ -90,7 +90,7 @@ class CborTest extends AnyFunSuite with Matchers {
   import org.scalatest.prop.TableDrivenPropertyChecks.forAll
   import org.scalatest.prop.Tables.Table
 
-  test("should encode concrete-type CommandIssue and decode base-type") {
+  test("should encode concrete-type CommandIssue and decode base-type | CSW-92") {
     val testData = Table(
       "CommandIssue models",
       MissingKeyIssue(""),
