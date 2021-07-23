@@ -11,26 +11,32 @@ public interface JSubsystem {
     Subsystem CSW = Subsystem.CSW$.MODULE$;
     Subsystem DMS = Subsystem.DMS$.MODULE$;
     Subsystem DPS = Subsystem.DPS$.MODULE$;
+    Subsystem ENC = Subsystem.ENC$.MODULE$;
     Subsystem ESEN = Subsystem.ESEN$.MODULE$;
     Subsystem ESW = Subsystem.ESW$.MODULE$;
-    Subsystem FMCS = Subsystem.FMCS$.MODULE$;
-    Subsystem GMS = Subsystem.GMS$.MODULE$;
+    Subsystem HNDL = Subsystem.HNDL$.MODULE$;
+    Subsystem HQ = Subsystem.HQ$.MODULE$;
     Subsystem IRIS = Subsystem.IRIS$.MODULE$;
     Subsystem LGSF = Subsystem.LGSF$.MODULE$;
+    Subsystem M1COAT = Subsystem.M1COAT$.MODULE$;
     Subsystem M1CS = Subsystem.M1CS$.MODULE$;
+    Subsystem M1S = Subsystem.M1S$.MODULE$;
+    Subsystem M2COAT = Subsystem.M2COAT$.MODULE$;
+    Subsystem M2S = Subsystem.M2S$.MODULE$;
+    Subsystem M3S = Subsystem.M3S$.MODULE$;
     Subsystem MODHIS = Subsystem.MODHIS$.MODULE$;
     Subsystem NFIRAOS = Subsystem.NFIRAOS$.MODULE$;
-    Subsystem NSCU = Subsystem.NSCU$.MODULE$;
     Subsystem OSS = Subsystem.OSS$.MODULE$;
-    Subsystem PFCS = Subsystem.PFCS$.MODULE$;
-    Subsystem PSFR = Subsystem.PSFR$.MODULE$;
     Subsystem REFR = Subsystem.REFR$.MODULE$;
-    Subsystem RTC = Subsystem.RTC$.MODULE$;
-    Subsystem RPG = Subsystem.RPG$.MODULE$;
     Subsystem SCMS = Subsystem.SCMS$.MODULE$;
+    Subsystem SER = Subsystem.SER$.MODULE$;
     Subsystem SOSS = Subsystem.SOSS$.MODULE$;
+    Subsystem STR = Subsystem.STR$.MODULE$;
+    Subsystem SUM = Subsystem.SUM$.MODULE$;
     Subsystem TCS = Subsystem.TCS$.MODULE$;
+    Subsystem TINS = Subsystem.TINS$.MODULE$;
     Subsystem WFOS = Subsystem.WFOS$.MODULE$;
 
     Subsystem Container = Subsystem.Container$.MODULE$;
+
 }
