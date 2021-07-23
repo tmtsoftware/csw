@@ -200,6 +200,7 @@ class EventsTest extends AnyFunSpec with Matchers {
   describe("Examples of Cbor") {
     it("should show usage of converting events to/from cbor | CSW-147") {
       //#cbor
+      //#observe-event
       //Key
       val solarSystemKey = KeyType.SolarSystemCoordKey.make("planets")
 
@@ -214,8 +215,9 @@ class EventsTest extends AnyFunSpec with Matchers {
       val name   = EventName("targetCoords")
       //events
       val observeEvent: ObserveEvent = WFSDetectorEvent.publishSuccess(prefix.toString).add(param)
-      val systemEvent1: SystemEvent  = SystemEvent(prefix, name).add(param)
-      val systemEvent2: SystemEvent  = SystemEvent(prefix, name).add(param)
+      //#observe-event
+      val systemEvent1: SystemEvent = SystemEvent(prefix, name).add(param)
+      val systemEvent2: SystemEvent = SystemEvent(prefix, name).add(param)
 
       //convert events to cbor bytestring
       val byteArray2 = EventCbor.encode(observeEvent)

@@ -203,7 +203,7 @@ public class JEventsTest extends JUnitSuite {
     @Test
     public void showUsageOfCbor__DEOPSCSW_331__CSW_147() {
         //#cbor
-
+        //#observe-event
         //prefixes
         Prefix prefix1 = Prefix.apply(JSubsystem.TCS, "pk");
         EventName name1 = new EventName("targetCoords");
@@ -219,12 +219,12 @@ public class JEventsTest extends JUnitSuite {
 
         //parameters
         Parameter<Coords.SolarSystemCoord> param = planets.set(planet1, planet2);
-
         //events
+
         ObserveEvent observeEvent = IRDetectorEvent.observeStart(prefix1.toString(), ObsId.apply("1234A-123-124")).add(param);
+        //#observe-event
         SystemEvent systemEvent1 = new SystemEvent(prefix1, name1).add(param);
         SystemEvent systemEvent2 = new SystemEvent(prefix2, name2).add(param);
-
         //convert events to cbor bytestring
         byte[] byteArray2 = EventCbor$.MODULE$.encode(observeEvent);
         byte[] byteArray3 = EventCbor$.MODULE$.encode(systemEvent1);

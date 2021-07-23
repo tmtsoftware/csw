@@ -37,7 +37,71 @@ Java
 
 ## Observe Event
 
-##TODO Update this section in story ESW-536
+ObserveEvent are standardized events used to describe an activities within the data acquisition process.
+These events are typically published by Science Detector Assemblies, which emit ObserveEvents during their exposures
+to signal the occurrence of specific activities/actions during the acquisition of data.
+
+The following are the standard ObserveEvents which are segregated into 4 types. 
+Each type has particular set of observe events which can be created using the following class
+
+1. IRDetectorEvent has following ObserveEvent factories
+    - observeStart
+    - exposureStart
+    - exposureEnd
+    - readoutEnd
+    - readoutFailed
+    - dataWriteStart
+    - dataWriteEnd
+    - exposureAborted
+    - observeEnd
+    - irDetectorExposureState
+    - irDetectorExposureData
+2. WFSDetectorEvent has following ObserveEvent factories
+    - observeStart
+    - prepareStart
+    - exposureStart
+    - exposureEnd
+    - readoutEnd
+    - readoutFailed
+    - dataWriteStart
+    - dataWriteEnd
+    - exposureAborted
+    - observeEnd
+    - opticalDetectorExposureState
+    - opticalDetectorExposureData
+3. OpticalDetectorEvent has following ObserveEvent factories
+    - publishSuccess 
+    - publishFailed
+    - wfsDetectorExposureState
+4. SequencerObserveEvent has following ObserveEvent factories
+    - presetStart
+    - presetEnd
+    - guidestarAcqStart
+    - guidestarAcqEnd
+    - scitargetAcqStart
+    - scitargetAcqEnd
+    - observationStart
+    - observationEnd
+    - observeStart
+    - observeEnd
+    - exposureStart
+    - exposureEnd
+    - readoutEnd
+    - readoutFailed
+    - dataWriteStart
+    - dataWriteEnd
+    - prepareStart
+    - observePaused
+    - observeResumed
+    - downtimeStart
+    
+The following snippet shows how to create
+
+Scala
+:   @@snip [EventsTest.scala](../../../../examples/src/test/scala/example/params/EventsTest.scala) { #observe-event }
+
+Java
+:   @@snip [JEventsTest.java](../../../../examples/src/test/java/example/params/JEventsTest.java) { #observe-event }
 
 
 

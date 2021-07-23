@@ -11,9 +11,9 @@ case class SequencerObserveEvent(prefix: Prefix) {
 
   def presetEnd(obsId: ObsId): ObserveEvent = createObserveEvent(ObserveEventNames.PresetEnd, obsId)
 
-  def guidstarAcqStart(obsId: ObsId): ObserveEvent = createObserveEvent(ObserveEventNames.GuidstarAcqStart, obsId)
+  def guidestarAcqStart(obsId: ObsId): ObserveEvent = createObserveEvent(ObserveEventNames.GuidestarAcqStart, obsId)
 
-  def guidstarAcqEnd(obsId: ObsId): ObserveEvent = createObserveEvent(ObserveEventNames.GuidstarAcqEnd, obsId)
+  def guidestarAcqEnd(obsId: ObsId): ObserveEvent = createObserveEvent(ObserveEventNames.GuidestarAcqEnd, obsId)
 
   def scitargetAcqStart(obsId: ObsId): ObserveEvent = createObserveEvent(ObserveEventNames.ScitargetAcqStart, obsId)
 

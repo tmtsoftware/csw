@@ -29,8 +29,8 @@ object ObserveEventNames {
   // Sequencer specific
   val PresetStart: EventName       = eventName("PresetStart")
   val PresetEnd: EventName         = eventName("PresetEnd")
-  val GuidstarAcqStart: EventName  = eventName("GuidstarAcqStart")
-  val GuidstarAcqEnd: EventName    = eventName("GuidstarAcqEnd")
+  val GuidestarAcqStart: EventName = eventName("GuidestarAcqStart")
+  val GuidestarAcqEnd: EventName   = eventName("GuidestarAcqEnd")
   val ScitargetAcqStart: EventName = eventName("ScitargetAcqStart")
   val ScitargetAcqEnd: EventName   = eventName("ScitargetAcqEnd")
   val ObservationStart: EventName  = eventName("ObservationStart")

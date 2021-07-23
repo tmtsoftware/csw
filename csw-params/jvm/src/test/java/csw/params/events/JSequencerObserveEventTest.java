@@ -3,7 +3,6 @@ package csw.params.events;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.ExposureId;
 import csw.params.core.models.ObsId;
-import csw.params.javadsl.JKeyType;
 import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
 import org.junit.Assert;
@@ -27,8 +26,8 @@ public class JSequencerObserveEventTest extends JUnitSuite {
                 new TestData(sequencerObserveEvent.presetStart(obsId), "ObserveEvent.PresetStart", prefix),
                 new TestData(sequencerObserveEvent.presetStart(obsId), "ObserveEvent.PresetStart", prefix),
                 new TestData(sequencerObserveEvent.presetEnd(obsId), "ObserveEvent.PresetEnd", prefix),
-                new TestData(sequencerObserveEvent.guidstarAcqStart(obsId), "ObserveEvent.GuidstarAcqStart", prefix),
-                new TestData(sequencerObserveEvent.guidstarAcqEnd(obsId), "ObserveEvent.GuidstarAcqEnd", prefix),
+                new TestData(sequencerObserveEvent.guidestarAcqStart(obsId), "ObserveEvent.GuidestarAcqStart", prefix),
+                new TestData(sequencerObserveEvent.guidestarAcqEnd(obsId), "ObserveEvent.GuidestarAcqEnd", prefix),
                 new TestData(sequencerObserveEvent.scitargetAcqStart(obsId), "ObserveEvent.ScitargetAcqStart", prefix),
                 new TestData(sequencerObserveEvent.scitargetAcqEnd(obsId), "ObserveEvent.ScitargetAcqEnd", prefix),
                 new TestData(sequencerObserveEvent.observationStart(obsId), "ObserveEvent.ObservationStart", prefix),
