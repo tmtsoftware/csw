@@ -2,7 +2,8 @@ package csw.params.events
 
 import csw.params.core.generics.KeyType.StringKey
 import csw.params.core.generics.Parameter
-import csw.params.core.models.{ExposureIdType, ObsId}
+import csw.params.core.models.ExposureId.ExposureId
+import csw.params.core.models.ObsId
 import csw.prefix.models.Prefix
 
 case class SequencerObserveEvent(prefix: Prefix) {
@@ -27,25 +28,25 @@ case class SequencerObserveEvent(prefix: Prefix) {
 
   def observeEnd(obsId: ObsId): ObserveEvent = createObserveEvent(ObserveEventNames.ObserveEnd, obsId)
 
-  def exposureStart(obsId: ObsId, exposureId: ExposureIdType): ObserveEvent =
+  def exposureStart(obsId: ObsId, exposureId: ExposureId): ObserveEvent =
     createObserveEventWithExposureId(ObserveEventNames.ExposureStart, obsId, exposureId)
 
-  def exposureEnd(obsId: ObsId, exposureId: ExposureIdType): ObserveEvent =
+  def exposureEnd(obsId: ObsId, exposureId: ExposureId): ObserveEvent =
     createObserveEventWithExposureId(ObserveEventNames.ExposureEnd, obsId, exposureId)
 
-  def readoutEnd(obsId: ObsId, exposureId: ExposureIdType): ObserveEvent =
+  def readoutEnd(obsId: ObsId, exposureId: ExposureId): ObserveEvent =
     createObserveEventWithExposureId(ObserveEventNames.ReadoutEnd, obsId, exposureId)
 
-  def readoutFailed(obsId: ObsId, exposureId: ExposureIdType): ObserveEvent =
+  def readoutFailed(obsId: ObsId, exposureId: ExposureId): ObserveEvent =
     createObserveEventWithExposureId(ObserveEventNames.ReadoutFailed, obsId, exposureId)
 
-  def dataWriteStart(obsId: ObsId, exposureId: ExposureIdType): ObserveEvent =
+  def dataWriteStart(obsId: ObsId, exposureId: ExposureId): ObserveEvent =
     createObserveEventWithExposureId(ObserveEventNames.DataWriteStart, obsId, exposureId)
 
-  def dataWriteEnd(obsId: ObsId, exposureId: ExposureIdType): ObserveEvent =
+  def dataWriteEnd(obsId: ObsId, exposureId: ExposureId): ObserveEvent =
     createObserveEventWithExposureId(ObserveEventNames.DataWriteEnd, obsId, exposureId)
 
-  def prepareStart(obsId: ObsId, exposureId: ExposureIdType): ObserveEvent =
+  def prepareStart(obsId: ObsId, exposureId: ExposureId): ObserveEvent =
     createObserveEventWithExposureId(ObserveEventNames.PrepareStart, obsId, exposureId)
 
   def observePaused(): ObserveEvent = ObserveEvent(prefix, ObserveEventNames.ObservePaused)
@@ -61,7 +62,7 @@ case class SequencerObserveEvent(prefix: Prefix) {
   private def createObserveEvent(eventName: EventName, obsId: ObsId) =
     ObserveEvent(prefix, eventName, Set(StringKey.make("obsId").set(obsId.toString())))
 
-  private def createObserveEventWithExposureId(eventName: EventName, obsId: ObsId, exposureId: ExposureIdType) = {
+  private def createObserveEventWithExposureId(eventName: EventName, obsId: ObsId, exposureId: ExposureId) = {
     val paramset: Set[Parameter[_]] = Set(
       ParamFactories.obsIdParam(obsId),
       ParamFactories.exposureIdParam(exposureId)

@@ -1,5 +1,6 @@
 package csw.params.core.models
 
+import csw.params.core.models.ExposureId.{ExposureIdWithObsId, StandaloneExposureId}
 import csw.prefix.models.Subsystem
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
@@ -90,7 +91,7 @@ class ExposureIdTest extends AnyFunSpec with Matchers {
     it("should throw exception if invalid exposure Id: typLevel is missing | CSW-121") {
       val e1 = intercept[IllegalArgumentException](ExposureId("2020A-001-123-CSW-IMG1-0001"))
       e1.getMessage shouldBe ("requirement failed: An ExposureId must be a - separated string of the form " +
-      "SemesterId-ProgramNumber-ObservationNumber-Subsystem-DET-TYPLevel-ExposureNumber")
+        "SemesterId-ProgramNumber-ObservationNumber-Subsystem-DET-TYPLevel-ExposureNumber")
 
       val e2 = intercept[NoSuchElementException](ExposureId("2020A-001-123-CSW-IMG1-0001-01"))
       e2.getMessage shouldBe

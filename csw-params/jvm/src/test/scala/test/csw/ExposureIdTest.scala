@@ -1,8 +1,9 @@
 package test.csw
 
 import csw.params.core.models.CalibrationLevel.Raw
+import csw.params.core.models.ExposureId.ExposureIdWithObsId
 import csw.params.core.models.TYP.DRK
-import csw.params.core.models.{ExposureId, ExposureIdWithObsId, ExposureNumber, ObsId, TYPLevel}
+import csw.params.core.models.{ExposureId, ExposureNumber, ObsId, TYPLevel}
 import csw.prefix.models.Subsystem
 import csw.prefix.models.Subsystem.CSW
 import org.scalatest.funspec.AnyFunSpec
@@ -46,6 +47,8 @@ class ExposureIdTest extends AnyFunSpec with Matchers {
       exposureId.subsystem shouldBe Subsystem.CSW
       exposureId.typLevel shouldBe TYPLevel("DRK0")
       exposureId.exposureNumber shouldBe ExposureNumber("0001")
+
+      //val xx = ObserveEvent(Id(), Prefix(CSW, "kim"), EventName("kim"), UTCTime.now(), Set[Parameter[_]])
     }
 
     it("should throw exception if invalid obsId in exposure Id | CSW-121") {
@@ -58,7 +61,7 @@ class ExposureIdTest extends AnyFunSpec with Matchers {
     it("should throw exception if invalid exposure Id: typLevel is missing | CSW-121") {
       val e1 = intercept[IllegalArgumentException](ExposureId("2020A-001-123-CSW-IMG1-0001"))
       e1.getMessage shouldBe ("requirement failed: An ExposureId must be a - separated string of the form " +
-      "SemesterId-ProgramNumber-ObservationNumber-Subsystem-DET-TYPLevel-ExposureNumber")
+        "SemesterId-ProgramNumber-ObservationNumber-Subsystem-DET-TYPLevel-ExposureNumber")
 
       val e2 = intercept[NoSuchElementException](ExposureId("2020A-001-123-CSW-IMG1-0001-01"))
       e2.getMessage shouldBe
