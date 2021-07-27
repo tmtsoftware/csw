@@ -6,7 +6,7 @@ object Libs {
   val ScalaVersion = "2.13.6"
 
   val `scala-java8-compat` = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.1"    //BSD 3-clause "New" or "Revised" License
-  val `scala-async`        = "org.scala-lang.modules" %% "scala-async"        % "1.0.0-M1" //BSD 3-clause "New" or "Revised" License
+  val `scala-async`        = "org.scala-lang.modules" %% "scala-async"        % "1.0.0"
   val `scopt`              = "com.github.scopt"       %% "scopt"              % "4.0.1"    //MIT License
   val `mockito-scala`      = "org.mockito"            %% "mockito-scala"      % "1.16.37"
 
