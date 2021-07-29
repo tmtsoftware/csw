@@ -1,6 +1,5 @@
 package csw.params.core.models
 
-import csw.params.core.models.ExposureId.{ExposureIdWithObsId, StandaloneExposureId}
 import csw.prefix.models.Subsystem
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
@@ -33,7 +32,6 @@ class ExposureIdTest extends AnyFunSpec with Matchers {
       exposureId2 should ===(
         ExposureIdWithObsId(Some(ObsId("2020A-001-123")), Subsystem.CSW, "IMG1", TYPLevel("SCI0"), ExposureNumber("0002"))
       )
-
     }
 
     it("should create valid ExposureId with no ObsId | CSW-121") {

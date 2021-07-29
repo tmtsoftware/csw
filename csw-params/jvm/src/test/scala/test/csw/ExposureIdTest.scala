@@ -1,9 +1,8 @@
 package test.csw
 
 import csw.params.core.models.CalibrationLevel.Raw
-import csw.params.core.models.ExposureId.ExposureIdWithObsId
 import csw.params.core.models.TYP.DRK
-import csw.params.core.models.{ExposureId, ExposureNumber, ObsId, TYPLevel}
+import csw.params.core.models.{ExposureId, ExposureIdWithObsId, ExposureNumber, ObsId, TYPLevel}
 import csw.prefix.models.Subsystem
 import csw.prefix.models.Subsystem.CSW
 import org.scalatest.funspec.AnyFunSpec
@@ -37,7 +36,7 @@ class ExposureIdTest extends AnyFunSpec with Matchers {
 
       ExposureId.nextExposureNumber(exposureId).exposureNumber == ExposureNumber(2)
     }
-
+/*
     it("should create valid ExposureId with ObsId using constructor | CSW-121") {
       val exposureId = ExposureIdWithObsId(Some(ObsId("2020B-100-456")), CSW, "IMG1", TYPLevel(DRK, Raw), ExposureNumber(1))
 
@@ -50,7 +49,7 @@ class ExposureIdTest extends AnyFunSpec with Matchers {
 
       //val xx = ObserveEvent(Id(), Prefix(CSW, "kim"), EventName("kim"), UTCTime.now(), Set[Parameter[_]])
     }
-
+*/
     it("should throw exception if invalid obsId in exposure Id | CSW-121") {
       val exception =
         intercept[IllegalArgumentException](ExposureId("2020A-ABC-123-CSW-IMG1-SCI0-0001"))

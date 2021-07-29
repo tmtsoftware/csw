@@ -2,8 +2,7 @@ package csw.params.events
 
 import csw.params.core.generics.KeyType.StringKey
 import csw.params.core.generics.Parameter
-import csw.params.core.models.ExposureId.ExposureId
-import csw.params.core.models.ObsId
+import csw.params.core.models.{ExposureId, ObsId}
 import csw.prefix.models.Prefix
 
 case class SequencerObserveEvent(prefix: Prefix) {
