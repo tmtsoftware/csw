@@ -113,8 +113,9 @@ public class JConfigAdminApiTest extends JUnitSuite {
     @Test
     public void testUpdateReturnsFileNotFoundExceptionOnAbsenceOfFile__DEOPSCSW_88_DEOPSCSW_138_DEOPSCSW_103_DEOPSCSW_49() {
         Path path = Paths.get("/tmt/trombone/assembly.conf");
-        Assert.assertThrows(FileNotFound.class, () ->
+        ExecutionException ex = Assert.assertThrows(ExecutionException.class, () ->
                 configService.update(path, ConfigData.fromString(configValue1), "commit assembly conf").get());
+        Assert.assertTrue(ex.getCause() instanceof FileNotFound);
     }
 
     // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
@@ -208,7 +209,8 @@ public class JConfigAdminApiTest extends JUnitSuite {
                 .thenReturn(firstUser, secondUser, thirdUser);
 
         try {
-            Assert.assertThrows(FileNotFound.class, () -> configService.history(path).get());
+            ExecutionException ex = Assert.assertThrows(ExecutionException.class, () -> configService.history(path).get());
+            Assert.assertTrue(ex.getCause() instanceof FileNotFound);
         } finally {
             String comment1 = "commit version 1";
             String comment2 = "commit version 2";
