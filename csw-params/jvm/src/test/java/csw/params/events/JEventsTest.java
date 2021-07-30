@@ -103,7 +103,7 @@ public class JEventsTest extends JUnitSuite {
 
     @Test
     public void shouldAbleToRemoveParamsInObserveEvent__DEOPSCSW_327_DEOPSCSW_328_DEOPSCSW_185_DEOPSCSW_329_DEOPSCSW_183() {
-        ObserveEvent observeEvent = WFSDetectorEvent.publishSuccess(prefix.toString()).add(encoderParam).add(epochByteParam);
+        ObserveEvent observeEvent = WFSDetectorEvent.publishSuccess(prefix).add(encoderParam).add(epochByteParam);
         Assert.assertEquals(2, observeEvent.size());
         Assert.assertArrayEquals(new Byte[]{10, 20}, observeEvent.jGet(epochByteKey).orElseThrow().jValues().toArray());
         ObserveEvent mutatedEvent = observeEvent.remove(encoderParam);
@@ -128,7 +128,7 @@ public class JEventsTest extends JUnitSuite {
 
     @Test
     public void shouldBeUniqueIdWhenParametersAreAddedOrRemovedForObserve__DEOPSCSW_327_DEOPSCSW_328_DEOPSCSW_185_DEOPSCSW_329_DEOPSCSW_183() {
-        ObserveEvent observeEvent1 = WFSDetectorEvent.publishSuccess(prefix.toString()).add(encoderParam).add(epochStringParam);
+        ObserveEvent observeEvent1 = WFSDetectorEvent.publishSuccess(prefix).add(encoderParam).add(epochStringParam);
         ObserveEvent observeEvent2 = observeEvent1.add(epochIntParam);
         ObserveEvent observeEvent3 = observeEvent2.remove(epochIntKey);
         System.out.println(observeEvent1.paramSet());

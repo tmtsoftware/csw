@@ -117,7 +117,7 @@ class EventsTest extends AnyFunSpec with Matchers {
       //parameter
       val i1: Parameter[MatrixData[Double]] = k1.set(m1)
       //events
-      val observeEvent: ObserveEvent = IRDetectorEvent.observeStart(prefix.toString, ObsId("1232A-123-123")).madd(i1)
+      val observeEvent: ObserveEvent = IRDetectorEvent.observeStart(prefix, ObsId("1232A-123-123")).madd(i1)
       val systemEvent: SystemEvent   = SystemEvent(prefix, name1).add(i1)
 
       //json support - write
@@ -215,9 +215,9 @@ class EventsTest extends AnyFunSpec with Matchers {
       //#observe-event
       val obsId                               = ObsId("1234A-001-0123")
       val prefix                              = Prefix("tcs.pk")
-      val wfsObserveEvent: ObserveEvent       = WFSDetectorEvent.publishSuccess(prefix.toString)
-      val irObserveEvent: ObserveEvent        = IRDetectorEvent.observeStart(prefix.toString, obsId)
-      val opdObserveEvent: ObserveEvent       = OpticalDetectorEvent.observeStart(prefix.toString, obsId)
+      val wfsObserveEvent: ObserveEvent       = WFSDetectorEvent.publishSuccess(prefix)
+      val irObserveEvent: ObserveEvent        = IRDetectorEvent.observeStart(prefix, obsId)
+      val opdObserveEvent: ObserveEvent       = OpticalDetectorEvent.observeStart(prefix, obsId)
       val sequencerObserveEvent: ObserveEvent = SequencerObserveEvent(prefix).observeStart(obsId)
       //#observe-event
       val systemEvent1: SystemEvent = SystemEvent(prefix, name).add(param)

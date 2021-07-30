@@ -8,7 +8,7 @@ import org.scalatest.prop.TableDrivenPropertyChecks._
 
 class IRDetectorEventTest extends AnyFunSpec with Matchers {
   describe("IR detector") {
-    val sourcePrefix                   = "ESW.filter.wheel"
+    val sourcePrefix                   = Prefix("ESW.filter.wheel")
     val obsId                          = ObsId("2020A-001-123")
     val exposureId                     = "12345"
     val detector                       = "ir-detector"
@@ -25,7 +25,7 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
         (IRDetectorEvent.exposureAborted(sourcePrefix, obsId, exposureId), "ObserveEvent.ExposureAborted", sourcePrefix)
       ).forEvery((observeEvent, eventName, sourcePrefix) => {
         observeEvent.eventName.name shouldBe eventName
-        observeEvent.source shouldBe Prefix(sourcePrefix)
+        observeEvent.source shouldBe sourcePrefix
       })
     }
 
@@ -36,7 +36,7 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
         (IRDetectorEvent.observeEnd(sourcePrefix, obsId), "ObserveEvent.ObserveEnd", sourcePrefix)
       ).forEvery((observeEvent, eventName, sourcePrefix) => {
         observeEvent.eventName.name shouldBe eventName
-        observeEvent.source shouldBe Prefix(sourcePrefix)
+        observeEvent.source shouldBe sourcePrefix
       })
     }
 
@@ -52,7 +52,7 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
         OperationalState.BUSY
       )
 
-      state.source shouldBe Prefix(sourcePrefix)
+      state.source shouldBe sourcePrefix
       state.eventName.name shouldBe "ObserveEvent.IRDetectorExposureState"
       state.paramSet shouldBe Set(
         ObserveEventKeys.detector.set(detector),
@@ -84,7 +84,7 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
         remainingExposureTime
       )
 
-      event.source shouldBe Prefix(sourcePrefix)
+      event.source shouldBe sourcePrefix
       event.eventName.name shouldBe "ObserveEvent.IRDetectorExposureData"
       event.paramSet shouldBe Set(
         ObserveEventKeys.exposureId.set(exposureIdType.toString),

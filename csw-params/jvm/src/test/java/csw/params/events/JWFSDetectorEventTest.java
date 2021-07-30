@@ -7,14 +7,13 @@ import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
 
 public class JWFSDetectorEventTest extends JUnitSuite {
-    String sourcePrefix = "ESW.filter.wheel";
-    Prefix prefix = new Prefix(JSubsystem.ESW, "filter.wheel");
+    Prefix sourcePrefix = new Prefix(JSubsystem.ESW, "filter.wheel");
 
     @Test
     public void shouldCreatePublishSuccessEvent__CSW_118_CSW_119() {
         ObserveEvent event = WFSDetectorEvent.publishSuccess(sourcePrefix);
 
-        Assert.assertEquals(prefix, event.source());
+        Assert.assertEquals(sourcePrefix, event.source());
         Assert.assertEquals("ObserveEvent.PublishSuccess", event.eventName().name());
     }
 
@@ -22,7 +21,7 @@ public class JWFSDetectorEventTest extends JUnitSuite {
     public void shouldCreatePublishFailEvent__CSW_118_CSW_119() {
         ObserveEvent event = WFSDetectorEvent.publishFail(sourcePrefix);
 
-        Assert.assertEquals(prefix, event.source());
+        Assert.assertEquals(sourcePrefix, event.source());
         Assert.assertEquals("ObserveEvent.PublishFail", event.eventName().name());
     }
 }

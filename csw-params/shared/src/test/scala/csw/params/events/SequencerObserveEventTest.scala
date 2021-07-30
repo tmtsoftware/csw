@@ -4,7 +4,7 @@ import csw.params.core.generics.KeyType.StringKey
 import csw.params.core.generics.Parameter
 import csw.params.core.models.{ExposureId, ObsId}
 import csw.prefix.models.Subsystem.ESW
-import csw.prefix.models.{Prefix}
+import csw.prefix.models.Prefix
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks._

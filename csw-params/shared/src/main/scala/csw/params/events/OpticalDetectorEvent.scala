@@ -5,11 +5,11 @@ import csw.params.core.models.{ExposureIdType, ObsId}
 import csw.prefix.models.Prefix
 
 object OpticalDetectorEvent extends DetectorEvent(ObserveEventNames.OpticalDetectorExposureState) {
-  def prepareStart(sourcePrefix: String, obsId: ObsId, exposureId: String): ObserveEvent =
+  def prepareStart(sourcePrefix: Prefix, obsId: ObsId, exposureId: String): ObserveEvent =
     create(sourcePrefix, obsId, exposureId, ObserveEventNames.PrepareStart)
 
   def exposureData(
-      sourcePrefix: String,
+      sourcePrefix: Prefix,
       exposureId: ExposureIdType,
       exposureTime: Long,
       remainingExposureTime: Long
@@ -19,6 +19,6 @@ object OpticalDetectorEvent extends DetectorEvent(ObserveEventNames.OpticalDetec
       ParamFactories.exposureTimeParam(exposureTime),
       ParamFactories.remainingExposureTimeParam(remainingExposureTime)
     )
-    ObserveEvent(Prefix(sourcePrefix), ObserveEventNames.OpticalDetectorExposureData, params)
+    ObserveEvent(sourcePrefix, ObserveEventNames.OpticalDetectorExposureData, params)
   }
 }

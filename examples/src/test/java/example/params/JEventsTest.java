@@ -125,7 +125,7 @@ public class JEventsTest extends JUnitSuite {
 
 
         //events
-        ObserveEvent observeEvent = IRDetectorEvent.observeStart(prefix1.toString(), ObsId.apply("1234A-123-124")).add(i1);
+        ObserveEvent observeEvent = IRDetectorEvent.observeStart(prefix1, ObsId.apply("1234A-123-124"));
         SystemEvent systemEvent = new SystemEvent(prefix1, name1).add(i1);
 
         //json support - write
@@ -221,7 +221,7 @@ public class JEventsTest extends JUnitSuite {
         Parameter<Coords.SolarSystemCoord> param = planets.set(planet1, planet2);
         //events
 
-        ObserveEvent observeEvent = IRDetectorEvent.observeStart(prefix1.toString(), ObsId.apply("1234A-123-124")).add(param);
+        ObserveEvent observeEvent = IRDetectorEvent.observeStart(prefix1, ObsId.apply("1234A-123-124"));
         //#observe-event
         SystemEvent systemEvent1 = new SystemEvent(prefix1, name1).add(param);
         SystemEvent systemEvent2 = new SystemEvent(prefix2, name2).add(param);

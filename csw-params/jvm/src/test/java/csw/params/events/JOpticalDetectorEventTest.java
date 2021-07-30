@@ -12,8 +12,7 @@ import org.scalatestplus.junit.JUnitSuite;
 import java.util.*;
 
 public class JOpticalDetectorEventTest extends JUnitSuite {
-    String sourcePrefix = "ESW.filter.wheel";
-    Prefix prefix = new Prefix(JSubsystem.ESW, "filter.wheel");
+    Prefix sourcePrefix = new Prefix(JSubsystem.ESW, "filter.wheel");
     ObsId obsId = ObsId.apply("2020A-001-123");
     String exposureId = "some-exposure-id";
 
@@ -79,7 +78,7 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
 
         Assert.assertEquals(paramSet, event.jParamSet());
         Assert.assertEquals("ObserveEvent.OpticalDetectorExposureState", event.eventName().name());
-        Assert.assertEquals(prefix, event.source());
+        Assert.assertEquals(sourcePrefix, event.source());
     }
 
     @Test
@@ -97,7 +96,7 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
 
         Assert.assertEquals(paramSet, event.jParamSet());
         Assert.assertEquals("ObserveEvent.OpticalDetectorExposureData", event.eventName().name());
-        Assert.assertEquals(prefix, event.source());
+        Assert.assertEquals(sourcePrefix, event.source());
     }
 
     private Set<Parameter<?>> getParamSetForExposureStateEvent() {
@@ -146,7 +145,7 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
 
     private void assertEvent(ObserveEvent event, String name) {
         Assert.assertEquals(name, event.eventName().name());
-        Assert.assertEquals(prefix, event.source());
+        Assert.assertEquals(sourcePrefix, event.source());
     }
 }
 

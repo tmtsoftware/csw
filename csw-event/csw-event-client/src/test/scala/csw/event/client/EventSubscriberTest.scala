@@ -367,10 +367,10 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     import redisProps._
 
     val obsId          = ObsId("2020A-001-123")
-    val irDetObsStart  = IRDetectorEvent.observeStart("IRIS.det", obsId)
-    val irDetObsEnd    = IRDetectorEvent.observeEnd("IRIS.det", obsId)
-    val publishSuccess = WFSDetectorEvent.publishSuccess("WFOS.test")
-    val optDetObsStart = OpticalDetectorEvent.observeStart("WFOS.det", obsId)
+    val irDetObsStart  = IRDetectorEvent.observeStart(Prefix("IRIS.det"), obsId)
+    val irDetObsEnd    = IRDetectorEvent.observeEnd(Prefix("IRIS.det"), obsId)
+    val publishSuccess = WFSDetectorEvent.publishSuccess(Prefix("WFOS.test"))
+    val optDetObsStart = OpticalDetectorEvent.observeStart(Prefix("WFOS.det"), obsId)
 
     val testEvent = makeEventWithPrefix(1, Prefix("csw.prefix"))
     val buffer    = mutable.ArrayBuffer.empty[Event]

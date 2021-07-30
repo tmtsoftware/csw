@@ -3,7 +3,6 @@ package csw.params.events;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.*;
 import csw.params.javadsl.JKeyType;
-import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
 import org.junit.Assert;
 import org.junit.Test;
@@ -11,9 +10,10 @@ import org.scalatestplus.junit.JUnitSuite;
 
 import java.util.*;
 
+import static csw.prefix.javadsl.JSubsystem.ESW;
+
 public class JIRDetectorEventTest extends JUnitSuite {
-    String sourcePrefix = "ESW.filter.wheel";
-    Prefix prefix = new Prefix(JSubsystem.ESW, "filter.wheel");
+    Prefix sourcePrefix = new Prefix(ESW, "filter.wheel");
     ObsId obsId = ObsId.apply("2020A-001-123");
     String exposureId = "some-exposure-id";
     String detector = "ir-detector";
@@ -76,7 +76,7 @@ public class JIRDetectorEventTest extends JUnitSuite {
 
         Assert.assertEquals(paramSet, event.jParamSet());
         Assert.assertEquals("ObserveEvent.IRDetectorExposureState", event.eventName().name());
-        Assert.assertEquals(prefix, event.source());
+        Assert.assertEquals(sourcePrefix, event.source());
     }
 
     @Test
@@ -102,7 +102,7 @@ public class JIRDetectorEventTest extends JUnitSuite {
 
         Assert.assertEquals(paramSet, event.jParamSet());
         Assert.assertEquals("ObserveEvent.IRDetectorExposureData", event.eventName().name());
-        Assert.assertEquals(prefix, event.source());
+        Assert.assertEquals(sourcePrefix, event.source());
     }
 
     private Set<Parameter<?>> getParamSetForExposureDataEvent(int readsInRamp, int readsComplete, int rampsInExposure, int rampsComplete, long exposureTime, long remainingExposureTime) {
@@ -132,7 +132,7 @@ public class JIRDetectorEventTest extends JUnitSuite {
         Parameter<Boolean> isAborted = JKeyType.BooleanKey().make("isAborted").set(true);
         Parameter<String> errorMessage = JKeyType.StringKey().make("errorMessage").set("");
         HashSet<Choice> operationalStateChoices = ObserveEventUtil.getOperationalStateChoices();
-        Parameter<Choice> operationalState = JKeyType.ChoiceKey().make("operationalState",  Choices.fromChoices(operationalStateChoices)).set(new Choice(JOperationalState.BUSY().entryName()));
+        Parameter<Choice> operationalState = JKeyType.ChoiceKey().make("operationalState", Choices.fromChoices(operationalStateChoices)).set(new Choice(JOperationalState.BUSY().entryName()));
 
         Set<Parameter<?>> paramSet = new HashSet<>(10);
         paramSet.add(obsIdParam);
@@ -157,7 +157,7 @@ public class JIRDetectorEventTest extends JUnitSuite {
 
     private void assertEvent(ObserveEvent event, String name) {
         Assert.assertEquals(name, event.eventName().name());
-        Assert.assertEquals(prefix, event.source());
+        Assert.assertEquals(sourcePrefix, event.source());
     }
 }
 

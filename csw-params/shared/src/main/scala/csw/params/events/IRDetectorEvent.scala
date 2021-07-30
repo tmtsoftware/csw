@@ -1,12 +1,12 @@
 package csw.params.events
 
 import csw.params.core.generics.Parameter
-import csw.params.core.models.{ExposureIdType}
+import csw.params.core.models.ExposureIdType
 import csw.prefix.models.Prefix
 
 object IRDetectorEvent extends DetectorEvent(ObserveEventNames.IRDetectorExposureState) {
   def exposureData(
-      sourcePrefix: String,
+      sourcePrefix: Prefix,
       exposureId: ExposureIdType,
       readsInRamp: Int,
       readsComplete: Int,
@@ -24,6 +24,6 @@ object IRDetectorEvent extends DetectorEvent(ObserveEventNames.IRDetectorExposur
       ParamFactories.exposureTimeParam(exposureTime),
       ParamFactories.remainingExposureTimeParam(remainingExposureTime)
     )
-    ObserveEvent(Prefix(sourcePrefix), ObserveEventNames.IRDetectorExposureData, params)
+    ObserveEvent(sourcePrefix, ObserveEventNames.IRDetectorExposureData, params)
   }
 }

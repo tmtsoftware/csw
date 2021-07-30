@@ -54,7 +54,7 @@ class EventPublishExamples(eventService: EventService, log: Logger) {
       def eventGenerator(): Option[Event] =
         baseEvent match {
           case e: SystemEvent  => Some(SystemEvent(e.source, e.eventName, e.paramSet))
-          case e: ObserveEvent => Some(IRDetectorEvent.observeStart(e.source.toString, ObsId("2020A-001-123")))
+          case e: ObserveEvent => Some(IRDetectorEvent.observeStart(e.source, ObsId("2020A-001-123")))
         }
 
       publisher.publish(eventGenerator(), interval)

@@ -29,6 +29,9 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Supplier;
 
+import static csw.prefix.javadsl.JSubsystem.IRIS;
+import static csw.prefix.javadsl.JSubsystem.WFOS;
+
 //DEOPSCSW-331: Event Service Accessible to all CSW component builders
 //DEOPSCSW-334: Publish an event
 //DEOPSCSW-335: Model for EventName that encapsulates the topic(or channel ) name
@@ -336,10 +339,10 @@ public class JEventSubscriberTest extends TestNGSuite {
     @Test(dataProvider = "redis-provider")
     public void should_be_able_to_subscribe_all_observe_events_CSW_119(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         ObsId obsId = ObsId.apply("2020A-001-123");
-        Event irDetObsStart = IRDetectorEvent.observeStart("IRIS.det", obsId);
-        Event irDetObsEnd = IRDetectorEvent.observeEnd("IRIS.det", obsId);
-        Event publishSuccess = WFSDetectorEvent.publishSuccess("WFOS.test");
-        Event optDetObsStart = OpticalDetectorEvent.observeStart("WFOS.det", obsId);
+        Event irDetObsStart = IRDetectorEvent.observeStart(new Prefix(IRIS,"det"), obsId);
+        Event irDetObsEnd = IRDetectorEvent.observeEnd(new Prefix(IRIS,"det"), obsId);
+        Event publishSuccess = WFSDetectorEvent.publishSuccess(new Prefix(WFOS,"test"));
+        Event optDetObsStart = OpticalDetectorEvent.observeStart(new Prefix(WFOS,"det"), obsId);
         Event testEvent = Utils.makeEventWithPrefix(1, Prefix.apply(JSubsystem.CSW, "prefix"));
 
         List<Event> receivedEvents = new ArrayList<>();
