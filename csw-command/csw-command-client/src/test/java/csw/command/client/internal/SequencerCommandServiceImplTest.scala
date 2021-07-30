@@ -5,7 +5,7 @@ import akka.util.Timeout
 import csw.command.client.SequencerCommandServiceImpl
 import csw.command.client.messages.sequencer.SequencerMsg
 import csw.command.client.messages.sequencer.SequencerMsg.{Query, QueryFinal, SubmitSequence}
-import csw.commons.AskProxyTestKit
+import csw.commons.{AskProxyTestKit, RandomUtils}
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType, Metadata}
@@ -51,7 +51,7 @@ class SequencerCommandServiceImplTest
   val queryFinalResponse: SubmitResponse = mock[SubmitResponse]
   val queryResponse: SubmitResponse      = mock[SubmitResponse]
 
-  private def randomString5 = Random.nextString(5)
+  private def randomString5 = RandomUtils.randomString5()
 
   override protected def afterAll(): Unit = {
     system.terminate()

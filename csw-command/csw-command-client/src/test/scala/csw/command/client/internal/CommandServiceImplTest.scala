@@ -7,7 +7,7 @@ import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
 import csw.command.client.messages.ComponentCommonMessage.ComponentStateSubscription
 import csw.command.client.messages.{ComponentMessage, Query, QueryFinal}
 import csw.command.client.models.framework.PubSub.Subscribe
-import csw.commons.AskProxyTestKit
+import csw.commons.{AskProxyTestKit, RandomUtils}
 import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandName, Observe, Setup}
 import csw.params.core.models.Id
@@ -33,7 +33,7 @@ class CommandServiceImplTest extends AnyFunSuiteLike with Matchers with MockitoS
   }
   import askProxyTestKit._
 
-  private def randomString5 = Random.nextString(5)
+  private def randomString5 = RandomUtils.randomString5()
 
   private val prefix  = Prefix(s"csw.$randomString5")
   private val setup   = Setup(prefix, CommandName(randomString5), None)
