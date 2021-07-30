@@ -2,15 +2,13 @@ package csw.database;
 
 import akka.actor.typed.ActorSystem;
 import akka.actor.typed.SpawnProtocol;
-import akka.actor.typed.javadsl.Behaviors;
 import com.opentable.db.postgres.embedded.EmbeddedPostgres;
 import csw.database.commons.DBTestHelper;
 import csw.database.exceptions.DatabaseException;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.scalatestplus.junit.JUnitSuite;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
@@ -18,7 +16,6 @@ import scala.concurrent.duration.Duration;
 import java.util.concurrent.ExecutionException;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.hamcrest.CoreMatchers.isA;
 
 //DEOPSCSW-615: DB service accessible to CSW component developers
 public class JDatabaseServiceFactoryFailureTest extends JUnitSuite {
@@ -41,12 +38,9 @@ public class JDatabaseServiceFactoryFailureTest extends JUnitSuite {
         Await.result(system.whenTerminated(), Duration.apply(5, SECONDS));
     }
 
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
-
     @Test
-    public void shouldThrowDatabaseConnectionWhileConnectingWithIncorrectPort__DEOPSCSW_615() throws InterruptedException, ExecutionException {
-        exception.expectCause(isA(DatabaseException.class));
-        dbFactory.jMakeDsl().get();
+    public void shouldThrowDatabaseConnectionWhileConnectingWithIncorrectPort__DEOPSCSW_615() {
+        ExecutionException ex = Assert.assertThrows(ExecutionException.class, () -> dbFactory.jMakeDsl().get());
+        Assert.assertTrue(ex.getCause() instanceof DatabaseException);
     }
 }

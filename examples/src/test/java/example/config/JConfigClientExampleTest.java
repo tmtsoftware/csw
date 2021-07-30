@@ -18,10 +18,8 @@ import csw.testkit.ConfigTestKit;
 import csw.testkit.javadsl.FrameworkTestKitJunitResource;
 import csw.testkit.javadsl.JCSWService;
 import org.junit.*;
-import org.junit.rules.ExpectedException;
 import org.scalatestplus.junit.JUnitSuite;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
@@ -38,12 +36,12 @@ public class JConfigClientExampleTest extends JUnitSuite {
     // DEOPSCSW-592: Create csw testkit for component writers
     @ClassRule
     public static final FrameworkTestKitJunitResource testKit = new FrameworkTestKitJunitResource(List.of(JCSWService.ConfigServer));
-    private static JMockedAuthentication mocks = new JMockedAuthentication();
-    private static ConfigTestKit configTestKit = testKit.frameworkTestKit().configTestKit();
-    private static ServerWiring configWiring = configTestKit.configWiring();
-    private static ActorSystem<SpawnProtocol.Command> actorSystem = configWiring.actorSystem();
+    private static final JMockedAuthentication mocks = new JMockedAuthentication();
+    private static final ConfigTestKit configTestKit = testKit.frameworkTestKit().configTestKit();
+    private static final ServerWiring configWiring = configTestKit.configWiring();
+    private static final ActorSystem<SpawnProtocol.Command> actorSystem = configWiring.actorSystem();
 
-    private static ILocationService clientLocationService = testKit.jLocationService();
+    private static final ILocationService clientLocationService = testKit.jLocationService();
 
     //#create-api
     //config client API
@@ -55,9 +53,6 @@ public class JConfigClientExampleTest extends JUnitSuite {
     //#declare_string_config
     String defaultStrConf = "foo { bar { baz : 1234 } }";
     //#declare_string_config
-
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
 
     @Before
     public void initSvnRepo() {
@@ -98,7 +93,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
 
     // DEOPSCSW-89: Examples of  Configuration Service usage in Java and Scala
     @Test
-    public void testCreateUpdateDelete__DEOPSCSW_89() throws ExecutionException, InterruptedException, URISyntaxException, IOException {
+    public void testCreateUpdateDelete__DEOPSCSW_89() throws ExecutionException, InterruptedException, URISyntaxException {
         //#create
         //construct ConfigData from String containing ASCII text
         String configString = "axisName11111 = tromboneAxis\naxisName22222 = tromboneAxis2\naxisName3 = tromboneAxis3333";
@@ -229,7 +224,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
 
     // DEOPSCSW-89: Examples of  Configuration Service usage in Java and Scala
     @Test
-    public void testHistory__DEOPSCSW_89() throws ExecutionException, InterruptedException, URISyntaxException, IOException {
+    public void testHistory__DEOPSCSW_89() throws ExecutionException, InterruptedException {
         //#history
         Path filePath = Paths.get("/a/test.conf");
         ConfigId id0 = adminApi.create(filePath, ConfigData.fromString(defaultStrConf), false, "first commit").get();
@@ -258,7 +253,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
 
     // DEOPSCSW-89: Examples of  Configuration Service usage in Java and Scala
     @Test
-    public void testActiveFileManagement__DEOPSCSW_89() throws ExecutionException, InterruptedException, URISyntaxException, IOException {
+    public void testActiveFileManagement__DEOPSCSW_89() throws ExecutionException, InterruptedException {
         //#active-file-mgmt
         Instant tBegin = Instant.now();
         Path filePath = Paths.get("/a/test.conf");

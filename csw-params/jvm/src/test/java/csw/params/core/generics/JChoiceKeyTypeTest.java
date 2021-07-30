@@ -1,18 +1,15 @@
 package csw.params.core.generics;
 
-import csw.params.javadsl.JKeyType;
 import csw.params.core.models.Choice;
 import csw.params.core.models.Choices;
+import csw.params.javadsl.JKeyType;
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.scalatestplus.junit.JUnitSuite;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static csw.params.javadsl.JUnits.NoUnits;
 import static csw.params.javadsl.JUnits.kilometer;
 
 // DEOPSCSW-183: Configure attributes and values
@@ -75,14 +72,10 @@ public class JChoiceKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(Arrays.asList(choicesArr), choiceParameter.jValues());
     }
 
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
-
     @Test
-    public void shouldThrowExceptionForInvalidChoice__DEOPSCSW_183_DEOPSCSW_190() {
+    public void shouldThrowExceptionForInvalidChoice__DEOPSCSW_183_DEOPSCSW_190_CSW_153() {
         Choice invalidChoice = new Choice("D");
-        exception.expect(AssertionError.class);
-        choiceKey.set(invalidChoice);
+        Assert.assertThrows(AssertionError.class, () -> choiceKey.set(invalidChoice));
     }
 
 }

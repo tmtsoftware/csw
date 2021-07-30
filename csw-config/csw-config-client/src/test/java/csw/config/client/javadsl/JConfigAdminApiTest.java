@@ -13,7 +13,6 @@ import csw.config.models.ConfigFileRevision;
 import csw.config.models.ConfigId;
 import csw.config.models.ConfigMetadata;
 import org.junit.*;
-import org.junit.rules.ExpectedException;
 import org.scalatestplus.junit.JUnitSuite;
 import scala.Some;
 
@@ -28,7 +27,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.hamcrest.CoreMatchers.isA;
 import static org.mockito.Mockito.when;
 
 // DEOPSCSW-88: Config service API implementation details need to be hidden from component developer
@@ -63,14 +61,11 @@ public class JConfigAdminApiTest extends JUnitSuite {
         jConfigClientBaseSuite.cleanup();
     }
 
-    private String configValue1 = "axisName1 = tromboneAxis\naxisName2 = tromboneAxis2\naxisName3 = tromboneAxis3";
-    private String configValue2 = "axisName11 = tromboneAxis\naxisName22 = tromboneAxis2\naxisName3 = tromboneAxis33";
-    private String configValue3 = "axisName111 = tromboneAxis\naxisName222 = tromboneAxis2\naxisName3 = tromboneAxis333";
-    private String configValue4 = "axisName1111 = tromboneAxis\naxisName2222 = tromboneAxis2\naxisName3 = tromboneAxis3333";
-    private String configValue5 = "axisName11111 = tromboneAxis\naxisName22222 = tromboneAxis2\naxisName3 = tromboneAxis3333";
-
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
+    private final String configValue1 = "axisName1 = tromboneAxis\naxisName2 = tromboneAxis2\naxisName3 = tromboneAxis3";
+    private final String configValue2 = "axisName11 = tromboneAxis\naxisName22 = tromboneAxis2\naxisName3 = tromboneAxis33";
+    private final String configValue3 = "axisName111 = tromboneAxis\naxisName222 = tromboneAxis2\naxisName3 = tromboneAxis333";
+    private final String configValue4 = "axisName1111 = tromboneAxis\naxisName2222 = tromboneAxis2\naxisName3 = tromboneAxis3333";
+    private final String configValue5 = "axisName11111 = tromboneAxis\naxisName22222 = tromboneAxis2\naxisName3 = tromboneAxis3333";
 
     // DEOPSCSW-42: Storing text based component configuration
     // DEOPSCSW-48: Store new configuration file in Config. service
@@ -88,8 +83,9 @@ public class JConfigAdminApiTest extends JUnitSuite {
     public void testFileAlreadyExistsExceptionOnCreate__DEOPSCSW_42_DEOPSCSW_88_DEOPSCSW_138_DEOPSCSW_103_DEOPSCSW_48() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/trombone/assembly/conf/normalfiles/test/test.conf");
         configService.create(path, ConfigData.fromString(configValue1), false, "commit test file").get();
-        exception.expectCause(isA(FileAlreadyExists.class));
-        configService.create(path, ConfigData.fromString(configValue1), false, "commit test file").get();
+        ExecutionException ex = Assert.assertThrows(ExecutionException.class, () ->
+                configService.create(path, ConfigData.fromString(configValue1), false, "commit test file").get());
+        Assert.assertTrue(ex.getCause() instanceof FileAlreadyExists);
     }
 
     @Test
@@ -115,10 +111,10 @@ public class JConfigAdminApiTest extends JUnitSuite {
 
     // DEOPSCSW-49: Update an Existing File with a New Version
     @Test
-    public void testUpdateReturnsFileNotFoundExceptionOnAbsenceOfFile__DEOPSCSW_88_DEOPSCSW_138_DEOPSCSW_103_DEOPSCSW_49() throws ExecutionException, InterruptedException {
+    public void testUpdateReturnsFileNotFoundExceptionOnAbsenceOfFile__DEOPSCSW_88_DEOPSCSW_138_DEOPSCSW_103_DEOPSCSW_49() {
         Path path = Paths.get("/tmt/trombone/assembly.conf");
-        exception.expectCause(isA(FileNotFound.class));
-        configService.update(path, ConfigData.fromString(configValue1), "commit assembly conf").get();
+        Assert.assertThrows(FileNotFound.class, () ->
+                configService.update(path, ConfigData.fromString(configValue1), "commit assembly conf").get());
     }
 
     // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
@@ -212,8 +208,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
                 .thenReturn(firstUser, secondUser, thirdUser);
 
         try {
-            exception.expectCause(isA(FileNotFound.class));
-            configService.history(path).get();
+            Assert.assertThrows(FileNotFound.class, () -> configService.history(path).get());
         } finally {
             String comment1 = "commit version 1";
             String comment2 = "commit version 2";

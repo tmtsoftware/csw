@@ -11,8 +11,10 @@ import csw.time.core.models.TMTTime;
 import csw.time.core.models.UTCTime;
 import io.github.embeddedkafka.EmbeddedKafka$;
 import org.apache.kafka.common.errors.RecordTooLargeException;
-import org.junit.*;
-import org.junit.rules.ExpectedException;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
 
 import java.time.Duration;
@@ -25,16 +27,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 
-import static org.hamcrest.CoreMatchers.isA;
-
 //DEOPSCSW-398: Propagate failure for publish api (eventGenerator)
 public class JKafkaFailureTest extends JUnitSuite {
 
     private static KafkaTestProps kafkaTestProps;
     private static IEventPublisher publisher;
-
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
 
     @BeforeClass
     public static void beforeClass() {
@@ -50,10 +47,9 @@ public class JKafkaFailureTest extends JUnitSuite {
 
     @Test
     public void failureInPublishingShouldFailFutureWithPublishFailedException__DEOPSCSW_398() throws InterruptedException, ExecutionException, TimeoutException {
-        exception.expectCause(isA(PublishFailure.class));
-
         // simulate publishing failure as message size is greater than message.max.bytes(1 byte) configured in broker
-        publisher.publish(Utils.makeEvent(2)).get(10, TimeUnit.SECONDS);
+        ExecutionException ex = Assert.assertThrows(ExecutionException.class, () -> publisher.publish(Utils.makeEvent(2)).get(10, TimeUnit.SECONDS));
+        Assert.assertTrue(ex.getCause() instanceof PublishFailure);
     }
 
     //DEOPSCSW-334: Publish an event
@@ -86,7 +82,7 @@ public class JKafkaFailureTest extends JUnitSuite {
         cancellable.cancel();
     }
 
-    //DEOPSCSW-000: Publish events with block generating futre of event
+    //DEOPSCSW-000: Publish events with block generating future of event
     @Test
     public void handleFailedPublishEventWithAnEventGeneratorGeneratingFutureOfEventAndACallback__DEOPSCSW_398_DEOPSCSW_000() {
         TestProbe<PublishFailure> testProbe = TestProbe.create(kafkaTestProps.actorSystem());

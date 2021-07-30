@@ -12,30 +12,27 @@ import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
 import csw.time.core.models.UTCTime;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.scalatestplus.junit.JUnitSuite;
 import scala.concurrent.Await;
 import scala.concurrent.duration.FiniteDuration;
 
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import static csw.alarm.models.Key.AlarmKey;
-import static org.hamcrest.CoreMatchers.isA;
 import static org.junit.Assert.*;
 
 // DEOPSCSW-444: Set severity api for component
 // CSW-83: Alarm models should take prefix
 public class JSeverityServiceModuleTest extends JUnitSuite {
 
-    private static AlarmServiceTestSetup alarmServiceTestSetup = new AlarmServiceTestSetup();
-    private static IAlarmService jAlarmService = alarmServiceTestSetup.jAlarmService();
-    private static AlarmAdminService alarmService = alarmServiceTestSetup.alarmService();
-    private Prefix prefix = Prefix.apply(JSubsystem.NFIRAOS, "trombone");
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
+    private static final AlarmServiceTestSetup alarmServiceTestSetup = new AlarmServiceTestSetup();
+    private static final IAlarmService jAlarmService = alarmServiceTestSetup.jAlarmService();
+    private static final AlarmAdminService alarmService = alarmServiceTestSetup.alarmService();
+    private final Prefix prefix = Prefix.apply(JSubsystem.NFIRAOS, "trombone");
 
     @Before
     public void setup() throws Exception {
@@ -90,11 +87,10 @@ public class JSeverityServiceModuleTest extends JUnitSuite {
     }
 
     @Test
-    public void setSeverity_shouldThrowInvalidSeverityExceptionWhenUnsupportedSeverityIsProvided__DEOPSCSW_444() throws Exception {
+    public void setSeverity_shouldThrowInvalidSeverityExceptionWhenUnsupportedSeverityIsProvided__DEOPSCSW_444_CSW_153() {
         AlarmKey tromboneAxisHighLimitAlarm = new AlarmKey(prefix, "tromboneAxisHighLimitAlarm");
-
-        exception.expectCause(isA(InvalidSeverityException.class));
-        setSeverityAndGetStatus(tromboneAxisHighLimitAlarm, JAlarmSeverity.Critical);
+        ExecutionException executionException = Assert.assertThrows(ExecutionException.class, () -> setSeverityAndGetStatus(tromboneAxisHighLimitAlarm, JAlarmSeverity.Critical));
+        Assert.assertTrue(executionException.getCause() instanceof InvalidSeverityException);
     }
 
     // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed

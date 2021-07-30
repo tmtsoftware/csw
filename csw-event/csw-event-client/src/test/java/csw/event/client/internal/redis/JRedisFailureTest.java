@@ -3,16 +3,18 @@ package csw.event.client.internal.redis;
 import akka.NotUsed;
 import akka.actor.testkit.typed.javadsl.TestProbe;
 import akka.stream.javadsl.Source;
-import csw.params.events.Event;
 import csw.event.api.exceptions.PublishFailure;
 import csw.event.api.javadsl.IEventPublisher;
 import csw.event.client.helpers.Utils;
+import csw.params.events.Event;
 import csw.time.core.models.TMTTime;
 import csw.time.core.models.UTCTime;
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.RedisException;
-import org.junit.*;
-import org.junit.rules.ExpectedException;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
 
 import java.time.Duration;
@@ -24,15 +26,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 
-import static org.hamcrest.CoreMatchers.isA;
-
 //DEOPSCSW-398: Propagate failure for publish api (eventGenerator)
 public class JRedisFailureTest extends JUnitSuite {
 
     private static RedisTestProps redisTestProps;
-
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
 
     @BeforeClass
     public static void beforeClass() {
@@ -56,8 +53,8 @@ public class JRedisFailureTest extends JUnitSuite {
 
         Thread.sleep(1000); // wait till the publisher is shutdown successfully
 
-        exception.expectCause(isA(PublishFailure.class));
-        publisher.publish(Utils.makeEvent(2)).get(10, TimeUnit.SECONDS);
+        ExecutionException ex = Assert.assertThrows(ExecutionException.class, () -> publisher.publish(Utils.makeEvent(2)).get(10, TimeUnit.SECONDS));
+        Assert.assertTrue(ex.getCause() instanceof PublishFailure);
     }
 
     //DEOPSCSW-334: Publish an event

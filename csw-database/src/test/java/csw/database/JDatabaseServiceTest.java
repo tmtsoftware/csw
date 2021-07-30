@@ -2,7 +2,6 @@ package csw.database;
 
 import akka.actor.typed.ActorSystem;
 import akka.actor.typed.SpawnProtocol;
-import akka.actor.typed.javadsl.Behaviors;
 import com.opentable.db.postgres.embedded.EmbeddedPostgres;
 import csw.database.commons.DBTestHelper;
 import csw.database.javadsl.JooqHelper;
@@ -12,10 +11,9 @@ import org.jooq.Record;
 import org.jooq.ResultQuery;
 import org.jooq.exception.DataAccessException;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.scalatestplus.junit.JUnitSuite;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
@@ -27,7 +25,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.hamcrest.CoreMatchers.isA;
 import static org.junit.Assert.*;
 
 //DEOPSCSW-601: Create Database API
@@ -156,10 +153,10 @@ public class JDatabaseServiceTest extends JUnitSuite {
         // query with joins and group by
         List<FilmBudget> resultSet = JooqHelper
                 .fetchAsync(dsl.resultQuery(
-                        "SELECT films.name, SUM(budget.amount) " +
-                                "FROM films INNER JOIN budget " +
-                                "ON films.id = budget.movie_id " +
-                                "GROUP BY films.name;"),
+                                "SELECT films.name, SUM(budget.amount) " +
+                                        "FROM films INNER JOIN budget " +
+                                        "ON films.id = budget.movie_id " +
+                                        "GROUP BY films.name;"),
                         FilmBudget.class)
                 .get(5, SECONDS);
 
@@ -225,13 +222,12 @@ public class JDatabaseServiceTest extends JUnitSuite {
         dsl.query("DROP TABLE films").executeAsync().toCompletableFuture().get(5, SECONDS);
     }
 
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
-
     @Test
     public void shouldBeThrowingExceptionInCaseOfSyntaxError__DEOPSCSW_601_DEOPSCSW_616() throws InterruptedException, ExecutionException {
-        exception.expectCause(isA(DataAccessException.class));
-        dsl.query("create1 table tableName (id SERIAL PRIMARY KEY)").executeAsync().toCompletableFuture().get();
+        ExecutionException ex = Assert.assertThrows(ExecutionException.class, () ->
+                dsl.query("create1 table tableName (id SERIAL PRIMARY KEY)").executeAsync().toCompletableFuture().get()
+        );
+        Assert.assertTrue(ex.getCause() instanceof DataAccessException);
     }
 
     @Test
@@ -249,8 +245,8 @@ public class JDatabaseServiceTest extends JUnitSuite {
 }
 
 class Film {
-    private Integer id;
-    private String name;
+    private final Integer id;
+    private final String name;
 
     Film(Integer id, String name) {
         this.id = id;
@@ -271,8 +267,8 @@ class Film {
 }
 
 class FilmBudget {
-    private String name;
-    private Integer amt;
+    private final String name;
+    private final Integer amt;
 
     FilmBudget(String name, Integer amt) {
         this.name = name;

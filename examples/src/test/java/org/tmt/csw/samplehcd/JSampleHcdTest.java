@@ -12,7 +12,7 @@ import csw.location.api.javadsl.ILocationService;
 import csw.location.api.javadsl.JComponentType;
 import csw.location.api.models.AkkaLocation;
 import csw.location.api.models.ComponentId;
-import csw.location.api.models.Connection.*;
+import csw.location.api.models.Connection.AkkaConnection;
 import csw.params.commands.CommandName;
 import csw.params.commands.CommandResponse;
 import csw.params.commands.Setup;
@@ -29,8 +29,10 @@ import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
 import csw.testkit.javadsl.FrameworkTestKitJunitResource;
 import csw.testkit.javadsl.JCSWService;
-import org.junit.*;
-import org.junit.rules.ExpectedException;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
 
 import java.time.Duration;
@@ -139,8 +141,6 @@ public class JSampleHcdTest extends JUnitSuite {
     //#submitAndWait
 
     //#exception
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 
     @Test
     public void testShouldGetExecutionExceptionIfSubmitTimeoutIsTooSmall() throws ExecutionException, InterruptedException {
@@ -159,8 +159,7 @@ public class JSampleHcdTest extends JUnitSuite {
 
         ICommandService hcd = CommandServiceFactory.jMake(location, typedActorSystem);
 
-        thrown.expect(ExecutionException.class);
-        hcd.submitAndWait(setupCommand, commandResponseTimeout).get();
+        Assert.assertThrows(ExecutionException.class, () -> hcd.submitAndWait(setupCommand, commandResponseTimeout).get());
     }
 //#exception
 }
