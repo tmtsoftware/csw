@@ -21,7 +21,6 @@ import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.duration.DurationLong
-import scala.util.Random
 
 class SequencerCommandServiceImplTest
     extends AnyFunSuiteLike

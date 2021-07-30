@@ -20,7 +20,6 @@ import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.duration.DurationInt
-import scala.util.Random
 
 class CommandServiceImplTest extends AnyFunSuiteLike with Matchers with MockitoSugar with ScalaFutures with BeforeAndAfterAll {
   private implicit val system: ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), "sequencer-command-system")
