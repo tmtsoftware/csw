@@ -1,7 +1,7 @@
 package csw.params.events
 
 import csw.params.core.generics.KeyType.StringKey
-import csw.params.core.models.ObsId
+import csw.params.core.models.{ExposureId, ExposureIdType, ObsId}
 import csw.prefix.models.Prefix
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
@@ -72,15 +72,13 @@ class OpticalDetectorEventTest extends AnyFunSpec with Matchers {
     }
 
     it("create OpticalDetectorExposureData event | ESW-118, CSW-119") {
-      val exposureTime          = 23923L
-      val remainingExposureTime = 324335L
-      val detector              = "my-detector"
-      val sourcePrefix          = "ESW.test"
-      val obsId                 = ObsId("2020A-001-123")
+      val exposureTime                   = 23923L
+      val remainingExposureTime          = 324335L
+      val sourcePrefix                   = "ESW.test"
+      val exposureIdType: ExposureIdType = ExposureId("2022A-001-123-IRIS-IMG-DRK1-0023")
       val observeEvent = OpticalDetectorEvent.exposureData(
         sourcePrefix,
-        obsId,
-        detector,
+        exposureIdType,
         exposureTime,
         remainingExposureTime
       )
@@ -88,8 +86,7 @@ class OpticalDetectorEventTest extends AnyFunSpec with Matchers {
       observeEvent.eventName shouldBe EventName("ObserveEvent.OpticalDetectorExposureData")
       observeEvent.source shouldBe Prefix(sourcePrefix)
       observeEvent.paramSet shouldBe Set(
-        ObserveEventKeys.detector.set(detector),
-        ObserveEventKeys.obsId.set(obsId.toString),
+        ObserveEventKeys.exposureId.set(exposureIdType.toString),
         ObserveEventKeys.exposureTime.set(exposureTime),
         ObserveEventKeys.remainingExposureTime.set(remainingExposureTime)
       )

@@ -1,7 +1,7 @@
 package csw.params.events
 
 import csw.params.core.generics.Parameter
-import csw.params.core.models.ObsId
+import csw.params.core.models.{ExposureIdType, ObsId}
 import csw.prefix.models.Prefix
 
 object OpticalDetectorEvent extends DetectorEvent(ObserveEventNames.OpticalDetectorExposureState) {
@@ -10,14 +10,12 @@ object OpticalDetectorEvent extends DetectorEvent(ObserveEventNames.OpticalDetec
 
   def exposureData(
       sourcePrefix: String,
-      obsId: ObsId,
-      detector: String,
+      exposureId: ExposureIdType,
       exposureTime: Long,
       remainingExposureTime: Long
   ): ObserveEvent = {
     val params: Set[Parameter[_]] = Set(
-      ParamFactories.obsIdParam(obsId),
-      ParamFactories.detectorParam(detector),
+      ParamFactories.exposureIdParam(exposureId.toString),
       ParamFactories.exposureTimeParam(exposureTime),
       ParamFactories.remainingExposureTimeParam(remainingExposureTime)
     )

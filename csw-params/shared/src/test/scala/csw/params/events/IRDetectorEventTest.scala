@@ -1,6 +1,6 @@
 package csw.params.events
 
-import csw.params.core.models.{ObsId}
+import csw.params.core.models.{ExposureId, ExposureIdType, ObsId}
 import csw.prefix.models.Prefix
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
@@ -8,11 +8,11 @@ import org.scalatest.prop.TableDrivenPropertyChecks._
 
 class IRDetectorEventTest extends AnyFunSpec with Matchers {
   describe("IR detector") {
-    val sourcePrefix = "ESW.filter.wheel"
-    val obsId        = ObsId("2020A-001-123")
-    val exposureId   = "12345"
-    val detector     = "ir-detector"
-
+    val sourcePrefix                   = "ESW.filter.wheel"
+    val obsId                          = ObsId("2020A-001-123")
+    val exposureId                     = "12345"
+    val detector                       = "ir-detector"
+    val exposureIdType: ExposureIdType = ExposureId("2022A-001-123-IRIS-IMG-DRK1-0023")
     it("should create observe event with obsId and exposure id parameters | CSW-118, CSW-119") {
       Table(
         ("Observe event", "event name", "prefix"),
@@ -75,8 +75,7 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
 
       val event = IRDetectorEvent.exposureData(
         sourcePrefix,
-        obsId,
-        detector,
+        exposureIdType,
         readsInRamp,
         readsComplete,
         rampsInExposure,
@@ -88,8 +87,7 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
       event.source shouldBe Prefix(sourcePrefix)
       event.eventName.name shouldBe "ObserveEvent.IRDetectorExposureData"
       event.paramSet shouldBe Set(
-        ObserveEventKeys.detector.set(detector),
-        ObserveEventKeys.obsId.set(obsId.toString),
+        ObserveEventKeys.exposureId.set(exposureIdType.toString),
         ObserveEventKeys.readsInRamp.set(readsInRamp),
         ObserveEventKeys.readsComplete.set(readsComplete),
         ObserveEventKeys.rampsInExposure.set(rampsInExposure),

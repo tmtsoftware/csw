@@ -1,9 +1,7 @@
 package csw.params.events;
 
 import csw.params.core.generics.Parameter;
-import csw.params.core.models.Choice;
-import csw.params.core.models.Choices;
-import csw.params.core.models.ObsId;
+import csw.params.core.models.*;
 import csw.params.javadsl.JKeyType;
 import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
@@ -21,6 +19,7 @@ public class JIRDetectorEventTest extends JUnitSuite {
     String detector = "ir-detector";
     Parameter<String> exposureIdParam = JKeyType.StringKey().make("exposureId").set(exposureId);
     Parameter<String> obsIdParam = JKeyType.StringKey().make("obsId").set(obsId.toString());
+    ExposureIdType exposureIdType = ExposureId.apply("2022A-001-123-IRIS-IMG-DRK1-0023");
 
     @Test
     public void shouldCreateIrDetectorObserveEventWithObsId__CSW_118_CSW_119() {
@@ -92,8 +91,7 @@ public class JIRDetectorEventTest extends JUnitSuite {
 
         ObserveEvent event = IRDetectorEvent.exposureData(
                 sourcePrefix,
-                obsId,
-                detector,
+                exposureIdType,
                 readsInRamp,
                 readsComplete,
                 rampsInExposure,
@@ -108,7 +106,7 @@ public class JIRDetectorEventTest extends JUnitSuite {
     }
 
     private Set<Parameter<?>> getParamSetForExposureDataEvent(int readsInRamp, int readsComplete, int rampsInExposure, int rampsComplete, long exposureTime, long remainingExposureTime) {
-        Parameter<String> detectorParam = JKeyType.StringKey().make("detector").set(detector);
+        Parameter<String> exposureIdParam = JKeyType.StringKey().make("exposureId").set(exposureIdType.toString());
         Parameter<Integer> readsInRampParam = JKeyType.IntKey().make("readsInRamp").set(readsInRamp);
         Parameter<Integer> readsCompleteParam = JKeyType.IntKey().make("readsComplete").set(readsComplete);
         Parameter<Integer> rampsInExposureParam = JKeyType.IntKey().make("rampsInExposure").set(rampsInExposure);
@@ -117,8 +115,7 @@ public class JIRDetectorEventTest extends JUnitSuite {
         Parameter<Long> remainingExposureTimeParam = JKeyType.LongKey().make("remainingExposureTime").set(remainingExposureTime);
 
         Set<Parameter<?>> paramSet = new HashSet<>(10);
-        paramSet.add(obsIdParam);
-        paramSet.add(detectorParam);
+        paramSet.add(exposureIdParam);
         paramSet.add(readsInRampParam);
         paramSet.add(readsCompleteParam);
         paramSet.add(rampsInExposureParam);
