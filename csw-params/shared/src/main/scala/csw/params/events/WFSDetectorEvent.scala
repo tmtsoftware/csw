@@ -1,6 +1,7 @@
 package csw.params.events
 
 import csw.params.core.generics.Parameter
+import csw.params.core.models.ExposureIdType
 import csw.prefix.models.Prefix
 
 object WFSDetectorEvent {
@@ -10,7 +11,7 @@ object WFSDetectorEvent {
   def publishFail(sourcePrefix: Prefix): ObserveEvent    = create(sourcePrefix, ObserveEventNames.PublishFail)
   def exposureState(
       sourcePrefix: Prefix,
-      detector: String,
+      exposureId: ExposureIdType,
       exposureInProgress: Boolean,
       abortInProgress: Boolean,
       isAborted: Boolean,
@@ -18,7 +19,7 @@ object WFSDetectorEvent {
       errorMessage: String
   ): ObserveEvent = {
     val params: Set[Parameter[_]] = Set(
-      ParamFactories.detectorParam(detector),
+      ParamFactories.exposureIdParam(exposureId),
       ParamFactories.operationalStateParam(operationalState),
       ParamFactories.errorMessageParam(errorMessage),
       ParamFactories.exposureInProgressParam(exposureInProgress),

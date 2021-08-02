@@ -2,7 +2,7 @@ package csw.params.events
 
 import csw.params.core.generics.KeyType.{BooleanKey, ChoiceKey, IntKey, LongKey, StringKey}
 import csw.params.core.generics.{GChoiceKey, Key, Parameter}
-import csw.params.core.models.{Choice, Choices, ObsId}
+import csw.params.core.models.{Choice, Choices, ExposureIdType, ObsId}
 
 object ObserveEventKeys {
 
@@ -29,7 +29,7 @@ object ObserveEventKeys {
 object ParamFactories {
   def obsIdParam(obsId: ObsId): Parameter[String] = ObserveEventKeys.obsId.set(obsId.toString)
 
-  def exposureIdParam(exposureId: String): Parameter[String] = ObserveEventKeys.exposureId.set(exposureId)
+  def exposureIdParam(exposureId: ExposureIdType): Parameter[String] = ObserveEventKeys.exposureId.set(exposureId.toString)
 
   def detectorParam(detector: String): Parameter[String] = ObserveEventKeys.detector.set(detector)
 

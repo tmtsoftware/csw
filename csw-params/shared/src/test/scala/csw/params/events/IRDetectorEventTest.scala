@@ -8,11 +8,9 @@ import org.scalatest.prop.TableDrivenPropertyChecks._
 
 class IRDetectorEventTest extends AnyFunSpec with Matchers {
   describe("IR detector") {
-    val sourcePrefix                   = Prefix("ESW.filter.wheel")
-    val obsId                          = ObsId("2020A-001-123")
-    val exposureId                     = "12345"
-    val detector                       = "ir-detector"
-    val exposureIdType: ExposureIdType = ExposureId("2022A-001-123-IRIS-IMG-DRK1-0023")
+    val sourcePrefix               = Prefix("ESW.filter.wheel")
+    val obsId                      = ObsId("2020A-001-123")
+    val exposureId: ExposureIdType = ExposureId("2022A-001-123-IRIS-IMG-DRK1-0023")
     it("should create observe event with obsId and exposure id parameters | CSW-118, CSW-119") {
       Table(
         ("Observe event", "event name", "prefix"),
@@ -43,8 +41,7 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
     it("should create exposure state event | CSW-118, CSW-119") {
       val state = IRDetectorEvent.exposureState(
         sourcePrefix,
-        obsId,
-        detector,
+        exposureId,
         exposureInProgress = true,
         abortInProgress = false,
         isAborted = true,
@@ -55,8 +52,7 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
       state.source shouldBe sourcePrefix
       state.eventName.name shouldBe "ObserveEvent.IRDetectorExposureState"
       state.paramSet shouldBe Set(
-        ObserveEventKeys.detector.set(detector),
-        ObserveEventKeys.obsId.set(obsId.toString),
+        ObserveEventKeys.exposureId.set(exposureId.toString),
         ObserveEventKeys.exposureInProgress.set(true),
         ObserveEventKeys.abortInProgress.set(false),
         ObserveEventKeys.isAborted.set(true),
@@ -75,7 +71,7 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
 
       val event = IRDetectorEvent.exposureData(
         sourcePrefix,
-        exposureIdType,
+        exposureId,
         readsInRamp,
         readsComplete,
         rampsInExposure,
@@ -87,7 +83,7 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
       event.source shouldBe sourcePrefix
       event.eventName.name shouldBe "ObserveEvent.IRDetectorExposureData"
       event.paramSet shouldBe Set(
-        ObserveEventKeys.exposureId.set(exposureIdType.toString),
+        ObserveEventKeys.exposureId.set(exposureId.toString),
         ObserveEventKeys.readsInRamp.set(readsInRamp),
         ObserveEventKeys.readsComplete.set(readsComplete),
         ObserveEventKeys.rampsInExposure.set(rampsInExposure),

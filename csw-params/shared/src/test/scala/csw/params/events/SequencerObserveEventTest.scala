@@ -12,10 +12,10 @@ import org.scalatest.prop.TableDrivenPropertyChecks._
 class SequencerObserveEventTest extends AnyFunSpec with Matchers {
   describe("SequencerObserveEvents") {
     val obsId                         = "2020A-001-123"
-    val exposureId                    = "2020A-001-123-TCS-DET-SCI0-0001"
+    val exposureId                    = ExposureId("2020A-001-123-TCS-DET-SCI0-0001")
     val prefix                        = Prefix(ESW, "filter.wheel")
     val obsIdParam: Parameter[_]      = ObserveEventKeys.obsId.set(obsId)
-    val exposureIdParam: Parameter[_] = ObserveEventKeys.exposureId.set(exposureId)
+    val exposureIdParam: Parameter[_] = ObserveEventKeys.exposureId.set(exposureId.toString)
     val sequencerObserveEvent         = SequencerObserveEvent(prefix)
 
     it("create Observe Event with obsId parameters | CSW-125") {
@@ -42,13 +42,13 @@ class SequencerObserveEventTest extends AnyFunSpec with Matchers {
     it("create Observe Event with obsId and exposure Id parameters | CSW-125") {
       Table(
         ("Observe Event", "Event Name", "Prefix"),
-        (sequencerObserveEvent.exposureStart(ObsId(obsId), ExposureId(exposureId)), "ObserveEvent.ExposureStart", prefix),
-        (sequencerObserveEvent.exposureEnd(ObsId(obsId), ExposureId(exposureId)), "ObserveEvent.ExposureEnd", prefix),
-        (sequencerObserveEvent.readoutEnd(ObsId(obsId), ExposureId(exposureId)), "ObserveEvent.ReadoutEnd", prefix),
-        (sequencerObserveEvent.readoutFailed(ObsId(obsId), ExposureId(exposureId)), "ObserveEvent.ReadoutFailed", prefix),
-        (sequencerObserveEvent.dataWriteStart(ObsId(obsId), ExposureId(exposureId)), "ObserveEvent.DataWriteStart", prefix),
-        (sequencerObserveEvent.dataWriteEnd(ObsId(obsId), ExposureId(exposureId)), "ObserveEvent.DataWriteEnd", prefix),
-        (sequencerObserveEvent.prepareStart(ObsId(obsId), ExposureId(exposureId)), "ObserveEvent.PrepareStart", prefix)
+        (sequencerObserveEvent.exposureStart(ObsId(obsId), exposureId), "ObserveEvent.ExposureStart", prefix),
+        (sequencerObserveEvent.exposureEnd(ObsId(obsId), exposureId), "ObserveEvent.ExposureEnd", prefix),
+        (sequencerObserveEvent.readoutEnd(ObsId(obsId), exposureId), "ObserveEvent.ReadoutEnd", prefix),
+        (sequencerObserveEvent.readoutFailed(ObsId(obsId), exposureId), "ObserveEvent.ReadoutFailed", prefix),
+        (sequencerObserveEvent.dataWriteStart(ObsId(obsId), exposureId), "ObserveEvent.DataWriteStart", prefix),
+        (sequencerObserveEvent.dataWriteEnd(ObsId(obsId), exposureId), "ObserveEvent.DataWriteEnd", prefix),
+        (sequencerObserveEvent.prepareStart(ObsId(obsId), exposureId), "ObserveEvent.PrepareStart", prefix)
       ).forEvery((observeEvent, expectedEventName, expectedPrefixStr) => {
         observeEvent.eventName should ===(EventName(expectedEventName))
         observeEvent.source should ===(expectedPrefixStr)

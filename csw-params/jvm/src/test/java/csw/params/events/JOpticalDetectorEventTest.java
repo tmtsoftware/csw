@@ -14,12 +14,11 @@ import java.util.*;
 public class JOpticalDetectorEventTest extends JUnitSuite {
     Prefix sourcePrefix = new Prefix(JSubsystem.ESW, "filter.wheel");
     ObsId obsId = ObsId.apply("2020A-001-123");
-    String exposureId = "some-exposure-id";
 
-    ExposureIdType exposureIdType = ExposureId.apply("2022A-001-123-IRIS-IMG-DRK1-0023");
+    ExposureIdType exposureId = ExposureId.apply("2022A-001-123-IRIS-IMG-DRK1-0023");
     String detector = "optical-detector";
     Parameter<String> obsIdParam = JKeyType.StringKey().make("obsId").set(obsId.toString());
-    Parameter<String> exposureIdParam = JKeyType.StringKey().make("exposureId").set(exposureId);
+    Parameter<String> exposureIdParam = JKeyType.StringKey().make("exposureId").set(exposureId.toString());
 
     @Test
     public void shouldCreateIrDetectorObserveEventWithObsId__CSW_118_CSW_119() {
@@ -67,8 +66,7 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
 
         ObserveEvent event = OpticalDetectorEvent.exposureState(
                 sourcePrefix,
-                obsId,
-                detector,
+                exposureId,
                 true,
                 false,
                 true,
@@ -89,7 +87,7 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
 
         ObserveEvent event = OpticalDetectorEvent.exposureData(
                 sourcePrefix,
-                exposureIdType,
+                exposureId,
                 exposureTime,
                 remainingExposureTime
         );
@@ -100,7 +98,7 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
     }
 
     private Set<Parameter<?>> getParamSetForExposureStateEvent() {
-        Parameter<String> detectorParam = JKeyType.StringKey().make("detector").set(detector);
+        Parameter<String> exposureIdParam = JKeyType.StringKey().make("exposureId").set(exposureId.toString());
         Parameter<Boolean> exposureInProgress = JKeyType.BooleanKey().make("exposureInProgress").set(true);
         Parameter<Boolean> abortInProgress = JKeyType.BooleanKey().make("abortInProgress").set(false);
         Parameter<Boolean> isAborted = JKeyType.BooleanKey().make("isAborted").set(true);
@@ -110,8 +108,7 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
 
 
         Set<Parameter<?>> paramSet = new HashSet<>(10);
-        paramSet.add(obsIdParam);
-        paramSet.add(detectorParam);
+        paramSet.add(exposureIdParam);
         paramSet.add(exposureInProgress);
         paramSet.add(abortInProgress);
         paramSet.add(isAborted);
@@ -123,7 +120,7 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
 
     private Set<Parameter<?>> getParamSetForExposureDataEvent(long exposureTime, long remainingExposureTime) {
         Parameter<Long> exposureTimeParam = JKeyType.LongKey().make("exposureTime").set(exposureTime);
-        Parameter<String> exposureIdParam = JKeyType.StringKey().make("exposureId").set(exposureIdType.toString());
+        Parameter<String> exposureIdParam = JKeyType.StringKey().make("exposureId").set(exposureId.toString());
         Parameter<Long> remainingExposureTimeParam = JKeyType.LongKey().make("remainingExposureTime").set(remainingExposureTime);
 
         Set<Parameter<?>> paramSet = new HashSet<>(10);

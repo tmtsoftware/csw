@@ -15,11 +15,10 @@ import static csw.prefix.javadsl.JSubsystem.ESW;
 public class JIRDetectorEventTest extends JUnitSuite {
     Prefix sourcePrefix = new Prefix(ESW, "filter.wheel");
     ObsId obsId = ObsId.apply("2020A-001-123");
-    String exposureId = "some-exposure-id";
     String detector = "ir-detector";
-    Parameter<String> exposureIdParam = JKeyType.StringKey().make("exposureId").set(exposureId);
     Parameter<String> obsIdParam = JKeyType.StringKey().make("obsId").set(obsId.toString());
-    ExposureIdType exposureIdType = ExposureId.apply("2022A-001-123-IRIS-IMG-DRK1-0023");
+    ExposureIdType exposureId = ExposureId.apply("2022A-001-123-IRIS-IMG-DRK1-0023");
+    Parameter<String> exposureIdParam = JKeyType.StringKey().make("exposureId").set(exposureId.toString());
 
     @Test
     public void shouldCreateIrDetectorObserveEventWithObsId__CSW_118_CSW_119() {
@@ -65,8 +64,7 @@ public class JIRDetectorEventTest extends JUnitSuite {
 
         ObserveEvent event = IRDetectorEvent.exposureState(
                 sourcePrefix,
-                obsId,
-                detector,
+                exposureId,
                 true,
                 false,
                 true,
@@ -91,7 +89,7 @@ public class JIRDetectorEventTest extends JUnitSuite {
 
         ObserveEvent event = IRDetectorEvent.exposureData(
                 sourcePrefix,
-                exposureIdType,
+                exposureId,
                 readsInRamp,
                 readsComplete,
                 rampsInExposure,
@@ -106,7 +104,7 @@ public class JIRDetectorEventTest extends JUnitSuite {
     }
 
     private Set<Parameter<?>> getParamSetForExposureDataEvent(int readsInRamp, int readsComplete, int rampsInExposure, int rampsComplete, long exposureTime, long remainingExposureTime) {
-        Parameter<String> exposureIdParam = JKeyType.StringKey().make("exposureId").set(exposureIdType.toString());
+        Parameter<String> exposureIdParam = JKeyType.StringKey().make("exposureId").set(exposureId.toString());
         Parameter<Integer> readsInRampParam = JKeyType.IntKey().make("readsInRamp").set(readsInRamp);
         Parameter<Integer> readsCompleteParam = JKeyType.IntKey().make("readsComplete").set(readsComplete);
         Parameter<Integer> rampsInExposureParam = JKeyType.IntKey().make("rampsInExposure").set(rampsInExposure);
@@ -126,7 +124,6 @@ public class JIRDetectorEventTest extends JUnitSuite {
     }
 
     private Set<Parameter<?>> getParamSetForExposureStateEvent() {
-        Parameter<String> detectorParam = JKeyType.StringKey().make("detector").set(detector);
         Parameter<Boolean> exposureInProgress = JKeyType.BooleanKey().make("exposureInProgress").set(true);
         Parameter<Boolean> abortInProgress = JKeyType.BooleanKey().make("abortInProgress").set(false);
         Parameter<Boolean> isAborted = JKeyType.BooleanKey().make("isAborted").set(true);
@@ -135,8 +132,7 @@ public class JIRDetectorEventTest extends JUnitSuite {
         Parameter<Choice> operationalState = JKeyType.ChoiceKey().make("operationalState", Choices.fromChoices(operationalStateChoices)).set(new Choice(JOperationalState.BUSY().entryName()));
 
         Set<Parameter<?>> paramSet = new HashSet<>(10);
-        paramSet.add(obsIdParam);
-        paramSet.add(detectorParam);
+        paramSet.add(exposureIdParam);
         paramSet.add(exposureInProgress);
         paramSet.add(abortInProgress);
         paramSet.add(isAborted);

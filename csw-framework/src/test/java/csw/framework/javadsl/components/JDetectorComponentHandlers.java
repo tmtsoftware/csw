@@ -14,6 +14,8 @@ import csw.logging.api.javadsl.ILogger;
 import csw.params.commands.CommandResponse;
 import csw.params.commands.CommandResponse.SubmitResponse;
 import csw.params.commands.ControlCommand;
+import csw.params.core.models.ExposureId;
+import csw.params.core.models.ExposureIdType;
 import csw.params.core.models.Id;
 import csw.params.core.models.ObsId;
 import csw.params.core.states.CurrentState;
@@ -55,7 +57,7 @@ public class JDetectorComponentHandlers extends JComponentHandlers {
 
         //#CSW-118 : publishing observe events for IR, Optical & WFS detectors
         ObsId obsId = ObsId.apply("2020A-001-123");
-        String exposureId = "some_exposure_id";
+        ExposureIdType exposureId = ExposureId.apply("2022A-001-123-IRIS-IMG-DRK1-0023");
         Prefix filterHcdPrefix = new Prefix(JSubsystem.WFOS, "blue.filter.hcd");
 
         ObserveEvent observeStart = IRDetectorEvent.observeStart(filterHcdPrefix, obsId);

@@ -9,7 +9,8 @@ import org.scalatest.prop.TableDrivenPropertyChecks.Table
 
 class OpticalDetectorEventTest extends AnyFunSpec with Matchers {
   describe("OpticalDetectorEvent") {
-    val sourcePrefix: Prefix = Prefix("ESW.test")
+    val sourcePrefix: Prefix       = Prefix("ESW.test")
+    val exposureId: ExposureIdType = ExposureId("2022A-001-123-IRIS-IMG-DRK1-0023")
 
     it("create Observe Events with obsId | ESW-118, CSW-119") {
       Table(
@@ -26,31 +27,28 @@ class OpticalDetectorEventTest extends AnyFunSpec with Matchers {
     it("create Observe Events with obsId and exposure id | ESW-118, CSW-119") {
       Table(
         ("Observe Event", "Event Name"),
-        (OpticalDetectorEvent.prepareStart(sourcePrefix, ObsId("2020A-001-123"), "exp-id"), "ObserveEvent.PrepareStart"),
-        (OpticalDetectorEvent.exposureStart(sourcePrefix, ObsId("2020A-001-123"), "exp-id"), "ObserveEvent.ExposureStart"),
-        (OpticalDetectorEvent.exposureEnd(sourcePrefix, ObsId("2020A-001-123"), "exp-id"), "ObserveEvent.ExposureEnd"),
-        (OpticalDetectorEvent.readoutEnd(sourcePrefix, ObsId("2020A-001-123"), "exp-id"), "ObserveEvent.ReadoutEnd"),
-        (OpticalDetectorEvent.readoutFailed(sourcePrefix, ObsId("2020A-001-123"), "exp-id"), "ObserveEvent.ReadoutFailed"),
-        (OpticalDetectorEvent.dataWriteStart(sourcePrefix, ObsId("2020A-001-123"), "exp-id"), "ObserveEvent.DataWriteStart"),
-        (OpticalDetectorEvent.dataWriteEnd(sourcePrefix, ObsId("2020A-001-123"), "exp-id"), "ObserveEvent.DataWriteEnd"),
-        (OpticalDetectorEvent.exposureAborted(sourcePrefix, ObsId("2020A-001-123"), "exp-id"), "ObserveEvent.ExposureAborted")
+        (OpticalDetectorEvent.prepareStart(sourcePrefix, ObsId("2020A-001-123"), exposureId), "ObserveEvent.PrepareStart"),
+        (OpticalDetectorEvent.exposureStart(sourcePrefix, ObsId("2020A-001-123"), exposureId), "ObserveEvent.ExposureStart"),
+        (OpticalDetectorEvent.exposureEnd(sourcePrefix, ObsId("2020A-001-123"), exposureId), "ObserveEvent.ExposureEnd"),
+        (OpticalDetectorEvent.readoutEnd(sourcePrefix, ObsId("2020A-001-123"), exposureId), "ObserveEvent.ReadoutEnd"),
+        (OpticalDetectorEvent.readoutFailed(sourcePrefix, ObsId("2020A-001-123"), exposureId), "ObserveEvent.ReadoutFailed"),
+        (OpticalDetectorEvent.dataWriteStart(sourcePrefix, ObsId("2020A-001-123"), exposureId), "ObserveEvent.DataWriteStart"),
+        (OpticalDetectorEvent.dataWriteEnd(sourcePrefix, ObsId("2020A-001-123"), exposureId), "ObserveEvent.DataWriteEnd"),
+        (OpticalDetectorEvent.exposureAborted(sourcePrefix, ObsId("2020A-001-123"), exposureId), "ObserveEvent.ExposureAborted")
       ).forEvery((observeEvent, expectedEventName) => {
         observeEvent.eventName shouldBe EventName(expectedEventName)
         observeEvent.source shouldBe sourcePrefix
         observeEvent.paramSet shouldBe Set(
           StringKey.make("obsId").set("2020A-001-123"),
-          StringKey.make("exposureId").set("exp-id")
+          StringKey.make("exposureId").set(exposureId.toString)
         )
       })
     }
 
     it("create OpticalDetectorExposureState event | ESW-118, CSW-119") {
-      val detector = "my-detector"
-      val obsId    = ObsId("2020A-001-123")
       val observeEvent = OpticalDetectorEvent.exposureState(
         sourcePrefix,
-        obsId,
-        detector,
+        exposureId,
         exposureInProgress = true,
         abortInProgress = false,
         isAborted = false,
@@ -61,8 +59,7 @@ class OpticalDetectorEventTest extends AnyFunSpec with Matchers {
       observeEvent.eventName shouldBe EventName("ObserveEvent.OpticalDetectorExposureState")
       observeEvent.source shouldBe sourcePrefix
       observeEvent.paramSet shouldBe Set(
-        ObserveEventKeys.detector.set(detector),
-        ObserveEventKeys.obsId.set("2020A-001-123"),
+        ObserveEventKeys.exposureId.set(exposureId.toString),
         ObserveEventKeys.operationalState.set("BUSY"),
         ObserveEventKeys.errorMessage.set(""),
         ObserveEventKeys.exposureInProgress.set(true),

@@ -9,7 +9,7 @@ import csw.location.api.models.TrackingEvent
 import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
-import csw.params.core.models.{Id, ObsId}
+import csw.params.core.models.{ExposureId, ExposureIdType, Id, ObsId}
 import csw.params.events.{IRDetectorEvent, OpticalDetectorEvent, WFSDetectorEvent}
 import csw.time.core.models.UTCTime
 
@@ -21,8 +21,8 @@ class DetectorHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCo
   override def initialize(): Unit = {
     log.info("Initializing HCD Component TLA")
     //#CSW-118 : publishing observe events for IR, Optical & WFS detectors
-    val obsId      = ObsId("2020A-001-123")
-    val exposureId = "some_exposure_id"
+    val obsId                      = ObsId("2020A-001-123")
+    val exposureId: ExposureIdType = ExposureId("2022A-001-123-IRIS-IMG-DRK1-0023")
 
     val observeStart   = IRDetectorEvent.observeStart(filterHcdPrefix, obsId)
     val exposureStart  = OpticalDetectorEvent.exposureStart(filterHcdPrefix, obsId, exposureId)

@@ -64,7 +64,7 @@ case class SequencerObserveEvent(prefix: Prefix) {
   private def createObserveEventWithExposureId(eventName: EventName, obsId: ObsId, exposureId: ExposureIdType) = {
     val paramset: Set[Parameter[_]] = Set(
       ParamFactories.obsIdParam(obsId),
-      ParamFactories.exposureIdParam(exposureId.toString)
+      ParamFactories.exposureIdParam(exposureId)
     )
     ObserveEvent(prefix, eventName, paramset)
   }

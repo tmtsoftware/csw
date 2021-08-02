@@ -16,7 +16,7 @@ object IRDetectorEvent extends DetectorEvent(ObserveEventNames.IRDetectorExposur
       remainingExposureTime: Long
   ): ObserveEvent = {
     val params: Set[Parameter[_]] = Set(
-      ParamFactories.exposureIdParam(exposureId.toString),
+      ParamFactories.exposureIdParam(exposureId),
       ParamFactories.readsInRampParam(readsInRamp),
       ParamFactories.readsCompleteParam(readsComplete),
       ParamFactories.rampsInExposureParam(rampsInExposure),
