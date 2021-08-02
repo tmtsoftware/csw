@@ -304,7 +304,7 @@ lazy val `csw-params` = crossProject(JSPlatform, JVMPlatform)
     fork := false
   )
   .jsSettings(
-    libraryDependencies += Libs.`scalajs-java-time`.value
+    libraryDependencies += Libs.`scala-java-time`.value
   )
   .jvmSettings(
     libraryDependencies ++= Dependencies.ParamsJvm.value
@@ -481,7 +481,7 @@ lazy val `csw-time-clock` = crossProject(JSPlatform, JVMPlatform)
   .in(file("csw-time/csw-time-clock"))
   .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
   .jvmSettings(libraryDependencies ++= Dependencies.TimeClockJvm.value)
-  .jsSettings(libraryDependencies += Libs.`scalajs-java-time`.value)
+  .jsSettings(libraryDependencies += Libs.`scala-java-time`.value)
   .jsSettings(jsTestArg)
   .settings(fork := false)
 

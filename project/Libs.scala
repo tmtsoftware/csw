@@ -5,9 +5,9 @@ import sbt._
 object Libs {
   val ScalaVersion = "2.13.6"
 
-  val `scala-java8-compat` = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.1"    //BSD 3-clause "New" or "Revised" License
+  val `scala-java8-compat` = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.1" //BSD 3-clause "New" or "Revised" License
   val `scala-async`        = "org.scala-lang.modules" %% "scala-async"        % "1.0.0"
-  val `scopt`              = "com.github.scopt"       %% "scopt"              % "4.0.1"    //MIT License
+  val `scopt`              = "com.github.scopt"       %% "scopt"              % "4.0.1" //MIT License
   val `mockito-scala`      = "org.mockito"            %% "mockito-scala"      % "1.16.37"
 
   //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
@@ -21,9 +21,9 @@ object Libs {
   val `gson`                         = "com.google.code.gson"                      % "gson"                         % "2.8.7"      //Apache 2.0
   val `play-json`                    = "com.typesafe.play"                        %% "play-json"                    % "2.9.2"      //Apache 2.0
 
-  val `enumeratum`        = dep("com.beachape" %%% "enumeratum" % "1.7.0") //MIT License
-  val `scalajs-java-time` = dep("org.scala-js" %%% "scalajs-java-time" % "1.0.0")
-  val `scalatest`         = dep("org.scalatest" %%% "scalatest" % "3.2.9") //Apache License 2.0
+  val `enumeratum`      = dep("com.beachape" %%% "enumeratum" % "1.7.0") //MIT License
+  val `scala-java-time` = dep("io.github.cquiroz" %%% "scala-java-time" % "2.3.0")
+  val `scalatest`       = dep("org.scalatest" %%% "scalatest" % "3.2.9") //Apache License 2.0
 
   val `jwt-core`          = "com.pauldijou"           %% "jwt-core"          % "5.0.0"
   val `lettuce`           = "io.lettuce"               % "lettuce-core"      % "6.1.3.RELEASE"
