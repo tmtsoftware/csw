@@ -74,7 +74,7 @@ public class JMatrixKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(matrixData, parameter.head());
         Assert.assertEquals(matrixData, parameter.get(0).get());
         Assert.assertEquals(matrixData, parameter.value(0));
-        Assert.assertEquals(paramValues, parameter.values());
+        Assert.assertArrayEquals(paramValues, (MatrixData[])parameter.values());
         Assert.assertEquals(List.of(matrixData), parameter.jValues());
 
     }
