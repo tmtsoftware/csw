@@ -218,7 +218,6 @@ class EventsTest extends AnyFunSpec with Matchers {
       val wfsObserveEvent: ObserveEvent       = WFSDetectorEvent.publishSuccess(prefix)
       val irObserveEvent: ObserveEvent        = IRDetectorEvent.observeStart(prefix, obsId)
       val opdObserveEvent: ObserveEvent       = OpticalDetectorEvent.observeStart(prefix, obsId)
-      val sequencerObserveEvent: ObserveEvent = SequencerObserveEvent(prefix).observeStart(obsId)
       //#observe-event
       val systemEvent1: SystemEvent = SystemEvent(prefix, name).add(param)
       val systemEvent2: SystemEvent = SystemEvent(prefix, name).add(param)
