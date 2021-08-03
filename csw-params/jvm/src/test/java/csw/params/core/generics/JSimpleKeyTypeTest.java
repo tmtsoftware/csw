@@ -16,7 +16,7 @@ import static csw.params.javadsl.JUnits.*;
 // DEOPSCSW-185: Easy to Use Syntax/Api
 // DEOPSCSW-190: Implement Unit Support
 // DEOPSCSW-184: Change configurations - attributes and values
-@SuppressWarnings("RedundantCast") // false negative, test fails if you remove explicit type.
+@SuppressWarnings({"RedundantCast", "unchecked"}) // false negative, test fails if you remove explicit type.
 public class JSimpleKeyTypeTest extends JUnitSuite {
 
     @Test

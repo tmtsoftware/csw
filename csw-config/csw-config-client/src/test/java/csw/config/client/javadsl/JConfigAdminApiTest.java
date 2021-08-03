@@ -1,7 +1,6 @@
 package csw.config.client.javadsl;
 
 import akka.actor.typed.ActorSystem;
-import akka.actor.typed.SpawnProtocol;
 import csw.config.api.ConfigData;
 import csw.config.api.exceptions.FileAlreadyExists;
 import csw.config.api.exceptions.FileNotFound;
@@ -32,6 +31,7 @@ import static org.mockito.Mockito.when;
 // DEOPSCSW-88: Config service API implementation details need to be hidden from component developer
 // DEOPSCSW-138: Split Config API into Admin API and Client API
 // DEOPSCSW-103: Java API for Configuration service
+@SuppressWarnings("unchecked")
 public class JConfigAdminApiTest extends JUnitSuite {
 
     private static JConfigClientBaseSuite jConfigClientBaseSuite;

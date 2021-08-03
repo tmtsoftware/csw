@@ -30,7 +30,7 @@ import csw.testkit.scaladsl.CSWService;
 public class JCSWService {
 
     public static CSWService LocationServer = CSWService.LocationServer$.MODULE$;
-    public static final CSWService ConfigServer   = CSWService.ConfigServer$.MODULE$;
-    public static final CSWService EventServer    = CSWService.EventServer$.MODULE$;
-    public static final CSWService AlarmServer    = CSWService.AlarmServer$.MODULE$;
+    public static CSWService ConfigServer   = CSWService.ConfigServer$.MODULE$;
+    public static CSWService EventServer    = CSWService.EventServer$.MODULE$;
+    public static CSWService AlarmServer    = CSWService.AlarmServer$.MODULE$;
 }
