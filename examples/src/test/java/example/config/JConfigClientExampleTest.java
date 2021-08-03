@@ -45,13 +45,13 @@ public class JConfigClientExampleTest extends JUnitSuite {
 
     //#create-api
     //config client API
-    IConfigClientService clientApi = JConfigClientFactory.clientApi(actorSystem, clientLocationService);
+    final IConfigClientService clientApi = JConfigClientFactory.clientApi(actorSystem, clientLocationService);
     //config admin API
-    IConfigService adminApi = JConfigClientFactory.adminApi(actorSystem, clientLocationService, mocks.factory());
+    final IConfigService adminApi = JConfigClientFactory.adminApi(actorSystem, clientLocationService, mocks.factory());
     //#create-api
 
     //#declare_string_config
-    String defaultStrConf = "foo { bar { baz : 1234 } }";
+    final String defaultStrConf = "foo { bar { baz : 1234 } }";
     //#declare_string_config
 
     @Before

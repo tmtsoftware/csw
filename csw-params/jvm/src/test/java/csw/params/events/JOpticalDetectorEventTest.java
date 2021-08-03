@@ -15,8 +15,8 @@ import org.scalatestplus.junit.JUnitSuite;
 import java.util.*;
 
 public class JOpticalDetectorEventTest extends JUnitSuite {
-    Prefix sourcePrefix = new Prefix(JSubsystem.ESW, "filter.wheel");
-    ObsId obsId = ObsId.apply("2020A-001-123");
+    final Prefix sourcePrefix = new Prefix(JSubsystem.ESW, "filter.wheel");
+    final ObsId obsId = ObsId.apply("2020A-001-123");
 
     ExposureId exposureId = ExposureId.apply("2022A-001-123-IRIS-IMG-DRK1-0023");
     Parameter<String> obsIdParam = JKeyType.StringKey().make("obsId").set(obsId.toString());
@@ -147,8 +147,8 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
     }
 
     public static class TestData {
-        ObserveEvent event;
-        String expectedName;
+        final ObserveEvent event;
+        final String expectedName;
 
         TestData(ObserveEvent event, String expectedName) {
             this.event = event;

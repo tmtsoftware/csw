@@ -223,7 +223,7 @@ public class JDatabaseServiceTest extends JUnitSuite {
     }
 
     @Test
-    public void shouldBeThrowingExceptionInCaseOfSyntaxError__DEOPSCSW_601_DEOPSCSW_616() throws InterruptedException, ExecutionException {
+    public void shouldBeThrowingExceptionInCaseOfSyntaxError__DEOPSCSW_601_DEOPSCSW_616() {
         ExecutionException ex = Assert.assertThrows(ExecutionException.class, () ->
                 dsl.query("create1 table tableName (id SERIAL PRIMARY KEY)").executeAsync().toCompletableFuture().get()
         );

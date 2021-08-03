@@ -32,17 +32,17 @@ import static csw.logging.client.utils.Eventually.eventually;
 // CSW-78: PrefixRedesign for logging
 // CSW-86: Subsystem should be case-insensitive
 public class ILoggerMutableActorTest extends JUnitSuite {
-    protected static ActorSystem<SpawnProtocol.Command> actorSystem = ActorSystem.create(SpawnProtocol.create(), "base-system");
+    protected static final ActorSystem<SpawnProtocol.Command> actorSystem = ActorSystem.create(SpawnProtocol.create(), "base-system");
     protected static LoggingSystem loggingSystem;
 
-    protected static List<JsonObject> logBuffer = new ArrayList<>();
+    protected static final List<JsonObject> logBuffer = new ArrayList<>();
 
     protected static JsonObject parse(String json) {
         Gson gson = new Gson();
         return gson.fromJson(json, JsonElement.class).getAsJsonObject();
     }
 
-    protected static TestAppender testAppender = new TestAppender(x -> {
+    protected static final TestAppender testAppender = new TestAppender(x -> {
         logBuffer.add(parse(x.toString()));
         return null;
     });

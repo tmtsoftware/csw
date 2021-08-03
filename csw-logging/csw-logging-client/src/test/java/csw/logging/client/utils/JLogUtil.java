@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class JLogUtil {
 
-    public static Map<String, String> logMsgMap = Map.of(
+    public static final Map<String, String> logMsgMap = Map.of(
         "trace", "logging at trace level",
         "debug", "logging at debug level",
         "info" , "logging at info level",

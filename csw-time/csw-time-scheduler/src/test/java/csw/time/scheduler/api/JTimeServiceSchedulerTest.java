@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 public class JTimeServiceSchedulerTest extends JUnitSuite {
 
     @Rule
-    public TestKitJunitResource testKit = new TestKitJunitResource(ManualTime.config());
+    public final TestKitJunitResource testKit = new TestKitJunitResource(ManualTime.config());
 
     private final akka.actor.typed.ActorSystem<Void> typedSystem = testKit.system();
     private final ManualTime manualTime = ManualTime.get(typedSystem);

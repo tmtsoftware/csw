@@ -56,9 +56,9 @@ public class JEventSubscriptionFrequencyTest extends TestNGSuite {
     private int counter = 0;
 
     class EventGenerator {
-        EventName eventName;
-        List<Event> publishedEvents;
-        List<Event> eventsGroup;
+        final EventName eventName;
+        final List<Event> publishedEvents;
+        final List<Event> eventsGroup;
 
         EventGenerator(EventName eventName) {
             this.eventName = eventName;

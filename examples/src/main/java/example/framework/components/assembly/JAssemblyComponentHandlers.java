@@ -344,7 +344,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
     private ICommandService hcd = null;
 
-    private void resolveHcdAndCreateCommandService() throws ExecutionException, InterruptedException {
+    private void resolveHcdAndCreateCommandService() {
 
         TypedConnection<AkkaLocation> hcdConnection = componentInfo.getConnections().stream()
                 .filter(connection -> connection.componentId().componentType() == JComponentType.HCD)

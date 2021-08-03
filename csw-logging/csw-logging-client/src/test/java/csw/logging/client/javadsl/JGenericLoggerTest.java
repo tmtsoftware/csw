@@ -73,7 +73,7 @@ public class JGenericLoggerTest extends JUnitSuite {
 
     // DEOPSCSW-277: Java nested class name is not logged correctly in log messages.
     @Test
-    public void testGenericLoggerWithoutComponentName__DEOPSCSW_277_DEOPSCSW_316() throws InterruptedException {
+    public void testGenericLoggerWithoutComponentName__DEOPSCSW_277_DEOPSCSW_316() {
         String className = JGenericLoggerTest.JGenericLoggerUtil.class.getName();
         new JGenericLoggerTest.JGenericLoggerUtil().start();
 
@@ -91,7 +91,7 @@ public class JGenericLoggerTest extends JUnitSuite {
     }
 
     @Test
-    public void testGenericLoggerActorWithoutComponentName_DEOPSCSW_316() throws InterruptedException {
+    public void testGenericLoggerActorWithoutComponentName_DEOPSCSW_316() {
 
         AkkaTypedExtension.UserActorFactory userActorFactory = AkkaTypedExtension.UserActorFactory(actorSystem);
 

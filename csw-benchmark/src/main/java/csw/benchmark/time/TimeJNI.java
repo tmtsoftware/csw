@@ -12,7 +12,7 @@ public class TimeJNI {  // Save as HelloJNI.java
 	//private native TimeSpec createTimeSpec(lon);
   
    // Test Driver
-   public static void main(String[] args) throws InterruptedException{
+   public static void main(String[] args) {
 //   	System.out.println("HellO");
 //   	TimeJNI tjni = new TimeJNI();
 //   	int i=1000;

@@ -47,7 +47,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
 import scala.concurrent.Await;
-import scala.concurrent.ExecutionContext;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
@@ -72,7 +71,6 @@ import static csw.common.components.command.ComponentStateForCommand.*;
 // DEOPSCSW-321: AkkaLocation provides wrapper for ActorRef[ComponentMessage]
 public class JCommandIntegrationTest extends JUnitSuite {
     private static final ActorSystem<SpawnProtocol.Command> hcdActorSystem = ActorSystemFactory.remote(SpawnProtocol.create(), "test");
-    private final ExecutionContext ec = hcdActorSystem.executionContext();
 
     private static JHTTPLocationService jHttpLocationService;
     private static ILocationService locationService;
@@ -442,7 +440,6 @@ public class JCommandIntegrationTest extends JUnitSuite {
         CompletableFuture<SubmitResponse> lockedCmdResCompletableFuture = hcdCmdService.submitAndWait(imdSetupCommand, timeout);
         SubmitResponse actualLockedCmdResponse = lockedCmdResCompletableFuture.get();
 
-        String reason = "This component is locked by component " + prefix();
         Assert.assertTrue(actualLockedCmdResponse instanceof CommandResponse.Locked);
 
         // Unlock component

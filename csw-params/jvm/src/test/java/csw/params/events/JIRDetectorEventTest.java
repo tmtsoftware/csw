@@ -154,8 +154,8 @@ public class JIRDetectorEventTest extends JUnitSuite {
     }
 
     public static class TestData {
-        ObserveEvent event;
-        String expectedName;
+        final ObserveEvent event;
+        final String expectedName;
 
         TestData(ObserveEvent event, String expectedName) {
             this.event = event;

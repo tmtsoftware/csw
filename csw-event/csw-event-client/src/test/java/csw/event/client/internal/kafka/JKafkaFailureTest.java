@@ -47,7 +47,7 @@ public class JKafkaFailureTest extends JUnitSuite {
     }
 
     @Test
-    public void failureInPublishingShouldFailFutureWithPublishFailedException__DEOPSCSW_398() throws InterruptedException, ExecutionException, TimeoutException {
+    public void failureInPublishingShouldFailFutureWithPublishFailedException__DEOPSCSW_398() {
         // simulate publishing failure as message size is greater than message.max.bytes(1 byte) configured in broker
         ExecutionException ex = Assert.assertThrows(ExecutionException.class, () -> publisher.publish(Utils.makeEvent(2)).get(10, TimeUnit.SECONDS));
         Assert.assertTrue(ex.getCause() instanceof PublishFailure);
