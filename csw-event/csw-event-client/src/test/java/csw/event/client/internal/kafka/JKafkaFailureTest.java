@@ -1,5 +1,6 @@
 package csw.event.client.internal.kafka;
 
+import akka.NotUsed;
 import akka.actor.Cancellable;
 import akka.actor.testkit.typed.javadsl.TestProbe;
 import akka.stream.javadsl.Source;
@@ -59,7 +60,7 @@ public class JKafkaFailureTest extends JUnitSuite {
         TestProbe<PublishFailure> testProbe = TestProbe.create(kafkaTestProps.actorSystem());
         Event event = Utils.makeEvent(1);
         Event eventSent = event;
-        Source eventStream = Source.single(eventSent);
+        Source<Event, NotUsed> eventStream = Source.single(eventSent);
 
         publisher.publish(eventStream, failure -> testProbe.ref().tell(failure));
 

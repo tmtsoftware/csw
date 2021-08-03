@@ -31,7 +31,7 @@ import static csw.logging.client.utils.Eventually.eventually;
 // CSW-86: Subsystem should be case-insensitive
 // DEOPSCSW-316: Improve Logger accessibility for component developers
 public class ILoggerActorTest extends JUnitSuite {
-    protected static ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.create(), "base-system");
+    protected static ActorSystem<SpawnProtocol.Command> actorSystem = ActorSystem.create(SpawnProtocol.create(), "base-system");
     protected static LoggingSystem loggingSystem;
 
     protected static List<JsonObject> logBuffer = new ArrayList<>();

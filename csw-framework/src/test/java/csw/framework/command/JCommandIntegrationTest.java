@@ -295,7 +295,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
 
         //#oneway
         Setup onewaySetup = new Setup(prefix(), onewayCmd(), Optional.empty()).add(encoderValue);
-        CompletableFuture onewayF = hcdCmdService
+        CompletableFuture<Void> onewayF = hcdCmdService
                 .oneway(onewaySetup)
                 .thenAccept(onewayResponse -> {
                     if (onewayResponse instanceof Invalid) {
