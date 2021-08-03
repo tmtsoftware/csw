@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
 
 // DEOPSCSW-183: Configure attributes and values
+@SuppressWarnings("RedundantCast") // false negative, test fails if you remove explicit type.
 public class JMatrixDataTest extends JUnitSuite {
 
     @Test

@@ -17,6 +17,7 @@ import static csw.params.javadsl.JUnits.NoUnits;
 
 // DEOPSCSW-183: Configure attributes and values
 //DEOPSCSW-282: Add a timestamp Key and Parameter
+@SuppressWarnings("RedundantCast") // false negative, test fails if you remove explicit type.
 public class JStructTest extends JUnitSuite {
 
     private final String keyName = "StructKey";
