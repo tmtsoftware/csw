@@ -15,7 +15,6 @@ import static csw.prefix.javadsl.JSubsystem.ESW;
 public class JIRDetectorEventTest extends JUnitSuite {
     Prefix sourcePrefix = new Prefix(ESW, "filter.wheel");
     ObsId obsId = ObsId.apply("2020A-001-123");
-    String detector = "ir-detector";
     Parameter<String> obsIdParam = JKeyType.StringKey().make("obsId").set(obsId.toString());
     ExposureId exposureId = ExposureId.apply("2022A-001-123-IRIS-IMG-DRK1-0023");
     Parameter<String> exposureIdParam = JKeyType.StringKey().make("exposureId").set(exposureId.toString());
@@ -24,7 +23,9 @@ public class JIRDetectorEventTest extends JUnitSuite {
     public void shouldCreateIrDetectorObserveEventWithObsId__CSW_118_CSW_119() {
         List<TestData> testData = new ArrayList(Arrays.asList(
                 new TestData(IRDetectorEvent.observeStart(sourcePrefix, obsId), "ObserveEvent.ObserveStart"),
-                new TestData(IRDetectorEvent.observeEnd(sourcePrefix, obsId), "ObserveEvent.ObserveEnd")
+                new TestData(IRDetectorEvent.observeStart(sourcePrefix), "ObserveEvent.ObserveStart"),
+                new TestData(IRDetectorEvent.observeEnd(sourcePrefix, obsId), "ObserveEvent.ObserveEnd"),
+                new TestData(IRDetectorEvent.observeEnd(sourcePrefix), "ObserveEvent.ObserveEnd")
         ));
 
         Set<Parameter<?>> paramSet = new HashSet<>(10);
@@ -38,18 +39,17 @@ public class JIRDetectorEventTest extends JUnitSuite {
 
 
     @Test
-    public void shouldCreateIrDetectorObserveEventWithObsIdAndExposureId__CSW_118_CSW_119() {
+    public void shouldCreateIrDetectorObserveEventWithExposureId__CSW_118_CSW_119() {
         List<TestData> testData = new ArrayList(Arrays.asList(
-                new TestData(IRDetectorEvent.exposureStart(sourcePrefix, obsId, exposureId), "ObserveEvent.ExposureStart"),
-                new TestData(IRDetectorEvent.exposureEnd(sourcePrefix, obsId, exposureId), "ObserveEvent.ExposureEnd"),
-                new TestData(IRDetectorEvent.readoutEnd(sourcePrefix, obsId, exposureId), "ObserveEvent.ReadoutEnd"),
-                new TestData(IRDetectorEvent.readoutFailed(sourcePrefix, obsId, exposureId), "ObserveEvent.ReadoutFailed"),
-                new TestData(IRDetectorEvent.dataWriteStart(sourcePrefix, obsId, exposureId), "ObserveEvent.DataWriteStart"),
-                new TestData(IRDetectorEvent.dataWriteEnd(sourcePrefix, obsId, exposureId), "ObserveEvent.DataWriteEnd"),
-                new TestData(IRDetectorEvent.exposureAborted(sourcePrefix, obsId, exposureId), "ObserveEvent.ExposureAborted")));
+                new TestData(IRDetectorEvent.exposureStart(sourcePrefix, exposureId), "ObserveEvent.ExposureStart"),
+                new TestData(IRDetectorEvent.exposureEnd(sourcePrefix, exposureId), "ObserveEvent.ExposureEnd"),
+                new TestData(IRDetectorEvent.readoutEnd(sourcePrefix, exposureId), "ObserveEvent.ReadoutEnd"),
+                new TestData(IRDetectorEvent.readoutFailed(sourcePrefix, exposureId), "ObserveEvent.ReadoutFailed"),
+                new TestData(IRDetectorEvent.dataWriteStart(sourcePrefix, exposureId), "ObserveEvent.DataWriteStart"),
+                new TestData(IRDetectorEvent.dataWriteEnd(sourcePrefix, exposureId), "ObserveEvent.DataWriteEnd"),
+                new TestData(IRDetectorEvent.exposureAborted(sourcePrefix, exposureId), "ObserveEvent.ExposureAborted")));
 
         Set<Parameter<?>> paramSet = new HashSet<>(10);
-        paramSet.add(obsIdParam);
         paramSet.add(exposureIdParam);
 
         for (TestData data : testData) {

@@ -5,8 +5,8 @@ import csw.params.core.models.{ExposureId, ObsId}
 import csw.prefix.models.Prefix
 
 object OpticalDetectorEvent extends DetectorEvent(ObserveEventNames.OpticalDetectorExposureState) {
-  def prepareStart(sourcePrefix: Prefix, obsId: ObsId, exposureId: ExposureId): ObserveEvent =
-    create(sourcePrefix, obsId, exposureId, ObserveEventNames.PrepareStart)
+  def prepareStart(sourcePrefix: Prefix, exposureId: ExposureId): ObserveEvent =
+    create(sourcePrefix, exposureId, ObserveEventNames.PrepareStart)
 
   def exposureData(
       sourcePrefix: Prefix,

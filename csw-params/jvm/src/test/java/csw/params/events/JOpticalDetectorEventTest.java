@@ -16,7 +16,6 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
     ObsId obsId = ObsId.apply("2020A-001-123");
 
     ExposureId exposureId = ExposureId.apply("2022A-001-123-IRIS-IMG-DRK1-0023");
-    String detector = "optical-detector";
     Parameter<String> obsIdParam = JKeyType.StringKey().make("obsId").set(obsId.toString());
     Parameter<String> exposureIdParam = JKeyType.StringKey().make("exposureId").set(exposureId.toString());
 
@@ -24,7 +23,9 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
     public void shouldCreateIrDetectorObserveEventWithObsId__CSW_118_CSW_119() {
         List<TestData> testData = new ArrayList(Arrays.asList(
                 new TestData(OpticalDetectorEvent.observeStart(sourcePrefix, obsId), "ObserveEvent.ObserveStart"),
-                new TestData(OpticalDetectorEvent.observeEnd(sourcePrefix, obsId), "ObserveEvent.ObserveEnd")
+                new TestData(OpticalDetectorEvent.observeStart(sourcePrefix), "ObserveEvent.ObserveStart"),
+                new TestData(OpticalDetectorEvent.observeEnd(sourcePrefix, obsId), "ObserveEvent.ObserveEnd"),
+                new TestData(OpticalDetectorEvent.observeEnd(sourcePrefix), "ObserveEvent.ObserveEnd")
         ));
 
         Set<Parameter<?>> paramSet = new HashSet<>(10);
@@ -38,20 +39,19 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
 
 
     @Test
-    public void shouldCreateIrDetectorObserveEventWithObsIdAndExposureId__CSW_118_CSW_119() {
+    public void shouldCreateIrDetectorObserveEventWithExposureId__CSW_118_CSW_119() {
         List<TestData> testData = new ArrayList(Arrays.asList(
-                new TestData(OpticalDetectorEvent.prepareStart(sourcePrefix, obsId, exposureId), "ObserveEvent.PrepareStart"),
-                new TestData(OpticalDetectorEvent.exposureStart(sourcePrefix, obsId, exposureId), "ObserveEvent.ExposureStart"),
-                new TestData(OpticalDetectorEvent.exposureEnd(sourcePrefix, obsId, exposureId), "ObserveEvent.ExposureEnd"),
-                new TestData(OpticalDetectorEvent.readoutEnd(sourcePrefix, obsId, exposureId), "ObserveEvent.ReadoutEnd"),
-                new TestData(OpticalDetectorEvent.readoutFailed(sourcePrefix, obsId, exposureId), "ObserveEvent.ReadoutFailed"),
-                new TestData(OpticalDetectorEvent.dataWriteStart(sourcePrefix, obsId, exposureId), "ObserveEvent.DataWriteStart"),
-                new TestData(OpticalDetectorEvent.dataWriteEnd(sourcePrefix, obsId, exposureId), "ObserveEvent.DataWriteEnd"),
-                new TestData(OpticalDetectorEvent.exposureAborted(sourcePrefix, obsId, exposureId), "ObserveEvent.ExposureAborted")
+                new TestData(OpticalDetectorEvent.prepareStart(sourcePrefix, exposureId), "ObserveEvent.PrepareStart"),
+                new TestData(OpticalDetectorEvent.exposureStart(sourcePrefix, exposureId), "ObserveEvent.ExposureStart"),
+                new TestData(OpticalDetectorEvent.exposureEnd(sourcePrefix, exposureId), "ObserveEvent.ExposureEnd"),
+                new TestData(OpticalDetectorEvent.readoutEnd(sourcePrefix, exposureId), "ObserveEvent.ReadoutEnd"),
+                new TestData(OpticalDetectorEvent.readoutFailed(sourcePrefix, exposureId), "ObserveEvent.ReadoutFailed"),
+                new TestData(OpticalDetectorEvent.dataWriteStart(sourcePrefix, exposureId), "ObserveEvent.DataWriteStart"),
+                new TestData(OpticalDetectorEvent.dataWriteEnd(sourcePrefix, exposureId), "ObserveEvent.DataWriteEnd"),
+                new TestData(OpticalDetectorEvent.exposureAborted(sourcePrefix, exposureId), "ObserveEvent.ExposureAborted")
         ));
 
         Set<Parameter<?>> paramSet = new HashSet<>(10);
-        paramSet.add(obsIdParam);
         paramSet.add(exposureIdParam);
 
         for (TestData data : testData) {

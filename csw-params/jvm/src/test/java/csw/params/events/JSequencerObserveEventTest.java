@@ -45,18 +45,17 @@ public class JSequencerObserveEventTest extends JUnitSuite {
     }
 
     @Test
-    public void createObserveEventWithObsIdAndExposureIdParameters__CSW_125() {
+    public void createObserveEventWithExposureIdParameters__CSW_125() {
         List<TestData> testData = new ArrayList(Arrays.asList(
-                new TestData(sequencerObserveEvent.exposureStart(obsId, ExposureId.apply(exposureId)), "ObserveEvent.ExposureStart", prefix),
-                new TestData(sequencerObserveEvent.exposureEnd(obsId, ExposureId.apply(exposureId)), "ObserveEvent.ExposureEnd", prefix),
-                new TestData(sequencerObserveEvent.readoutEnd(obsId, ExposureId.apply(exposureId)), "ObserveEvent.ReadoutEnd", prefix),
-                new TestData(sequencerObserveEvent.readoutFailed(obsId, ExposureId.apply(exposureId)), "ObserveEvent.ReadoutFailed", prefix),
-                new TestData(sequencerObserveEvent.dataWriteStart(obsId, ExposureId.apply(exposureId)), "ObserveEvent.DataWriteStart", prefix),
-                new TestData(sequencerObserveEvent.dataWriteEnd(obsId, ExposureId.apply(exposureId)), "ObserveEvent.DataWriteEnd", prefix),
-                new TestData(sequencerObserveEvent.prepareStart(obsId, ExposureId.apply(exposureId)), "ObserveEvent.PrepareStart", prefix)
+                new TestData(sequencerObserveEvent.exposureStart(ExposureId.apply(exposureId)), "ObserveEvent.ExposureStart", prefix),
+                new TestData(sequencerObserveEvent.exposureEnd(ExposureId.apply(exposureId)), "ObserveEvent.ExposureEnd", prefix),
+                new TestData(sequencerObserveEvent.readoutEnd(ExposureId.apply(exposureId)), "ObserveEvent.ReadoutEnd", prefix),
+                new TestData(sequencerObserveEvent.readoutFailed(ExposureId.apply(exposureId)), "ObserveEvent.ReadoutFailed", prefix),
+                new TestData(sequencerObserveEvent.dataWriteStart(ExposureId.apply(exposureId)), "ObserveEvent.DataWriteStart", prefix),
+                new TestData(sequencerObserveEvent.dataWriteEnd(ExposureId.apply(exposureId)), "ObserveEvent.DataWriteEnd", prefix),
+                new TestData(sequencerObserveEvent.prepareStart(ExposureId.apply(exposureId)), "ObserveEvent.PrepareStart", prefix)
         ));
         Set<Parameter<?>> paramSet = new HashSet<>(10);
-        paramSet.add(obsIdParam);
         paramSet.add(exposureIdParam);
         for (TestData data : testData) {
             assertEvent(data.event, data.expectedName);

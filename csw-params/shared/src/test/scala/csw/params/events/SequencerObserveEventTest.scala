@@ -42,17 +42,17 @@ class SequencerObserveEventTest extends AnyFunSpec with Matchers {
     it("create Observe Event with obsId and exposure Id parameters | CSW-125") {
       Table(
         ("Observe Event", "Event Name", "Prefix"),
-        (sequencerObserveEvent.exposureStart(ObsId(obsId), exposureId), "ObserveEvent.ExposureStart", prefix),
-        (sequencerObserveEvent.exposureEnd(ObsId(obsId), exposureId), "ObserveEvent.ExposureEnd", prefix),
-        (sequencerObserveEvent.readoutEnd(ObsId(obsId), exposureId), "ObserveEvent.ReadoutEnd", prefix),
-        (sequencerObserveEvent.readoutFailed(ObsId(obsId), exposureId), "ObserveEvent.ReadoutFailed", prefix),
-        (sequencerObserveEvent.dataWriteStart(ObsId(obsId), exposureId), "ObserveEvent.DataWriteStart", prefix),
-        (sequencerObserveEvent.dataWriteEnd(ObsId(obsId), exposureId), "ObserveEvent.DataWriteEnd", prefix),
-        (sequencerObserveEvent.prepareStart(ObsId(obsId), exposureId), "ObserveEvent.PrepareStart", prefix)
+        (sequencerObserveEvent.exposureStart(exposureId), "ObserveEvent.ExposureStart", prefix),
+        (sequencerObserveEvent.exposureEnd(exposureId), "ObserveEvent.ExposureEnd", prefix),
+        (sequencerObserveEvent.readoutEnd(exposureId), "ObserveEvent.ReadoutEnd", prefix),
+        (sequencerObserveEvent.readoutFailed(exposureId), "ObserveEvent.ReadoutFailed", prefix),
+        (sequencerObserveEvent.dataWriteStart(exposureId), "ObserveEvent.DataWriteStart", prefix),
+        (sequencerObserveEvent.dataWriteEnd(exposureId), "ObserveEvent.DataWriteEnd", prefix),
+        (sequencerObserveEvent.prepareStart(exposureId), "ObserveEvent.PrepareStart", prefix)
       ).forEvery((observeEvent, expectedEventName, expectedPrefixStr) => {
         observeEvent.eventName should ===(EventName(expectedEventName))
         observeEvent.source should ===(expectedPrefixStr)
-        observeEvent.paramSet shouldBe Set(obsIdParam, exposureIdParam)
+        observeEvent.paramSet shouldBe Set(exposureIdParam)
       })
     }
 

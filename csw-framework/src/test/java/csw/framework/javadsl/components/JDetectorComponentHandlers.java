@@ -60,7 +60,7 @@ public class JDetectorComponentHandlers extends JComponentHandlers {
         Prefix filterHcdPrefix = new Prefix(JSubsystem.WFOS, "blue.filter.hcd");
 
         ObserveEvent observeStart = IRDetectorEvent.observeStart(filterHcdPrefix, obsId);
-        ObserveEvent exposureStart = OpticalDetectorEvent.exposureStart(filterHcdPrefix, obsId, exposureId);
+        ObserveEvent exposureStart = OpticalDetectorEvent.exposureStart(filterHcdPrefix, exposureId);
         ObserveEvent publishSuccess = WFSDetectorEvent.publishSuccess(filterHcdPrefix);
         eventService.defaultPublisher().publish(observeStart);
         eventService.defaultPublisher().publish(exposureStart);

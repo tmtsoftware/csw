@@ -14,13 +14,13 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
     it("should create observe event with obsId and exposure id parameters | CSW-118, CSW-119") {
       Table(
         ("Observe event", "event name", "prefix"),
-        (IRDetectorEvent.exposureStart(sourcePrefix, obsId, exposureId), "ObserveEvent.ExposureStart", sourcePrefix),
-        (IRDetectorEvent.exposureEnd(sourcePrefix, obsId, exposureId), "ObserveEvent.ExposureEnd", sourcePrefix),
-        (IRDetectorEvent.readoutEnd(sourcePrefix, obsId, exposureId), "ObserveEvent.ReadoutEnd", sourcePrefix),
-        (IRDetectorEvent.readoutFailed(sourcePrefix, obsId, exposureId), "ObserveEvent.ReadoutFailed", sourcePrefix),
-        (IRDetectorEvent.dataWriteStart(sourcePrefix, obsId, exposureId), "ObserveEvent.DataWriteStart", sourcePrefix),
-        (IRDetectorEvent.dataWriteEnd(sourcePrefix, obsId, exposureId), "ObserveEvent.DataWriteEnd", sourcePrefix),
-        (IRDetectorEvent.exposureAborted(sourcePrefix, obsId, exposureId), "ObserveEvent.ExposureAborted", sourcePrefix)
+        (IRDetectorEvent.exposureStart(sourcePrefix, exposureId), "ObserveEvent.ExposureStart", sourcePrefix),
+        (IRDetectorEvent.exposureEnd(sourcePrefix, exposureId), "ObserveEvent.ExposureEnd", sourcePrefix),
+        (IRDetectorEvent.readoutEnd(sourcePrefix, exposureId), "ObserveEvent.ReadoutEnd", sourcePrefix),
+        (IRDetectorEvent.readoutFailed(sourcePrefix, exposureId), "ObserveEvent.ReadoutFailed", sourcePrefix),
+        (IRDetectorEvent.dataWriteStart(sourcePrefix, exposureId), "ObserveEvent.DataWriteStart", sourcePrefix),
+        (IRDetectorEvent.dataWriteEnd(sourcePrefix, exposureId), "ObserveEvent.DataWriteEnd", sourcePrefix),
+        (IRDetectorEvent.exposureAborted(sourcePrefix, exposureId), "ObserveEvent.ExposureAborted", sourcePrefix)
       ).forEvery((observeEvent, eventName, sourcePrefix) => {
         observeEvent.eventName.name shouldBe eventName
         observeEvent.source shouldBe sourcePrefix
@@ -31,7 +31,9 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
       Table(
         ("Observe event", "event name", "prefix"),
         (IRDetectorEvent.observeStart(sourcePrefix, obsId), "ObserveEvent.ObserveStart", sourcePrefix),
-        (IRDetectorEvent.observeEnd(sourcePrefix, obsId), "ObserveEvent.ObserveEnd", sourcePrefix)
+        (IRDetectorEvent.observeStart(sourcePrefix), "ObserveEvent.ObserveStart", sourcePrefix),
+        (IRDetectorEvent.observeEnd(sourcePrefix, obsId), "ObserveEvent.ObserveEnd", sourcePrefix),
+        (IRDetectorEvent.observeEnd(sourcePrefix), "ObserveEvent.ObserveEnd", sourcePrefix)
       ).forEvery((observeEvent, eventName, sourcePrefix) => {
         observeEvent.eventName.name shouldBe eventName
         observeEvent.source shouldBe sourcePrefix

@@ -25,7 +25,7 @@ class DetectorHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCo
     val exposureId: ExposureId = ExposureId("2022A-001-123-IRIS-IMG-DRK1-0023")
 
     val observeStart   = IRDetectorEvent.observeStart(filterHcdPrefix, obsId)
-    val exposureStart  = OpticalDetectorEvent.exposureStart(filterHcdPrefix, obsId, exposureId)
+    val exposureStart  = OpticalDetectorEvent.exposureStart(filterHcdPrefix, exposureId)
     val publishSuccess = WFSDetectorEvent.publishSuccess(filterHcdPrefix)
     eventService.defaultPublisher.publish(observeStart)
     eventService.defaultPublisher.publish(exposureStart)
