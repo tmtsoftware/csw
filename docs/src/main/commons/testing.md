@@ -61,12 +61,12 @@ Java
 
 Other ways to spawn Assembly and HCD in the standalone mode using Framework testkit.
 
-Spawning a HCD
+## Spawning a HCD
 
 Scala
 :   @@snip [TestKitsExampleTest.scala](../../../../examples/src/test/scala/example/teskit/TestKitsExampleTest.scala) { #spawn-assembly }
 
-Spawning an Assembly
+## Spawning an Assembly
 
 Scala
 :   @@snip [TestKitsExampleTest.scala](../../../../examples/src/test/scala/example/teskit/TestKitsExampleTest.scala) { #spawn-hcd }
@@ -76,17 +76,7 @@ Full source at GitHub
 * [Scala]($github.base_url$/examples/src/test/scala/example/teskit/TestKitsExampleTest.scala)
 * [Java]($github.base_url$/examples/src/test/java/example/testkit/JTestKitsExampleTest.java)
 
-### Initializing alarms & Get severity of alarms
-
-The example below shows the usage `initAlarms` & `getCurrentSeverity` methods using `AlarmTestKit`.
-
-Scala
-: @@snip [ScalaTestExampleIntegrationTest.scala](../../../../examples/src/test/scala/example/teskit/ScalaTestIntegrationExampleTest.scala) { #scalatest-alarm-testkit }
-
-Java
-:   @@snip [JUnitIntegrationExampleTest.scala](../../../../examples/src/test/java/example/testkit/JUnitIntegrationExampleTest.java) { #junit-alarm-testkit }
-
-## Test framework integration
+## Test Framework Integration
 
 ### ScalaTest
 If you are using ScalaTest, then you can extend `csw.testkit.scaladsl.ScalaTestFrameworkTestKit` to have the Framework testkit automatically start the provided services before running tests and shut them down when the tests are complete. 
@@ -118,6 +108,26 @@ You do not need to externally start any services like the Event Service, Config 
 Testkits will start required services as a part of initialization. For the Event and Alarm service, it uses an instance of `embedded-redis`. 
 
 @@@
+
+### Initializing alarms & getting severity of alarms
+
+To use alarms in your tests, the list of available alarms must be defined prior to starting the Alarm Service.  This will
+create alarms in the Alarm Store, and then the alarm severities can be set individually.  
+See the @ref:[Alarm Service Documentation](../services/alarm.md) for more information on the 
+alarm configuration file.
+
+The `AlarmTestKit` provides methods to initialize the alarm store, as well as get the current severity of
+an alarm for testing purposes.
+
+The example below shows the usage `initAlarms` & `getCurrentSeverity` methods using `AlarmTestKit`.
+
+Scala
+: @@snip [ScalaTestExampleIntegrationTest.scala](../../../../examples/src/test/scala/example/teskit/ScalaTestIntegrationExampleTest.scala) { #scalatest-alarm-testkit }
+
+Java
+:   @@snip [JUnitIntegrationExampleTest.scala](../../../../examples/src/test/java/example/testkit/JUnitIntegrationExampleTest.java) { #junit-alarm-testkit }
+
+
 
 ## Unit Tests
 
