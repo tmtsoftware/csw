@@ -89,7 +89,7 @@ public class JEventSubscriberTest extends TestNGSuite {
         Event event1 = Utils.makeDistinctJavaEvent(new Random().nextInt());
         EventKey eventKey = event1.eventKey();
 
-        TestProbe probe = TestProbe.create(baseProperties.actorSystem());
+        TestProbe<Event> probe = TestProbe.create(baseProperties.actorSystem());
 
         java.util.Set<EventKey> set = Set.of(eventKey);
 
@@ -115,7 +115,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     public void should_be_able_to_subscribe_with_async_callback__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_338_DEOPSCSW_343(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         Event event1 = Utils.makeDistinctJavaEvent(new Random().nextInt());
 
-        TestProbe probe = TestProbe.create(baseProperties.actorSystem());
+        TestProbe<Event> probe = TestProbe.create(baseProperties.actorSystem());
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
         Thread.sleep(500); // Needed for redis set which is fire and forget operation
@@ -166,7 +166,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_subscribe_with_callback__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_338(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
 
-        TestProbe probe = TestProbe.create(baseProperties.actorSystem());
+        TestProbe<Event> probe = TestProbe.create(baseProperties.actorSystem());
 
         List<Event> listOfPublishedEvents = new ArrayList<>(5);
         for (int i = 1; i <= 5; i++) {
@@ -214,7 +214,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     public void should_be_able_to_subscribe_with_an_ActorRef__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_339(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         Event event1 = Utils.makeDistinctJavaEvent(new Random().nextInt());
 
-        TestProbe probe = TestProbe.create(baseProperties.actorSystem());
+        TestProbe<Event> probe = TestProbe.create(baseProperties.actorSystem());
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
         Thread.sleep(500); // Needed for redis set which is fire and forget operation

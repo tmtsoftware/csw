@@ -29,7 +29,7 @@ import static csw.logging.client.utils.Eventually.eventually;
 
 // DEOPSCSW-316: Improve Logger accessibility for component developers
 public class JGenericLoggerTest extends JUnitSuite {
-    private static final ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.create(), "base-system");
+    private static final ActorSystem<SpawnProtocol.Command> actorSystem = ActorSystem.create(SpawnProtocol.create(), "base-system");
     private static LoggingSystem loggingSystem;
 
     private static final List<JsonObject> logBuffer = new ArrayList<>();

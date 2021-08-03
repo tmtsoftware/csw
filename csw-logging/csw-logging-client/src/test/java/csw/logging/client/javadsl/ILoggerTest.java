@@ -39,7 +39,7 @@ import static csw.logging.client.utils.Eventually.eventually;
 // CSW-78: PrefixRedesign for logging
 // CSW-86: Subsystem should be case-insensitive
 public class ILoggerTest extends JUnitSuite {
-    private static final ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.create(), "base-system");
+    private static final ActorSystem<SpawnProtocol.Command> actorSystem = ActorSystem.create(SpawnProtocol.create(), "base-system");
     private static LoggingSystem loggingSystem;
 
     private static final List<JsonObject> logBuffer = new ArrayList<>();
@@ -127,7 +127,7 @@ public class ILoggerTest extends JUnitSuite {
     }
 
     @Test
-    public void testDefaultLogConfigurationAndDefaultComponentLogLevel__DEOPSCSW_316() throws InterruptedException {
+    public void testDefaultLogConfigurationAndDefaultComponentLogLevel__DEOPSCSW_316() {
         JTromboneHCDTLA jTromboneHCD = new JTromboneHCDTLA(new JLoggerFactory(Prefix.apply("csw.tromboneHcd")));
         String tromboneHcdClassName = jTromboneHCD.getClass().getName();
 
@@ -154,7 +154,7 @@ public class ILoggerTest extends JUnitSuite {
     // DEOPSCSW-117: Provide unique name for each logging instance of components
     // DEOPSCSW-127: Runtime update for logging characteristics
     @Test
-    public void testLogLevelOfMultipleComponentsInSingleContainer__DEOPSCSW_316_DEOPSCSW_117_DEOPSCSW_127() throws InterruptedException {
+    public void testLogLevelOfMultipleComponentsInSingleContainer__DEOPSCSW_316_DEOPSCSW_117_DEOPSCSW_127() {
 
         allComponentsStartLogging();
         eventually(java.time.Duration.ofSeconds(10), () -> Assert.assertEquals(20, logBuffer.size()));
