@@ -36,7 +36,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
 
     private static JConfigClientBaseSuite jConfigClientBaseSuite;
     private static IConfigService configService;
-    private static ActorSystem<SpawnProtocol.Command> system;
+    private static ActorSystem<?> system;
 
     @BeforeClass
     public static void beforeAll() throws Exception {
@@ -203,7 +203,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
         String secondUser = "secondUser";
         String thirdUser = "thirdUser";
         when(jConfigClientBaseSuite.validToken().preferred_username())
-                .thenReturn(new Some(firstUser), new Some(secondUser), new Some(thirdUser));
+                .thenReturn(new Some<>(firstUser), new Some<>(secondUser), new Some<>(thirdUser));
 
         when(jConfigClientBaseSuite.validToken().userOrClientName())
                 .thenReturn(firstUser, secondUser, thirdUser);
@@ -267,7 +267,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
 
         String firstUser = "firstUser";
         String secondUser = "secondUser";
-        when(jConfigClientBaseSuite.validToken().preferred_username()).thenReturn(new Some(firstUser), new Some(secondUser));
+        when(jConfigClientBaseSuite.validToken().preferred_username()).thenReturn(new Some<>(firstUser), new Some<>(secondUser));
         when(jConfigClientBaseSuite.validToken().userOrClientName()).thenReturn(firstUser, secondUser);
 
         String tromboneConfigComment = "hello trombone";
@@ -400,7 +400,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
 
         String firstUser = "firstUser";
         String secondUser = "secondUser";
-        when(jConfigClientBaseSuite.validToken().preferred_username()).thenReturn(new Some(firstUser), new Some(secondUser));
+        when(jConfigClientBaseSuite.validToken().preferred_username()).thenReturn(new Some<>(firstUser), new Some<>(secondUser));
         when(jConfigClientBaseSuite.validToken().userOrClientName()).thenReturn(firstUser, secondUser);
 
         String tromboneConfigComment = "test{Annex file no1}";
@@ -512,7 +512,7 @@ public class JConfigAdminApiTest extends JUnitSuite {
 
         String firstUser = "firstUser";
         String secondUser = "secondUser";
-        when(jConfigClientBaseSuite.validToken().preferred_username()).thenReturn(new Some(firstUser), new Some(secondUser));
+        when(jConfigClientBaseSuite.validToken().preferred_username()).thenReturn(new Some<>(firstUser), new Some<>(secondUser));
         when(jConfigClientBaseSuite.validToken().userOrClientName()).thenReturn(firstUser, secondUser);
 
         // Add files to repo

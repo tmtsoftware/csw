@@ -1,7 +1,10 @@
 package csw.params.events;
 
 import csw.params.core.generics.Parameter;
-import csw.params.core.models.*;
+import csw.params.core.models.Choice;
+import csw.params.core.models.Choices;
+import csw.params.core.models.ExposureId;
+import csw.params.core.models.ObsId;
 import csw.params.javadsl.JKeyType;
 import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
@@ -21,7 +24,7 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
 
     @Test
     public void shouldCreateIrDetectorObserveEventWithObsId__CSW_118_CSW_119() {
-        List<TestData> testData = new ArrayList(Arrays.asList(
+        List<TestData> testData = new ArrayList<TestData>(Arrays.asList(
                 new TestData(OpticalDetectorEvent.observeStart(sourcePrefix, obsId), "ObserveEvent.ObserveStart"),
                 new TestData(OpticalDetectorEvent.observeEnd(sourcePrefix, obsId), "ObserveEvent.ObserveEnd")
         ));
@@ -53,7 +56,7 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
 
     @Test
     public void shouldCreateIrDetectorObserveEventWithExposureId__CSW_118_CSW_119() {
-        List<TestData> testData = new ArrayList(Arrays.asList(
+        List<TestData> testData = new ArrayList<TestData>(Arrays.asList(
                 new TestData(OpticalDetectorEvent.prepareStart(sourcePrefix, exposureId), "ObserveEvent.PrepareStart"),
                 new TestData(OpticalDetectorEvent.exposureStart(sourcePrefix, exposureId), "ObserveEvent.ExposureStart"),
                 new TestData(OpticalDetectorEvent.exposureEnd(sourcePrefix, exposureId), "ObserveEvent.ExposureEnd"),
@@ -117,7 +120,7 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
         Parameter<Boolean> isAborted = JKeyType.BooleanKey().make("isAborted").set(true);
         Parameter<String> errorMessage = JKeyType.StringKey().make("errorMessage").set("");
         HashSet<Choice> operationalStateChoices = ObserveEventUtil.getOperationalStateChoices();
-        Parameter<Choice> operationalState = JKeyType.ChoiceKey().make("operationalState",  Choices.fromChoices(operationalStateChoices)).set(new Choice(JOperationalState.READY().entryName()));
+        Parameter<Choice> operationalState = JKeyType.ChoiceKey().make("operationalState", Choices.fromChoices(operationalStateChoices)).set(new Choice(JOperationalState.READY().entryName()));
 
 
         Set<Parameter<?>> paramSet = new HashSet<>(10);
