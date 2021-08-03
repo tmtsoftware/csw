@@ -8,7 +8,7 @@ import csw.prefix.models.Prefix;
 
 public class JIrisSupervisorActor {
 
-    public static Behavior<String> behavior =
+    public static final Behavior<String> behavior =
             Behaviors.setup(context -> {
                 // DEOPSCSW-316: Improve Logger accessibility for component developers
                 final ILogger log = new JLoggerFactory(Prefix.apply("csw.jIRIS")).getLogger(context, JIrisSupervisorActor.class);

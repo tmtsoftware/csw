@@ -12,13 +12,13 @@ import org.scalatestplus.junit.JUnitSuite;
 import java.util.*;
 
 public class JSequencerObserveEventTest extends JUnitSuite {
-    Prefix prefix = new Prefix(JSubsystem.ESW, "filter.wheel");
-    ObsId obsId = ObsId.apply("2020A-001-123");
-    String exposureId = "2021A-001-123-TCS-DET-SCI2-1234";
-    Parameter<String> exposureIdParam = ObserveEventKeys.exposureId().set(exposureId);
-    Parameter<String> obsIdParam = ObserveEventKeys.obsId().set(obsId.toString());
-    Parameter<String> downTimeParam = ObserveEventKeys.downTimeReason().set("infra failure");
-    SequencerObserveEvent sequencerObserveEvent = new SequencerObserveEvent(prefix);
+    final Prefix prefix = new Prefix(JSubsystem.ESW, "filter.wheel");
+    final ObsId obsId = ObsId.apply("2020A-001-123");
+    final String exposureId = "2021A-001-123-TCS-DET-SCI2-1234";
+    final Parameter<String> exposureIdParam = ObserveEventKeys.exposureId().set(exposureId);
+    final Parameter<String> obsIdParam = ObserveEventKeys.obsId().set(obsId.toString());
+    final Parameter<String> downTimeParam = ObserveEventKeys.downTimeReason().set("infra failure");
+    final SequencerObserveEvent sequencerObserveEvent = new SequencerObserveEvent(prefix);
 
     @Test
     public void createObserveEventwithObsIdParameters__CSW_125() {
@@ -90,9 +90,9 @@ public class JSequencerObserveEventTest extends JUnitSuite {
     }
 
     public static class TestData {
-        ObserveEvent event;
-        String expectedName;
-        Prefix prefix;
+        final ObserveEvent event;
+        final String expectedName;
+        final Prefix prefix;
 
         TestData(ObserveEvent event, String expectedName, Prefix prefix) {
             this.event = event;

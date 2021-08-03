@@ -7,7 +7,7 @@ import csw.logging.client.javadsl.JGenericLoggerFactory;
 
 public class JGenericActor {
 
-    public static Behavior<String> behavior =
+    public static final Behavior<String> behavior =
             Behaviors.setup(context -> {
                 // DEOPSCSW-316: Improve Logger accessibility for component developers
                 final ILogger log = JGenericLoggerFactory.getLogger(context, JGenericActor.class);

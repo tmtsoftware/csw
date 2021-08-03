@@ -24,8 +24,8 @@ public class JConfigClientBaseSuite extends JMockedAuthentication {
     private final ActorRuntime actorRuntime = new ActorRuntime(system);
     private final ILocationService clientLocationService = JHttpLocationServiceFactory.makeLocalClient(actorRuntime.actorSystem());
 
-    public IConfigService configService = JConfigClientFactory.adminApi(actorRuntime.actorSystem(), clientLocationService, factory());
-    public IConfigClientService configClientApi = JConfigClientFactory.clientApi(actorRuntime.actorSystem(), clientLocationService);
+    public final IConfigService configService = JConfigClientFactory.adminApi(actorRuntime.actorSystem(), clientLocationService, factory());
+    public final IConfigClientService configClientApi = JConfigClientFactory.clientApi(actorRuntime.actorSystem(), clientLocationService);
 
     private final ServerWiring serverWiring = ServerWiring$.MODULE$.make(securityDirectives());
     private final HttpService httpService = serverWiring.httpService();

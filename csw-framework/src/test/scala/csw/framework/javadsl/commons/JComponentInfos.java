@@ -12,7 +12,7 @@ import java.util.Collections;
 
 public class JComponentInfos {
 
-    public static ComponentInfo jHcdInfo = JComponentInfo.from(
+    public static final ComponentInfo jHcdInfo = JComponentInfo.from(
             Prefix.apply("wfos.jSampleHcd"),
             JComponentType.HCD,
             "csw.framework.javadsl.components.JSampleComponentBehaviorFactory",
@@ -21,7 +21,7 @@ public class JComponentInfos {
             Duration.ofSeconds(10)
     );
 
-    public static ComponentInfo jHcdInfoWithInitializeTimeout = JComponentInfo.from(
+    public static final ComponentInfo jHcdInfoWithInitializeTimeout = JComponentInfo.from(
             Prefix.apply("wfos.trombone"),
             JComponentType.HCD,
             "csw.framework.javadsl.components.JSampleComponentBehaviorFactory",
