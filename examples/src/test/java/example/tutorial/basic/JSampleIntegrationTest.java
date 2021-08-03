@@ -35,19 +35,19 @@ import static example.tutorial.basic.shared.JSampleInfo.*;
 
 public class JSampleIntegrationTest extends JUnitSuite {
 
-    private static AkkaConnection containerConnection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.Container, "JSampleContainer"),
+    private static final AkkaConnection containerConnection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.Container, "JSampleContainer"),
             JComponentType.Container));
     private static AkkaLocation containerLocation;
 
-    private static AkkaConnection assemblyConnection = new AkkaConnection(
+    private static final AkkaConnection assemblyConnection = new AkkaConnection(
             new ComponentId(Prefix.apply(JSubsystem.CSW, "sample"), JComponentType.Assembly));
     private static AkkaLocation assemblyLocation;
 
-    private static AkkaConnection hcdConnection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.CSW, "samplehcd"), JComponentType.HCD));
+    private static final AkkaConnection hcdConnection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.CSW, "samplehcd"), JComponentType.HCD));
     private static AkkaLocation hcdLocation;
     private static IEventSubscriber subscriber;
     private static EventKey receivedHcdEvent;
-    private Timeout timeout = new Timeout(12, TimeUnit.SECONDS);
+    private final Timeout timeout = new Timeout(12, TimeUnit.SECONDS);
 
 
     @ClassRule

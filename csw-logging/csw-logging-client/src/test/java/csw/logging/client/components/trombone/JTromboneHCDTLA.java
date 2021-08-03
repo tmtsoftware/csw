@@ -6,7 +6,7 @@ import csw.logging.client.utils.JLogUtil;
 
 public class JTromboneHCDTLA {
 
-    private ILogger logger;
+    private final ILogger logger;
 
     public JTromboneHCDTLA(JLoggerFactory loggerFactory) {
         this.logger = loggerFactory.getLogger(getClass());

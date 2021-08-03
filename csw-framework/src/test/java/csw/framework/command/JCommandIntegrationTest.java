@@ -71,14 +71,14 @@ import static csw.common.components.command.ComponentStateForCommand.*;
 // DEOPSCSW-317: Use state values of HCD to determine command completion
 // DEOPSCSW-321: AkkaLocation provides wrapper for ActorRef[ComponentMessage]
 public class JCommandIntegrationTest extends JUnitSuite {
-    private static ActorSystem<SpawnProtocol.Command> hcdActorSystem = ActorSystemFactory.remote(SpawnProtocol.create(), "test");
-    private ExecutionContext ec = hcdActorSystem.executionContext();
+    private static final ActorSystem<SpawnProtocol.Command> hcdActorSystem = ActorSystemFactory.remote(SpawnProtocol.create(), "test");
+    private final ExecutionContext ec = hcdActorSystem.executionContext();
 
     private static JHTTPLocationService jHttpLocationService;
     private static ILocationService locationService;
     private static ICommandService hcdCmdService;
     private static AkkaLocation hcdLocation;
-    private Timeout timeout = new Timeout(5, TimeUnit.SECONDS);
+    private final Timeout timeout = new Timeout(5, TimeUnit.SECONDS);
 
     @BeforeClass
     public static void setup() throws Exception {

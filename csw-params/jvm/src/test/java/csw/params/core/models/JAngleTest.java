@@ -9,7 +9,7 @@ import static csw.params.core.models.JAngle.*;
 
 // Tests the Angle class usage from Java (including helper methods in JAngle)
 public class JAngleTest extends JUnitSuite {
-    private double delta = 0.00000001;
+    private final double delta = 0.00000001;
 
     // Basic parsing of radec as strings
 

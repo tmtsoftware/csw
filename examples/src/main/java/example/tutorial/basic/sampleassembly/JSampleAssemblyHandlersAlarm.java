@@ -53,9 +53,9 @@ import static example.tutorial.basic.shared.JSampleInfo.hcdSleep;
 @SuppressWarnings({"unused", "OptionalUsedAsFieldOrParameterType"})
 public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
 
-    private JCswContext cswCtx;
-    private ILogger log;
-    private ActorContext<TopLevelActorMessage> actorContext;
+    private final JCswContext cswCtx;
+    private final ILogger log;
+    private final ActorContext<TopLevelActorMessage> actorContext;
     private final ActorRef<WorkerCommand> commandSender;
 
     JSampleAssemblyHandlersAlarm(ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
@@ -162,8 +162,8 @@ public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
     }
     //#track-location
 
-    private EventKey counterEventKey = new EventKey(Prefix.apply(ESW, "SampleHcd"), new EventName("HcdCounter"));
-    private Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter");
+    private final EventKey counterEventKey = new EventKey(Prefix.apply(ESW, "SampleHcd"), new EventName("HcdCounter"));
+    private final Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter");
 
 
     //#subscribe

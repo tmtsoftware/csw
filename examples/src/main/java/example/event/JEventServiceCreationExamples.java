@@ -11,8 +11,8 @@ import io.lettuce.core.RedisClient;
 
 public class JEventServiceCreationExamples {
 
-    private ActorSystem<SpawnProtocol.Command> actorSystem;
-    private ILocationService locationService;
+    private final ActorSystem<SpawnProtocol.Command> actorSystem;
+    private final ILocationService locationService;
 
     public JEventServiceCreationExamples(akka.actor.typed.ActorSystem<SpawnProtocol.Command> actorSystem, ILocationService locationService) {
         this.actorSystem = actorSystem;

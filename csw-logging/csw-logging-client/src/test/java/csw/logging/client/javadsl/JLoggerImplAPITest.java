@@ -32,36 +32,36 @@ import static csw.logging.client.utils.Eventually.eventually;
 // DEOPSCSW-278: Create Java API without arguments as suppliers
 public class JLoggerImplAPITest extends JUnitSuite {
 
-    private ILogger logger = JGenericLoggerFactory.getLogger(getClass());
+    private final ILogger logger = JGenericLoggerFactory.getLogger(getClass());
 
-    private java.time.Duration duration = java.time.Duration.ofSeconds(10);
+    private final java.time.Duration duration = java.time.Duration.ofSeconds(10);
 
-    private String message = "Sample log message";
-    private String exceptionMessage = "Sample exception message";
-    private RuntimeException runtimeException = new RuntimeException(exceptionMessage);
-    private RequestId requestId = JRequestId.id();
-    private Map<String, Object> data = Map.of(
+    private final String message = "Sample log message";
+    private final String exceptionMessage = "Sample exception message";
+    private final RuntimeException runtimeException = new RuntimeException(exceptionMessage);
+    private final RequestId requestId = JRequestId.id();
+    private final Map<String, Object> data = Map.of(
             JKeys.OBS_ID, "foo_obs_id",
             "key1", "value1",
             "key2", "value2"
     );
-    private String className = getClass().getName();
+    private final String className = getClass().getName();
 
-    private static ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.create(), "base-system");
+    private static final ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.create(), "base-system");
     private static LoggingSystem loggingSystem;
 
-    private static List<JsonObject> logBuffer = new Vector<>();
+    private static final List<JsonObject> logBuffer = new Vector<>();
 
     private static JsonObject parse(String json) {
         Gson gson = new Gson();
         return gson.fromJson(json, JsonElement.class).getAsJsonObject();
     }
 
-    private static TestAppender testAppender = new TestAppender(x -> {
+    private static final TestAppender testAppender = new TestAppender(x -> {
         logBuffer.add(parse(x.toString()));
         return null;
     });
-    private static List<LogAppenderBuilder> appenderBuilders = List.of(testAppender);
+    private static final List<LogAppenderBuilder> appenderBuilders = List.of(testAppender);
 
     @BeforeClass
     public static void setup() {

@@ -8,7 +8,7 @@ import java.util.Optional;
 //#container-app
 public class JContainerCmdApp {
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         JContainerCmd.start("JContainer-Cmd-App", JSubsystem.CSW,args, Optional.empty());
     }
 

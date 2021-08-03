@@ -23,7 +23,7 @@ public class AkkaSchedulerExample {
 
 class MyTask1 implements Runnable {
 
-    private ArrayList<String> buf = new ArrayList<>();
+    private final ArrayList<String> buf = new ArrayList<>();
     private int numWarningBeeps = 901000;
 
     @Override

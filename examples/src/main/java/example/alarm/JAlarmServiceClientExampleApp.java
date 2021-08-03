@@ -33,7 +33,7 @@ public class JAlarmServiceClientExampleApp {
     //#create-java-api
 
     //#setSeverity-java
-    private AlarmKey alarmKey = new AlarmKey(Prefix.apply(JSubsystem.NFIRAOS, "trombone"), "tromboneAxisLowLimitAlarm");
+    private final AlarmKey alarmKey = new AlarmKey(Prefix.apply(JSubsystem.NFIRAOS, "trombone"), "tromboneAxisLowLimitAlarm");
     Future<Done> doneF = jclientAPI1.setSeverity(alarmKey, JAlarmSeverity.Okay);
     //#setSeverity-java
 }

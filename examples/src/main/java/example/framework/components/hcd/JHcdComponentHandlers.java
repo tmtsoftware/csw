@@ -38,14 +38,14 @@ public class JHcdComponentHandlers extends JComponentHandlers {
     private final CurrentStatePublisher currentStatePublisher;
     private final ILocationService locationService;
     private final IEventService eventService;
-    private ILogger log;
+    private final ILogger log;
     private IConfigClientService configClient;
     private ConfigData hcdConfig;
     private ActorRef<WorkerActorMsg> worker;
     private int current;
     private int stats;
-    private int timeout = 10;
-    private TimeUnit timeUnit = TimeUnit.SECONDS;
+    private final int timeout = 10;
+    private final TimeUnit timeUnit = TimeUnit.SECONDS;
 
     public JHcdComponentHandlers(
             akka.actor.typed.javadsl.ActorContext<TopLevelActorMessage> ctx,

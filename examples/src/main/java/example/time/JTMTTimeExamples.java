@@ -11,18 +11,18 @@ import java.time.ZonedDateTime;
 class JTMTTimeExamples {
     //#current-time
     // get current UTC time
-    private UTCTime utcTime = UTCTime.now();
+    private final UTCTime utcTime = UTCTime.now();
 
     // get current TAI time
-    private TAITime taiTime = TAITime.now();
+    private final TAITime taiTime = TAITime.now();
     //#current-time
 
     // #creating-time-instances
     //creating a UTCTime of an hour ago
-    private UTCTime utcTimeOfHourAgo = new UTCTime(Instant.now().minusSeconds(3600));
+    private final UTCTime utcTimeOfHourAgo = new UTCTime(Instant.now().minusSeconds(3600));
 
     //creating a TAITime of an hour ago
-    private TAITime taiTimeOfHourAgo = new TAITime(Instant.now().minusSeconds(3600));
+    private final TAITime taiTimeOfHourAgo = new TAITime(Instant.now().minusSeconds(3600));
     // #creating-time-instances
 
     void usage() {

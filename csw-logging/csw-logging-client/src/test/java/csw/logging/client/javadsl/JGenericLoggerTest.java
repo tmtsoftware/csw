@@ -29,21 +29,21 @@ import static csw.logging.client.utils.Eventually.eventually;
 
 // DEOPSCSW-316: Improve Logger accessibility for component developers
 public class JGenericLoggerTest extends JUnitSuite {
-    private static ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.create(), "base-system");
+    private static final ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.create(), "base-system");
     private static LoggingSystem loggingSystem;
 
-    private static List<JsonObject> logBuffer = new ArrayList<>();
+    private static final List<JsonObject> logBuffer = new ArrayList<>();
 
     private static JsonObject parse(String json) {
         Gson gson = new Gson();
         return gson.fromJson(json, JsonElement.class).getAsJsonObject();
     }
 
-    private static TestAppender testAppender = new TestAppender(x -> {
+    private static final TestAppender testAppender = new TestAppender(x -> {
         logBuffer.add(parse(x.toString()));
         return null;
     });
-    private static List<LogAppenderBuilder> appenderBuilders = List.of(testAppender);
+    private static final List<LogAppenderBuilder> appenderBuilders = List.of(testAppender);
 
 
     @BeforeClass
@@ -64,7 +64,7 @@ public class JGenericLoggerTest extends JUnitSuite {
     }
 
     private class JGenericLoggerUtil {
-        private ILogger logger = JGenericLoggerFactory.getLogger(getClass());
+        private final ILogger logger = JGenericLoggerFactory.getLogger(getClass());
 
         public void start() {
             JLogUtil.logInBulk(logger);

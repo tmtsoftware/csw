@@ -46,7 +46,7 @@ public class ILoggerMutableActorTest extends JUnitSuite {
         logBuffer.add(parse(x.toString()));
         return null;
     });
-    private static List<LogAppenderBuilder> appenderBuilders = List.of(testAppender);
+    private static final List<LogAppenderBuilder> appenderBuilders = List.of(testAppender);
 
     @BeforeClass
     public static void setup() {

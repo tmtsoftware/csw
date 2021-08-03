@@ -2,10 +2,8 @@ package csw.testkit.javadsl;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import csw.alarm.api.javadsl.IAlarmService;
 import csw.alarm.api.javadsl.JAlarmSeverity;
 import csw.alarm.client.internal.commons.AlarmServiceConnection;
-import csw.alarm.models.AlarmSeverity;
 import csw.alarm.models.FullAlarmSeverity;
 import csw.alarm.models.Key;
 import csw.config.server.commons.ConfigServiceConnection;
@@ -17,17 +15,13 @@ import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
 import csw.testkit.AlarmTestKit;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
-import scala.concurrent.Await;
-import scala.concurrent.duration.FiniteDuration;
 
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 // DEOPSCSW-592: Create csw testkit for component writers
 public class FrameworkTestKitJunitTest extends JUnitSuite {
@@ -36,8 +30,8 @@ public class FrameworkTestKitJunitTest extends JUnitSuite {
     public static final FrameworkTestKitJunitResource testKit =
             new FrameworkTestKitJunitResource(Arrays.asList(JCSWService.AlarmServer, JCSWService.ConfigServer));
 
-    private ILocationService locationService = testKit.jLocationService();
-    private AlarmTestKit alarmTestKit = testKit.frameworkTestKit().alarmTestKit();
+    private final ILocationService locationService = testKit.jLocationService();
+    private final AlarmTestKit alarmTestKit = testKit.frameworkTestKit().alarmTestKit();
 
     @Test
     public void shouldStartAllProvidedCSWServices__DEOPSCSW_592() throws ExecutionException, InterruptedException {

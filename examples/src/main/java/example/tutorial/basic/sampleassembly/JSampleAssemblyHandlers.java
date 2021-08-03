@@ -109,8 +109,8 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
   //#track-location
 
   //#subscribe
-  private EventKey counterEventKey = new EventKey(Prefix.apply(JSubsystem.ESW, "SampleHcd"), new EventName("HcdCounter"));
-  private Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter");
+  private final EventKey counterEventKey = new EventKey(Prefix.apply(JSubsystem.ESW, "SampleHcd"), new EventName("HcdCounter"));
+  private final Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter");
 
   private void processEvent(Event event) {
     log.info("Event received: " + event.eventKey());

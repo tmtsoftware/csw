@@ -26,7 +26,7 @@ public abstract class JavaCommandHandler {
     static final Parameter<Integer> encoderParam = encoderIntKey.set(55, 66);
     static final Parameter<String> epochStringParam = epochStringKey.set("Event1", "Event2");
 
-    private static SystemEvent systemEvent = new SystemEvent(prefix, new EventName("")).add(encoderParam).add(epochStringParam);
+    private static final SystemEvent systemEvent = new SystemEvent(prefix, new EventName("")).add(encoderParam).add(epochStringParam);
 
     private JavaCommandHandler() {
     }

@@ -39,32 +39,32 @@ import static csw.logging.client.utils.Eventually.eventually;
 // CSW-78: PrefixRedesign for logging
 // CSW-86: Subsystem should be case-insensitive
 public class ILoggerTest extends JUnitSuite {
-    private static ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.create(), "base-system");
+    private static final ActorSystem actorSystem = ActorSystem.create(SpawnProtocol.create(), "base-system");
     private static LoggingSystem loggingSystem;
 
-    private static List<JsonObject> logBuffer = new ArrayList<>();
+    private static final List<JsonObject> logBuffer = new ArrayList<>();
 
     private static JsonObject parse(String json) {
         Gson gson = new Gson();
         return gson.fromJson(json, JsonElement.class).getAsJsonObject();
     }
 
-    private static TestAppender testAppender = new TestAppender(x -> {
+    private static final TestAppender testAppender = new TestAppender(x -> {
         logBuffer.add(parse(x.toString()));
         return null;
     });
-    private static List<LogAppenderBuilder> appenderBuilders = List.of(testAppender);
+    private static final List<LogAppenderBuilder> appenderBuilders = List.of(testAppender);
 
-    private static Map<String, List<JsonObject>> componentLogBuffer = new HashMap<>();
-    private static List<JsonObject> genericLogBuffer = new ArrayList<>();
+    private static final Map<String, List<JsonObject>> componentLogBuffer = new HashMap<>();
+    private static final List<JsonObject> genericLogBuffer = new ArrayList<>();
     private static List<JsonObject> irisLogBuffer = new ArrayList<>();
     private static List<JsonObject> tromboneHcdLogBuffer = new ArrayList<>();
 
-    private static AkkaTypedExtension.UserActorFactory userActorFactory = AkkaTypedExtension.UserActorFactory(actorSystem);
+    private static final AkkaTypedExtension.UserActorFactory userActorFactory = AkkaTypedExtension.UserActorFactory(actorSystem);
 
-    private static ActorRef<String> irisSupervisorActor = userActorFactory.<String>spawn(JIrisSupervisorActor.behavior, "csw.JIRISActor", Props.empty());
-    private static ActorRef<String> tromboneSupervisorActor = userActorFactory.<String>spawn(JTromboneHCDSupervisorActor.behavior(new JLoggerFactory(Prefix.apply("csw.jTromboneHcdActor"))), "csw.JTromboneActor", Props.empty());
-    private static ActorRef<String> genericActor = userActorFactory.<String>spawn(JGenericActor.behavior, "JGenericActor", Props.empty());
+    private static final ActorRef<String> irisSupervisorActor = userActorFactory.<String>spawn(JIrisSupervisorActor.behavior, "csw.JIRISActor", Props.empty());
+    private static final ActorRef<String> tromboneSupervisorActor = userActorFactory.<String>spawn(JTromboneHCDSupervisorActor.behavior(new JLoggerFactory(Prefix.apply("csw.jTromboneHcdActor"))), "csw.JTromboneActor", Props.empty());
+    private static final ActorRef<String> genericActor = userActorFactory.<String>spawn(JGenericActor.behavior, "JGenericActor", Props.empty());
 
     @BeforeClass
     public static void setup() {
