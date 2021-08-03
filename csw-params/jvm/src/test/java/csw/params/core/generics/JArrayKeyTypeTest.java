@@ -16,11 +16,11 @@ import static csw.params.javadsl.JUnits.*;
 // DEOPSCSW-184: Change configurations - attributes and values
 public class JArrayKeyTypeTest extends JUnitSuite {
 
-    private void commonAssertions(String keyName, KeyType keyType, ArrayData[] testData, Parameter parameter, Units unit) {
+    private void commonAssertions(String keyName, KeyType<?> keyType, ArrayData<?>[] testData, Parameter<?> parameter, Units unit) {
         Assert.assertEquals(keyName, keyName);
         Assert.assertEquals(keyType,parameter.keyType());
 
-        List paramValuesAsList = parameter.jValues();
+        List<?> paramValuesAsList = parameter.jValues();
         Assert.assertEquals(testData.length, paramValuesAsList.size());
         Assert.assertEquals(testData[0], paramValuesAsList.get(0));
         Assert.assertEquals(testData[1], paramValuesAsList.get(1));

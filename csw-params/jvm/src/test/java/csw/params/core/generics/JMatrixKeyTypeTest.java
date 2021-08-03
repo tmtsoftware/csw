@@ -18,15 +18,16 @@ import static csw.params.javadsl.JUnits.*;
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-190: Implement Unit Support
 // DEOPSCSW-184: Change configurations - attributes and values
+@SuppressWarnings("RedundantCast") // false negative, test fails if you remove explicit type.
 @RunWith(value = Parameterized.class)
 public class JMatrixKeyTypeTest extends JUnitSuite {
 
     private final String keyName;
-    private final SimpleKeyType<MatrixData> matrixKey;
+    private final SimpleKeyType<MatrixData<?>> matrixKey;
     private final Object[][] data;
     private final Optional<Units> units;
 
-    public JMatrixKeyTypeTest(String keyName, SimpleKeyType<MatrixData> keyType, Object[][] data, Optional<Units> units) {
+    public JMatrixKeyTypeTest(String keyName, SimpleKeyType<MatrixData<?>> keyType, Object[][] data, Optional<Units> units) {
         this.keyName = keyName;
         this.matrixKey = keyType;
         this.data = data;
@@ -61,9 +62,9 @@ public class JMatrixKeyTypeTest extends JUnitSuite {
 
     @Test
     public void matrixKeyParameterTest__DEOPSCSW_183_DEOPSCSW_190_DEOPSCSW_184() {
-        Parameter parameter;
-        MatrixData matrixData = MatrixData.fromArrays(data);
-        MatrixData[] paramValues = {matrixData};
+        Parameter<?> parameter;
+        MatrixData<?> matrixData = MatrixData.fromArrays(data);
+        MatrixData<?>[] paramValues = {matrixData};
 
         if (units.isPresent()) parameter = matrixKey.make(keyName, units.orElseThrow()).setAll(paramValues);
         else parameter = matrixKey.make(keyName, NoUnits).setAll(paramValues);
@@ -74,7 +75,7 @@ public class JMatrixKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(matrixData, parameter.head());
         Assert.assertEquals(matrixData, parameter.get(0).get());
         Assert.assertEquals(matrixData, parameter.value(0));
-        Assert.assertArrayEquals(paramValues, (MatrixData[])parameter.values());
+        Assert.assertArrayEquals(paramValues, (MatrixData<?>[])parameter.values());
         Assert.assertEquals(List.of(matrixData), parameter.jValues());
 
     }

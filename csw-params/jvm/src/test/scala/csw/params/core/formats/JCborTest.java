@@ -87,7 +87,7 @@ public class JCborTest extends JUnitSuite {
     public void shouldAbleToConvertToAndFromParameterAndEvent__DEOPSCSW_495__CSW_147() {
         // ===== Test Parameter SERDE =====
         byte[] byteArray = Cbor.encode(param, ParamCodecs$.MODULE$.paramEncExistential()).toByteArray();
-        Parameter parameterFromBytes = Cbor.decode(byteArray, JInput.FromByteArrayProvider()).to(ParamCodecs$.MODULE$.paramDecExistential()).value();
+        Parameter<?> parameterFromBytes = Cbor.decode(byteArray, JInput.FromByteArrayProvider()).to(ParamCodecs$.MODULE$.paramDecExistential()).value();
 
         Assert.assertEquals(param, parameterFromBytes);
 

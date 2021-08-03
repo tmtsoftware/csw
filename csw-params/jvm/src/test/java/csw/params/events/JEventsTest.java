@@ -33,7 +33,7 @@ public class JEventsTest extends JUnitSuite {
 
     private final Prefix prefix = Prefix.apply(JSubsystem.WFOS, "red.detector");
 
-    private <T extends ParameterSetType & Event> void assertOnEventsAPI(T event, EventName name) {
+    private <T extends ParameterSetType<?> & Event> void assertOnEventsAPI(T event, EventName name) {
 
         // metadata (eventId, source, eventName, eventTime)
         Assert.assertNotNull(event.eventId());
