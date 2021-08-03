@@ -46,7 +46,7 @@ import static example.tutorial.basic.shared.JSampleInfo.*;
  * and if validation is successful, then onSubmit hook gets invoked.
  * You can find more information on this here : https://tmtsoftware.github.io/csw/framework.html
  */
-@SuppressWarnings({"OptionalGetWithoutIsPresent", "FieldCanBeLocal", "OptionalUsedAsFieldOrParameterType"})
+@SuppressWarnings({"OptionalGetWithoutIsPresent", "unchecked", "FieldCanBeLocal", "OptionalUsedAsFieldOrParameterType"})
 public class JSampleAssemblyHandlers extends JComponentHandlers {
 
   private final ActorSystem<Void> system;

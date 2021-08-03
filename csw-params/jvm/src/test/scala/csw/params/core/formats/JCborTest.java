@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 // DEOPSCSW-495: Protobuf serde fails for Java keys/parameters
+@SuppressWarnings("unchecked")
 @RunWith(value = Parameterized.class)
 public class JCborTest extends JUnitSuite {
 

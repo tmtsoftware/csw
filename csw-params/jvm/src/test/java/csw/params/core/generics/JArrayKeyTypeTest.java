@@ -14,6 +14,7 @@ import static csw.params.javadsl.JUnits.*;
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-190: Implement Unit Support
 // DEOPSCSW-184: Change configurations - attributes and values
+@SuppressWarnings("unchecked")
 public class JArrayKeyTypeTest extends JUnitSuite {
 
     private void commonAssertions(String keyName, KeyType<?> keyType, ArrayData<?>[] testData, Parameter<?> parameter, Units unit) {

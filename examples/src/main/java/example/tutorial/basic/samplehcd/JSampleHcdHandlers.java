@@ -38,7 +38,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
  * and if validation is successful, then onSubmit hook gets invoked.
  * You can find more information on this here : https://tmtsoftware.github.io/csw/framework.html
  */
-@SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "unused"})
+@SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "unused", "unchecked"})
 public class JSampleHcdHandlers extends JComponentHandlers {
 
     private final JCswContext cswCtx;

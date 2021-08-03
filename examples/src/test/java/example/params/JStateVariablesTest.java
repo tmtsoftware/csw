@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 import static csw.params.javadsl.JUnits.NoUnits;
 import static csw.params.javadsl.JUnits.meter;
 
+@SuppressWarnings("unchecked")
 public class JStateVariablesTest extends JUnitSuite {
 
     @Test

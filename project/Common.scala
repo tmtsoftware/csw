@@ -52,6 +52,9 @@ object Common {
       "-Xasync"
       // -Y options are rarely needed, please look for -W equivalents
     ),
+    javacOptions ++= Seq(
+      "-Xlint:unchecked"
+    ),
     Compile / doc / javacOptions ++= Seq("-Xdoclint:none"),
     doc / javacOptions ++= Seq("--ignore-source-errors"),
     Test / testOptions ++= reporterOptions,

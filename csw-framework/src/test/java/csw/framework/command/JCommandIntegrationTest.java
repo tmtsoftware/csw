@@ -69,6 +69,7 @@ import static csw.common.components.command.ComponentStateForCommand.*;
 // DEOPSCSW-234: CCS accessibility to all CSW component builders
 // DEOPSCSW-317: Use state values of HCD to determine command completion
 // DEOPSCSW-321: AkkaLocation provides wrapper for ActorRef[ComponentMessage]
+@SuppressWarnings("unchecked")
 public class JCommandIntegrationTest extends JUnitSuite {
     private static final ActorSystem<SpawnProtocol.Command> hcdActorSystem = ActorSystemFactory.remote(SpawnProtocol.create(), "test");
 
