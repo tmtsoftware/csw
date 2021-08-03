@@ -32,7 +32,7 @@ import static org.junit.Assert.assertTrue;
 //DEOPSCSW-615: DB service accessible to CSW component developers
 public class JDatabaseServiceFactoryTest extends JUnitSuite {
 
-    private static Integer port = 5432;
+    private static final Integer port = 5432;
     private static JHTTPLocationService jHttpLocationService;
     private static akka.actor.typed.ActorSystem<SpawnProtocol.Command> typedSystem;
     private static EmbeddedPostgres postgres;
@@ -40,7 +40,7 @@ public class JDatabaseServiceFactoryTest extends JUnitSuite {
     private static ILocationService locationService;
     private static DSLContext testDsl;
 
-    private String dbName = "postgres";
+    private final String dbName = "postgres";
 
     @BeforeClass
     public static void setup() throws ExecutionException, InterruptedException, TimeoutException {

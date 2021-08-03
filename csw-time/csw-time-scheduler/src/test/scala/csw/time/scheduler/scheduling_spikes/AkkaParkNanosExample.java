@@ -5,7 +5,7 @@ import java.util.concurrent.locks.LockSupport;
 
 public class AkkaParkNanosExample {
 
-    private static ArrayList<Long> buf = new ArrayList<>();
+    private static final ArrayList<Long> buf = new ArrayList<>();
     private static int numWarningBeeps = 901000;
 
     public static void main(String[] args) {

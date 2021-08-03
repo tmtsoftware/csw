@@ -6,7 +6,7 @@ import csw.logging.client.utils.JLogUtil;
 
 public class JIrisTLA {
 
-    private ILogger logger;
+    private final ILogger logger;
 
     public JIrisTLA(JLoggerFactory loggerFactory) {
         // DEOPSCSW-316: Improve Logger accessibility for component developers

@@ -21,8 +21,8 @@ import java.util.concurrent.CompletionStage;
 //DEOPSCSW-615: DB service accessible to CSW component developers
 public class JAssemblyComponentHandlers extends JComponentHandlers {
 
-    private ActorContext<TopLevelActorMessage> ctx;
-    private JCswContext cswCtx;
+    private final ActorContext<TopLevelActorMessage> ctx;
+    private final JCswContext cswCtx;
     private DatabaseServiceFactory dbFactory;
     private DSLContext dsl;
 
@@ -106,7 +106,6 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
             private Integer id;  // variable name (id) and type (Integer) should be same as column's name and type in database
             private String name; // variable name (name) and type (String) should be same as column's name and type in database
         }
-        ;
 
         // fetch data from table and map it to Films class
         ResultQuery<Record> selectQuery = dsl.resultQuery("SELECT id, name FROM films WHERE id = ?", 1);

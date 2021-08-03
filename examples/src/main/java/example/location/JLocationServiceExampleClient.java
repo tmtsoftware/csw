@@ -49,14 +49,14 @@ import java.util.concurrent.TimeUnit;
  */
 public class JLocationServiceExampleClient extends AbstractActor {
 
-    private ILogger log = new JLoggerFactory(Prefix.apply("csw.my-component-name")).getLogger(context(), getClass());
-    private ActorSystem<Void> typedSystem = Adapter.toTyped(this.system);
+    private final ILogger log = new JLoggerFactory(Prefix.apply("csw.my-component-name")).getLogger(context(), getClass());
+    private final ActorSystem<Void> typedSystem = Adapter.toTyped(this.system);
     //#create-location-service
-    private akka.actor.ActorSystem system = context().system();
-    private ILocationService locationService = JHttpLocationServiceFactory.makeLocalClient(Adapter.toTyped(system));
+    private final akka.actor.ActorSystem system = context().system();
+    private final ILocationService locationService = JHttpLocationServiceFactory.makeLocalClient(Adapter.toTyped(system));
     //#create-location-service
 
-    private AkkaConnection exampleConnection = LocationServiceExampleComponent.connection();
+    private final AkkaConnection exampleConnection = LocationServiceExampleComponent.connection();
 
     private IRegistrationResult httpRegResult;
     private IRegistrationResult httpRegResultonPublicNetwork;

@@ -20,7 +20,7 @@ import java.util.concurrent.CompletableFuture;
 
 //CSW-83:Alarm models should take prefix
 public class JAlarmRefreshActorTest extends JUnitSuite {
-    private ActorSystem<SpawnProtocol.Command> typedSystem = ActorSystem.apply(SpawnProtocol.create(), "SpawnProtocolGuardian");
+    private final ActorSystem<SpawnProtocol.Command> typedSystem = ActorSystem.apply(SpawnProtocol.create(), "SpawnProtocolGuardian");
 
     // DEOPSCSW-507: Auto-refresh utility for component developers
     @Test

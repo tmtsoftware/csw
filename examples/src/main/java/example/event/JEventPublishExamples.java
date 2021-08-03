@@ -17,7 +17,7 @@ import java.util.concurrent.CompletionStage;
 
 public class JEventPublishExamples {
 
-    private JEventService eventService;
+    private final JEventService eventService;
 
     public JEventPublishExamples(JEventService eventService) {
         this.eventService = eventService;

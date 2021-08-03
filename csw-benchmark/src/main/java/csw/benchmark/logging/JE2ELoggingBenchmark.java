@@ -104,10 +104,10 @@ public class JE2ELoggingBenchmark extends JUnitSuite {
 }
 
 class JPerson {
-    private String firstName;
-    private String lastName;
-    private String address;
-    private String city;
+    private final String firstName;
+    private final String lastName;
+    private final String address;
+    private final String city;
 
     public JPerson(String firstName, String lastName, String address, String city) {
         this.firstName = firstName;

@@ -3,7 +3,6 @@ package csw.params.events;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.generics.ParameterSetType;
-import csw.params.core.models.ObsId;
 import csw.params.javadsl.JKeyType;
 import csw.params.javadsl.JUnits;
 import csw.prefix.models.Prefix;

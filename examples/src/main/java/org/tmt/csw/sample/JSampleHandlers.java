@@ -48,9 +48,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class JSampleHandlers extends JComponentHandlers {
 
-    private JCswContext cswCtx;
-    private ILogger log;
-    private ActorContext<TopLevelActorMessage> actorContext;
+    private final JCswContext cswCtx;
+    private final ILogger log;
+    private final ActorContext<TopLevelActorMessage> actorContext;
     private final ActorRef<WorkerCommand> commandSender;
 
     JSampleHandlers(ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
@@ -188,8 +188,8 @@ public class JSampleHandlers extends JComponentHandlers {
     //#track-location
 
     //#subscribe
-    private EventKey counterEventKey = new EventKey(Prefix.apply(JSubsystem.CSW, "samplehcd"), new EventName("HcdCounter"));
-    private Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter", JUnits.NoUnits);
+    private final EventKey counterEventKey = new EventKey(Prefix.apply(JSubsystem.CSW, "samplehcd"), new EventName("HcdCounter"));
+    private final Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter", JUnits.NoUnits);
 
     private void processEvent(Event event) {
         log.info("Event received: " + event.eventKey());

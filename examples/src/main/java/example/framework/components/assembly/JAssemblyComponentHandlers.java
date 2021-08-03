@@ -49,14 +49,14 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     private final CommandResponseManager commandResponseManager;
     private final ILocationService locationService;
     private final IEventService eventService;
-    private ILogger log;
-    private IConfigClientService configClient;
-    private Map<Connection, Optional<ICommandService>> runningHcds;
+    private final ILogger log;
+    private final IConfigClientService configClient;
+    private final Map<Connection, Optional<ICommandService>> runningHcds;
     private ActorRef<DiagnosticPublisherMessages> diagnosticPublisher;
     private ActorRef<CommandResponse.SubmitResponse> commandResponseAdapter;
 
-    private int timeout = 10;
-    private TimeUnit timeUnit = TimeUnit.SECONDS;
+    private final int timeout = 10;
+    private final TimeUnit timeUnit = TimeUnit.SECONDS;
 
     public JAssemblyComponentHandlers(akka.actor.typed.javadsl.ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
         super(ctx, cswCtx);

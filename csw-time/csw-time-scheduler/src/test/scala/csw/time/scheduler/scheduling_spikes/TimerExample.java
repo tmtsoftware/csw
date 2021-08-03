@@ -22,7 +22,7 @@ class TimerExample {
 
 class MyTask extends TimerTask {
 
-    private LinkedList<String> buf = new LinkedList<String>();
+    private final LinkedList<String> buf = new LinkedList<String>();
 
     private int numWarningBeeps = 901000;
 

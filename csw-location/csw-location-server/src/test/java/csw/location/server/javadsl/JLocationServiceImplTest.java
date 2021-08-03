@@ -47,7 +47,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
     private static akka.actor.ActorSystem untypedSystem;
     private static ActorSystem<SpawnProtocol.Command> typedSystem;
     private static ILocationService locationService;
-    private static NetworkType insideNetwork = JNetworkType.Inside;
+    private static final NetworkType insideNetwork = JNetworkType.Inside;
     private static String hostname;
 
     private final ComponentId akkaHcdComponentId = new ComponentId(new Prefix(JSubsystem.CSW, "hcd1"),

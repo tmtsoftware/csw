@@ -15,7 +15,7 @@ import java.time.Duration;
 public class JSchedulerExamples {
 
     private ActorContext<UTCTime> ctx;
-    private UTCTime utcTime = UTCTime.now();
+    private final UTCTime utcTime = UTCTime.now();
     TimeServiceScheduler scheduler;
 
     public JSchedulerExamples(ActorSystem<Object> actorSystem) {

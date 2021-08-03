@@ -4,7 +4,6 @@ import csw.params.core.generics.GChoiceKey;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.*;
-import csw.params.core.models.Coords.*;
 import csw.params.javadsl.JKeyType;
 import csw.params.javadsl.JUnits;
 import csw.time.core.models.TAITime;

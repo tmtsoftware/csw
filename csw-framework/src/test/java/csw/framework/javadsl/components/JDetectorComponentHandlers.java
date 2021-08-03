@@ -33,13 +33,13 @@ import java.util.Optional;
 public class JDetectorComponentHandlers extends JComponentHandlers {
 
     // Demonstrating logger accessibility in Java Component handlers
-    private ILogger log;
-    private CommandResponseManager commandResponseManager;
-    private CurrentStatePublisher currentStatePublisher;
-    private CurrentState currentState = new CurrentState(SampleComponentState.prefix(), new StateName("testStateName"));
-    private ActorContext<TopLevelActorMessage> actorContext;
-    private IEventService eventService;
-    private Optional<Cancellable> diagModeCancellable = Optional.empty();
+    private final ILogger log;
+    private final CommandResponseManager commandResponseManager;
+    private final CurrentStatePublisher currentStatePublisher;
+    private final CurrentState currentState = new CurrentState(SampleComponentState.prefix(), new StateName("testStateName"));
+    private final ActorContext<TopLevelActorMessage> actorContext;
+    private final IEventService eventService;
+    private final Optional<Cancellable> diagModeCancellable = Optional.empty();
 
     JDetectorComponentHandlers(ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
         super(ctx, cswCtx);

@@ -17,7 +17,7 @@ import static csw.time.core.utils.Eventually.eventually;
 import static org.junit.Assert.assertFalse;
 
 public class JTMTTimeHelperTest extends JUnitSuite {
-    private TestProperties testProperties = JTestProperties.instance();
+    private final TestProperties testProperties = JTestProperties.instance();
 
     //DEOPSCSW-541: PTP accuracy and precision while reading remote location time
     //DEOPSCSW-549: Time service api

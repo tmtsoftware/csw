@@ -26,7 +26,7 @@ import java.util.concurrent.ExecutionException;
 public class JTestKitsExampleTest extends JUnitSuite {
 
     //#framework-testkit
-    private static FrameworkTestKit frameworkTestKit = FrameworkTestKit.create();
+    private static final FrameworkTestKit frameworkTestKit = FrameworkTestKit.create();
 
     @BeforeClass
     public static void beforeAll() {
@@ -39,8 +39,8 @@ public class JTestKitsExampleTest extends JUnitSuite {
     }
     //#framework-testkit
 
-    private ActorSystem<SpawnProtocol.Command> system = frameworkTestKit.actorSystem();
-    private ILocationService locationService =
+    private final ActorSystem<SpawnProtocol.Command> system = frameworkTestKit.actorSystem();
+    private final ILocationService locationService =
             JHttpLocationServiceFactory.makeLocalClient(system);
 
     @Test

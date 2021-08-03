@@ -4,7 +4,6 @@ import csw.params.commands.CommandName;
 import csw.params.commands.Setup;
 import csw.params.core.formats.JParamCodecs;
 import csw.params.core.formats.JavaJsonSupport;
-import csw.params.core.models.Coords.*;
 import csw.params.javadsl.JUnits;
 import csw.prefix.models.Prefix;
 import csw.prefix.javadsl.JSubsystem;
@@ -22,8 +21,8 @@ import static org.junit.Assert.assertEquals;
 
 @SuppressWarnings({"SameParameterValue", "FieldCanBeLocal"})
 public class JCoordsTest {
-    private double delta = 0.00000001;
-    private Prefix src = Prefix.apply(JSubsystem.ESW, "ocs.seq");
+    private final double delta = 0.00000001;
+    private final Prefix src = Prefix.apply(JSubsystem.ESW, "ocs.seq");
 
     // Basic Eq Coordinate Tests
 
@@ -83,7 +82,7 @@ public class JCoordsTest {
     }
 
     // JSON tests
-    private ProperMotion pm = new ProperMotion(0.5, 2.33);
+    private final ProperMotion pm = new ProperMotion(0.5, 2.33);
 
     @Test
     public void shouldConvertPmToFromJSON() {

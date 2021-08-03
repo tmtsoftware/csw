@@ -27,13 +27,13 @@ import java.util.concurrent.TimeUnit;
 // DEOPSCSW-481: Component Developer API available to all CSW components
 public class JAlarmServiceFactoryTest extends JUnitSuite {
     // start location http server
-    private static JHTTPLocationService jHttpLocationService = new JHTTPLocationService();
+    private static final JHTTPLocationService jHttpLocationService = new JHTTPLocationService();
 
-    private static AlarmServiceTestSetup testSetup = new AlarmServiceTestSetup();
-    private AlarmServiceFactory alarmServiceFactory = testSetup.alarmServiceFactory();
-    private static ActorSystem<SpawnProtocol.Command> seedSystem = ActorSystemFactory.remote(SpawnProtocol.create(), "test");
-    private static ILocationService locationService = JHttpLocationServiceFactory.makeLocalClient(seedSystem);
-    private AlarmAdminService alarmService = testSetup.alarmService();
+    private static final AlarmServiceTestSetup testSetup = new AlarmServiceTestSetup();
+    private final AlarmServiceFactory alarmServiceFactory = testSetup.alarmServiceFactory();
+    private static final ActorSystem<SpawnProtocol.Command> seedSystem = ActorSystemFactory.remote(SpawnProtocol.create(), "test");
+    private static final ILocationService locationService = JHttpLocationServiceFactory.makeLocalClient(seedSystem);
+    private final AlarmAdminService alarmService = testSetup.alarmService();
 
     @BeforeClass
     public static void setup() throws ExecutionException, InterruptedException {

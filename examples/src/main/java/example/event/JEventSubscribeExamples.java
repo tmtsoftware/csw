@@ -22,9 +22,9 @@ import java.util.concurrent.CompletableFuture;
 
 public class JEventSubscribeExamples {
 
-    private JEventService eventService;
-    private AkkaLocation hcdLocation;
-    private ActorSystem<Void> system;
+    private final JEventService eventService;
+    private final AkkaLocation hcdLocation;
+    private final ActorSystem<Void> system;
 
     public JEventSubscribeExamples(JEventService eventService, AkkaLocation hcdLocation, ActorSystem<Void> system) {
         this.eventService = eventService;

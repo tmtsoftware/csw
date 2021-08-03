@@ -1,11 +1,9 @@
 package csw.logging.client.utils;
 
-import akka.actor.AbstractActor;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.Behaviors;
 import csw.logging.api.javadsl.ILogger;
 import csw.logging.client.javadsl.JGenericLoggerFactory;
-import csw.logging.client.javadsl.JLoggerFactory;
 
 public class JGenericActor {
 
