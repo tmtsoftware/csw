@@ -31,12 +31,23 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
       Table(
         ("Observe event", "event name", "prefix"),
         (IRDetectorEvent.observeStart(sourcePrefix, obsId), "ObserveEvent.ObserveStart", sourcePrefix),
+        (IRDetectorEvent.observeEnd(sourcePrefix, obsId), "ObserveEvent.ObserveEnd", sourcePrefix)
+      ).forEvery((observeEvent, eventName, sourcePrefix) => {
+        observeEvent.eventName.name shouldBe eventName
+        observeEvent.source shouldBe sourcePrefix
+        observeEvent.paramSet shouldBe Set(ParamFactories.obsIdParam(obsId))
+      })
+    }
+
+    it("should create observe event without obsId | CSW-118, CSW-119") {
+      Table(
+        ("Observe event", "event name", "prefix"),
         (IRDetectorEvent.observeStart(sourcePrefix), "ObserveEvent.ObserveStart", sourcePrefix),
-        (IRDetectorEvent.observeEnd(sourcePrefix, obsId), "ObserveEvent.ObserveEnd", sourcePrefix),
         (IRDetectorEvent.observeEnd(sourcePrefix), "ObserveEvent.ObserveEnd", sourcePrefix)
       ).forEvery((observeEvent, eventName, sourcePrefix) => {
         observeEvent.eventName.name shouldBe eventName
         observeEvent.source shouldBe sourcePrefix
+        observeEvent.paramSet shouldBe Set.empty
       })
     }
 

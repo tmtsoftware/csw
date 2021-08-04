@@ -23,13 +23,26 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
     public void shouldCreateIrDetectorObserveEventWithObsId__CSW_118_CSW_119() {
         List<TestData> testData = new ArrayList(Arrays.asList(
                 new TestData(OpticalDetectorEvent.observeStart(sourcePrefix, obsId), "ObserveEvent.ObserveStart"),
-                new TestData(OpticalDetectorEvent.observeStart(sourcePrefix), "ObserveEvent.ObserveStart"),
-                new TestData(OpticalDetectorEvent.observeEnd(sourcePrefix, obsId), "ObserveEvent.ObserveEnd"),
-                new TestData(OpticalDetectorEvent.observeEnd(sourcePrefix), "ObserveEvent.ObserveEnd")
+                new TestData(OpticalDetectorEvent.observeEnd(sourcePrefix, obsId), "ObserveEvent.ObserveEnd")
         ));
 
         Set<Parameter<?>> paramSet = new HashSet<>(10);
         paramSet.add(obsIdParam);
+
+        for (TestData data : testData) {
+            assertEvent(data.event, data.expectedName);
+            Assert.assertEquals(paramSet, data.event.jParamSet());
+        }
+    }
+
+    @Test
+    public void shouldCreateIrDetectorObserveEventWithoutObsId__CSW_118_CSW_119() {
+        List<TestData> testData = new ArrayList(Arrays.asList(
+                new TestData(OpticalDetectorEvent.observeStart(sourcePrefix), "ObserveEvent.ObserveStart"),
+                new TestData(OpticalDetectorEvent.observeEnd(sourcePrefix), "ObserveEvent.ObserveEnd")
+        ));
+
+        Set<Parameter<?>> paramSet = new HashSet<>(10);
 
         for (TestData data : testData) {
             assertEvent(data.event, data.expectedName);

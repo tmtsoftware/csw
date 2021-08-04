@@ -15,13 +15,23 @@ class OpticalDetectorEventTest extends AnyFunSpec with Matchers {
       Table(
         ("Observe Event", "Event Name"),
         (OpticalDetectorEvent.observeStart(sourcePrefix, obsId), "ObserveEvent.ObserveStart"),
-        (OpticalDetectorEvent.observeStart(sourcePrefix), "ObserveEvent.ObserveStart"),
-        (OpticalDetectorEvent.observeEnd(sourcePrefix, obsId), "ObserveEvent.ObserveEnd"),
-        (OpticalDetectorEvent.observeEnd(sourcePrefix), "ObserveEvent.ObserveEnd")
+        (OpticalDetectorEvent.observeEnd(sourcePrefix, obsId), "ObserveEvent.ObserveEnd")
       ).forEvery((observeEvent, expectedEventName) => {
         observeEvent.eventName shouldBe EventName(expectedEventName)
         observeEvent.source shouldBe sourcePrefix
         observeEvent.paramSet shouldBe Set(ParamFactories.obsIdParam(obsId))
+      })
+    }
+
+    it("create Observe Events without obsId | ESW-118, CSW-119") {
+      Table(
+        ("Observe Event", "Event Name"),
+        (OpticalDetectorEvent.observeStart(sourcePrefix), "ObserveEvent.ObserveStart"),
+        (OpticalDetectorEvent.observeEnd(sourcePrefix), "ObserveEvent.ObserveEnd")
+      ).forEvery((observeEvent, expectedEventName) => {
+        observeEvent.eventName shouldBe EventName(expectedEventName)
+        observeEvent.source shouldBe sourcePrefix
+        observeEvent.paramSet shouldBe Set.empty
       })
     }
 
