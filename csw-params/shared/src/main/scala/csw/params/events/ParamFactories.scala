@@ -2,7 +2,7 @@ package csw.params.events
 
 import csw.params.core.generics.KeyType.{BooleanKey, ChoiceKey, IntKey, LongKey, StringKey}
 import csw.params.core.generics.{GChoiceKey, Key, Parameter}
-import csw.params.core.models.{Choice, Choices, ExposureIdType, ObsId}
+import csw.params.core.models.{Choice, Choices, ExposureId, ObsId}
 
 object ObserveEventKeys {
 
@@ -17,7 +17,7 @@ object ObserveEventKeys {
   val isAborted: Key[Boolean]          = BooleanKey.make("isAborted")
   val exposureTime: Key[Long]          = LongKey.make("exposureTime")
   val remainingExposureTime: Key[Long] = LongKey.make("remainingExposureTime")
-  val readsInRamp                      = IntKey.make("readsInRamp")
+  val readsInRamp: Key[Int]            = IntKey.make("readsInRamp")
   val readsComplete: Key[Int]          = IntKey.make("readsComplete")
   val rampsInExposure: Key[Int]        = IntKey.make("rampsInExposure")
   val rampsComplete: Key[Int]          = IntKey.make("rampsComplete")
@@ -29,7 +29,7 @@ object ObserveEventKeys {
 object ParamFactories {
   def obsIdParam(obsId: ObsId): Parameter[String] = ObserveEventKeys.obsId.set(obsId.toString)
 
-  def exposureIdParam(exposureId: ExposureIdType): Parameter[String] = ObserveEventKeys.exposureId.set(exposureId.toString)
+  def exposureIdParam(exposureId: ExposureId): Parameter[String] = ObserveEventKeys.exposureId.set(exposureId.toString)
 
   def detectorParam(detector: String): Parameter[String] = ObserveEventKeys.detector.set(detector)
 

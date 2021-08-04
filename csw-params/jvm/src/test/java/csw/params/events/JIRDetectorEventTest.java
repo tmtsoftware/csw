@@ -17,7 +17,7 @@ public class JIRDetectorEventTest extends JUnitSuite {
     ObsId obsId = ObsId.apply("2020A-001-123");
     String detector = "ir-detector";
     Parameter<String> obsIdParam = JKeyType.StringKey().make("obsId").set(obsId.toString());
-    ExposureIdType exposureId = ExposureId.apply("2022A-001-123-IRIS-IMG-DRK1-0023");
+    ExposureId exposureId = ExposureId.apply("2022A-001-123-IRIS-IMG-DRK1-0023");
     Parameter<String> exposureIdParam = JKeyType.StringKey().make("exposureId").set(exposureId.toString());
 
     @Test

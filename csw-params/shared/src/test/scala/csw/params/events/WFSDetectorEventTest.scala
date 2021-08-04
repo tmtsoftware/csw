@@ -1,14 +1,14 @@
 package csw.params.events
 
-import csw.params.core.models.{ExposureId, ExposureIdType}
+import csw.params.core.models.{ExposureId}
 import csw.prefix.models.Prefix
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
 class WFSDetectorEventTest extends AnyFunSpec with Matchers {
   describe("WFS Detector") {
-    val sourcePrefix               = Prefix("ESW.filter.wheel")
-    val exposureId: ExposureIdType = ExposureId("2022A-001-123-IRIS-IMG-DRK1-0023")
+    val sourcePrefix           = Prefix("ESW.filter.wheel")
+    val exposureId: ExposureId = ExposureId("2022A-001-123-IRIS-IMG-DRK1-0023")
 
     it("should create publish success observe event | CSW-118, CSW-119") {
       val event = WFSDetectorEvent.publishSuccess(sourcePrefix)
