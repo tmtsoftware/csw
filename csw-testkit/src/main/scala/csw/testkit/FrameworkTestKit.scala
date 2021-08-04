@@ -14,6 +14,7 @@ import csw.prefix.models.Prefix
 import csw.testkit.internal.{SpawnComponent, TestKitUtils}
 import csw.testkit.scaladsl.CSWService
 import csw.testkit.scaladsl.CSWService._
+import io.lettuce.core.RedisClient
 
 import scala.annotation.varargs
 import scala.concurrent.ExecutionContext
@@ -40,13 +41,14 @@ import scala.concurrent.duration.{DurationInt, FiniteDuration}
  */
 final class FrameworkTestKit private (
     val actorSystem: typed.ActorSystem[SpawnProtocol.Command],
+    val redisClient: RedisClient,
     val locationTestKit: LocationTestKit,
     val configTestKit: ConfigTestKit,
     val eventTestKit: EventTestKit,
     val alarmTestKit: AlarmTestKit
 ) {
 
-  lazy val frameworkWiring: FrameworkWiring            = FrameworkWiring.make(actorSystem)
+  lazy val frameworkWiring: FrameworkWiring            = FrameworkWiring.make(actorSystem, redisClient)
   implicit lazy val ec: ExecutionContext               = frameworkWiring.actorRuntime.ec
   private var locationTestkitWithAuth: LocationTestKit = _
 
@@ -174,13 +176,13 @@ final class FrameworkTestKit private (
    * Shutdown all testkits which are started.
    */
   def shutdown(): Unit = {
+    redisClient.shutdown()
+    TestKitUtils.shutdown(frameworkWiring.actorRuntime.shutdown(), timeout)
+    locationTestKit.shutdownLocationServer()
     if (configStarted) configTestKit.deleteServerFiles(); configTestKit.terminateServer()
     if (eventStarted) eventTestKit.stopRedis()
     if (alarmStarted) alarmTestKit.stopRedis()
     if (locationWithAuthStarted) locationTestkitWithAuth.shutdownLocationServer()
-    TestKitUtils.shutdown(frameworkWiring.actorRuntime.shutdown(), timeout)
-    locationTestKit.shutdownLocationServer()
-
   }
 }
 
@@ -196,14 +198,17 @@ object FrameworkTestKit {
   def apply(
       actorSystem: typed.ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol(), "framework-testkit"),
       testKitSettings: TestKitSettings = TestKitSettings(ConfigFactory.load())
-  ): FrameworkTestKit =
+  ): FrameworkTestKit = {
+    val redisClient = RedisClient.create()
     new FrameworkTestKit(
       actorSystem,
+      redisClient,
       LocationTestKit(testKitSettings),
       ConfigTestKit(actorSystem, testKitSettings = testKitSettings),
       EventTestKit(actorSystem, testKitSettings),
-      AlarmTestKit(actorSystem = actorSystem, testKitSettings = testKitSettings)
+      AlarmTestKit(actorSystem, redisClient, testKitSettings)
     )
+  }
 
   /**
    * Java API for creating FrameworkTestKit

@@ -33,16 +33,16 @@ class FrameworkWiring {
   lazy val redisClient: RedisClient = {
     val client = RedisClient.create()
     shutdownRedisOnTermination(client)
-    client
   }
 
-  private def shutdownRedisOnTermination(client: RedisClient): Unit = {
+  private[framework] def shutdownRedisOnTermination(client: RedisClient): RedisClient = {
     implicit val ec: ExecutionContext = actorSystem.executionContext
 
     actorRuntime.coordinatedShutdown.addTask(
       CoordinatedShutdown.PhaseBeforeServiceUnbind,
       "redis-client-shutdown"
     )(() => Future { client.shutdown(); Done })
+    client
   }
 }
 
@@ -65,7 +65,7 @@ object FrameworkWiring {
   def make(_actorSystem: ActorSystem[SpawnProtocol.Command], _redisClient: RedisClient): FrameworkWiring =
     new FrameworkWiring {
       override lazy val actorSystem: ActorSystem[SpawnProtocol.Command] = _actorSystem
-      override lazy val redisClient: RedisClient                        = _redisClient
+      override lazy val redisClient: RedisClient                        = shutdownRedisOnTermination(_redisClient)
     }
 
   /**
@@ -89,6 +89,6 @@ object FrameworkWiring {
     new FrameworkWiring {
       override lazy val actorSystem: ActorSystem[SpawnProtocol.Command] = _actorSystem
       override lazy val locationService: LocationService                = _locationService
-      override lazy val redisClient: RedisClient                        = _redisClient
+      override lazy val redisClient: RedisClient                        = shutdownRedisOnTermination(_redisClient)
     }
 }
