@@ -16,4 +16,3 @@ class ScalaTestIntegrationExampleTest extends ScalaTestFrameworkTestKit(AlarmSer
   }
 }
 //#scalatest-testkit
-

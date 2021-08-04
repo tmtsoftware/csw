@@ -16,19 +16,19 @@ private[events] class DetectorEvent(detectorExpStateName: EventName) {
   def observeEnd(sourcePrefix: Prefix): ObserveEvent =
     createWithOptionalObsId(sourcePrefix, ObserveEventNames.ObserveEnd)
 
-  def exposureStart(sourcePrefix: Prefix, exposureId: ExposureIdType): ObserveEvent =
+  def exposureStart(sourcePrefix: Prefix, exposureId: ExposureId): ObserveEvent =
     create(sourcePrefix, exposureId, ObserveEventNames.ExposureStart)
-  def exposureEnd(sourcePrefix: Prefix, exposureId: ExposureIdType): ObserveEvent =
+  def exposureEnd(sourcePrefix: Prefix, exposureId: ExposureId): ObserveEvent =
     create(sourcePrefix, exposureId, ObserveEventNames.ExposureEnd)
-  def readoutEnd(sourcePrefix: Prefix, exposureId: ExposureIdType): ObserveEvent =
+  def readoutEnd(sourcePrefix: Prefix, exposureId: ExposureId): ObserveEvent =
     create(sourcePrefix, exposureId, ObserveEventNames.ReadoutEnd)
-  def readoutFailed(sourcePrefix: Prefix, exposureId: ExposureIdType): ObserveEvent =
+  def readoutFailed(sourcePrefix: Prefix, exposureId: ExposureId): ObserveEvent =
     create(sourcePrefix, exposureId, ObserveEventNames.ReadoutFailed)
-  def dataWriteStart(sourcePrefix: Prefix, exposureId: ExposureIdType): ObserveEvent =
+  def dataWriteStart(sourcePrefix: Prefix, exposureId: ExposureId): ObserveEvent =
     create(sourcePrefix, exposureId, ObserveEventNames.DataWriteStart)
-  def dataWriteEnd(sourcePrefix: Prefix, exposureId: ExposureIdType): ObserveEvent =
+  def dataWriteEnd(sourcePrefix: Prefix, exposureId: ExposureId): ObserveEvent =
     create(sourcePrefix, exposureId, ObserveEventNames.DataWriteEnd)
-  def exposureAborted(sourcePrefix: Prefix, exposureId: ExposureIdType): ObserveEvent =
+  def exposureAborted(sourcePrefix: Prefix, exposureId: ExposureId): ObserveEvent =
     create(sourcePrefix, exposureId, ObserveEventNames.ExposureAborted)
 
   def exposureState(
@@ -57,7 +57,7 @@ private[events] class DetectorEvent(detectorExpStateName: EventName) {
       case None        => ObserveEvent(sourcePrefix, eventName, Set.empty)
     }
 
-  private[events] def create(sourcePrefix: Prefix, obsId: ObsId, exposureId: ExposureId, eventName: EventName): ObserveEvent =
+  private[events] def create(sourcePrefix: Prefix, exposureId: ExposureId, eventName: EventName): ObserveEvent =
     ObserveEvent(
       sourcePrefix,
       eventName,

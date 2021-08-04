@@ -1,7 +1,7 @@
 package csw.params.events
 
 import csw.params.core.generics.Parameter
-import csw.params.core.models.{ExposureId, ObsId}
+import csw.params.core.models.ExposureId
 import csw.prefix.models.Prefix
 
 object OpticalDetectorEvent extends DetectorEvent(ObserveEventNames.OpticalDetectorExposureState) {
