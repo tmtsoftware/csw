@@ -122,7 +122,7 @@ an alarm for testing purposes.
 The example below shows the usage `initAlarms` & `getCurrentSeverity` methods using `AlarmTestKit`.
 
 Scala
-: @@snip [ScalaTestExampleIntegrationTest.scala](../../../../examples/src/test/scala/example/teskit/ScalaTestIntegrationExampleTest.scala) { #scalatest-alarm-testkit }
+: @@snip [ScalaTestExampleIntegrationTest.scala](../../../../examples/src/test/scala/example/teskit/ScalaAlarmTestKitExampleTest.scala) { #scalatest-alarm-testkit }
 
 Java
 :   @@snip [JUnitIntegrationExampleTest.scala](../../../../examples/src/test/java/example/testkit/JUnitIntegrationExampleTest.java) { #junit-alarm-testkit }
