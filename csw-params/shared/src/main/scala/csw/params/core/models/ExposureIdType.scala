@@ -16,31 +16,31 @@ sealed trait ExposureId {
 
   /**
    * The Observation Id for the exposure.
-   * @return an [[ObsId]] as an option
+   * @return an [[csw.params.core.models.ObsId]] as an option
    */
   def obsId: Option[ObsId]
 
   /**
    * The Subsystem that produced the exposure.
-   *  @return a valid [[Subsystem]]
+   *  @return a valid [[csw.prefix.models.Subsystem]]
    */
   def subsystem: Subsystem
 
   /**
    * The detector name associated with the exposure.
-   * @return detector description as a [[String]]
+   * @return detector description as a [[java.lang.String]]
    */
   def det: String
 
   /**
    * The exposure type and calibration level
-   * @return a [[TYPLevel]]
+   * @return a [[csw.params.core.models.TYPLevel]]
    */
   def typLevel: TYPLevel
 
   /**
    * The number of the exposure in a series.
-   * @return the number as an [[ExposureNumber]]
+   * @return the number as an [[csw.params.core.models.ExposureNumber]]
    */
   def exposureNumber: ExposureNumber
 }
@@ -120,7 +120,7 @@ object ExposureId {
    * Example: 2020A-001-123-WFOS-IMG1-SCI0-0001 => 2020A-001-228-WFOS-IMG1-SCI0-0001.
    * Note that a standalone ExposureId will be changed to an ExposureId with an ObsId
    * @param exposureId current ExposureId
-   * @param obsId new ObsId as an [[ObsId]]
+   * @param obsId new ObsId as an [[csw.params.core.models.ObsId]]
    * @return a new ExposureId with given new ObsId
    */
   def withObsId(exposureId: ExposureId, obsId: ObsId): ExposureId = {
@@ -138,7 +138,7 @@ object ExposureId {
    * Note that a standalone ExposureId will be changed to an ExposureId with an ObsId.
    * @param exposureId current ExposureId
    * @param obsIdString new ObsId as a String
-   * @return ExposureId with given new [[ObsId]]
+   * @return ExposureId with given new [[csw.params.core.models.ObsId]]
    */
   def withObsId(exposureId: ExposureId, obsIdString: String): ExposureId =
     withObsId(exposureId, ObsId(obsIdString))
@@ -147,7 +147,7 @@ object ExposureId {
    * A convenience function that allows creating a standalone ExposureId at a specific UTC date and time.
    * Note than an ExposureId with an ObsId can be changed to a standalone ExposureId.
    * @param exposureId current ExposureId
-   * @param utc a [[UTCTime]] for the ExposureId
+   * @param utc a [[csw.time.core.models.UTCTime]] for the ExposureId
    * @return a standalone ExposureId at the provided UTC
    */
   def withUTC(exposureId: ExposureId, utc: UTCTime): ExposureId =
@@ -165,7 +165,7 @@ object ExposureId {
    * 2020A-001-123-IRIS-IMG-SCI0-0001 or 2020A-001-123-IRIS-IMG-SCI0-0001-02 when an ObsId is present.
    * @param exposureId proper ExposureId as a String
    * @return instance of ExposureId
-   * @throws IllegalArgumentException if the String does not follow the correct structure
+   * @throws java.lang.IllegalArgumentException if the String does not follow the correct structure
    */
   def apply(exposureId: String): ExposureId = {
     val maxArgs: Int = 8
@@ -215,11 +215,11 @@ object ExposureId {
   }
 
   /**
-   * This creates a stand-alone ExposureId for the case when there is no [[ObsId]] available.
-   * @param subsystem [[Subsystem]] associated with exposure
+   * This creates a stand-alone ExposureId for the case when there is no [[csw.params.core.models.ObsId]] available.
+   * @param subsystem [[csw.prefix.models.Subsystem]] associated with exposure
    * @param det a valid detector String
-   * @param typLevel the exposure's [[TYPLevel]]
-   * @param exposureNumber the exposure's Exposure Number [[ExposureNumber]]
+   * @param typLevel the exposure's [[csw.params.core.models.TYPLevel]]
+   * @param exposureNumber the exposure's Exposure Number [[csw.params.core.models.ExposureNumber]]
    * @return A stand-alone ExposureId
    */
   def apply(subsystem: Subsystem, det: String, typLevel: TYPLevel, exposureNumber: ExposureNumber): ExposureId =
@@ -227,11 +227,11 @@ object ExposureId {
 
   /**
    * This creates an ExposureId with an ObsId.
-   * @param obsId a valid [[ObsId]]
-   * @param subsystem [[Subsystem]] associated with exposure
+   * @param obsId a valid [[csw.params.core.models.ObsId]]
+   * @param subsystem [[csw.prefix.models.Subsystem]] associated with exposure
    * @param det a valid detector String
-   * @param typLevel the exposure's [[TYPLevel]]
-   * @param exposureNumber the exposure's Exposure Number [[ExposureNumber]]
+   * @param typLevel the exposure's [[csw.params.core.models.TYPLevel]]
+   * @param exposureNumber the exposure's Exposure Number [[csw.params.core.models.ExposureNumber]]
    * @return A standalone ExposureId
    */
   def apply(obsId: ObsId, subsystem: Subsystem, det: String, typLevel: TYPLevel, exposureNumber: ExposureNumber): ExposureId =
