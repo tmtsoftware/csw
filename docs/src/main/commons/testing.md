@@ -125,7 +125,7 @@ Scala
 : @@snip [ScalaTestExampleIntegrationTest.scala](../../../../examples/src/test/scala/example/teskit/ScalaAlarmTestKitExampleTest.scala) { #scalatest-alarm-testkit }
 
 Java
-:   @@snip [JUnitIntegrationExampleTest.scala](../../../../examples/src/test/java/example/testkit/JUnitIntegrationExampleTest.java) { #junit-alarm-testkit }
+:   @@snip [JUnitIntegrationExampleTest.scala](../../../../examples/src/test/java/example/testkit/JUnitAlarmTestKitExampleTest.java) { #junit-alarm-testkit }
 
 
 
