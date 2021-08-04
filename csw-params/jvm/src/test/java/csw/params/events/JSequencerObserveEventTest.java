@@ -22,7 +22,7 @@ public class JSequencerObserveEventTest extends JUnitSuite {
 
     @Test
     public void createObserveEventwithObsIdParameters__CSW_125() {
-        List<TestData> testData = new ArrayList<TestData>(Arrays.asList(
+        List<TestData> testData = new ArrayList<>(Arrays.asList(
                 new TestData(sequencerObserveEvent.presetStart(obsId), "ObserveEvent.PresetStart", prefix),
                 new TestData(sequencerObserveEvent.presetStart(obsId), "ObserveEvent.PresetStart", prefix),
                 new TestData(sequencerObserveEvent.presetEnd(obsId), "ObserveEvent.PresetEnd", prefix),
@@ -46,7 +46,7 @@ public class JSequencerObserveEventTest extends JUnitSuite {
 
     @Test
     public void createObserveEventWithExposureIdParameters__CSW_125() {
-        List<TestData> testData = new ArrayList<TestData>(Arrays.asList(
+        List<TestData> testData = new ArrayList<>(Arrays.asList(
                 new TestData(sequencerObserveEvent.exposureStart(ExposureId.apply(exposureId)), "ObserveEvent.ExposureStart", prefix),
                 new TestData(sequencerObserveEvent.exposureEnd(ExposureId.apply(exposureId)), "ObserveEvent.ExposureEnd", prefix),
                 new TestData(sequencerObserveEvent.readoutEnd(ExposureId.apply(exposureId)), "ObserveEvent.ReadoutEnd", prefix),

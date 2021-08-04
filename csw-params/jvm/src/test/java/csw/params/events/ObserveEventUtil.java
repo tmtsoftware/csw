@@ -6,7 +6,7 @@ import java.util.HashSet;
 
 public class ObserveEventUtil {
     public static HashSet<Choice> getOperationalStateChoices() {
-        HashSet<Choice> operationalStateChoices = new HashSet<Choice>();
+        HashSet<Choice> operationalStateChoices = new HashSet<>();
         operationalStateChoices.add(new Choice(JOperationalState.BUSY().entryName()));
         operationalStateChoices.add(new Choice(JOperationalState.READY().entryName()));
         operationalStateChoices.add(new Choice(JOperationalState.ERROR().entryName()));

@@ -21,7 +21,7 @@ public class JIRDetectorEventTest extends JUnitSuite {
 
     @Test
     public void shouldCreateIrDetectorObserveEventWithObsId__CSW_118_CSW_119() {
-        List<TestData> testData = new ArrayList<TestData>(Arrays.asList(
+        List<TestData> testData = new ArrayList<>(Arrays.asList(
                 new TestData(IRDetectorEvent.observeStart(sourcePrefix, obsId), "ObserveEvent.ObserveStart"),
                 new TestData(IRDetectorEvent.observeEnd(sourcePrefix, obsId), "ObserveEvent.ObserveEnd")
         ));
@@ -37,7 +37,7 @@ public class JIRDetectorEventTest extends JUnitSuite {
 
     @Test
     public void shouldCreateIrDetectorObserveEventWithoutObsId__CSW_118_CSW_119() {
-        List<TestData> testData = new ArrayList(Arrays.asList(
+        List<TestData> testData = new ArrayList<>(Arrays.asList(
                 new TestData(IRDetectorEvent.observeStart(sourcePrefix), "ObserveEvent.ObserveStart"),
                 new TestData(IRDetectorEvent.observeEnd(sourcePrefix), "ObserveEvent.ObserveEnd")
         ));
@@ -52,7 +52,7 @@ public class JIRDetectorEventTest extends JUnitSuite {
 
     @Test
     public void shouldCreateIrDetectorObserveEventWithExposureId__CSW_118_CSW_119() {
-        List<TestData> testData = new ArrayList<TestData>(Arrays.asList(
+        List<TestData> testData = new ArrayList<>(Arrays.asList(
                 new TestData(IRDetectorEvent.exposureStart(sourcePrefix, exposureId), "ObserveEvent.ExposureStart"),
                 new TestData(IRDetectorEvent.exposureEnd(sourcePrefix, exposureId), "ObserveEvent.ExposureEnd"),
                 new TestData(IRDetectorEvent.readoutEnd(sourcePrefix, exposureId), "ObserveEvent.ReadoutEnd"),
