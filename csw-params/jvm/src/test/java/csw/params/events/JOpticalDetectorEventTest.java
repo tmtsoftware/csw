@@ -24,7 +24,7 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
 
     @Test
     public void shouldCreateIrDetectorObserveEventWithObsId__CSW_118_CSW_119() {
-        List<TestData> testData = new ArrayList<TestData>(Arrays.asList(
+        List<TestData> testData = new ArrayList<>(Arrays.asList(
                 new TestData(OpticalDetectorEvent.observeStart(sourcePrefix, obsId), "ObserveEvent.ObserveStart"),
                 new TestData(OpticalDetectorEvent.observeEnd(sourcePrefix, obsId), "ObserveEvent.ObserveEnd")
         ));
@@ -40,7 +40,7 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
 
     @Test
     public void shouldCreateIrDetectorObserveEventWithoutObsId__CSW_118_CSW_119() {
-        List<TestData> testData = new ArrayList(Arrays.asList(
+        List<TestData> testData = new ArrayList<>(Arrays.asList(
                 new TestData(OpticalDetectorEvent.observeStart(sourcePrefix), "ObserveEvent.ObserveStart"),
                 new TestData(OpticalDetectorEvent.observeEnd(sourcePrefix), "ObserveEvent.ObserveEnd")
         ));
@@ -56,7 +56,7 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
 
     @Test
     public void shouldCreateIrDetectorObserveEventWithExposureId__CSW_118_CSW_119() {
-        List<TestData> testData = new ArrayList<TestData>(Arrays.asList(
+        List<TestData> testData = new ArrayList<>(Arrays.asList(
                 new TestData(OpticalDetectorEvent.prepareStart(sourcePrefix, exposureId), "ObserveEvent.PrepareStart"),
                 new TestData(OpticalDetectorEvent.exposureStart(sourcePrefix, exposureId), "ObserveEvent.ExposureStart"),
                 new TestData(OpticalDetectorEvent.exposureEnd(sourcePrefix, exposureId), "ObserveEvent.ExposureEnd"),
