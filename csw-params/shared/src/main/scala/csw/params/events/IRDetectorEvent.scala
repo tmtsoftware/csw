@@ -1,13 +1,13 @@
 package csw.params.events
 
 import csw.params.core.generics.Parameter
-import csw.params.core.models.ExposureIdType
+import csw.params.core.models.ExposureId
 import csw.prefix.models.Prefix
 
 object IRDetectorEvent extends DetectorEvent(ObserveEventNames.IRDetectorExposureState) {
   def exposureData(
       sourcePrefix: Prefix,
-      exposureId: ExposureIdType,
+      exposureId: ExposureId,
       readsInRamp: Int,
       readsComplete: Int,
       rampsInExposure: Int,

@@ -4,7 +4,6 @@ import csw.params.core.generics.Parameter;
 import csw.params.core.models.Choice;
 import csw.params.core.models.Choices;
 import csw.params.core.models.ExposureId;
-import csw.params.core.models.ExposureIdType;
 import csw.params.javadsl.JKeyType;
 import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
@@ -17,7 +16,7 @@ import java.util.Set;
 
 public class JWFSDetectorEventTest extends JUnitSuite {
     Prefix sourcePrefix = new Prefix(JSubsystem.ESW, "filter.wheel");
-    ExposureIdType exposureId = ExposureId.apply("2022A-001-123-IRIS-IMG-DRK1-0023");
+    ExposureId exposureId = ExposureId.apply("2022A-001-123-IRIS-IMG-DRK1-0023");
 
     @Test
     public void shouldCreatePublishSuccessEvent__CSW_118_CSW_119() {

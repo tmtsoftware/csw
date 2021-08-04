@@ -18,7 +18,7 @@ object ProgramId {
         ProgramId(SemesterId(semesterId), programNumber.toInt)
       case _ =>
         throw new IllegalArgumentException(
-          s"requirement failed: ProgramId must form with semesterId, programNumber separated with '${Separator.Hyphen}' ex: 2020A-001"
+          s"A program Id consists of a semester Id and program number separated by '${Separator.Hyphen}' ex: 2020A-001"
         )
     }
 }

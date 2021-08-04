@@ -213,11 +213,11 @@ class EventsTest extends AnyFunSpec with Matchers {
       val name = EventName("targetCoords")
       //events
       //#observe-event
-      val obsId                               = ObsId("1234A-001-0123")
-      val prefix                              = Prefix("tcs.pk")
-      val wfsObserveEvent: ObserveEvent       = WFSDetectorEvent.publishSuccess(prefix)
-      val irObserveEvent: ObserveEvent        = IRDetectorEvent.observeStart(prefix, obsId)
-      val opdObserveEvent: ObserveEvent       = OpticalDetectorEvent.observeStart(prefix, obsId)
+      val obsId                         = ObsId("1234A-001-0123")
+      val prefix                        = Prefix("tcs.pk")
+      val wfsObserveEvent: ObserveEvent = WFSDetectorEvent.publishSuccess(prefix)
+      val irObserveEvent: ObserveEvent  = IRDetectorEvent.observeStart(prefix, obsId)
+      val opdObserveEvent: ObserveEvent = OpticalDetectorEvent.observeStart(prefix, obsId)
       //#observe-event
       val systemEvent1: SystemEvent = SystemEvent(prefix, name).add(param)
       val systemEvent2: SystemEvent = SystemEvent(prefix, name).add(param)

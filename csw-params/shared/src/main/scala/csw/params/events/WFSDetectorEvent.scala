@@ -1,7 +1,7 @@
 package csw.params.events
 
 import csw.params.core.generics.Parameter
-import csw.params.core.models.ExposureIdType
+import csw.params.core.models.ExposureId
 import csw.prefix.models.Prefix
 
 object WFSDetectorEvent {
@@ -11,7 +11,7 @@ object WFSDetectorEvent {
   def publishFail(sourcePrefix: Prefix): ObserveEvent    = create(sourcePrefix, ObserveEventNames.PublishFail)
   def exposureState(
       sourcePrefix: Prefix,
-      exposureId: ExposureIdType,
+      exposureId: ExposureId,
       exposureInProgress: Boolean,
       abortInProgress: Boolean,
       isAborted: Boolean,
