@@ -2,8 +2,8 @@ package csw.params.core.models
 
 import csw.prefix.models.Subsystem
 import csw.time.core.models.UTCTime
-
-import java.time.ZoneId
+import java.time.{Instant, ZoneId}
+import scala.util.{Failure, Success, Try}
 
 /**
  * ExposureId is an identifier in ESW/DMS for a single exposure.
@@ -87,17 +87,41 @@ object ExposureId {
   private val exposureIdPattern = "uMMdd-HHmmss"
   private val dateTimeFormatter = DateTimeFormatter.ofPattern(exposureIdPattern).withZone(ZoneId.of("UTC"))
 
+
+  /**
+   * A convenience function to create a new ExposureId with a specific exposure number.
+   * Example: 2020A-001-123-WFOS-IMG1-SCI0-0001 with 3 => 2020A-001-123-WFOS-IMG1-SCI0-0003
+   * @param exposureId current ExposureId
+   * @param exposureNumber desired exposure number
+   * @return ExposureId with specified exposure number
+   */
+  def withExposureNumber(exposureId: ExposureId, exposureNumber: Int): ExposureId =
+    updateExposureNumber(exposureId, ExposureNumber(exposureNumber))
+
   /**
    * A convenience function to create a new ExposureId with the next higher exposure number.
    * Example: 2020A-001-123-WFOS-IMG1-SCI0-0001 => 2020A-001-123-WFOS-IMG1-SCI0-0002
    * @param exposureId current ExposureId
-   * @return ExposureId with next higher ExposureNumber
+   * @return ExposureId with next higher exposure number
    */
   def nextExposureNumber(exposureId: ExposureId): ExposureId =
     updateExposureNumber(exposureId, exposureId.exposureNumber.next())
 
   /**
-   * A convenience function to create a new ExposureId with the next higher exposure number.
+   * A convenience function to create a new ExposureId with the same exposure number and
+   * specified sub array number
+   * Example: 2020A-001-123-WFOS-IMG1-SCI0-0001, 3 => 2020A-001-123-WFOS-IMG1-SCI0-0002-03.
+   * Example: 2020A-001-123-WFOS-IMG1-SCI0-0002-00, 4 => 2020A-001-123-WFOS-IMG1-SCI0-0002-04.
+   * @param exposureId current ExposureId
+   * @param subArrayNumber specified subArray number
+   * @return ExposureId with next higher ExposureNumber
+   */
+  def withSubArrayNumber(exposureId: ExposureId, subArrayNumber: Int): ExposureId =
+    updateExposureNumber(exposureId,
+      ExposureNumber(exposureId.exposureNumber.exposureNumber, Some(subArrayNumber)))
+
+  /**
+   * A convenience function to create a new ExposureId with the next higher sub array number.
    * Example: 2020A-001-123-WFOS-IMG1-SCI0-0001 => 2020A-001-123-WFOS-IMG1-SCI0-0002-00.
    * Example: 2020A-001-123-WFOS-IMG1-SCI0-0002-00 => 2020A-001-123-WFOS-IMG1-SCI0-0002-01.
    * @param exposureId current ExposureId
@@ -170,6 +194,7 @@ object ExposureId {
   def apply(exposureId: String): ExposureId = {
     val maxArgs: Int = 8
     exposureId.split(Separator.Hyphen, maxArgs) match {
+        // 8 Args
       case Array(obs1, obs2, obs3, subsystemStr, detStr, typStr, expNumStr, subArrayStr) =>
         // This is the case with an ObsId and a sub array
         ExposureIdWithObsId(
@@ -179,17 +204,50 @@ object ExposureId {
           TYPLevel(typStr),
           ExposureNumber(expNumStr + Separator.Hyphen + subArrayStr)
         )
-      case Array(obs1, obs2, obs3, subsystemStr, detStr, typStr, expNumStr) =>
+        // 7 args
+      case Array(p1, p2, p3, p4, p5, p6, p7) =>
         // This is the case with an ObsId and no subarray
-        ExposureIdWithObsId(
-          Some(ObsId(Separator.hyphenate(obs1, obs2, obs3))),
-          Subsystem.withNameInsensitive(subsystemStr),
-          detStr,
-          TYPLevel(typStr),
-          ExposureNumber(expNumStr)
-        )
+        // Or Standalone with subarray
+        // If it is with ObsId, the first part with be a semester ID which is always length 5
+        if (p1.length == 5) {
+          ExposureIdWithObsId(
+            Some(ObsId(Separator.hyphenate(p1, p2, p3))),
+            Subsystem.withNameInsensitive(p4),
+            p5,
+            TYPLevel(p6),
+            ExposureNumber(p7)
+          )
+        } else {
+          // It is a standalone with a subarray
+          toTimeDateAtUTC(p1, p2) match {
+            case Success(utcTime) =>
+              StandaloneExposureId(
+                utcTime,
+                Subsystem.withNameInsensitive(p3),
+                p4,
+                TYPLevel(p5),
+                ExposureNumber(p6 + Separator.Hyphen + p7)
+              )
+            case Failure(ex) =>
+              throw ex
+          }
+        }
+      case Array(date, time, subsystemStr, detStr, typStr, expNumStr) if (date.length != 5) =>
+        // 6 args - first two should be UTC time
+        toTimeDateAtUTC(date, time) match {
+          case Success(utcTime) =>
+            StandaloneExposureId(
+              utcTime,
+              Subsystem.withNameInsensitive(subsystemStr),
+              detStr,
+              TYPLevel(typStr),
+              ExposureNumber(expNumStr)
+            )
+          case Failure(ex) =>
+            throw ex
+        }
       case Array(subsystemStr, detStr, typStr, expNumStr, subArrayStr) =>
-        // This is standalone with subarray
+        // 5 args = this is standalone with subarray
         StandaloneExposureId(
           UTCTime.now(),
           Subsystem.withNameInsensitive(subsystemStr),
@@ -197,6 +255,7 @@ object ExposureId {
           TYPLevel(typStr),
           ExposureNumber(expNumStr + Separator.Hyphen + subArrayStr)
         )
+        // 4 args
       case Array(subsystemStr, detStr, typStr, expNumStr) =>
         // This is standalone with no subarray
         StandaloneExposureId(
@@ -212,6 +271,11 @@ object ExposureId {
             "SemesterId-ProgramNumber-ObservationNumber-Subsystem-DET-TYPLevel-ExposureNumber"
         )
     }
+  }
+
+  /** Convert an input date and time string to an Instant.  Throws parse exception on failure */
+  private def toTimeDateAtUTC(dateStr: String, timeStr: String):Try[UTCTime] = Try {
+      UTCTime(Instant.from(dateTimeFormatter.parse(s"$dateStr-$timeStr")))
   }
 
   /**
