@@ -46,7 +46,7 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String)
   // DEOPSCSW-35: CRDT detects comp/service crash
   // DEOPSCSW-36: Track a crashed service/comp
   test(
-    s"${this.suiteName}:${myself.name} akka component running on one node should detect if other component running on another node crashes | DEOPSCSW-15, DEOPSCSW-35, DEOPSCSW-36, DEOPSCSW-429"
+    s"${testPrefixWithSuite} akka component running on one node should detect if other component running on another node crashes | DEOPSCSW-15, DEOPSCSW-35, DEOPSCSW-36, DEOPSCSW-429"
   ) {
 
     val akkaConnection = AkkaConnection(ComponentId(Prefix(Subsystem.Container, "Container1"), ComponentType.Container))

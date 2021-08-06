@@ -26,6 +26,8 @@ abstract class LSNodeSpec[T <: NMembersAndSeed](val config: T, mode: String = "c
     case "http"    => HttpLocationServiceFactory.makeLocalClient(typedSystem)
     case "cluster" => LocationServiceFactory.make(clusterSettings)
   }
+  lazy val testPrefix = s"${myself.name}"
+  lazy val testPrefixWithSuite = s"${this.suiteName}:${testPrefix}"
 
   override def initialParticipants: Int = roles.size
 
@@ -33,7 +35,7 @@ abstract class LSNodeSpec[T <: NMembersAndSeed](val config: T, mode: String = "c
 
   override def afterAll(): Unit = multiNodeSpecAfterAll()
 
-  test(s"${this.suiteName}:${myself.name} ensure that location service is up for all the nodes") {
+  test(s"${testPrefixWithSuite} ensure that location service is up for all the nodes") {
     locationService.list.await
     enterBarrier("cluster-formed")
   }

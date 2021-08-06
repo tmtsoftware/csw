@@ -47,7 +47,7 @@ class LongRunningCommandTest(ignore: Int)
   implicit val testkit: TestKitSettings     = TestKitSettings(typedSystem)
 
   test(
-    s"${this.suiteName}:${myself.name} should be able to send long running commands asynchronously and get the response | DEOPSCSW-194, DEOPSCSW-227, DEOPSCSW-228, DEOPSCSW-233"
+    s"${testPrefix} should be able to send long running commands asynchronously and get the response | DEOPSCSW-194, DEOPSCSW-227, DEOPSCSW-228, DEOPSCSW-233"
   ) {
     runOn(seed) {
       // cluster seed is running on jvm-1

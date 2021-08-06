@@ -95,7 +95,7 @@ class CommandServiceTest(ignore: Int)
   implicit private val patience: PatienceConfig = PatienceConfig(5.seconds, 100.millis)
 
   test(
-    s"${this.suiteName}:${myself.name} sender of command should receive appropriate responses | DEOPSCSW-207, DEOPSCSW-234, DEOPSCSW-222, DEOPSCSW-228, DEOPSCSW-217, DEOPSCSW-201, DEOPSCSW-212, DEOPSCSW-202, DEOPSCSW-313, DEOPSCSW-623, DEOPSCSW-208, DEOPSCSW-225, DEOPSCSW-224, DEOPSCSW-321, DEOPSCSW-233, DEOPSCSW-317, DEOPSCSW-229"
+    s"${testPrefix} sender of command should receive appropriate responses | DEOPSCSW-207, DEOPSCSW-234, DEOPSCSW-222, DEOPSCSW-228, DEOPSCSW-217, DEOPSCSW-201, DEOPSCSW-212, DEOPSCSW-202, DEOPSCSW-313, DEOPSCSW-623, DEOPSCSW-208, DEOPSCSW-225, DEOPSCSW-224, DEOPSCSW-321, DEOPSCSW-233, DEOPSCSW-317, DEOPSCSW-229"
   ) {
 
     runOn(seed) {

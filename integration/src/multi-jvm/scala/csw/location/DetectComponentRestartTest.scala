@@ -30,7 +30,7 @@ class DetectComponentRestartTest(ignore: Int, mode: String)
 
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(Slf4JLoggerFactory.INSTANCE)
-  test(s"${this.suiteName}:${myself.name} should detect re-registering of new location for a connection that has crashed/gone away | DEOPSCSW-429") {
+  test(s"${testPrefixWithSuite} should detect re-registering of new location for a connection that has crashed/gone away | DEOPSCSW-429") {
 
     val akkaConnection = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "TromboneHcd"), ComponentType.HCD))
 

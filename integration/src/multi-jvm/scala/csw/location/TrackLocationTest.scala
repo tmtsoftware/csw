@@ -21,7 +21,7 @@ class TrackLocationTest(ignore: Int, mode: String) extends helpers.LSNodeSpec(co
 
   // DEOPSCSW-26: Track a connection
   test(
-    s"${this.suiteName}:${myself.name} two components should able to track same connection and single component should able to track two components | DEOPSCSW-26, DEOPSCSW-429"
+    s"${testPrefixWithSuite} two components should able to track same connection and single component should able to track two components | DEOPSCSW-26, DEOPSCSW-429"
   ) {
     //create akka connection
     val akkaConnection = AkkaConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneHcd"), ComponentType.HCD))

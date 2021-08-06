@@ -31,7 +31,7 @@ class ConfigServiceTest(ignore: Int)
     testFileUtils.deleteServerFiles()
   }
 
-  test(s"${this.suiteName}:${myself.name} should start config service server on one node and client should able to create and get files from other node") {
+  test(s"${testPrefix} should start config service server on one node and client should able to create and get files from other node") {
 
     runOn(server) {
       val serverWiring = ServerWiring.make(locationService, securityDirectives)
