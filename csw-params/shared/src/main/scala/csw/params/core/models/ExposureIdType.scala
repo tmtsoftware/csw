@@ -87,7 +87,6 @@ object ExposureId {
   private val exposureIdPattern = "uMMdd-HHmmss"
   private val dateTimeFormatter = DateTimeFormatter.ofPattern(exposureIdPattern).withZone(ZoneId.of("UTC"))
 
-
   /**
    * A convenience function to create a new ExposureId with a specific exposure number.
    * Example: 2020A-001-123-WFOS-IMG1-SCI0-0001 with 3 => 2020A-001-123-WFOS-IMG1-SCI0-0003
@@ -117,8 +116,7 @@ object ExposureId {
    * @return ExposureId with next higher ExposureNumber
    */
   def withSubArrayNumber(exposureId: ExposureId, subArrayNumber: Int): ExposureId =
-    updateExposureNumber(exposureId,
-      ExposureNumber(exposureId.exposureNumber.exposureNumber, Some(subArrayNumber)))
+    updateExposureNumber(exposureId, ExposureNumber(exposureId.exposureNumber.exposureNumber, Some(subArrayNumber)))
 
   /**
    * A convenience function to create a new ExposureId with the next higher sub array number.
@@ -194,7 +192,7 @@ object ExposureId {
   def apply(exposureId: String): ExposureId = {
     val maxArgs: Int = 8
     exposureId.split(Separator.Hyphen, maxArgs) match {
-        // 8 Args
+      // 8 Args
       case Array(obs1, obs2, obs3, subsystemStr, detStr, typStr, expNumStr, subArrayStr) =>
         // This is the case with an ObsId and a sub array
         ExposureIdWithObsId(
@@ -204,7 +202,7 @@ object ExposureId {
           TYPLevel(typStr),
           ExposureNumber(expNumStr + Separator.Hyphen + subArrayStr)
         )
-        // 7 args
+      // 7 args
       case Array(p1, p2, p3, p4, p5, p6, p7) =>
         // This is the case with an ObsId and no subarray
         // Or Standalone with subarray
@@ -217,7 +215,8 @@ object ExposureId {
             TYPLevel(p6),
             ExposureNumber(p7)
           )
-        } else {
+        }
+        else {
           // It is a standalone with a subarray
           toTimeDateAtUTC(p1, p2) match {
             case Success(utcTime) =>
@@ -255,7 +254,7 @@ object ExposureId {
           TYPLevel(typStr),
           ExposureNumber(expNumStr + Separator.Hyphen + subArrayStr)
         )
-        // 4 args
+      // 4 args
       case Array(subsystemStr, detStr, typStr, expNumStr) =>
         // This is standalone with no subarray
         StandaloneExposureId(
@@ -274,8 +273,8 @@ object ExposureId {
   }
 
   /** Convert an input date and time string to an Instant.  Throws parse exception on failure */
-  private def toTimeDateAtUTC(dateStr: String, timeStr: String):Try[UTCTime] = Try {
-      UTCTime(Instant.from(dateTimeFormatter.parse(s"$dateStr-$timeStr")))
+  private def toTimeDateAtUTC(dateStr: String, timeStr: String): Try[UTCTime] = Try {
+    UTCTime(Instant.from(dateTimeFormatter.parse(s"$dateStr-$timeStr")))
   }
 
   /**

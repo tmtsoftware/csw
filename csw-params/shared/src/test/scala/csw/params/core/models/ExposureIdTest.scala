@@ -67,12 +67,12 @@ class ExposureIdTest extends AnyFunSpec with Matchers {
 
       // Should be able to parse a standalone with and without subArray
       val testStandalone = "20210806-005937-CSW-IMG1-SCI0-0001"
-      val exposureId5 = ExposureId(testStandalone)
+      val exposureId5    = ExposureId(testStandalone)
       exposureId5.exposureNumber.exposureNumber shouldBe 1
       exposureId5.toString shouldBe testStandalone
 
       val testStandalone2 = "20210806-005937-CSW-IMG1-SCI0-0002-03"
-      val exposureId6 = ExposureId(testStandalone2)
+      val exposureId6     = ExposureId(testStandalone2)
       exposureId6.exposureNumber.exposureNumber shouldBe 2
       exposureId6.exposureNumber.subArray shouldBe Some(3)
       exposureId6.toString shouldBe testStandalone2
