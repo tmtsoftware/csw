@@ -38,7 +38,7 @@ class CancellableCommandTest(ignore: Int)
     system.toTyped.asInstanceOf[ActorSystem[SpawnProtocol.Command]]
   private implicit val timeout: Timeout = 5.seconds
 
-  test("a long running command should be cancellable | DEOPSCSW-211") {
+  test(s"${this.suiteName}:${myself.name} a long running command should be cancellable | DEOPSCSW-211") {
     runOn(seed) {
       // spawn container having assembly and hcd running in jvm-1
       val wiring       = FrameworkWiring.make(actorSystem, locationService, mock[RedisClient])

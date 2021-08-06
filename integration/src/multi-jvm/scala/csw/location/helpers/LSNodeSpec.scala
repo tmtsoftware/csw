@@ -33,7 +33,7 @@ abstract class LSNodeSpec[T <: NMembersAndSeed](val config: T, mode: String = "c
 
   override def afterAll(): Unit = multiNodeSpecAfterAll()
 
-  test("ensure that location service is up for all the nodes") {
+  test(s"${this.suiteName}:${myself.name} ensure that location service is up for all the nodes") {
     locationService.list.await
     enterBarrier("cluster-formed")
   }
