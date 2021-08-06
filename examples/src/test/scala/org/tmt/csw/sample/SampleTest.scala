@@ -18,7 +18,7 @@ import scala.concurrent.Await
 
 //#intro
 class SampleTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with AnyFunSuiteLike {
-  import frameworkTestKit.frameworkWiring._
+  import frameworkTestKit._
   //#intro
 
   //#setup

@@ -10,7 +10,7 @@ class ScalaTestFrameworkTestKitSpec
     extends ScalaTestFrameworkTestKit(LocationServer, ConfigServer, EventServer)
     with AnyFunSuiteLike {
 
-  import frameworkTestKit.frameworkWiring._
+  import frameworkTestKit._
 
   test("should start all the provided services | DEOPSCSW-592") {
 

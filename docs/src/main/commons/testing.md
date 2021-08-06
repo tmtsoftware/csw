@@ -20,11 +20,11 @@ CSW comes with a dedicated `csw-testkit` module for supporting tests. This modul
  - `EventTestKit` : starts and stops the Event Service (Note : This uses `embedded-redis` to start redis sentinel and master) 
  - `AlarmTestKit` : starts and stops the Alarm Service (Note : This uses `embedded-redis` to start redis sentinel and master)
  - `FrameworkTestKit` : in most of the cases, you will end up using this testkit. `FrameworkTestKit` is created by composing all the above mentioned testkits.
-    Hence it supports starting and stopping all provided CSW services. 
+    Hence, it supports starting and stopping all provided CSW services. 
     
 @@@ note
 
-All of the testkits require the Location Server to be up and running. Hence, the first thing all testkits do is to start a Location Server.
+All the testkits require the Location Server to be up and running. Hence, the first thing all testkits do is to start a Location Server.
 You do not need to start it explicitly.
 
 @@@
@@ -64,12 +64,12 @@ Other ways to spawn Assembly and HCD in the standalone mode using Framework test
 ## Spawning a HCD
 
 Scala
-:   @@snip [TestKitsExampleTest.scala](../../../../examples/src/test/scala/example/teskit/TestKitsExampleTest.scala) { #spawn-assembly }
+:   @@snip [TestKitsExampleTest.scala](../../../../examples/src/test/scala/example/teskit/TestKitsExampleTest.scala) { #spawn-hcd }
 
 ## Spawning an Assembly
 
 Scala
-:   @@snip [TestKitsExampleTest.scala](../../../../examples/src/test/scala/example/teskit/TestKitsExampleTest.scala) { #spawn-hcd }
+:   @@snip [TestKitsExampleTest.scala](../../../../examples/src/test/scala/example/teskit/TestKitsExampleTest.scala) { #spawn-assembly }
 
 Full source at GitHub
 

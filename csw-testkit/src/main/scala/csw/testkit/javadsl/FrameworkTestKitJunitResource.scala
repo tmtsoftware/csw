@@ -57,20 +57,15 @@ final class FrameworkTestKitJunitResource(val frameworkTestKit: FrameworkTestKit
   /** Initialize testkit with provided actorSystem */
   def this(actorSystem: typed.ActorSystem[SpawnProtocol.Command]) = this(FrameworkTestKit(actorSystem), Collections.emptyList())
 
-  private val wiring = frameworkTestKit.frameworkWiring
-
   /** Easy access to testkits untyped actor system from java */
-  lazy val actorSystem: typed.ActorSystem[SpawnProtocol.Command] = wiring.actorSystem
-
-  /** Easy access to testkits typed actor system from java (just wraps untyped to typed). */
-//  lazy val typedSystem: typed.ActorSystem[_] = actorSystem.toTyped
+  lazy val actorSystem: typed.ActorSystem[SpawnProtocol.Command] = frameworkTestKit.actorSystem
 
   /** Handle to Java Location service */
   lazy val jLocationService: ILocationService =
-    LocationServiceExt.RichLocationService(wiring.locationService).asJava(wiring.actorRuntime.ec)
+    LocationServiceExt.RichLocationService(frameworkTestKit.locationService).asJava(frameworkTestKit.ec)
 
   /** Handle to Java Event service client */
-  lazy val jEventService: IEventService = wiring.eventServiceFactory.jMake(jLocationService, actorSystem)
+  lazy val jEventService: IEventService = frameworkTestKit.eventServiceFactory.jMake(jLocationService, actorSystem)
 
   /** Delegate to framework testkit */
   def spawnContainer(config: Config): ActorRef[ContainerMessage] = frameworkTestKit.spawnContainer(config)

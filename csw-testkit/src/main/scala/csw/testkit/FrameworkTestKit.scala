@@ -1,14 +1,18 @@
 package csw.testkit
 
 import akka.actor.typed
-import akka.actor.typed.{ActorRef, SpawnProtocol}
+import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
+import csw.alarm.client.AlarmServiceFactory
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.command.client.models.framework.LocationServiceUsage
+import csw.config.api.scaladsl.ConfigClientService
+import csw.event.api.scaladsl.EventService
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.framework.scaladsl.ComponentBehaviorFactory
 import csw.location.api.models.{ComponentType, Connection}
+import csw.location.api.scaladsl.LocationService
 import csw.location.client.ActorSystemFactory
 import csw.prefix.models.Prefix
 import csw.testkit.internal.{SpawnComponent, TestKitUtils}
@@ -40,19 +44,26 @@ import scala.concurrent.duration.{DurationInt, FiniteDuration}
  * }}}
  */
 final class FrameworkTestKit private (
-    val actorSystem: typed.ActorSystem[SpawnProtocol.Command],
+    system: ActorSystem[SpawnProtocol.Command],
     val redisClient: RedisClient,
     val locationTestKit: LocationTestKit,
     val configTestKit: ConfigTestKit,
     val eventTestKit: EventTestKit,
     val alarmTestKit: AlarmTestKit
 ) {
+  private lazy val frameworkWiring              = FrameworkWiring.make(system, redisClient)
+  private[testkit] lazy val eventServiceFactory = frameworkWiring.eventServiceFactory
 
-  lazy val frameworkWiring: FrameworkWiring            = FrameworkWiring.make(actorSystem, redisClient)
-  implicit lazy val ec: ExecutionContext               = frameworkWiring.actorRuntime.ec
+  implicit lazy val actorSystem: ActorSystem[SpawnProtocol.Command] = system
+  implicit lazy val ec: ExecutionContext                            = system.executionContext
+  lazy val locationService: LocationService                         = frameworkWiring.locationService
+  lazy val configClientService: ConfigClientService                 = frameworkWiring.configClientService
+  lazy val eventService: EventService                               = eventServiceFactory.make(locationService)
+  lazy val alarmServiceFactory: AlarmServiceFactory                 = frameworkWiring.alarmServiceFactory
+
+  lazy val timeout: Timeout = locationTestKit.timeout
+
   private var locationTestkitWithAuth: LocationTestKit = _
-
-  implicit val timeout: Timeout = locationTestKit.timeout
 
   private var configStarted           = false
   private var eventStarted            = false
@@ -80,7 +91,7 @@ final class FrameworkTestKit private (
       case AlarmServer    => alarmTestKit.startAlarmService(); alarmStarted = true
       case LocationServer => // location server without auth is already started above
       case LocationServerWithAuth =>
-        locationTestkitWithAuth = LocationTestKit.withAuth(actorSystem.settings.config)
+        locationTestkitWithAuth = LocationTestKit.withAuth(system.settings.config)
         locationTestkitWithAuth.startLocationServer()
         locationWithAuthStarted = true
     }

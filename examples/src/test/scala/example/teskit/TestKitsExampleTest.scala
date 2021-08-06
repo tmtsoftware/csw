@@ -4,12 +4,10 @@ import com.typesafe.config.ConfigFactory
 import csw.location.api.models.ComponentId
 import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.scaladsl.LocationService
-import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.testkit.FrameworkTestKit
 import csw.testkit.scaladsl.CSWService.{ConfigServer, EventServer}
-import io.netty.util.internal.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
+import io.netty.util.internal.logging.InternalLoggerFactory
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{BeforeAndAfterAll, OptionValues}
@@ -35,8 +33,7 @@ class TestKitsExampleTest extends AnyFunSuiteLike with BeforeAndAfterAll with Ma
   override protected def afterAll(): Unit = frameworkTestKit.shutdown()
   //#framework-testkit
 
-  import frameworkTestKit.frameworkWiring.actorRuntime._
-  private val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient
+  import frameworkTestKit._
 
   test("framework testkit example for spawning container") {
     //#spawn-using-testkit

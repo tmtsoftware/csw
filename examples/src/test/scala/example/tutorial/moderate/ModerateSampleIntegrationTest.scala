@@ -1,14 +1,14 @@
 package example.tutorial.moderate
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
+import akka.actor.typed.ActorRef
 import akka.util.Timeout
 import csw.command.client.CommandServiceFactory
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.command.client.models.framework.LockingResponse
 import csw.command.client.models.framework.LockingResponse.{LockAcquired, LockReleased}
-import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.params.commands.CommandResponse.{Cancelled, Completed, Locked, Started}
 import csw.params.commands.Setup
 import csw.prefix.models.{Prefix, Subsystem}
@@ -26,7 +26,7 @@ object LockCommandFactory {
 //noinspection ScalaStyle
 //#intro
 class ModerateSampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with AnyWordSpecLike {
-  import frameworkTestKit.frameworkWiring._
+  import frameworkTestKit._
 
   private val containerConnection = AkkaConnection(
     ComponentId(Prefix(Subsystem.Container, "SampleContainer"), ComponentType.Container)
@@ -41,8 +41,7 @@ class ModerateSampleContainerTest extends ScalaTestFrameworkTestKit(AlarmServer,
     spawnContainer(com.typesafe.config.ConfigFactory.load("ModerateSampleContainer.conf"))
   }
 
-  private implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = frameworkTestKit.actorSystem
-  private implicit val timeout: Timeout                                = 12.seconds
+  private implicit val timeout: Timeout = 12.seconds
 
   //#locate
   import example.tutorial.moderate.shared.SampleInfo._

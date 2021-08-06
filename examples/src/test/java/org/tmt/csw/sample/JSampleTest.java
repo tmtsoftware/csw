@@ -4,7 +4,7 @@ import csw.location.api.javadsl.ILocationService;
 import csw.location.api.javadsl.JComponentType;
 import csw.location.api.models.AkkaLocation;
 import csw.location.api.models.ComponentId;
-import csw.location.api.models.Connection.*;
+import csw.location.api.models.Connection.AkkaConnection;
 import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
 import csw.testkit.javadsl.FrameworkTestKitJunitResource;
@@ -32,7 +32,7 @@ public class JSampleTest extends JUnitSuite {
     public static void setup() {
         testKit.spawnStandalone(com.typesafe.config.ConfigFactory.load("JSampleStandalone.conf"));
     }
-//#setup
+    //#setup
 
     //#locate
     @Test

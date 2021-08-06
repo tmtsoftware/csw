@@ -23,7 +23,7 @@ import scala.concurrent.Await
 
 //#setup
 class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with AnyFunSuiteLike with BeforeAndAfterEach {
-  import frameworkTestKit.frameworkWiring._
+  import frameworkTestKit._
 
   override def beforeAll(): Unit = {
     super.beforeAll()
@@ -44,8 +44,7 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
     val counterEventKey = EventKey(Prefix("CSW.samplehcd"), EventName("HcdCounter"))
     val hcdCounterKey   = KeyType.IntKey.make("counter")
 
-    val eventService = eventServiceFactory.make(locationService)(actorSystem)
-    val subscriber   = eventService.defaultSubscriber
+    val subscriber = eventService.defaultSubscriber
 
     // wait for a bit to ensure HCD has started and published an event
     Thread.sleep(2000)
