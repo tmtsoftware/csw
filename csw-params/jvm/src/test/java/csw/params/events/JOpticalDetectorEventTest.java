@@ -18,7 +18,7 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
     final Prefix sourcePrefix = new Prefix(JSubsystem.ESW, "filter.wheel");
     final ObsId obsId = ObsId.apply("2020A-001-123");
 
-    ExposureId exposureId = ExposureId.apply("2022A-001-123-IRIS-IMG-DRK1-0023");
+    ExposureId exposureId = ExposureId.fromString("2022A-001-123-IRIS-IMG-DRK1-0023");
     Parameter<String> obsIdParam = JKeyType.StringKey().make("obsId").set(obsId.toString());
     Parameter<String> exposureIdParam = JKeyType.StringKey().make("exposureId").set(exposureId.toString());
     String filename = "some/nested/folder/file123.conf";

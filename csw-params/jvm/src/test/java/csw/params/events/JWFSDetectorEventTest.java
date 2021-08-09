@@ -16,7 +16,7 @@ import java.util.Set;
 
 public class JWFSDetectorEventTest extends JUnitSuite {
     Prefix sourcePrefix = new Prefix(JSubsystem.ESW, "filter.wheel");
-    ExposureId exposureId = ExposureId.apply("2022A-001-123-IRIS-IMG-DRK1-0023");
+    ExposureId exposureId = ExposureId.fromString("2022A-001-123-IRIS-IMG-DRK1-0023");
 
     @Test
     public void shouldCreatePublishSuccessEvent__CSW_118_CSW_119() {

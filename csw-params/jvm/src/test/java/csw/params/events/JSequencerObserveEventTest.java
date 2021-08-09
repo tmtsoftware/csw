@@ -15,7 +15,7 @@ import java.util.*;
 public class JSequencerObserveEventTest extends JUnitSuite {
     final Prefix prefix = new Prefix(JSubsystem.ESW, "filter.wheel");
     final ObsId obsId = ObsId.apply("2020A-001-123");
-    final ExposureId exposureId = ExposureId.apply("2021A-001-123-TCS-DET-SCI2-1234");
+    final ExposureId exposureId = ExposureId.fromString("2021A-001-123-TCS-DET-SCI2-1234");
     final Parameter<String> exposureIdParam = ObserveEventKeys.exposureId().set(exposureId.toString());
     final Parameter<String> obsIdParam = ObserveEventKeys.obsId().set(obsId.toString());
     final Parameter<String> downTimeParam = ObserveEventKeys.downTimeReason().set("infra failure");

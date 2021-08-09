@@ -182,6 +182,13 @@ object ExposureId {
   def utcAsStandaloneString(utcTime: UTCTime): String = dateTimeFormatter.format(utcTime.value)
 
   /**
+   * A helper function that allows creating exposure id from string in java file.
+   * @param exposureId proper ExposureId as a String
+   * @return instance of ExposureId
+   */
+  def fromString(exposureId: String): ExposureId = apply(exposureId)
+
+  /**
    * Create an ExposureId from a String of the 4 forms with and without an ObsId and with and without a subarray:
    * IRIS-IMG-SCI0-0001,IRIS-IMG-SCI0-0001-02 when no ObsId is present. Or
    * 2020A-001-123-IRIS-IMG-SCI0-0001 or 2020A-001-123-IRIS-IMG-SCI0-0001-02 when an ObsId is present.
