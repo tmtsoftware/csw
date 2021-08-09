@@ -105,10 +105,10 @@ publish two additional Events plus the one we receive when the subscription star
 value of the first `counterEvent` to determine what the set of counter values we expect to get in our subscription.
 
 Scala
-:   @@snip [BasicSampleHcdTest.scala](../../../../examples/src/test/scala/example/tutorial/basic/BasicSampleHcdTest.scala) { #subscribe }
+:   @@snip [BasicSampleHcdTest.scala](../../../../examples/src/test/scala/org/tmt/csw/samplehcd/SampleHcdTest.scala) { #subscribe }
 
 Java
-:   @@snip [JSampleHcdTest.java](../../../../examples/src/test/java/example/tutorial/basic/JSampleHcdTest.java) { #subscribe }
+:   @@snip [JSampleHcdTest.java](../../../../examples/src/test/java/org/tmt/csw/samplehcd/JSampleHcdTest.java) { #subscribe }
 
 Next, we'll add a test for command handling in the HCD.  The HCD supports a "sleep" command, which sleeps
 some amount of seconds as specified in the command payload, and then returns a `CommandResponse.Completed`.
@@ -117,10 +117,10 @@ obtaining a `CommandService` reference requires an Akka Typed Actor System, so o
 using the Actor System provided by the Test Kit.
 
 Scala
-:   @@snip [BasicSampleHcdTest.scala](../../../../examples/src/test/scala/example/tutorial/basic/BasicSampleHcdTest.scala) { #submit }
+:   @@snip [BasicSampleHcdTest.scala](../../../../examples/src/test/scala/org/tmt/csw/samplehcd/SampleHcdTest.scala) { #submit }
 
 Java
-:   @@snip [JSampleHcdTest.java](../../../../examples/src/test/java/example/tutorial/basic/JSampleHcdTest.java) { #submitAndWait }
+:   @@snip [JSampleHcdTest.java](../../../../examples/src/test/java/org/tmt/csw/samplehcd/JSampleHcdTest.java) { #submitAndWait }
 
 Finally, we will show an example of tests that check that exceptions are thrown when expected.  We will do this
 by using the "sleep" command, but failing to wait long enough for the sleep to complete.  This causes a 
@@ -128,10 +128,10 @@ by using the "sleep" command, but failing to wait long enough for the sleep to c
 are in fact thrown.
 
 Scala
-:   @@snip [BasicSampleHcdTest.scala](../../../../examples/src/test/scala/example/tutorial/basic/BasicSampleHcdTest.scala) { #exception }
+:   @@snip [BasicSampleHcdTest.scala](../../../../examples/src/test/scala/org/tmt/csw/samplehcd/SampleHcdTest.scala) { #exception }
 
 Java
-:   @@snip [JSampleHcdTest.java](../../../../examples/src/test/java/example/tutorial/basic/JSampleHcdTest.java) { #exception }
+:   @@snip [JSampleHcdTest.java](../../../../examples/src/test/java/org/tmt/csw/samplehcd/JSampleHcdTest.java) { #exception }
 
 ###Other ways to spawn Assembly and HCD in the standalone mode using CSW Test Kit.
 
