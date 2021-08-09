@@ -7,14 +7,14 @@ import csw.prefix.models.Prefix
 private[events] class DetectorEvent(detectorExpStateName: EventName) {
 
   def observeStart(sourcePrefix: Prefix, obsId: ObsId): ObserveEvent =
-    createWithOptionalObsId(sourcePrefix, ObserveEventNames.ObserveStart, Some(obsId))
+    create(sourcePrefix, ObserveEventNames.ObserveStart, Some(obsId))
   def observeStart(sourcePrefix: Prefix): ObserveEvent =
-    createWithOptionalObsId(sourcePrefix, ObserveEventNames.ObserveStart)
+    create(sourcePrefix, ObserveEventNames.ObserveStart)
 
   def observeEnd(sourcePrefix: Prefix, obsId: ObsId): ObserveEvent =
-    createWithOptionalObsId(sourcePrefix, ObserveEventNames.ObserveEnd, Some(obsId))
+    create(sourcePrefix, ObserveEventNames.ObserveEnd, Some(obsId))
   def observeEnd(sourcePrefix: Prefix): ObserveEvent =
-    createWithOptionalObsId(sourcePrefix, ObserveEventNames.ObserveEnd)
+    create(sourcePrefix, ObserveEventNames.ObserveEnd)
 
   def exposureStart(sourcePrefix: Prefix, exposureId: ExposureId): ObserveEvent =
     create(sourcePrefix, exposureId, ObserveEventNames.ExposureStart)
@@ -24,10 +24,10 @@ private[events] class DetectorEvent(detectorExpStateName: EventName) {
     create(sourcePrefix, exposureId, ObserveEventNames.ReadoutEnd)
   def readoutFailed(sourcePrefix: Prefix, exposureId: ExposureId): ObserveEvent =
     create(sourcePrefix, exposureId, ObserveEventNames.ReadoutFailed)
-  def dataWriteStart(sourcePrefix: Prefix, exposureId: ExposureId): ObserveEvent =
-    create(sourcePrefix, exposureId, ObserveEventNames.DataWriteStart)
-  def dataWriteEnd(sourcePrefix: Prefix, exposureId: ExposureId): ObserveEvent =
-    create(sourcePrefix, exposureId, ObserveEventNames.DataWriteEnd)
+  def dataWriteStart(sourcePrefix: Prefix, exposureId: ExposureId, filename: String): ObserveEvent =
+    create(sourcePrefix, exposureId, ObserveEventNames.DataWriteStart, filename)
+  def dataWriteEnd(sourcePrefix: Prefix, exposureId: ExposureId, filename: String): ObserveEvent =
+    create(sourcePrefix, exposureId, ObserveEventNames.DataWriteEnd, filename)
   def exposureAborted(sourcePrefix: Prefix, exposureId: ExposureId): ObserveEvent =
     create(sourcePrefix, exposureId, ObserveEventNames.ExposureAborted)
 
@@ -51,7 +51,7 @@ private[events] class DetectorEvent(detectorExpStateName: EventName) {
     ObserveEvent(sourcePrefix, detectorExpStateName, params)
   }
 
-  private def createWithOptionalObsId(sourcePrefix: Prefix, eventName: EventName, obsId: Option[ObsId] = None): ObserveEvent =
+  private def create(sourcePrefix: Prefix, eventName: EventName, obsId: Option[ObsId] = None): ObserveEvent =
     obsId match {
       case Some(value) => ObserveEvent(sourcePrefix, eventName, Set(ParamFactories.obsIdParam(value)))
       case None        => ObserveEvent(sourcePrefix, eventName, Set.empty)
@@ -62,5 +62,17 @@ private[events] class DetectorEvent(detectorExpStateName: EventName) {
       sourcePrefix,
       eventName,
       Set(ParamFactories.exposureIdParam(exposureId))
+    )
+
+  private[events] def create(
+      sourcePrefix: Prefix,
+      exposureId: ExposureId,
+      eventName: EventName,
+      filename: String
+  ): ObserveEvent =
+    ObserveEvent(
+      sourcePrefix,
+      eventName,
+      Set(ParamFactories.exposureIdParam(exposureId), ParamFactories.filenameParam(filename))
     )
 }

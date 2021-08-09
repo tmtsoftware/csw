@@ -3,6 +3,7 @@ package csw.params.events;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.ExposureId;
 import csw.params.core.models.ObsId;
+import csw.params.javadsl.JKeyType;
 import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
 import org.junit.Assert;
@@ -14,12 +15,13 @@ import java.util.*;
 public class JSequencerObserveEventTest extends JUnitSuite {
     final Prefix prefix = new Prefix(JSubsystem.ESW, "filter.wheel");
     final ObsId obsId = ObsId.apply("2020A-001-123");
-    final String exposureId = "2021A-001-123-TCS-DET-SCI2-1234";
-    final Parameter<String> exposureIdParam = ObserveEventKeys.exposureId().set(exposureId);
+    final ExposureId exposureId = ExposureId.apply("2021A-001-123-TCS-DET-SCI2-1234");
+    final Parameter<String> exposureIdParam = ObserveEventKeys.exposureId().set(exposureId.toString());
     final Parameter<String> obsIdParam = ObserveEventKeys.obsId().set(obsId.toString());
     final Parameter<String> downTimeParam = ObserveEventKeys.downTimeReason().set("infra failure");
     final SequencerObserveEvent sequencerObserveEvent = new SequencerObserveEvent(prefix);
-
+    String filename = "some/nested/folder/file123.conf";
+    Parameter<String> filenameParam = JKeyType.StringKey().make("filename").set(filename);
     @Test
     public void createObserveEventwithObsIdParameters__CSW_125() {
         List<TestData> testData = new ArrayList<>(Arrays.asList(
@@ -47,13 +49,11 @@ public class JSequencerObserveEventTest extends JUnitSuite {
     @Test
     public void createObserveEventWithExposureIdParameters__CSW_125() {
         List<TestData> testData = new ArrayList<>(Arrays.asList(
-                new TestData(sequencerObserveEvent.exposureStart(ExposureId.apply(exposureId)), "ObserveEvent.ExposureStart", prefix),
-                new TestData(sequencerObserveEvent.exposureEnd(ExposureId.apply(exposureId)), "ObserveEvent.ExposureEnd", prefix),
-                new TestData(sequencerObserveEvent.readoutEnd(ExposureId.apply(exposureId)), "ObserveEvent.ReadoutEnd", prefix),
-                new TestData(sequencerObserveEvent.readoutFailed(ExposureId.apply(exposureId)), "ObserveEvent.ReadoutFailed", prefix),
-                new TestData(sequencerObserveEvent.dataWriteStart(ExposureId.apply(exposureId)), "ObserveEvent.DataWriteStart", prefix),
-                new TestData(sequencerObserveEvent.dataWriteEnd(ExposureId.apply(exposureId)), "ObserveEvent.DataWriteEnd", prefix),
-                new TestData(sequencerObserveEvent.prepareStart(ExposureId.apply(exposureId)), "ObserveEvent.PrepareStart", prefix)
+                new TestData(sequencerObserveEvent.exposureStart(exposureId), "ObserveEvent.ExposureStart", prefix),
+                new TestData(sequencerObserveEvent.exposureEnd(exposureId), "ObserveEvent.ExposureEnd", prefix),
+                new TestData(sequencerObserveEvent.readoutEnd(exposureId), "ObserveEvent.ReadoutEnd", prefix),
+                new TestData(sequencerObserveEvent.readoutFailed(exposureId), "ObserveEvent.ReadoutFailed", prefix),
+                new TestData(sequencerObserveEvent.prepareStart(exposureId), "ObserveEvent.PrepareStart", prefix)
         ));
         Set<Parameter<?>> paramSet = new HashSet<>(10);
         paramSet.add(exposureIdParam);
@@ -73,6 +73,22 @@ public class JSequencerObserveEventTest extends JUnitSuite {
         Assert.assertEquals(paramSet, event.jParamSet());
         Assert.assertEquals("ObserveEvent.DowntimeStart", event.eventName().name());
         Assert.assertEquals(prefix, event.source());
+    }
+
+    @Test
+    public void shouldCreateEventWithExposureIdAndFilename__CSW_118_CSW_119() {
+        List<JIRDetectorEventTest.TestData> testData = new ArrayList<>(Arrays.asList(
+                new JIRDetectorEventTest.TestData(sequencerObserveEvent.dataWriteStart(exposureId, filename), "ObserveEvent.DataWriteStart"),
+                new JIRDetectorEventTest.TestData(sequencerObserveEvent.dataWriteEnd(exposureId, filename), "ObserveEvent.DataWriteEnd")));
+
+        Set<Parameter<?>> paramSet = new HashSet<>(10);
+        paramSet.add(exposureIdParam);
+        paramSet.add(filenameParam);
+
+        for (JIRDetectorEventTest.TestData data : testData) {
+            assertEvent(data.event, data.expectedName);
+            Assert.assertEquals(paramSet, data.event.jParamSet());
+        }
     }
 
     @Test

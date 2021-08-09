@@ -18,6 +18,8 @@ public class JIRDetectorEventTest extends JUnitSuite {
     Parameter<String> obsIdParam = JKeyType.StringKey().make("obsId").set(obsId.toString());
     ExposureId exposureId = ExposureId.apply("2022A-001-123-IRIS-IMG-DRK1-0023");
     Parameter<String> exposureIdParam = JKeyType.StringKey().make("exposureId").set(exposureId.toString());
+    String filename = "some/nested/folder/file123.conf";
+    Parameter<String> filenameParam = JKeyType.StringKey().make("filename").set(filename);
 
     @Test
     public void shouldCreateIrDetectorObserveEventWithObsId__CSW_118_CSW_119() {
@@ -57,12 +59,26 @@ public class JIRDetectorEventTest extends JUnitSuite {
                 new TestData(IRDetectorEvent.exposureEnd(sourcePrefix, exposureId), "ObserveEvent.ExposureEnd"),
                 new TestData(IRDetectorEvent.readoutEnd(sourcePrefix, exposureId), "ObserveEvent.ReadoutEnd"),
                 new TestData(IRDetectorEvent.readoutFailed(sourcePrefix, exposureId), "ObserveEvent.ReadoutFailed"),
-                new TestData(IRDetectorEvent.dataWriteStart(sourcePrefix, exposureId), "ObserveEvent.DataWriteStart"),
-                new TestData(IRDetectorEvent.dataWriteEnd(sourcePrefix, exposureId), "ObserveEvent.DataWriteEnd"),
                 new TestData(IRDetectorEvent.exposureAborted(sourcePrefix, exposureId), "ObserveEvent.ExposureAborted")));
 
         Set<Parameter<?>> paramSet = new HashSet<>(10);
         paramSet.add(exposureIdParam);
+
+        for (TestData data : testData) {
+            assertEvent(data.event, data.expectedName);
+            Assert.assertEquals(paramSet, data.event.jParamSet());
+        }
+    }
+
+    @Test
+    public void shouldCreateIrDetectorObserveEventWithExposureIdAndFilename__CSW_118_CSW_119() {
+        List<TestData> testData = new ArrayList<>(Arrays.asList(
+                new TestData(IRDetectorEvent.dataWriteStart(sourcePrefix, exposureId, filename), "ObserveEvent.DataWriteStart"),
+                new TestData(IRDetectorEvent.dataWriteEnd(sourcePrefix, exposureId, filename), "ObserveEvent.DataWriteEnd")));
+
+        Set<Parameter<?>> paramSet = new HashSet<>(10);
+        paramSet.add(exposureIdParam);
+        paramSet.add(filenameParam);
 
         for (TestData data : testData) {
             assertEvent(data.event, data.expectedName);

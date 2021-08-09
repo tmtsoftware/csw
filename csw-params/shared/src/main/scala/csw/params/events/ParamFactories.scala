@@ -22,7 +22,7 @@ object ObserveEventKeys {
   val rampsInExposure: Key[Int]        = IntKey.make("rampsInExposure")
   val rampsComplete: Key[Int]          = IntKey.make("rampsComplete")
   val downTimeReason: Key[String]      = StringKey.make("reason")
-
+  val filename: Key[String]            = StringKey.make("filename")
 }
 
 // commonly used params factories
@@ -60,4 +60,6 @@ object ParamFactories {
   def rampsCompleteParam(rampsComplete: Int): Parameter[Int] = ObserveEventKeys.rampsComplete.set(rampsComplete)
 
   def downTimeReasonParam(reasonForDownTime: String): Parameter[String] = ObserveEventKeys.downTimeReason.set(reasonForDownTime)
+
+  def filenameParam(filename: String): Parameter[String] = ObserveEventKeys.filename.set(filename)
 }

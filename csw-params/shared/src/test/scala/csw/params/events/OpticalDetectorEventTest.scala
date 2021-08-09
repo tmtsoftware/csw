@@ -11,6 +11,8 @@ class OpticalDetectorEventTest extends AnyFunSpec with Matchers {
     val sourcePrefix: Prefix   = Prefix("ESW.test")
     val exposureId: ExposureId = ExposureId("2022A-001-123-IRIS-IMG-DRK1-0023")
     val obsId: ObsId           = ObsId("2020A-001-123")
+    val filename               = "some/nested/folder/file123.conf"
+
     it("create Observe Events with obsId | ESW-118, CSW-119") {
       Table(
         ("Observe Event", "Event Name"),
@@ -35,6 +37,18 @@ class OpticalDetectorEventTest extends AnyFunSpec with Matchers {
       })
     }
 
+    it("should create observe event with exposureId and filename | CSW-118, CSW-119") {
+      Table(
+        ("Observe event", "event name", "prefix"),
+        (OpticalDetectorEvent.dataWriteStart(sourcePrefix, exposureId, filename), "ObserveEvent.DataWriteStart", sourcePrefix),
+        (OpticalDetectorEvent.dataWriteEnd(sourcePrefix, exposureId, filename), "ObserveEvent.DataWriteEnd", sourcePrefix)
+      ).forEvery((observeEvent, eventName, sourcePrefix) => {
+        observeEvent.eventName.name shouldBe eventName
+        observeEvent.source shouldBe sourcePrefix
+        observeEvent.paramSet shouldBe Set(ParamFactories.exposureIdParam(exposureId), ParamFactories.filenameParam(filename))
+      })
+    }
+
     it("create Observe Events with obsId and exposure id | ESW-118, CSW-119") {
       Table(
         ("Observe Event", "Event Name"),
@@ -43,8 +57,6 @@ class OpticalDetectorEventTest extends AnyFunSpec with Matchers {
         (OpticalDetectorEvent.exposureEnd(sourcePrefix, exposureId), "ObserveEvent.ExposureEnd"),
         (OpticalDetectorEvent.readoutEnd(sourcePrefix, exposureId), "ObserveEvent.ReadoutEnd"),
         (OpticalDetectorEvent.readoutFailed(sourcePrefix, exposureId), "ObserveEvent.ReadoutFailed"),
-        (OpticalDetectorEvent.dataWriteStart(sourcePrefix, exposureId), "ObserveEvent.DataWriteStart"),
-        (OpticalDetectorEvent.dataWriteEnd(sourcePrefix, exposureId), "ObserveEvent.DataWriteEnd"),
         (OpticalDetectorEvent.exposureAborted(sourcePrefix, exposureId), "ObserveEvent.ExposureAborted")
       ).forEvery((observeEvent, expectedEventName) => {
         observeEvent.eventName shouldBe EventName(expectedEventName)

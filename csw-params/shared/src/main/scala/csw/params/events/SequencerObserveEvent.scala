@@ -26,25 +26,25 @@ case class SequencerObserveEvent(prefix: Prefix) {
   def observeEnd(obsId: ObsId): ObserveEvent = createObserveEvent(ObserveEventNames.ObserveEnd, obsId)
 
   def exposureStart(exposureId: ExposureId): ObserveEvent =
-    createObserveEventWithExposureId(ObserveEventNames.ExposureStart, exposureId)
+    createObserveEvent(ObserveEventNames.ExposureStart, exposureId)
 
   def exposureEnd(exposureId: ExposureId): ObserveEvent =
-    createObserveEventWithExposureId(ObserveEventNames.ExposureEnd, exposureId)
+    createObserveEvent(ObserveEventNames.ExposureEnd, exposureId)
 
   def readoutEnd(exposureId: ExposureId): ObserveEvent =
-    createObserveEventWithExposureId(ObserveEventNames.ReadoutEnd, exposureId)
+    createObserveEvent(ObserveEventNames.ReadoutEnd, exposureId)
 
   def readoutFailed(exposureId: ExposureId): ObserveEvent =
-    createObserveEventWithExposureId(ObserveEventNames.ReadoutFailed, exposureId)
+    createObserveEvent(ObserveEventNames.ReadoutFailed, exposureId)
 
-  def dataWriteStart(exposureId: ExposureId): ObserveEvent =
-    createObserveEventWithExposureId(ObserveEventNames.DataWriteStart, exposureId)
+  def dataWriteStart(exposureId: ExposureId, filename: String): ObserveEvent =
+    createObserveEvent(ObserveEventNames.DataWriteStart, exposureId, filename)
 
-  def dataWriteEnd(exposureId: ExposureId): ObserveEvent =
-    createObserveEventWithExposureId(ObserveEventNames.DataWriteEnd, exposureId)
+  def dataWriteEnd(exposureId: ExposureId, filename: String): ObserveEvent =
+    createObserveEvent(ObserveEventNames.DataWriteEnd, exposureId, filename)
 
   def prepareStart(exposureId: ExposureId): ObserveEvent =
-    createObserveEventWithExposureId(ObserveEventNames.PrepareStart, exposureId)
+    createObserveEvent(ObserveEventNames.PrepareStart, exposureId)
 
   def observePaused(): ObserveEvent = ObserveEvent(prefix, ObserveEventNames.ObservePaused)
 
@@ -59,7 +59,11 @@ case class SequencerObserveEvent(prefix: Prefix) {
   private def createObserveEvent(eventName: EventName, obsId: ObsId) =
     ObserveEvent(prefix, eventName, Set(ParamFactories.obsIdParam(obsId)))
 
-  private def createObserveEventWithExposureId(eventName: EventName, exposureId: ExposureId) = {
+  private def createObserveEvent(eventName: EventName, exposureId: ExposureId) = {
     ObserveEvent(prefix, eventName, Set(ParamFactories.exposureIdParam(exposureId)))
+  }
+
+  private def createObserveEvent(eventName: EventName, exposureId: ExposureId, filename: String) = {
+    ObserveEvent(prefix, eventName, Set(ParamFactories.exposureIdParam(exposureId), ParamFactories.filenameParam(filename)))
   }
 }

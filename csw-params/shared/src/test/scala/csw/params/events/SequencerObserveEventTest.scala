@@ -17,6 +17,7 @@ class SequencerObserveEventTest extends AnyFunSpec with Matchers {
     val obsIdParam: Parameter[_]      = ObserveEventKeys.obsId.set(obsId)
     val exposureIdParam: Parameter[_] = ObserveEventKeys.exposureId.set(exposureId.toString)
     val sequencerObserveEvent         = SequencerObserveEvent(prefix)
+    val filename                      = "some/nested/folder/file123.conf"
 
     it("create Observe Event with obsId parameters | CSW-125") {
       Table(
@@ -46,13 +47,23 @@ class SequencerObserveEventTest extends AnyFunSpec with Matchers {
         (sequencerObserveEvent.exposureEnd(exposureId), "ObserveEvent.ExposureEnd", prefix),
         (sequencerObserveEvent.readoutEnd(exposureId), "ObserveEvent.ReadoutEnd", prefix),
         (sequencerObserveEvent.readoutFailed(exposureId), "ObserveEvent.ReadoutFailed", prefix),
-        (sequencerObserveEvent.dataWriteStart(exposureId), "ObserveEvent.DataWriteStart", prefix),
-        (sequencerObserveEvent.dataWriteEnd(exposureId), "ObserveEvent.DataWriteEnd", prefix),
         (sequencerObserveEvent.prepareStart(exposureId), "ObserveEvent.PrepareStart", prefix)
       ).forEvery((observeEvent, expectedEventName, expectedPrefixStr) => {
         observeEvent.eventName should ===(EventName(expectedEventName))
         observeEvent.source should ===(expectedPrefixStr)
         observeEvent.paramSet shouldBe Set(exposureIdParam)
+      })
+    }
+
+    it("should create observe event with exposureId and filename | CSW-118, CSW-119") {
+      Table(
+        ("Observe event", "event name", "prefix"),
+        (sequencerObserveEvent.dataWriteStart(exposureId, filename), "ObserveEvent.DataWriteStart", prefix),
+        (sequencerObserveEvent.dataWriteEnd(exposureId, filename), "ObserveEvent.DataWriteEnd", prefix)
+      ).forEvery((observeEvent, eventName, sourcePrefix) => {
+        observeEvent.eventName.name shouldBe eventName
+        observeEvent.source shouldBe sourcePrefix
+        observeEvent.paramSet shouldBe Set(exposureIdParam, ParamFactories.filenameParam(filename))
       })
     }
 

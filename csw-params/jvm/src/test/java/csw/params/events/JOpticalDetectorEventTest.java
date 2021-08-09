@@ -21,9 +21,11 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
     ExposureId exposureId = ExposureId.apply("2022A-001-123-IRIS-IMG-DRK1-0023");
     Parameter<String> obsIdParam = JKeyType.StringKey().make("obsId").set(obsId.toString());
     Parameter<String> exposureIdParam = JKeyType.StringKey().make("exposureId").set(exposureId.toString());
+    String filename = "some/nested/folder/file123.conf";
+    Parameter<String> filenameParam = JKeyType.StringKey().make("filename").set(filename);
 
     @Test
-    public void shouldCreateIrDetectorObserveEventWithObsId__CSW_118_CSW_119() {
+    public void shouldOpticalDetectorEventWithObsId__CSW_118_CSW_119() {
         List<TestData> testData = new ArrayList<>(Arrays.asList(
                 new TestData(OpticalDetectorEvent.observeStart(sourcePrefix, obsId), "ObserveEvent.ObserveStart"),
                 new TestData(OpticalDetectorEvent.observeEnd(sourcePrefix, obsId), "ObserveEvent.ObserveEnd")
@@ -39,7 +41,7 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
     }
 
     @Test
-    public void shouldCreateIrDetectorObserveEventWithoutObsId__CSW_118_CSW_119() {
+    public void shouldOpticalDetectorEventWithoutObsId__CSW_118_CSW_119() {
         List<TestData> testData = new ArrayList<>(Arrays.asList(
                 new TestData(OpticalDetectorEvent.observeStart(sourcePrefix), "ObserveEvent.ObserveStart"),
                 new TestData(OpticalDetectorEvent.observeEnd(sourcePrefix), "ObserveEvent.ObserveEnd")
@@ -55,15 +57,13 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
 
 
     @Test
-    public void shouldCreateIrDetectorObserveEventWithExposureId__CSW_118_CSW_119() {
+    public void shouldOpticalDetectorEventWithExposureId__CSW_118_CSW_119() {
         List<TestData> testData = new ArrayList<>(Arrays.asList(
                 new TestData(OpticalDetectorEvent.prepareStart(sourcePrefix, exposureId), "ObserveEvent.PrepareStart"),
                 new TestData(OpticalDetectorEvent.exposureStart(sourcePrefix, exposureId), "ObserveEvent.ExposureStart"),
                 new TestData(OpticalDetectorEvent.exposureEnd(sourcePrefix, exposureId), "ObserveEvent.ExposureEnd"),
                 new TestData(OpticalDetectorEvent.readoutEnd(sourcePrefix, exposureId), "ObserveEvent.ReadoutEnd"),
                 new TestData(OpticalDetectorEvent.readoutFailed(sourcePrefix, exposureId), "ObserveEvent.ReadoutFailed"),
-                new TestData(OpticalDetectorEvent.dataWriteStart(sourcePrefix, exposureId), "ObserveEvent.DataWriteStart"),
-                new TestData(OpticalDetectorEvent.dataWriteEnd(sourcePrefix, exposureId), "ObserveEvent.DataWriteEnd"),
                 new TestData(OpticalDetectorEvent.exposureAborted(sourcePrefix, exposureId), "ObserveEvent.ExposureAborted")
         ));
 
@@ -71,6 +71,22 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
         paramSet.add(exposureIdParam);
 
         for (TestData data : testData) {
+            assertEvent(data.event, data.expectedName);
+            Assert.assertEquals(paramSet, data.event.jParamSet());
+        }
+    }
+
+    @Test
+    public void shouldOpticalDetectorEventWithExposureIdAndFilename__CSW_118_CSW_119() {
+        List<JIRDetectorEventTest.TestData> testData = new ArrayList<>(Arrays.asList(
+                new JIRDetectorEventTest.TestData(OpticalDetectorEvent.dataWriteStart(sourcePrefix, exposureId, filename), "ObserveEvent.DataWriteStart"),
+                new JIRDetectorEventTest.TestData(OpticalDetectorEvent.dataWriteEnd(sourcePrefix, exposureId, filename), "ObserveEvent.DataWriteEnd")));
+
+        Set<Parameter<?>> paramSet = new HashSet<>(10);
+        paramSet.add(exposureIdParam);
+        paramSet.add(filenameParam);
+
+        for (JIRDetectorEventTest.TestData data : testData) {
             assertEvent(data.event, data.expectedName);
             Assert.assertEquals(paramSet, data.event.jParamSet());
         }

@@ -11,6 +11,8 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
     val sourcePrefix           = Prefix("ESW.filter.wheel")
     val obsId                  = ObsId("2020A-001-123")
     val exposureId: ExposureId = ExposureId("2022A-001-123-IRIS-IMG-DRK1-0023")
+    val filename               = "some/nested/folder/file123.conf";
+
     it("should create observe event with obsId and exposure id parameters | CSW-118, CSW-119") {
       Table(
         ("Observe event", "event name", "prefix"),
@@ -18,8 +20,6 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
         (IRDetectorEvent.exposureEnd(sourcePrefix, exposureId), "ObserveEvent.ExposureEnd", sourcePrefix),
         (IRDetectorEvent.readoutEnd(sourcePrefix, exposureId), "ObserveEvent.ReadoutEnd", sourcePrefix),
         (IRDetectorEvent.readoutFailed(sourcePrefix, exposureId), "ObserveEvent.ReadoutFailed", sourcePrefix),
-        (IRDetectorEvent.dataWriteStart(sourcePrefix, exposureId), "ObserveEvent.DataWriteStart", sourcePrefix),
-        (IRDetectorEvent.dataWriteEnd(sourcePrefix, exposureId), "ObserveEvent.DataWriteEnd", sourcePrefix),
         (IRDetectorEvent.exposureAborted(sourcePrefix, exposureId), "ObserveEvent.ExposureAborted", sourcePrefix)
       ).forEvery((observeEvent, eventName, sourcePrefix) => {
         observeEvent.eventName.name shouldBe eventName
@@ -36,6 +36,18 @@ class IRDetectorEventTest extends AnyFunSpec with Matchers {
         observeEvent.eventName.name shouldBe eventName
         observeEvent.source shouldBe sourcePrefix
         observeEvent.paramSet shouldBe Set(ParamFactories.obsIdParam(obsId))
+      })
+    }
+
+    it("should create observe event with exposureId and filename | CSW-118, CSW-119") {
+      Table(
+        ("Observe event", "event name", "prefix"),
+        (IRDetectorEvent.dataWriteStart(sourcePrefix, exposureId, filename), "ObserveEvent.DataWriteStart", sourcePrefix),
+        (IRDetectorEvent.dataWriteEnd(sourcePrefix, exposureId, filename), "ObserveEvent.DataWriteEnd", sourcePrefix)
+      ).forEvery((observeEvent, eventName, sourcePrefix) => {
+        observeEvent.eventName.name shouldBe eventName
+        observeEvent.source shouldBe sourcePrefix
+        observeEvent.paramSet shouldBe Set(ParamFactories.exposureIdParam(exposureId), ParamFactories.filenameParam(filename))
       })
     }
 
