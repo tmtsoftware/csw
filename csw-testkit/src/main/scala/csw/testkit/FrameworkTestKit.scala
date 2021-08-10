@@ -190,7 +190,10 @@ final class FrameworkTestKit private (
     redisClient.shutdown()
     TestKitUtils.shutdown(frameworkWiring.actorRuntime.shutdown(), timeout)
     locationTestKit.shutdownLocationServer()
-    if (configStarted) configTestKit.deleteServerFiles(); configTestKit.terminateServer()
+    if (configStarted) {
+      configTestKit.deleteServerFiles()
+      configTestKit.terminateServer()
+    }
     if (eventStarted) eventTestKit.stopRedis()
     if (alarmStarted) alarmTestKit.stopRedis()
     if (locationWithAuthStarted) locationTestkitWithAuth.shutdownLocationServer()
