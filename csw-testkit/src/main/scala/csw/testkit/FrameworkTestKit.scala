@@ -188,8 +188,6 @@ final class FrameworkTestKit private (
    */
   def shutdown(): Unit = {
     redisClient.shutdown()
-    TestKitUtils.shutdown(frameworkWiring.actorRuntime.shutdown(), timeout)
-    locationTestKit.shutdownLocationServer()
     if (configStarted) {
       configTestKit.deleteServerFiles()
       configTestKit.terminateServer()
@@ -197,6 +195,8 @@ final class FrameworkTestKit private (
     if (eventStarted) eventTestKit.stopRedis()
     if (alarmStarted) alarmTestKit.stopRedis()
     if (locationWithAuthStarted) locationTestkitWithAuth.shutdownLocationServer()
+    TestKitUtils.shutdown(frameworkWiring.actorRuntime.shutdown(), timeout)
+    locationTestKit.shutdownLocationServer()
   }
 }
 
