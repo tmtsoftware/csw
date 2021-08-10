@@ -88,6 +88,15 @@ public class JSampleHcdTest extends JUnitSuite {
         // Sleep for 5 seconds, to allow HCD to publish events
         Thread.sleep(5000);
 
+        // FIXME flaky: REASON -
+        //  Total sleep = 7 seconds (2 + 5), subscriber listens for all the events between 2-7 seconds
+        //  1)  If HCD publish starts at 1st second
+        //      then events published at 1, 3, 5, 7, 9 etc. seconds
+        //      In this case, subscriber will receive events at 2(initial), 3, 5, 7, i.e. total 4 events
+        //  2)  If HCD publish starts at 1.5th seconds
+        //      then events published at 1.5, 3.5, 5.5, 7.5, 9.5 etc. seconds
+        //      In this case, subscriber will receive events at 2(initial), 3.5, 5.5, i.e. total 3 events
+
         // Event publishing period is 2 seconds.
         // Expecting 3 events
         Assert.assertEquals(3, subscriptionEventList.size());
