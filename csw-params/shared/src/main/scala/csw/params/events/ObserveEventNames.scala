@@ -39,5 +39,9 @@ object ObserveEventNames {
   val ObserveResumed: EventName    = eventName("ObserveResumed")
   val DowntimeStart: EventName     = eventName("DowntimeStart")
 
+  // DMS specific
+  val MetadataAvailable: EventName = eventName("MetadataAvailable")
+  val ExposureAvailable: EventName = eventName("ExposureAvailable")
+
   private def eventName(name: String) = EventName(s"ObserveEvent.$name")
 }
