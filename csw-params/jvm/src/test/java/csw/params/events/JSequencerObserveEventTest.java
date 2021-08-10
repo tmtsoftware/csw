@@ -53,7 +53,8 @@ public class JSequencerObserveEventTest extends JUnitSuite {
                 new TestData(sequencerObserveEvent.exposureEnd(exposureId), "ObserveEvent.ExposureEnd", prefix),
                 new TestData(sequencerObserveEvent.readoutEnd(exposureId), "ObserveEvent.ReadoutEnd", prefix),
                 new TestData(sequencerObserveEvent.readoutFailed(exposureId), "ObserveEvent.ReadoutFailed", prefix),
-                new TestData(sequencerObserveEvent.prepareStart(exposureId), "ObserveEvent.PrepareStart", prefix)
+                new TestData(sequencerObserveEvent.prepareStart(exposureId), "ObserveEvent.PrepareStart", prefix),
+                new TestData(sequencerObserveEvent.exposureAborted(exposureId), "ObserveEvent.ExposureAborted", prefix)
         ));
         Set<Parameter<?>> paramSet = new HashSet<>(10);
         paramSet.add(exposureIdParam);

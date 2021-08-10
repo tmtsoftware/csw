@@ -47,7 +47,8 @@ class SequencerObserveEventTest extends AnyFunSpec with Matchers {
         (sequencerObserveEvent.exposureEnd(exposureId), "ObserveEvent.ExposureEnd", prefix),
         (sequencerObserveEvent.readoutEnd(exposureId), "ObserveEvent.ReadoutEnd", prefix),
         (sequencerObserveEvent.readoutFailed(exposureId), "ObserveEvent.ReadoutFailed", prefix),
-        (sequencerObserveEvent.prepareStart(exposureId), "ObserveEvent.PrepareStart", prefix)
+        (sequencerObserveEvent.prepareStart(exposureId), "ObserveEvent.PrepareStart", prefix),
+        (sequencerObserveEvent.exposureAborted(exposureId), "ObserveEvent.ExposureAborted", prefix)
       ).forEvery((observeEvent, expectedEventName, expectedPrefixStr) => {
         observeEvent.eventName should ===(EventName(expectedEventName))
         observeEvent.source should ===(expectedPrefixStr)
