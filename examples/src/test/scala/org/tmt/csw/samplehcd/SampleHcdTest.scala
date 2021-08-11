@@ -1,6 +1,5 @@
 package org.tmt.csw.samplehcd
 
-import akka.actor.typed.ActorSystem
 import akka.util.Timeout
 import csw.command.client.CommandServiceFactory
 import csw.location.api.models.ComponentType.HCD
@@ -82,7 +81,6 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
   //#subscribe
 
   //#submit
-  implicit val typedActorSystem: ActorSystem[_] = actorSystem
   test("should be able to send sleep command to HCD") {
     import scala.concurrent.duration._
     implicit val sleepCommandTimeout: Timeout = Timeout(10000.millis)
