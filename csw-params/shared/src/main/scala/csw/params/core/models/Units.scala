@@ -11,12 +11,14 @@ import scala.collection.immutable
  */
 sealed abstract class Units(name: String, description: String) extends EnumEntry {
   // Should parameterize Units so concat can be created concat[A, B]
-//  override def toString: String = "[" + name + "]"
+  override def toString: String = name
+
+  override lazy val entryName: String = getClass.getSimpleName.stripSuffix("$")
 
   /**
    * The name of the unit
    */
-  def getName: String = s"[$name]"
+  def getName: String = name
 
   /**
    * The description of unit
