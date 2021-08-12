@@ -53,16 +53,6 @@ CREATE USER <username>;
 ALTER USER <username> WITH PASSWORD '<mypassword>';
 ```
 
-On Linux systems it may be necessary to edit the `pg_hba.conf` temp file used by the Database Service to allow
-logging in without a password long enough to create a user and assign a password. 
-Assuming the Database Service is running (after running `csw-services start`), edit `/tmp/pg_hba.conf*.tmp`
-and replace `password` with `trust`. Then get the process id of the postgres process and send it the HUP signal:
-```
-ps auwx | grep postgres
-kill -HUP <postgresPid>
-```
-After that you should be able to use the above psql command to login and create a user.
-
 On MacOS, when Postgres is installed with `brew`, a Postgres user with your user name is automatically created.
 @@@
 
