@@ -123,17 +123,6 @@ Java
 :   @@snip [JKeysAndParametersTest.java](../../../../examples/src/test/java/example/params/JKeysAndParametersTest.java) { #choice }
 
 
-### Struct
-
-Structs can be used to create a hierarchy of parameters. The following snippet also demonstrates some of the utility functions
-available for manipulating parameter sets:
-
-Scala
-:   @@snip [KeysAndParametersTest.scala](../../../../examples/src/test/scala/example/params/KeysAndParametersTest.scala) { #struct }
-
-Java
-:   @@snip [JKeysAndParametersTest.java](../../../../examples/src/test/java/example/params/JKeysAndParametersTest.java) { #struct }
-
 ## Source Code for Examples
 
 * [Scala Example]($github.base_url$/examples/src/test/scala/example/params/KeysAndParametersTest.scala)

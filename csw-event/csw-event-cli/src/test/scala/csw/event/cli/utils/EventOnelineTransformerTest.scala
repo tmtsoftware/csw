@@ -35,7 +35,7 @@ class EventOnelineTransformerTest extends AnyFunSuite with Matchers {
 
   test("should be able to get specified paths for event in oneline format") {
 
-    val options       = Options(cmd = "get", eventsMap = Map(event1.eventKey -> Set("epoch", "struct-1/dec")))
+    val options       = Options(cmd = "get", eventsMap = Map(event1.eventKey -> Set("epoch", "dec")))
     val onelineOutput = new EventOnelineTransformer(options).transform(List(event1))
 
     onelineOutput shouldEqualContentsOf "oneline/full_paths.txt"
@@ -44,19 +44,12 @@ class EventOnelineTransformerTest extends AnyFunSuite with Matchers {
   test("should be able to get paths for multiple events in oneline format") {
 
     val options =
-      Options(cmd = "get", eventsMap = Map(event1.eventKey -> Set("epoch"), event2.eventKey -> Set("struct-2/struct-1/ra")))
+      Options(cmd = "get", eventsMap = Map(event1.eventKey -> Set("epoch"), event2.eventKey -> Set("ra")))
 
     val onelineOutput = new EventOnelineTransformer(options).transform(List(event1, event2))
     onelineOutput shouldEqualContentsOf "oneline/get_multiple_paths.txt"
   }
 
-  test("should be able to get partial struct paths from event in oneline format") {
-
-    val options       = Options(cmd = "get", eventsMap = Map(event2.eventKey -> Set("struct-2")))
-    val onelineOutput = new EventOnelineTransformer(options).transform(List(event2))
-
-    onelineOutput shouldEqualContentsOf "oneline/get_partial_struct_path.txt"
-  }
 
   test("should be able to log timestamp in oneline format") {
 

@@ -1,6 +1,5 @@
 package csw.params.core.generics;
 
-import csw.params.core.models.Struct;
 import csw.params.javadsl.JKeyType;
 import csw.time.core.models.TAITime;
 import csw.time.core.models.UTCTime;
@@ -334,43 +333,6 @@ public class JSimpleKeyTypeTest extends JUnitSuite {
         Assert.assertEquals(degree, parameterWithUnits.units());
 
         Assert.assertArrayEquals(paramData, (String[]) parameterWithUnits.values());
-        Assert.assertEquals(paramData[0], parameterWithUnits.get(0).get());
-        Assert.assertEquals(paramData[1], parameterWithUnits.value(1));
-        Assert.assertEquals(paramData[0], parameterWithUnits.head());
-        Assert.assertEquals(paramData.length, parameterWithUnits.size());
-    }
-
-    @Test
-    public void testStructKeyParameter__DEOPSCSW_183_DEOPSCSW_185_DEOPSCSW_190_DEOPSCSW_184() {
-        String keyName = "StructKey";
-        Key<Struct> key = JKeyType.StructKey().make(keyName, NoUnits);
-
-        Key<String> ra = JKeyType.StringKey().make("ra", NoUnits);
-        Key<String> dec = JKeyType.StringKey().make("dec", NoUnits);
-        Key<Double> epoch = JKeyType.DoubleKey().make("epoch", year);
-
-        Struct struct1 = (Struct) new Struct().madd(ra.set("12:13:14.1"), dec.set("32:33:34.4"), epoch.set(1950.0));
-        Struct struct2 = (Struct) new Struct().madd(ra.set("22:23:24.2"), dec.set("42:43:44.4"), epoch.set(2950.0));
-
-        Struct[] paramData = {struct1, struct2};
-        Assert.assertEquals(keyName, key.keyName());
-        Assert.assertEquals(JKeyType.StructKey(), key.keyType());
-
-        // key.set without Units
-        Parameter<Struct> parameterWithoutUnits = key.setAll(paramData);
-
-        Assert.assertArrayEquals(paramData, (Struct[]) parameterWithoutUnits.values());
-
-        Assert.assertEquals(paramData[0], parameterWithoutUnits.get(0).get());
-        Assert.assertEquals(paramData[1], parameterWithoutUnits.value(1));
-        Assert.assertEquals(paramData[0], parameterWithoutUnits.head());
-        Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
-
-        // key.set with Units
-        Parameter<Struct> parameterWithUnits = key.setAll(paramData);
-        Assert.assertEquals(NoUnits, parameterWithUnits.units());
-
-        Assert.assertArrayEquals(paramData, (Struct[]) parameterWithUnits.values());
         Assert.assertEquals(paramData[0], parameterWithUnits.get(0).get());
         Assert.assertEquals(paramData[1], parameterWithUnits.value(1));
         Assert.assertEquals(paramData[0], parameterWithUnits.head());

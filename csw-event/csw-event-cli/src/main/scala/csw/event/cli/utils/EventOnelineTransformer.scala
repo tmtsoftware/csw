@@ -1,9 +1,7 @@
 package csw.event.cli.utils
 
 import csw.event.cli.args.Options
-import csw.params.core.generics.KeyType.StructKey
 import csw.params.core.generics.Parameter
-import csw.params.core.models.Struct
 import csw.params.events.Event
 
 class EventOnelineTransformer(options: Options) {
@@ -23,19 +21,14 @@ class EventOnelineTransformer(options: Options) {
     else List(onelines)
   }
 
-  private def makeCurrentPath(param: Parameter[_], parentKey: Option[String]) =
-    if (parentKey.isDefined) s"${parentKey.get}/${param.keyName}"
-    else param.keyName
-
-  private def traverse(params: Set[Parameter[_]], paths: List[String], parentKey: Option[String] = None): List[Oneline] =
+  private def traverse(params: Set[Parameter[_]], paths: List[String]): List[Oneline] =
     params.toList.flatMap { param =>
-      val currentPath = makeCurrentPath(param, parentKey)
+      val currentPath = param.keyName
 
       param.keyType match {
-        case StructKey =>
-          val nestedParams = param.values.flatMap(_.asInstanceOf[Struct].paramSet).toSet
-          traverse(nestedParams, paths, Some(currentPath))
-        case _ if paths.isEmpty || paths.contains(currentPath) || paths.exists(p => currentPath.contains(p)) =>
+        case _
+            if paths.isEmpty || paths.contains(currentPath)
+            =>
           List(Oneline(currentPath, param))
         case _ => Nil
       }

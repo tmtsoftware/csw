@@ -18,7 +18,6 @@ object Data {
   private val taiTimeKey    = KeyType.TAITimeKey.make("tai-times")
   private val arrayDataKey  = KeyType.IntArrayKey.make("intarrays")
   private val matrixDataKey = KeyType.IntMatrixKey.make("intmatrices")
-  private val structKey     = KeyType.StructKey.make("structs")
 
   private val paramSet: Set[Parameter[_]] = Set(
     byteKey.set(100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100),
@@ -50,9 +49,8 @@ object Data {
       "100"
     )
   )
-  private val baseEvent       = SystemEvent(Prefix("a.b"), EventName("eventName1"))
-  val data: Parameter[Struct] = structKey.setAll((1 to 150).map(_ => Struct(paramSet)).toArray)
-  val bigEvent: SystemEvent   = baseEvent.copy(paramSet = Set(data))
+  private val baseEvent     = SystemEvent(Prefix("a.b"), EventName("eventName1"))
+  val bigEvent: SystemEvent = baseEvent.copy(paramSet = paramSet)
 
   val smallEvent: SystemEvent = baseEvent.copy(
     paramSet = Set(
@@ -60,8 +58,7 @@ object Data {
       choiceKey.set(Choice("100")),
       taiTimeKey.set(TAITime(Instant.ofEpochSecond(20, 20))),
       arrayDataKey.set(ArrayData(Array(10, 20, 30))),
-      matrixDataKey.set(MatrixData.fromArrays(Array(Array(10, 20, 30)))),
-      structKey.set(Struct(Set(KeyType.IntKey.make("ints").set(4, 5, 6))))
+      matrixDataKey.set(MatrixData.fromArrays(Array(Array(10, 20, 30))))
     )
   )
 }

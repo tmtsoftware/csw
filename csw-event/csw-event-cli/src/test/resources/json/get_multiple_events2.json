@@ -6,34 +6,10 @@
   "eventTime": "2018-07-02T09:23:26.477Z",
   "paramSet": [
     {
-      "StructKey": {
-        "keyName": "struct-2",
+      "StringKey": {
+        "keyName": "ra",
         "values": [
-          {
-            "paramSet": [
-              {
-                "StructKey": {
-                  "keyName": "struct-1",
-                  "values": [
-                    {
-                      "paramSet": [
-                        {
-                          "StringKey": {
-                            "keyName": "ra",
-                            "values": [
-                              "12:13:14.1"
-                            ],
-                            "units": "NoUnits"
-                          }
-                        }
-                      ]
-                    }
-                  ],
-                  "units": "NoUnits"
-                }
-              }
-            ]
-          }
+          "12:13:14.1"
         ],
         "units": "NoUnits"
       }
