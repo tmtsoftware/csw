@@ -50,7 +50,6 @@ class EventOnelineTransformerTest extends AnyFunSuite with Matchers {
     onelineOutput shouldEqualContentsOf "oneline/get_multiple_paths.txt"
   }
 
-
   test("should be able to log timestamp in oneline format") {
 
     val options       = Options(cmd = "get", eventsMap = Map(event1.eventKey -> Set("epoch")), printTimestamp = true)

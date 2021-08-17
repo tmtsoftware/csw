@@ -49,7 +49,7 @@ object Data {
       "100"
     )
   )
-  private val baseEvent     = SystemEvent(Prefix("a.b"), EventName("eventName1"))
+  private val baseEvent     = SystemEvent(Prefix("ESW.b"), EventName("eventName1"))
   val bigEvent: SystemEvent = baseEvent.copy(paramSet = paramSet)
 
   val smallEvent: SystemEvent = baseEvent.copy(

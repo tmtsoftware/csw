@@ -26,9 +26,7 @@ class EventOnelineTransformer(options: Options) {
       val currentPath = param.keyName
 
       param.keyType match {
-        case _
-            if paths.isEmpty || paths.contains(currentPath)
-            =>
+        case _ if paths.isEmpty || paths.contains(currentPath) =>
           List(Oneline(currentPath, param))
         case _ => Nil
       }
