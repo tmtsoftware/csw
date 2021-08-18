@@ -50,7 +50,7 @@ csw-event-cli inspect -e wfos.prog.cloudcover,wfos.prog.filter
 
 Takes a comma separated list of events with nested key paths and displays event information including values either in one-line or JSON format.
 
-- `-e`, `--events`     comma separated list of events in the form of `<event1:key1>,<event2:key2:key3>`, use `:` to separate multiple keys for same event. Ex. `-e a.b.c:struct1/ra,x.y.z:struct2/dec:epoch`
+- `-e`, `--events`     comma separated list of events in the form of `<event1:key1>,<event2:key2:key3>`, use `:` to separate multiple keys for same event. Ex. `-e a.b.c:ra,x.y.z:dec:epoch`
 - `-o`, `--out`        output format, default is one-line
 - `-t`, `--timestamp`  display timestamp
 - `--id`               display event id
@@ -152,7 +152,7 @@ Takes a comma separated list of Events with nested key paths and displays contin
 along with `timestamp`, `event id` and `units` of tge provided keys in one-line format as soon as there is an Event published for the key `wfos.prog.cloudcover`.
 
     ```bash
-    csw-event-cli subscribe -e wfos.prog.cloudcover:struct1/ra:epoch -t --id -u
+    csw-event-cli subscribe -e wfos.prog.cloudcover:ra:epoch -t --id -u
     ```
 
 3. Subscribes to the Event key `wfos.prog.cloudcover` and displays all key information at provided interval <500ms>.
