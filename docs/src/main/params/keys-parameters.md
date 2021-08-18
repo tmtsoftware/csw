@@ -81,7 +81,6 @@ Java
 | Primitive       | Scala KeyType               | Java KeyType                   | 
 | :-------------: |:--------------------------: | :-----------------------------:|  
 | Choice          | KeyType.ChoiceKey           | JKeyType.ChoiceKey            |
-| Struct          | KeyType.StructKey           | JKeyType.StructKey            |
 
 ## Coordinate Types
 
@@ -111,6 +110,9 @@ Scala
 Java
 :   @@snip [JKeysAndParametersTest.java](../../../../examples/src/test/java/example/params/JKeysAndParametersTest.java) { #coords }
 
+### Struct
+
+Struct got removed in 4.0.0 version.
 
 ### Choice
 
