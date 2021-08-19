@@ -19,6 +19,7 @@ object CommandContract extends CommandData with CommandServiceCodecs {
     ModelType[Parameter[_]](paramSet.toList),
     ModelType(KeyType),
     ModelType(Units),
+    ModelType(UnitsMap.value),
     ModelType(result),
     ModelType[SubmitResponse](cancelled, completed, error, invalid, locked, started),
     ModelType[OnewayResponse](accepted, invalid, locked),
