@@ -48,7 +48,7 @@ Loads the alarm data in the alarm store
 * `--local` - this specifies that the config file must be read from the local disk
 * `--reset` - this is an optional parameter to clear previous data before loading the new one. By default, it is `false`.
 
-#### Example
+#### Example of init api
 
 The command below clears the alarm store and loads alarm data to the alarm store from `/path/allAlarms.conf`, which is the path of a local file.
 ```bash
@@ -65,7 +65,7 @@ will be displayed.
 * `--metadata` - is an optional parameter to get only the metadata of alarms
 * `--status` - is an optional parameter to get only the status of the alarms
 
-#### Examples
+#### Examples of list api
 
 1.  Displays metadata, status and severity of alarm with name `tromboneAxisLowLimitAlarm` of component `trombone` and subsystem `nfiraos`.
     ```bash
@@ -88,7 +88,7 @@ Commands given below are specific to an alarm. All of commands must be provided 
 ## acknowledge
 Sets the acknowledgement status of the alarm to `Acknowledged`
 
-#### Example
+#### Example of acknowledge api
 
 Acknowledge the alarm with name `tromboneAxisLowLimitAlarm` of component `trombone` and subsystem `nfiraos`.
 ```bash
@@ -98,7 +98,7 @@ csw-alarm-cli acknowledge --subsystem nfiraos --component trombone --name trombo
 ## unacknowledge
 Sets the acknowledgement status of the alarm to `Unacknowledged`
 
-#### Example
+#### Example of unacknowledge api
 
 Unacknowledge the alarm with name `tromboneAxisLowLimitAlarm` of component `trombone` and subsystem `nfiraos`.
 ```bash
@@ -108,7 +108,7 @@ csw-alarm-cli unacknowledge --subsystem nfiraos --component trombone --name trom
 ## activate
 Sets the activation status of the alarm to `Active`
 
-#### Example
+#### Example of activate api
 
 Sets activation status to `Active` of the alarm with name `tromboneAxisLowLimitAlarm` of component `trombone` and subsystem `nfiraos`.
 ```bash
@@ -128,7 +128,7 @@ csw-alarm-cli inactivate --subsystem nfiraos --component trombone --name trombon
 ## shelve
 Sets the shelve status of the alarm to `Shelved`
 
-#### Example
+#### Example of shelve api
 
 Shelves the alarm with name `tromboneAxisLowLimitAlarm` of component `trombone` and subsystem `nfiraos`.
 ```bash
@@ -138,7 +138,7 @@ csw-alarm-cli shelve --subsystem nfiraos --component trombone --name tromboneAxi
 ## unshelve
 Sets the shelve status of the alarm to `Unshelved`
 
-#### Example
+#### Example of unshelve api
 
 Unshelves the alarm with name `tromboneAxisLowLimitAlarm` of component `trombone` and subsystem `nfiraos`.
 ```bash
@@ -149,7 +149,7 @@ csw-alarm-cli unshelve --subsystem nfiraos --component trombone --name tromboneA
 Resets the alarm status. This will set the acknowledgement Status to `Acknowledged` and the latched severity to the current
 severity of the alarm.
 
-#### Example
+#### Example of reset api
 
 Resets the alarm with name `tromboneAxisLowLimitAlarm` of component `trombone` and subsystem `nfiraos`.
 ```bash
@@ -160,7 +160,7 @@ csw-alarm-cli reset --subsystem nfiraos --component trombone --name tromboneAxis
 
 Severity command contains 3 sub-commands.
 
-### get
+### get severity
 Used to get the severity of the subsystem, component or alarm. If none of the optional parameters are given, then the severity
 of whole TMT system will be displayed.
 
@@ -174,7 +174,7 @@ For a single alarm, current severity will be displayed. For a system, subsystem 
 * `--component` - is an optional parameter to get the severity of a specific component's alarms. `--subsystem` must be specified with this parameter.
 * `--name` - is an optional parameter to get the severity of a specific alarm. `--subsystem` and `--component` must be specified with this parameter.
 
-#### Examples
+#### Examples of getting severity
 
 1.  Displays the severity of the alarm with name `tromboneAxisLowLimitAlarm` of component `trombone` and subsystem `nfiraos`.
     ```bash
@@ -195,7 +195,7 @@ Sets the given severity for the specified alarm
 * `--name` - is a parameter to specify the name alarm
 * `--refresh` - is an optional parameter to refresh severity after every 3 seconds
 
-#### Examples
+#### Examples of setting severity 
 
 1.  Sets `Major` as the severity of the alarm with name `tromboneAxisLowLimitAlarm` of component `trombone` and subsystem `nfiraos`.
     ```bash
@@ -208,7 +208,7 @@ every 3 seconds.
     csw-alarm-cli severity set major --subsystem nfiraos --component trombone --name tromboneAxisLowLimitAlarm --refresh
     ```
 
-### subscribe
+### subscribe severity api
 Subscribes to the severity changes of the whole TMT system, subsystem, component or an alarm. If none of the optional parameters
 are given then the severity of the whole TMT system will be displayed.
 
@@ -222,7 +222,7 @@ For a single alarm, the current severity will be displayed. For system, subsyste
 * `--component` - is an optional parameter to get the severity of a specific component's alarms. `--subsystem` must be specified with this parameter.
 * `--name` - is an optional parameter to get the severity of a specific alarm. `--subsystem` and `--component` must be specified with this parameter.
 
-#### Example
+#### Example of severity api
 
 Subscribes to the aggregated severity of a component with name `trombone` and subsystem `nfiraos`.
 ```bash
@@ -233,7 +233,7 @@ csw-alarm-cli severity subscribe --subsystem nfiraos --component trombone
 
 Health command contains two sub-commands.
 
-### get
+### get health
 
 Gets the health of the whole TMT system, subsystem, component or alarm. If none of the optional parameters are given, then
 the health of the whole TMT system will be displayed.
@@ -248,7 +248,7 @@ For a single alarm, the current health will be displayed. For the system, subsys
 * `--component` - is an optional parameter to get the health of a specific component's alarms. `--subsystem` must be specified with this parameter.
 * `--name` - is an optional parameter to get the health of a specific alarm. `--subsystem` and `--component` must be specified with this parameter.
 
-#### Examples
+#### Examples of getting health
 
 1.  Displays the health of the alarm with name `tromboneAxisLowLimitAlarm` of component `trombone` and subsystem `nfiraos`.
     ```bash
@@ -263,7 +263,7 @@ For a single alarm, the current health will be displayed. For the system, subsys
     ./csw-alarm-cli health get --subsystem nfiraos
     ```
 
-### subscribe
+### subscribe health api
 Subscribes to the health changes of the whole TMT system, subsystem, component or an alarm. If none of the optional parameters are given, then the health of the whole TMT system will be displayed.
 
 @@@ note
@@ -276,7 +276,7 @@ For a single alarm, current health will be displayed. For the system, subsystem 
 * `--component` - is an optional parameter to get the health of a specific component's alarms. `--subsystem` must be specified with this parameter.
 * `--name` - is an optional parameter to get the health of a specific alarm. `--subsystem` and `--component` must be specified with this parameter.
 
-#### Examples
+#### Examples of subscribing to health api
 
 Subscribes to the aggregated health of the subsystem with name `nfiraos`.
 ```bash

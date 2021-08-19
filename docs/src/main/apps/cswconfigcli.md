@@ -53,7 +53,7 @@ For development and testing purposes, AAS comes pre-bundled with the following u
 These credentials will not be available in actual production environment.
 @@@ 
 
-### Examples
+### Examples of login api
 
 1.  The command below opens up default browser on your machine and asks you to provide username and password. 
 Once you provide valid credentials, AAS will respond with an access token, refresh token etc. which get stored on the local filesystem.
@@ -92,7 +92,7 @@ Takes an input source file and creates the configuration in the repository at a 
  * `--annex` is optional parameter. Add this option to specify if the input file must be saved to annex store. This is usually the case if file is binary/large(>10 MiB)
  * `-c, --comment` optional create comment
  
-#### Examples
+#### Examples of create api
 
 1.  Creates a config file at path `/path/hcd/trombone.conf`, using the local file at `/Users/admin/configs/trombone.conf`, with `Initial version` as a comment.
     ```bash
@@ -112,7 +112,7 @@ Overwrites the file specified in the repository by the input file.
  * `-i`, `--in` is input file path
  * `-c, --comment` optional create comment
  
-#### Example
+#### Example of update api
 
 Updates repository file `/path/hcd/trombone.conf`, with a local file at `/Users/foo/new_trombone.conf`, using the specified comment.
 ```bash
@@ -127,7 +127,7 @@ Retrieves a file for a given path and saves it to the output file. The latest fi
  * `--id` optional. if specified this id will be matched
  * `--date` optional. if specified will get the file matching this date. Format: 2017-04-16T16:15:23.503Z
  
-#### Examples
+#### Examples of get api
 
 1.  Gets repository file `/path/hcd/trombone.conf`, stores at the local disk location `/Users/bar/temp/latest_trombone.conf`
     
@@ -148,7 +148,7 @@ Deletes the file at the specified path in the repository.
   * 'relativeRepoPath' is path in the repository
   * `-c, --comment` optional delete comment
   
-#### Example
+#### Example of delete api
 
 Deletes the repository file `/path/hcd/outdated_trombone.conf`, if it exists, using a comment
 
@@ -169,7 +169,7 @@ Shows the version history of the file in the repository.
 * 'relativeRepoPath' is path in the repository
 * `--max` optional parameter, indicating the maximum number of files to be retrieved
 
-#### Example
+#### Example of history api
 
 Prints the history of repository file `/path/hcd/trombone.conf`, with only 25 entries.
 ```bash
@@ -184,7 +184,7 @@ Sets the active version of the file in the repository.
  * `--id` optional parameter, specifying the version ID of the repository file to set as active.
  * `-c, --comment` optional delete comment
  
-#### Example
+#### Example of setActiveVersion api
 
 Sets revision 4 to be active for the repository file `/path/hcd/trombone.conf`, using a comment.
 ```bash
@@ -198,7 +198,7 @@ Resets the active version to the latest version for the specified file path.
   * 'relativeRepoPath' is path in the repository
   * `-c, --comment` optional reset comment
   
-#### Example
+#### Example of resetActiveVersion api
 
 Sets latest revision to be active for the repository file `/path/hcd/trombone.conf`, using a comment.
 ```bash
@@ -210,7 +210,7 @@ Gets the ID of the active version of the file in the repository.
 
  * 'relativeRepoPath' is path in the repository
  
-#### Example
+#### Example of getActiveVersion api
 
 Gets active version ID for the repository file `/path/hcd/trombone.conf`.
 ```bash
@@ -224,7 +224,7 @@ Gets the file that was active at a specified time.
   * `-o`, `--out` is output file path
   * `--date` optional. If specified, will get the active file matching this date. Format: 2017-04-16T16:15:23.503Z
   
-#### Example
+#### Example of getActiveByTime api
 
 Gets version of teh repository file `/path/hcd/trombone.conf`, that was active on `2017-05-09T07:29:53.242Z`, and saves it to local disk.
 ```bash
@@ -235,7 +235,7 @@ csw-config-cli getActiveByTime /path/hcd/trombone.conf -o /usr/tmp/last_week_tro
 ### getMetadata
 Gets the metadata of the Configuration Service server e.g. repository directory, annex directory, min annex file size, max config file size.
 
-#### Example
+#### Example of getMetadata api
 
 Prints the metadata on screen.
 ```bash
@@ -250,7 +250,7 @@ Checks if the file exists at specified path in the repository.
 
  * 'relativeRepoPath' is path in the repository
  
-#### Example
+#### Example of exists api
 
 True if repository file `/path/hcd/trombone.conf` exists, false otherwise
 ```bash
@@ -262,7 +262,7 @@ Retrieves active file for a given path from the Configuration Service and writes
   * 'relativeRepoPath' is path in the repository
   * `-o`, `--out` is output file path
   
-#### Example
+#### Example of getActive api
 
 Gets currently active version of the repository file `/path/hcd/trombone.conf`, stores to the local disk location `/Users/bar/temp/scheduled_trombone.conf`
 ```bash

@@ -77,7 +77,7 @@ A `SubmitResponse` is returned to the caller when the `submit` message is used.
 If the `validateCommand` handler returns `Accepted`, the framework calls the `onSubmit` handler of the Top Level
 Actor. The `onSubmit` handler always returns a `SubmitResponse`.
 
-####Immediate Completion Scenario
+####Immediate Completion Scenario (submit)
 If the actions of the `submit` command take a very short time to complete, they may be completed by the 
 `onSubmit` handler.  This is called *immediate completion*. The time for the actions to complete should be
 less than 1 second. (Note: The framework will timeout if the destination does not return a response within 1 second.)
@@ -89,7 +89,7 @@ The immediate completion behavior is similar to a remote procedure call although
 If the actions are successful, the `Completed` `SubmitResponse` is returned. If there is a result, the
 `Completed` is returned with a parameter set of `Result` type that can be inspected by the sender.
 
-####Long Running Actions Scenario
+####Long Running Actions Scenario (submit)
 When actions take longer than 1 second, `onSubmit` should start the actions and return the `Started` `SubmitResponse`. The
 `Started` response indicates to the framework that long-running actions have been started.
 
@@ -106,7 +106,7 @@ A `SubmitResponse` is returned to the caller when the `submitAndWait` message is
 If the `validateCommand` handler returns `Accepted`, the framework calls the `onSubmit` handler of the Top Level
 Actor. The `onSubmit` handler always returns a `SubmitResponse`.
 
-####Immediate Completion Scenario
+####Immediate Completion Scenario (submitAndWait)
 If the actions of the `submitAndWait` command take a very short time to complete, `submitAndWait` behaves exactly
 like `submit` as described above.
 
@@ -114,7 +114,7 @@ The immediate completion behavior is similar to a remote procedure call although
 If the actions are successful, the `Completed` `SubmitResponse` is returned. If there is a result, the
 `Completed` is returned with a parameter set of `Result` type that can be inspected by the sender.
 
-####Long Running Actions Scenario
+####Long Running Actions Scenario (submitAndWait)
 When actions take longer than 1 second, `onSubmit` should start the actions and return the `Started` `SubmitResponse`. The
 `Started` response indicates to the framework that long-running actions have been started. In this case, `submitAndWait`
 immediately executes a `queryFinal` command in order to wait for the final response.

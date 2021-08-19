@@ -36,7 +36,7 @@ Takes a comma separated list of events and displays each event's parameter infor
 
 - `-e`, `--events` : comma separated list of events to inspect
 
-#### Example
+#### Example of inspect api
 
 ```bash
 csw-event-cli inspect -e wfos.prog.cloudcover,wfos.prog.filter
@@ -56,7 +56,7 @@ Takes a comma separated list of events with keys and displays event information 
 - `--id`               display event id
 - `-u`, `--units`      display units
 
-#### Examples
+#### Examples of get api
 
 1. Displays all keys information in one-line form for event `wfos.prog.cloudcover`
 
@@ -107,7 +107,7 @@ If `--data` & `--params` are provided together, then the Event is generated from
 Option `-p` should be used with `-i`, otherwise `-p` is ignored. 
 @@@
 
-#### Examples
+#### Examples of publish api
 
 1. Creates event from provided JSON file and publishes it with key `wfos.prog.cloudcover` to the Event Server.
 
@@ -140,7 +140,7 @@ Takes a comma separated list of Events with keys and displays continuous stream 
 - `--id`               display event id
 - `-u`, `--units`      display units
 
-#### Examples
+#### Examples of subscribe api
 
 1. Subscribes to Event key `wfos.prog.cloudcover` and displays all key information as soon as there is an Event published for key `wfos.prog.cloudcover` with the one-line format.
 
