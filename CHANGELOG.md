@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - Changed default unit for `UTCTimeKey` & `TAITimeKey` from `second` to `utc` & `tai` respectively. 
 - Added new `WrongCommandTypeIssue` entry in `CommandIssue`.
 - Removed `RaDec` from `KeyType`. Alternatively user can use `Coord` special KeyType to capture original use cases for RaDec.
+- Removed `Struct` from `Key`. It was mentioned in the earlier release that `Struct` will be removed.
 
 ## [CSW v3.0.1] - 2021-01-28
 

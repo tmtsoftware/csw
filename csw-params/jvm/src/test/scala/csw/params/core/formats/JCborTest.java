@@ -57,7 +57,6 @@ public class JCborTest extends JUnitSuite {
 
         return Arrays.asList(new Object[][]{
                 {"JChoiceKey", JKeyType.ChoiceKey().make("choiceKey", Choices.from("A", "B", "C")).set(new Choice("A"))},
-                {"JStructKey", JKeyType.StructKey().make("structKey").set(new Struct().add(JKeyType.SolarSystemCoordKey().make("solarKey").set(new Coords.SolarSystemCoord(new Coords.Tag("solar"), JCoords.Jupiter()))))},
                 {"JStringKey", JKeyType.StringKey().make("stringKey").set("str1", "str2")},
                 {"JUTCTimeKey", JKeyType.UTCTimeKey().make("UTCTimeKey").set(UTCTime.now())},
                 {"JTAITimeKey", JKeyType.UTCTimeKey().make("TAITimeKey").set(UTCTime.now())},

@@ -25,38 +25,6 @@
       }
     },
     {
-      "StructKey": {
-        "keyName": "StructKey",
-        "values": [
-          {
-            "paramSet": [
-              {
-                "BooleanKey": {
-                  "keyName": "BooleanKey",
-                  "values": [
-                    true,
-                    false
-                  ],
-                  "units": "NoUnits"
-                }
-              },
-              {
-                "ByteKey": {
-                  "keyName": "ByteKey",
-                  "values": [
-                    10,
-                    20
-                  ],
-                  "units": "NoUnits"
-                }
-              }
-            ]
-          }
-        ],
-        "units": "NoUnits"
-      }
-    },
-    {
       "IntArrayKey": {
         "keyName": "IntArrayKey",
         "values": [

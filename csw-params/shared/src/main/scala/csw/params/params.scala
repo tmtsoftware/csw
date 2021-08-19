@@ -81,7 +81,6 @@ package csw
  *       | DoubleMatrix | KeyType.DoubleMatrixKey | JKeyType.DoubleMatrixKey |
  *       | ----------   | ----------              | ----------               |
  *       | Choice       | KeyType.ChoiceKey       | JKeyType.ChoiceKey       |
- *       | Struct       | KeyType.StructKey       | JKeyType.StructKey       |
  *       +--------------+-------------------------+---------------------------+
  *
  * }}}

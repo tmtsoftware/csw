@@ -38,13 +38,6 @@ class CommandLineRunnerTest extends SeedData with Eventually with CommonCodecs {
   import cliWiring._
   import actorRuntime._
 
-  // DEOPSCSW-364: [Event Cli] Inspect command
-  test("should able to inspect events containing multiple parameters including recursive structs | DEOPSCSW-364") {
-
-    commandLineRunner.inspect(argsParser.parse(Seq("inspect", "-e", s"${event1.eventKey},${event2.eventKey}")).get).await
-    logBuffer shouldEqualContentsOf "oneline/inspect_multiple_events.txt"
-  }
-
   // DEOPSCSW-431: [Event Cli] Get command
   test("should able to get events in json format | DEOPSCSW-431") {
 

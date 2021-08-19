@@ -51,7 +51,6 @@ object JKeyType {
   val CoordKey            = KeyType.CoordKey
 
   val StringKey  = KeyType.StringKey
-  val StructKey  = KeyType.StructKey
   val UTCTimeKey = KeyType.UTCTimeKey
   val TAITimeKey = KeyType.TAITimeKey
 

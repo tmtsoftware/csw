@@ -1150,26 +1150,6 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
     }
   }
 
-  describe("testing StructItem") {
-    it("should allow creating Struct items | DEOPSCSW-183, DEOPSCSW-185, DEOPSCSW-188, DEOPSCSW-184, DEOPSCSW-196") {
-      val skey = StructKey.make("myStruct")
-
-      val ra    = KeyType.StringKey.make("ra", degree)
-      val dec   = KeyType.StringKey.make("dec", degree)
-      val epoch = KeyType.DoubleKey.make("epoch", year)
-      val sc1   = Struct().madd(ra.set("12:13:14.1"), dec.set("32:33:34.4"), epoch.set(1950.0))
-
-      val citem = skey.set(sc1)
-
-      assert(citem.size == 1)
-      assert(citem.head.size == 3)
-      assert(citem.head.get(ra).head.head == "12:13:14.1")
-      assert(citem.head.get(dec).head.head == "32:33:34.4")
-      assert(citem.head.get(epoch).head.head == 1950.0)
-
-    }
-  }
-
   // DEOPSCSW-190: Implement Unit Support
   // DEOPSCSW-184: Change configurations - attributes and values
   describe("test setting multiple values") {

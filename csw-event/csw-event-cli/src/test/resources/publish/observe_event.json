@@ -6,40 +6,28 @@
   "eventTime": "2017-08-09T06:40:00.898Z",
   "paramSet": [
     {
-      "StructKey": {
-        "keyName": "myStruct",
+      "StringKey": {
+        "keyName": "ra",
         "values": [
-          {
-            "paramSet": [
-              {
-                "StringKey": {
-                  "keyName": "ra",
-                  "values": [
-                    "12:13:14.1"
-                  ],
-                  "units": "NoUnits"
-                }
-              },
-              {
-                "StringKey": {
-                  "keyName": "dec",
-                  "values": [
-                    "32:33:34.4"
-                  ],
-                  "units": "NoUnits"
-                }
-              },
-              {
-                "DoubleKey": {
-                  "keyName": "epoch",
-                  "values": [
-                    1950.0
-                  ],
-                  "units": "NoUnits"
-                }
-              }
-            ]
-          }
+          "12:13:14.1"
+        ],
+        "units": "NoUnits"
+      }
+    },
+    {
+      "StringKey": {
+        "keyName": "dec",
+        "values": [
+          "32:33:34.4"
+        ],
+        "units": "NoUnits"
+      }
+    },
+    {
+      "DoubleKey": {
+        "keyName": "epoch",
+        "values": [
+          1950.0
         ],
         "units": "NoUnits"
       }

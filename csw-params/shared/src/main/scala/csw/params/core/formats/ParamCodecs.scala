@@ -108,9 +108,6 @@ trait ParamCodecsBase extends CommonCodecs {
     ParamCore.toParam(Map(keyTypeName -> paramCore))
   }
 
-  // ************************ Struct Codecs ********************
-  implicit lazy val structCodec: Codec[Struct] = MapBasedCodecs.deriveCodec
-
   // ************************ Event Codecs ********************
   implicit lazy val idCodec: Codec[Id]               = deriveCodec
   implicit lazy val eventNameCodec: Codec[EventName] = deriveCodec

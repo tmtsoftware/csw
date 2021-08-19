@@ -485,27 +485,4 @@ class JsonTest extends AnyFunSpec {
     }
   }
 
-  describe("testing StructItem JSON support") {
-    it("should allow Struct values | DEOPSCSW-183, DEOPSCSW-188") {
-      val k1    = StructKey.make("myStruct")
-      val ra    = StringKey.make("ra")
-      val dec   = StringKey.make("dec")
-      val epoch = DoubleKey.make("epoch")
-      val c1    = Struct().madd(ra.set("12:13:14.1"), dec.set("32:33:34.4"), epoch.set(1950.0))
-      val c2    = Struct().madd(ra.set("12:13:15.2"), dec.set("32:33:35.5"), epoch.set(1950.0))
-
-      val i1: Parameter[Struct] = k1.set(c1, c2)
-
-      val sc1 = Setup(ck, CommandName("move"), Some(obsId)).add(i1)
-      assert(sc1(k1).head == c1)
-      assert(sc1(k1).value(1) == c2)
-
-      val sc1out = JsonSupport.writeSequenceCommand(sc1)
-
-      val sc1in: Setup = JsonSupport.readSequenceCommand[Setup](sc1out)
-      assert(sc1.equals(sc1in))
-      assert(sc1in(k1).head == c1)
-      assert(sc1in(k1).head.get(ra).head.head == "12:13:14.1")
-    }
-  }
 }

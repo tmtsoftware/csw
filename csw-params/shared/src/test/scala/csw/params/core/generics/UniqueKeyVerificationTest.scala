@@ -1,7 +1,7 @@
 package csw.params.core.generics
 
 import csw.params.commands._
-import csw.params.core.models.{Id, ObsId, Struct}
+import csw.params.core.models.{Id, ObsId}
 import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.params.events._
 import csw.prefix.models.Prefix
@@ -104,25 +104,6 @@ class UniqueKeyVerificationTest extends AnyFunSpec with Matchers {
       //parameters with duplicate key via constructor
       val result =
         Result(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3)
-      result.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
-
-      //parameters with duplicate key via add + madd
-      val changedResult = result.add(encParam3).madd(filterParam1, filterParam2, filterParam3)
-      changedResult.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
-
-      //parameter with unique key and parameter with duplicate key
-      val finalResult = result.madd(Set(miscParam1, encParam1))
-      finalResult.paramSet.toList
-        .map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName, miscKey.keyName)
-    }
-  }
-
-  describe("Test Struct") {
-
-    it("is able to remove duplicate keys | DEOPSCSW-184") {
-
-      //parameters with duplicate key via constructor
-      val result = Struct(Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
       result.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
       //parameters with duplicate key via add + madd

@@ -2,7 +2,7 @@ package csw.params.core.formats
 
 import csw.params.commands.{CommandName, Observe, Setup, Wait}
 import csw.params.core.generics.KeyType
-import csw.params.core.generics.KeyType.{LongMatrixKey, StructKey}
+import csw.params.core.generics.KeyType.LongMatrixKey
 import csw.params.core.models.Coords.{SolarSystemCoord, Tag}
 import csw.params.core.models.Coords.SolarSystemObject.{Jupiter, Venus}
 import csw.params.core.models.Units.{NoUnits, encoder, meter}
@@ -97,15 +97,15 @@ class JsonContractTest extends AnyFunSpec with Matchers {
     it(
       "should adhere to specified standard ObserveEvent json format | DEOPSCSW-183, DEOPSCSW-188, DEOPSCSW-282, DEOPSCSW-184, DEOPSCSW-423, DEOPSCSW-401"
     ) {
-      val structKey = StructKey.make("myStruct")
 
-      val ra         = KeyType.StringKey.make("ra")
-      val dec        = KeyType.StringKey.make("dec")
-      val epoch      = KeyType.DoubleKey.make("epoch")
-      val structItem = Struct().madd(ra.set("12:13:14.1"), dec.set("32:33:34.4"), epoch.set(1950.0))
+      val ra        = KeyType.StringKey.make("ra")
+      val dec       = KeyType.StringKey.make("dec")
+      val epoch     = KeyType.DoubleKey.make("epoch")
+      val raItem    = ra.set("12:13:14.1")
+      val decItem   = dec.set("32:33:34.4")
+      val epochItem = epoch.set(1950.0)
 
-      val structParam        = structKey.set(structItem)
-      val observeEvent       = ObserveEvent(eventId, prefix, eventName, eventTime, Set(structParam))
+      val observeEvent       = ObserveEvent(eventId, prefix, eventName, eventTime, Set(raItem, decItem, epochItem))
       val observeEventToJson = JsonSupport.writeEvent(observeEvent)
 
       val expectedObserveEventJson =

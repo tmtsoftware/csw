@@ -100,7 +100,6 @@ object KeyType extends Enum[KeyType[_]] {
   }
 
   case object StringKey  extends SimpleKeyType[String]
-  case object StructKey  extends SimpleKeyType[Struct]
   case object UTCTimeKey extends SimpleKeyTypeWithUnits[UTCTime](utc)
   case object TAITimeKey extends SimpleKeyTypeWithUnits[TAITime](tai)
 

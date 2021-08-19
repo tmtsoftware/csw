@@ -227,67 +227,6 @@ public class JKeysAndParametersTest extends JUnitSuite {
         //#coords
     }
 
-    @Test
-    public void showUsageOfStruct() {
-        //#struct
-        //keys
-        Key<Struct> skey = JKeyType.StructKey().make("myStruct", JUnits.NoUnits);
-
-        Key<String> ra = JKeyType.StringKey().make("ra", JUnits.NoUnits);
-        Key<String> dec = JKeyType.StringKey().make("dec", JUnits.NoUnits);
-        Key<Double> epoch = JKeyType.DoubleKey().make("epoch", JUnits.year);
-
-        //initialize struct
-        Struct struct1 = new Struct().madd(
-                ra.set("12:13:14.1"),
-                dec.set("32:33:34.4"),
-                epoch.set(1950.0));
-        Struct struct2 = new Struct().madd(
-                dec.set("32:33:34.4"),
-                ra.set("12:13:14.1"),
-                epoch.set(1970.0));
-
-        //make parameters
-        Parameter<Struct> p1 = skey.set(struct1);
-        Parameter<Struct> p2 = skey.set(struct1, struct2);
-
-        //add units
-        Parameter<Struct> paramWithLightYear = p1.withUnits(JUnits.lightyear);
-
-        //default unit is NoUnits()
-        boolean bDefaultUnit = JUnits.NoUnits == p1.units();
-
-        //retrieving values
-        Struct head = p1.head();
-        List<Struct> structs = p2.jValues();
-
-        //get individual keys
-        Optional<Parameter<String>> firstKey = struct1.jGet(JKeyType.StringKey().make("ra", JUnits.NoUnits));
-        Optional<Parameter<String>> secondKey = struct1.jGet("dec", JKeyType.StringKey());
-        Optional<Parameter<Double>> thirdKey = struct1.jGet("epoch", JKeyType.DoubleKey());
-
-        //access parameter using 'parameter' and 'apply' method
-        boolean bSuccess = struct1.parameter(ra) == struct1.apply(ra);
-
-        //remove a parameter and verify it doesn't exist
-        Struct mutated1 = struct1.remove(ra); //using key
-        Struct mutated2 = struct1.remove(firstKey.orElseThrow());
-
-        //find out missing keys
-        Set<String> missingKeySet = mutated1.jMissingKeys(ra, dec, epoch, JKeyType.StringKey().make("someRandomKey", JUnits.NoUnits));
-        Set<String> expectedMissingKeys = Set.of("ra", "someRandomKey");
-        //#struct
-
-        //validations
-        Assert.assertTrue(bDefaultUnit);
-        Assert.assertEquals(struct1, head);
-        Assert.assertEquals(JUnits.lightyear, paramWithLightYear.units());
-        Assert.assertEquals(struct1.parameter(dec), secondKey.orElseThrow());
-        Assert.assertEquals(struct1.parameter(epoch), thirdKey.orElseThrow());
-        Assert.assertEquals(expectedMissingKeys, missingKeySet);
-        Assert.assertFalse(mutated1.exists(ra));
-        Assert.assertFalse(mutated2.exists(ra));
-    }
 
     @Test
     public void showUsageOfUnits() {

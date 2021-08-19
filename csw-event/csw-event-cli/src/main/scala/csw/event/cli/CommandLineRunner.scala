@@ -79,6 +79,7 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
   private def processEvent(options: Options, event: Event): Unit =
     if (options.isJsonOut) processGetJson(event, options)
     else new EventOnelineTransformer(options).transform(event).foreach(printLine)
+
   private def processGetJson(event: Event, options: Options): Unit = {
     if (event.isInvalid) printLine(Formatter.invalidKey(event.eventKey))
     else {

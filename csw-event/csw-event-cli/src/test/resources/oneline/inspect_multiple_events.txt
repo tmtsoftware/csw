@@ -2,15 +2,13 @@
 EventKey: WFOS.prog.cloudcover.move
 
 epoch = DoubleKey[none]
-struct-1/dec = StringKey[none]
-struct-1/ra = StringKey[none]
+dec = StringKey[none]
+ra = StringKey[none]
 ===============================================================================================================
 EventKey: WFOS.prog.filter.stop
 
-struct-2/dec = StringKey[none]
-struct-2/ra = StringKey[none]
-struct-2/struct-1/dec = StringKey[none]
-struct-2/struct-1/ra = StringKey[none]
+dec = StringKey[none]
+ra = StringKey[none]
 temperature = StringKey[K]
 utcTime = UTCTimeKey[UTC]
 ===============================================================================================================
