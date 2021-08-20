@@ -21,4 +21,5 @@ Make sure to replace the `host` and `port` of the running location service on lo
 
 ## Change
 
-This is the base version - 3
+This is version 4 of CSW-contracts.
+

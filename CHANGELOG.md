@@ -9,7 +9,12 @@ The product is in a new repository: [csw](https://github.com/tmtsoftware/csw).
 
 All notable changes to this project will be documented in this file.
 
-## [CSW v4.0.0]
+## [CSW v4.0.0-RC1] - 2021-08-20
+
+This is a release candidate 1 for version 4.0.0 of the TMT Common Software for project stakeholders.
+See [here](https://tmtsoftware.github.io/csw/4.0.0-RC1/) for a detailed documentation of this version of the CSW software.
+
+### Changes
 - Added `JDefaultComponentHandlers` and `DefaultComponentHandlers` - default component handlers to create assembly or hcd in both scala and java 
 - Removed `allTags` and `allTagNames` method from `Coords` and `JCoords`
 - Updated app name's with `csw` prefix according to `apps.prod.json` in `osw-apps` repo.
@@ -18,6 +23,12 @@ All notable changes to this project will be documented in this file.
 - Added new `WrongCommandTypeIssue` entry in `CommandIssue`.
 - Removed `RaDec` from `KeyType`. Alternatively user can use `Coord` special KeyType to capture original use cases for RaDec.
 - Removed `Struct` from `Key`. It was mentioned in the earlier release that `Struct` will be removed.
+- Added ObserveEvent Factories for IRDetector, OpticalDetector, WFSDetector & Sequencer.
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/4.0.0-RC1/
+- Scaladoc: https://tmtsoftware.github.io/csw/4.0.0-RC1/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/4.0.0-RC1/api/java/index.html
 
 ## [CSW v3.0.1] - 2021-01-28
 

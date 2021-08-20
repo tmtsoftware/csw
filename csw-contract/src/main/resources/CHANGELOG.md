@@ -1,5 +1,6 @@
 # Change Log
-
+## [v4]
+- WrongCommandTypeIssue model got added.
 ## [v3] 
 
 - Model change for Registration to accommodate metadata
