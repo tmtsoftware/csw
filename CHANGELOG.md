@@ -24,6 +24,8 @@ See [here](https://tmtsoftware.github.io/csw/4.0.0-RC1/) for a detailed document
 - Removed `RaDec` from `KeyType`. Alternatively user can use `Coord` special KeyType to capture original use cases for RaDec.
 - Removed `Struct` from `Key`. It was mentioned in the earlier release that `Struct` will be removed.
 - Added ObserveEvent Factories for IRDetector, OpticalDetector, WFSDetector & Sequencer.
+- Subsystem list got updated as per https://docushare.tmt.org/docushare/dsweb/Services/Document-4780.
+- Added `initAlarms` & `getCurrentSeverity` methods in AlarmTestKit.
 
 ### Documentation
 - Reference paradox documentation: https://tmtsoftware.github.io/csw/4.0.0-RC1/
