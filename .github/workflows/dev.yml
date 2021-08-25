@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: [ master ]
   push:
-    branches: [ master, branch-3.0.x ]
+    branches: [ master, 'branch-*' ]
     paths-ignore:
       - "scripts/**"
       - "tools/**"
