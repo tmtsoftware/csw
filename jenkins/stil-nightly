@@ -114,5 +114,5 @@ def sendNotification(String buildStatus = 'STARTED') {
         )
     }
 
-    slackSend(channel: "#{SLACK_CH}", color: colorCode, message: summary)
+    slackSend(channel: "#${SLACK_CH}", color: colorCode, message: summary)
 }
