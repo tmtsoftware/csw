@@ -12,7 +12,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 sh "git checkout $VERSION"
-                sh "git pull"
+                sh "git pull origin $VERSION"
             }
         }
 
@@ -72,7 +72,7 @@ pipeline {
     post {
         always {
             // Generate RTM
-            sh "./scripts/coursier launch --channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/apps.json rtm:da9dc6cb -- target/RTM/testStoryMapping.txt tools/RTM/cswStoryToRequirementMap.csv target/RTM/testRequirementsMapping.txt"
+            sh "./scripts/coursier launch --channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/apps.json rtm:0.1.0 -- target/RTM/testStoryMapping.txt tools/RTM/cswStoryToRequirementMap.csv target/RTM/testRequirementsMapping.txt"
             // Upload RTM
              publishHTML(target: [
                                         alwaysLinkToLastBuild: false,
@@ -93,7 +93,7 @@ def sendNotification(String buildStatus = 'STARTED') {
     buildStatus = buildStatus ?: 'SUCCESS'
 
     def colorCode = '#FF0000'
-    def subject = "${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"
+    def subject = "${buildStatus}: Job '${env.JOB_NAME}' [${VERSION}] [${env.BUILD_NUMBER}]"
     def summary = "${subject} (${env.BUILD_URL})"
     def details = '${JELLY_SCRIPT,template="html"}'
 
@@ -114,5 +114,5 @@ def sendNotification(String buildStatus = 'STARTED') {
         )
     }
 
-    slackSend(channel: "#ci-nightly", color: colorCode, message: summary)
+    slackSend(channel: "#{SLACK_CH}", color: colorCode, message: summary)
 }
