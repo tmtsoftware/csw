@@ -1,7 +1,7 @@
 package csw.command.client
 
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{ActorRef, Behavior}
+import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import csw.params.commands.CommandIssue.IdNotAvailableIssue
 import csw.params.commands.CommandResponse.{Invalid, Started, SubmitResponse}
 import csw.params.core.models.Id
@@ -52,11 +52,18 @@ object MiniCRM {
     case class GetWaiters(replyTo: ActorRef[List[(Id, ActorRef[SubmitResponse])]]) extends CRMMessage
     case class GetStarters(replTo: ActorRef[List[SubmitResponse]])                 extends CRMMessage
   }
-  import MiniCRMMessage._
+  import MiniCRMMessage.*
 
   //noinspection ScalaStyle
-  def make(startedSize: Int = 10, responseSize: Int = 10, waiterSize: Int = 10): Behavior[CRMMessage] =
-    Behaviors.setup(_ => handle(new StartedList(startedSize), new ResponseList(responseSize), new WaiterList(waiterSize)))
+  def make(startedSize: Option[Int] = None, responseSize: Option[Int] = None, waiterSize: Option[Int] = None)(implicit
+      typedSystem: ActorSystem[?]
+  ): Behavior[CRMMessage] = {
+    lazy val config   = typedSystem.settings.config.getConfig("mini-crm")
+    val _startedSize  = startedSize.getOrElse(config.getInt("started-size"))
+    val _responseSize = responseSize.getOrElse(config.getInt("response-size"))
+    val _waiterSize   = waiterSize.getOrElse(config.getInt("waiter-size"))
+    Behaviors.setup(_ => handle(new StartedList(_startedSize), new ResponseList(_responseSize), new WaiterList(_waiterSize)))
+  }
 
   // scalastyle:off method.length
   // scalastyle:off cyclomatic.complexity

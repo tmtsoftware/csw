@@ -2,7 +2,7 @@ package csw.command.client
 
 import akka.actor.testkit.typed.scaladsl.ActorTestKit
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import csw.command.client.MiniCRM.MiniCRMMessage._
+import csw.command.client.MiniCRM.MiniCRMMessage.*
 import csw.command.client.MiniCRM.{Responses, Starters, Waiters}
 import csw.params.commands.CommandIssue.IdNotAvailableIssue
 import csw.params.commands.CommandResponse.{Completed, Invalid, Started, SubmitResponse}
@@ -11,12 +11,12 @@ import org.scalatest.BeforeAndAfterAll
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 class MiniCRMTest extends AnyFunSuite with Matchers with BeforeAndAfterAll {
 
-  private val actorSystem: ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), "test")
-  private val testKit                                         = ActorTestKit(actorSystem)
+  private implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), "test")
+  private val testKit                                                  = ActorTestKit(actorSystem)
 
   override def afterAll(): Unit = testKit.shutdownTestKit()
 
@@ -268,7 +268,7 @@ class MiniCRMTest extends AnyFunSuite with Matchers with BeforeAndAfterAll {
 
   // This test adds responses to make sure SizedList is removing oldest and restricting size
   test("add responses, check max size") {
-    val crm           = testKit.spawn(MiniCRM.make(2, 2))
+    val crm           = testKit.spawn(MiniCRM.make(Some(2), Some(2)))
     val responseProbe = testKit.createTestProbe[Responses]()
 
     val id1 = Id()
