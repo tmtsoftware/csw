@@ -58,7 +58,7 @@ object MiniCRM {
   def make(startedSize: Option[Int] = None, responseSize: Option[Int] = None, waiterSize: Option[Int] = None)(implicit
       typedSystem: ActorSystem[?]
   ): Behavior[CRMMessage] = {
-    lazy val config   = typedSystem.settings.config.getConfig("mini-crm")
+    lazy val config   = typedSystem.settings.config.getConfig("csw-command-client.mini-crm")
     val _startedSize  = startedSize.getOrElse(config.getInt("started-size"))
     val _responseSize = responseSize.getOrElse(config.getInt("response-size"))
     val _waiterSize   = waiterSize.getOrElse(config.getInt("waiter-size"))
