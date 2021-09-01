@@ -26,6 +26,7 @@ object ContainerCmd {
    *
    * @param name              The name to be used for the main app which uses this utility
    * @param args              The command line args accepted in the main app which uses this utility
+   * @param subsystem         The subsystem which starts the container(used for logging)
    * @param defaultConfig     The default configuration which specifies the container or the component to be started
    * alone without any container
    * @return                  Actor ref of the container or supervisor of the component started without container
