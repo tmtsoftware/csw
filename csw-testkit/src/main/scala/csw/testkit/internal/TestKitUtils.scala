@@ -8,7 +8,7 @@ import akka.util.Timeout
 
 import scala.concurrent.{Await, Future}
 
-private[testkit] object TestKitUtils {
+private[csw] object TestKitUtils {
 
   def await[T](f: Future[T], timeout: Timeout): T = Await.result(f, timeout.duration)
 

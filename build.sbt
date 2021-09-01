@@ -511,6 +511,7 @@ lazy val `csw-testkit` = project
   .dependsOn(
     `csw-location-server`,
     `csw-config-server`,
+    `csw-database`,
     `csw-framework`,
     `csw-commons` % "test->test"
   )
