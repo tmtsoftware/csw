@@ -1,11 +1,12 @@
 package csw.framework.internal.supervisor
 
 import akka.Done
-import akka.actor.typed._
-import akka.actor.typed.scaladsl._
+import akka.actor.typed.*
+import akka.actor.typed.scaladsl.*
 import akka.http.scaladsl.Http.ServerBinding
 import akka.http.scaladsl.server.Route
 import csw.command.client.MiniCRM.MiniCRMMessage
+import csw.command.client.messages.*
 import csw.command.client.messages.ComponentCommonMessage.{
   ComponentStateSubscription,
   GetSupervisorLifecycleState,
@@ -23,12 +24,11 @@ import csw.command.client.messages.SupervisorInternalRunningMessage.{
 }
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.command.client.messages.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
-import csw.command.client.messages._
+import csw.command.client.models.framework.*
 import csw.command.client.models.framework.LocationServiceUsage.DoNotRegister
 import csw.command.client.models.framework.LockingResponse.{LockExpired, LockExpiringShortly}
 import csw.command.client.models.framework.PubSub.Publish
 import csw.command.client.models.framework.ToComponentLifecycleMessage.{GoOffline, GoOnline}
-import csw.command.client.models.framework._
 import csw.framework.exceptions.{FailureRestart, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehavior
 import csw.framework.models.CswContext
@@ -74,8 +74,8 @@ private[framework] final class SupervisorBehavior(
     cswCtx: CswContext
 ) extends AbstractBehavior[SupervisorMessage](ctx) {
 
-  import SupervisorBehavior._
-  import cswCtx._
+  import SupervisorBehavior.*
+  import cswCtx.*
   import ctx.executionContext
 
   private val log: Logger                        = loggerFactory.getLogger(ctx)
@@ -233,12 +233,12 @@ private[framework] final class SupervisorBehavior(
    */
   private def onInternalRunning(internalRunningMessage: SupervisorInternalRunningMessage): Unit =
     internalRunningMessage match {
-      case RegistrationSuccess(componentRef)     => onRegistrationComplete(componentRef)
-      case RegistrationNotRequired(componentRef) => onRegistrationComplete(componentRef)
+      case RegistrationSuccess(componentRef)     => onRegistrationComplete()
+      case RegistrationNotRequired(componentRef) => onRegistrationComplete()
       case RegistrationFailed(throwable)         => onRegistrationFailed(throwable)
     }
 
-  private def onRegistrationComplete(componentRef: ActorRef[RunningMessage]): Unit = {
+  private def onRegistrationComplete(): Unit = {
     maybeContainerRef.foreach { container =>
       container ! SupervisorLifecycleStateChanged(ctx.self, lifecycleState)
       log.debug(s"Supervisor notified container :[$container] for lifecycle state :[$lifecycleState]")
