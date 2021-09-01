@@ -241,7 +241,7 @@ private[framework] final class SupervisorBehavior(
   private def onRegistrationComplete(componentRef: ActorRef[RunningMessage]): Unit = {
     maybeContainerRef.foreach { container =>
       container ! SupervisorLifecycleStateChanged(ctx.self, lifecycleState)
-      log.debug(s"Supervisor acknowledged container :[$container] for lifecycle state :[$lifecycleState]")
+      log.debug(s"Supervisor notified container :[$container] for lifecycle state :[$lifecycleState]")
     }
   }
 
