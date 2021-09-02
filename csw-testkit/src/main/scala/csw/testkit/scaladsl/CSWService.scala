@@ -30,4 +30,5 @@ object CSWService {
   case object ConfigServer           extends CSWService
   case object EventServer            extends CSWService
   case object AlarmServer            extends CSWService
+  case object DatabaseServer         extends CSWService
 }

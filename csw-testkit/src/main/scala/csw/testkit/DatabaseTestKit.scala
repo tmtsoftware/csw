@@ -11,7 +11,6 @@ import csw.network.utils.SocketUtils
 import csw.testkit.database.EmbeddedPG
 import csw.testkit.internal.TestKitUtils
 import org.jooq.DSLContext
-import org.scalatest.concurrent.ScalaFutures.PatienceConfig
 
 /**
  * DatabaseTestKit supports starting Database server using embedded postgres
@@ -36,7 +35,7 @@ import org.scalatest.concurrent.ScalaFutures.PatienceConfig
  *
  * }}}
  */
-final class DatabaseTestKit(_system: ActorSystem[?], testKitSettings: TestKitSettings) extends EmbeddedPG {
+final class DatabaseTestKit private (_system: ActorSystem[?], testKitSettings: TestKitSettings) extends EmbeddedPG {
   override implicit def system: ActorSystem[?] = _system
   override implicit def timeout: Timeout       = testKitSettings.DefaultTimeout
 
