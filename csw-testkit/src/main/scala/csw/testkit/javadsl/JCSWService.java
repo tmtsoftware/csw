@@ -33,4 +33,5 @@ public class JCSWService {
     public static CSWService ConfigServer   = CSWService.ConfigServer$.MODULE$;
     public static CSWService EventServer    = CSWService.EventServer$.MODULE$;
     public static CSWService AlarmServer    = CSWService.AlarmServer$.MODULE$;
+    public static CSWService DatabaseServer    = CSWService.DatabaseServer$.MODULE$;
 }

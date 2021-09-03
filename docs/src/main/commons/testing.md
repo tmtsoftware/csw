@@ -19,6 +19,7 @@ CSW comes with a dedicated `csw-testkit` module for supporting tests. This modul
 - `ConfigTestKit` : starts and stops the Config Server
 - `EventTestKit` : starts and stops the Event Service (Note : This uses `embedded-redis` to start redis sentinel and master)
 - `AlarmTestKit` : starts and stops the Alarm Service (Note : This uses `embedded-redis` to start redis sentinel and master)
+- `DatabaseTestKit` : starts and stops the Database Service (Note : This uses `embedded postgres`)
 - `FrameworkTestKit` : in most of the cases, you will end up using this testkit. `FrameworkTestKit` is created by composing all the above mentioned testkits. Hence, it supports starting and stopping all provided CSW services.
 
 @@@ note
@@ -30,7 +31,7 @@ You do not need to start it explicitly.
 
 ## TestKits
 
-When you really want granular level access to testkits, then only you would want to use `LocationTestKit`|`ConfigTestKit`|`EventTestKit`|`AlarmTestKit`|`FrameworkTestKit` directly.
+When you really want granular level access to testkits, then only you would want to use `LocationTestKit`|`ConfigTestKit`|`EventTestKit`|`AlarmTestKit`|`DatabaseTestKit`|`FrameworkTestKit` directly.
 You can create instance of `FrameworkTestKit` as shown below:
 
 Scala
@@ -102,12 +103,13 @@ If you are using JUnit then you can use `csw.testkit.javadsl.FrameworkTestKitJun
 
 `ScalaTestFrameworkTestKit` and `FrameworkTestKitJunitResource` both support starting one or more of the following services.
 
-| Scala                     | Java                       |
-| ------------------------- | -------------------------- |
-| CSWService.LocationServer | JCSWService.LocationServer |
-| CSWService.ConfigServer   | JCSWService.ConfigServer   |
-| CSWService.EventServer    | JCSWService.EventServer    |
-| CSWService.AlarmServer    | JCSWService.AlarmServer    |
+| Scala                         | Java                          |
+| -------------------------     | --------------------------    |
+| CSWService.LocationServer     | JCSWService.LocationServer    |
+| CSWService.ConfigServer       | JCSWService.ConfigServer      |
+| CSWService.EventServer        | JCSWService.EventServer       |
+| CSWService.AlarmServer        | JCSWService.AlarmServer       |
+| CSWService.DatabaseServer     | JCSWService.DatabaseServer    |
 
 The example below shows the usage of `ScalaTestFrameworkTestKit` and `FrameworkTestKitJunitResource` and how you can start the above mentioned services as per your need.
 
