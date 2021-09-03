@@ -139,10 +139,24 @@ an alarm for testing purposes.
 The example below shows the usage `initAlarms` & `getCurrentSeverity` methods using `AlarmTestKit`.
 
 Scala
-: @@snip [ScalaTestExampleIntegrationTest.scala](../../../../examples/src/test/scala/example/teskit/ScalaAlarmTestKitExampleTest.scala) { #scalatest-alarm-testkit }
+: @@snip [ScalaAlarmTestKitExampleTest.scala](../../../../examples/src/test/scala/example/teskit/ScalaAlarmTestKitExampleTest.scala) { #scalatest-alarm-testkit }
 
 Java
-:   @@snip [JUnitIntegrationExampleTest.scala](../../../../examples/src/test/java/example/testkit/JUnitAlarmTestKitExampleTest.java) { #junit-alarm-testkit }
+:   @@snip [JUnitAlarmTestKitExampleTest.scala](../../../../examples/src/test/java/example/testkit/JUnitAlarmTestKitExampleTest.java) { #junit-alarm-testkit }
+
+### Using dslContext provided by DatabaseTestKit
+
+`DatabaseTestKit` starts embedded postgres with default database, user and password. You can override these defaults by adding custom configurations. For more details refer @ref:[Database Service Documentation](../services/database.md)
+
+The `DatabaseTestKit` also provides methods to create database client and execute queries.
+
+The example below shows the usage `dslContext` & `databaseServiceFactory` methods using `DatabaseTestKit`.
+
+Scala
+: @@snip [ScalaDatabaseTestKitExampleTest.scala](../../../../examples/src/test/scala/example/teskit/ScalaDatabaseTestKitExampleTest.scala) { #scalatest-database-testkit }
+
+Java
+:   @@snip [JUnitDatabaseTestKitExampleTest.scala](../../../../examples/src/test/java/example/testkit/JUnitDatabaseTestKitExampleTest.java) { #junit-database-testkit }
 
 ## Unit Tests
 
