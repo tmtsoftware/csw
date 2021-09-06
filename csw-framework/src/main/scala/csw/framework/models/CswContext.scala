@@ -2,8 +2,8 @@ package csw.framework.models
 import akka.actor.typed.{ActorSystem, Scheduler, SpawnProtocol}
 import csw.alarm.api.scaladsl.AlarmService
 import csw.alarm.client.AlarmServiceFactory
-import csw.command.client.{CommandResponseManager, MiniCRM}
 import csw.command.client.models.framework.ComponentInfo
+import csw.command.client.{CommandResponseManager, MiniCRM}
 import csw.config.api.scaladsl.ConfigClientService
 import csw.config.client.scaladsl.ConfigClientFactory
 import csw.event.api.scaladsl.EventService
@@ -59,6 +59,8 @@ object CswContext {
     implicit val scheduler: Scheduler                            = richSystem.scheduler
     implicit val ec: ExecutionContextExecutor                    = typedSystem.executionContext
 
+    val settings = new Settings(typedSystem.settings.config)
+
     val eventService         = eventServiceFactory.make(locationService)
     val alarmService         = alarmServiceFactory.makeClientApi(locationService)
     val timeServiceScheduler = new TimeServiceSchedulerFactory().make()
@@ -73,7 +75,7 @@ object CswContext {
       val currentStatePublisher = new CurrentStatePublisher(pubSubComponentActor)
 
       // create CommandResponseManager (CRM)
-      val crmBehavior = MiniCRM.make()
+      val crmBehavior = MiniCRM.make(settings.startedSize, settings.responseSize, settings.waiterSize)
       val crmActor    = await(richSystem.spawnTyped(crmBehavior, CommandResponseManagerActorName))
       val crm         = new CommandResponseManager(crmActor)
 

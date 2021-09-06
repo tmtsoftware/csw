@@ -1,7 +1,7 @@
 package csw.command.client
 
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
+import akka.actor.typed.{ActorRef, Behavior}
 import csw.params.commands.CommandIssue.IdNotAvailableIssue
 import csw.params.commands.CommandResponse.{Invalid, Started, SubmitResponse}
 import csw.params.core.models.Id
@@ -55,14 +55,8 @@ object MiniCRM {
   import MiniCRMMessage.*
 
   //noinspection ScalaStyle
-  def make(startedSize: Option[Int] = None, responseSize: Option[Int] = None, waiterSize: Option[Int] = None)(implicit
-      typedSystem: ActorSystem[?]
-  ): Behavior[CRMMessage] = {
-    lazy val config   = typedSystem.settings.config.getConfig("csw-command-client.mini-crm")
-    val _startedSize  = startedSize.getOrElse(config.getInt("started-size"))
-    val _responseSize = responseSize.getOrElse(config.getInt("response-size"))
-    val _waiterSize   = waiterSize.getOrElse(config.getInt("waiter-size"))
-    Behaviors.setup(_ => handle(new StartedList(_startedSize), new ResponseList(_responseSize), new WaiterList(_waiterSize)))
+  def make(startedSize: Int, responseSize: Int, waiterSize: Int): Behavior[CRMMessage] = {
+    Behaviors.setup(_ => handle(new StartedList(startedSize), new ResponseList(responseSize), new WaiterList(waiterSize)))
   }
 
   // scalastyle:off method.length
