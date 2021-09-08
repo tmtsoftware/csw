@@ -59,7 +59,7 @@ object CswContext {
     implicit val scheduler: Scheduler                            = richSystem.scheduler
     implicit val ec: ExecutionContextExecutor                    = typedSystem.executionContext
 
-    val settings = new Settings(typedSystem.settings.config)
+    val settings = new Settings(typedSystem)
 
     val eventService         = eventServiceFactory.make(locationService)
     val alarmService         = alarmServiceFactory.makeClientApi(locationService)

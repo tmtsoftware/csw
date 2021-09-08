@@ -1,9 +1,9 @@
 package csw.framework.models
 
-import com.typesafe.config.Config
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 
-class Settings(config: Config) {
-  private val crmConfig = config.getConfig("csw-command-client.mini-crm")
+class Settings(actorSystem: ActorSystem[SpawnProtocol.Command]) {
+  private val crmConfig = actorSystem.settings.config.getConfig("csw-command-client.mini-crm")
 
   def startedSize: Int  = crmConfig.getInt("started-size")
   def responseSize: Int = crmConfig.getInt("response-size")
