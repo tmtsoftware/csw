@@ -13,6 +13,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+//#CSW-161
 //#junit-database-testkit
 class JUnitDatabaseTestKitExampleTest extends JUnitSuite {
 
