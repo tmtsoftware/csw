@@ -14,7 +14,8 @@
 1. Refer RELEASING.md of `msocket` repo.
 2. Refer RELEASING.md of `embedded-keycloak` repo
 3. Refer RELEASING.md of `sbt-docs` repo.
-2. Use the tagged version of above repos in csw repo.
+4. Refer RELEASING.md of `rtm` repo.
+5. Use the tagged version of above repos in csw repo.
 
 ### Versioning Strategy
 
@@ -27,7 +28,7 @@ A milestone release is cut from master branch as we expect bug fixes / feedback 
 - We cut a branch from master, any changes on master from here onwards will not be considered for this current release.
 - Do not update any third party dependencies. 
   If Secondary packages has some changes after M1 Release of CSW, we update them & use their latest tags. 
-  These secondary packages include `msocket`, `sbt-docs`, `kotlin-plugin` & `embedded-keycloak`.
+  These secondary packages include `msocket`, `embedded-keycloak`, `sbt-docs` & `rtm`.
 - Documentation related updates are allowed on this RC branch, because these changes won't be breaking anything code-wise.
 3. While making `Final` release, we follow: 
 - RC branch will be considered final & not the master branch.
@@ -50,9 +51,10 @@ A milestone release is cut from master branch as we expect bug fixes / feedback 
 10. Bump up the `csw-contract` version (if needed)
 11. Exclude projects from `build.sbt` which you do not want to release
 12. Update secondary packages versions if necessary (this step to be done only in milestone & RC release).
-13. Update versions in `release.yml'` for other repos like `ESW_TS_VERSION` etc. which we will be releasing next. (These versions are used to create parameterized links in the documentation)
-14. Commit and push the changes to `branch-<major>.<minor>.x` branch.
-15. Run `release.sh $VERSION$` script by providing version number argument (This triggers release workflow)
+13. Update latest RTM version in github and jenkins workflow files(this step to be done only in milestone & RC release).
+14. Update versions in `release.yml'` for other repos like `ESW_TS_VERSION` etc. which we will be releasing next. (These versions are used to create parameterized links in the documentation)
+15. Commit and push the changes to `branch-<major>.<minor>.x` branch.
+16. Run `release.sh $VERSION$` script by providing version number argument (This triggers release workflow)
 
     **Note:** `PROD=true` environment variable needs to be set before running `release.sh`
 
