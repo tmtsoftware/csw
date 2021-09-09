@@ -2,7 +2,6 @@ package csw.commons
 
 import java.io.File
 import java.nio.file.{Files, Path}
-
 import scala.io.Source
 
 object ResourceReader {

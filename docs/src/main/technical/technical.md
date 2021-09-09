@@ -7,6 +7,7 @@
 * [Component Framework](framework/framework.md)
 * [Commands](command/command.md)
 * [CSW params](params/params.md)
+* [Adding Units](units/adding-unit.md)
 * [Location Service](location/location.md)
 * [Configuration Service](configuration/configuration.md)
 * [Logging Service](logging/logging.md)

@@ -17,7 +17,7 @@ import csw.location.client.ActorSystemFactory
 import csw.prefix.models.Prefix
 import csw.testkit.internal.{SpawnComponent, TestKitUtils}
 import csw.testkit.scaladsl.CSWService
-import csw.testkit.scaladsl.CSWService._
+import csw.testkit.scaladsl.CSWService.*
 import io.lettuce.core.RedisClient
 
 import scala.annotation.varargs
@@ -49,7 +49,8 @@ final class FrameworkTestKit private (
     val locationTestKit: LocationTestKit,
     val configTestKit: ConfigTestKit,
     val eventTestKit: EventTestKit,
-    val alarmTestKit: AlarmTestKit
+    val alarmTestKit: AlarmTestKit,
+    val databaseTestKit: DatabaseTestKit
 ) {
   private lazy val frameworkWiring              = FrameworkWiring.make(system, redisClient)
   private[testkit] lazy val eventServiceFactory = frameworkWiring.eventServiceFactory
@@ -68,6 +69,7 @@ final class FrameworkTestKit private (
   private var configStarted           = false
   private var eventStarted            = false
   private var alarmStarted            = false
+  private var dbStarted               = false
   private var locationWithAuthStarted = false
 
   /**
@@ -89,6 +91,7 @@ final class FrameworkTestKit private (
       case ConfigServer   => configTestKit.startConfigServer(); configStarted = true
       case EventServer    => eventTestKit.startEventService(); eventStarted = true
       case AlarmServer    => alarmTestKit.startAlarmService(); alarmStarted = true
+      case DatabaseServer => databaseTestKit.startDatabaseService(); dbStarted = true
       case LocationServer => // location server without auth is already started above
       case LocationServerWithAuth =>
         locationTestkitWithAuth = LocationTestKit.withAuth(system.settings.config)
@@ -194,6 +197,7 @@ final class FrameworkTestKit private (
     }
     if (eventStarted) eventTestKit.stopRedis()
     if (alarmStarted) alarmTestKit.stopRedis()
+    if (dbStarted) databaseTestKit.shutdownDatabaseService()
     if (locationWithAuthStarted) locationTestkitWithAuth.shutdownLocationServer()
     TestKitUtils.shutdown(frameworkWiring.actorRuntime.shutdown(), timeout)
     locationTestKit.shutdownLocationServer()
@@ -220,7 +224,8 @@ object FrameworkTestKit {
       LocationTestKit(testKitSettings),
       ConfigTestKit(actorSystem, testKitSettings = testKitSettings),
       EventTestKit(actorSystem, testKitSettings),
-      AlarmTestKit(actorSystem, redisClient, testKitSettings)
+      AlarmTestKit(actorSystem, redisClient, testKitSettings),
+      DatabaseTestKit(actorSystem, testKitSettings)
     )
   }
 

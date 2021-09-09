@@ -20,7 +20,7 @@ import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
-private[database] object DatabaseServiceFactory {
+private[csw] object DatabaseServiceFactory {
   val ReadUsernameHolder = "DB_READ_USERNAME"
   val ReadPasswordHolder = "DB_READ_PASSWORD"
 }
@@ -34,7 +34,7 @@ private[database] object DatabaseServiceFactory {
  *                    2) schedule the task of database connection
  * @param values used for testing purposes, to manually set the values for credentials instead of reading from env vars
  */
-class DatabaseServiceFactory private[database] (actorSystem: ActorSystem[_], values: Map[String, String]) {
+class DatabaseServiceFactory private[csw] (actorSystem: ActorSystem[_], values: Map[String, String]) {
 
   /**
    * Creates the DatabaseServiceFactory. It is not injected in `CswContext` like other csw services.

@@ -72,7 +72,7 @@ pipeline {
     post {
         always {
             // Generate RTM
-            sh "./scripts/coursier launch --channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/apps.json rtm:0.1.0 -- target/RTM/testStoryMapping.txt tools/RTM/cswStoryToRequirementMap.csv target/RTM/testRequirementsMapping.txt"
+            sh "./scripts/coursier launch --channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/apps.json rtm:0.2.0 -- target/RTM/testStoryMapping.txt tools/RTM/cswStoryToRequirementMap.csv target/RTM/testRequirementsMapping.txt"
             // Upload RTM
              publishHTML(target: [
                                         alwaysLinkToLastBuild: false,

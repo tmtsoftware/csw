@@ -9,6 +9,21 @@ The product is in a new repository: [csw](https://github.com/tmtsoftware/csw).
 
 All notable changes to this project will be documented in this file.
 
+## [CSW v4.0.0-RC2] - 2021-09-09
+
+This is a release candidate 2 for version 4.0.0 of the TMT Common Software for project stakeholders.
+See [here](https://tmtsoftware.github.io/csw/4.0.0-RC2/) for a detailed documentation of this version of the CSW software.
+
+### Changes
+- Added logic to read MiniCrm configuration from config file and add defaults in `reference.conf` of project
+- Added helper `DatabaseTestKit` with embedded postgres in `FrameworkTestKit`
+- Added doc for [Adding New Unit](adding-unit.md)
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/4.0.0-RC2/
+- Scaladoc: https://tmtsoftware.github.io/csw/4.0.0-RC2/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/4.0.0-RC2/api/java/index.html
+
 ## [CSW v4.0.0-RC1] - 2021-08-20
 
 This is a release candidate 1 for version 4.0.0 of the TMT Common Software for project stakeholders.

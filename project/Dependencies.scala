@@ -353,6 +353,7 @@ object Dependencies {
       //TODO: make this as provided deps
       Libs.`scalatest`.value,
       Libs.`embedded-redis`,
+      Libs.`otj-pg-embedded`,
       Libs.`junit-4-13`,
       Libs.`mockito-scala`
     )

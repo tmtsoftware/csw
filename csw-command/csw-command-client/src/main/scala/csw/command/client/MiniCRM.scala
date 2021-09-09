@@ -52,11 +52,12 @@ object MiniCRM {
     case class GetWaiters(replyTo: ActorRef[List[(Id, ActorRef[SubmitResponse])]]) extends CRMMessage
     case class GetStarters(replTo: ActorRef[List[SubmitResponse]])                 extends CRMMessage
   }
-  import MiniCRMMessage._
+  import MiniCRMMessage.*
 
   //noinspection ScalaStyle
-  def make(startedSize: Int = 10, responseSize: Int = 10, waiterSize: Int = 10): Behavior[CRMMessage] =
+  def make(startedSize: Int, responseSize: Int, waiterSize: Int): Behavior[CRMMessage] = {
     Behaviors.setup(_ => handle(new StartedList(startedSize), new ResponseList(responseSize), new WaiterList(waiterSize)))
+  }
 
   // scalastyle:off method.length
   // scalastyle:off cyclomatic.complexity

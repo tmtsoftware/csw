@@ -2,7 +2,7 @@ package csw.command.client
 
 import akka.actor.testkit.typed.scaladsl.ActorTestKit
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import csw.command.client.MiniCRM.MiniCRMMessage._
+import csw.command.client.MiniCRM.MiniCRMMessage.*
 import csw.command.client.MiniCRM.{Responses, Starters, Waiters}
 import csw.params.commands.CommandIssue.IdNotAvailableIssue
 import csw.params.commands.CommandResponse.{Completed, Invalid, Started, SubmitResponse}
@@ -11,18 +11,19 @@ import org.scalatest.BeforeAndAfterAll
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 class MiniCRMTest extends AnyFunSuite with Matchers with BeforeAndAfterAll {
 
-  private val actorSystem: ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), "test")
-  private val testKit                                         = ActorTestKit(actorSystem)
+  private implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), "test")
+  private val testKit                                                  = ActorTestKit(actorSystem)
+  private val crmListSize                                              = 5
 
   override def afterAll(): Unit = testKit.shutdownTestKit()
 
   // This test just adds responses to make sure they are added properly to the response list
   test("add responses, check inclusion") {
-    val crm           = testKit.spawn(MiniCRM.make())
+    val crm           = testKit.spawn(MiniCRM.make(crmListSize, crmListSize, crmListSize))
     val responseProbe = testKit.createTestProbe[Responses]()
 
     val id = Id("1")
@@ -48,7 +49,7 @@ class MiniCRMTest extends AnyFunSuite with Matchers with BeforeAndAfterAll {
 
   // This test makes sure waiters are added properly
   test("add waiters, check inclusion") {
-    val crm             = testKit.spawn(MiniCRM.make())
+    val crm             = testKit.spawn(MiniCRM.make(crmListSize, crmListSize, crmListSize))
     val responseProbe   = testKit.createTestProbe[SubmitResponse]()
     val waiterListProbe = testKit.createTestProbe[Waiters]()
 
@@ -76,7 +77,7 @@ class MiniCRMTest extends AnyFunSuite with Matchers with BeforeAndAfterAll {
   // 2. The response remains
   // 3. The waiters are removed
   test("add response first then queryFinal") {
-    val crm                  = testKit.spawn(MiniCRM.make())
+    val crm                  = testKit.spawn(MiniCRM.make(crmListSize, crmListSize, crmListSize))
     val commandResponseProbe = testKit.createTestProbe[SubmitResponse]()
     val responseProbe        = testKit.createTestProbe[Responses]()
     val waiterListProbe      = testKit.createTestProbe[Waiters]()
@@ -115,7 +116,7 @@ class MiniCRMTest extends AnyFunSuite with Matchers with BeforeAndAfterAll {
   // 2. After waiter list should be empty
   // 3. Response remains
   test("queryFinal first, then add response") {
-    val crm                  = testKit.spawn(MiniCRM.make())
+    val crm                  = testKit.spawn(MiniCRM.make(crmListSize, crmListSize, crmListSize))
     val commandResponseProbe = testKit.createTestProbe[SubmitResponse]()
     val responseProbe        = testKit.createTestProbe[Responses]()
     val waiterListProbe      = testKit.createTestProbe[Waiters]()
@@ -149,7 +150,7 @@ class MiniCRMTest extends AnyFunSuite with Matchers with BeforeAndAfterAll {
   // Verify that it is possible to have two waiters for the same id and both get updated
   // It is desired that if the same client does queryFinal twice, both get an answer
   test("queryFinal twice, then add response -- should get both updates") {
-    val crm                   = testKit.spawn(MiniCRM.make())
+    val crm                   = testKit.spawn(MiniCRM.make(crmListSize, crmListSize, crmListSize))
     val commandResponseProbe1 = testKit.createTestProbe[SubmitResponse]()
     val commandResponseProbe2 = testKit.createTestProbe[SubmitResponse]()
     val responseProbe         = testKit.createTestProbe[Responses]()
@@ -186,7 +187,7 @@ class MiniCRMTest extends AnyFunSuite with Matchers with BeforeAndAfterAll {
   // Verify that it is possible to have two waiters for the same id and both get updated
   // In this case the same client does queryFinal twice, both get an answer
   test("queryFinal twice, but receiver is the same actor!") {
-    val crm                   = testKit.spawn(MiniCRM.make())
+    val crm                   = testKit.spawn(MiniCRM.make(crmListSize, crmListSize, crmListSize))
     val commandResponseProbe1 = testKit.createTestProbe[SubmitResponse]()
     val responseProbe         = testKit.createTestProbe[Responses]()
     val waiterListProbe       = testKit.createTestProbe[Waiters]()
@@ -219,7 +220,7 @@ class MiniCRMTest extends AnyFunSuite with Matchers with BeforeAndAfterAll {
   // 1. queryFinal should complete
   // 2. second queryFinal should still work and return the same
   test("queryFinal waiting for final, then check queryFinal again") {
-    val crm                  = testKit.spawn(MiniCRM.make())
+    val crm                  = testKit.spawn(MiniCRM.make(crmListSize, crmListSize, crmListSize))
     val commandResponseProbe = testKit.createTestProbe[SubmitResponse]()
 
     val id1 = Id("1")
@@ -242,7 +243,7 @@ class MiniCRMTest extends AnyFunSuite with Matchers with BeforeAndAfterAll {
   // 3, Complete command and queryFinal should complete
   // 4. Second query should still work and return the same complete
   test("query after starting, wait for final, then check query again") {
-    val crm                  = testKit.spawn(MiniCRM.make())
+    val crm                  = testKit.spawn(MiniCRM.make(crmListSize, crmListSize, crmListSize))
     val commandResponseProbe = testKit.createTestProbe[SubmitResponse]()
 
     val id1 = Id("1")
@@ -268,7 +269,7 @@ class MiniCRMTest extends AnyFunSuite with Matchers with BeforeAndAfterAll {
 
   // This test adds responses to make sure SizedList is removing oldest and restricting size
   test("add responses, check max size") {
-    val crm           = testKit.spawn(MiniCRM.make(2, 2))
+    val crm           = testKit.spawn(MiniCRM.make(2, 2, 2))
     val responseProbe = testKit.createTestProbe[Responses]()
 
     val id1 = Id()
@@ -304,7 +305,7 @@ class MiniCRMTest extends AnyFunSuite with Matchers with BeforeAndAfterAll {
   // This test adds waiters through queryFinal and then sends a response to make sure waiters are removed, but only
   // the waiters that are supposed to be removed
   test("add responses, verify waiter removal is proper") {
-    val crm         = testKit.spawn(MiniCRM.make())
+    val crm         = testKit.spawn(MiniCRM.make(crmListSize, crmListSize, crmListSize))
     val waiterProbe = testKit.createTestProbe[Waiters]()
     val qfProbe1    = testKit.createTestProbe[SubmitResponse]()
     val qfProbe2    = testKit.createTestProbe[SubmitResponse]()
@@ -354,7 +355,7 @@ class MiniCRMTest extends AnyFunSuite with Matchers with BeforeAndAfterAll {
 
   // Test the query algo. This test just adds responses and some starters to see if the correct response is returned
   test("add responses and starters.  Check query.") {
-    val crm           = testKit.spawn(MiniCRM.make())
+    val crm           = testKit.spawn(MiniCRM.make(crmListSize, crmListSize, crmListSize))
     val responseProbe = testKit.createTestProbe[Responses]()
     val startersProbe = testKit.createTestProbe[Starters]()
     val queryProbe    = testKit.createTestProbe[SubmitResponse]()
