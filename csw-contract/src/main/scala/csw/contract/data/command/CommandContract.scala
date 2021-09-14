@@ -5,12 +5,14 @@ import csw.command.api.messages.CommandServiceRequest.{Oneway, Query, Submit, Va
 import csw.command.api.messages.CommandServiceStreamRequest.{QueryFinal, SubscribeCurrentState}
 import csw.command.api.messages.{CommandServiceRequest, CommandServiceStreamRequest}
 import csw.contract.ResourceFetcher
+import csw.contract.data.command.ParamSetData.{taiTime, utcTime}
 import csw.contract.generator.ClassNameHelpers.name
-import csw.contract.generator._
-import csw.params.commands.CommandResponse._
+import csw.contract.generator.*
+import csw.params.commands.CommandResponse.*
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.Units
 import csw.params.core.states.CurrentState
+import csw.time.core.models.{TAITime, TMTTime, UTCTime}
 
 object CommandContract extends CommandData with CommandServiceCodecs {
   private val models: ModelSet = ModelSet.models(
@@ -45,7 +47,9 @@ object CommandContract extends CommandData with CommandServiceCodecs {
       wrongUnitsIssue,
       wrongCommandTypeIssue,
       otherIssue
-    )
+    ),
+    ModelType(utcTime),
+    ModelType(taiTime)
   )
 
   private val httpRequests = new RequestSet[CommandServiceRequest] {
