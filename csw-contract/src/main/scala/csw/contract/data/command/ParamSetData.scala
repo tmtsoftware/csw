@@ -15,23 +15,25 @@ object ParamSetData {
   import Angle._
 
   // Simple Key's
-  private val p1 = BooleanKey.make("BooleanKey").set(true, false)
-  private val p2 = ByteKey.make("ByteKey").setAll(Array[Byte](10, 20))
-  private val p3 = CharKey.make("CharKey").set('A', 'B')
-  private val p4 = ShortKey.make("ShortKey").setAll(Array[Short](30, 40))
-  private val p5 = LongKey.make("LongKey").setAll(Array[Long](50, 60))
-  private val p6 = IntKey.make("IntKey").set(70, 80)
-  private val p7 = FloatKey.make("FloatKey").setAll(Array[Float](90, 100))
-  private val p8 = DoubleKey.make("DoubleKey").setAll(Array[Double](110, 120))
+  private val p1       = BooleanKey.make("BooleanKey").set(true, false)
+  private val p2       = ByteKey.make("ByteKey").setAll(Array[Byte](10, 20))
+  private val p3       = CharKey.make("CharKey").set('A', 'B')
+  private val p4       = ShortKey.make("ShortKey").setAll(Array[Short](30, 40))
+  private val p5       = LongKey.make("LongKey").setAll(Array[Long](50, 60))
+  private val p6       = IntKey.make("IntKey").set(70, 80)
+  private val p7       = FloatKey.make("FloatKey").setAll(Array[Float](90, 100))
+  private val p8       = DoubleKey.make("DoubleKey").setAll(Array[Double](110, 120))
+  val utcTime: UTCTime = UTCTime.now()
   private val p9 =
     UTCTimeKey
       .make("UTCTimeKey")
-      .set(UTCTime(Instant.ofEpochMilli(0)), UTCTime(Instant.parse("2017-09-04T19:00:00.123456789Z")))
+      .set(UTCTime(Instant.ofEpochMilli(0)), utcTime)
 
+  val taiTime: TAITime = TAITime.now()
   private val p10 =
     TAITimeKey
       .make("TAITimeKey")
-      .set(TAITime(Instant.ofEpochMilli(0)), TAITime(Instant.parse("2017-09-04T19:00:00.123456789Z")))
+      .set(TAITime(Instant.ofEpochMilli(0)), taiTime)
 
   // ArrayData Key's
   private val p11 = ByteArrayKey.make("ByteArrayKey").set(ArrayData.fromArray(Array[Byte](1, 2)))
