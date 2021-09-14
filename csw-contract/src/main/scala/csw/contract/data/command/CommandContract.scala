@@ -12,7 +12,6 @@ import csw.params.commands.CommandResponse.*
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.Units
 import csw.params.core.states.CurrentState
-import csw.time.core.models.{TAITime, TMTTime, UTCTime}
 
 object CommandContract extends CommandData with CommandServiceCodecs {
   private val models: ModelSet = ModelSet.models(
