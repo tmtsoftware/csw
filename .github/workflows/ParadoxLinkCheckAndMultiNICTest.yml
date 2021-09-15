@@ -8,9 +8,16 @@ on:
 jobs:
   unit-tests:
     runs-on: ubuntu-18.04
-
+    strategy:
+      matrix:
+        branch:
+        - master
+        - branch-4.0.x
+        
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: ${{ matrix.branch }}      
       - uses: laughedelic/coursier-setup@v1
         with:
           jvm: 11
@@ -33,4 +40,4 @@ jobs:
         with:
           job-status: ${{ job.status }}
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
-          channel: ci-dev
+          channel: ci-linkcheck
