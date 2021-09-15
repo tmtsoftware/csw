@@ -17,7 +17,7 @@ See [here](https://tmtsoftware.github.io/csw/4.0.0-RC2/) for a detailed document
 ### Changes
 - Added logic to read MiniCrm configuration from config file and add defaults in `reference.conf` of project
 - Added helper `DatabaseTestKit` with embedded postgres in `FrameworkTestKit`
-- Added doc for [Adding New Unit](adding-unit.md)
+- Added doc in technical section for Adding New Unit
 
 ### Documentation
 - Reference paradox documentation: https://tmtsoftware.github.io/csw/4.0.0-RC2/
