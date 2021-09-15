@@ -3,21 +3,16 @@ name: Paradox Link Check and Multi-NIC test
 on:
   workflow_dispatch:
   schedule:
-    - cron: "30 18 * * *" # run at 00:00 AM IST
+    - cron: "45 18 * * *" # run at 00:15 AM IST
 
 jobs:
   unit-tests:
     runs-on: ubuntu-18.04
-    strategy:
-      matrix:
-        branch:
-        - master
-        - branch-4.0.x
         
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: ${{ matrix.branch }}      
+          ref: branch-4.0.x
       - uses: laughedelic/coursier-setup@v1
         with:
           jvm: 11
