@@ -1,0 +1,38 @@
+name: Paradox Link Check and Multi-NIC test
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "45 18 * * *" # run at 00:15 AM IST
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-18.04
+        
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: branch-4.0.x
+      - uses: laughedelic/coursier-setup@v1
+        with:
+          jvm: 11
+      - uses: coursier/cache-action@v5
+      - run: sudo chmod 666 /var/run/docker.sock
+
+      - name: Package
+        run: ./integration/scripts/bootstrap_standalone_jars.sh
+
+      - name: Multi-NICs Docker
+        run: ./integration/scripts/multiple_nic_test.sh
+
+      - name: Paradox Validate Links
+        run: sbtn docs/paradoxValidateLinks
+
+      - name: Notify slack
+        if: always()
+        continue-on-error: true
+        uses: kpritam/slack-job-status-action@v1
+        with:
+          job-status: ${{ job.status }}
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+          channel: ci-linkcheck
