@@ -3,10 +3,10 @@ name: Master Link Check and Multi-NIC test
 on:
   workflow_dispatch:
   schedule:
-    - cron: "30 18 * * *" # run at 00:00 AM IST
+    - cron: "30 20 * * *" # run at 02:00 AM IST
 
 jobs:
-  unit-tests:
+  link-check:
     runs-on: ubuntu-18.04
         
     steps:
