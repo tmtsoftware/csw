@@ -18,7 +18,7 @@ This page assumes that you have already installed and setup @ref:[coursier](csin
 Following command creates an executable file named csw-config-server in the default installation directory.
 
 ```bash
-cs install csw-config-server:<version | SHA>
+cs install csw-config-server
 ```
 
 Note: If you don't provide the version or SHA in above command, `csw-config-server` will be installed with the latest tagged binary of `csw-config-server`
