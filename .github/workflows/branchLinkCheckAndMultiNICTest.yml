@@ -3,10 +3,10 @@ name: Branch Link Check and Multi-NIC test
 on:
   workflow_dispatch:
   schedule:
-    - cron: "45 18 * * *" # run at 00:15 AM IST
+    - cron: "00 09 * * *" # run at 02:30 PM IST
 
 jobs:
-  unit-tests:
+  link-check:
     runs-on: ubuntu-18.04
         
     steps:
