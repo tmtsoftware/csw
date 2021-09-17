@@ -17,7 +17,7 @@ This page assumes that you have already installed and setup @ref:[coursier](csin
 Following command creates an executable file named csw-location-server in the default installation directory.
 
 ```bash
-cs install csw-location-server:<version | SHA>
+cs install csw-location-server
 ```
 
 Note: If you don't provide the version or SHA in above command, `csw-location-server` will be installed with the latest tagged binary of `csw-location-server`

@@ -15,7 +15,7 @@ This page assumes that you have already installed and setup @ref:[coursier](csin
 Following command creates an executable file named `csw-services` in the default installation directory.
 
 ```bash
-cs install csw-services:<version | SHA>
+cs install csw-services
 ```
 
 @@@ note

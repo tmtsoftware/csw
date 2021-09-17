@@ -18,7 +18,7 @@ This page assumes that you have already installed and setup @ref:[coursier](csin
 Following command creates an executable file named csw-event-cli in the default installation directory.
 
 ```bash
-cs install csw-event-cli:<version | SHA>
+cs install csw-event-cli
 ```
 
 Note: If you don't provide the version or SHA in above command, `csw-event-cli` will be installed with the latest tagged binary of `csw-event-cli`
