@@ -56,6 +56,7 @@ A milestone release is cut from master branch as we expect bug fixes / feedback 
 15. Commit and push the changes to `branch-<major>.<minor>.x` branch.
 15. Make sure build is green for dev and paradox link check pipeline for this branch.
 16. Run `release.sh $VERSION$` script by providing version number argument (This triggers release workflow)
+17. Applicable for final release only - Upgrade all the versions of all csw apps in [here](https://github.com/tmtsoftware/osw-apps/blob/master/apps.json)
 
     **Note:** `PROD=true` environment variable needs to be set before running `release.sh`
 

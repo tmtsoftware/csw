@@ -49,17 +49,18 @@ So that developer does not need to manually configure these environment variable
 
 ## Examples
 
-The command `cs install <app-name>:<version | SHA>` installs an application `<app-name>` using coursier.  
+The command `cs install <app-name>` installs an application `<app-name>` using coursier.  
 
-### Installing Alarm CLI v2.0.1
+### Installing Alarm CLI (with the version present in apps.json)
 
 ```bash
 // csw-alarm-cli is the name of the application installed
-// 2.0.1 is the version of the application to be installed
-cs install csw-alarm-cli:2.0.1
+cs install csw-alarm-cli
 ```
 
-### Installing Alarm CLI Latest Version
+*Note:* In case you get a Connection Refused error, try setting the @ref:[Environment Variables](../deployment/env-vars.md) (INTERFACE_NAME etc.).
+
+### Installing Alarm CLI Latest Version(using apps.prod.json channel)
 
 If version number or SHA not provided in the `install` command, then the latest tagged binary of application gets installed.
 
@@ -67,3 +68,5 @@ If version number or SHA not provided in the `install` command, then the latest 
 // installs Alarm CLI with latest tagged version
 cs install csw-alarm-cli
 ```
+
+*Note:* Set the @ref:[Environment Variables](../deployment/env-vars.md) before running the app through `apps.prod.json`
