@@ -91,8 +91,8 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
     logMetadata2.componentLevel shouldBe WARN
   }
 
-  // DEOPSCSW-37: Add diagnosticMode handler to component handlers
-  test("Supervisor should forward DiagnosticMode to componentTLA | DEOPSCSW-163, DEOPSCSW-37") {
+  // CSW-37: Add diagnosticMode handler to component handlers
+  test("Supervisor should forward DiagnosticMode to componentTLA | DEOPSCSW-163, CSW-37") {
     val supervisorBehaviorTestKit = BehaviorTestKit(supervisorBehavior)
 
     val childInbox: TestInbox[RunningMessage] = supervisorBehaviorTestKit.childInbox(componentTLAName)

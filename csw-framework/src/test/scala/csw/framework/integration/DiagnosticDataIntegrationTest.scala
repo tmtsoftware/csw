@@ -20,7 +20,7 @@ import redis.embedded.{RedisSentinel, RedisServer}
 
 import scala.concurrent.duration.DurationLong
 
-// DEOPSCSW-37: Add diagnosticMode handler to component handlers
+// CSW-37: Add diagnosticMode handler to component handlers
 // CSW-82: ComponentInfo should take prefix
 class DiagnosticDataIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
@@ -43,7 +43,7 @@ class DiagnosticDataIntegrationTest extends FrameworkIntegrationSuite {
     super.afterAll()
   }
 
-  test("component should be able to handle diagnostic data request | DEOPSCSW-37") {
+  test("component should be able to handle diagnostic data request | CSW-37") {
     import SampleComponentState._
     import wiring._
     Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring)
