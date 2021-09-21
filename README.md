@@ -64,6 +64,6 @@ The Java API docs are [here](https://tmtsoftware.github.io/csw/api/java/?/index.
 
 To build everything, including the documentation, run:
 
-    sbt publishLocal stage makeSite
+    sbt publishLocal makeSite
 
 See [here](https://tmtsoftware.github.io/csw/commons/sbt-tasks.html) for a description of the sbt tasks.
