@@ -519,11 +519,3 @@ Java
 ```
 sbt "sample-deploy/runMain org.tmt.csw.sampledeploy.SampleContainerCmdApp --local --standalone src/main/resources/JSampleHcdStandalone.conf"
 ```
-
-To run the component using the deployment package, perform the following steps:
-
--   Run `sbt <project>/universal:packageBin`, where `<project>` is your deployment module (e.g. `sample-deploy`). This will create self-contained zip in `<project>/target/universal` directory
--   Unzip generated zip file and enter into bin directory
--   Run the `./<project>-cmd-app --local --standalone <path-to-local-config-file-to-start-the-component>`
-
-Alternatively, you can run `sbt stage`, which installs the application under target/universal/stage/bin.

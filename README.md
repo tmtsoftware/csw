@@ -12,7 +12,8 @@ See [here](https://tmtsoftware.github.io/csw/) for a detailed description of the
 
 | Date | Tag | Docs | Source | Download |
 |-----|-----|--------|-----|-----|
-| 2021-01-28 | v3.0.1 | [scala](https://tmtsoftware.github.io/csw/3.0.1/api/scala/index.html), [java](https://tmtsoftware.github.io/csw/3.0.1/api/java/index.html) | [csw-3.0.0](https://github.com/tmtsoftware/csw/tree/v3.0.1)| Apps: [zip](https://github.com/tmtsoftware/csw/releases/download/v3.0.1/csw-apps-3.0.1.zip), Source: [tar.gz](https://github.com/tmtsoftware/csw/archive/v3.0.1.tar.gz), [zip](https://github.com/tmtsoftware/csw/archive/v3.0.1.zip) |
+| 2021-09-23 | v4.0.0 | [scala](https://tmtsoftware.github.io/csw/4.0.0/api/scala/index.html), [java](https://tmtsoftware.github.io/csw/4.0.0/api/java/index.html) | [csw-4.0.0](https://github.com/tmtsoftware/csw/tree/v4.0.0)| Apps: [zip](https://github.com/tmtsoftware/csw/releases/download/v4.0.0/csw-apps-4.0.0.zip), Source: [tar.gz](https://github.com/tmtsoftware/csw/archive/v4.0.0.tar.gz), [zip](https://github.com/tmtsoftware/csw/archive/v4.0.0.zip) |
+| 2021-01-28 | v3.0.1 | [scala](https://tmtsoftware.github.io/csw/3.0.1/api/scala/index.html), [java](https://tmtsoftware.github.io/csw/3.0.1/api/java/index.html) | [csw-3.0.1](https://github.com/tmtsoftware/csw/tree/v3.0.1)| Apps: [zip](https://github.com/tmtsoftware/csw/releases/download/v3.0.1/csw-apps-3.0.1.zip), Source: [tar.gz](https://github.com/tmtsoftware/csw/archive/v3.0.1.tar.gz), [zip](https://github.com/tmtsoftware/csw/archive/v3.0.1.zip) |
 | 2021-01-22 | v3.0.0 | [scala](https://tmtsoftware.github.io/csw/3.0.0/api/scala/index.html), [java](https://tmtsoftware.github.io/csw/3.0.0/api/java/index.html) | [csw-3.0.0](https://github.com/tmtsoftware/csw/tree/v3.0.0)| Apps: [zip](https://github.com/tmtsoftware/csw/releases/download/v3.0.0/csw-apps-3.0.0.zip), Source: [tar.gz](https://github.com/tmtsoftware/csw/archive/v3.0.0.tar.gz), [zip](https://github.com/tmtsoftware/csw/archive/v3.0.0.zip) |
 | 2020-03-20 | v2.0.1 | [scala](https://tmtsoftware.github.io/csw/2.0.1/api/scala/index.html), [java](https://tmtsoftware.github.io/csw/2.0.1/api/java/index.html) | [csw-2.0.1](https://github.com/tmtsoftware/csw/tree/v2.0.1)| Apps: [zip](https://github.com/tmtsoftware/csw/releases/download/v2.0.1/csw-apps-2.0.1.zip), Source: [tar.gz](https://github.com/tmtsoftware/csw/archive/v2.0.1.tar.gz), [zip](https://github.com/tmtsoftware/csw/archive/v2.0.1.zip) |
 | 2020-03-19 | v2.0.0 | [scala](https://tmtsoftware.github.io/csw/2.0.0/api/scala/index.html), [java](https://tmtsoftware.github.io/csw/2.0.0/api/java/index.html) | [csw-2.0.0](https://github.com/tmtsoftware/csw/tree/v2.0.0)| Apps: [zip](https://github.com/tmtsoftware/csw/releases/download/v2.0.0/csw-apps-2.0.0.zip), Source: [tar.gz](https://github.com/tmtsoftware/csw/archive/v2.0.0.tar.gz), [zip](https://github.com/tmtsoftware/csw/archive/v2.0.0.zip) |
@@ -64,6 +65,6 @@ The Java API docs are [here](https://tmtsoftware.github.io/csw/api/java/?/index.
 
 To build everything, including the documentation, run:
 
-    sbt publishLocal stage makeSite
+    sbt publishLocal makeSite
 
 See [here](https://tmtsoftware.github.io/csw/commons/sbt-tasks.html) for a description of the sbt tasks.

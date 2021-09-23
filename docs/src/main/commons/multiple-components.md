@@ -324,18 +324,6 @@ Java
 sbt "sample-deploy/runMain org.tmt.csw.sampledeploy.SampleContainerCmdApp --local src/main/resources/JSampleContainer.conf"
 ```
 
-Like with the HCD, the `sbt stage` command can also be used to create binaries in the `target/universal/stage/bin` directories of the root project.
-
-To run using the deployment packaging, follow the steps below:
-
-- Run `sbt sample-deploy/universal:packageBin`, this will create self contained zip in `sample-deploy/target/universal` directory.
-- Unzip the generated zip file and enter into `bin` directory.
-- You will see four scripts in the `bin` directory (two bash scripts and two windows scripts).
-- If you want to start multiple containers on a host machine, follow this guide @ref:[here](../apps/hostconfig.md#examples).
-- If you want to start multiple components in container mode or single component in standalone mode, follow this guide @ref:[here](../framework/deploying-components.md).
-- Example to run container:    `./sample-container-cmd-app --local ../../../../sample-deploy/src/main/resources/SampleContainer.conf`
-- Example to run host config:  `./sample-host-config-app --local ../../../../sample-deploy/src/main/resources/SampleHostConfig.conf -s ./sample-container-cmd-app`
-
 @@@ note { title=Note }
 
 This assumes you still have the CSW Services running using the  `csw-services` application as described in the 

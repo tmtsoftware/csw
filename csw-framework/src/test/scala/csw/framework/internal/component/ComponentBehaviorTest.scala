@@ -55,8 +55,8 @@ class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar with Ma
     verify(sampleComponentHandler).isOnline_=(true)
   }
 
-  // DEOPSCSW-37: Add diagnosticMode handler to component handlers
-  test("component should handle DiagnosticMode message | DEOPSCSW-165, DEOPSCSW-166, DEOPSCSW-37") {
+  // CSW-37: Add diagnosticMode handler to component handlers
+  test("component should handle DiagnosticMode message | DEOPSCSW-165, DEOPSCSW-166, CSW-37") {
     val supervisorProbe = TestProbe[FromComponentLifecycleMessage]()
     val testData        = new TestData(supervisorProbe)
     import testData._
