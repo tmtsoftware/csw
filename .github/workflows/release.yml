@@ -9,7 +9,7 @@ jobs:
   release:
     runs-on: ubuntu-18.04
     env:
-      ESW_TS_VERSION: "0.2.0-RC2"
+      ESW_TS_VERSION: "0.2.0"
     steps:
       - uses: actions/checkout@v2
       - uses: laughedelic/coursier-setup@v1

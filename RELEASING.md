@@ -32,7 +32,7 @@ A milestone release is cut from master branch as we expect bug fixes / feedback 
 - Documentation related updates are allowed on this RC branch, because these changes won't be breaking anything code-wise.
 3. While making `Final` release, we follow: 
 - RC branch will be considered final & not the master branch.
-- After getting the approval, `V*.*.*-Final` tag will be created.
+- After getting the approval, `V*.*.*` tag will be created.
 
 
 ### CSW
@@ -40,7 +40,7 @@ A milestone release is cut from master branch as we expect bug fixes / feedback 
 1. Create a branch named `branch-<major>.<minor>.x` if not already exists from `master`. Example branch name `branch-3.0.x`.
    All subsequent release for this release cycle should be done on this branch. All further steps are to be done on this branch.
 2. Update release notes (`notes/<version>.markdown`) in `csw` repo and link the migration guide
- **Note** - The version in `notes` should be of format `v1.0.0`
+ **Note** - The version in `notes` should be of format `1.0.0`
 3. Update top-level `CHANGELOG.md`
 4. Update top-level `README.md`
 5. Update top-level `INSTALL.md`
