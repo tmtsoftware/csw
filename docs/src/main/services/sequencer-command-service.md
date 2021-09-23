@@ -16,7 +16,7 @@ sbt
     
 ## Creating SequencerCommandService
 
-To create SequencerCommandService, you need to resolve the @scaladoc[AkkaLocation](csw/location/models/AkkaLocation) of the `Sequencer` using the Location Service. Pass the resolved
+To create SequencerCommandService, you need to resolve the @scaladoc[AkkaLocation](csw/location/api/models/AkkaLocation) of the `Sequencer` using the Location Service. Pass the resolved
 location to the @scaladoc[SequencerCommandServiceImpl](csw/command/client/SequencerCommandServiceImpl), which will return the handle of a `SequencerCommandService`. 
 
 Scala
