@@ -108,7 +108,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         }
 
         // fetch data from table and map it to Films class
-        ResultQuery<Record> selectQuery = dsl.resultQuery("SELECT id, name FROM films WHERE id = ?", 1);
+        ResultQuery<org.jooq.Record> selectQuery = dsl.resultQuery("SELECT id, name FROM films WHERE id = ?", 1);
         CompletableFuture<List<Films>> selectResultF = JooqHelper.fetchAsync(selectQuery, Films.class);
         selectResultF.thenAccept(names -> System.out.println("Fetched names of films " + names));
         // Alternatively, you can block and wait for the future result to complete:
