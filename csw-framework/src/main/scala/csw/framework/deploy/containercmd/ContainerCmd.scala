@@ -1,7 +1,5 @@
 package csw.framework.deploy.containercmd
 
-import java.nio.file.Path
-
 import akka.Done
 import akka.actor.typed.ActorRef
 import com.typesafe.config.Config
@@ -13,6 +11,8 @@ import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
 import csw.prefix.models.{Prefix, Subsystem}
 
+import java.io.Closeable
+import java.nio.file.Path
 import scala.async.Async.{async, await}
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, Future}
@@ -31,8 +31,11 @@ object ContainerCmd {
    * alone without any container
    * @return                  Actor ref of the container or supervisor of the component started without container
    */
-  def start(name: String, subsystem: Subsystem, args: Array[String], defaultConfig: Option[Config] = None): ActorRef[_] =
-    new ContainerCmd(name, subsystem, true, defaultConfig).start(args)
+  def start(name: String, subsystem: Subsystem, args: Array[String], defaultConfig: Option[Config] = None): Closeable = {
+    val container = new ContainerCmd(name, subsystem, true, defaultConfig)
+    container.start(args)
+    () => container.shutdown()
+  }
 }
 
 private[framework] class ContainerCmd(
@@ -44,7 +47,7 @@ private[framework] class ContainerCmd(
   private val log: Logger = new LoggerFactory(Prefix(subsystem, name)).getLogger
 
   private lazy val wiring: FrameworkWiring = new FrameworkWiring
-  import wiring.actorRuntime._
+  import wiring.actorRuntime.*
 
   def start(args: Array[String]): ActorRef[_] =
     new ArgsParser(name).parse(args.toList) match {
