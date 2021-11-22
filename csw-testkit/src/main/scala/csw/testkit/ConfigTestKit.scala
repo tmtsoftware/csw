@@ -4,7 +4,6 @@ import java.nio.file.Paths
 
 import akka.actor.typed
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.http.scaladsl.Http
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.aas.http.SecurityDirectives
@@ -54,8 +53,6 @@ final class ConfigTestKit private (
       }
   }
 
-  private var configServer: Option[Http.ServerBinding] = None
-
   implicit lazy val ec: ExecutionContextExecutor = configWiring.actorRuntime.ec
   implicit lazy val timeout: Timeout             = testKitSettings.DefaultTimeout
 
@@ -68,7 +65,7 @@ final class ConfigTestKit private (
    */
   def startConfigServer(): Unit = {
     val (server, _) = TestKitUtils.await(configWiring.httpService.registeredLazyBinding, timeout)
-    configServer = Some(server)
+    server.addToCoordinatedShutdown(timeout.duration)
     deleteServerFiles()
     initSvnRepo()
   }
@@ -86,9 +83,6 @@ final class ConfigTestKit private (
     TestKitUtils.deleteDirectoryRecursively(configWiring.settings.repositoryFile)
   }
 
-  /** terminate HTTP ConfigServer */
-  def terminateServer(): Unit = configServer.foreach(TestKitUtils.terminateHttpServerBinding(_, timeout))
-
   /**
    * Shutdown HTTP Config server
    *
@@ -96,7 +90,6 @@ final class ConfigTestKit private (
    */
   def shutdownConfigServer(): Unit = {
     deleteServerFiles()
-    terminateServer()
     TestKitUtils.shutdown(configWiring.actorRuntime.shutdown(), timeout)
   }
 
