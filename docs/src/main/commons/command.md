@@ -176,6 +176,11 @@ Note that the Scala examples are using async/await which simplifies handling the
 
 @@@
 
+This example shows creating a `Command Service` using `Akka Location` of the receiving component, discovered from the Location Service.
+
+Scala/resolve hcd/create command serviceScala/submit w/invalid response
+:   @@snip [CommandServiceTest.scala](../../../../integration/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #resolve-hcd-and-create-commandservice }
+
 The API can be exercised as follows for different scenarios of command-based communication:
 
 ### submit

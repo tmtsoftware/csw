@@ -135,8 +135,9 @@ class CommandServiceTest(ignore: Int)
       val sequencerConf = ConfigFactory.load("command/commanding_assembly.conf")
       Await.result(Standalone.spawn(sequencerConf, wiring), 5.seconds)
       enterBarrier("spawned")
-
+       
       // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
+      //#resolve-hcd-and-create-commandservice
       val assemblyLocF =
         locationService.resolve(
           AkkaConnection(models.ComponentId(Prefix(Subsystem.WFOS, "Assembly"), ComponentType.Assembly)),
@@ -144,7 +145,7 @@ class CommandServiceTest(ignore: Int)
         )
       val assemblyLocation: AkkaLocation = Await.result(assemblyLocF, 10.seconds).get
       val assemblyCmdService             = CommandServiceFactory.make(assemblyLocation)
-
+       //#resolve-hcd-and-create-commandservice
       // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
       val hcdLocF =
         locationService.resolve(AkkaConnection(models.ComponentId(Prefix(Subsystem.WFOS, "HCD"), ComponentType.HCD)), 5.seconds)
