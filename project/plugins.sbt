@@ -1,7 +1,6 @@
 addSbtPlugin("com.timushev.sbt"                  % "sbt-updates"               % "0.6.0")
 addSbtPlugin("org.scalastyle"                   %% "scalastyle-sbt-plugin"     % "1.0.0")
 addSbtPlugin("org.scalameta"                     % "sbt-scalafmt"              % "2.4.3")
-addSbtPlugin("com.dwijnand"                      % "sbt-dynver"                % "4.1.1")
 addSbtPlugin("com.thoughtworks.sbt-api-mappings" % "sbt-api-mappings"          % "3.0.0")
 addSbtPlugin("org.scoverage"                     % "sbt-scoverage"             % "1.9.1")
 addSbtPlugin("com.typesafe.sbt"                  % "sbt-multi-jvm"             % "0.4.0")
