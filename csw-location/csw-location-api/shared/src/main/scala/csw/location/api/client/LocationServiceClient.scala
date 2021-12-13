@@ -9,7 +9,6 @@ import csw.location.api.messages.LocationStreamRequest.Track
 import csw.location.api.messages.{LocationRequest, LocationStreamRequest}
 import csw.location.api.models.*
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
-import csw.logging.api.scaladsl.Logger
 import msocket.api.codecs.BasicCodecs
 import msocket.api.{Subscription, Transport}
 import msocket.portable.Observer
@@ -17,10 +16,14 @@ import msocket.portable.Observer
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 
+trait CswVersion {
+  def check(location: Location): Unit
+}
+
 class LocationServiceClient(
     httpTransport: Transport[LocationRequest],
     websocketTransport: Transport[LocationStreamRequest],
-    logger: Logger
+    cswVersion: CswVersion = _ => ()
 )(implicit actorSystem: ActorSystem[_])
     extends LocationService
     with LocationServiceCodecs
@@ -72,21 +75,8 @@ class LocationServiceClient(
 
   private def validateMayBeLocation[L <: Location](mayBeLocation: Option[L]): Option[L] = {
     mayBeLocation.map { location =>
-      validateCswVersion(location)
+      cswVersion.check(location)
       location
-    }
-  }
-
-  private def validateCswVersion(location: Location): Unit = {
-    val mayBeCswVersion = location.metadata.getCSWVersion
-    mayBeCswVersion match {
-      case Some(serverCswVersion) =>
-        val clientCswVersion = this.getClass.getPackage.getSpecificationVersion
-        if (serverCswVersion != clientCswVersion)
-          logger.error(
-            s"Csw version mismatch for ${location.connection.prefix}: \n Server side : $serverCswVersion \n Client side: $clientCswVersion "
-          )
-      case None => logger.error(s"Could not find csw-version for ${location.connection.prefix}")
     }
   }
 }
