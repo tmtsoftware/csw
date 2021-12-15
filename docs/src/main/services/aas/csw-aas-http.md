@@ -89,14 +89,14 @@ This results into following sequence of actions when a request arrives for a sec
 
 1. Check request header to look for an access token
 1. Validate the token signature and expiry
-1. Check the token for roles and validate that it has the `admin` [realm role](https://www.keycloak.org/docs/latest/server_admin/index.html#realm-roles)
+1. Check the token for roles and validate that it has the `admin` [realm role](https://www.keycloak.org/docs/latest/server_admin/#proc-creating-realm-roles_server_administration_guide)
 1. After all the above checks/validations pass, execute the route logic 
 
 If any of the validations fails, an appropriate HTTP status code is returned to the requester.
 For authentication failure, `401` is sent and for authorization failure, `403` is sent.
 
 @@@ note
-To know more about realm roles, check out the [Keycloak documentation](https://www.keycloak.org/docs/latest/server_admin/index.html#realm-roles)
+To know more about realm roles, check out the [Keycloak documentation](https://www.keycloak.org/docs/latest/server_admin/#proc-creating-realm-roles_server_administration_guide)
 @@@
 
 ## Authorization Policies 

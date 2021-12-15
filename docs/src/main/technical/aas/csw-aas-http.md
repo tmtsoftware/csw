@@ -3,7 +3,7 @@
 This is security adapter for akka http server applications. It exposes security directives e.g. sGet, sPost etc which enforce
 authentication and authorization based on authorization policies.
 
-In order for akka http server to utilize keycloak it has to be registered as keycloak client. Please refer to [keycloak documentation](https://www.keycloak.org/docs/latest/getting_started/index.html)
+In order for akka http server to utilize keycloak it has to be registered as keycloak client. Please refer to [keycloak documentation](https://www.keycloak.org/getting-started/getting-started-zip)
 for details.
 
 ## Types of tokens

@@ -4,7 +4,7 @@ Installed App Auth Adapter is library provided to support authentication and aut
 It is mainly used in Config service cli.
 
 In order for native app to utilize installed app auth adapter, it has to be registered as keycloak client. After registering to keycloak, all client are given
- client secrets which needed for client verification. Please refer to [keycloak documentation](https://www.keycloak.org/docs/latest/getting_started/index.html) for details.
+ client secrets which needed for client verification. Please refer to [keycloak documentation](https://www.keycloak.org/getting-started/getting-started-zip) for details.
 
 ## Technology 
 Keycloak comes with its own adapter for native applications. Csw InstalledAppAuthAdapter is wrapper on top of keycloak provided adapter with added support for local storage for tokens.
