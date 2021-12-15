@@ -16,14 +16,10 @@ import msocket.portable.Observer
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 
-trait CswVersion {
-  def check(location: Location): Unit
-}
-
 class LocationServiceClient(
     httpTransport: Transport[LocationRequest],
     websocketTransport: Transport[LocationStreamRequest],
-    cswVersion: CswVersion = _ => ()
+    cswVersion: CswVersion
 )(implicit actorSystem: ActorSystem[_])
     extends LocationService
     with LocationServiceCodecs
@@ -32,7 +28,9 @@ class LocationServiceClient(
   import actorSystem.executionContext
 
   override def register(registration: Registration): Future[RegistrationResult] = {
-    httpTransport.requestResponse[Location](Register(registration.withCswVersion())).map(RegistrationResult.from(_, unregister))
+    httpTransport
+      .requestResponse[Location](Register(registration.withCswVersion(cswVersion.get)))
+      .map(RegistrationResult.from(_, unregister))
   }
 
   override def unregister(connection: Connection): Future[Done] =
@@ -75,7 +73,7 @@ class LocationServiceClient(
 
   private def validateMayBeLocation[L <: Location](mayBeLocation: Option[L]): Option[L] = {
     mayBeLocation.map { location =>
-      cswVersion.check(location)
+      cswVersion.check(location.metadata, location.prefix)
       location
     }
   }

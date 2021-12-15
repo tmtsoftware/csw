@@ -1,20 +1,22 @@
 package csw.location.server.internal
 
 import akka.Done
-import akka.actor.typed.scaladsl.AskPattern._
+import akka.actor.typed.scaladsl.AskPattern.*
+import akka.cluster.ddata.*
 import akka.cluster.ddata.Replicator.{ModifyFailure, NotFound, UpdateSuccess}
-import akka.cluster.ddata._
 import akka.cluster.ddata.typed.scaladsl.Replicator
 import akka.cluster.ddata.typed.scaladsl.Replicator.{Changed, GetSuccess}
 import akka.stream.OverflowStrategy
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.typed.scaladsl.ActorSource
 import akka.util.Timeout
-import csw.location.api.exceptions._
+import csw.location.api.CswVersionJvm
+import csw.location.api.client.CswVersion
+import csw.location.api.exceptions.*
+import csw.location.api.models.*
 import csw.location.api.models.ComponentType.{Assembly, HCD, Sequencer}
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
 import csw.location.api.models.NetworkType.Outside
-import csw.location.api.models._
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.server.commons.{CswCluster, LocationServiceLogger}
 import csw.location.server.internal.Registry.AllServices
@@ -22,17 +24,18 @@ import csw.logging.api.scaladsl.Logger
 import msocket.api.Subscription
 import msocket.jvm.SourceExtension.RichSource
 
-import scala.async.Async._
+import scala.async.Async.*
 import scala.concurrent.Future
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 
-private[location] class LocationServiceImpl(cswCluster: CswCluster) extends LocationService {
+private[location] class LocationServiceImpl(cswCluster: CswCluster, cswVersion: CswVersion = new CswVersionJvm())
+    extends LocationService {
   outer =>
 
-  private val locationServerVersion = this.getClass.getPackage.getSpecificationVersion
-  private val log: Logger           = LocationServiceLogger.getLogger
+//  private val locationServerVersion = BuildInfo.version
+  private val log: Logger = LocationServiceLogger.getLogger
 
-  import cswCluster._
+  import cswCluster.*
   private implicit val timeout: Timeout = Timeout(5.seconds)
 
   /**
@@ -40,7 +43,9 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
    */
   def register(registration: Registration): Future[RegistrationResult] =
     async {
-      validateCswVersion(registration)
+      //compare registration,etadata with cswVersion.get
+      // or just call cswVersion.check(registration.metadata)
+      cswVersion.check(registration.metadata, registration.connection.prefix)
       val location: Location = getLocation(registration)
       log.info(s"Registering connection: [${registration.connection.name}] with location: [${location.uri.toString}]")
 
@@ -87,17 +92,17 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
       await(registrationResultF)
     }
 
-  private def validateCswVersion(registration: Registration): Unit = {
-    val mayBeCswVersion = registration.metadata.getCSWVersion
-    mayBeCswVersion match {
-      case Some(value) =>
-        if (value != locationServerVersion)
-          log.error(
-            s"Csw version mismatch : \n ${registration.connection.prefix} : $value \n Location Server: $locationServerVersion "
-          )
-      case None => log.error(s"Could not find csw-version for ${registration.connection.prefix}")
-    }
-  }
+//  private def validateCswVersion(registration: Registration): Unit = {
+//    val mayBeCswVersion = registration.metadata.getCSWVersion
+//    mayBeCswVersion match {
+//      case Some(value) =>
+//        if (value != locationServerVersion)
+//          log.error(
+//            s"Csw version mismatch : \n ${registration.connection.prefix} : $value \n Location Server: $locationServerVersion "
+//          )
+//      case None => log.error(s"Could not find csw-version for ${registration.connection.prefix}")
+//    }
+//  }
 
   private[internal] def getLocation(registration: Registration) =
     registration match {

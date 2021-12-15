@@ -1,6 +1,7 @@
 package csw.location.client.scaladsl
 
 import akka.actor.typed.ActorSystem
+import csw.location.api.CswVersionJvm
 import csw.location.api.client.{CswVersion, LocationServiceClient}
 import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.commons.LocationServiceLogger
@@ -41,23 +42,9 @@ object HttpLocationServiceFactory extends LocationServiceCodecs {
       new HttpPostTransport[LocationRequest](httpUri, Json, tokenFactory)
     val websocketTransport: Transport[LocationStreamRequest] =
       new WebsocketTransport[LocationStreamRequest](websocketUri, Json)
-    val version: CswVersion = loc => this.validateCswVersion(loc)
-    new LocationServiceClient(httpTransport, websocketTransport, version)
+    new LocationServiceClient(httpTransport, websocketTransport, new CswVersionJvm())
   }
 
   private[csw] def make(serverIp: String)(implicit actorSystem: ActorSystem[_]): LocationService =
     make(serverIp, httpServerPort)
-
-  private def validateCswVersion(location: Location): Unit = {
-    val mayBeCswVersion = location.metadata.getCSWVersion
-    mayBeCswVersion match {
-      case Some(serverCswVersion) =>
-        val clientCswVersion = this.getClass.getPackage.getSpecificationVersion
-        if (serverCswVersion != clientCswVersion)
-          logger.error(
-            s"Csw version mismatch for ${location.connection.prefix}: \n Server side : $serverCswVersion \n Client side: $clientCswVersion "
-          )
-      case None => logger.error(s"Could not find csw-version for ${location.connection.prefix}")
-    }
-  }
 }

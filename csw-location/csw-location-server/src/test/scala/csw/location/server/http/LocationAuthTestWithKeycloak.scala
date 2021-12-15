@@ -80,7 +80,7 @@ class LocationAuthTestWithKeycloak
     registrationResult.location shouldBe HttpLocation(
       connection,
       URI.create(s"http://$hostname:$servicePort/abc"),
-      Metadata.empty
+      Metadata().withCSWVersion()
     )
   }
 

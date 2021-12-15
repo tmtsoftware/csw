@@ -23,7 +23,9 @@ case class Metadata(value: Map[String, String]) {
 
   def add(key: String, value: String): Metadata = copy(this.value + (key -> value))
 
-  def withCSWVersion(): Metadata                     = add(CswVersionKey, this.getClass.getPackage.getSpecificationVersion)
+  def withCSWVersion(version: String): Metadata = {
+    add(CswVersionKey, version)
+  }
   def withPid(pid: Long): Metadata                   = add(PidKey, pid.toString)
   def withAgentPrefix(agentPrefix: Prefix): Metadata = add(AgentPrefixKey, agentPrefix.toString)
   def withSequenceComponentPrefix(sequenceComponentPrefix: Prefix): Metadata =

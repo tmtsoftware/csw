@@ -28,7 +28,7 @@ sealed abstract class Registration extends LocationSerializable {
    */
   def metadata: Metadata
 
-  def withCswVersion(): Registration
+  def withCswVersion(version: String): Registration
 
 }
 
@@ -54,7 +54,7 @@ final case class AkkaRegistration private[csw] (
    */
   override def location(hostname: String): Location = AkkaLocation(connection, actorRefURI, metadata)
 
-  override def withCswVersion(): AkkaRegistration = this.copy(metadata = metadata.withCSWVersion())
+  override def withCswVersion(version: String): AkkaRegistration = this.copy(metadata = metadata.withCSWVersion(version))
 
 }
 
@@ -77,7 +77,7 @@ final case class TcpRegistration(connection: TcpConnection, port: Int, metadata:
    */
   override def location(hostname: String): Location = TcpLocation(connection, new URI(s"tcp://$hostname:$port"), metadata)
 
-  override def withCswVersion(): TcpRegistration = this.copy(metadata = metadata.withCSWVersion())
+  override def withCswVersion(version: String): TcpRegistration = this.copy(metadata = metadata.withCSWVersion(version))
 }
 
 object TcpRegistration {
@@ -118,7 +118,7 @@ final case class HttpRegistration(
     HttpLocation(connection, new URI(s"http://$hostname:$port/$path"), metadata)
   }
 
-  override def withCswVersion(): HttpRegistration = this.copy(metadata = metadata.withCSWVersion())
+  override def withCswVersion(version: String): HttpRegistration = this.copy(metadata = metadata.withCSWVersion(version))
 }
 
 object HttpRegistration {

@@ -108,7 +108,9 @@ public class JLocationServiceImplTest extends JUnitSuite {
             InterruptedException {
         int port = 8080;
 
-        AkkaRegistration akkaRegistration = JAkkaRegistrationFactory.make(akkaHcdConnection, actorRef, new Metadata(Map.of("", "")));
+        Metadata metadata = new Metadata(Map.of("", ""));
+        metadata.withCSWVersion();
+        AkkaRegistration akkaRegistration = JAkkaRegistrationFactory.make(akkaHcdConnection, actorRef, metadata);
         HttpRegistration httpRegistration = new HttpRegistration(httpServiceConnection, port, Path);
         TcpRegistration tcpRegistration = new TcpRegistration(tcpServiceConnection, port);
 
