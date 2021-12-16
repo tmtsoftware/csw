@@ -2,14 +2,11 @@ package csw.location.client.scaladsl
 
 import akka.actor.typed.ActorSystem
 import csw.location.api.CswVersionJvm
-import csw.location.api.client.{CswVersion, LocationServiceClient}
+import csw.location.api.client.LocationServiceClient
 import csw.location.api.codec.LocationServiceCodecs
-import csw.location.api.commons.LocationServiceLogger
 import csw.location.api.messages.{LocationRequest, LocationStreamRequest}
-import csw.location.api.models.Location
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.internal.Settings
-import csw.logging.api.scaladsl.Logger
 import msocket.api.ContentType.Json
 import msocket.api.Transport
 import msocket.http.post.HttpPostTransport
@@ -19,7 +16,6 @@ import msocket.http.ws.WebsocketTransport
  * The factory is used to create LocationService instance.
  */
 object HttpLocationServiceFactory extends LocationServiceCodecs {
-  private val logger: Logger = LocationServiceLogger.getLogger
   private val httpServerPort = Settings().serverPort
 
   /**

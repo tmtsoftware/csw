@@ -8,16 +8,17 @@ import akka.actor.typed.{Behavior, SpawnProtocol}
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.testkit.TestProbe
 import csw.location.api.exceptions.OtherLocationIsRegistered
+import csw.location.api.models.*
 import csw.location.api.models.ComponentType.{Assembly, HCD, Sequencer}
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.location.api.models._
 import csw.location.api.scaladsl.LocationService
-import csw.location.api.{AkkaRegistrationFactory, models}
+import csw.location.api.{AkkaRegistrationFactory, CswVersionJvm, models}
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.server.commons.ClusterAwareSettings
 import csw.location.server.commons.TestFutureExtension.RichFuture
 import csw.location.server.internal.LocationServiceFactory
+import csw.location.server.scaladsl.TestRegistrationExt.RichRegistration
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.network.utils.Networks
 import csw.prefix.models.{Prefix, Subsystem}
@@ -29,8 +30,19 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt
+import scala.language.implicitConversions
 
 class LocationServiceCompTestWithCluster extends LocationServiceCompTest("cluster")
+
+object TestRegistrationExt {
+
+  implicit class RichRegistration(registration: Registration) {
+    implicit def cswVersion(mode: String): Registration = mode match {
+      case "http"    => registration.withCswVersion(new CswVersionJvm().get)
+      case "cluster" => registration
+    }
+  }
+}
 
 class LocationServiceCompTest(mode: String)
     extends AnyFunSuite
@@ -50,7 +62,8 @@ class LocationServiceCompTest(mode: String)
     case "http"    => HttpLocationServiceFactory.makeLocalClient
     case "cluster" => LocationServiceFactory.make(ClusterAwareSettings)
   }
-  import AkkaRegistrationFactory._
+
+  import AkkaRegistrationFactory.*
 
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 100.millis)
 
@@ -81,8 +94,10 @@ class LocationServiceCompTest(mode: String)
 
     // register, resolve & list tcp connection for the first time
     locationService.register(tcpRegistration).await
-    locationService.resolve(connection, 2.seconds).await.get shouldBe tcpRegistration.location(Networks().hostname)
-    locationService.list.await shouldBe List(tcpRegistration.location(Networks().hostname))
+    locationService.resolve(connection, 2.seconds).await.get shouldBe tcpRegistration
+      .cswVersion(mode)
+      .location(Networks().hostname)
+    locationService.list.await shouldBe List(tcpRegistration.cswVersion(mode).location(Networks().hostname))
 
     // unregister, resolve & list tcp connection
     locationService.unregister(connection).await
@@ -91,10 +106,14 @@ class LocationServiceCompTest(mode: String)
 
     // re-register, resolve & list tcp connection
     locationService.register(tcpRegistration).await
-    locationService.resolve(connection, 2.seconds).await.get shouldBe tcpRegistration.location(
-      Networks().hostname
+    locationService.resolve(connection, 2.seconds).await.get shouldBe tcpRegistration
+      .cswVersion(mode)
+      .location(
+        Networks().hostname
+      )
+    locationService.list.await shouldBe List(
+      tcpRegistration.cswVersion(mode).location(Networks().hostname)
     )
-    locationService.list.await shouldBe List(tcpRegistration.location(Networks().hostname))
   }
 
   // DEOPSCSW-12: Create location service API
@@ -113,10 +132,12 @@ class LocationServiceCompTest(mode: String)
 
     // register, resolve & list http connection for the first time
     locationService.register(httpRegistration).await.location.connection shouldBe httpConnection
-    locationService.resolve(httpConnection, 2.seconds).await.get shouldBe httpRegistration.location(
-      Networks().hostname
-    )
-    locationService.list.await shouldBe List(httpRegistration.location(Networks().hostname))
+    locationService.resolve(httpConnection, 2.seconds).await.get shouldBe httpRegistration
+      .cswVersion(mode)
+      .location(
+        Networks().hostname
+      )
+    locationService.list.await shouldBe List(httpRegistration.cswVersion(mode).location(Networks().hostname))
 
     // unregister, resolve & list http connection
     locationService.unregister(httpConnection).await
@@ -125,10 +146,14 @@ class LocationServiceCompTest(mode: String)
 
     // re-register, resolve & list http connection
     locationService.register(httpRegistration).await.location.connection shouldBe httpConnection
-    locationService.resolve(httpConnection, 2.seconds).await.get shouldBe httpRegistration.location(
-      Networks().hostname
+    locationService.resolve(httpConnection, 2.seconds).await.get shouldBe httpRegistration
+      .cswVersion(mode)
+      .location(
+        Networks().hostname
+      )
+    locationService.list.await shouldBe List(
+      httpRegistration.cswVersion(mode).location(Networks().hostname)
     )
-    locationService.list.await shouldBe List(httpRegistration.location(Networks().hostname))
   }
 
   // DEOPSCSW-12: Create location service API
@@ -146,10 +171,12 @@ class LocationServiceCompTest(mode: String)
 
     // register, resolve & list akka connection for the first time
     locationService.register(akkaRegistration).await.location.connection shouldBe connection
-    locationService.resolve(connection, 2.seconds).await.get shouldBe akkaRegistration.location(
-      Networks().hostname
-    )
-    locationService.list.await shouldBe List(akkaRegistration.location(Networks().hostname))
+    locationService.resolve(connection, 2.seconds).await.get shouldBe akkaRegistration
+      .cswVersion(mode)
+      .location(
+        Networks().hostname
+      )
+    locationService.list.await shouldBe List(akkaRegistration.cswVersion(mode).location(Networks().hostname))
 
     // unregister, resolve & list akka connection
     locationService.unregister(connection).await
@@ -158,10 +185,14 @@ class LocationServiceCompTest(mode: String)
 
     // re-register, resolve & list akka connection
     locationService.register(akkaRegistration).await.location.connection shouldBe connection
-    locationService.resolve(connection, 2.seconds).await.get shouldBe akkaRegistration.location(
-      Networks().hostname
+    locationService.resolve(connection, 2.seconds).await.get shouldBe akkaRegistration
+      .cswVersion(mode)
+      .location(
+        Networks().hostname
+      )
+    locationService.list.await shouldBe List(
+      akkaRegistration.cswVersion(mode).location(Networks().hostname)
     )
-    locationService.list.await shouldBe List(akkaRegistration.location(Networks().hostname))
   }
 
   List(HCD, Assembly, Sequencer).foreach { compType =>
@@ -205,7 +236,7 @@ class LocationServiceCompTest(mode: String)
       .location
       .connection shouldBe connection
 
-    locationService.list.await shouldBe List(make(connection, actorRef).location(Networks().hostname))
+    locationService.list.await shouldBe List(make(connection, actorRef).cswVersion(mode).location(Networks().hostname))
 
     actorRef ! "Kill"
 
@@ -231,7 +262,7 @@ class LocationServiceCompTest(mode: String)
 
     val result  = locationService.register(redis1Registration).await
     val result2 = locationService.register(redis2registration).await
-    probe.expectMessage(LocationUpdated(redis1Registration.location(Networks().hostname)))
+    probe.expectMessage(LocationUpdated(redis1Registration.cswVersion(mode).location(Networks().hostname)))
 
     result.unregister().await
     result2.unregister().await
@@ -254,7 +285,7 @@ class LocationServiceCompTest(mode: String)
     val switch = locationService.subscribe(redis1Connection, te => probe.ref ! te)
 
     locationService.register(redis1Registration).await
-    probe.expectMsg(LocationUpdated(redis1Registration.location(hostname)))
+    probe.expectMsg(LocationUpdated(redis1Registration.cswVersion(mode).location(hostname)))
 
     locationService.unregister(redis1Connection).await
     probe.expectMsg(LocationRemoved(redis1Registration.connection))
@@ -290,8 +321,8 @@ class LocationServiceCompTest(mode: String)
     val httpSwitch = locationService.track(httpConnection).toMat(Sink.foreach(httpProbe.ref.tell(_)))(Keep.left).run()
     val akkaSwitch = locationService.track(akkaConnection).toMat(Sink.foreach(akkaProbe.ref.tell(_)))(Keep.left).run()
 
-    httpProbe.expectMessage(LocationUpdated(httpRegistration.location(hostname)))
-    akkaProbe.expectMessage(LocationUpdated(akkaRegistration.location(hostname)))
+    httpProbe.expectMessage(LocationUpdated(httpRegistration.cswVersion(mode).location(hostname)))
+    akkaProbe.expectMessage(LocationUpdated(akkaRegistration.cswVersion(mode).location(hostname)))
 
     //unregister http connection
     httpRegistrationResult.unregister().await
@@ -325,7 +356,7 @@ class LocationServiceCompTest(mode: String)
     //start tracking http connection
     val httpSwitch = locationService.track(httpConnection).toMat(Sink.foreach(httpProbe.ref.tell(_)))(Keep.left).run()
 
-    httpProbe.expectMessage(LocationUpdated(httpRegistration.location(hostname)))
+    httpProbe.expectMessage(LocationUpdated(httpRegistration.cswVersion(mode).location(hostname)))
 
     //stop tracking http connection
     httpSwitch.cancel()

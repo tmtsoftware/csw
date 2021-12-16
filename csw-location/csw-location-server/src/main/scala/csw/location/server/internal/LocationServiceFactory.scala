@@ -1,6 +1,5 @@
 package csw.location.server.internal
 
-import csw.location.api.CswVersionJvm
 import csw.location.api.scaladsl.LocationService
 import csw.location.server.commons.{ClusterSettings, CswCluster}
 
