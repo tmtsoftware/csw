@@ -28,7 +28,7 @@ class CswVersionJvm extends CswVersion {
   }
   override def get: String = {
     Option(
-      classOf[LocationService].getClass.getPackage.getSpecificationVersion
-    ).getOrElse("SNAPSHOT")
+      classOf[LocationService].getPackage.getSpecificationVersion
+    ).getOrElse("0.1.0-SNAPSHOT")
   }
 }
