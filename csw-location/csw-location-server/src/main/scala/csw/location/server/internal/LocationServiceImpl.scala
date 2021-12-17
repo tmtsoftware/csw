@@ -32,7 +32,6 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster, cswVersion: 
     extends LocationService {
   outer =>
 
-//  private val locationServerVersion = BuildInfo.version
   private val log: Logger = LocationServiceLogger.getLogger
 
   import cswCluster.*
@@ -43,8 +42,6 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster, cswVersion: 
    */
   def register(registration: Registration): Future[RegistrationResult] =
     async {
-      //compare registration,etadata with cswVersion.get
-      // or just call cswVersion.check(registration.metadata)
       cswVersion.check(registration.metadata, registration.connection.prefix)
       val location: Location = getLocation(registration)
       log.info(s"Registering connection: [${registration.connection.name}] with location: [${location.uri.toString}]")
