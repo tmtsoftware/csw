@@ -17,11 +17,11 @@ class CswVersionJvm extends CswVersion {
   private def validateCswVersion(metadata: Metadata, prefix: Prefix): Unit = {
     val mayBeCswVersion = metadata.getCSWVersion
     mayBeCswVersion match {
-      case Some(serverCswVersion) =>
-        val clientCswVersion = get
-        if (serverCswVersion != clientCswVersion)
+      case Some(cswVersionInMetadata) =>
+        val myCswVersion = get
+        if (cswVersionInMetadata != myCswVersion)
           logger.error(
-            s"csw-version mismatch for Prefix : In $prefix's Metadata Found : $serverCswVersion , Expected : $clientCswVersion"
+            s"csw-version mismatch, In $prefix's Metadata Found:$cswVersionInMetadata, my csw-version:$myCswVersion"
           )
       case None => logger.error(s"Could not find csw-version for $prefix")
     }
