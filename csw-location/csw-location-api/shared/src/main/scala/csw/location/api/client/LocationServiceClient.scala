@@ -4,10 +4,10 @@ import akka.Done
 import akka.actor.typed.ActorSystem
 import akka.stream.scaladsl.Source
 import csw.location.api.codec.LocationServiceCodecs
-import csw.location.api.messages.LocationRequest._
+import csw.location.api.messages.LocationRequest.*
 import csw.location.api.messages.LocationStreamRequest.Track
 import csw.location.api.messages.{LocationRequest, LocationStreamRequest}
-import csw.location.api.models._
+import csw.location.api.models.*
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import msocket.api.codecs.BasicCodecs
 import msocket.api.{Subscription, Transport}
@@ -18,7 +18,8 @@ import scala.concurrent.duration.FiniteDuration
 
 class LocationServiceClient(
     httpTransport: Transport[LocationRequest],
-    websocketTransport: Transport[LocationStreamRequest]
+    websocketTransport: Transport[LocationStreamRequest],
+    cswVersion: CswVersion
 )(implicit actorSystem: ActorSystem[_])
     extends LocationService
     with LocationServiceCodecs
@@ -26,8 +27,11 @@ class LocationServiceClient(
 
   import actorSystem.executionContext
 
-  override def register(registration: Registration): Future[RegistrationResult] =
-    httpTransport.requestResponse[Location](Register(registration)).map(RegistrationResult.from(_, unregister))
+  override def register(registration: Registration): Future[RegistrationResult] = {
+    httpTransport
+      .requestResponse[Location](Register(registration.withCswVersion(cswVersion.get)))
+      .map(RegistrationResult.from(_, unregister))
+  }
 
   override def unregister(connection: Connection): Future[Done] =
     httpTransport.requestResponse[Done](Unregister(connection))
@@ -35,11 +39,17 @@ class LocationServiceClient(
   override def unregisterAll(): Future[Done] =
     httpTransport.requestResponse[Done](UnregisterAll)
 
-  override def find[L <: Location](connection: TypedConnection[L]): Future[Option[L]] =
-    httpTransport.requestResponse[Option[L]](Find(connection.asInstanceOf[TypedConnection[Location]]))
+  override def find[L <: Location](connection: TypedConnection[L]): Future[Option[L]] = {
+    val eventualMaybeL: Future[Option[L]] =
+      httpTransport.requestResponse[Option[L]](Find(connection.asInstanceOf[TypedConnection[Location]]))
+    eventualMaybeL.map(validateMayBeLocation)
+  }
 
-  override def resolve[L <: Location](connection: TypedConnection[L], within: FiniteDuration): Future[Option[L]] =
-    httpTransport.requestResponse[Option[L]](Resolve(connection.asInstanceOf[TypedConnection[Location]], within))
+  override def resolve[L <: Location](connection: TypedConnection[L], within: FiniteDuration): Future[Option[L]] = {
+    val eventualMaybeL =
+      httpTransport.requestResponse[Option[L]](Resolve(connection.asInstanceOf[TypedConnection[Location]], within))
+    eventualMaybeL.map(validateMayBeLocation)
+  }
 
   override def list: Future[List[Location]] = httpTransport.requestResponse[List[Location]](ListEntries)
 
@@ -60,4 +70,11 @@ class LocationServiceClient(
 
   override def subscribe(connection: Connection, callback: TrackingEvent => Unit): Subscription =
     websocketTransport.requestStream[TrackingEvent](Track(connection), Observer.create(callback))
+
+  private def validateMayBeLocation[L <: Location](mayBeLocation: Option[L]): Option[L] = {
+    mayBeLocation.map { location =>
+      cswVersion.check(location.metadata, location.prefix)
+      location
+    }
+  }
 }

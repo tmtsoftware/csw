@@ -8,6 +8,7 @@ import akka.japi.Pair;
 import akka.stream.javadsl.Keep;
 import akka.stream.testkit.TestSubscriber;
 import akka.stream.testkit.scaladsl.TestSink;
+import csw.location.api.CswVersionJvm;
 import csw.location.api.JAkkaRegistrationFactory;
 import csw.location.api.commons.Constants;
 import csw.location.api.javadsl.*;
@@ -97,7 +98,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
         HttpRegistration httpRegistration = new HttpRegistration(httpServiceConnection, port, Path);
 
         IRegistrationResult registrationResult = locationService.register(httpRegistration).get();
-        Assert.assertEquals(httpRegistration.location(hostname), registrationResult.location());
+        Assert.assertEquals(withCswVersion(httpRegistration).location(hostname), registrationResult.location());
         locationService.unregister(httpServiceConnection).get();
         Assert.assertEquals(Collections.emptyList(), locationService.list().get());
     }
@@ -108,7 +109,8 @@ public class JLocationServiceImplTest extends JUnitSuite {
             InterruptedException {
         int port = 8080;
 
-        AkkaRegistration akkaRegistration = JAkkaRegistrationFactory.make(akkaHcdConnection, actorRef, new Metadata(Map.of("", "")));
+        Metadata metadata = new Metadata(Map.of("", ""));
+        AkkaRegistration akkaRegistration = JAkkaRegistrationFactory.make(akkaHcdConnection, actorRef, metadata);
         HttpRegistration httpRegistration = new HttpRegistration(httpServiceConnection, port, Path);
         TcpRegistration tcpRegistration = new TcpRegistration(tcpServiceConnection, port);
 
@@ -117,13 +119,13 @@ public class JLocationServiceImplTest extends JUnitSuite {
         locationService.register(tcpRegistration).get();
 
         Assert.assertEquals(3, locationService.list().get().size());
-        Assert.assertEquals(akkaRegistration.location(hostname),
+        Assert.assertEquals(withCswVersion(akkaRegistration).location(hostname),
                 locationService.find(akkaHcdConnection).get().orElseThrow());
-        Assert.assertEquals(akkaRegistration.metadata(),
+        Assert.assertEquals(withCswVersion(akkaRegistration).metadata(),
                 locationService.find(akkaHcdConnection).get().orElseThrow().metadata());
-        Assert.assertEquals(httpRegistration.location(hostname),
+        Assert.assertEquals(withCswVersion(httpRegistration).location(hostname),
                 locationService.find(httpServiceConnection).get().orElseThrow());
-        Assert.assertEquals(tcpRegistration.location(hostname),
+        Assert.assertEquals(withCswVersion(tcpRegistration).location(hostname),
                 locationService.find(tcpServiceConnection).get().orElseThrow());
     }
 
@@ -135,7 +137,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
         TcpRegistration tcpRegistration = new TcpRegistration(tcpServiceConnection, port);
 
         locationService.register(tcpRegistration).get();
-        Assert.assertEquals(tcpRegistration.location(hostname),
+        Assert.assertEquals(withCswVersion(tcpRegistration).location(hostname),
                 locationService.find(tcpServiceConnection).get().orElseThrow());
     }
 
@@ -145,7 +147,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
     public void testResolveAkkaConnection__DEOPSCSW_13_DEOPSCSW_39() throws ExecutionException, InterruptedException {
         AkkaRegistration registration = JAkkaRegistrationFactory.make(akkaHcdConnection, actorRef);
         locationService.register(registration).get();
-        Assert.assertEquals(registration.location(hostname),
+        Assert.assertEquals(withCswVersion(registration).location(hostname),
                 locationService.find(akkaHcdConnection).get().orElseThrow());
     }
 
@@ -168,7 +170,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
 
         locationService.register(tcpRegistration).get();
         Assert.assertEquals(1, locationService.list().get().size());
-        Assert.assertEquals(tcpRegistration.location(hostname),
+        Assert.assertEquals(withCswVersion(tcpRegistration).location(hostname),
                 locationService.find(tcpServiceConnection).get().orElseThrow());
     }
 
@@ -179,7 +181,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
         AkkaRegistration registration = JAkkaRegistrationFactory.make(akkaHcdConnection, actorRef);
 
         locationService.register(registration).get();
-        Assert.assertEquals(registration.location(hostname),
+        Assert.assertEquals(withCswVersion(registration).location(hostname),
                 locationService.find(akkaHcdConnection).get().orElseThrow());
     }
 
@@ -200,9 +202,9 @@ public class JLocationServiceImplTest extends JUnitSuite {
         locationService.register(tcpServiceRegistration).get();
 
         Set<Location> locations = Set.of(
-                httpRegistration.location(hostname),
-                akkaHcdRegistration.location(hostname),
-                tcpServiceRegistration.location(hostname)
+                withCswVersion(httpRegistration).location(hostname),
+                withCswVersion(akkaHcdRegistration).location(hostname),
+                withCswVersion(tcpServiceRegistration).location(hostname)
         );
 
         Set<Location> actualSetOfLocations = Set.copyOf(locationService.list().get());
@@ -251,21 +253,21 @@ public class JLocationServiceImplTest extends JUnitSuite {
         locationService.register(httpServiceRegistration).get();
 
         //  Filter by HCD type
-        List<Location> hcdLocations = List.of(akkaHcdRegistration.location(hostname));
+        List<Location> hcdLocations = List.of(withCswVersion(akkaHcdRegistration).location(hostname));
         Assert.assertEquals(hcdLocations, locationService.list(JComponentType.HCD).get());
 
         //  Filter by Assembly type
-        List<Location> assemblyLocations = List.of(akkaAssemblyRegistration.location(hostname));
+        List<Location> assemblyLocations = List.of(withCswVersion(akkaAssemblyRegistration).location(hostname));
         Assert.assertEquals(assemblyLocations, locationService.list(JComponentType.Assembly).get());
 
         //  Filter by Container type
-        List<Location> containerLocations = List.of(akkaContainerRegistration.location(hostname));
+        List<Location> containerLocations = List.of(withCswVersion(akkaContainerRegistration).location(hostname));
         Assert.assertEquals(containerLocations, locationService.list(JComponentType.Container).get());
 
         //  Filter by Service type
         Set<Location> serviceLocations = Set.of(
-                tcpServiceRegistration.location(hostname),
-                httpServiceRegistration.location(hostname)
+                withCswVersion(tcpServiceRegistration).location(hostname),
+                withCswVersion(httpServiceRegistration).location(hostname)
         );
         Set<Location> actualSetOfLocations = Set.copyOf(locationService.list(JComponentType.Service).get());
         Assert.assertEquals(serviceLocations, actualSetOfLocations);
@@ -286,8 +288,8 @@ public class JLocationServiceImplTest extends JUnitSuite {
         locationService.register(akkaRegistration).get();
 
         Set<Location> locations = Set.of(
-                tcpRegistration.location(hostname),
-                akkaRegistration.location(hostname)
+                withCswVersion(tcpRegistration).location(hostname),
+                withCswVersion(akkaRegistration).location(hostname)
         );
 
         Set<Location> actualSetOfLocations = Set.copyOf(locationService.list(hostname).get());
@@ -313,15 +315,15 @@ public class JLocationServiceImplTest extends JUnitSuite {
         locationService.register(akkaRegistration).get();
 
         //  filter by Tcp type
-        List<Location> tcpLocations = List.of(tcpRegistration.location(hostname));
+        List<Location> tcpLocations = List.of(withCswVersion(tcpRegistration).location(hostname));
         Assert.assertEquals(tcpLocations, locationService.list(JConnectionType.TcpType).get());
 
         //  filter by Http type
-        List<Location> httpLocations = List.of(httpRegistration.location(hostname));
+        List<Location> httpLocations = List.of(withCswVersion(httpRegistration).location(hostname));
         Assert.assertEquals(httpLocations, locationService.list(JConnectionType.HttpType).get());
 
         //  filter by Akka type
-        List<Location> akkaLocations = List.of(akkaRegistration.location(hostname));
+        List<Location> akkaLocations = List.of(withCswVersion(akkaRegistration).location(hostname));
         Assert.assertEquals(akkaLocations, locationService.list(JConnectionType.AkkaType).get());
     }
 
@@ -346,9 +348,9 @@ public class JLocationServiceImplTest extends JUnitSuite {
 
         // filter akka locations by prefix
         List<AkkaLocation> akkaLocations = List.of(
-                (AkkaLocation) akkaRegistration1.location(hostname),
-                (AkkaLocation) akkaRegistration2.location(hostname),
-                (AkkaLocation) akkaRegistration3.location(hostname)
+                (AkkaLocation) withCswVersion(akkaRegistration1).location(hostname),
+                (AkkaLocation) withCswVersion(akkaRegistration2).location(hostname),
+                (AkkaLocation) withCswVersion(akkaRegistration3).location(hostname)
         );
         Assert.assertEquals(akkaLocations.size(), locationService.listByPrefix("NFIRAOS.ncc.trombone").get().size());
         Assert.assertTrue(locationService.listByPrefix("NFIRAOS.ncc.trombone").get().containsAll(akkaLocations));
@@ -376,7 +378,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
         IRegistrationResult result2 = locationService.register(redis2registration).get();
 
         trackingEventProbe.request(1);
-        trackingEventProbe.expectNext(new LocationUpdated(redis1Registration.location(hostname)));
+        trackingEventProbe.expectNext(new LocationUpdated(withCswVersion(redis1Registration).location(hostname)));
 
         result.unregister().get();
         result2.unregister().get();
@@ -403,7 +405,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
                 trackingEvent -> probe.ref().tell(trackingEvent));
 
         locationService.register(redis1Registration).toCompletableFuture().get();
-        probe.expectMessage(new LocationUpdated(redis1Registration.location(hostname)));
+        probe.expectMessage(new LocationUpdated(withCswVersion(redis1Registration).location(hostname)));
 
         locationService.unregister(redis1Connection).toCompletableFuture().get();
         probe.expectMessage(new LocationRemoved(redis1Registration.connection()));
@@ -441,7 +443,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
                         Props.empty());
 
         AkkaRegistration registration = JAkkaRegistrationFactory.make(connection, actorRef);
-        Location location = registration.location(hostname);
+        Location location = withCswVersion(registration).location(hostname);
         IRegistrationResult registrationResult = locationService.register(registration).get();
         Assert.assertEquals(location, registrationResult.location());
 
@@ -457,5 +459,9 @@ public class JLocationServiceImplTest extends JUnitSuite {
                 e.printStackTrace();
             }
         });
+    }
+
+    private Registration withCswVersion(Registration registration) {
+        return registration.withCswVersion(new CswVersionJvm().get());
     }
 }

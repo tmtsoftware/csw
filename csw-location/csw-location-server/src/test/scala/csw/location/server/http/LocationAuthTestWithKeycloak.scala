@@ -1,12 +1,11 @@
 package csw.location.server.http
 
-import java.net.URI
-
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.aas.core.commons.AASConnection
+import csw.location.api.CswVersionJvm
 import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.models.Connection.HttpConnection
-import csw.location.api.models.{ComponentId, ComponentType, HttpLocation, HttpRegistration, Metadata}
+import csw.location.api.models.*
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.network.utils.SocketUtils
 import csw.prefix.models.Prefix
@@ -14,11 +13,12 @@ import msocket.http.HttpError
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers
-import org.tmt.embedded_keycloak.KeycloakData._
+import org.tmt.embedded_keycloak.KeycloakData.*
 import org.tmt.embedded_keycloak.impl.StopHandle
 import org.tmt.embedded_keycloak.utils.BearerToken
 import org.tmt.embedded_keycloak.{EmbeddedKeycloak, KeycloakData, Settings}
 
+import java.net.URI
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationLong
@@ -80,7 +80,7 @@ class LocationAuthTestWithKeycloak
     registrationResult.location shouldBe HttpLocation(
       connection,
       URI.create(s"http://$hostname:$servicePort/abc"),
-      Metadata.empty
+      Metadata().withCSWVersion(new CswVersionJvm().get)
     )
   }
 

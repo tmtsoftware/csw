@@ -1,6 +1,7 @@
 package csw.location.client.scaladsl
 
 import akka.actor.typed.ActorSystem
+import csw.location.api.CswVersionJvm
 import csw.location.api.client.LocationServiceClient
 import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.messages.{LocationRequest, LocationStreamRequest}
@@ -15,7 +16,6 @@ import msocket.http.ws.WebsocketTransport
  * The factory is used to create LocationService instance.
  */
 object HttpLocationServiceFactory extends LocationServiceCodecs {
-
   private val httpServerPort = Settings().serverPort
 
   /**
@@ -31,16 +31,16 @@ object HttpLocationServiceFactory extends LocationServiceCodecs {
   private[csw] def make(serverIp: String, port: Int, tokenFactory: () => Option[String] = () => None)(implicit
       actorSystem: ActorSystem[_]
   ): LocationService = {
+
     val httpUri      = s"http://$serverIp:$port/post-endpoint"
     val websocketUri = s"ws://$serverIp:$port/websocket-endpoint"
     val httpTransport: Transport[LocationRequest] =
       new HttpPostTransport[LocationRequest](httpUri, Json, tokenFactory)
     val websocketTransport: Transport[LocationStreamRequest] =
       new WebsocketTransport[LocationStreamRequest](websocketUri, Json)
-    new LocationServiceClient(httpTransport, websocketTransport)
+    new LocationServiceClient(httpTransport, websocketTransport, new CswVersionJvm())
   }
 
   private[csw] def make(serverIp: String)(implicit actorSystem: ActorSystem[_]): LocationService =
     make(serverIp, httpServerPort)
-
 }
