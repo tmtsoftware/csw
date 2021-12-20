@@ -89,18 +89,6 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster, cswVersion: 
       await(registrationResultF)
     }
 
-//  private def validateCswVersion(registration: Registration): Unit = {
-//    val mayBeCswVersion = registration.metadata.getCSWVersion
-//    mayBeCswVersion match {
-//      case Some(value) =>
-//        if (value != locationServerVersion)
-//          log.error(
-//            s"Csw version mismatch : \n ${registration.connection.prefix} : $value \n Location Server: $locationServerVersion "
-//          )
-//      case None => log.error(s"Could not find csw-version for ${registration.connection.prefix}")
-//    }
-//  }
-
   private[internal] def getLocation(registration: Registration) =
     registration match {
       case HttpRegistration(_, _, _, Outside, _) => registration.location(cswCluster.publicHostname)
