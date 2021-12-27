@@ -1,5 +1,6 @@
 package csw.testkit
 
+import akka.http.scaladsl.Http
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.aas.http.SecurityDirectives
@@ -41,13 +42,14 @@ final class LocationTestKit private (testKitSettings: TestKitSettings, enableAut
 
   implicit lazy val timeout: Timeout = testKitSettings.DefaultTimeout
 
+  private var locationServer: Option[Http.ServerBinding] = None
+
   /**
    * Start HTTP location server on default port 7654
    *
    * Location server is required to be running on a machine before starting components. (HCD's, Assemblies etc.)
    */
-  def startLocationServer(): Unit =
-    TestKitUtils.await(locationWiring.locationHttpService.start(), timeout).addToCoordinatedShutdown(timeout.duration)
+  def startLocationServer(): Unit = locationServer = Some(TestKitUtils.await(locationWiring.locationHttpService.start(), timeout))
 
   /**
    * Shutdown HTTP location server
@@ -55,6 +57,7 @@ final class LocationTestKit private (testKitSettings: TestKitSettings, enableAut
    * When the test has completed, make sure you shutdown location server.
    */
   def shutdownLocationServer(): Unit = {
+    locationServer.foreach(TestKitUtils.terminateHttpServerBinding(_, timeout))
     TestKitUtils.shutdown(shutdown(), timeout.duration)
   }
 

@@ -67,6 +67,8 @@ final class FrameworkTestKit private (
   private var locationTestkitWithAuth: LocationTestKit = _
 
   private var configStarted           = false
+  private var eventStarted            = false
+  private var alarmStarted            = false
   private var dbStarted               = false
   private var locationWithAuthStarted = false
 
@@ -87,8 +89,8 @@ final class FrameworkTestKit private (
     locationTestKit.startLocationServer()
     services.foreach {
       case ConfigServer   => configTestKit.startConfigServer(); configStarted = true
-      case EventServer    => eventTestKit.startEventService()
-      case AlarmServer    => alarmTestKit.startAlarmService()
+      case EventServer    => eventTestKit.startEventService(); eventStarted = true
+      case AlarmServer    => alarmTestKit.startAlarmService(); alarmStarted = true
       case DatabaseServer => databaseTestKit.startDatabaseService(); dbStarted = true
       case LocationServer => // location server without auth is already started above
       case LocationServerWithAuth =>
@@ -189,7 +191,12 @@ final class FrameworkTestKit private (
    */
   def shutdown(): Unit = {
     redisClient.shutdown()
-    if (configStarted) configTestKit.deleteServerFiles()
+    if (configStarted) {
+      configTestKit.deleteServerFiles()
+      configTestKit.terminateServer()
+    }
+    if (eventStarted) eventTestKit.stopRedis()
+    if (alarmStarted) alarmTestKit.stopRedis()
     if (dbStarted) databaseTestKit.shutdownDatabaseService()
     if (locationWithAuthStarted) locationTestkitWithAuth.shutdownLocationServer()
     TestKitUtils.shutdown(frameworkWiring.actorRuntime.shutdown(), timeout)

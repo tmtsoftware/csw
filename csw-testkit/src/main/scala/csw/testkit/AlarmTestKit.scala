@@ -18,8 +18,9 @@ import csw.testkit.redis.RedisStore
 import io.lettuce.core.RedisClient
 
 import java.util.Optional
+import java.util.concurrent.TimeUnit
 import scala.concurrent.Await
-import scala.concurrent.duration.DurationInt
+import scala.concurrent.duration.FiniteDuration
 
 /**
  * AlarmTestKit supports starting Alarm server using embedded redis internally (sentinel + master)
@@ -97,7 +98,7 @@ final class AlarmTestKit private (
    *         [[csw.alarm.api.exceptions.ConfigParseException]]
    */
   def initAlarms(config: Config, reset: Boolean = false): Done =
-    Await.result(alarmService.initAlarms(config, reset), 8.seconds)
+    Await.result(alarmService.initAlarms(config, reset), new FiniteDuration(8, TimeUnit.SECONDS))
 
   /**
    * Fetches the severity of the given alarm from the alarm store
@@ -106,7 +107,7 @@ final class AlarmTestKit private (
    * @return the alarm severity or fails with [[csw.alarm.api.exceptions.KeyNotFoundException]]
    */
   def getCurrentSeverity(alarmKey: AlarmKey): FullAlarmSeverity =
-    Await.result(alarmService.getCurrentSeverity(alarmKey), 1.second)
+    Await.result(alarmService.getCurrentSeverity(alarmKey), new FiniteDuration(1, TimeUnit.SECONDS))
 }
 
 object AlarmTestKit {
