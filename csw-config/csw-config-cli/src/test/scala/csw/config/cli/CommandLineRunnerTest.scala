@@ -2,7 +2,6 @@ package csw.config.cli
 
 import java.nio.file.{Files, Paths}
 import java.time.Instant
-
 import akka.actor.typed
 import akka.actor.typed.scaladsl.Behaviors
 import csw.aas.installed.api.InstalledAppAuthAdapter
@@ -15,6 +14,7 @@ import csw.config.server.ServerWiring
 import csw.config.server.mocks.MockedAuthentication
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.server.http.HTTPLocationService
+import org.mockito.Mockito.{verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.should.Matchers
 

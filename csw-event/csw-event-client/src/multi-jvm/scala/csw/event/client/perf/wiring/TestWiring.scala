@@ -4,7 +4,7 @@ import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.event.api.scaladsl.{EventPublisher, EventSubscriber}
 import csw.event.client.EventServiceFactory
 import csw.event.client.models.EventStores.{KafkaStore, RedisStore}
-import org.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 
 import scala.concurrent.ExecutionContext
 

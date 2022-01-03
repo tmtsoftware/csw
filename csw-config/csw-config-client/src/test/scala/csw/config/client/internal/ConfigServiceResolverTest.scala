@@ -1,7 +1,6 @@
 package csw.config.client.internal
 
 import java.net.URI
-
 import csw.config.client.ConfigClientBaseSuite
 import csw.config.client.commons.ConfigServiceConnection
 import csw.config.client.scaladsl.ConfigClientFactory
@@ -10,8 +9,9 @@ import csw.location.api.models
 import csw.location.api.models.Metadata
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
+import org.mockito.Mockito.when
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.concurrent.{Await, Future}
 
 class ConfigServiceResolverTest extends ConfigClientBaseSuite {

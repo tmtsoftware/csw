@@ -8,14 +8,14 @@ import msocket.security.AccessControllerFactory
 import msocket.security.api.TokenValidator
 import msocket.security.models.AccessToken
 import org.keycloak.adapters.KeycloakDeployment
-import org.mockito.MockitoSugar
+import org.mockito.Mockito.when
 
 import scala.concurrent.Future
 
 class JMockedAuthentication extends MockedAuthentication
 
 trait MockedAuthentication {
-  import MockitoSugar._
+  import org.scalatestplus.mockito.MockitoSugar._
 
   private val keycloakDeployment = new KeycloakDeployment()
   keycloakDeployment.setRealm("TMT")

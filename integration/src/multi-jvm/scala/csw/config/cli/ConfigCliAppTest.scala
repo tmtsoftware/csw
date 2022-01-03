@@ -1,8 +1,7 @@
 package csw.config.cli
 
 import java.nio.file.{Files, Paths}
-
-import akka.actor.typed.scaladsl.adapter._
+import akka.actor.typed.scaladsl.adapter.*
 import com.typesafe.config.ConfigFactory
 import csw.aas.installed.api.InstalledAppAuthAdapter
 import csw.commons.ResourceReader
@@ -16,8 +15,8 @@ import csw.config.server.{ServerWiring, Settings}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.helpers.LSNodeSpec
 import csw.location.server.http.MultiNodeHTTPLocationService
-import org.mockito.MockitoSugar
 import org.scalatest.funsuite.AnyFunSuiteLike
+import org.scalatestplus.mockito.MockitoSugar
 
 class ConfigCliAppTestMultiJvmNode1 extends ConfigCliAppTest(0)
 

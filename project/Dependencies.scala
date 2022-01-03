@@ -31,7 +31,7 @@ object Dependencies {
       MSocket.`msocket-http`,
       Libs.`scalatest`.value          % Test,
       Libs.`junit-4-13`               % Test,
-      Libs.`mockito-scala`            % Test,
+      Libs.`mockito`                  % Test,
       Akka.`akka-actor-testkit-typed` % Test,
       Libs.`jboss-logging`            % Test,
       Libs.`embedded-keycloak`        % Test,
@@ -121,7 +121,7 @@ object Dependencies {
       Libs.`scala-java8-compat`,
       Libs.`scalatest`.value % Test,
       Libs.`junit-4-13`      % Test,
-      Libs.`mockito-scala`   % Test
+      Libs.`mockito`         % Test
     )
   )
 
@@ -202,7 +202,7 @@ object Dependencies {
       Akka.`akka-stream-testkit`      % Test,
       Libs.`scalatest`.value          % Test,
       Libs.`junit-4-13`               % Test,
-      Libs.`mockito-scala`            % Test
+      Libs.`mockito`                  % Test
     )
   )
 
@@ -224,7 +224,7 @@ object Dependencies {
       Akka.`akka-stream-testkit`      % Test,
       Libs.`scalatest`.value          % Test,
       Libs.`junit-4-13`               % Test,
-      Libs.`mockito-scala`            % Test
+      Libs.`mockito`                  % Test
     )
   )
 
@@ -263,7 +263,7 @@ object Dependencies {
       Akka.`akka-actor-testkit-typed` % Test,
       Libs.`scalatest`.value          % Test,
       Libs.`junit-4-13`               % Test,
-      Libs.`mockito-scala`            % Test,
+      Libs.`mockito`                  % Test,
       Libs.`embedded-redis`           % Test,
       Libs.`embedded-kafka`           % Test,
       Libs.`testng-6-7`               % Test
@@ -319,7 +319,7 @@ object Dependencies {
       Akka.`akka-stream-typed`,
       Libs.`scalatest`.value % Test,
       Libs.`junit-4-13`      % Test,
-      Libs.`mockito-scala`   % Test
+      Libs.`mockito`         % Test
     )
   )
 
@@ -355,7 +355,7 @@ object Dependencies {
       Libs.`embedded-redis`,
       Libs.`otj-pg-embedded`,
       Libs.`junit-4-13`,
-      Libs.`mockito-scala`
+      Libs.`mockito`
     )
   )
 
@@ -401,7 +401,7 @@ object Dependencies {
       Libs.`os-lib`,
       //(legacy dependencies) required*
       Libs.`scalatest`.value % Test,
-      Libs.`mockito-scala`   % Test
+      Libs.`mockito`         % Test
     )
   )
 
@@ -419,7 +419,7 @@ object Dependencies {
       Libs.`jboss-logging`,
       Libs.httpclient,
       Libs.`scalatest`.value % Test,
-      Libs.`mockito-scala`   % Test
+      Libs.`mockito`         % Test
     )
   )
 
@@ -431,7 +431,7 @@ object Dependencies {
       Libs.`scalatest`.value          % Test,
       Akka.`akka-actor-testkit-typed` % Test,
       AkkaHttp.`akka-http-testkit`    % Test,
-      Libs.`mockito-scala`            % Test
+      Libs.`mockito`                  % Test
     )
   )
 
@@ -451,7 +451,7 @@ object Dependencies {
     Seq(
       Libs.`config`,
       Libs.`scalatest`.value % Test,
-      Libs.`mockito-scala`   % Test
+      Libs.`mockito`         % Test
     )
   )
 
@@ -511,7 +511,7 @@ object Dependencies {
     Seq(
       Libs.`scalatest`.value,
       Libs.`junit-4-13`,
-      Libs.`mockito-scala`,
+      Libs.`mockito`,
       Akka.`akka-actor`,
       Akka.`akka-actor-typed`,
       Akka.`akka-actor-testkit-typed`,

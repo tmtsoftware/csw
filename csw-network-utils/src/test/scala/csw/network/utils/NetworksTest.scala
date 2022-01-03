@@ -1,15 +1,15 @@
 package csw.network.utils
 
 import java.net.{InetAddress, NetworkInterface}
-
 import csw.network.utils.exceptions.{NetworkInterfaceNotFound, NetworkInterfaceNotProvided}
 import csw.network.utils.internal.NetworkInterfaceProvider
-import org.mockito.MockitoSugar
+import org.mockito.Mockito.when
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
+import org.scalatestplus.mockito.MockitoSugar
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 class NetworksTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach with MockitoSugar {
 

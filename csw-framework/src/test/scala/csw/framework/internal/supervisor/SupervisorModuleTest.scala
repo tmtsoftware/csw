@@ -15,17 +15,19 @@ import csw.command.client.messages.SupervisorContainerCommonMessages.Restart
 import csw.command.client.models.framework.PubSub.Subscribe
 import csw.command.client.models.framework.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.command.client.models.framework.{ComponentInfo, LifecycleStateChanged, SupervisorLifecycleState}
-import csw.framework.ComponentInfos._
+import csw.framework.ComponentInfos.*
 import csw.framework.FrameworkTestSuite
 import csw.framework.javadsl.commons.JComponentInfos.{jHcdInfo, jHcdInfoWithInitializeTimeout}
 import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.location.api.models.{Connection, Registration}
-import csw.params.commands.CommandResponse._
-import csw.params.commands._
+import csw.params.commands.CommandResponse.*
+import csw.params.commands.*
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.ObsId
 import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.prefix.models.Prefix
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.{times, verify}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.Eventually
 import org.scalatest.prop.TableDrivenPropertyChecks.forAll

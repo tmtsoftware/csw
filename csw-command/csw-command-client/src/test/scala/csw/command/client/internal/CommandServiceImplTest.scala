@@ -8,16 +8,16 @@ import csw.command.client.messages.ComponentCommonMessage.ComponentStateSubscrip
 import csw.command.client.messages.{ComponentMessage, Query, QueryFinal}
 import csw.command.client.models.framework.PubSub.Subscribe
 import csw.commons.{AskProxyTestKit, RandomUtils}
-import csw.params.commands.CommandResponse._
+import csw.params.commands.CommandResponse.*
 import csw.params.commands.{CommandName, Observe, Setup}
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.prefix.models.Prefix
-import org.mockito.MockitoSugar
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.mockito.MockitoSugar
 
 import scala.concurrent.duration.DurationInt
 

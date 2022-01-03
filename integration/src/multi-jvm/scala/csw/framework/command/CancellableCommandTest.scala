@@ -1,6 +1,6 @@
 package csw.framework.command
 
-import akka.actor.typed.scaladsl.adapter._
+import akka.actor.typed.scaladsl.adapter.*
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
@@ -11,13 +11,13 @@ import csw.location.api.models.{ComponentId, ComponentType}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.helpers.{LSNodeSpec, OneMemberAndSeed}
 import csw.location.server.http.MultiNodeHTTPLocationService
-import csw.params.commands.CommandResponse._
+import csw.params.commands.CommandResponse.*
 import csw.params.commands.Setup
 import csw.params.core.generics.KeyType
 import csw.params.core.models.ObsId
 import csw.prefix.models.{Prefix, Subsystem}
 import io.lettuce.core.RedisClient
-import org.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt

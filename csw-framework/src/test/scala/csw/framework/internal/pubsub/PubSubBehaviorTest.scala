@@ -13,13 +13,13 @@ import csw.location.client.ActorSystemFactory
 import csw.logging.api.scaladsl.Logger
 import csw.params.core.states.{CurrentState, StateName}
 import csw.prefix.models.Prefix
-import org.mockito.MockitoSugar
 import org.scalatest.BeforeAndAfterAll
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.mockito.MockitoSugar
 
 class PubSubBehaviorTest extends AnyFunSuite with Matchers with BeforeAndAfterAll {
 

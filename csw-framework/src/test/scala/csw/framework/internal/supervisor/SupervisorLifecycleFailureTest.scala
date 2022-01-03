@@ -12,10 +12,10 @@ import csw.command.client.messages.ComponentCommonMessage.{
 import csw.command.client.messages.SupervisorContainerCommonMessages.Restart
 import csw.command.client.messages.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
 import csw.command.client.models.framework.{LifecycleStateChanged, PubSub, SupervisorLifecycleState}
-import csw.common.FrameworkAssertions._
-import csw.common.components.framework.SampleComponentState._
+import csw.common.FrameworkAssertions.*
+import csw.common.components.framework.SampleComponentState.*
 import csw.common.utils.TestAppender
-import csw.framework.ComponentInfos._
+import csw.framework.ComponentInfos.*
 import csw.framework.exceptions.{FailureRestart, FailureStop}
 import csw.framework.internal.component.ComponentBehavior
 import csw.framework.models.CswContext
@@ -30,6 +30,9 @@ import csw.params.commands.{CommandName, ControlCommand, Setup}
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.{Id, ObsId}
 import csw.params.core.states.{CurrentState, StateName}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito
+import org.mockito.Mockito.{doThrow, verify, when}
 import org.mockito.stubbing.Answer
 import org.scalatest.BeforeAndAfterEach
 import play.api.libs.json.{JsObject, Json}
@@ -123,7 +126,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 
     // On receiving Restart message the supervisor first unregisters itself. But in the case of initialization failures
     // it never registers itself and thus never unregisters as well on receiving Restart message.
-    verify(registrationResult, never).unregister()
+    verify(registrationResult, Mockito.never()).unregister()
   }
 
   test("handle TLA failure with FailureRestart exception in initialize | DEOPSCSW-178, DEOPSCSW-181, DEOPSCSW-180") {

@@ -16,7 +16,7 @@ import csw.command.client.messages.{ComponentMessage, ContainerActorMessage, Con
 import csw.command.client.models.framework.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.command.client.models.framework.{ComponentInfo, ContainerLifecycleState, SupervisorLifecycleState, _}
 import csw.event.client.EventServiceFactory
-import csw.framework.ComponentInfos._
+import csw.framework.ComponentInfos.*
 import csw.framework.FrameworkTestMocks
 import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.scaladsl.RegistrationFactory
@@ -25,16 +25,18 @@ import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaRegistration, Metadata}
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.client.ActorSystemFactory
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.mockito.MockitoSugar
 
 import scala.concurrent.{Future, Promise}
 import scala.util.Success
 
 //DEOPSCSW-182-Control Life Cycle of Components
 //DEOPSCSW-216-Locate and connect components to send AKKA commands
-class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar with ArgumentMatchersSugar {
+class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar {
   implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol(), "test")
   implicit val settings: TestKitSettings                       = TestKitSettings(typedSystem)
   private val mocks                                            = new FrameworkTestMocks()
@@ -71,7 +73,7 @@ class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar 
           any[AlarmServiceFactory],
           any[RegistrationFactory]
         )
-    ).thenAnswer((_: ActorRef[ContainerIdleMessage], ci: ComponentInfo) => answer(ci))
+    ).thenAnswer(arg => answer(arg.getArgument(1, classOf[ComponentInfo])))
     when(actorRefResolver.resolveActorRef(any[String])).thenReturn(TestProbe().ref)
 
     private val registrationFactory: RegistrationFactory = mock[RegistrationFactory]

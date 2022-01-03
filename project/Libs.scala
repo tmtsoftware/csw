@@ -8,7 +8,7 @@ object Libs {
   val `scala-java8-compat` = "org.scala-lang.modules" %% "scala-java8-compat" % "1.0.1" //BSD 3-clause "New" or "Revised" License
   val `scala-async`        = "org.scala-lang.modules" %% "scala-async"        % "1.0.1"
   val `scopt`              = "com.github.scopt"       %% "scopt"              % "4.0.1" //MIT License
-  val `mockito-scala`      = "org.mockito"            %% "mockito-scala"      % "1.16.42"
+  val `mockito`            = "org.scalatestplus"      %% "mockito-3-4"        % "3.2.10.0"
 
   //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
   val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.2.6"

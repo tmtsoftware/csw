@@ -1,13 +1,14 @@
 package csw.aas.http
 
 import akka.http.scaladsl.server.Directives
-import akka.http.scaladsl.testkit._
+import akka.http.scaladsl.testkit.*
 import csw.aas.http.AuthorizationPolicy.{CustomPolicy, RealmRolePolicy}
 import msocket.security.models.AccessToken
-import org.mockito.MockitoSugar
+import org.mockito.Mockito.{verify, when}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.mockito.MockitoSugar
 
 import scala.concurrent.duration.DurationInt
 

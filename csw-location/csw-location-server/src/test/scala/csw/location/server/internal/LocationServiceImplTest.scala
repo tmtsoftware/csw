@@ -5,13 +5,14 @@ import akka.actor.typed.scaladsl.Behaviors
 import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
-import csw.location.api.models._
+import csw.location.api.models.*
 import csw.location.client.ActorSystemFactory
 import csw.location.server.commons.CswCluster
 import csw.prefix.models.{Prefix, Subsystem}
-import org.mockito.MockitoSugar
+import org.mockito.Mockito.when
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.mockito.MockitoSugar
 
 class LocationServiceImplTest extends AnyFunSuite with Matchers with MockitoSugar {
   private val system         = ActorSystemFactory.remote(SpawnProtocol(), "test-system")

@@ -8,13 +8,13 @@ import csw.event.client.helpers.Utils
 import csw.params.events.Event
 import csw.time.core.models.UTCTime
 import org.apache.kafka.common.errors.RecordTooLargeException
-import org.mockito.MockitoSugar
 import org.scalatest.BeforeAndAfterAll
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.mockito.MockitoSugar
 
 //DEOPSCSW-398: Propagate failure for publish api (eventGenerator)
 class KafkaFailureTest extends AnyFunSuite with Matchers with MockitoSugar with BeforeAndAfterAll {

@@ -1,20 +1,20 @@
 package csw.config.client.commons
 import java.io.File
 import java.nio.file.{Files, Paths}
-
 import akka.actor.typed
 import akka.actor.typed.scaladsl.Behaviors
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.config.api.ConfigData
 import csw.config.api.exceptions.{LocalFileNotFound, UnableToParseOptions}
 import csw.config.api.scaladsl.ConfigClientService
-import org.mockito.MockitoSugar
+import org.mockito.Mockito.when
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, Future}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.mockito.MockitoSugar
 
 class ConfigUtilsTest extends AnyFunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll with MockitoSugar {
 
