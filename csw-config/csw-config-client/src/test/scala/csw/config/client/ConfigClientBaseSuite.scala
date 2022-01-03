@@ -3,10 +3,10 @@ package csw.config.client
 import csw.config.server.commons.TestFutureExtension.RichFuture
 import csw.config.server.mocks.MockedAuthentication
 import csw.location.server.internal.ServerWiring
-import org.mockito.MockitoSugar
-import org.scalatest._
+import org.scalatest.*
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.mockito.MockitoSugar
 
 trait ConfigClientBaseSuite
     extends MockedAuthentication

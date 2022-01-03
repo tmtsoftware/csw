@@ -1,8 +1,7 @@
 package csw.config.server.http
 
 import java.time.Instant
-
-import akka.http.scaladsl.model._
+import akka.http.scaladsl.model.*
 import akka.http.scaladsl.model.headers.Authorization
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.ScalatestRouteTest
@@ -14,12 +13,13 @@ import csw.config.server.ServerWiring
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.mocks.MockedAuthentication
 import io.netty.util.internal.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
-import org.mockito.MockitoSugar
+import org.mockito.Mockito.when
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 
 import scala.collection.mutable.ArrayBuffer
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.mockito.MockitoSugar
 
 // DEOPSCSW-80: HTTP based access for configuration file
 // DEOPSCSW-576: Auth token for Configuration service
@@ -350,11 +350,11 @@ class ConfigServiceRouteTest
 
     when(validToken.preferred_username)
       .thenReturn(Some(bilal))
-      .andThen(Some(poorva))
+      .thenReturn(Some(poorva))
 
     when(validToken.userOrClientName)
       .thenReturn(bilal)
-      .andThen(poorva)
+      .thenReturn(poorva)
 
     // consumes 2 revisions, one for actual file one for active file
     // first request will use username=bilal
@@ -572,13 +572,13 @@ class ConfigServiceRouteTest
 
     when(validToken.preferred_username)
       .thenReturn(Some(bilal))
-      .andThen(Some(poorva))
-      .andThen(Some(shubham))
+      .thenReturn(Some(poorva))
+      .thenReturn(Some(shubham))
 
     when(validToken.userOrClientName)
       .thenReturn(bilal)
-      .andThen(poorva)
-      .andThen(shubham)
+      .thenReturn(poorva)
+      .thenReturn(shubham)
 
     //consumes 2 revisions, one for actual file one for active file
     // first request will use username=bilal

@@ -8,16 +8,17 @@ import csw.command.api.messages.CommandServiceRequest.{Oneway, Query, Submit, Va
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.handlers.TestHelper.Narrower
 import csw.commons.RandomUtils
-import csw.params.commands.CommandResponse._
+import csw.params.commands.CommandResponse.*
 import csw.params.commands.{CommandName, Setup}
 import csw.params.core.models.Id
 import csw.prefix.models.{Prefix, Subsystem}
 import msocket.http.post.{PostRouteFactory, ServerHttpCodecs}
 import msocket.jvm.metrics.LabelExtractor
-import org.mockito.MockitoSugar.{mock, reset, verify, when}
+import org.mockito.Mockito.{reset, verify, when}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
+import org.scalatestplus.mockito.MockitoSugar.mock
 
 import scala.concurrent.Future
 
@@ -43,7 +44,8 @@ class CommandServiceHttpHandlerTest
   private val accepted  = Accepted(Id())
 
   override protected def beforeEach(): Unit = {
-    reset(securityDirective, commandService)
+    reset(securityDirective)
+    reset(commandService)
     super.beforeEach()
   }
 

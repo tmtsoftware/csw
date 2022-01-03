@@ -9,16 +9,16 @@ import csw.commons.{AskProxyTestKit, RandomUtils}
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType, Metadata}
-import csw.params.commands.CommandResponse._
+import csw.params.commands.CommandResponse.*
 import csw.params.commands.{CommandName, Sequence, Setup}
 import csw.params.core.models.Id
 import csw.prefix.models.Prefix
-import csw.prefix.models.Subsystem._
-import org.mockito.MockitoSugar
+import csw.prefix.models.Subsystem.*
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.mockito.MockitoSugar
 
 import scala.concurrent.duration.DurationLong
 

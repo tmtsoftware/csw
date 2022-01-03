@@ -6,21 +6,21 @@ import akka.actor.typed.Scheduler
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
-import csw.common.components.command.ComponentStateForCommand._
+import csw.common.components.command.ComponentStateForCommand.*
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandIssue.OtherIssue
-import csw.params.commands.CommandResponse._
+import csw.params.commands.CommandResponse.*
 import csw.params.commands.Setup
 import csw.params.core.models.ObsId
 import csw.params.core.states.{CurrentState, StateName}
 import csw.prefix.models.{Prefix, Subsystem}
 import io.lettuce.core.RedisClient
-import org.mockito.MockitoSugar
 import org.scalatest.concurrent.{PatienceConfiguration, ScalaFutures}
+import org.scalatestplus.mockito.MockitoSugar
 
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, ExecutionContextExecutor, Future}

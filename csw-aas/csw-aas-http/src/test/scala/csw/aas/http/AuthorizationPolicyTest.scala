@@ -4,11 +4,12 @@ import akka.http.scaladsl.server.Directives
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import csw.aas.http.AuthorizationPolicy.{CustomPolicy, CustomPolicyAsync, EmptyPolicy, RealmRolePolicy}
 import msocket.security.models.AccessToken
-import org.mockito.MockitoSugar
+import org.mockito.Mockito.{verify, when}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.time.SpanSugar.convertIntToGrainOfTime
+import org.scalatestplus.mockito.MockitoSugar
 
 import scala.concurrent.Future
 

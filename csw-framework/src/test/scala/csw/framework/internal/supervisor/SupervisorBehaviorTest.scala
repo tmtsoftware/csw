@@ -7,15 +7,17 @@ import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.{Behaviors, TimerScheduler}
 import csw.command.client.messages.DiagnosticDataMessage.DiagnosticMode
 import csw.command.client.messages.FromComponentLifecycleMessage.Running
-import csw.command.client.messages._
+import csw.command.client.messages.*
 import csw.common.components.framework.SampleComponentBehaviorFactory
 import csw.common.extensions.CswContextExtensions.RichCswContext
-import csw.framework.ComponentInfos._
+import csw.framework.ComponentInfos.*
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.logging.models.Level.WARN
 import csw.logging.models.LogMetadata
 import csw.time.core.models.UTCTime
-import org.mockito.{ArgumentMatchers, MockitoSugar}
+import org.mockito.ArgumentMatchers
+import org.mockito.Mockito.{doNothing, when}
+import org.scalatestplus.mockito.MockitoSugar
 
 import scala.collection.immutable
 import scala.concurrent.Future
@@ -29,7 +31,7 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
   val containerIdleMessageProbe: TestProbe[ContainerIdleMessage] = TestProbe[ContainerIdleMessage]()
   private val timerScheduler                                     = mock[TimerScheduler[SupervisorMessage]]
 
-  doNothing
+  doNothing()
     .when(timerScheduler)
     .startSingleTimer(
       ArgumentMatchers.eq(SupervisorBehavior.InitializeTimerKey),
@@ -37,7 +39,7 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
       ArgumentMatchers.any[FiniteDuration]
     )
 
-  doNothing.when(timerScheduler).cancel(ArgumentMatchers.eq(SupervisorBehavior.InitializeTimerKey))
+  doNothing().when(timerScheduler).cancel(ArgumentMatchers.eq(SupervisorBehavior.InitializeTimerKey))
   when(timerScheduler.isTimerActive(SupervisorBehavior.InitializeTimerKey)).thenReturn(true)
 
   val supervisorBehavior: Behavior[ComponentMessage] = createBehavior(timerScheduler)

@@ -17,17 +17,17 @@ import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandIssue.IdNotAvailableIssue
-import csw.params.commands.CommandResponse._
-import csw.params.commands._
+import csw.params.commands.CommandResponse.*
+import csw.params.commands.*
 import csw.params.core.generics.Parameter
 import csw.params.core.models.{Id, ObsId}
 import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.prefix.models.{Prefix, Subsystem}
 import io.lettuce.core.RedisClient
-import org.mockito.MockitoSugar
 import org.scalatest.concurrent.Eventually
+import org.scalatestplus.mockito.MockitoSugar
 
-import scala.async.Async._
+import scala.async.Async.*
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, ExecutionContext, Future}
 

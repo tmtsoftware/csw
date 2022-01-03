@@ -1,7 +1,5 @@
 package csw.location.server.http
 
-import java.net.URI
-
 import akka.Done
 import akka.http.scaladsl.server.directives.BasicDirectives
 import akka.http.scaladsl.testkit.ScalatestRouteTest
@@ -10,20 +8,22 @@ import csw.aas.http.SecurityDirectives
 import csw.commons.RandomUtils
 import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.messages.LocationRequest
-import csw.location.api.messages.LocationRequest._
+import csw.location.api.messages.LocationRequest.*
+import csw.location.api.models.*
 import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.models._
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.prefix.models.{Prefix, Subsystem}
 import msocket.http.post.{PostRouteFactory, ServerHttpCodecs}
 import msocket.jvm.metrics.LabelExtractor
 import msocket.security.models.AccessToken
-import org.mockito.MockitoSugar.{mock, reset, verify, when}
+import org.mockito.Mockito.{reset, verify, when}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
+import org.scalatestplus.mockito.MockitoSugar.mock
 
+import java.net.URI
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 
@@ -47,7 +47,10 @@ class LocationRequestHandlerTest
   private val route = new PostRouteFactory[LocationRequest]("post-endpoint", handler).make()
 
   override protected def beforeEach(): Unit = {
-    reset(locationService, securityDirectives, accessToken, registrationResult)
+    reset(locationService)
+    reset(securityDirectives)
+    reset(accessToken)
+    reset(registrationResult)
     super.beforeEach()
   }
 

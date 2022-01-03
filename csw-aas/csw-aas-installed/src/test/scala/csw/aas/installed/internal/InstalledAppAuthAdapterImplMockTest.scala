@@ -8,13 +8,14 @@ import msocket.security.models.AccessToken
 import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.adapters.installed.KeycloakInstalled
 import org.keycloak.representations.AccessTokenResponse
-import org.mockito.MockitoSugar
+import org.mockito.Mockito.{doNothing, times, verify, when}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.mockito.MockitoSugar
 
 //DEOPSCSW-575: Client Library for AAS to be accessed by CSW cli apps
 class InstalledAppAuthAdapterImplMockTest extends AnyFunSuite with MockitoSugar with Matchers {
@@ -40,7 +41,7 @@ class InstalledAppAuthAdapterImplMockTest extends AnyFunSuite with MockitoSugar 
     when(keycloakInstalled.getTokenResponse).thenReturn(accessTokenResponse)
     when(keycloakInstalled.getDeployment).thenReturn(kd)
 
-    doNothing.when(keycloakInstalled).login()
+    doNothing().when(keycloakInstalled).login()
 
     // mock keycloak's access token response calls
     when(accessTokenResponse.getToken).thenReturn(accessTokenStr)
@@ -129,7 +130,7 @@ class InstalledAppAuthAdapterImplMockTest extends AnyFunSuite with MockitoSugar 
     import mocks._
 
     when(tokenVerifier.verifyAndDecode(accessTokenStr)).thenReturn(Future.successful(Left(TokenExpired)))
-    when(store.getAccessTokenString).thenReturn(Some(accessTokenStr)).andThen(Some(refreshedAccessTokenStr))
+    when(store.getAccessTokenString).thenReturn(Some(accessTokenStr)).thenReturn(Some(refreshedAccessTokenStr))
 
     authService.getAccessToken() shouldBe Some(refreshedAccessToken)
 
@@ -148,7 +149,7 @@ class InstalledAppAuthAdapterImplMockTest extends AnyFunSuite with MockitoSugar 
     val tokenExp          = (System.currentTimeMillis() / 1000) + maxTokenValidity
 
     when(tokenVerifier.verifyAndDecode(accessTokenStr)).thenReturn(Future.successful(Right(AccessToken(exp = Some(tokenExp)))))
-    when(store.getAccessTokenString).thenReturn(Some(accessTokenStr)).andThen(Some(refreshedAccessTokenStr))
+    when(store.getAccessTokenString).thenReturn(Some(accessTokenStr)).thenReturn(Some(refreshedAccessTokenStr))
 
     authService.getAccessToken(minValidityNeeded.seconds) shouldBe Some(refreshedAccessToken)
 

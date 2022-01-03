@@ -2,11 +2,11 @@ package csw.framework.internal.supervisor
 
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.scaladsl.adapter._
+import akka.actor.typed.scaladsl.adapter.*
 import akka.actor.{ActorSystem, typed}
 import csw.command.client.messages.CommandMessage.Submit
 import csw.command.client.models.framework.LockingResponse
-import csw.command.client.models.framework.LockingResponse._
+import csw.command.client.models.framework.LockingResponse.*
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse.SubmitResponse
@@ -14,9 +14,10 @@ import csw.params.commands.{CommandName, Setup}
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.ObsId
 import csw.prefix.models.{Prefix, Subsystem}
-import org.mockito.MockitoSugar
+import org.mockito.Mockito.when
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.mockito.MockitoSugar
 
 // DEOPSCSW-222: Locking a component for a specific duration
 // DEOPSCSW-301: Support UnLocking

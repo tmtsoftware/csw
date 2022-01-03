@@ -10,9 +10,10 @@ import csw.aas.http.AuthorizationPolicy.{CustomPolicy, RealmRolePolicy}
 import msocket.security.AccessControllerFactory
 import msocket.security.api.TokenValidator
 import msocket.security.models.AccessToken
-import org.mockito.MockitoSugar
+import org.mockito.Mockito.when
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.mockito.MockitoSugar
 
 import scala.concurrent.Future
 

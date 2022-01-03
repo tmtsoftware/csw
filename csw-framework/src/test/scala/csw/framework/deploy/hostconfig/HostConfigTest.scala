@@ -2,9 +2,10 @@ package csw.framework.deploy.hostconfig
 
 import csw.commons.ResourceReader
 import csw.prefix.models.Subsystem.CSW
-import org.mockito.MockitoSugar
+import org.mockito.Mockito.{times, verify, when}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.mockito.MockitoSugar
 
 // DEOPSCSW-174: Starting Multiple Containers with an init Script
 // DEOPSCSW-314: End to End Automated Test for host-config-app

@@ -10,7 +10,6 @@ import csw.params.events.{Event, EventKey}
 import csw.time.core.models.UTCTime
 import io.lettuce.core.ClientOptions.DisconnectedBehavior
 import io.lettuce.core.{ClientOptions, RedisException}
-import org.mockito.MockitoSugar
 import org.scalatest.BeforeAndAfterAll
 
 import scala.concurrent.Future
@@ -18,6 +17,7 @@ import scala.concurrent.duration.DurationInt
 import scala.util.Random
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.mockito.MockitoSugar
 
 //DEOPSCSW-398: Propagate failure for publish api (eventGenerator)
 //DEOPSCSW-399: Propagate failure for publish api when redis/kafka server is down

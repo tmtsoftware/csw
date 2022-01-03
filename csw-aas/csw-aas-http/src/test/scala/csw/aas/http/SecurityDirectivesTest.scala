@@ -1,8 +1,7 @@
 package csw.aas.http
 
 import java.net.URI
-
-import akka.http.scaladsl.model.HttpMethods._
+import akka.http.scaladsl.model.HttpMethods.*
 import akka.http.scaladsl.server.Directives
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import com.typesafe.config.ConfigValueFactory
@@ -11,10 +10,12 @@ import csw.location.api.models.Connection.HttpConnection
 import csw.location.api.models.{HttpLocation, Metadata}
 import csw.location.api.scaladsl.LocationService
 import msocket.security.api.AuthorizationPolicy
-import org.mockito.ArgumentMatchersSugar._
-import org.mockito.MockitoSugar
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito
+import org.mockito.Mockito.{verify, when}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.mockito.MockitoSugar
 
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
@@ -95,7 +96,7 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
   test("apply should not resolve AAS location when auth param is disabled | DEOPSCSW-579") {
     val locationService: LocationService = mock[LocationService]
     SecurityDirectives(system.settings.config, locationService, enableAuth = false)
-    verify(locationService, never).resolve(any[HttpConnection], any[FiniteDuration])
+    verify(locationService, Mockito.never()).resolve(any[HttpConnection], any[FiniteDuration])
   }
 
   test("apply should resolve AAS location when auth param is enabled | DEOPSCSW-579") {
@@ -109,14 +110,14 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
   test("authDisabled should never resolve AAS location | DEOPSCSW-579") {
     val locationService: LocationService = mock[LocationService]
     SecurityDirectives.authDisabled(system.settings.config)
-    verify(locationService, never).resolve(any[HttpConnection], any[FiniteDuration])
+    verify(locationService, Mockito.never()).resolve(any[HttpConnection], any[FiniteDuration])
   }
 
   test("apply should not resolve AAS location when auth is disabled in config | DEOPSCSW-579") {
     val locationService: LocationService = mock[LocationService]
     val config                           = system.settings.config.withValue("auth-config.disabled", ConfigValueFactory.fromAnyRef("true"))
     SecurityDirectives(config, locationService)
-    verify(locationService, never).resolve(any[HttpConnection], any[FiniteDuration])
+    verify(locationService, Mockito.never()).resolve(any[HttpConnection], any[FiniteDuration])
   }
 
   test("apply should resolve AAS location when auth is enabled in config | DEOPSCSW-579") {

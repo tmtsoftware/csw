@@ -6,10 +6,11 @@ import msocket.security.models.{Access, AccessToken, Audience, Authorization}
 import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.exceptions.{TokenNotActiveException, TokenSignatureInvalidException}
 import org.keycloak.representations.{AccessToken => KeycloakAccessToken}
-import org.mockito.MockitoSugar
+import org.mockito.Mockito.when
 import org.scalatest.EitherValues
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.mockito.MockitoSugar
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationInt

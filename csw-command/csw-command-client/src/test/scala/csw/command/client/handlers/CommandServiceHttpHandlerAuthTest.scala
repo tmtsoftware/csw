@@ -20,13 +20,14 @@ import msocket.http.post.{PostRouteFactory, ServerHttpCodecs}
 import msocket.jvm.metrics.LabelExtractor
 import msocket.security.models.{Access, AccessToken}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.MockitoSugar.{mock, never, reset, verify, when}
-import org.mockito.captor.{ArgCaptor, Captor}
+import org.mockito.{ArgumentCaptor, Mockito}
+import org.mockito.Mockito.{reset, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks.forAll
 import org.scalatest.prop.Tables.Table
+import org.scalatestplus.mockito.MockitoSugar.mock
 
 import scala.concurrent.Future
 
@@ -51,7 +52,9 @@ class CommandServiceHttpHandlerAuthTest
   private val route = new PostRouteFactory[CommandServiceRequest]("post-endpoint", handler).make()
 
   override def beforeEach(): Unit = {
-    reset(securityDirective, commandService, accessToken)
+    reset(securityDirective)
+    reset(commandService)
+    reset(accessToken)
     super.beforeEach()
   }
 
@@ -67,10 +70,10 @@ class CommandServiceHttpHandlerAuthTest
     val name = msg.getClass.getSimpleName
 
     test(s"$name should check for auth if destination prefix is provided while creating handlers") {
-      val captor          = ArgCaptor[CustomPolicy]
-      val invalidResponse = Invalid(Id(), IdNotAvailableIssue(RandomUtils.randomString5()))
+      val captor: ArgumentCaptor[CustomPolicy] = ArgumentCaptor.forClass(classOf[CustomPolicy])
+      val invalidResponse                      = Invalid(Id(), IdNotAvailableIssue(RandomUtils.randomString5()))
 
-      when(securityDirective.sPost(captor)).thenReturn(accessTokenDirective)
+      when(securityDirective.sPost(captor.capture())).thenReturn(accessTokenDirective)
       when(action(commandService)).thenReturn(Future.successful(invalidResponse))
 
       Post("/post-endpoint", msg.narrow) ~> route ~> check {
@@ -87,12 +90,12 @@ class CommandServiceHttpHandlerAuthTest
 
     Post("/post-endpoint", Query(id).narrow) ~> route ~> check {
       verify(commandService).query(id)
-      verify(securityDirective, never).sPost(any[CustomPolicy])
+      verify(securityDirective, Mockito.never()).sPost(any[CustomPolicy])
     }
   }
 
-  private def checkCapturedPolicy(captor: Captor[CustomPolicy]) =
-    captor.value.predicate(AccessToken(realm_access = Access(Set(s"$subsystem-user")))) should ===(true)
+  private def checkCapturedPolicy(captor: ArgumentCaptor[CustomPolicy]) =
+    captor.getValue.predicate(AccessToken(realm_access = Access(Set(s"$subsystem-user")))) should ===(true)
 
   private def randomSubsystem: Subsystem = RandomUtils.randomFrom(Subsystem.values)
 }

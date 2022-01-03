@@ -24,11 +24,13 @@ import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse.SubmitResponse
 import csw.params.core.states.CurrentState
 import csw.time.scheduler.api.TimeServiceScheduler
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.{doNothing, when}
+import org.scalatestplus.mockito.MockitoSugar
 
 import scala.concurrent.Future
 
-class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol.Command]) extends MockitoSugar with ArgumentMatchersSugar {
+class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol.Command]) extends MockitoSugar {
 
   ///////////////////////////////////////////////
   val testActor: ActorRef[Any]                   = TestProbe("test-probe").ref
@@ -68,7 +70,7 @@ class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol.Command]) ex
   val commandResponseManager: CommandResponseManager             = mock[CommandResponseManager]
 
   when(commandResponseManager.commandResponseManagerActor).thenReturn(commandResponseManagerActor.ref)
-  doNothing.when(commandResponseManager).updateCommand(any[SubmitResponse])
+  doNothing().when(commandResponseManager).updateCommand(any[SubmitResponse])
 
   ///////////////////////////////////////////////
   val configClientService: ConfigClientService = ConfigClientFactory.clientApi(system, locationService)
