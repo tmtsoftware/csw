@@ -267,68 +267,93 @@ object Angle {
     math.abs(x % d) < tolerance || math.abs(x % d - d) < tolerance
   }
 
-  private def formatSecs(sec: Double): String = {
-    if (isNear(sec, 1))
-      s"${math.round(sec)}"
-    else if (isNear(sec, 0.1))
-      f"$sec%2.1f"
-    else if (isNear(sec, 0.01))
-      f"$sec%2.2f"
-    else
-      s"$sec"
+  private def formatSecs(sec: Double, withLeadingZero: Boolean): String = {
+    if (withLeadingZero) {
+      f"$sec%06.3f"
+    }
+    else {
+      if (isNear(sec, 1))
+        s"${math.round(sec)}"
+      else if (isNear(sec, 0.1))
+        f"$sec%2.1f"
+      else if (isNear(sec, 0.01))
+        f"$sec%2.2f"
+      else
+        s"$sec"
+    }
   }
 
   /**
-   * convert RA to string in format '1h 2m'
-   * minutes and seconds are auto added as needed
+   * Converts RA to a string in the format 01:02:03.333 (or '1h 2m 3.33s').
+   * Minutes and seconds are auto added as needed.
    *
    * @param ra in radians
+   * @param withColon if true format as hh:mm:ss.sss, otherwise XXh XXm XXs
    * @return ra in string form
    */
-  def raToString(ra: Double): String = {
+  def raToString(ra: Double, withColon: Boolean = true): String = {
     if (isNear(ra, H2R)) {
       val hour = math.round(ra * R2H).toInt
-      s"${hour}h"
+      if (withColon)
+        s"$hour:00:00.000"
+      else
+        s"${hour}h"
     }
     else if (isNear(ra, H2R / 60)) {
       val hour = (ra * R2H).toInt
       val min  = Math.round((ra - H2R * hour) * R2H * 60).toInt
-      s"${hour}h ${min}m"
+      if (withColon)
+        s"$hour:$min:00.000"
+      else
+        s"${hour}h ${min}m"
     }
     else {
       val hour = (ra * R2H).toInt
       val min  = ((ra - H2R * hour) * R2H * 60).toInt
       val sec  = (ra - H2R * hour - min * H2R / 60) * R2H * 3600
-      val s    = formatSecs(sec)
-      s"${hour}h ${min}m ${s}s"
+      val s    = formatSecs(sec, withColon)
+      if (withColon)
+        f"$hour%02d:$min%02d:$s"
+      else
+        s"${hour}h ${min}m ${s}s"
     }
   }
 
   /**
-   * convert DE to string in format '1d 2m'
-   * minutes and seconds are auto added as needed
+   * Converts DE to a string in the format 01:02:03.333 (or '1d 2m 3.333s)'
+   * Minutes and seconds are auto added as needed.
    *
    * @param de2 in radians
+   * @param withColon if true format as dd:mm:ss.sss, otherwise XXd XXm XXs
    * @return de in string form
    */
-  def deToString(de2: Double): String = {
+  def deToString(de2: Double, withColon: Boolean = true): String = {
     val (de, sign) = if (de2 < 0) (-de2, "-") else (de2, "")
 
     if (isNear(de, D2R)) {
       val deg = math.round(de * R2D).toInt
-      sign + deg + DEGREE_SIGN
+      if (withColon)
+        s"$sign$deg:00:00.000"
+      else
+        sign + deg + DEGREE_SIGN
     }
     else if (isNear(de, M2R)) {
       val deg = (de * R2D).toInt
       val min = ((de - D2R * deg) * R2M).toInt
-      sign + deg + DEGREE_SIGN + min + "'"
+      if (withColon)
+        s"$sign$deg:$min:00.000"
+      else
+        sign + deg + DEGREE_SIGN + min + "'"
     }
     else {
       val deg = (de * R2D).toInt
       val min = ((de - D2R * deg) * R2D * 60).toInt
       val sec = (de - D2R * deg - min * D2R / 60) * R2D * 3600
-      val s   = formatSecs(sec)
-      sign + deg + DEGREE_SIGN + min + "'" + s + "\""
+      val s   = formatSecs(sec, withColon)
+      if (withColon)
+        f"$sign$deg%02d:$min%02d:$s"
+      else
+        sign + deg + DEGREE_SIGN + min + "'" + s + "\""
     }
   }
 

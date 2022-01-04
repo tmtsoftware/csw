@@ -85,18 +85,44 @@ class AngleTests extends AnyFunSpec with Matchers {
   describe("Positions to String") {
 
     it("should convert RA to string") {
-      "11h" shouldBe Angle.raToString(Angle.H2R * 11)
-      "11h 12m" shouldBe Angle.raToString(Angle.H2R * 11 + Angle.H2R * 12 / 60)
-      "11h 12m 13s" shouldBe Angle.raToString(Angle.H2R * 11 + Angle.H2R * 12 / 60 + Angle.H2R * 13 / 3600)
-      "11h 12m 13.3s" shouldBe Angle.raToString(Angle.H2R * 11 + Angle.H2R * 12 / 60 + Angle.H2R * 13.3 / 3600)
+      "11h" shouldBe Angle.raToString(Angle.H2R * 11, withColon = false)
+      "11:00:00.000" shouldBe Angle.raToString(Angle.H2R * 11)
+
+      "11h 12m" shouldBe Angle.raToString(Angle.H2R * 11 + Angle.H2R * 12 / 60, withColon = false)
+      "11:12:00.000" shouldBe Angle.raToString(Angle.H2R * 11 + Angle.H2R * 12 / 60)
+
+      "11h 12m 13s" shouldBe Angle.raToString(Angle.H2R * 11 + Angle.H2R * 12 / 60 + Angle.H2R * 13 / 3600, withColon = false)
+      "11:12:13.000" shouldBe Angle.raToString(Angle.H2R * 11 + Angle.H2R * 12 / 60 + Angle.H2R * 13 / 3600)
+
+      "11h 12m 13.3s" shouldBe Angle.raToString(Angle.H2R * 11 + Angle.H2R * 12 / 60 + Angle.H2R * 13.3 / 3600, withColon = false)
+      "11:12:13.300" shouldBe Angle.raToString(Angle.H2R * 11 + Angle.H2R * 12 / 60 + Angle.H2R * 13.3 / 3600)
+
+      "01:02:03.330" shouldBe Angle.raToString(Angle.parseRa("01:02:03.33").toRadian)
     }
 
     it("should convert Dec to string") {
-      "11" + Angle.DEGREE_SIGN shouldBe Angle.deToString(Angle.D2R * 11)
-      "11" + Angle.DEGREE_SIGN + "12'" shouldBe Angle.deToString(Angle.D2R * 11 + Angle.M2R * 12)
-      "11" + Angle.DEGREE_SIGN + "12'13\"" shouldBe Angle.deToString(Angle.D2R * 11 + Angle.M2R * 12 + Angle.S2R * 13)
-      "11" + Angle.DEGREE_SIGN + "12'13.3\"" shouldBe Angle.deToString(Angle.D2R * 11 + Angle.M2R * 12 + Angle.S2R * 13.3)
-      "-11" + Angle.DEGREE_SIGN + "12'" shouldBe Angle.deToString(-(Angle.D2R * 11 + Angle.M2R * 12))
+      "11" + Angle.DEGREE_SIGN shouldBe Angle.deToString(Angle.D2R * 11, withColon = false)
+      "11:00:00.000" shouldBe Angle.deToString(Angle.D2R * 11)
+
+      "11" + Angle.DEGREE_SIGN + "12'" shouldBe Angle.deToString(Angle.D2R * 11 + Angle.M2R * 12, withColon = false)
+      "11:12:00.000" shouldBe Angle.deToString(Angle.D2R * 11 + Angle.M2R * 12)
+
+      "11" + Angle.DEGREE_SIGN + "12'13\"" shouldBe Angle.deToString(
+        Angle.D2R * 11 + Angle.M2R * 12 + Angle.S2R * 13,
+        withColon = false
+      )
+      "11:12:13.000" shouldBe Angle.deToString(Angle.D2R * 11 + Angle.M2R * 12 + Angle.S2R * 13)
+
+      "11" + Angle.DEGREE_SIGN + "12'13.3\"" shouldBe Angle.deToString(
+        Angle.D2R * 11 + Angle.M2R * 12 + Angle.S2R * 13.3,
+        withColon = false
+      )
+      "11:12:13.300" shouldBe Angle.deToString(Angle.D2R * 11 + Angle.M2R * 12 + Angle.S2R * 13.3)
+
+      "-11" + Angle.DEGREE_SIGN + "12'" shouldBe Angle.deToString(-(Angle.D2R * 11 + Angle.M2R * 12), withColon = false)
+      "-11:12:00.000" shouldBe Angle.deToString(-(Angle.D2R * 11 + Angle.M2R * 12))
+
+      "01:02:03.330" shouldBe Angle.deToString(Angle.parseDe("01:02:03.33").toRadian)
     }
   }
 }

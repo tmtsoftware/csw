@@ -115,18 +115,38 @@ public class JAngleTest extends JUnitSuite {
     // Positions to String
     @Test
     public void shouldConvertRaToString() {
-        assertEquals("11h", Angle.raToString(Angle.H2R() * 11));
-        assertEquals("11h 12m", Angle.raToString(Angle.H2R() * 11 + Angle.H2R() * 12 / 60));
-        assertEquals("11h 12m 13s", Angle.raToString(Angle.H2R() * 11 + Angle.H2R() * 12 / 60 + Angle.H2R() * 13 / 3600));
-        assertEquals("11h 12m 13.3s", Angle.raToString(Angle.H2R() * 11 + Angle.H2R() * 12 / 60 + Angle.H2R() * 13.3 / 3600));
+        assertEquals("11h", Angle.raToString(Angle.H2R() * 11, false));
+        assertEquals("11:00:00.000", Angle.raToString(Angle.H2R() * 11, true));
+
+        assertEquals("11h 12m", Angle.raToString(Angle.H2R() * 11 + Angle.H2R() * 12 / 60, false));
+        assertEquals("11:12:00.000", Angle.raToString(Angle.H2R() * 11 + Angle.H2R() * 12 / 60, true));
+
+        assertEquals("11h 12m 13s", Angle.raToString(Angle.H2R() * 11 + Angle.H2R() * 12 / 60 + Angle.H2R() * 13 / 3600, false));
+        assertEquals("11:12:13.000", Angle.raToString(Angle.H2R() * 11 + Angle.H2R() * 12 / 60 + Angle.H2R() * 13 / 3600, true));
+
+        assertEquals("11h 12m 13.3s", Angle.raToString(Angle.H2R() * 11 + Angle.H2R() * 12 / 60 + Angle.H2R() * 13.3 / 3600, false));
+        assertEquals("11:12:13.300", Angle.raToString(Angle.H2R() * 11 + Angle.H2R() * 12 / 60 + Angle.H2R() * 13.3 / 3600, true));
+
+        assertEquals("01:02:03.330", Angle.raToString(Angle.parseRa("01:02:03.33").toRadian(), true));
     }
 
     @Test
     public void shouldConvertDecToString() {
-        assertEquals("11" + Angle.DEGREE_SIGN(), Angle.deToString(Angle.D2R() * 11));
-        assertEquals("11" + Angle.DEGREE_SIGN() + "12'", Angle.deToString(Angle.D2R() * 11 + Angle.M2R() * 12));
-        assertEquals("11" + Angle.DEGREE_SIGN() + "12'13\"", Angle.deToString(Angle.D2R() * 11 + Angle.M2R() * 12 + Angle.S2R() * 13));
-        assertEquals("11" + Angle.DEGREE_SIGN() + "12'13.3\"", Angle.deToString(Angle.D2R() * 11 + Angle.M2R() * 12 + Angle.S2R() * 13.3));
-        assertEquals("-11" + Angle.DEGREE_SIGN() + "12'", Angle.deToString(-(Angle.D2R() * 11 + Angle.M2R() * 12)));
+        assertEquals("11" + Angle.DEGREE_SIGN(), Angle.deToString(Angle.D2R() * 11, false));
+        assertEquals("11:00:00.000", Angle.deToString(Angle.D2R() * 11, true));
+
+        assertEquals("11" + Angle.DEGREE_SIGN() + "12'", Angle.deToString(Angle.D2R() * 11 + Angle.M2R() * 12, false));
+        assertEquals("11:12:00.000", Angle.deToString(Angle.D2R() * 11 + Angle.M2R() * 12, true));
+
+        assertEquals("11" + Angle.DEGREE_SIGN() + "12'13\"", Angle.deToString(Angle.D2R() * 11 + Angle.M2R() * 12 + Angle.S2R() * 13, false));
+        assertEquals("11:12:13.000", Angle.deToString(Angle.D2R() * 11 + Angle.M2R() * 12 + Angle.S2R() * 13, true));
+
+        assertEquals("11" + Angle.DEGREE_SIGN() + "12'13.3\"", Angle.deToString(Angle.D2R() * 11 + Angle.M2R() * 12 + Angle.S2R() * 13.3, false));
+        assertEquals("11:12:13.300", Angle.deToString(Angle.D2R() * 11 + Angle.M2R() * 12 + Angle.S2R() * 13.3, true));
+
+        assertEquals("-11" + Angle.DEGREE_SIGN() + "12'", Angle.deToString(-(Angle.D2R() * 11 + Angle.M2R() * 12), false));
+        assertEquals("-11:12:00.000", Angle.deToString(-(Angle.D2R() * 11 + Angle.M2R() * 12), true));
+
+        assertEquals("01:02:03.330", Angle.deToString(Angle.parseDe("01:02:03.33").toRadian(), true));
     }
 }
