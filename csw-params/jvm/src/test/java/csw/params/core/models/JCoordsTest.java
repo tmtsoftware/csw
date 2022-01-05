@@ -53,8 +53,8 @@ public class JCoordsTest {
 
         // HMS/Deg, check all values here
         var c2 = new EqCoord(arcHour(18), degree(-35), ICRS(), OIWFS1(), "NGC1234", 0.0, 2.0);
-        assertEquals(c2.ra().toDegree(), 18 * Angle.H2D(), delta);
-        assertEquals(c2.dec().toDegree(), -35, delta);
+        assertEquals(c2.ra().asAngle().toDegree(), 18 * Angle.H2D(), delta);
+        assertEquals(c2.dec().asAngle().toDegree(), -35, delta);
         assertEquals(c2.tag(), OIWFS1());
         assertEquals(c2.pm(), new ProperMotion(0.0, 2.0));
         assertEquals(c2.catalogName(), "NGC1234");

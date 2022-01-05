@@ -6,6 +6,8 @@ package csw.params.core.models
  *  it will be useful, but WITHOUT ANY WARRANTY.
  */
 
+import csw.params.core.models.Coords.{Dec, Ra}
+
 import scala.language.implicitConversions
 
 /**
@@ -25,6 +27,9 @@ import scala.language.implicitConversions
  */
 //noinspection ScalaStyle
 case class Angle(uas: Long) extends /*AnyVal with*/ Serializable with Ordered[Angle] {
+
+  def asRa: Ra   = Ra(uas)
+  def asDec: Dec = Dec(uas)
 
   // Note: extending AnyVal is an optimization, since the value 'uas' is inlined, but it makes Java interop confusing...
 
@@ -127,7 +132,7 @@ object Angle {
    * @return declination in microarcseconds
    */
   def parseDe(deSign: String, deDegree: String, deMin: String, deSec: String): Angle = {
-    val sign: Int = if ("-".equals(deSign.trim)) -1 else 1
+    val sign: Int       = if ("-".equals(deSign.trim)) -1 else 1
     import java.math.BigDecimal
     val deg: BigDecimal = new BigDecimal(deDegree)
     if (deg.doubleValue < 0 || deg.doubleValue > 89) throw new IllegalArgumentException("Invalid deDegree: " + deg)
@@ -172,9 +177,9 @@ object Angle {
     import java.math.BigDecimal
     val raHour2: BigDecimal = new BigDecimal(raHour)
     if (raHour2.doubleValue < 0 || raHour2.doubleValue > 23) throw new IllegalArgumentException("Invalid raHour: " + raHour2)
-    val raMin2: BigDecimal = if (raMin != null) new BigDecimal(raMin) else BigDecimal.ZERO
+    val raMin2: BigDecimal  = if (raMin != null) new BigDecimal(raMin) else BigDecimal.ZERO
     if (raMin2.doubleValue < 0 || raMin2.doubleValue >= 60) throw new IllegalArgumentException("Invalid raMin: " + raMin2)
-    val raSec2: BigDecimal = if (raSec != null) new BigDecimal(raSec) else BigDecimal.ZERO
+    val raSec2: BigDecimal  = if (raSec != null) new BigDecimal(raSec) else BigDecimal.ZERO
     if (raSec2.doubleValue < 0 || raSec2.doubleValue >= 60) throw new IllegalArgumentException("Invalid raSec: " + raSec2)
 
     Angle(
@@ -270,8 +275,7 @@ object Angle {
   private def formatSecs(sec: Double, withLeadingZero: Boolean): String = {
     if (withLeadingZero) {
       f"$sec%06.3f"
-    }
-    else {
+    } else {
       if (isNear(sec, 1))
         s"${math.round(sec)}"
       else if (isNear(sec, 0.1))
@@ -298,16 +302,14 @@ object Angle {
         s"$hour:00:00.000"
       else
         s"${hour}h"
-    }
-    else if (isNear(ra, H2R / 60)) {
+    } else if (isNear(ra, H2R / 60)) {
       val hour = (ra * R2H).toInt
       val min  = Math.round((ra - H2R * hour) * R2H * 60).toInt
       if (withColon)
         s"$hour:$min:00.000"
       else
         s"${hour}h ${min}m"
-    }
-    else {
+    } else {
       val hour = (ra * R2H).toInt
       val min  = ((ra - H2R * hour) * R2H * 60).toInt
       val sec  = (ra - H2R * hour - min * H2R / 60) * R2H * 3600
@@ -336,16 +338,14 @@ object Angle {
         s"$sign$deg:00:00.000"
       else
         sign + deg + DEGREE_SIGN
-    }
-    else if (isNear(de, M2R)) {
+    } else if (isNear(de, M2R)) {
       val deg = (de * R2D).toInt
       val min = ((de - D2R * deg) * R2M).toInt
       if (withColon)
         s"$sign$deg:$min:00.000"
       else
         sign + deg + DEGREE_SIGN + min + "'"
-    }
-    else {
+    } else {
       val deg = (de * R2D).toInt
       val min = ((de - D2R * deg) * R2D * 60).toInt
       val sec = (de - D2R * deg - min * D2R / 60) * R2D * 3600

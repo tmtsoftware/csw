@@ -42,8 +42,8 @@ class CoordsTests extends AnyFunSpec with Matchers {
 
       // HMS/Deg, check all values here
       val c2 = EqCoord(18.arcHour, -35.degree, ICRS, tag = OIWFS1, pmy = 2.0, catalogName = "NGC1234")
-      c2.ra.toDegree shouldEqual 18 * Angle.H2D
-      c2.dec.toDegree shouldEqual -35
+      c2.ra.asAngle.toDegree shouldEqual 18 * Angle.H2D
+      c2.dec.asAngle.toDegree shouldEqual -35
       c2.tag shouldBe OIWFS1
       c2.pm shouldEqual ProperMotion(0.0, 2.0)
       c2.catalogName shouldBe "NGC1234"
@@ -186,7 +186,7 @@ class CoordsTests extends AnyFunSpec with Matchers {
         allTestTags.flatMap(tag => setup.get(CoordKey.make(tag.name)).map(_ => tag))
 
       val obsMode = obsModeKey.set("IRIS LGS Mode 1")
-      val setup = Setup(src, CommandName("slewAndFollow"), None).madd(
+      val setup   = Setup(src, CommandName("slewAndFollow"), None).madd(
         obsMode,
         tagsKey.set(BASE.name, OIWFS1.name, OIWFS2.name),
         CoordKey.make(c0.tag.name).set(c0),
@@ -264,7 +264,7 @@ class CoordsTests extends AnyFunSpec with Matchers {
       val c6 = EqCoord("12:32:00.1", "45:14:49.5", tag = ODGW2)
 
       val obsMode = obsModeKey.set("IRIS LGS Mode 1")
-      val setup =
+      val setup   =
         Setup(src, CommandName("slewAndFollow"), None).madd(
           obsMode,
           baseKey.set(c0),

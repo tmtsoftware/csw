@@ -22,7 +22,7 @@ object JParamCodecs extends ParamCodecs {
   //just needed for the Java test, which should not exist
   val eqFrameCodec: Codec[EqFrame] = Codec.of[EqFrame]
 }
-object ParamCodecs extends ParamCodecs
+object ParamCodecs  extends ParamCodecs
 
 /**
  * Supports (de)serialization of csw models
@@ -54,6 +54,8 @@ trait ParamCodecsBase extends CommonCodecs {
 
   implicit lazy val tagCodec: Codec[Coords.Tag]            = deriveCodec
   implicit lazy val angleCodec: Codec[Angle]               = deriveCodec
+  implicit lazy val raCodec: Codec[Ra]                     = deriveCodec
+  implicit lazy val decCodec: Codec[Dec]                   = deriveCodec
   implicit lazy val properMotionCodec: Codec[ProperMotion] = deriveCodec
 
   lazy val coordCodecValue: Codec[Coord] = deriveAllCodecs

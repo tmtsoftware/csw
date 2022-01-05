@@ -15,7 +15,7 @@ object Coords {
   case class Tag(name: String) {
     override def toString: String = name
   }
-  val BASE    = Tag("BASE")
+  val BASE = Tag("BASE")
   val OIWFS1  = Tag("OIWFS1")
   val OIWFS2  = Tag("OIWFS2")
   val OIWFS3  = Tag("OIWFS3")
@@ -28,7 +28,7 @@ object Coords {
   val GUIDER2 = Tag("GUIDER2")
 
   sealed trait EqFrame extends EnumEntry
-  object EqFrame extends Enum[EqFrame] {
+  object EqFrame       extends Enum[EqFrame] {
     override def values: immutable.IndexedSeq[EqFrame] = findValues
     case object ICRS extends EqFrame
     case object FK5  extends EqFrame
@@ -47,7 +47,7 @@ object Coords {
   }
 
   sealed trait SolarSystemObject extends EnumEntry
-  object SolarSystemObject extends Enum[SolarSystemObject] {
+  object SolarSystemObject       extends Enum[SolarSystemObject] {
 
     override def values: immutable.IndexedSeq[SolarSystemObject] = findValues
 
@@ -72,7 +72,7 @@ object Coords {
       argOfPerihelion: Angle,   // degrees
       meanDistance: Double,     // AU
       eccentricity: Double,
-      meanAnomaly: Angle // degrees
+      meanAnomaly: Angle        // degrees
   ) extends Coord
 
   case class CometCoord(
@@ -87,6 +87,13 @@ object Coords {
 
   import EqCoord._
 
+  case class Ra(uas: Long)  {
+    def asAngle: Angle = Angle(uas)
+  }
+  case class Dec(uas: Long) {
+    def asAngle: Angle = Angle(uas)
+  }
+
   /**
    * Equatorial coordinates.
    *
@@ -97,7 +104,7 @@ object Coords {
    * @param catalogName  the name of the catalog from which the coordinates were taken (use "none" if unknown)
    * @param pm proper motion
    */
-  case class EqCoord(tag: Tag, ra: Angle, dec: Angle, frame: EqFrame, catalogName: String, pm: ProperMotion) extends Coord {
+  case class EqCoord(tag: Tag, ra: Ra, dec: Dec, frame: EqFrame, catalogName: String, pm: ProperMotion) extends Coord {
 
     /**
      * Creates an EqCoord from the given arguments, which all have default values.
@@ -123,15 +130,15 @@ object Coords {
       this(
         tag,
         ra match {
-          case ras: String => Angle.parseRa(ras)
-          case rad: Double => Angle.double2angle(rad).degree
-          case raa: Angle  => raa
+          case ras: String => Angle.parseRa(ras).asRa
+          case rad: Double => Angle.double2angle(rad).degree.asRa
+          case raa: Angle  => raa.asRa
           case x           => throw new MatchError(x)
         },
         dec match {
-          case des: String => Angle.parseDe(des)
-          case ded: Double => Angle.double2angle(ded).degree
-          case dea: Angle  => dea
+          case des: String => Angle.parseDe(des).asDec
+          case ded: Double => Angle.double2angle(ded).degree.asDec
+          case dea: Angle  => dea.asDec
           case x           => throw new MatchError(x)
         },
         ICRS,
@@ -143,7 +150,7 @@ object Coords {
     def withPM(pmx: Double, pmy: Double): EqCoord = this.copy(pm = ProperMotion(pmx, pmy))
 
     override def toString: String =
-      s"EqCoord(${Angle.raToString(ra.toRadian)}  ${Angle.deToString(dec.toRadian)}" +
+      s"EqCoord(${Angle.raToString(ra.asAngle.toRadian)}  ${Angle.deToString(dec.asAngle.toRadian)}" +
         s" ${frame.toString} $catalogName $tag ${pm.toString})"
 
   }
@@ -190,7 +197,7 @@ object Coords {
         pmy: Double = DEFAULT_PMY
     ): EqCoord = {
       val (ra, dec) = Angle.parseRaDe(radec)
-      apply(tag, ra, dec, frame, catalogName, ProperMotion(pmx, pmy))
+      apply(tag, ra.asRa, dec.asDec, frame, catalogName, ProperMotion(pmx, pmy))
     }
   }
 }
