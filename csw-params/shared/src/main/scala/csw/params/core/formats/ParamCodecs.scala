@@ -1,20 +1,21 @@
 package csw.params.core.formats
 
 import java.lang.{Byte => JByte}
-
-import csw.params.commands._
+import csw.params.commands.*
+import csw.params.core.formats.EqCoordCodecHelpers.WireModel
 import csw.params.core.generics.{KeyType, Parameter}
-import csw.params.core.models.Coords._
-import csw.params.core.models._
+import csw.params.core.models.Coords.*
+import csw.params.core.models.*
 import csw.params.core.states.{CurrentState, StateName, StateVariable}
 import csw.params.events.{Event, EventName}
 import csw.prefix.codecs.CommonCodecs
 import csw.time.core.models.{TAITime, UTCTime}
-import io.bullet.borer._
+import io.bullet.borer.*
 import io.bullet.borer.derivation.CompactMapBasedCodecs.deriveCodec
 import io.bullet.borer.derivation.MapBasedCodecs
 import io.bullet.borer.derivation.MapBasedCodecs.deriveAllCodecs
 
+import scala.annotation.nowarn
 import scala.collection.mutable.{ArraySeq => ArrayS}
 import scala.reflect.ClassTag
 
@@ -56,7 +57,15 @@ trait ParamCodecsBase extends CommonCodecs {
   implicit lazy val angleCodec: Codec[Angle]               = deriveCodec
   implicit lazy val properMotionCodec: Codec[ProperMotion] = deriveCodec
 
-  lazy val coordCodecValue: Codec[Coord] = deriveAllCodecs
+  lazy val coordCodecValue: Codec[Coord] = {
+    implicit lazy val wireModelCodec: Codec[WireModel] = MapBasedCodecs.deriveCodec
+    @nowarn
+    implicit lazy val eqCordCodec: Codec[EqCoord] = Codec.bimap[WireModel, EqCoord](
+      EqCoordCodecHelpers.fromEqCord,
+      EqCoordCodecHelpers.toEqCord
+    )
+    deriveAllCodecs
+  }
 
   implicit lazy val utcTimeCodec: Codec[UTCTime] = deriveCodec
   implicit lazy val taiTimeCodec: Codec[TAITime] = deriveCodec
@@ -148,5 +157,19 @@ object ParamCore {
   }
   def fromParam[T](param: Parameter[T]): Map[String, ParamCore[T]] = {
     Map(param.keyType.entryName -> ParamCore(param.keyName, param.items, param.units))
+  }
+}
+
+object EqCoordCodecHelpers {
+  case class WireModel(tag: Coords.Tag, ra: String, dec: String, frame: EqFrame, catalogName: String, pm: ProperMotion)
+
+  def toEqCord(wireModel: WireModel): EqCoord = {
+    import wireModel.*
+    EqCoord(tag, Angle.parseRa(ra), Angle.parseDe(dec), frame, catalogName, pm)
+  }
+
+  def fromEqCord(eqCoord: EqCoord): WireModel = {
+    import eqCoord.*
+    WireModel(tag, Angle.raToString(ra.toRadian), Angle.deToString(dec.toRadian), frame, catalogName, pm)
   }
 }
