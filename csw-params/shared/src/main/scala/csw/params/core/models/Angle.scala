@@ -31,22 +31,14 @@ case class Angle(uas: Long) extends /*AnyVal with*/ Serializable with Ordered[An
   //require(uas> - Angle.CIRCLE && uas < Angle.CIRCLE, "out of range, possible overflow ");
 
   //operators
-  def +(a2: Angle): Angle = new Angle(uas + a2.uas)
-
-  def -(a2: Angle): Angle = new Angle(uas - a2.uas)
-
-  def *(a2: Double): Angle = new Angle((uas * a2).toLong)
-
-  def *(a2: Int): Angle = new Angle(uas * a2)
-
-  def /(a2: Double): Angle = new Angle((uas / a2).toLong)
-
-  def /(a2: Int): Angle = new Angle(uas / a2)
-
-  def unary_+ : Angle = this
-
-  def unary_- : Angle = Angle(-uas)
-
+  def +(a2: Angle): Angle                = new Angle(uas + a2.uas)
+  def -(a2: Angle): Angle                = new Angle(uas - a2.uas)
+  def *(a2: Double): Angle               = new Angle((uas * a2).toLong)
+  def *(a2: Int): Angle                  = new Angle(uas * a2)
+  def /(a2: Double): Angle               = new Angle((uas / a2).toLong)
+  def /(a2: Int): Angle                  = new Angle(uas / a2)
+  def unary_+ : Angle                    = this
+  def unary_- : Angle                    = Angle(-uas)
   override def compare(that: Angle): Int = uas.compare(that.uas)
 
   /** returns angle value in radians */
@@ -85,24 +77,17 @@ object Angle {
 
   /** used in implicit conversion to support `1.degree`, `1.arcMinute` etc */
   class AngleWrapperDouble(value: Double) {
-    def degree: Angle = Angle((value * Angle.D2Uas).toLong)
-
+    def degree: Angle    = Angle((value * Angle.D2Uas).toLong)
     def arcMinute: Angle = Angle((value * Angle.M2Uas).toLong)
-
-    def arcSec: Angle = Angle((value * Angle.S2Uas).toLong)
-
-    def arcHour: Angle = Angle((value * Angle.H2Uas).toLong)
-
-    def radian: Angle = Angle((value * Angle.R2Uas).toLong)
-
-    def mas: Angle = Angle((value * 1000).toLong)
+    def arcSec: Angle    = Angle((value * Angle.S2Uas).toLong)
+    def arcHour: Angle   = Angle((value * Angle.H2Uas).toLong)
+    def radian: Angle    = Angle((value * Angle.R2Uas).toLong)
+    def mas: Angle       = Angle((value * 1000).toLong)
   }
 
   //implicit conversions
-  implicit def long2angle(d: Long): AngleWrapperDouble = new AngleWrapperDouble(d.toDouble)
-
-  implicit def int2angle(d: Int): AngleWrapperDouble = new AngleWrapperDouble(d.toDouble)
-
+  implicit def long2angle(d: Long): AngleWrapperDouble     = new AngleWrapperDouble(d.toDouble)
+  implicit def int2angle(d: Int): AngleWrapperDouble       = new AngleWrapperDouble(d.toDouble)
   implicit def double2angle(d: Double): AngleWrapperDouble = new AngleWrapperDouble(d)
 
   /** returns random angle with value between 0 and 2*PI */
@@ -207,21 +192,14 @@ object Angle {
    * An example:
    * The following writings are allowed:
    * <pre>
-   * 20 54 05.689 +37 01 17.38
-   * 10:12:45.3-45:17:50
-   * 15h17m-11d10m
-   * 15h17+89d15
-   * 275d11m15.6954s+17d59m59.876s
-   * 12.34567h-17.87654d
-   * 350.123456d-17.33333d <=> 350.123456 -17.33333
+   * 20 54 05.689 +37 01 17.38, 10:12:45.3-45:17:50, 15h17m-11d10m, 15h17+89d15, 275d11m15.6954s+17d59m59.876s
+   * 12.34567h-17.87654d, 350.123456d-17.33333d <=> 350.123456 -17.33333
    * </pre>
    */
   def parseRaDe(str: String): (Angle, Angle) = {
-    //20 54 05.689 +37 01 17.38
-    //10:12:45.3-45:17:50
+    //20 54 05.689 +37 01 17.38, 10:12:45.3-45:17:50
     lazy val r1 = "([0-9]{2})[ :]([0-9]{2})[ :]([0-9]{2}\\.[0-9]+)[ ]?(\\+|-)([0-9]{2})[ :]([0-9]{2})[ :]([0-9]{2}\\.?[0-9]*)".r
-    //15h17m-11d10m
-    //15h17+89d15
+    //15h17m-11d10m, 15h17+89d15
     lazy val r2 = "([0-9]{2})h([0-9]{2})[m]?(\\+|-)([0-9]{2})d([0-9]{2})[m]?".r
     //275d11m15.6954s+17d59m59.876s
     lazy val r3 = "([0-9]{2,3}d[0-9]{2}m[0-9]{2}\\.[0-9]+s)([\\+-][0-9]{2}d[0-9]{2}m[0-9]{2}\\.[0-9]+s)".r
@@ -238,7 +216,6 @@ object Angle {
       case r5(ra, de)                  => (ra.toDouble.degree, de.toDouble.degree)
       case x                           => throw new MatchError(x)
     }
-
   }
 
   /**
@@ -248,7 +225,6 @@ object Angle {
     var ra = ra2
     while (ra < 0) ra += math.Pi * 2
     while (ra >= math.Pi * 2) ra -= math.Pi * 2
-
     ra
   }
 
@@ -478,5 +454,4 @@ object Angle {
 
   /** round circle which marks degrees */
   val DEGREE_SIGN: Char = '\u00B0'
-
 }
