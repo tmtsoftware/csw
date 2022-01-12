@@ -21,6 +21,8 @@ object OperationalState extends Enum[OperationalState] {
 
   case object READY extends OperationalState
 
+  case object NOT_READY extends OperationalState
+
   case object ERROR extends OperationalState
 
   case object BUSY extends OperationalState
@@ -29,7 +31,8 @@ object OperationalState extends Enum[OperationalState] {
 }
 
 object JOperationalState {
-  val READY: OperationalState = OperationalState.READY
-  val ERROR: OperationalState = OperationalState.ERROR
-  val BUSY: OperationalState  = OperationalState.BUSY
+  val READY: OperationalState     = OperationalState.READY
+  val ERROR: OperationalState     = OperationalState.ERROR
+  val BUSY: OperationalState      = OperationalState.BUSY
+  val NOT_READY: OperationalState = OperationalState.NOT_READY
 }
