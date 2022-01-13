@@ -21,6 +21,8 @@ object ObserveEventKeys {
   val readsComplete: Key[Int]          = IntKey.make("readsComplete")
   val rampsInExposure: Key[Int]        = IntKey.make("rampsInExposure")
   val rampsComplete: Key[Int]          = IntKey.make("rampsComplete")
+  val coaddsInExposure: Key[Int]       = IntKey.make("coaddsInExposure")
+  val coaddsDone: Key[Int]             = IntKey.make("coaddsDone")
   val downTimeReason: Key[String]      = StringKey.make("reason")
   val filename: Key[String]            = StringKey.make("filename")
 }
@@ -58,6 +60,10 @@ object ParamFactories {
   def rampsInExposureParam(rampsInExposure: Int): Parameter[Int] = ObserveEventKeys.rampsInExposure.set(rampsInExposure)
 
   def rampsCompleteParam(rampsComplete: Int): Parameter[Int] = ObserveEventKeys.rampsComplete.set(rampsComplete)
+
+  def coaddsInExposureParam(coaddsInExposure: Int): Parameter[Int] = ObserveEventKeys.coaddsInExposure.set(coaddsInExposure)
+
+  def coaddsDoneParam(coaddsDone: Int): Parameter[Int] = ObserveEventKeys.coaddsDone.set(coaddsDone)
 
   def downTimeReasonParam(reasonForDownTime: String): Parameter[String] = ObserveEventKeys.downTimeReason.set(reasonForDownTime)
 

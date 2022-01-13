@@ -94,9 +94,13 @@ class OpticalDetectorEventTest extends AnyFunSpec with Matchers {
       val exposureTime           = 23923L
       val remainingExposureTime  = 324335L
       val exposureId: ExposureId = ExposureId("2022A-001-123-IRIS-IMG-DRK1-0023")
+      val coaddsDone             = 2
+      val coaddsInExposure       = 4
       val observeEvent = OpticalDetectorEvent.exposureData(
         sourcePrefix,
         exposureId,
+        coaddsInExposure,
+        coaddsDone,
         exposureTime,
         remainingExposureTime
       )
@@ -106,7 +110,9 @@ class OpticalDetectorEventTest extends AnyFunSpec with Matchers {
       observeEvent.paramSet shouldBe Set(
         ObserveEventKeys.exposureId.set(exposureId.toString),
         ObserveEventKeys.exposureTime.set(exposureTime),
-        ObserveEventKeys.remainingExposureTime.set(remainingExposureTime)
+        ObserveEventKeys.remainingExposureTime.set(remainingExposureTime),
+        ObserveEventKeys.coaddsInExposure.set(coaddsInExposure),
+        ObserveEventKeys.coaddsDone.set(coaddsDone)
       )
     }
 
