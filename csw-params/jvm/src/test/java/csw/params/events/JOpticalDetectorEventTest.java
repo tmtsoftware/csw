@@ -115,11 +115,14 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
     public void shouldCreateOpticalDetectorExposureDataEvent__CSW_118_CSW_119() {
         long exposureTime = 1000L;
         long remainingExposureTime = 20L;
-        Set<Parameter<?>> paramSet = getParamSetForExposureDataEvent(exposureTime, remainingExposureTime);
-
+        int coaddsInExposure = 4;
+        int coaddsDone = 2;
+        Set<Parameter<?>> paramSet = getParamSetForExposureDataEvent(exposureTime, remainingExposureTime, coaddsInExposure, coaddsDone);
         ObserveEvent event = OpticalDetectorEvent.exposureData(
                 sourcePrefix,
                 exposureId,
+                coaddsInExposure,
+                coaddsDone,
                 exposureTime,
                 remainingExposureTime
         );
@@ -150,14 +153,18 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
     }
 
 
-    private Set<Parameter<?>> getParamSetForExposureDataEvent(long exposureTime, long remainingExposureTime) {
+    private Set<Parameter<?>> getParamSetForExposureDataEvent(long exposureTime, long remainingExposureTime, int coaddsInExposure, int coaddsDone) {
         Parameter<Long> exposureTimeParam = JKeyType.LongKey().make("exposureTime").set(exposureTime);
+        Parameter<Integer> coaddsInExposureParam = JKeyType.IntKey().make("coaddsInExposure").set(coaddsInExposure);
+        Parameter<Integer> coaddsDoneParam = JKeyType.IntKey().make("coaddsDone").set(coaddsDone);
         Parameter<String> exposureIdParam = JKeyType.StringKey().make("exposureId").set(exposureId.toString());
         Parameter<Long> remainingExposureTimeParam = JKeyType.LongKey().make("remainingExposureTime").set(remainingExposureTime);
 
         Set<Parameter<?>> paramSet = new HashSet<>(10);
         paramSet.add(exposureIdParam);
         paramSet.add(exposureTimeParam);
+        paramSet.add(coaddsInExposureParam);
+        paramSet.add(coaddsDoneParam);
         paramSet.add(remainingExposureTimeParam);
         return paramSet;
     }

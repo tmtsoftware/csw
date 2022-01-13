@@ -9,6 +9,11 @@ The product is in a new repository: [csw](https://github.com/tmtsoftware/csw).
 
 All notable changes to this project will be documented in this file.
 
+## [Changes in Upcoming releases]
+
+### Changes
+- Add `coaddsInExposure` and `coaddsDone` to OpticalExposureData ObserveEvent
+
 ## [CSW v4.0.0] - 2021-09-23
 
 This is final release v4.0.0 of the TMT Common Software for project stakeholders.

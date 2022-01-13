@@ -20,6 +20,8 @@ object OpticalDetectorEvent extends DetectorEvent(ObserveEventNames.OpticalDetec
    *                   The ExposureId follows the structure: 2020A-001-123-WFOS-IMG1-SCI0-0001 with an included ObsId or
    *                   when no ObsId is present, in the standalone format: 20200706-190204-WFOS-IMG1-SCI0-0001 with a UTC time
    *                   when the ExposureId is created.
+   * @param coaddsInExposure The integer total number of coadds in the current exposure. Value should be constant during an exposure
+   * @param coaddsDone Integer number of completed coadds from 1 to coaddsInExposure. Should be reset to 0 at the start of every exposure.
    * @param exposureTime Length in seconds of the current exposure
    * @param remainingExposureTime Number of seconds remaining in current exposure • Should count down in seconds – no faster than 1 Hz
    * @return [[csw.params.events.ObserveEvent]]]
@@ -27,13 +29,17 @@ object OpticalDetectorEvent extends DetectorEvent(ObserveEventNames.OpticalDetec
   def exposureData(
       sourcePrefix: Prefix,
       exposureId: ExposureId,
+      coaddsInExposure: Int,
+      coaddsDone: Int,
       exposureTime: Long,
       remainingExposureTime: Long
   ): ObserveEvent = {
     val params: Set[Parameter[_]] = Set(
       ParamFactories.exposureIdParam(exposureId),
       ParamFactories.exposureTimeParam(exposureTime),
-      ParamFactories.remainingExposureTimeParam(remainingExposureTime)
+      ParamFactories.remainingExposureTimeParam(remainingExposureTime),
+      ParamFactories.coaddsInExposureParam(coaddsInExposure),
+      ParamFactories.coaddsDoneParam(coaddsDone)
     )
     ObserveEvent(sourcePrefix, ObserveEventNames.OpticalDetectorExposureData, params)
   }
