@@ -12,11 +12,13 @@ import csw.params.commands.CommandResponse.*
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.Units
 import csw.params.core.states.CurrentState
+import csw.params.events.OperationalState
 
 object CommandContract extends CommandData with CommandServiceCodecs {
   private val models: ModelSet = ModelSet.models(
     ModelType(observe, observeWithoutObsId, setup, setupWithoutObsId),
     ModelType(commandName),
+    ModelType(OperationalState),
     ModelType[Parameter[_]](paramSet.toList),
     ModelType(KeyType),
     ModelType(Units),
