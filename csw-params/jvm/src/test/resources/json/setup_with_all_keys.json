@@ -131,8 +131,8 @@
           {
             "_type": "EqCoord",
             "tag": "BASE",
-            "ra": "12:13:14.150",
-            "dec": "-30:31:32.300",
+            "ra": 659912250000,
+            "dec": -109892300000,
             "frame": "ICRS",
             "catalogName": "none",
             "pm": {
