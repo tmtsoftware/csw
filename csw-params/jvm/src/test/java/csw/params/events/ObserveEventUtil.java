@@ -10,6 +10,7 @@ public class ObserveEventUtil {
         operationalStateChoices.add(new Choice(JOperationalState.BUSY().entryName()));
         operationalStateChoices.add(new Choice(JOperationalState.READY().entryName()));
         operationalStateChoices.add(new Choice(JOperationalState.ERROR().entryName()));
+        operationalStateChoices.add(new Choice(JOperationalState.NOT_READY().entryName()));
         return operationalStateChoices;
     }
 }
