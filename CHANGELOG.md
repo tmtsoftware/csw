@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changes
 - Add `coaddsInExposure` and `coaddsDone` to OpticalExposureData ObserveEvent
+- Add `NOT_READY` choice to OperationalState
 
 ## [CSW v4.0.0] - 2021-09-23
 
