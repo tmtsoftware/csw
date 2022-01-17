@@ -3,7 +3,7 @@ name: Master Link Check and Multi-NIC test
 on:
   workflow_dispatch:
   schedule:
-    - cron: "30 01 * * *" # run at 07:00 AM IST
+    - cron: "30 06 * * *" # run at 12:00 PM IST
 
 jobs:
   link-check:
