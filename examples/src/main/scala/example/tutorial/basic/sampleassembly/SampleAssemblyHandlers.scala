@@ -42,12 +42,12 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
   //#resolve-hcd-and-create-commandservice
   private implicit val system: ActorSystem[Nothing] = ctx.system
   //#resolve-hcd-and-create-commandservice
-  private implicit val timeout: Timeout             = 10.seconds
-  private val log                                   = loggerFactory.getLogger
-  private val prefix: Prefix                        = cswCtx.componentInfo.prefix
-  private val hcdConnection                         = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
-  private var hcdLocation: AkkaLocation             = _
-  private var hcdCS: Option[CommandService]         = None
+  private implicit val timeout: Timeout     = 10.seconds
+  private val log                           = loggerFactory.getLogger
+  private val prefix: Prefix                = cswCtx.componentInfo.prefix
+  private val hcdConnection                 = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
+  private var hcdLocation: AkkaLocation     = _
+  private var hcdCS: Option[CommandService] = None
 
   //#initialize
   private var maybeEventSubscription: Option[EventSubscription] = None
