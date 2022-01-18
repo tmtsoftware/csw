@@ -176,10 +176,13 @@ Note that the Scala examples are using async/await which simplifies handling the
 
 @@@
 
-This example shows creating a `Command Service` using `Akka Location` of the receiving component, discovered from the Location Service.
+This example shows creating a `Command Service` using `Akka Location` of the receiving component, discovered from the Location Service. Actor System is created here using Actor System Context `ctx` and is passed as implicit parameter to `make` method of `CommandServiceFactory`. In Java though the actor is passed explicitly as shown in the example. 
 
-Scala/resolve hcd/create command serviceScala/submit w/invalid response
-:   @@snip [CommandServiceTest.scala](../../../../integration/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #resolve-hcd-and-create-commandservice }
+Scala/resolve hcd/create command service
+:   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/example/tutorial/basic/sampleassembly/SampleAssemblyHandlers.scala) { #resolve-hcd-and-create-commandservice }
+
+Java/resolve hcd/create command service
+:   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/example/tutorial/basic/sampleassembly/JSampleAssemblyHandlers.java) { #resolve-hcd-and-create-commandservice }
 
 The API can be exercised as follows for different scenarios of command-based communication:
 

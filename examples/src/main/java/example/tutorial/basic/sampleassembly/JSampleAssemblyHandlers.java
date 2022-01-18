@@ -48,8 +48,9 @@ import static example.tutorial.basic.shared.JSampleInfo.*;
  */
 @SuppressWarnings({"OptionalGetWithoutIsPresent", "unchecked", "FieldCanBeLocal", "OptionalUsedAsFieldOrParameterType"})
 public class JSampleAssemblyHandlers extends JComponentHandlers {
-
+//#resolve-hcd-and-create-commandservice
   private final ActorSystem<Void> system;
+  //#resolve-hcd-and-create-commandservice
   private final Timeout timeout;
   private final JCswContext cswCtx;
   private final ILogger log;
@@ -58,11 +59,12 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
   @SuppressWarnings("unused")
   private AkkaLocation hcdLocation = null;
   private Optional<ICommandService> hcdCS = Optional.empty();
-
+//#resolve-hcd-and-create-commandservice
   JSampleAssemblyHandlers(ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
     super(ctx, cswCtx);
     this.cswCtx = cswCtx;
     system = ctx.getSystem();
+    //#resolve-hcd-and-create-commandservice
     timeout = new Timeout(10, TimeUnit.SECONDS);
     this.log = cswCtx.loggerFactory().getLogger(getClass());
     prefix = cswCtx.componentInfo().prefix();

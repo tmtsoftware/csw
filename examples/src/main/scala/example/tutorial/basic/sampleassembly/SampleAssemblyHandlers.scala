@@ -34,11 +34,14 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
  * You can find more information on this here : https://tmtsoftware.github.io/csw/framework.html
  */
 //noinspection DuplicatedCode
+//#resolve-hcd-and-create-commandservice
 class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext) extends ComponentHandlers(ctx, cswCtx) {
-
+//#resolve-hcd-and-create-commandservice
   import cswCtx._
   private implicit val ec: ExecutionContextExecutor = ctx.executionContext
+  //#resolve-hcd-and-create-commandservice
   private implicit val system: ActorSystem[Nothing] = ctx.system
+  //#resolve-hcd-and-create-commandservice
   private implicit val timeout: Timeout             = 10.seconds
   private val log                                   = loggerFactory.getLogger
   private val prefix: Prefix                        = cswCtx.componentInfo.prefix
