@@ -22,7 +22,7 @@ object Command {
     val port                      = optionsHandler.portOpt("port", options.port)
     val command = optionsHandler
       .stringOpt("command", options.command)
-      .getOrElse("false") //if command is not specified, registration will proceed with "false" command.
+      .getOrElse("false") // if command is not specified, registration will proceed with "false" command.
       .replace("%port", port.toString)
     Command(command, port, options.delay.getOrElse(defaultDelay), options.noExit, options.httpPath)
   }

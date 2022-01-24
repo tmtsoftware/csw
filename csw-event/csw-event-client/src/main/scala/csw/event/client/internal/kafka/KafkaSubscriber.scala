@@ -133,7 +133,7 @@ private[event] class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[S
     Source.futureSource(future).map(x => EventConverter.toEvent(x.value()))
   }
 
-  //Get the last offset for the given partitions. The last offset of a partition is the offset of the upcoming
+  // Get the last offset for the given partitions. The last offset of a partition is the offset of the upcoming
   // message, i.e. the offset of the last available message + 1.
   private def getLatestOffsets(eventKeys: Set[EventKey]): Future[Map[TopicPartition, Long]] = {
     val topicPartitions = eventKeys.map(e => new TopicPartition(e.key, 0)).toList

@@ -7,7 +7,7 @@ import io.bullet.borer.derivation.CompactMapBasedCodecs.deriveCodec
 
 object LoggingCodecs extends LoggingCodecs
 trait LoggingCodecs {
-  //do not name this to enumCodec as it then conflicts with an implicit value with the same name
+  // do not name this to enumCodec as it then conflicts with an implicit value with the same name
   def explicitEnumCodec[T <: EnumEntry: Enum]: Codec[T] =
     Codec.bimap[String, T](
       _.entryName,

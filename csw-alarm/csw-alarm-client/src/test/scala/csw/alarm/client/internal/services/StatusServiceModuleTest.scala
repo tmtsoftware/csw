@@ -108,7 +108,7 @@ class StatusServiceModuleTest
       previousStatus.acknowledgementStatus shouldEqual Acknowledged
       previousStatus.latchedSeverity shouldEqual Disconnected
 
-      //reset alarm
+      // reset alarm
       reset(tromboneAxisLowLimitAlarmKey).await
 
       val newStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
@@ -130,7 +130,7 @@ class StatusServiceModuleTest
     defaultStatus.acknowledgementStatus shouldEqual Acknowledged
     getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Disconnected
 
-    //set current and latched severity to warning
+    // set current and latched severity to warning
     setSeverity(tromboneAxisLowLimitAlarmKey, Warning).await
 
     val originalStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
@@ -139,7 +139,7 @@ class StatusServiceModuleTest
     originalStatus.acknowledgementStatus shouldEqual Unacknowledged
     getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Warning
 
-    //wait for current severity to expire and get disconnected
+    // wait for current severity to expire and get disconnected
     Thread.sleep(1500)
     getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Disconnected
 
@@ -147,11 +147,11 @@ class StatusServiceModuleTest
     // we are relying on future Alarm Server to do this change
     val notUpdatedStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
     notUpdatedStatus.latchedSeverity shouldEqual Warning
-    //NOTE: this will not be the case when alarm server is running and subscribed to currentSeverity.
-    //As soon as current severity changes to disconnected it, will change latched severity to disconnected
-    //(unless it was already latched to critical)
+    // NOTE: this will not be the case when alarm server is running and subscribed to currentSeverity.
+    // As soon as current severity changes to disconnected it, will change latched severity to disconnected
+    // (unless it was already latched to critical)
 
-    //reset alarm
+    // reset alarm
     reset(tromboneAxisLowLimitAlarmKey).await
 
     val newStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
@@ -210,7 +210,7 @@ class StatusServiceModuleTest
     shelve(tromboneAxisHighLimitAlarmKey).await
     getStatus(tromboneAxisHighLimitAlarmKey).await.shelveStatus shouldBe Shelved
 
-    //repeat the shelve operation
+    // repeat the shelve operation
     noException shouldBe thrownBy(shelve(tromboneAxisHighLimitAlarmKey).await)
   }
 
@@ -240,7 +240,7 @@ class StatusServiceModuleTest
     unshelve(tromboneAxisHighLimitAlarmKey).await
     getStatus(tromboneAxisHighLimitAlarmKey).await.shelveStatus shouldBe Unshelved
 
-    //repeat the unshelve operation
+    // repeat the unshelve operation
     noException shouldBe thrownBy(unshelve(tromboneAxisHighLimitAlarmKey).await)
   }
 
@@ -252,12 +252,12 @@ class StatusServiceModuleTest
   // DEOPSCSW-501: AlarmServer update time and latch severity
   test("latchToDisconnected should latch the status to disconnected | DEOPSCSW-501") {
 
-    //starts a "mini alarm server". This is a small alarm server impl created just for testing
-    //'latchToDisconnected' api
+    // starts a "mini alarm server". This is a small alarm server impl created just for testing
+    // 'latchToDisconnected' api
     val redisSubscription = startAlarmWatcher()
 
-    //awaiting for stream to become ready is very important step.
-    //without this, we lose events
+    // awaiting for stream to become ready is very important step.
+    // without this, we lose events
     redisSubscription.ready().await
 
     // Initially latch and current are disconnected
@@ -274,33 +274,33 @@ class StatusServiceModuleTest
     acknowledge(tromboneAxisLowLimitAlarmKey).await
     getStatus(tromboneAxisLowLimitAlarmKey).await.acknowledgementStatus shouldBe Acknowledged
 
-    //wait for current severity to expire and get disconnected
+    // wait for current severity to expire and get disconnected
     Thread.sleep(1500)
     getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Disconnected
 
     val status2: AlarmStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
 
-    //the test stream that we have created, should have latched the alarm to Disconnected by now
+    // the test stream that we have created, should have latched the alarm to Disconnected by now
     status2.latchedSeverity shouldEqual Disconnected
     status2.initializing shouldBe false
     status2.acknowledgementStatus shouldBe Unacknowledged withClue ", alarm should become Unacknowledged"
     status2.shelveStatus shouldEqual Unshelved
     status2.alarmTime.value.isAfter(status1.alarmTime.value) shouldBe true withClue ", alarm time did not change"
 
-    //simulate component starts sending Okay heartbeat again
+    // simulate component starts sending Okay heartbeat again
     val status3 = setSeverityAndGetStatus(tromboneAxisLowLimitAlarmKey, Okay)
 
-    //confirm that current severity is okay
+    // confirm that current severity is okay
     getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Okay
 
-    //test that latched severity is still Disconnected
+    // test that latched severity is still Disconnected
     status3.latchedSeverity shouldEqual Disconnected
     status3.initializing shouldBe false
     status3.acknowledgementStatus shouldBe Unacknowledged withClue ", alarm should be Unacknowledged"
     status3.shelveStatus shouldEqual Unshelved
     status3.alarmTime.value.isAfter(status1.alarmTime.value) shouldBe true withClue ", alarm time did not change"
 
-    //shut down the alarm watcher
+    // shut down the alarm watcher
     redisSubscription.unsubscribe().await
   }
 
@@ -314,24 +314,24 @@ class StatusServiceModuleTest
    * @return RedisSubscription - This subscription has a ready() and an unsubscribe() method.
    */
   private def startAlarmWatcher(): RedisSubscription = {
-    //import codecs
+    // import codecs
     import csw.alarm.client.internal.AlarmRomaineCodec._
 
-    //import helpers
+    // import helpers
     import connsFactory._
 
-    //create async api for severity which will be needed to create keyspace api
+    // create async api for severity which will be needed to create keyspace api
     lazy val severityApi: RedisAsyncApi[SeverityKey, FullAlarmSeverity] = asyncApi
 
-    //get all severity keys
+    // get all severity keys
     val severityKeys = metadataApi.keys(Key.GlobalKey).await.map(m => SeverityKey.fromAlarmKey(m))
 
-    //create keyspace api for severity and return RedisSubscription
+    // create keyspace api for severity and return RedisSubscription
     connsFactory
       .redisKeySpaceApi(severityApi)
       .watchKeyspaceValueChange(severityKeys, overflowStrategy = OverflowStrategy.LATEST)
       .to(Sink.foreach {
-        //'None' case indicates that redis key has expired
+        // 'None' case indicates that redis key has expired
         case RedisResult(k, RedisValueChange(oldSeverityMayBe, None)) =>
           latchToDisconnected(k, oldSeverityMayBe.getOrElse(Disconnected)).await
         case _ =>

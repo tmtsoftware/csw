@@ -157,7 +157,7 @@ class ConfigServiceRouteTest
 
   test("get - failure status codes | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
 
-    //consumes 2 revisions, one for actual file one for active file
+    // consumes 2 revisions, one for actual file one for active file
     Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
@@ -174,7 +174,7 @@ class ConfigServiceRouteTest
 
   }
 
-  //DEOPSCSW-626: Get route of config server with path for empty config file
+  // DEOPSCSW-626: Get route of config server with path for empty config file
   test("get - success status code for empty file | DEOPSCSW-579, DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-626, DEOPSCSW-69") {
     Post("/config/test.conf?annex=true&comment=commit1", emptyConfigFile).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
@@ -517,7 +517,7 @@ class ConfigServiceRouteTest
       status shouldEqual StatusCodes.NotFound
     }
 
-    //consumes 2 revisions, one for actual file one for active file
+    // consumes 2 revisions, one for actual file one for active file
     Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
@@ -580,7 +580,7 @@ class ConfigServiceRouteTest
       .thenReturn(poorva)
       .thenReturn(shubham)
 
-    //consumes 2 revisions, one for actual file one for active file
+    // consumes 2 revisions, one for actual file one for active file
     // first request will use username=bilal
     Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created

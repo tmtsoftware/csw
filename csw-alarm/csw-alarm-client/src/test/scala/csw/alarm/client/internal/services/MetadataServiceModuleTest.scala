@@ -186,7 +186,7 @@ class MetadataServiceModuleTest
   test("activate should activate an inactive alarm | DEOPSCSW-486, DEOPSCSW-443, DEOPSCSW-448") {
     initTestAlarms()
 
-    //ensure alarm is Inactive first
+    // ensure alarm is Inactive first
     getMetadata(cpuIdleAlarmKey).await.activationStatus should be(ActivationStatus.Inactive)
 
     activate(cpuIdleAlarmKey).await
@@ -199,7 +199,7 @@ class MetadataServiceModuleTest
   test("deActivate should deactivate an active alarm | DEOPSCSW-486, DEOPSCSW-443, DEOPSCSW-448") {
     initTestAlarms()
 
-    //ensure alarm is Active first
+    // ensure alarm is Active first
     getMetadata(outOfRangeOffloadAlarmKey).await.activationStatus should be(ActivationStatus.Active)
 
     deactivate(outOfRangeOffloadAlarmKey).await

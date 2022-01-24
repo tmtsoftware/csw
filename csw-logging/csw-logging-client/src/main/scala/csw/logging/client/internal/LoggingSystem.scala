@@ -230,7 +230,7 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
 
     def stopAppenders(): Future[Unit] = Future.sequence(appenders map (_.stop())).map(_ => ())
 
-    //Stop gc logger
+    // Stop gc logger
     gcLogger.foreach(_.stop())
 
     // Stop Slf4j

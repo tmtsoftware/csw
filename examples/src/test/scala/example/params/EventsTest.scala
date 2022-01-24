@@ -16,14 +16,14 @@ class EventsTest extends AnyFunSpec with Matchers {
 
   describe("Examples of EventTime") {
     it("should show usage of utility functions") {
-      //#eventtime
+      // #eventtime
       val source    = Prefix("iris.filter.wheel")
       val eventName = EventName("temperatures")
       val event     = SystemEvent(source, eventName)
 
       // accessing eventTime
       val eventTime = event.eventTime
-      //#eventtime
+      // #eventtime
 
       assert(eventName == event.eventName)
       assert(eventTime == event.eventTime)
@@ -35,56 +35,56 @@ class EventsTest extends AnyFunSpec with Matchers {
     // DEOPSCSW-330: Include complex payloads - paramset in Event and ObserveEvent
     it("should show usages of SystemEvent") {
 
-      //#systemevent
-      //keys
+      // #systemevent
+      // keys
       val k1: Key[Int]    = KeyType.IntKey.make("encoder")
       val k2: Key[Int]    = KeyType.IntKey.make("speed")
       val k3: Key[String] = KeyType.StringKey.make("filter")
       val k4: Key[Int]    = KeyType.IntKey.make("notUsed")
 
-      //prefixes
+      // prefixes
       val ck1   = Prefix("wfos.red.filter")
       val name1 = EventName("filterWheel")
       val ck3   = Prefix("iris.imager.filter")
       val name3 = EventName("status")
 
-      //parameters
+      // parameters
       val p1: Parameter[Int]    = k1.set(22)
       val p2: Parameter[Int]    = k2.set(44)
       val p3: Parameter[String] = k3.set("A", "B", "C", "D")
 
-      //Create SystemEvent using madd
+      // Create SystemEvent using madd
       val se1: SystemEvent = SystemEvent(ck1, name1).madd(p1, p2)
-      //Create SystemEvent using apply
+      // Create SystemEvent using apply
       val se2: SystemEvent = SystemEvent(ck3, name3, Set(p1, p2))
-      //Create SystemEvent and use add
+      // Create SystemEvent and use add
       val se3: SystemEvent = SystemEvent(ck3, name3).add(p1).add(p2).add(p3)
 
-      //access keys
-      val k1Exists: Boolean = se1.exists(k1) //true
+      // access keys
+      val k1Exists: Boolean = se1.exists(k1) // true
 
-      //access Parameters
+      // access Parameters
       val p4: Option[Parameter[Int]] = se1.get(k1)
 
-      //access values
+      // access values
       val v1: Array[Int] = se1(k1).values
       val v2: Array[Int] = se2.parameter(k2).values
-      //k4 is missing
+      // k4 is missing
       val missingKeys: Set[String] = se3.missingKeys(k1, k2, k3, k4)
 
-      //remove keys
+      // remove keys
       val se4: SystemEvent = se3.remove(k3)
 
-      //add more than one parameters, using madd
+      // add more than one parameters, using madd
       val se5: SystemEvent = se4.madd(k3.set("X", "Y", "Z").withUnits(Units.day), k4.set(99, 100))
       val paramSize: Int   = se5.size
 
-      //update existing key with set
+      // update existing key with set
       val se6: SystemEvent = se5.add(k2.set(5, 6, 7, 8))
 
-      //#systemevent
+      // #systemevent
 
-      //validations
+      // validations
       assert(k1Exists === true)
       assert(p4.get === p1)
       assert(v1 === p1.values)
@@ -99,43 +99,43 @@ class EventsTest extends AnyFunSpec with Matchers {
   describe("Examples of serialization") {
     it("should show reading and writing of events") {
 
-      //#json-serialization
+      // #json-serialization
       import play.api.libs.json.{JsValue, Json}
 
-      //key
+      // key
       val k1: Key[MatrixData[Double]] = DoubleMatrixKey.make("myMatrix")
 
       val name1  = EventName("correctionInfo")
       val prefix = Prefix("aoesw.rpg")
 
-      //values
+      // values
       val m1: MatrixData[Double] = MatrixData.fromArrays(
         Array(1.0, 2.0, 3.0),
         Array(4.1, 5.1, 6.1),
         Array(7.2, 8.2, 9.2)
       )
-      //parameter
+      // parameter
       val i1: Parameter[MatrixData[Double]] = k1.set(m1)
-      //events
+      // events
       val observeEvent: ObserveEvent = IRDetectorEvent.observeStart(prefix, ObsId("1232A-123-123")).madd(i1)
       val systemEvent: SystemEvent   = SystemEvent(prefix, name1).add(i1)
 
-      //json support - write
+      // json support - write
       val observeJson: JsValue = JsonSupport.writeEvent(observeEvent)
       val systemJson: JsValue  = JsonSupport.writeEvent(systemEvent)
 
-      //optionally prettify
+      // optionally prettify
       val str: String = Json.prettyPrint(systemJson)
 
-      //construct command from string
+      // construct command from string
       val systemEventFromPrettyStr: SystemEvent = JsonSupport.readEvent[SystemEvent](Json.parse(str))
 
-      //json support - read
+      // json support - read
       val observeEvent1: ObserveEvent = JsonSupport.readEvent[ObserveEvent](observeJson)
       val systemEvent1: SystemEvent   = JsonSupport.readEvent[SystemEvent](systemJson)
-      //#json-serialization
+      // #json-serialization
 
-      //validations
+      // validations
       assert(observeEvent === observeEvent1)
       assert(systemEvent === systemEvent1)
       assert(systemEventFromPrettyStr === systemEvent)
@@ -145,18 +145,18 @@ class EventsTest extends AnyFunSpec with Matchers {
   describe("Examples of unique key constraint") {
     it("should show duplicate keys are removed") {
 
-      //#unique-key
-      //keys
+      // #unique-key
+      // keys
       val encoderKey: Key[Int] = KeyType.IntKey.make("encoder")
       val filterKey: Key[Int]  = KeyType.IntKey.make("filter")
       val miscKey: Key[Int]    = KeyType.IntKey.make("misc")
 
-      //prefix
+      // prefix
       val prefix = Prefix("wfos.blue.filter")
 
       val name1 = EventName("filterWheel")
 
-      //params
+      // params
       val encParam1 = encoderKey.set(1)
       val encParam2 = encoderKey.set(2)
 
@@ -167,13 +167,13 @@ class EventsTest extends AnyFunSpec with Matchers {
       val filterParam3 = filterKey.set(3)
 
       val miscParam1 = miscKey.set(100)
-      //StatusEvent with duplicate key via constructor
+      // StatusEvent with duplicate key via constructor
       val systemEvent =
         SystemEvent(prefix, name1, Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
-      //four duplicate keys are removed; now contains one Encoder and one Filter key
+      // four duplicate keys are removed; now contains one Encoder and one Filter key
       val uniqueKeys1 = systemEvent.paramSet.toList.map(_.keyName)
 
-      //try adding duplicate keys via add + madd
+      // try adding duplicate keys via add + madd
       val changedStatusEvent = systemEvent
         .add(encParam3)
         .madd(
@@ -181,16 +181,16 @@ class EventsTest extends AnyFunSpec with Matchers {
           filterParam2,
           filterParam3
         )
-      //duplicate keys will not be added. Should contain one Encoder and one Filter key
+      // duplicate keys will not be added. Should contain one Encoder and one Filter key
       val uniqueKeys2 = changedStatusEvent.paramSet.toList.map(_.keyName)
 
-      //miscKey(unique) will be added; encoderKey(duplicate) will not be added
+      // miscKey(unique) will be added; encoderKey(duplicate) will not be added
       val finalStatusEvent = systemEvent.madd(Set(miscParam1, encParam1))
-      //now contains encoderKey, filterKey, miscKey
+      // now contains encoderKey, filterKey, miscKey
       val uniqueKeys3 = finalStatusEvent.paramSet.toList.map(_.keyName)
-      //#unique-key
+      // #unique-key
 
-      //validations
+      // validations
       uniqueKeys1 should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
       uniqueKeys2 should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
       uniqueKeys3 should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName, miscKey.keyName)
@@ -199,41 +199,41 @@ class EventsTest extends AnyFunSpec with Matchers {
 
   describe("Examples of Cbor") {
     it("should show usage of converting events to/from cbor | CSW-147") {
-      //#cbor
-      //Key
+      // #cbor
+      // Key
       val solarSystemKey = KeyType.SolarSystemCoordKey.make("planets")
 
-      //values
+      // values
       val planet1 = SolarSystemCoord(Tag("planet"), Jupiter)
       val planet2 = SolarSystemCoord(Tag("planet"), Venus)
 
-      //parameters
+      // parameters
       val param = solarSystemKey.set(planet1, planet2)
 
       val name = EventName("targetCoords")
-      //events
-      //#observe-event
+      // events
+      // #observe-event
       val obsId                         = ObsId("1234A-001-0123")
       val prefix                        = Prefix("tcs.pk")
       val wfsObserveEvent: ObserveEvent = WFSDetectorEvent.publishSuccess(prefix)
       val irObserveEvent: ObserveEvent  = IRDetectorEvent.observeStart(prefix, obsId)
       val opdObserveEvent: ObserveEvent = OpticalDetectorEvent.observeStart(prefix, obsId)
-      //#observe-event
+      // #observe-event
       val systemEvent1: SystemEvent = SystemEvent(prefix, name).add(param)
       val systemEvent2: SystemEvent = SystemEvent(prefix, name).add(param)
 
-      //convert events to cbor bytestring
+      // convert events to cbor bytestring
       val byteArray2 = EventCbor.encode(wfsObserveEvent)
       val byteArray3 = EventCbor.encode(systemEvent1)
       val byteArray4 = EventCbor.encode(systemEvent2)
 
-      //convert cbor bytestring to events
+      // convert cbor bytestring to events
       val pbObserveEvent: ObserveEvent = EventCbor.decode(byteArray2)
       val pbSystemEvent1: SystemEvent  = EventCbor.decode(byteArray3)
       val pbSystemEvent2: SystemEvent  = EventCbor.decode(byteArray4)
-      //#cbor
+      // #cbor
 
-      //validations
+      // validations
       assert(pbObserveEvent === wfsObserveEvent)
       assert(pbSystemEvent1 === systemEvent1)
       assert(pbSystemEvent2 === systemEvent2)

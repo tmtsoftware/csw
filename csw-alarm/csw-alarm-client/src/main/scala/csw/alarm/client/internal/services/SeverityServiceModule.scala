@@ -98,7 +98,7 @@ private[client] trait SeverityServiceModule extends SeverityService {
     val severitySourceF: Future[Source[FullAlarmSeverity, RedisSubscription]] = async {
       val metadataKeys                          = await(getActiveAlarmKeys(key))
       val activeSeverityKeys: List[SeverityKey] = metadataKeys.map(a => SeverityKey.fromAlarmKey(a))
-      val currentSeverities                     = await(severityApi.mget(activeSeverityKeys)).map(result => result.key -> result.value).toMap
+      val currentSeverities = await(severityApi.mget(activeSeverityKeys)).map(result => result.key -> result.value).toMap
 
       keySpaceApi
         .watchKeyspaceValue(activeSeverityKeys, OverflowStrategy.LATEST)

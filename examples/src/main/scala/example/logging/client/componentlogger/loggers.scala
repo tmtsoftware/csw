@@ -17,7 +17,7 @@ class SampleClass(loggerFactory: LoggerFactory) {
 //#component-logger-actor
 class SampleActor(loggerFactory: LoggerFactory) extends akka.actor.Actor {
 
-  //context is available from akka.actor.Actor
+  // context is available from akka.actor.Actor
   val log: Logger = loggerFactory.getLogger(context)
 
   override def receive = ???
@@ -32,10 +32,10 @@ class SampleTypedActor(loggerFactory: LoggerFactory, ctx: ActorContext[Component
 //#component-logger-typed-actor
 
 object Sample {
-  //#logger-factory-creation
+  // #logger-factory-creation
   val loggerFactory: LoggerFactory = new LoggerFactory(Prefix("csw.my-component-name"))
 
   // convert a scala LoggerFactory to java JLoggerFactory
   val jLoggerFactory: JLoggerFactory = loggerFactory.asJava
-  //#logger-factory-creation
+  // #logger-factory-creation
 }

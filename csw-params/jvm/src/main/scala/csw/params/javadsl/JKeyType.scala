@@ -4,7 +4,7 @@ import csw.params.core.generics.{ArrayKeyType, KeyType, MatrixKeyType, SimpleKey
 import csw.params.core.models.Units.NoUnits
 
 object JSimpleKeyType {
-  //required for Scala compatible and efficient ByteArray codecs
+  // required for Scala compatible and efficient ByteArray codecs
   import csw.params.core.formats.ParamCodecs.{javaByteArrayDec, javaByteArrayEnc}
 
   case object BooleanKey extends SimpleKeyTypeWithUnits[java.lang.Boolean](NoUnits)

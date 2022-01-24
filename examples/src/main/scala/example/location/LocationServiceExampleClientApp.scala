@@ -42,20 +42,20 @@ object LocationServiceExampleClientApp extends App {
   private val wiring = new LocationServerWiring().wiring
   Await.result(wiring.locationHttpService.start(), 5.seconds)
   val untypedSystem = ActorSystem("untyped-system")
-  //#create-actor-system
+  // #create-actor-system
   val typedSystem: typed.ActorSystem[SpawnProtocol.Command] =
     ActorSystemFactory.remote(SpawnProtocol(), "csw-examples-locationServiceClient")
-  //#create-actor-system
+  // #create-actor-system
 
-  //#create-location-service
+  // #create-location-service
   private val locationService = HttpLocationServiceFactory.makeLocalClient(typedSystem)
-  //#create-location-service
+  // #create-location-service
 
-  //#create-logging-system
+  // #create-logging-system
   private val host = InetAddress.getLocalHost.getHostName
   // Only call this once per application
   val loggingSystem: LoggingSystem = LoggingSystemFactory.start("LocationServiceExampleClient", "0.1", host, typedSystem)
-  //#create-logging-system
+  // #create-logging-system
 
   untypedSystem.actorOf(LocationServiceExampleClient.props(locationService, loggingSystem)(typedSystem))
 }
@@ -79,7 +79,7 @@ object LocationServiceExampleClient {
     s"${connection.name}, component type=${connection.componentId.componentType}, connection type=${connection.connectionType}"
   }
 
-  //#tracking
+  // #tracking
   def sinkBehavior: Behaviors.Receive[ExampleMessages] =
     Behaviors.receive[ExampleMessages] { (ctx, msg) =>
       {
@@ -95,7 +95,7 @@ object LocationServiceExampleClient {
         Behaviors.same
       }
     }
-  //#tracking
+  // #tracking
 }
 
 /**
@@ -120,7 +120,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   // Not only does this serve as an example for starting applications that are not written in CSW,
   // but it also will help demonstrate location filtering later in this demo.
 
-  //#Components-Connections-Registrations
+  // #Components-Connections-Registrations
 
   // add some dummy registrations for illustrative purposes
 
@@ -173,9 +173,9 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   val assemblyRegistration: AkkaRegistration = AkkaRegistrationFactory.make(assemblyConnection, typedActorRef)
 
   val assemblyRegResult: RegistrationResult = Await.result(locationService.register(assemblyRegistration), 2.seconds)
-  //#Components-Connections-Registrations
+  // #Components-Connections-Registrations
 
-  //#Components-Connections-Registrations-With-Metadata
+  // #Components-Connections-Registrations-With-Metadata
   // add some dummy registrations for illustrative purposes
 
   // dummy http connection
@@ -188,36 +188,36 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   val httpRegistrationForService =
     HttpRegistration(httpConnectionForService, httpPortForService, "path123", Metadata(Map("key1" -> "value1")))
   val httpRegResultForService: RegistrationResult = Await.result(locationService.register(httpRegistrationForService), 2.seconds)
-  //#Components-Connections-Registrations-With-Metadata
+  // #Components-Connections-Registrations-With-Metadata
 
-  //#find
+  // #find
   // find connection to LocationServiceExampleComponent in location service
   // [do this before starting LocationServiceExampleComponent.  this should return Future[None]]
   val exampleConnection: AkkaConnection = LocationServiceExampleComponent.connection
 
-  //#log-info-map
+  // #log-info-map
   log.info(
     s"Attempting to find $exampleConnection",
     Map(Keys.OBS_ID -> "foo_obs_id", "exampleConnection" -> exampleConnection.name)
   )
-  //#log-info-map
+  // #log-info-map
   val findResult: Option[AkkaLocation] = Await.result(locationService.find(exampleConnection), timeout)
 
-  //#log-info
+  // #log-info
   log.info(s"Result of the find call: $findResult")
-  //#log-info
-  //#find
+  // #log-info
+  // #find
 
   findResult.foreach(akkaLocation => {
-    //#typed-ref
+    // #typed-ref
     // If the component type is HCD or Assembly, use this to get the correct ActorRef
     val typedComponentRef: ActorRef[ComponentMessage] = akkaLocation.componentRef
 
     // If the component type is Container, use this to get the correct ActorRef
     val typedContainerRef: ActorRef[ContainerMessage] = akkaLocation.containerRef
-    //#typed-ref
+    // #typed-ref
   })
-  //#resolve
+  // #resolve
   // resolve connection to LocationServiceExampleComponent
   // [start LocationServiceExampleComponent after this command but before timeout]
   log.info(s"Attempting to resolve $exampleConnection with a wait of $waitForResolveLimit ...")
@@ -230,39 +230,39 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
     case None =>
       log.info(s"Timeout waiting for location $exampleConnection to resolve.")
   }
-  //#resolve
+  // #resolve
 
-  //#list
+  // #list
   // list connections in location service
   val connectionList: List[Location] = Await.result(locationService.list, timeout)
   log.info("All Registered Connections:")
   connectionList.foreach(c => log.info(s"--- ${locationInfoToString(c)}"))
-  //#list
+  // #list
 
-  //#filtering-component
+  // #filtering-component
   // filter connections based on component type
   val componentList: List[Location] = Await.result(locationService.list(ComponentType.Assembly), timeout)
   log.info("Registered Assemblies:")
   componentList.foreach(c => log.info(s"--- ${locationInfoToString(c)}"))
-  //#filtering-component
+  // #filtering-component
 
-  //#filtering-connection
+  // #filtering-connection
   // filter connections based on connection type
   val akkaList: List[Location] = Await.result(locationService.list(ConnectionType.AkkaType), timeout)
   log.info("Registered Akka connections:")
   akkaList.foreach(c => log.info(s"--- ${locationInfoToString(c)}"))
-  //#filtering-connection
+  // #filtering-connection
 
-  //#filtering-prefix
+  // #filtering-prefix
   // filter akka locations based on prefix
   val akkaLocations: List[Location] = Await.result(locationService.listByPrefix("NFIRAOS.ncc"), timeout)
   log.info("Registered akka locations for nfiraos.ncc")
   akkaLocations.foreach(c => log.info(s"--- ${locationInfoToString(c)}"))
-  //#filtering-prefix
+  // #filtering-prefix
 
   if (resolveResult.isDefined) {
 
-    //#tracking
+    // #tracking
     // the following two methods are examples of two ways to track a connection.
     // both are implemented but only one is really needed.
 
@@ -276,8 +276,8 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
       .map(TrackingEventAdapter)
       .to(ActorSink.actorRef[ExampleMessages](sinfActorRef, AllDone(exampleConnection), CustomException))
       .run()
-    //track returns a Killswitch, that can be used to turn off notifications arbitarily
-    //in this case track a connection for 5 seconds, after that schedule switching off the stream
+    // track returns a Killswitch, that can be used to turn off notifications arbitarily
+    // in this case track a connection for 5 seconds, after that schedule switching off the stream
     val killswitch = locationService
       .track(httpConnection)
       .toMat(Sink.foreach(println))(Keep.left)
@@ -296,7 +296,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
         self ! trackingEvent
       }
     )
-    //#tracking
+    // #tracking
 
     // scalastyle:on print.ln
 
@@ -307,7 +307,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   // tha application.
   override def postStop(): Unit = {
 
-    //#unregister
+    // #unregister
     val unregisterF: Future[Done] = async {
       await(httpRegResult.unregister())
       await(httpRegResultOnPublicNetwork.unregister())
@@ -315,15 +315,15 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
       await(assemblyRegResult.unregister())
     }
     Await.result(unregisterF, 5.seconds)
-    //#unregister
+    // #unregister
 
     // Gracefully shutdown actor system
     Await.result(context.system.terminate(), 20.seconds)
 
-    //#stop-logging-system
+    // #stop-logging-system
     // Only call this once per application
     Await.result(loggingSystem.stop, 30.seconds)
-    //#stop-logging-system
+    // #stop-logging-system
   }
 
   @nowarn("msg=unreachable code")
@@ -341,10 +341,10 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
       log.info(s"Tracking of $exampleConnection complete.")
 
     case x =>
-      //#log-error
+      // #log-error
       val runtimeException = new RuntimeException(s"Received unexpected message $x")
       log.error(runtimeException.getMessage, ex = runtimeException)
-    //#log-error
+    // #log-error
 
   }
 }

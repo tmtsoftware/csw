@@ -31,8 +31,8 @@ private[csw] class Wiring {
   lazy val tokenFactory: TokenFactory                 = new CliTokenFactory(nativeAuthAdapter)
   lazy val configService: ConfigService               = ConfigClientFactory.adminApi(actorSystem, locationService, tokenFactory)
   lazy val printLine: Any => Unit                     = println
-  lazy val commandLineRunner                          = new CommandLineRunner(configService, actorRuntime, printLine, nativeAuthAdapter)
-  lazy val cliApp                                     = new CliApp(commandLineRunner)
+  lazy val commandLineRunner = new CommandLineRunner(configService, actorRuntime, printLine, nativeAuthAdapter)
+  lazy val cliApp            = new CliApp(commandLineRunner)
 }
 
 private[config] object Wiring {

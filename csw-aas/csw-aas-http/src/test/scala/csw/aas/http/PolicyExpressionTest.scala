@@ -26,12 +26,12 @@ class PolicyExpressionTest
   private implicit val patience: PatienceConfig = PatienceConfig(1.seconds, 100.millis)
 
   val testCases = List(
-    //AND truth table
+    // AND truth table
     TestCase(left = true, "And", right = true, expectedOutcome = true),
     TestCase(left = true, "And", right = false, expectedOutcome = false),
     TestCase(left = false, "And", right = true, expectedOutcome = false),
     TestCase(left = false, "And", right = false, expectedOutcome = false),
-    //OR truth table
+    // OR truth table
     TestCase(left = true, "Or", right = true, expectedOutcome = true),
     TestCase(left = true, "Or", right = false, expectedOutcome = true),
     TestCase(left = false, "Or", right = true, expectedOutcome = true),

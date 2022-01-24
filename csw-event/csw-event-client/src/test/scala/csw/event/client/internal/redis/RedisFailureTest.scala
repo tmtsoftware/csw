@@ -55,7 +55,7 @@ class RedisFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
     failure.getCause shouldBe a[RedisException]
   }
 
-  //DEOPSCSW-334: Publish an event
+  // DEOPSCSW-334: Publish an event
   test("should invoke onError callback on publish failure [stream API] | DEOPSCSW-398, DEOPSCSW-399, DEOPSCSW-334") {
     import redisTestProps._
     val publisher = eventService.makeNewPublisher()
@@ -76,7 +76,7 @@ class RedisFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
     failure.getCause shouldBe a[RedisException]
   }
 
-  //DEOPSCSW-334: Publish an event
+  // DEOPSCSW-334: Publish an event
   test("should invoke onError callback on publish failure [eventGenerator API] | DEOPSCSW-398, DEOPSCSW-399, DEOPSCSW-334") {
     import redisTestProps._
     val publisher = eventService.makeNewPublisher()
@@ -111,7 +111,7 @@ class RedisFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
     redisServer.start()
   }
 
-  //DEOPSCSW-000: Publish an event with block generating future of event
+  // DEOPSCSW-000: Publish an event with block generating future of event
   test(
     "should invoke onError callback on publish failure [eventGenerator API] with future of event generator | DEOPSCSW-398, DEOPSCSW-399"
   ) {
@@ -133,7 +133,7 @@ class RedisFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
     failure.getCause shouldBe a[RedisException]
   }
 
-  //DEOPSCSW-515: Include Start Time in API
+  // DEOPSCSW-515: Include Start Time in API
   test(
     "should invoke onError callback on publish failure [eventGenerator API] with start time and event generator | DEOPSCSW-398, DEOPSCSW-399, DEOPSCSW-515"
   ) {
@@ -157,7 +157,7 @@ class RedisFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
     failure.getCause shouldBe a[RedisException]
   }
 
-  //DEOPSCSW-515: Include Start Time in API
+  // DEOPSCSW-515: Include Start Time in API
   test(
     "should invoke onError callback on publish failure [eventGenerator API] with start time and future of event generator | DEOPSCSW-398, DEOPSCSW-399, DEOPSCSW-515"
   ) {
@@ -181,7 +181,7 @@ class RedisFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
     failure.getCause shouldBe a[RedisException]
   }
 
-  //DEOPSCSW-516: Optionally Publish - API Change
+  // DEOPSCSW-516: Optionally Publish - API Change
   test(
     "should not invoke onError on opting to not publish event with eventGenerator | DEOPSCSW-398, DEOPSCSW-399, DEOPSCSW-516"
   ) {
@@ -202,7 +202,7 @@ class RedisFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
     testProbe.expectNoMessage(500.millis)
   }
 
-  //DEOPSCSW-516: Optionally Publish - API Change
+  // DEOPSCSW-516: Optionally Publish - API Change
   test(
     "should not invoke onError on opting to not publish event with async eventGenerator | DEOPSCSW-398, DEOPSCSW-399, DEOPSCSW-516"
   ) {

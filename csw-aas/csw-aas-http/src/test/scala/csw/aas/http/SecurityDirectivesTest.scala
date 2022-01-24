@@ -115,14 +115,14 @@ class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directiv
 
   test("apply should not resolve AAS location when auth is disabled in config | DEOPSCSW-579") {
     val locationService: LocationService = mock[LocationService]
-    val config                           = system.settings.config.withValue("auth-config.disabled", ConfigValueFactory.fromAnyRef("true"))
+    val config = system.settings.config.withValue("auth-config.disabled", ConfigValueFactory.fromAnyRef("true"))
     SecurityDirectives(config, locationService)
     verify(locationService, Mockito.never()).resolve(any[HttpConnection], any[FiniteDuration])
   }
 
   test("apply should resolve AAS location when auth is enabled in config | DEOPSCSW-579") {
     val locationService: LocationService = mock[LocationService]
-    val config                           = system.settings.config.withValue("auth-config.disabled", ConfigValueFactory.fromAnyRef("false"))
+    val config = system.settings.config.withValue("auth-config.disabled", ConfigValueFactory.fromAnyRef("false"))
     when(locationService.resolve(any[HttpConnection], any[FiniteDuration]))
       .thenReturn(Future.successful(Some(HttpLocation(AASConnection.value, URI.create(""), Metadata.empty))))
     SecurityDirectives(config, locationService)

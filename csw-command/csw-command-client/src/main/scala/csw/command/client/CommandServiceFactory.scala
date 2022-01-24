@@ -28,7 +28,7 @@ object CommandServiceFactory {
    */
   def make(componentLocation: Location)(implicit actorSystem: ActorSystem[_]): CommandService = {
     componentLocation match {
-      case _: TcpLocation             => throw new RuntimeException("Only AkkaLocation and HttpLocation can be used to access a component")
+      case _: TcpLocation => throw new RuntimeException("Only AkkaLocation and HttpLocation can be used to access a component")
       case akkaLocation: AkkaLocation => new CommandServiceImpl(akkaLocation.componentRef)
       case httpLocation: HttpLocation => httpClient(httpLocation)
     }

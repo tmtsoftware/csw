@@ -29,7 +29,7 @@ private[csw] object LoggingKeys {
   val PREFIX         = "@prefix"        // Passed into LoggerImpl on instantiation of a ComponentLogger.  Passed in Log Message
   val SUBSYSTEM      = "@subsystem"     // Passed into LoggerImpl on instantiation of a ComponentLogger.  Passed in Log Message
   val COMPONENT_NAME = "@componentName" // Passed into LoggerImpl on instantiation of a ComponentLogger.  Passed in Log Message
-  val ACTOR          = "actor"          // Passed into LoggerImpl on instantiation of a ComponentLogger.Actor.  Passed in Log Message
+  val ACTOR = "actor" // Passed into LoggerImpl on instantiation of a ComponentLogger.Actor.  Passed in Log Message
 
   // following items are passed in by user, and are optional (except message)
   val MESSAGE  = "message"  // user, via logger methods.  Passed to actor in Log Message

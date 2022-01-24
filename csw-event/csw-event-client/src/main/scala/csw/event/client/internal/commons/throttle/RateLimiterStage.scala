@@ -28,7 +28,7 @@ private[event] class RateLimiterStage[A](delay: FiniteDuration) extends GraphSta
         in,
         new InHandler {
           override def onPush(): Unit = {
-            if (open) pull(in) //drop
+            if (open) pull(in) // drop
             else {
               push(out, grab(in))
               open = true

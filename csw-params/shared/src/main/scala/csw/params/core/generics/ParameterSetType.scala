@@ -165,7 +165,7 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] { self: T =>
    * @tparam S the Scala value type
    * @return a new T, where T is a parameter set child with the key removed or identical if the key is not present
    */
-  def remove[S](key: Key[S]): T = removeByKeyname(this, key.keyName) //doRemove(this, key)
+  def remove[S](key: Key[S]): T = removeByKeyname(this, key.keyName) // doRemove(this, key)
 
   /**
    * Removes a parameter based on the parameter
@@ -188,7 +188,7 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] { self: T =>
     val f: Option[P] = getByKeyname(c.paramSet, keyname)
     f match {
       case Some(parameter) => create(c.paramSet - parameter)
-      case None            => c.asInstanceOf[T] //create(c.parameters) also works
+      case None            => c.asInstanceOf[T] // create(c.parameters) also works
     }
   }
 

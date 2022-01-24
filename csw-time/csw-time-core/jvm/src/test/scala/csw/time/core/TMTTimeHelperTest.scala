@@ -59,8 +59,8 @@ class TMTTimeHelperTest extends AnyFunSuite with Matchers {
     zonedDateTime.getYear shouldBe 2007
     zonedDateTime.getMonth.getValue shouldBe 12
     zonedDateTime.getDayOfMonth shouldBe 3
-    zonedDateTime.getHour shouldBe 10 + 5    //with zone offset
-    zonedDateTime.getMinute shouldBe 15 + 30 //with zone offset
+    zonedDateTime.getHour shouldBe 10 + 5    // with zone offset
+    zonedDateTime.getMinute shouldBe 15 + 30 // with zone offset
     zonedDateTime.getSecond shouldBe 30
   }
 }

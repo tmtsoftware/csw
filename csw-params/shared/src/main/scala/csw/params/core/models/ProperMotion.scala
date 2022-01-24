@@ -10,7 +10,7 @@ object ProperMotion {
 
 case class PMValue(uaspyr: Long) extends AnyVal with Serializable with Ordered[PMValue] {
 
-  //operators
+  // operators
   def +(a2: PMValue): PMValue = new PMValue(uaspyr + a2.uaspyr)
 
   def -(a2: PMValue): PMValue = new PMValue(uaspyr - a2.uaspyr)
