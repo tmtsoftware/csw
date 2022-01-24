@@ -21,7 +21,7 @@ class HttpServiceTest extends HTTPLocationService {
   private val testLocationService: LocationService        = HttpLocationServiceFactory.makeLocalClient
   implicit override val patienceConfig: PatienceConfig    = PatienceConfig(10.seconds, 100.millis)
 
-  //register AAS with location service
+  // register AAS with location service
   private val AASPort = 8080
 
   override def beforeAll(): Unit = {
@@ -35,7 +35,7 @@ class HttpServiceTest extends HTTPLocationService {
     super.afterAll()
   }
 
-  //CSW-97
+  // CSW-97
   /*
    * Tests can be run of different OS and each OS follow its own naming convention for interface names.
    * e.g. for Mac OS  interface names are like en0, en1 ,etc. For Linux they are eth0, eth1, etc. and so on.
@@ -61,7 +61,7 @@ class HttpServiceTest extends HTTPLocationService {
     location.uri.getHost shouldBe hostname
     location.uri.getPort shouldBe _servicePort
     location.connection shouldBe ConfigServiceConnection.value
-    //should not bind to all but specific hostname IP
+    // should not bind to all but specific hostname IP
     SocketUtils.isAddressInUse(hostname, _servicePort) shouldBe true
     SocketUtils.isAddressInUse("localhost", _servicePort) shouldBe false
     actorRuntime.shutdown().futureValue

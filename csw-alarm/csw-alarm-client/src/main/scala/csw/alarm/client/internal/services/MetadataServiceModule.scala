@@ -66,8 +66,8 @@ private[client] trait MetadataServiceModule extends MetadataService {
     }
 
   private def feedAlarmStore(alarmMetadataSet: AlarmMetadataSet): Future[Done] = {
-    val alarms                                = alarmMetadataSet.alarms
-    val metadataMap                           = alarms.map(metadata => MetadataKey.fromAlarmKey(metadata.alarmKey) -> metadata).toMap
+    val alarms      = alarmMetadataSet.alarms
+    val metadataMap = alarms.map(metadata => MetadataKey.fromAlarmKey(metadata.alarmKey) -> metadata).toMap
     val statusMap: Map[AlarmKey, AlarmStatus] = alarms.map(metadata => metadata.alarmKey -> AlarmStatus()).toMap
 
     log.info(s"Feeding alarm metadata in alarm store for following alarms: [${alarms.map(_.alarmKey.value).mkString("\n")}]")

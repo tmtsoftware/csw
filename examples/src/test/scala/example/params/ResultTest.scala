@@ -11,52 +11,52 @@ import org.scalatest.matchers.should.Matchers
 
 class ResultTest extends AnyFunSpec with Matchers {
 
-  //#runid
+  // #runid
   val runId: Id = Id()
-  //#runid
+  // #runid
 
   describe("Examples of Result") {
 
     it("Should show usage of Result") {
-      //#result
-      //keys
+      // #result
+      // keys
       val k1: Key[Int]    = KeyType.IntKey.make("encoder")
       val k2: Key[Int]    = KeyType.IntKey.make("windspeed")
       val k3: Key[String] = KeyType.StringKey.make("filter")
       val k4: Key[Int]    = KeyType.IntKey.make("notUsed")
 
-      //prefixes
+      // prefixes
       val prefix = Prefix("wfos.prog.cloudcover")
 
-      //parameters
+      // parameters
       val p1: Parameter[Int]    = k1.set(22)
       val p2: Parameter[Int]    = k2.set(44)
       val p3: Parameter[String] = k3.set("A", "B", "C", "D")
 
-      //Create Result using madd
+      // Create Result using madd
       val r1: Result = Result().madd(p1, p2)
-      //Create Result using apply
+      // Create Result using apply
       val r2: Result = Result(p1, p2)
-      //Create Result and use add
+      // Create Result and use add
       val r3: Result = Result().add(p1).add(p2).add(p3)
 
-      //access keys
-      val k1Exists: Boolean = r1.exists(k1) //true
+      // access keys
+      val k1Exists: Boolean = r1.exists(k1) // true
 
-      //access Parameters
+      // access Parameters
       val p4: Option[Parameter[Int]] = r1.get(k1)
 
-      //access values
+      // access values
       val v1: Array[Int] = r1(k1).values
       val v2: Array[Int] = r2.parameter(k2).values
-      //k4 is missing
+      // k4 is missing
       val missingKeys: Set[String] = r3.missingKeys(k1, k2, k3, k4)
 
-      //remove keys
+      // remove keys
       val r4: Result = r3.remove(k3)
-      //#result
+      // #result
 
-      //validations
+      // validations
       assert(k1Exists === true)
       assert(p4.get === p1)
       assert(v1 === p1.values)
@@ -99,41 +99,41 @@ class ResultTest extends AnyFunSpec with Matchers {
   describe("Examples of serialization") {
     it("should show reading and writing of commands") {
 
-      //#json-serialization
+      // #json-serialization
       import play.api.libs.json.{JsValue, Json}
 
-      //key
+      // key
       val k1: Key[MatrixData[Double]] = DoubleMatrixKey.make("myMatrix")
-      //values
+      // values
       val m1: MatrixData[Double] = MatrixData.fromArrays(
         Array(1.0, 2.0, 3.0),
         Array(4.1, 5.1, 6.1),
         Array(7.2, 8.2, 9.2)
       )
 
-      //prefixes
+      // prefixes
       val prefix = Prefix("wfos.prog.cloudcover")
 
-      //parameter
+      // parameter
       val i1: Parameter[MatrixData[Double]] = k1.set(m1)
 
-      //result
+      // result
       val result: Result = Result().add(i1)
 
-      //json support - write
+      // json support - write
       val resultJson: JsValue = JsonSupport.writeResult(result)
 
-      //optionally prettify
+      // optionally prettify
       val str: String = Json.prettyPrint(resultJson)
 
-      //construct result from string
+      // construct result from string
       val scFromPrettyStr: Result = JsonSupport.readResult(Json.parse(str))
 
-      //json support - read
+      // json support - read
       val result1: Result = JsonSupport.readResult(resultJson)
-      //#json-serialization
+      // #json-serialization
 
-      //validations
+      // validations
       assert(result === result1)
       assert(scFromPrettyStr === result)
     }
@@ -142,16 +142,16 @@ class ResultTest extends AnyFunSpec with Matchers {
   describe("Examples of unique key constraint") {
     it("should show duplicate keys are removed") {
 
-      //#unique-key
-      //keys
+      // #unique-key
+      // keys
       val encoderKey: Key[Int] = KeyType.IntKey.make("encoder")
       val filterKey: Key[Int]  = KeyType.IntKey.make("filter")
       val miscKey: Key[Int]    = KeyType.IntKey.make("misc.")
 
-      //prefix
+      // prefix
       val prefix = Prefix("wfos.blue.filter")
 
-      //params
+      // params
       val encParam1 = encoderKey.set(1)
       val encParam2 = encoderKey.set(2)
       val encParam3 = encoderKey.set(3)
@@ -162,12 +162,12 @@ class ResultTest extends AnyFunSpec with Matchers {
 
       val miscParam1 = miscKey.set(100)
 
-      //Setup command with duplicate key via constructor
+      // Setup command with duplicate key via constructor
       val result = Result(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3)
-      //four duplicate keys are removed; now contains one Encoder and one Filter key
+      // four duplicate keys are removed; now contains one Encoder and one Filter key
       val uniqueKeys1 = result.paramSet.toList.map(_.keyName)
 
-      //try adding duplicate keys via add + madd
+      // try adding duplicate keys via add + madd
       val changedResult = result
         .add(encParam3)
         .madd(
@@ -175,16 +175,16 @@ class ResultTest extends AnyFunSpec with Matchers {
           filterParam2,
           filterParam3
         )
-      //duplicate keys will not be added. Should contain one Encoder and one Filter key
+      // duplicate keys will not be added. Should contain one Encoder and one Filter key
       val uniqueKeys2 = changedResult.paramSet.toList.map(_.keyName)
 
-      //miscKey(unique) will be added; encoderKey(duplicate) will not be added
+      // miscKey(unique) will be added; encoderKey(duplicate) will not be added
       val finalResult = result.madd(Set(miscParam1, encParam1))
-      //now contains encoderKey, filterKey, miscKey
+      // now contains encoderKey, filterKey, miscKey
       val uniqueKeys3 = finalResult.paramSet.toList.map(_.keyName)
-      //#unique-key
+      // #unique-key
 
-      //validations
+      // validations
       uniqueKeys1 should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
       uniqueKeys2 should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
       uniqueKeys3 should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName, miscKey.keyName)

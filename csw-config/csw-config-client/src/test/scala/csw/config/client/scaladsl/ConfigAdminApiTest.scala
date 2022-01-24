@@ -61,7 +61,7 @@ class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
     val configData = ConfigData.fromPath(path)
     val repoPath   = Paths.get(fileName)
 
-    //verify that files smaller than annex-min-file-size go to annex if encoding is Binary
+    // verify that files smaller than annex-min-file-size go to annex if encoding is Binary
     serverWiring.settings.`annex-min-file-size` should be > configData.length
 
     val configId =
@@ -74,8 +74,8 @@ class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
     list.map(_.path) shouldBe List(repoPath)
     list.map(_.author) shouldBe List(preferredUserName)
 
-    //Note that configService instance from the server-wiring can be used for assert-only calls for sha files
-    //This call is invalid from client side
+    // Note that configService instance from the server-wiring can be used for assert-only calls for sha files
+    // This call is invalid from client side
     val svnConfigData =
       serverConfigService
         .getById(Paths.get(s"$fileName${serverWiring.settings.`sha1-suffix`}"), configId)
@@ -84,7 +84,7 @@ class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
     svnConfigData.toStringF.await shouldBe Sha1.fromConfigData(configData).await
   }
 
-  //DEOPSCSW-75 List the names of configuration files that match a path
+  // DEOPSCSW-75 List the names of configuration files that match a path
   test(
     "should throw invalid input exception if pattern is invalid | DEOPSCSW-80, DEOPSCSW-576, DEOPSCSW-75, DEOPSCSW-88, DEOPSCSW-138"
   ) {
@@ -183,9 +183,9 @@ class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
     val configId1 = configService.create(file, ConfigData.fromString(configValue1), annex = false, "create").await
 
     // update file twice
-    //user2
+    // user2
     val configId3 = configService.update(file, ConfigData.fromString(configValue3), "Update 1").await
-    //user3
+    // user3
     val configId4 = configService.update(file, ConfigData.fromString(configValue4), "Update 2").await
 
     // set active version of file to id=3

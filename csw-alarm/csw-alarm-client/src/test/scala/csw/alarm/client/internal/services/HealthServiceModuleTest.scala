@@ -74,7 +74,7 @@ class HealthServiceModuleTest
 
   // DEOPSCSW-466: Fetch health for a given alarm, component name or a subsystem name
   test("getAggregatedHealth should get aggregated health for global system | DEOPSCSW-466") {
-    //feeding data of four alarms only, one inactive
+    // feeding data of four alarms only, one inactive
     val validAlarmsConfig = ConfigFactory.parseResources("test-alarms/valid-alarms.conf")
     initAlarms(validAlarmsConfig, reset = true).await
 
@@ -210,7 +210,7 @@ class HealthServiceModuleTest
     testProbe.expectNoMessage(100.millis)
 
     setSeverity(tromboneAxisHighLimitAlarmKey, Warning).await
-    testProbe.expectMessage(Ill) //tromboneAxisHighLimitAlarmKey=Warning & tromboneAxisLowLimitAlarmKey=Major
+    testProbe.expectMessage(Ill) // tromboneAxisHighLimitAlarmKey=Warning & tromboneAxisLowLimitAlarmKey=Major
 
     setSeverity(splitterLimitAlarmKey, Critical).await
     testProbe.expectNoMessage(100.millis)

@@ -46,7 +46,7 @@ class CommandServiceHttpHandlerAuthTest
   private val securityDirective = mock[SecurityDirectives]
   private val commandService    = mock[CommandService]
   private val accessToken       = mock[AccessToken]
-  private val handler           = new CommandServiceRequestHandler(commandService, securityDirective, Some(prefix), CommandRoles.empty)
+  private val handler = new CommandServiceRequestHandler(commandService, securityDirective, Some(prefix), CommandRoles.empty)
 
   import LabelExtractor.Implicits.default
   private val route = new PostRouteFactory[CommandServiceRequest]("post-endpoint", handler).make()

@@ -24,10 +24,10 @@ class CommandHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCon
     log.info("Initializing HCD Component TLA")
     Thread.sleep(100)
 
-    //#currentStatePublisher
+    // #currentStatePublisher
     // Publish the CurrentState using parameter set created using a sample Choice parameter
     currentStatePublisher.publish(CurrentState(filterHcdPrefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
-    //#currentStatePublisher
+    // #currentStatePublisher
 
   }
 

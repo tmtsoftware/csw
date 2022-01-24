@@ -77,7 +77,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
     clearAlarmStore().futureValue
     a[KeyNotFoundException] shouldBe thrownBy(getMetadata(GlobalKey).await)
 
-    cliApp.execute(cmd) //initialize alarm store
+    cliApp.execute(cmd) // initialize alarm store
     logBuffer.toList shouldEqual List(successMsg)
 
     val metadata = getMetadata(GlobalKey).futureValue
@@ -101,7 +101,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
     clearAlarmStore().futureValue
     a[KeyNotFoundException] shouldBe thrownBy(getMetadata(GlobalKey).await)
 
-    cliApp.execute(cmd) //initialize alarm store
+    cliApp.execute(cmd) // initialize alarm store
     logBuffer.toList shouldEqual List(successMsg)
     val metadata = getMetadata(GlobalKey).futureValue
     metadata.map(_.alarmKey).toSet shouldEqual allAlarmKeys

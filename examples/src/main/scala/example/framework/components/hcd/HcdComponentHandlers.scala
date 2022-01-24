@@ -39,7 +39,7 @@ class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
   var current: Int                  = _
   var stats: Int                    = _
 
-  //#initialize-handler
+  // #initialize-handler
   override def initialize(): Unit = {
 
     // fetch config (preferably from configuration service)
@@ -52,49 +52,49 @@ class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
     current = Await.result(worker ? InitialState, timeout.duration)
     stats = Await.result(worker ? GetStatistics, timeout.duration)
   }
-  //#initialize-handler
+  // #initialize-handler
 
-  //#validateCommand-handler
+  // #validateCommand-handler
   override def validateCommand(runId: Id, controlCommand: ControlCommand): ValidateCommandResponse =
     controlCommand match {
       case _: Setup   => Accepted(runId) // validation for setup goes here
       case _: Observe => Accepted(runId) // validation for observe goes here
     }
-  //#validateCommand-handler
+  // #validateCommand-handler
 
-  //#onSubmit-handler
+  // #onSubmit-handler
   override def onSubmit(runId: Id, controlCommand: ControlCommand): SubmitResponse =
     controlCommand match {
       case setup: Setup     => submitSetup(runId, setup)     // includes logic to handle Submit with Setup config command
       case observe: Observe => submitObserve(runId, observe) // includes logic to handle Submit with Observe config command
     }
-  //#onSubmit-handler
+  // #onSubmit-handler
 
-  //#onOneway-handler
+  // #onOneway-handler
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit =
     controlCommand match {
       case setup: Setup     => onewaySetup(setup)     // includes logic to handle Oneway with Setup config command
       case observe: Observe => onewayObserve(observe) // includes logic to handle Oneway with Setup config command
     }
-  //#onOneway-handler
+  // #onOneway-handler
 
-  //#onGoOffline-handler
+  // #onGoOffline-handler
   override def onGoOffline(): Unit = {
     // do something when going offline
   }
-  //#onGoOffline-handler
+  // #onGoOffline-handler
 
-  //#onGoOnline-handler
+  // #onGoOnline-handler
   override def onGoOnline(): Unit = {
     // do something when going online
   }
-  //#onGoOnline-handler
+  // #onGoOnline-handler
 
-  //#onShutdown-handler
+  // #onShutdown-handler
   override def onShutdown(): Unit = {
     // clean up resources
   }
-  //#onShutdown-handler
+  // #onShutdown-handler
 
   override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = {
     // do something on Diagnostic Mode
@@ -104,13 +104,13 @@ class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
     // do something on Operations Mode
   }
 
-  //#onLocationTrackingEvent-handler
+  // #onLocationTrackingEvent-handler
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit =
     trackingEvent match {
       case LocationUpdated(location)   => // do something for the tracked location when it is updated
       case LocationRemoved(connection) => // do something for the tracked location when it is no longer available
     }
-  //#onLocationTrackingEvent-handler
+  // #onLocationTrackingEvent-handler
 
   private def processSetup(sc: Setup): Unit = {
     sc.commandName.toString match {

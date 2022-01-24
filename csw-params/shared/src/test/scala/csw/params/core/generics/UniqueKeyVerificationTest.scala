@@ -32,7 +32,7 @@ class UniqueKeyVerificationTest extends AnyFunSpec with Matchers {
 
     it("Setup command is able to remove duplicate keys | DEOPSCSW-184") {
 
-      //parameters with duplicate key via constructor
+      // parameters with duplicate key via constructor
       val setup =
         Setup(
           prefix,
@@ -42,11 +42,11 @@ class UniqueKeyVerificationTest extends AnyFunSpec with Matchers {
         )
       setup.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
-      //parameters with duplicate key via add + madd
+      // parameters with duplicate key via add + madd
       val changedSetup = setup.add(encParam3).madd(filterParam1, filterParam2, filterParam3)
       changedSetup.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
-      //parameter with unique key and parameter with duplicate key
+      // parameter with unique key and parameter with duplicate key
       val finalSetUp = setup.madd(Set(miscParam1, encParam1))
       finalSetUp.paramSet.toList
         .map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName, miscKey.keyName)
@@ -54,7 +54,7 @@ class UniqueKeyVerificationTest extends AnyFunSpec with Matchers {
 
     it("Observe command is able to remove duplicate keys | DEOPSCSW-184") {
 
-      //parameters with duplicate key via constructor
+      // parameters with duplicate key via constructor
       val observe =
         Observe(
           prefix,
@@ -64,11 +64,11 @@ class UniqueKeyVerificationTest extends AnyFunSpec with Matchers {
         )
       observe.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
-      //parameters with duplicate key via add + madd
+      // parameters with duplicate key via add + madd
       val changedObserve = observe.add(encParam3).madd(filterParam1, filterParam2, filterParam3)
       changedObserve.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
-      //parameter with unique key and parameter with duplicate key
+      // parameter with unique key and parameter with duplicate key
       val finalObserve = observe.madd(Set(miscParam1, encParam1))
       finalObserve.paramSet.toList
         .map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName, miscKey.keyName)
@@ -76,7 +76,7 @@ class UniqueKeyVerificationTest extends AnyFunSpec with Matchers {
 
     it("Wait command is able to remove duplicate keys | DEOPSCSW-184") {
 
-      //parameters with duplicate key via constructor
+      // parameters with duplicate key via constructor
       val wait =
         Wait(
           prefix,
@@ -86,11 +86,11 @@ class UniqueKeyVerificationTest extends AnyFunSpec with Matchers {
         )
       wait.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
-      //parameters with duplicate key via add + madd
+      // parameters with duplicate key via add + madd
       val changedWait = wait.add(encParam3).madd(filterParam1, filterParam2, filterParam3)
       changedWait.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
-      //parameter with unique key and parameter with duplicate key
+      // parameter with unique key and parameter with duplicate key
       val finalWait = wait.madd(Set(miscParam1, encParam1))
       finalWait.paramSet.toList
         .map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName, miscKey.keyName)
@@ -101,16 +101,16 @@ class UniqueKeyVerificationTest extends AnyFunSpec with Matchers {
 
     it("is able to remove duplicate keys | DEOPSCSW-184") {
 
-      //parameters with duplicate key via constructor
+      // parameters with duplicate key via constructor
       val result =
         Result(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3)
       result.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
-      //parameters with duplicate key via add + madd
+      // parameters with duplicate key via add + madd
       val changedResult = result.add(encParam3).madd(filterParam1, filterParam2, filterParam3)
       changedResult.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
-      //parameter with unique key and parameter with duplicate key
+      // parameter with unique key and parameter with duplicate key
       val finalResult = result.madd(Set(miscParam1, encParam1))
       finalResult.paramSet.toList
         .map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName, miscKey.keyName)
@@ -121,7 +121,7 @@ class UniqueKeyVerificationTest extends AnyFunSpec with Matchers {
 
     it("DemandState is able to remove duplicate keys | DEOPSCSW-184") {
 
-      //parameters with duplicate key via constructor
+      // parameters with duplicate key via constructor
       val state = DemandState(
         Prefix("csw.prefix"),
         StateName("testStateName"),
@@ -129,11 +129,11 @@ class UniqueKeyVerificationTest extends AnyFunSpec with Matchers {
       )
       state.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
-      //parameters with duplicate key via add + madd
+      // parameters with duplicate key via add + madd
       val changedState = state.add(encParam3).madd(filterParam1, filterParam2, filterParam3)
       changedState.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
-      //parameter with unique key and parameter with duplicate key
+      // parameter with unique key and parameter with duplicate key
       val finalState = state.madd(Set(miscParam1, encParam1))
       finalState.paramSet.toList
         .map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName, miscKey.keyName)
@@ -141,7 +141,7 @@ class UniqueKeyVerificationTest extends AnyFunSpec with Matchers {
 
     it("CurrentState is able to remove duplicate keys | DEOPSCSW-184") {
 
-      //parameters with duplicate key via constructor
+      // parameters with duplicate key via constructor
       val state =
         CurrentState(
           Prefix("csw.prefix"),
@@ -150,11 +150,11 @@ class UniqueKeyVerificationTest extends AnyFunSpec with Matchers {
         )
       state.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
-      //parameters with duplicate key via add + madd
+      // parameters with duplicate key via add + madd
       val changedState = state.add(encParam3).madd(filterParam1, filterParam2, filterParam3)
       changedState.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
-      //parameter with unique key and parameter with duplicate key
+      // parameter with unique key and parameter with duplicate key
       val finalState = state.madd(Set(miscParam1, encParam1))
       finalState.paramSet.toList
         .map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName, miscKey.keyName)
@@ -165,7 +165,7 @@ class UniqueKeyVerificationTest extends AnyFunSpec with Matchers {
 
     it("ObserveEvent command is able to remove duplicate keys | DEOPSCSW-184") {
 
-      //parameters with duplicate key via constructor
+      // parameters with duplicate key via constructor
       val event =
         ObserveEvent(
           prefix,
@@ -174,11 +174,11 @@ class UniqueKeyVerificationTest extends AnyFunSpec with Matchers {
         )
       event.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
-      //parameters with duplicate key via add + madd
+      // parameters with duplicate key via add + madd
       val changedEvent = event.add(encParam3).madd(filterParam1, filterParam2, filterParam3)
       changedEvent.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
-      //parameter with unique key and parameter with duplicate key
+      // parameter with unique key and parameter with duplicate key
       val finalEvent = event.madd(Set(miscParam1, encParam1))
       finalEvent.paramSet.toList
         .map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName, miscKey.keyName)
@@ -186,7 +186,7 @@ class UniqueKeyVerificationTest extends AnyFunSpec with Matchers {
 
     it("SystemEvent command is able to remove duplicate keys | DEOPSCSW-184") {
 
-      //parameters with duplicate key via constructor
+      // parameters with duplicate key via constructor
       val event =
         SystemEvent(
           prefix,
@@ -195,11 +195,11 @@ class UniqueKeyVerificationTest extends AnyFunSpec with Matchers {
         )
       event.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
-      //parameters with duplicate key via add + madd
+      // parameters with duplicate key via add + madd
       val changedEvent = event.add(encParam3).madd(filterParam1, filterParam2, filterParam3)
       changedEvent.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
-      //parameter with unique key and parameter with duplicate key
+      // parameter with unique key and parameter with duplicate key
       val finalEvent = event.madd(Set(miscParam1, encParam1))
       finalEvent.paramSet.toList
         .map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName, miscKey.keyName)

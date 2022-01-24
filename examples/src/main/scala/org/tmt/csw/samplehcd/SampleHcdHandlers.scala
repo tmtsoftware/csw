@@ -29,7 +29,7 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
   private val log                           = loggerFactory.getLogger
 
-  //#worker-actor
+  // #worker-actor
   sealed trait WorkerCommand
   case class Sleep(runId: Id, timeInMillis: Long) extends WorkerCommand
 
@@ -50,9 +50,9 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
       }),
       "WorkerActor"
     )
-  //#worker-actor
+  // #worker-actor
 
-  //#initialize
+  // #initialize
   var maybePublishingGenerator: Option[Cancellable] = None
   override def initialize(): Unit = {
     log.info("In HCD initialize")
@@ -66,9 +66,9 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
   override def onShutdown(): Unit = {
     log.info("HCD is shutting down")
   }
-  //#initialize
+  // #initialize
 
-  //#publish
+  // #publish
   import scala.concurrent.duration._
   private def publishCounter(): Cancellable = {
     var counter = 0
@@ -87,9 +87,9 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
     log.info("Stopping publish stream")
     maybePublishingGenerator.foreach(_.cancel())
   }
-  //#publish
+  // #publish
 
-  //#validate
+  // #validate
   override def validateCommand(runId: Id, controlCommand: ControlCommand): ValidateCommandResponse = {
     log.info(s"Validating command: ${controlCommand.commandName.name}")
     controlCommand.commandName.name match {
@@ -97,9 +97,9 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
       case x       => Invalid(runId, CommandIssue.UnsupportedCommandIssue(s"Command $x. not supported."))
     }
   }
-  //#validate
+  // #validate
 
-  //#onSetup
+  // #onSetup
   override def onSubmit(runId: Id, controlCommand: ControlCommand): SubmitResponse = {
     log.info(s"Handling command: ${controlCommand.commandName}")
 
@@ -125,7 +125,7 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
 
     Started(runId)
   }
-  //#onSetup
+  // #onSetup
 
   override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = {}
 

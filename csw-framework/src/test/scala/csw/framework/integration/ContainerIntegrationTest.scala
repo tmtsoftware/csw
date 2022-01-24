@@ -210,7 +210,7 @@ class ContainerIntegrationTest extends FrameworkIntegrationSuite {
     assertConnectionIsRegistered(instrumentHcdHttpConnection)
     assertConnectionIsRegistered(disperserHcdHttpConnection)
 
-    //Using seedActorSystem in trackers as they are needed to be external to Container and components
+    // Using seedActorSystem in trackers as they are needed to be external to Container and components
     val containerTracker      = testkit.TestProbe()(testWiring.seedActorSystem.toClassic)
     val filterAssemblyTracker = testkit.TestProbe()(testWiring.seedActorSystem.toClassic)
     val instrumentHcdTracker  = testkit.TestProbe()(testWiring.seedActorSystem.toClassic)

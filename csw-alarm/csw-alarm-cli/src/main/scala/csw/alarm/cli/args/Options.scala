@@ -24,7 +24,7 @@ case class Options(
   def alarmKey: AlarmKey =
     (maybeSubsystem, maybeComponent, maybeAlarmName) match {
       case (Some(subsystem), Some(component), Some(name)) => AlarmKey(Prefix(subsystem, component), name)
-      case _                                              => throw new IllegalArgumentException("Subsystem, Component or Alarm Name required.")
+      case _ => throw new IllegalArgumentException("Subsystem, Component or Alarm Name required.")
     }
 
   def key: Key =

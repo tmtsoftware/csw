@@ -35,7 +35,7 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   private implicit val timeout: Timeout     = 15.seconds
 
   private val filterHCDConnection = AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "FilterHCD"), HCD))
-  //val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient(ctx.system, clientMat)
+  // val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient(ctx.system, clientMat)
 
   private val filterHCDLocation    = Await.result(locationService.resolve(filterHCDConnection, 5.seconds), 5.seconds)
   var hcdComponent: CommandService = CommandServiceFactory.make(filterHCDLocation.get)(ctx.system)
@@ -49,10 +49,10 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
     log.info("Initializing Assembly Component TLA")
 
     Thread.sleep(100)
-    //#currentStatePublisher
+    // #currentStatePublisher
     // Publish the CurrentState using parameter set created using a sample Choice parameter
     currentStatePublisher.publish(CurrentState(filterAsmPrefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
-    //#currentStatePublisher
+    // #currentStatePublisher
   }
 
   override def onGoOffline(): Unit =
@@ -95,7 +95,7 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
         // Starts long-runing and returns started
         Started(runId)
 
-      //#longRunning
+      // #longRunning
       case `longRunningCmdToAsm` =>
         hcdComponent.submitAndWait(longRunning).foreach {
           case _: Completed =>
@@ -107,8 +107,8 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
         // Assembly starts long-running and returns started
         Started(runId)
 
-      //#longRunning
-      //#queryFinalAll
+      // #longRunning
+      // #queryFinalAll
       case `longRunningCmdToAsmComp` =>
         // In this case, assembly does not need to do anything until both commands complete
         // Could wait and return directly if commands are fast, but this is better
@@ -127,7 +127,7 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
             commandResponseManager.updateCommand(Error(runId, ex.toString))
         }
         Started(runId)
-      //#queryFinalAll
+      // #queryFinalAll
 
       case `longRunningCmdToAsmInvalid` =>
         val long    = hcdComponent.submitAndWait(longRunning)

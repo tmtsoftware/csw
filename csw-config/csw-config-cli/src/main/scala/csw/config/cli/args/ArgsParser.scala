@@ -14,7 +14,7 @@ class ArgsParser(name: String) {
   val parser: OptionParser[Options] = new scopt.OptionParser[Options](name) {
     head(name, BuildInfo.version)
 
-    //login operation
+    // login operation
     cmd("login") action { (_, c) =>
       c.copy(op = "login")
     } text "login to access admin API's" children (
@@ -23,12 +23,12 @@ class ArgsParser(name: String) {
       } text "optional:: add this option to login from command line instead of browser"
     )
 
-    //logout operation
+    // logout operation
     cmd("logout") action { (_, c) =>
       c.copy(op = "logout")
     } text "logout"
 
-    //create operation
+    // create operation
     (cmd("create") action { (_, c) =>
       c.copy(op = "create")
     } text "creates the input file in the repository at a specified path").children(
@@ -46,7 +46,7 @@ class ArgsParser(name: String) {
       } text "create comment"
     )
 
-    //update operation
+    // update operation
     (cmd("update") action { (_, c) =>
       c.copy(op = "update")
     } text "overwrites the file specified in the repository by the input file").children(
@@ -61,7 +61,7 @@ class ArgsParser(name: String) {
       } text "create comment"
     )
 
-    //get operation
+    // get operation
     (cmd("get") action { (_, c) =>
       c.copy(op = "get")
     } text "retrieves a file for a given path and saves it to the output file. Latest file is fetched if neither date nor id is specified.")
@@ -80,7 +80,7 @@ class ArgsParser(name: String) {
         } text "optional:. if specified will get the file matching this date. Format: 2017-04-16T16:15:23.503Z"
       )
 
-    //delete operation
+    // delete operation
     (cmd("delete") action { (_, c) =>
       c.copy(op = "delete")
     } text "deletes the file at specified path in the repository").children(
@@ -92,7 +92,7 @@ class ArgsParser(name: String) {
       } text "delete comment"
     )
 
-    //list operation
+    // list operation
     (cmd("list") action { (_, c) =>
       c.copy(op = "list")
     } text "lists the files in the repository").children(
@@ -107,7 +107,7 @@ class ArgsParser(name: String) {
       } text "optional: list all files whose path matches the given pattern"
     )
 
-    //history operation
+    // history operation
     (cmd("history") action { (_, c) =>
       c.copy(op = "history")
     } text "shows versioning history of the file in the repository").children(
@@ -125,7 +125,7 @@ class ArgsParser(name: String) {
       } text "optional: maximum entries of file versions"
     )
 
-    //setActiveVersion operation
+    // setActiveVersion operation
     (cmd("setActiveVersion") action { (_, c) =>
       c.copy(op = "setActiveVersion")
     } text "sets active version of the file in the repository").children(
@@ -140,7 +140,7 @@ class ArgsParser(name: String) {
       } text "create comment"
     )
 
-    //resetActiveVersion operation
+    // resetActiveVersion operation
     (cmd("resetActiveVersion") action { (_, c) =>
       c.copy(op = "resetActiveVersion")
     } text "resets the active version to the latest version for the specified file").children(
@@ -152,7 +152,7 @@ class ArgsParser(name: String) {
       } text "reset comment"
     )
 
-    //getActiveVersion operation
+    // getActiveVersion operation
     cmd("getActiveVersion") action { (_, c) =>
       c.copy(op = "getActiveVersion")
     } text "gets the id of the active version of the file in the repository" children (
@@ -161,7 +161,7 @@ class ArgsParser(name: String) {
       } text "file path in the repository"
     )
 
-    //getActiveByTime operation
+    // getActiveByTime operation
     (cmd("getActiveByTime") action { (_, c) =>
       c.copy(op = "getActiveByTime")
     } text "gets the file that was active at a specified time").children(
@@ -176,7 +176,7 @@ class ArgsParser(name: String) {
       } text "output file path"
     )
 
-    //history operation
+    // history operation
     (cmd("historyActive") action { (_, c) =>
       c.copy(op = "historyActive")
     } text "shows versioning history of the active file in the repository").children(
@@ -194,12 +194,12 @@ class ArgsParser(name: String) {
       } text "optional: maximum entries of file versions"
     )
 
-    //getMetadata operation
+    // getMetadata operation
     cmd("getMetadata") action { (_, c) =>
       c.copy(op = "getMetadata")
     } text "gets the metadata of config server e.g. repository directory, annex directory, min annex file size, max config file size"
 
-    //exists operation
+    // exists operation
     cmd("exists") action { (_, c) =>
       c.copy(op = "exists")
     } text "checks if the file exists at specified path in the repository" children (
@@ -208,7 +208,7 @@ class ArgsParser(name: String) {
       } text "file path in the repository"
     )
 
-    //getActive operation
+    // getActive operation
     (cmd("getActive") action { (_, c) =>
       c.copy(op = "getActive")
     } text "retrieves active file for a given path from config service, and writes it to the output file").children(

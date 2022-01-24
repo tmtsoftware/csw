@@ -22,7 +22,7 @@ class MainTest extends AnyFunSuiteLike with Matchers with ScalaFutures {
     val `127.0.0.1`       = "127.0.0.1"
     val (binding, wiring) = Main.start(startLogging = false, options = options)
 
-    //assert location server running at 127.0.0.1
+    // assert location server running at 127.0.0.1
     binding.localAddress.getAddress.getHostAddress shouldBe `127.0.0.1`
     SocketUtils.isAddressInUse(`127.0.0.1`, httpPort) shouldBe true
 
@@ -30,7 +30,7 @@ class MainTest extends AnyFunSuiteLike with Matchers with ScalaFutures {
     val httpClient: LocationService = HttpLocationServiceFactory.makeLocalClient(wiring.actorSystem)
     httpClient.unregisterAll().futureValue
 
-    //Clean up
+    // Clean up
     binding.terminate(2.seconds).futureValue
     wiring.actorRuntime.shutdown().futureValue
   }
@@ -41,10 +41,10 @@ class MainTest extends AnyFunSuiteLike with Matchers with ScalaFutures {
     val hostname = Networks(NetworkType.Outside.envKey).hostname
 
     val (binding, wiring) = Main.start(startLogging = false, options = options)
-    //AAS location is registered here to make sure, it does not give AASResolution Failed error
+    // AAS location is registered here to make sure, it does not give AASResolution Failed error
     wiring.locationService.register(HttpRegistration(AASConnection.value, SocketUtils.getFreePort, "auth")).futureValue
 
-    //assert location server running at hostname
+    // assert location server running at hostname
     binding.localAddress.getAddress.getHostAddress shouldBe hostname
     SocketUtils.isAddressInUse(hostname, httpPort) shouldBe true
 
@@ -54,7 +54,7 @@ class MainTest extends AnyFunSuiteLike with Matchers with ScalaFutures {
     exception.getCause shouldBe a[HttpError]
     exception.getCause.asInstanceOf[HttpError].statusCode shouldBe 401
 
-    //Clean up
+    // Clean up
     binding.terminate(2.seconds).futureValue
     wiring.actorRuntime.shutdown().futureValue
   }

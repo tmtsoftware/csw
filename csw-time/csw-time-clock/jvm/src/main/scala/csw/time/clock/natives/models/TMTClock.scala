@@ -22,7 +22,7 @@ private[time] class LinuxClock extends TMTClock {
   override def utcInstant: Instant = now(ClockRealtime)
   override def taiInstant: Instant = now(ClockTAI)
 
-  //#native-calls
+  // #native-calls
   private def now(clockId: Int): Instant = {
     val timeSpec = new TimeSpec()
     TimeLibrary.clock_gettime(clockId, timeSpec)
@@ -35,7 +35,7 @@ private[time] class LinuxClock extends TMTClock {
     if (timeVal.tai == 0) printWarning()
     timeVal.tai
   }
-  //#native-calls
+  // #native-calls
 
   private def printWarning(): Unit = {
     println(

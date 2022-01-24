@@ -124,10 +124,10 @@ class LocationServiceCompTest(mode: String)
   test(
     "should able to register, resolve, list and unregister http location | DEOPSCSW-12, DEOPSCSW-16, DEOPSCSW-17, DEOPSCSW-20, DEOPSCSW-23, DEOPSCSW-34, DEOPSCSW-429"
   ) {
-    val componentId: ComponentId           = models.ComponentId(Prefix(Subsystem.CSW, "exampleHTTPService"), ComponentType.Service)
-    val httpConnection: HttpConnection     = HttpConnection(componentId)
-    val Port: Int                          = 8080
-    val Path: String                       = "path/to/resource"
+    val componentId: ComponentId       = models.ComponentId(Prefix(Subsystem.CSW, "exampleHTTPService"), ComponentType.Service)
+    val httpConnection: HttpConnection = HttpConnection(componentId)
+    val Port: Int                      = 8080
+    val Path: String                   = "path/to/resource"
     val httpRegistration: HttpRegistration = HttpRegistration(httpConnection, Port, Path)
 
     // register, resolve & list http connection for the first time
@@ -300,13 +300,13 @@ class LocationServiceCompTest(mode: String)
     "should able to track http and akka connection registered before tracking started | DEOPSCSW-12, DEOPSCSW-16, DEOPSCSW-17, DEOPSCSW-20, DEOPSCSW-23, DEOPSCSW-34, DEOPSCSW-26, DEOPSCSW-429"
   ) {
     val hostname = Networks().hostname
-    //create http registration
+    // create http registration
     val port             = 9595
     val prefix           = Prefix(Subsystem.CSW, "Assembly1")
     val httpConnection   = HttpConnection(models.ComponentId(prefix, ComponentType.Assembly))
     val httpRegistration = HttpRegistration(httpConnection, port, prefix.toString)
 
-    //create akka registration
+    // create akka registration
     val akkaComponentId  = models.ComponentId(Prefix(Subsystem.CSW, "container1"), ComponentType.Container)
     val akkaConnection   = AkkaConnection(akkaComponentId)
     val actorRef         = typedSystem.spawn(Behaviors.empty, "container1-actor")
@@ -317,21 +317,21 @@ class LocationServiceCompTest(mode: String)
     val httpProbe              = scaladsl.TestProbe[TrackingEvent]("http-probe")
     val akkaProbe              = scaladsl.TestProbe[TrackingEvent]("akka-probe")
 
-    //start tracking both http and akka connections
+    // start tracking both http and akka connections
     val httpSwitch = locationService.track(httpConnection).toMat(Sink.foreach(httpProbe.ref.tell(_)))(Keep.left).run()
     val akkaSwitch = locationService.track(akkaConnection).toMat(Sink.foreach(akkaProbe.ref.tell(_)))(Keep.left).run()
 
     httpProbe.expectMessage(LocationUpdated(httpRegistration.cswVersion(mode).location(hostname)))
     akkaProbe.expectMessage(LocationUpdated(akkaRegistration.cswVersion(mode).location(hostname)))
 
-    //unregister http connection
+    // unregister http connection
     httpRegistrationResult.unregister().await
     httpProbe.expectMessage(LocationRemoved(httpConnection))
 
-    //stop tracking http connection
+    // stop tracking http connection
     httpSwitch.cancel()
 
-    //unregister and stop tracking akka connection
+    // unregister and stop tracking akka connection
     akkaRegistrationResult.unregister().await
     akkaProbe.expectMessage(LocationRemoved(akkaConnection))
 
@@ -343,7 +343,7 @@ class LocationServiceCompTest(mode: String)
     "should able to stop tracking | DEOPSCSW-12, DEOPSCSW-16, DEOPSCSW-17, DEOPSCSW-20, DEOPSCSW-23, DEOPSCSW-34, DEOPSCSW-26, DEOPSCSW-429"
   ) {
     val hostname = Networks().hostname
-    //create http registration
+    // create http registration
     val port             = 9595
     val prefix           = Prefix(Subsystem.CSW, "trombone1")
     val httpConnection   = HttpConnection(models.ComponentId(prefix, HCD))
@@ -353,12 +353,12 @@ class LocationServiceCompTest(mode: String)
 
     val httpProbe = scaladsl.TestProbe[TrackingEvent]("test-probe")
 
-    //start tracking http connection
+    // start tracking http connection
     val httpSwitch = locationService.track(httpConnection).toMat(Sink.foreach(httpProbe.ref.tell(_)))(Keep.left).run()
 
     httpProbe.expectMessage(LocationUpdated(httpRegistration.cswVersion(mode).location(hostname)))
 
-    //stop tracking http connection
+    // stop tracking http connection
     httpSwitch.cancel()
 
     httpRegistrationResult.unregister().await

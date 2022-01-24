@@ -38,7 +38,7 @@ private[event] class RateAdapterStage[A](delay: FiniteDuration) extends GraphSta
             if (firstTick) {
               push(out, ele); firstTick = false
             }
-            pull(in) //drop
+            pull(in) // drop
           }
         }
       )

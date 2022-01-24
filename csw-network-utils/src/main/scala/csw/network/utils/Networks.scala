@@ -36,7 +36,7 @@ case class Networks(private val interfaceName: String, networkProvider: NetworkI
     // Don't use ipv6 addresses yet, since it seems to not be working with the current akka version
     !addr.isLoopbackAddress && !addr.isInstanceOf[Inet6Address]
 
-  //Get a flattened seq of Index -> InetAddresses pairs
+  // Get a flattened seq of Index -> InetAddresses pairs
   private def mappings: Seq[(Int, InetAddress)] =
     for {
       (index, inetAddresses) <- interfaces

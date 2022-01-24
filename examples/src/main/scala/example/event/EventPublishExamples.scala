@@ -18,19 +18,19 @@ import scala.concurrent.duration.DurationDouble
 class EventPublishExamples(eventService: EventService, log: Logger) {
 
   def singleEvent(componentInfo: ComponentInfo): Future[Done] =
-    //#single-event
+    // #single-event
     {
       val publisher = eventService.defaultPublisher
       val event     = SystemEvent(componentInfo.prefix, EventName("filter_wheel"))
       publisher.publish(event)
     }
-  //#single-event
+  // #single-event
 
   def source(componentInfo: ComponentInfo): Future[Done] = {
     val n: Int                                             = 10
     def makeEvent(i: Int, prefix: Prefix, name: EventName) = SystemEvent(prefix, name)
 
-    //#with-source
+    // #with-source
     def onError(publishFailure: PublishFailure): Unit =
       log.error(s"Publish failed for event: [${publishFailure.event}]", ex = publishFailure.cause)
 
@@ -40,11 +40,11 @@ class EventPublishExamples(eventService: EventService, log: Logger) {
       .watchTermination()(Keep.right)
 
     publisher.publish(eventStream, failure => onError(failure))
-    //#with-source
+    // #with-source
   }
 
   def generator(componentInfo: ComponentInfo): Cancellable =
-    //#event-generator
+    // #event-generator
     {
       val publisher        = eventService.defaultPublisher
       val baseEvent: Event = SystemEvent(componentInfo.prefix, EventName("filter_wheel"))
@@ -59,5 +59,5 @@ class EventPublishExamples(eventService: EventService, log: Logger) {
 
       publisher.publish(eventGenerator(), interval)
     }
-  //#event-generator
+  // #event-generator
 }

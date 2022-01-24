@@ -29,7 +29,7 @@ object AlarmServiceClientExampleApp {
       Behaviors.same
     }
 
-  //#create-scala-api
+  // #create-scala-api
   // create alarm client using host and port of alarm server
   private val clientAPI1 = new AlarmServiceFactory().makeClientApi("localhost", 5225)
 
@@ -41,99 +41,99 @@ object AlarmServiceClientExampleApp {
 
   // create alarm admin using location service
   private val adminAPI2 = new AlarmServiceFactory().makeAdminApi(locationService)
-  //#create-scala-api
+  // #create-scala-api
 
   val clientAPI: AlarmService     = clientAPI1
   val adminAPI: AlarmAdminService = adminAPI1
 
-  //#setSeverity-scala
+  // #setSeverity-scala
   val alarmKey              = AlarmKey(Prefix(NFIRAOS, "trombone"), "tromboneAxisLowLimitAlarm")
   val resultF: Future[Done] = clientAPI.setSeverity(alarmKey, Okay)
-  //#setSeverity-scala
+  // #setSeverity-scala
 
-  //#initAlarms
+  // #initAlarms
   val resource               = "test-alarms/valid-alarms.conf"
   val alarmsConfig: Config   = ConfigFactory.parseResources(resource)
   val result2F: Future[Done] = adminAPI.initAlarms(alarmsConfig)
-  //#initAlarms
+  // #initAlarms
 
-  //#acknowledge
+  // #acknowledge
   val result3F: Future[Done] = adminAPI.acknowledge(alarmKey)
-  //#acknowledge
+  // #acknowledge
 
-  //#shelve
+  // #shelve
   val result4F: Future[Done] = adminAPI.shelve(alarmKey)
-  //#shelve
+  // #shelve
 
-  //#unshelve
+  // #unshelve
   val result5F: Future[Done] = adminAPI.unshelve(alarmKey)
-  //#unshelve
+  // #unshelve
 
-  //#reset
+  // #reset
   val result6F: Future[Done] = adminAPI.reset(alarmKey)
-  //#reset
+  // #reset
 
-  //#getMetadata
+  // #getMetadata
   val metadataF: Future[AlarmMetadata] = adminAPI.getMetadata(alarmKey)
   metadataF.onComplete {
     case Success(metadata)  => println(s"${metadata.name}: ${metadata.description}")
     case Failure(exception) => println(s"Error getting metadata: ${exception.getMessage}")
   }
-  //#getMetadata
+  // #getMetadata
 
-  //#getStatus
+  // #getStatus
   val statusF: Future[AlarmStatus] = adminAPI.getStatus(alarmKey)
   statusF.onComplete {
     case Success(status)    => println(s"${status.alarmTime}: ${status.latchedSeverity}")
     case Failure(exception) => println(s"Error getting status: ${exception.getMessage}")
   }
-  //#getStatus
+  // #getStatus
 
-  //#getCurrentSeverity
+  // #getCurrentSeverity
   val severityF: Future[FullAlarmSeverity] = adminAPI.getCurrentSeverity(alarmKey)
   severityF.onComplete {
     case Success(severity)  => println(s"${severity.name}: ${severity.level}")
     case Failure(exception) => println(s"Error getting severity: ${exception.getMessage}")
   }
-  //#getCurrentSeverity
+  // #getCurrentSeverity
 
-  //#getAggregatedSeverity
+  // #getAggregatedSeverity
   val componentKey                                   = ComponentKey(Prefix(NFIRAOS, "tromboneassembly"))
   val aggregatedSeverityF: Future[FullAlarmSeverity] = adminAPI.getAggregatedSeverity(componentKey)
   aggregatedSeverityF.onComplete {
     case Success(severity)  => println(s"aggregate severity: ${severity.name}: ${severity.level}")
     case Failure(exception) => println(s"Error getting aggregate severity: ${exception.getMessage}")
   }
-  //#getAggregatedSeverity
+  // #getAggregatedSeverity
 
-  //#getAggregatedHealth
+  // #getAggregatedHealth
   val subsystemKey                 = SubsystemKey(IRIS)
   val healthF: Future[AlarmHealth] = adminAPI.getAggregatedHealth(subsystemKey)
   healthF.onComplete {
     case Success(health)    => println(s"${subsystemKey.subsystem.name} health = ${health.entryName}")
     case Failure(exception) => println(s"Error getting health: ${exception.getMessage}")
   }
-  //#getAggregatedHealth
+  // #getAggregatedHealth
 
-  //#subscribeAggregatedSeverityCallback
+  // #subscribeAggregatedSeverityCallback
   val alarmSubscription: AlarmSubscription = adminAPI.subscribeAggregatedSeverityCallback(
     ComponentKey(Prefix(NFIRAOS, "tromboneAssembly")),
     aggregatedSeverity => { /* do something*/ }
   )
   // to unsubscribe:
   val unsubscribe1F: Future[Done] = alarmSubscription.unsubscribe()
-  //#subscribeAggregatedSeverityCallback
+  // #subscribeAggregatedSeverityCallback
 
-  //#subscribeAggregatedSeverityActorRef
+  // #subscribeAggregatedSeverityActorRef
   val severityActorRef = typed.ActorSystem(behaviour[FullAlarmSeverity], "fullSeverityActor")
   val alarmSubscription2: AlarmSubscription =
     adminAPI.subscribeAggregatedSeverityActorRef(SubsystemKey(NFIRAOS), severityActorRef)
 
   // to unsubscribe:
   val unsubscribe2F: Future[Done] = alarmSubscription2.unsubscribe()
-  //#subscribeAggregatedSeverityActorRef
+  // #subscribeAggregatedSeverityActorRef
 
-  //#subscribeAggregatedHealthCallback
+  // #subscribeAggregatedHealthCallback
   val alarmSubscription3: AlarmSubscription = adminAPI.subscribeAggregatedHealthCallback(
     ComponentKey(Prefix(IRIS, "ImagerDetectorAssembly")),
     aggregatedHealth => { /* do something*/ }
@@ -141,13 +141,13 @@ object AlarmServiceClientExampleApp {
 
   // to unsubscribe
   val unsubscribe3F: Future[Done] = alarmSubscription3.unsubscribe()
-  //#subscribeAggregatedHealthCallback
+  // #subscribeAggregatedHealthCallback
 
-  //#subscribeAggregatedHealthActorRef
+  // #subscribeAggregatedHealthActorRef
   val healthActorRef                        = typed.ActorSystem(behaviour[AlarmHealth], "healthActor")
   val alarmSubscription4: AlarmSubscription = adminAPI.subscribeAggregatedHealthActorRef(SubsystemKey(IRIS), healthActorRef)
 
   // to unsubscribe
   val unsubscribe4F: Future[Done] = alarmSubscription4.unsubscribe()
-  //#subscribeAggregatedHealthActorRef
+  // #subscribeAggregatedHealthActorRef
 }

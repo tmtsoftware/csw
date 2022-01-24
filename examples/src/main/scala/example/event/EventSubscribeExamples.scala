@@ -15,7 +15,7 @@ import scala.concurrent.duration.DurationDouble
 class EventSubscribeExamples(eventService: EventService, hcd: AkkaLocation)(implicit system: ActorSystem[_]) {
 
   def callback(): EventSubscription =
-    //#with-callback
+    // #with-callback
     {
       val subscriber = eventService.defaultSubscriber
 
@@ -24,9 +24,9 @@ class EventSubscribeExamples(eventService: EventService, hcd: AkkaLocation)(impl
         event => { /*do something*/ }
       )
     }
-  //#with-callback
+  // #with-callback
 
-  //#with-async-callback
+  // #with-async-callback
   def subscribe(): EventSubscription = {
     val subscriber = eventService.defaultSubscriber
     subscriber.subscribeAsync(Set(EventKey(hcd.prefix, EventName("filter_wheel"))), callback)
@@ -36,9 +36,9 @@ class EventSubscribeExamples(eventService: EventService, hcd: AkkaLocation)(impl
     /* do something */
     Future.successful("some value")
   }
-  //#with-async-callback
+  // #with-async-callback
 
-  //#with-actor-ref
+  // #with-actor-ref
   def subscribe(ctx: ActorContext[TopLevelActorMessage]): EventSubscription = {
     val subscriber                    = eventService.defaultSubscriber
     val eventHandler: ActorRef[Event] = ctx.spawnAnonymous(EventHandler.behavior)
@@ -48,17 +48,17 @@ class EventSubscribeExamples(eventService: EventService, hcd: AkkaLocation)(impl
 
   object EventHandler {
     val behavior: Behavior[Event] = Behaviors.setup { ctx =>
-      //setup required for the actor
+      // setup required for the actor
 
-      Behaviors.receiveMessage { case _ => //handle messages and return new behavior with changed state
+      Behaviors.receiveMessage { case _ => // handle messages and return new behavior with changed state
         Behaviors.same
       }
     }
   }
-  //#with-actor-ref
+  // #with-actor-ref
 
   def source(): EventSubscription =
-    //#with-source
+    // #with-source
     {
       val subscriber = eventService.defaultSubscriber
 
@@ -67,10 +67,10 @@ class EventSubscribeExamples(eventService: EventService, hcd: AkkaLocation)(impl
         .to(Sink.foreach { event => /*do something*/ })
         .run()
     }
-  //#with-source
+  // #with-source
 
   def subscribeWithRate(): EventSubscription =
-    //#with-subscription-mode
+    // #with-subscription-mode
     {
       val subscriber = eventService.defaultSubscriber
 
@@ -81,7 +81,7 @@ class EventSubscribeExamples(eventService: EventService, hcd: AkkaLocation)(impl
         SubscriptionModes.RateAdapterMode
       )
     }
-  //#with-subscription-mode
+  // #with-subscription-mode
 
   def subscribeToSubsystemEvents(subsystem: Subsystem): EventSubscription =
     // #psubscribe

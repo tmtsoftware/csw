@@ -30,7 +30,7 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
     }
   }
 
-  //#updateCommand
+  // #updateCommand
   override def onSubmit(runId: Id, controlCommand: ControlCommand): SubmitResponse = {
     controlCommand.commandName match {
       case `longRunning` =>
@@ -38,7 +38,7 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
           commandResponseManager.updateCommand(Completed(runId))
         }
         Started(runId)
-      //#updateCommand
+      // #updateCommand
       case `mediumRunning` =>
         timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plusSeconds(3))) {
           commandResponseManager.updateCommand(Completed(runId))
@@ -47,7 +47,7 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
       case `shortRunning` =>
         timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plusSeconds(1))) {
           commandResponseManager.updateCommand(Completed(runId))
-          //commandResponseManager.updateCommand(Error(runId, "Totally fucked"))
+          // commandResponseManager.updateCommand(Error(runId, "Totally fucked"))
         }
         Started(runId)
       case `failureAfterValidationCmd` =>

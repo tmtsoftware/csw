@@ -17,17 +17,17 @@ class EventServiceCreationExamples {
   private val locationService = HttpLocationServiceFactory.makeLocalClient
 
   def defaultEventService(): Unit = {
-    //#default-event-service
+    // #default-event-service
     // create event service using location service
     val eventService1: EventService = new EventServiceFactory().make(locationService)
 
     // create event service using host and port of event server.
     val eventService2: EventService = new EventServiceFactory().make("localhost", 26379)
-    //#default-event-service
+    // #default-event-service
   }
 
   def redisEventService(): Unit = {
-    //#redis-event-service
+    // #redis-event-service
 
     val clientOptions = ClientOptions.builder().disconnectedBehavior(DisconnectedBehavior.REJECT_COMMANDS).build
     val redisClient   = RedisClient.create()
@@ -38,17 +38,17 @@ class EventServiceCreationExamples {
 
     // create event service using host and port of event server.
     val eventService2: EventService = new EventServiceFactory(RedisStore(redisClient)).make("localhost", 26379)
-    //#redis-event-service
+    // #redis-event-service
   }
 
   def kafkaEventService(): Unit = {
-    //#kafka-event-service
+    // #kafka-event-service
     // create event service using location service
     val eventService1: EventService = new EventServiceFactory(KafkaStore).make(locationService)
 
     // create event service using host and port of event server.
     val eventService2: EventService = new EventServiceFactory(KafkaStore).make("localhost", 26379)
-    //#kafka-event-service
+    // #kafka-event-service
   }
 
 }
