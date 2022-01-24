@@ -33,7 +33,7 @@ class CommandLineRunner(
     printLine(s"SUCCESS : Logged out successfully")
   }
 
-  //adminApi
+  // adminApi
   def create(options: Options): ConfigId = {
     val inputFilePath = options.inputFilePath.get
     if (Files.exists(inputFilePath)) {
@@ -157,7 +157,7 @@ class CommandLineRunner(
     metaData
   }
 
-  //clientApi
+  // clientApi
   def exists(options: Options): Boolean = {
     val exists = await(configService.exists(options.relativeRepoPath.get))
     printLine(s"File ${options.relativeRepoPath.get} exists in the repo? : $exists")

@@ -73,7 +73,7 @@ class EventServiceIntegrationTest extends FrameworkIntegrationSuite with Eventua
 
     val states = assemblyProbe.receiveAll().filter(_.paramSet.contains(choiceKey.set(eventReceivedChoice)))
 
-    states.size shouldBe 2 //inclusive of latest event
+    states.size shouldBe 2 // inclusive of latest event
     states should contain(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(eventReceivedChoice))))
   }
 

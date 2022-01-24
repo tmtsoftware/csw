@@ -61,7 +61,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
       Array(kafkaTestProps)
     )
 
-  //DEOPSCSW-659: Investigate initial latency in event service pub sub API for single publish
+  // DEOPSCSW-659: Investigate initial latency in event service pub sub API for single publish
   @Test
   def should_publish_initialization_event_on_publisher_creation__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516_DEOPSCSW_659()
       : Unit = {
@@ -71,7 +71,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
     initEvent.paramSet shouldBe InitializationEvent.value.paramSet
   }
 
-  //DEOPSCSW-345: Publish events irrespective of subscriber existence
+  // DEOPSCSW-345: Publish events irrespective of subscriber existence
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_publish_and_subscribe_an_event__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516_DEOPSCSW_345(
       baseProperties: BaseProperties
@@ -96,8 +96,8 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
     testProbe.expectNoMessage(2.seconds)
   }
 
-  //DEOPSCSW-345: Publish events irrespective of subscriber existence
-  //DEOPSCSW-516: Optionally Publish - API Change
+  // DEOPSCSW-345: Publish events irrespective of subscriber existence
+  // DEOPSCSW-516: Optionally Publish - API Change
   var cancellable: Cancellable = _
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_publish_an_event_with_duration__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516_DEOPSCSW_345(
@@ -130,7 +130,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
     queue should (have length 3 and contain allElementsOf Seq(Event.invalidEvent(eventKey)) ++ events.take(2))
   }
 
-  //DEOPSCSW-341: Allow to reuse single connection for subscribing to multiple EventKeys
+  // DEOPSCSW-341: Allow to reuse single connection for subscribing to multiple EventKeys
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_publish_concurrently_to_the_different_channel__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516_DEOPSCSW_341(
       baseProperties: BaseProperties
@@ -152,8 +152,8 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
     queue should contain theSameElementsAs events.map(x => Event.invalidEvent(x.eventKey)) ++ events
   }
 
-  //DEOPSCSW-000: Publish events with block generating future of event
-  //DEOPSCSW-516: Optionally Publish - API Change
+  // DEOPSCSW-000: Publish events with block generating future of event
+  // DEOPSCSW-516: Optionally Publish - API Change
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_publish_an_event_with_block_generating_future_of_event__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516(
       baseProperties: BaseProperties
@@ -186,7 +186,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
     queue should (have length 3 and contain allElementsOf Seq(Event.invalidEvent(eventKey)) ++ events.take(2))
   }
 
-  //DEOPSCSW-595: Enforce ordering in publish
+  // DEOPSCSW-595: Enforce ordering in publish
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_maintain_ordering_while_publish__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516_DEOPSCSW_595(
       baseProperties: BaseProperties
@@ -224,8 +224,8 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
     testProbe.expectMessage(event5)
   }
 
-  //DEOPSCSW-515: Include Start Time in API
-  //DEOPSCSW-516: Optionally Publish - API Change
+  // DEOPSCSW-515: Include Start Time in API
+  // DEOPSCSW-516: Optionally Publish - API Change
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_publish_event_via_event_generator_with_start_time__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516(
       baseProperties: BaseProperties
@@ -276,8 +276,8 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
     queue.tail.foreach(ev => ev.eventTime should be >= startTime)
   }
 
-  //DEOPSCSW-515: Include Start Time in API
-  //DEOPSCSW-516: Optionally Publish - API Change
+  // DEOPSCSW-515: Include Start Time in API
+  // DEOPSCSW-516: Optionally Publish - API Change
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_publish_event_via_asynchronous_event_generator_with_start_time__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516(
       baseProperties: BaseProperties

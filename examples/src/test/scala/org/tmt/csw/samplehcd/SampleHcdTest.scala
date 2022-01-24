@@ -36,9 +36,9 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
 
     akkaLocation.connection shouldBe connection
   }
-  //#setup
+  // #setup
 
-  //#subscribe
+  // #subscribe
   test("should be able to subscribe to HCD events") {
     val counterEventKey = EventKey(Prefix("CSW.samplehcd"), EventName("HcdCounter"))
     val hcdCounterKey   = KeyType.IntKey.make("counter")
@@ -78,9 +78,9 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
 
     counterList shouldBe expectedCounterList
   }
-  //#subscribe
+  // #subscribe
 
-  //#submit
+  // #submit
   test("should be able to send sleep command to HCD") {
     import scala.concurrent.duration._
     implicit val sleepCommandTimeout: Timeout = Timeout(10000.millis)
@@ -88,7 +88,7 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
     // Construct Setup command
     val sleepTimeKey: Key[Long]         = KeyType.LongKey.make("SleepTime")
     val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(5000).withUnits(Units.millisecond)
-    val setupCommand                    = Setup(Prefix("csw.move"), CommandName("sleep"), Some(ObsId("2020A-001-123"))).add(sleepTimeParam)
+    val setupCommand = Setup(Prefix("csw.move"), CommandName("sleep"), Some(ObsId("2020A-001-123"))).add(sleepTimeParam)
 
     val connection = AkkaConnection(ComponentId(Prefix(CSW, "samplehcd"), ComponentType.HCD))
 
@@ -100,9 +100,9 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
 
     Await.result(responseF, 10000.millis) shouldBe a[Completed]
   }
-  //#submit
+  // #submit
 
-  //#exception
+  // #exception
   test("should get timeout exception if submit timeout is too small") {
     import scala.concurrent.duration._
     implicit val sleepCommandTimeout: Timeout = Timeout(1000.millis)
@@ -110,7 +110,7 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
     // Construct Setup command
     val sleepTimeKey: Key[Long]         = KeyType.LongKey.make("SleepTime")
     val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(5000).withUnits(Units.millisecond)
-    val setupCommand                    = Setup(Prefix("csw.move"), CommandName("sleep"), Some(ObsId("2020A-001-123"))).add(sleepTimeParam)
+    val setupCommand = Setup(Prefix("csw.move"), CommandName("sleep"), Some(ObsId("2020A-001-123"))).add(sleepTimeParam)
 
     val connection = AkkaConnection(ComponentId(Prefix(CSW, "samplehcd"), ComponentType.HCD))
 
@@ -124,12 +124,12 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
       Await.result(responseF, 10000.millis) shouldBe a[Completed]
     }
   }
-  //#exception
+  // #exception
 
   test("should be able to spawn a hcd without providing config file") {
-    //#spawn-hcd
+    // #spawn-hcd
     spawnHCD(Prefix("TCS.sampleHcd"), (ctx, cswCtx) => new SampleHcdHandlers(ctx, cswCtx))
-    //#spawn-hcd
+    // #spawn-hcd
 
     val hcdConnection = AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "sampleHcd"), HCD))
     val hcdLocation   = Await.result(locationService.resolve(hcdConnection, 5.seconds), 10.seconds)

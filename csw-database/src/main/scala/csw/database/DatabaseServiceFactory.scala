@@ -96,8 +96,8 @@ class DatabaseServiceFactory private[csw] (actorSystem: ActorSystem[_], values: 
         "dataSource.serverName"   -> uri.getHost,
         "dataSource.portNumber"   -> uri.getPort,
         "dataSource.databaseName" -> dbName,
-        "dataSource.user"         -> envVars(usernameHolder), //NoSuchElementFoundException can be thrown if no env variable is set
-        "dataSource.password"     -> envVars(passwordHolder) //NoSuchElementFoundException can be thrown if no env variable is set
+        "dataSource.user"     -> envVars(usernameHolder), // NoSuchElementFoundException can be thrown if no env variable is set
+        "dataSource.password" -> envVars(passwordHolder)  // NoSuchElementFoundException can be thrown if no env variable is set
       )
       val dataSourceConfig = ConfigFactory.parseMap(dataSource.asJava)
       createDslInternal(Some(dataSourceConfig))

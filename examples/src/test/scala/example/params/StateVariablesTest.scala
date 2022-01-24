@@ -16,37 +16,37 @@ class StateVariablesTest extends AnyFunSpec with Matchers {
 
     it("should show usages of DemandState") {
 
-      //#demandstate
-      //prefix
+      // #demandstate
+      // prefix
       val prefix = Prefix("wfos.prog.cloudcover")
 
-      //key
+      // key
       val charKey: Key[Char]       = KeyType.CharKey.make("charKey")
       val intKey: Key[Int]         = KeyType.IntKey.make("intKey")
       val booleanKey: Key[Boolean] = KeyType.BooleanKey.make("booleanKey")
       val utcTimeKey: Key[UTCTime] = KeyType.UTCTimeKey.make("utcTimeKey")
       val notUsedKey: Key[String]  = KeyType.StringKey.make("notUsed")
 
-      //parameters
+      // parameters
       val charParam: Parameter[Char]       = charKey.set('A', 'B', 'C').withUnits(NoUnits)
       val intParam: Parameter[Int]         = intKey.set(1, 2, 3).withUnits(meter)
       val booleanParam: Parameter[Boolean] = booleanKey.set(true, false)
       val utcTime: Parameter[UTCTime]      = utcTimeKey.set(UTCTime.now())
 
-      //create DemandState and use sequential add
+      // create DemandState and use sequential add
       val ds1: DemandState = DemandState(prefix, StateName("testStateName")).add(charParam).add(intParam)
-      //create DemandState and add more than one Parameters using madd
+      // create DemandState and add more than one Parameters using madd
       val ds2: DemandState = DemandState(prefix, StateName("testStateName")).madd(intParam, booleanParam)
-      //create DemandState using apply
+      // create DemandState using apply
       val ds3: DemandState = DemandState(prefix, StateName("testStateName"), Set(utcTime))
 
-      //access keys
-      val charKeyExists: Boolean = ds1.exists(charKey) //true
+      // access keys
+      val charKeyExists: Boolean = ds1.exists(charKey) // true
 
-      //access Parameters
+      // access Parameters
       val p1: Option[Parameter[Int]] = ds1.get(intKey)
 
-      //access values
+      // access values
       val v1: Array[Char]    = ds1(charKey).values
       val v2: Array[Boolean] = ds2.parameter(booleanKey).values
       val missingKeys: Set[String] = ds3.missingKeys(
@@ -57,14 +57,14 @@ class StateVariablesTest extends AnyFunSpec with Matchers {
         notUsedKey
       )
 
-      //remove keys
+      // remove keys
       val ds4: DemandState = ds3.remove(utcTimeKey)
 
-      //update existing keys - set it back by an hour
+      // update existing keys - set it back by an hour
       val ds5: DemandState = ds3.add(utcTimeKey.set(UTCTime(UTCTime.now().value.minusSeconds(3600))))
 
-      //#demandstate
-      //validations
+      // #demandstate
+      // validations
       assert(charKeyExists === true)
       assert(p1.get === intParam)
       assert(v1 === Array('A', 'B', 'C'))
@@ -76,38 +76,38 @@ class StateVariablesTest extends AnyFunSpec with Matchers {
 
     it("should show usages of CurrentState") {
 
-      //#currentstate
+      // #currentstate
 
-      //prefix
+      // prefix
       val prefix = Prefix("wfos.prog.cloudcover")
 
-      //key
+      // key
       val charKey    = KeyType.CharKey.make("charKey")
       val intKey     = KeyType.IntKey.make("intKey")
       val booleanKey = KeyType.BooleanKey.make("booleanKey")
       val utcTimeKey = KeyType.UTCTimeKey.make("utcTimeKey")
       val notUsedKey = KeyType.StringKey.make("notUsed")
 
-      //parameters
+      // parameters
       val charParam    = charKey.set('A', 'B', 'C').withUnits(NoUnits)
       val intParam     = intKey.set(1, 2, 3).withUnits(meter)
       val booleanParam = booleanKey.set(true, false)
       val utcTime      = utcTimeKey.set(UTCTime.now())
 
-      //create CurrentState and use sequential add
+      // create CurrentState and use sequential add
       val cs1 = CurrentState(prefix, StateName("testStateName")).add(charParam).add(intParam)
-      //create CurrentState and add more than one Parameters using madd
+      // create CurrentState and add more than one Parameters using madd
       val cs2 = CurrentState(prefix, StateName("testStateName")).madd(intParam, booleanParam)
-      //create CurrentState using apply
+      // create CurrentState using apply
       val cs3 = CurrentState(prefix, StateName("testStateName"), Set(utcTime))
 
-      //access keys
-      val charKeyExists = cs1.exists(charKey) //true
+      // access keys
+      val charKeyExists = cs1.exists(charKey) // true
 
-      //access Parameters
+      // access Parameters
       val p1: Option[Parameter[Int]] = cs1.get(intKey)
 
-      //access values
+      // access values
       val v1: Array[Char]    = cs1(charKey).values
       val v2: Array[Boolean] = cs2.parameter(booleanKey).values
       val missingKeys: Set[String] = cs3.missingKeys(
@@ -118,15 +118,15 @@ class StateVariablesTest extends AnyFunSpec with Matchers {
         notUsedKey
       )
 
-      //remove keys
+      // remove keys
       val cs4 = cs3.remove(utcTimeKey)
 
-      //update existing keys - set it back by an hour
+      // update existing keys - set it back by an hour
       val cs5 = cs3.add(utcTimeKey.set(UTCTime(UTCTime.now().value.minusSeconds(3600))))
 
-      //#currentstate
+      // #currentstate
 
-      //validations
+      // validations
       assert(charKeyExists === true)
       assert(p1.get === intParam)
       assert(v1 === Array('A', 'B', 'C'))
@@ -139,41 +139,41 @@ class StateVariablesTest extends AnyFunSpec with Matchers {
 
   describe("Examples of serialization") {
     it("should show reading and writing of State variables") {
-      //#json-serialization
+      // #json-serialization
       import play.api.libs.json.{JsValue, Json}
 
-      //key
+      // key
       val k1: Key[MatrixData[Double]] = DoubleMatrixKey.make("myMatrix")
-      //values
+      // values
       val m1: MatrixData[Double] = MatrixData.fromArrays(
         Array(1.0, 2.0, 3.0),
         Array(4.1, 5.1, 6.1),
         Array(7.2, 8.2, 9.2)
       )
 
-      //parameter
+      // parameter
       val p1: Parameter[MatrixData[Double]] = k1.set(m1)
 
-      //state variables
+      // state variables
       val ds: DemandState  = DemandState(Prefix("wfos.blue.filter"), StateName("testStateName")).add(p1)
       val cs: CurrentState = CurrentState(Prefix("wfos.blue.filter"), StateName("testStateName")).add(p1)
 
-      //json support - write
+      // json support - write
       val dsJson: JsValue = JsonSupport.writeStateVariable(ds)
       val csJson: JsValue = JsonSupport.writeStateVariable(cs)
 
-      //optionally prettify
+      // optionally prettify
       val str: String = Json.prettyPrint(dsJson)
 
-      //construct command from string
+      // construct command from string
       val scFromPrettyStr = JsonSupport.readStateVariable[DemandState](Json.parse(str))
 
-      //json support - read
+      // json support - read
       val ds1: DemandState  = JsonSupport.readStateVariable[DemandState](dsJson)
       val cs1: CurrentState = JsonSupport.readStateVariable[CurrentState](csJson)
-      //#json-serialization
+      // #json-serialization
 
-      //validations
+      // validations
       assert(ds === ds1)
       assert(cs === cs1)
       assert(scFromPrettyStr === ds)
@@ -183,16 +183,16 @@ class StateVariablesTest extends AnyFunSpec with Matchers {
   describe("Examples of unique key constraint") {
     it("should show duplicate keys are removed") {
 
-      //#unique-key
-      //keys
+      // #unique-key
+      // keys
       val encoderKey: Key[Int] = KeyType.IntKey.make("encoder")
       val filterKey: Key[Int]  = KeyType.IntKey.make("filter")
       val miscKey: Key[Int]    = KeyType.IntKey.make("misc.")
 
-      //prefix
+      // prefix
       val prefix = Prefix("wfos.blue.filter")
 
-      //params
+      // params
       val encParam1 = encoderKey.set(1)
       val encParam2 = encoderKey.set(2)
       val encParam3 = encoderKey.set(3)
@@ -203,16 +203,16 @@ class StateVariablesTest extends AnyFunSpec with Matchers {
 
       val miscParam1 = miscKey.set(100)
 
-      //DemandState with duplicate key via constructor
+      // DemandState with duplicate key via constructor
       val statusEvent = DemandState(
         prefix,
         StateName("testStateName"),
         Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3)
       )
-      //four duplicate keys are removed; now contains one Encoder and one Filter key
+      // four duplicate keys are removed; now contains one Encoder and one Filter key
       val uniqueKeys1 = statusEvent.paramSet.toList.map(_.keyName)
 
-      //try adding duplicate keys via add + madd
+      // try adding duplicate keys via add + madd
       val changedStatusEvent = statusEvent
         .add(encParam3)
         .madd(
@@ -220,16 +220,16 @@ class StateVariablesTest extends AnyFunSpec with Matchers {
           filterParam2,
           filterParam3
         )
-      //duplicate keys will not be added. Should contain one Encoder and one Filter key
+      // duplicate keys will not be added. Should contain one Encoder and one Filter key
       val uniqueKeys2 = changedStatusEvent.paramSet.toList.map(_.keyName)
 
-      //miscKey(unique) will be added; encoderKey(duplicate) will not be added
+      // miscKey(unique) will be added; encoderKey(duplicate) will not be added
       val finalStatusEvent = statusEvent.madd(Set(miscParam1, encParam1))
-      //now contains encoderKey, filterKey, miscKey
+      // now contains encoderKey, filterKey, miscKey
       val uniqueKeys3 = finalStatusEvent.paramSet.toList.map(_.keyName)
-      //#unique-key
+      // #unique-key
 
-      //validations
+      // validations
       uniqueKeys1 should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
       uniqueKeys2 should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
       uniqueKeys3 should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName, miscKey.keyName)

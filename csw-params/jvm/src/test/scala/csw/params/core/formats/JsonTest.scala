@@ -342,7 +342,7 @@ class JsonTest extends AnyFunSpec {
       assert(sc1(k1).head == m1)
 
       val sc1out = JsonSupport.writeSequenceCommand(sc1)
-      //info("sc1out: " + sc1out.prettyPrint)
+      // info("sc1out: " + sc1out.prettyPrint)
 
       val sc1in = JsonSupport.readSequenceCommand[Setup](sc1out)
       assert(sc1.equals(sc1in))
@@ -359,7 +359,7 @@ class JsonTest extends AnyFunSpec {
       assert(sc1(k1).head == m1)
 
       val sc1out = JsonSupport.writeSequenceCommand(sc1)
-      //info("sc1out: " + sc1out.prettyPrint)
+      // info("sc1out: " + sc1out.prettyPrint)
 
       val sc1in = JsonSupport.readSequenceCommand[Setup](sc1out)
       assert(sc1.equals(sc1in))

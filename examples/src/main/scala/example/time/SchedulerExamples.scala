@@ -14,13 +14,13 @@ import scala.concurrent.ExecutionContext
 
 class SchedulerExamples(ctx: ActorContext[UTCTime]) {
 
-  //#create-scheduler
+  // #create-scheduler
   // create time service scheduler using the factory method
   implicit val actorSystem: typed.ActorSystem[_]         = ctx.system
   implicit val scheduler: Scheduler                      = actorSystem.scheduler
   implicit val executionContext: ExecutionContext        = actorSystem.executionContext
   private val timeServiceScheduler: TimeServiceScheduler = new TimeServiceSchedulerFactory().make()
-  //#create-scheduler
+  // #create-scheduler
 
   private val utcTime = UTCTime.now()
 
@@ -34,7 +34,7 @@ class SchedulerExamples(ctx: ActorContext[UTCTime]) {
   object SchedulingHandler {
     def behavior: Behavior[UTCTime] =
       Behaviors.setup { ctx =>
-        //setup required for the actor
+        // setup required for the actor
 
         Behaviors.receiveMessage { case _ => // handle the message to execute the task on scheduled time and return new behavior
           Behaviors.same

@@ -57,7 +57,7 @@ object AuthDocumentation {
 
   object Policies {
     // #custom-policy-async
-    //GET http://[host]:[port]/files?fileId=[fileId]
+    // GET http://[host]:[port]/files?fileId=[fileId]
     val route: Route =
       path("files" / LongNumber) { fileId =>
         sGet(CustomPolicyAsync(token => Database.doesUserOwnFile(token.preferred_username, fileId))) {
@@ -75,11 +75,11 @@ object AuthDocumentation {
       }
     // #empty-policy-usage
 
-    //#realm-role-policy-usage
+    // #realm-role-policy-usage
     val routeWithRealmRolePolicy: Route = sGet(RealmRolePolicy("admin")) {
       complete("OK")
     }
-    //#realm-role-policy-usage
+    // #realm-role-policy-usage
 
     // #custom-policy-usage
     val routeWithCustomPolicy: Route = sPost(CustomPolicy(token => token.given_name.contains("test-user"))) {

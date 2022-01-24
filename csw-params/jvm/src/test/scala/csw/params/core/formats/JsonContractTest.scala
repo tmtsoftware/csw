@@ -69,7 +69,7 @@ class JsonContractTest extends AnyFunSpec with Matchers {
       val observeToJson = JsonSupport.writeSequenceCommand(observe)
 
       val expectedObserveJson =
-        Json.parse(Source.fromResource("json/observe_command.json").mkString) //.replace("test-runId", observe.runId.id))
+        Json.parse(Source.fromResource("json/observe_command.json").mkString) // .replace("test-runId", observe.runId.id))
 
       observeToJson shouldEqual expectedObserveJson
     }
@@ -86,7 +86,7 @@ class JsonContractTest extends AnyFunSpec with Matchers {
       val waitToJson = JsonSupport.writeSequenceCommand(wait)
 
       val expectedWaitJson =
-        Json.parse(Source.fromResource("json/wait_command.json").mkString) //.replace("test-runId", wait.runId.id))
+        Json.parse(Source.fromResource("json/wait_command.json").mkString) // .replace("test-runId", wait.runId.id))
 
       waitToJson shouldEqual expectedWaitJson
     }

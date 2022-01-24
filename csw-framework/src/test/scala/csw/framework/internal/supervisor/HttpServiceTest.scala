@@ -46,7 +46,7 @@ class HttpServiceTest extends AnyFunSuiteLike with MockitoSugar with ScalaFuture
     binding.localAddress.getAddress.getHostAddress shouldBe hostname
     verify(locationService).register(captor.capture())
     captor.getValue.networkType shouldBe NetworkType.Inside
-    //should not bind to all but specific hostname IP
+    // should not bind to all but specific hostname IP
     SocketUtils.isAddressInUse(hostname, binding.localAddress.getPort) shouldBe true
     SocketUtils.isAddressInUse("localhost", binding.localAddress.getPort) shouldBe false
     binding.terminate(2.seconds).futureValue

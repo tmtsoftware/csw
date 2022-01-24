@@ -60,7 +60,7 @@ class LoggingSystemTest extends AnyFunSuite with Matchers with BeforeAndAfterAll
 
   // DEOPSCSW-142: Flexibility of logging approaches
   test("should throw AppenderNotFoundException for an invalid appender configured | DEOPSCSW-142") {
-    val config      = ConfigFactory.parseString("""
+    val config = ConfigFactory.parseString("""
         |csw-logging {
         | appenders = ["abcd"]
         |}

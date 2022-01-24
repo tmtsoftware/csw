@@ -949,8 +949,8 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
     }
   }
 
-  //DEOPSCSW-282: Add a timestamp Key and Parameter
-  //DEOPSCSW-661: Create UTCTimeKey and TAITimeKey replacing TimestampKey in Protobuf parameters
+  // DEOPSCSW-282: Add a timestamp Key and Parameter
+  // DEOPSCSW-661: Create UTCTimeKey and TAITimeKey replacing TimestampKey in Protobuf parameters
   describe("test UTCTimeItems") {
     val utcTimeValue: UTCTime    = UTCTime.now()
     val utcTimeKey: Key[UTCTime] = KeyType.UTCTimeKey.make(s1)
@@ -970,7 +970,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
       val li1: Parameter[UTCTime] = utcTimeKey.set(utcTimeValue)
       li1.units should be(utc)
 
-      //must respect overriding also
+      // must respect overriding also
       val li2: Parameter[UTCTime] = utcTimeKey.set(utcTimeValue).withUnits(NoUnits)
       li2.units should be(NoUnits)
     }
@@ -1004,7 +1004,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
     }
   }
 
-  //DEOPSCSW-661: Create UTCTimeKey and TAITimeKey replacing TimestampKey in Protobuf parameters
+  // DEOPSCSW-661: Create UTCTimeKey and TAITimeKey replacing TimestampKey in Protobuf parameters
   describe("test TAITimeItems") {
     val taiTimeValue: TAITime    = TAITime.now()
     val taiTimeKey: Key[TAITime] = KeyType.TAITimeKey.make(s1)
@@ -1024,7 +1024,7 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
       val li1: Parameter[TAITime] = taiTimeKey.set(taiTimeValue)
       li1.units should be(tai)
 
-      //must respect overriding also
+      // must respect overriding also
       val li2: Parameter[TAITime] = taiTimeKey.set(taiTimeValue).withUnits(NoUnits)
       li2.units should be(NoUnits)
     }

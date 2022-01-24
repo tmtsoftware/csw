@@ -37,7 +37,7 @@ class SampleHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCo
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
   private val log                           = loggerFactory.getLogger
 
-  //#worker-actor
+  // #worker-actor
   sealed trait WorkerCommand
   case class SendCommand(hcd: CommandService) extends WorkerCommand
 
@@ -61,7 +61,7 @@ class SampleHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCo
     // Construct Setup command
     val sleepTimeKey: Key[Long]         = KeyType.LongKey.make("SleepTime")
     val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(5000).withUnits(Units.millisecond)
-    val setupCommand                    = Setup(componentInfo.prefix, CommandName("sleep"), Some(ObsId("2020A-001-123"))).add(sleepTimeParam)
+    val setupCommand = Setup(componentInfo.prefix, CommandName("sleep"), Some(ObsId("2020A-001-123"))).add(sleepTimeParam)
 
     // Submit command, and handle validation response. Final response is returned as a Future
     val submitCommandResponseF: Future[SubmitResponse] = hcd.submitAndWait(setupCommand).flatMap {
@@ -79,9 +79,9 @@ class SampleHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCo
       case _                            => log.error("Command failed")
     }
   }
-  //#worker-actor
+  // #worker-actor
 
-  //#initialize
+  // #initialize
   private var maybeEventSubscription: Option[EventSubscription] = None
   override def initialize(): Unit = {
     log.info("In Assembly initialize")
@@ -91,9 +91,9 @@ class SampleHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCo
   override def onShutdown(): Unit = {
     log.info("Assembly is shutting down.")
   }
-  //#initialize
+  // #initialize
 
-  //#track-location
+  // #track-location
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {
     log.debug(s"onLocationTrackingEvent called: $trackingEvent")
     trackingEvent match {
@@ -103,12 +103,12 @@ class SampleHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCo
       case LocationRemoved(_) => log.info("HCD no longer available")
     }
   }
-  //#track-location
+  // #track-location
 
   private val counterEventKey = EventKey(Prefix("CSW.samplehcd"), EventName("HcdCounter"))
   private val hcdCounterKey   = KeyType.IntKey.make("counter")
 
-  //#subscribe
+  // #subscribe
   private def processEvent(event: Event): Unit = {
     log.info(s"Event received: ${event.eventKey}")
     event match {
@@ -123,9 +123,9 @@ class SampleHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCo
       case e: ObserveEvent => log.warn("Unexpected ObserveEvent received.") // not expected
     }
   }
-  //#subscribe
+  // #subscribe
 
-  //#alarm
+  // #alarm
   private val safeRange  = 0 to 10
   private val warnRange  = 11 to 15
   private val majorRange = 16 to 20
@@ -146,7 +146,7 @@ class SampleHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCo
       case Failure(ex)    => log.error(s"Error setting severity for alarm ${counterAlarmKey.name}: ${ex.getMessage}")
     }
   }
-  //#alarm
+  // #alarm
 
   private def subscribeToHcd(): EventSubscription = {
     log.info("Starting subscription.")

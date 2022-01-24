@@ -24,7 +24,7 @@ class ConfigDataTest extends TestKit(ActorSystem("test-system")) with AnyFunSuit
       |Then create a source from ByteString
       |""".stripMargin
 
-  //DEOPSCSW-73: Retrieve a configuration file to memory
+  // DEOPSCSW-73: Retrieve a configuration file to memory
   test("should able to retrieve string from Config Data source | DEOPSCSW-73") {
     ConfigData.fromString(expectedStringConfigData).toStringF.await shouldEqual expectedStringConfigData
   }
@@ -39,7 +39,7 @@ class ConfigDataTest extends TestKit(ActorSystem("test-system")) with AnyFunSuit
     configData.source.runFold("")(_ + _.utf8String).await shouldEqual expectedStringConfigData
   }
 
-  //DEOPSCSW-72: Retrieve a configuration file to a specified file location on a local disk
+  // DEOPSCSW-72: Retrieve a configuration file to a specified file location on a local disk
   test("should be able to save ConfigData to local disc | DEOPSCSW-72") {
     val configData     = ConfigData.fromString(expectedStringConfigData)
     val tempOutputFile = Files.createTempFile("temp-config", ".conf")

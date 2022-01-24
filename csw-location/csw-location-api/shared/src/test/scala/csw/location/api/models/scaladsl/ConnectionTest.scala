@@ -41,7 +41,7 @@ class ConnectionTest extends AnyFunSuite with Matchers with BeforeAndAfterAll wi
   // DEOPSCSW-14: Codec for data model
   test("should able to form a string representation for akka connection for trombone assembly | DEOPSCSW-14") {
     val expectedAkkaConnectionName = "NFIRAOS.tromboneAssembly-Assembly-akka"
-    val akkaConnection             = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneAssembly"), ComponentType.Assembly))
+    val akkaConnection = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneAssembly"), ComponentType.Assembly))
     akkaConnection.name shouldBe expectedAkkaConnectionName
   }
 

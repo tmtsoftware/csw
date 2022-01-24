@@ -40,7 +40,7 @@ class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCt
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
   private val log                           = loggerFactory.getLogger
 
-  //#worker-actor
+  // #worker-actor
   sealed trait WorkerCommand
   case class SendCommand(hcd: CommandService) extends WorkerCommand
 
@@ -81,9 +81,9 @@ class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCt
       case _                            => log.error("Command failed")
     }
   }
-  //#worker-actor
+  // #worker-actor
 
-  //#initialize
+  // #initialize
   private var maybeEventSubscription: Option[EventSubscription] = None
   override def initialize(): Unit = {
     log.info("In Assembly initialize")
@@ -93,9 +93,9 @@ class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCt
   override def onShutdown(): Unit = {
     log.info("Assembly is shutting down.")
   }
-  //#initialize
+  // #initialize
 
-  //#track-location
+  // #track-location
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {
     log.debug(s"onLocationTrackingEvent called: $trackingEvent")
     trackingEvent match {
@@ -105,12 +105,12 @@ class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCt
       case LocationRemoved(_) => log.info("HCD no longer available")
     }
   }
-  //#track-location
+  // #track-location
 
   private val counterEventKey = EventKey(Prefix("CSW.samplehcd"), EventName("HcdCounter"))
   private val hcdCounterKey   = KeyType.IntKey.make("counter")
 
-  //#subscribe
+  // #subscribe
   private def processEvent(event: Event): Unit = {
     log.info(s"Event received: ${event.eventKey}")
     event match {
@@ -126,9 +126,9 @@ class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCt
       case _: ObserveEvent => log.warn("Unexpected ObserveEvent received.") // not expected
     }
   }
-  //#subscribe
+  // #subscribe
 
-  //#alarm
+  // #alarm
   private val safeRange  = 0 to 10
   private val warnRange  = 11 to 15
   private val majorRange = 16 to 20
@@ -149,14 +149,14 @@ class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCt
       case Failure(ex) => log.error(s"Error setting severity for alarm ${counterAlarmKey.name}: ${ex.getMessage}")
     }
   }
-  //#alarm
+  // #alarm
 
   private def subscribeToHcd(): EventSubscription = {
     log.info("Starting subscription.")
     eventService.defaultSubscriber.subscribeCallback(Set(counterEventKey), processEvent)
   }
 
-  //noinspection ScalaUnusedSymbol
+  // noinspection ScalaUnusedSymbol
   private def unsubscribeHcd(): Unit = {
     log.info("Stopping subscription.")
     maybeEventSubscription.foreach(_.unsubscribe())

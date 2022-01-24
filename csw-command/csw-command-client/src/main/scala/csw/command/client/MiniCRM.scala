@@ -54,7 +54,7 @@ object MiniCRM {
   }
   import MiniCRMMessage.*
 
-  //noinspection ScalaStyle
+  // noinspection ScalaStyle
   def make(startedSize: Int, responseSize: Int, waiterSize: Int): Behavior[CRMMessage] = {
     Behaviors.setup(_ => handle(new StartedList(startedSize), new ResponseList(responseSize), new WaiterList(waiterSize)))
   }

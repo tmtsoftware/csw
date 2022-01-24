@@ -247,19 +247,19 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
     val binaryConfPath        = Paths.get("trombone/test/binary/binaryConf.bin")
     val expectedConfigIds     = List(ConfigId(1), ConfigId(3), ConfigId(5), ConfigId(7), ConfigId(9), ConfigId(10))
 
-    //consumes 2 revisions, one for actual file one for active file
+    // consumes 2 revisions, one for actual file one for active file
     val configId1 = configService
       .create(tromboneHcdConf, ConfigData.fromString(configValue1), comment = "creating tromboneHCD.conf")
       .await
-    //consumes 2 revisions, one for actual file one for active file
+    // consumes 2 revisions, one for actual file one for active file
     val configId2 = configService
       .create(tromboneAssemblyConf, ConfigData.fromString(configValue2), comment = "creating tromboneAssembly.conf")
       .await
-    //consumes 2 revisions, one for actual file one for active file
+    // consumes 2 revisions, one for actual file one for active file
     val configId3 = configService
       .create(binaryConfPath, ConfigData.fromString(configValue3), annex = true, "creating binary conf file")
       .await
-    //consumes 2 revisions, one for actual file one for active file
+    // consumes 2 revisions, one for actual file one for active file
     val configId4 = configService
       .create(tromboneContainerConf, ConfigData.fromString(configValue4), comment = "creating trombone container.conf")
       .await
@@ -362,7 +362,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
     configService.getByTime(file, time).await.get.toStringF.await shouldBe configValue1
   }
 
-  //DEOPSCSW-85 Record of time and date when config file is created/updated
+  // DEOPSCSW-85 Record of time and date when config file is created/updated
   test("should record datetime for creation of config file | DEOPSCSW-85") {
     val file       = Paths.get("/tmt/lgs/trombone/hcd.conf")
     val commitMsg1 = "commit version: 1"
@@ -378,7 +378,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
     configFileHistories.map(_.time.toEpochMilli).head shouldBe expectedRecordedTimeSpread
   }
 
-  //DEOPSCSW-85 Record of time and date when config file is created/updated
+  // DEOPSCSW-85 Record of time and date when config file is created/updated
   test("should record datetime when config file is updated | DEOPSCSW-85") {
     val file       = Paths.get("/tmt/lgs/trombone/hcd.conf")
     val configData = ConfigData.fromString(configValue1)
@@ -585,7 +585,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
     configService.getActiveVersion(file).await.get shouldBe configId4
   }
 
-  //DEOPSCSW-86: Retrieve a version of a configuration file based on time range for being default version
+  // DEOPSCSW-86: Retrieve a version of a configuration file based on time range for being default version
   test("should able to get history of active versions of file | DEOPSCSW-86") {
     val file = Paths.get("/tmt/test/setactive/getactive/resetactive/active.conf")
     // on create call, active file gets created with this comment by default, note that this is an internal implementation
@@ -688,15 +688,15 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
 
     val configData = ConfigData.fromString(content)
 
-    //verify that files smaller than annex-min-file-size go to annex if flag is set
+    // verify that files smaller than annex-min-file-size go to annex if flag is set
     serverWiring.settings.`annex-min-file-size` > configData.length shouldBe true
 
     val configId    = configService.create(file, configData, annex = true, "committing annex file").await
     val fileContent = configService.getById(file, configId).await.get
     fileContent.toStringF.await shouldBe content
 
-    //Note that configService instance from the server-wiring can be used for assert-only calls for sha files
-    //This call is invalid from client side
+    // Note that configService instance from the server-wiring can be used for assert-only calls for sha files
+    // This call is invalid from client side
     val svnConfigData =
       serverConfigService
         .getById(Paths.get(s"${file.toString}${serverWiring.settings.`sha1-suffix`}"), configId)
@@ -751,8 +751,8 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
     configService.getById(file, configId3).await.get.toStringF.await shouldBe configValue3
 
     val shaFilePath = Paths.get(s"${file.toString}${serverWiring.settings.`sha1-suffix`}")
-    //Note that configService instance from the server-wiring can be used for assert-only calls for sha files
-    //This call is invalid from client side
+    // Note that configService instance from the server-wiring can be used for assert-only calls for sha files
+    // This call is invalid from client side
     val shaOfConfigData1 = serverConfigService.getById(shaFilePath, configId1).await.get
     shaOfConfigData1.toStringF.await shouldBe Sha1.fromConfigData(configData1).await
 
@@ -790,7 +790,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
     )
   }
 
-  //DEOPSCSW-86: Retrieve a version of a configuration file based on time range for being default version
+  // DEOPSCSW-86: Retrieve a version of a configuration file based on time range for being default version
   test("should able to get history of active versions of file from annex store | DEOPSCSW-86") {
     val file = Paths.get("/tmt/annex/hcd.bin")
     // on create call, active file gets created with this comment by default, note that this is an internal implementation
@@ -965,7 +965,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
     serverWiringAnnexTest.actorRuntime.shutdown().await
   }
 
-  //DEOPSCSW-75 List the names of configuration files that match a path
+  // DEOPSCSW-75 List the names of configuration files that match a path
   test("should list all files in a repository | DEOPSCSW-75") {
     val tromboneConfig        = Paths.get("a/c/trombone.conf")
     val hcdConfig             = Paths.get("a/b/c/hcd/hcd.conf")
@@ -986,7 +986,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
 
   }
 
-  //DEOPSCSW-75 List the names of configuration files that match a path
+  // DEOPSCSW-75 List the names of configuration files that match a path
   test("should give empty list if pattern does not match any file | DEOPSCSW-75") {
     val tromboneConfig = Paths.get("a/c/trombone.conf")
     val assemblyConfig = Paths.get("a/b/assembly/assembly.conf")
@@ -1000,7 +1000,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
     fileInfoes3.isEmpty shouldBe true
   }
 
-  //DEOPSCSW-75 List the names of configuration files that match a path
+  // DEOPSCSW-75 List the names of configuration files that match a path
   test("should filter list based on the pattern | DEOPSCSW-75") {
     val tromboneConfig = Paths.get("a/c/trombone.conf")
     val assemblyConfig = Paths.get("a/b/assembly/assembly.conf")
@@ -1023,8 +1023,8 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
     fileInfoes6.map(_.path).toSet shouldBe Set(hcdConfig)
   }
 
-  //DEOPSCSW-132 List oversize and normal sized files
-  //DEOPSCSW-75 List the names of configuration files that match a path
+  // DEOPSCSW-132 List oversize and normal sized files
+  // DEOPSCSW-75 List the names of configuration files that match a path
   test("should filter list based on the type and pattern | DEOPSCSW-75, DEOPSCSW-132") {
     val tromboneConfig   = Paths.get("a/c/trombone.conf")
     val hcdConfig        = Paths.get("a/b/c/hcd/hcd.conf")
@@ -1069,7 +1069,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
     fileInfoes8.map(_.path).toSet shouldBe Set(hcdConfig)
   }
 
-  //DEOPSCSW-140 Provide new routes to get active file as of date
+  // DEOPSCSW-140 Provide new routes to get active file as of date
   test("should get the correct active version of the file based on time | DEOPSCSW-140") {
 
     // create file
@@ -1092,7 +1092,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
     configService.getActiveByTime(file, Instant.now()).await.get.toStringF.await shouldBe configValue3
   }
 
-  //DEOPSCSW-133: Provide meta config for normal and oversize repo
+  // DEOPSCSW-133: Provide meta config for normal and oversize repo
   test("should get metadata | DEOPSCSW-133") {
     val config: Config = ConfigFactory.parseString("""
     |csw-config-server.repository-dir=/test/csw-config-svn

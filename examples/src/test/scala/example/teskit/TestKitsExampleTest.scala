@@ -22,7 +22,7 @@ class TestKitsExampleTest extends AnyFunSuiteLike with BeforeAndAfterAll with Ma
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(InternalLoggerFactory.getDefaultFactory)
 
-  //#framework-testkit
+  // #framework-testkit
   // create instance of framework testkit
   private val frameworkTestKit = FrameworkTestKit()
 
@@ -31,12 +31,12 @@ class TestKitsExampleTest extends AnyFunSuiteLike with BeforeAndAfterAll with Ma
 
   // stops all services started by this testkit
   override protected def afterAll(): Unit = frameworkTestKit.shutdown()
-  //#framework-testkit
+  // #framework-testkit
 
   import frameworkTestKit._
 
   test("framework testkit example for spawning container") {
-    //#spawn-using-testkit
+    // #spawn-using-testkit
 
     // starting container from container config using testkit
     frameworkTestKit.spawnContainer(ConfigFactory.load("SampleContainer.conf"))
@@ -45,7 +45,7 @@ class TestKitsExampleTest extends AnyFunSuiteLike with BeforeAndAfterAll with Ma
     // val componentRef: ActorRef[ComponentMessage] =
     //   frameworkTestKit.spawnStandaloneComponent(ConfigFactory.load("SampleHcdStandalone.conf"))
 
-    //#spawn-using-testkit
+    // #spawn-using-testkit
 
     val connection       = AkkaConnection(ComponentId(Prefix(Subsystem.CSW, "sample"), Assembly))
     val assemblyLocation = Await.result(locationService.resolve(connection, 5.seconds), 10.seconds)
@@ -54,17 +54,17 @@ class TestKitsExampleTest extends AnyFunSuiteLike with BeforeAndAfterAll with Ma
 
   test("framework testkit example for spawning hcd and assembly without config") {
 
-    //#spawn-assembly
+    // #spawn-assembly
     frameworkTestKit.spawnAssembly(Prefix("TCS.sampleAssembly"), (ctx, cswCtx) => new SampleHandlers(ctx, cswCtx))
-    //#spawn-assembly
+    // #spawn-assembly
 
     val assemblyConnection = AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "sampleAssembly"), Assembly))
     val assemblyLocation   = Await.result(locationService.resolve(assemblyConnection, 5.seconds), 10.seconds)
     assemblyLocation.value.connection shouldBe assemblyConnection
 
-    //#spawn-hcd
+    // #spawn-hcd
     frameworkTestKit.spawnHCD(Prefix("TCS.sampleHcd"), (ctx, cswCtx) => new SampleHcdHandlers(ctx, cswCtx))
-    //#spawn-hcd
+    // #spawn-hcd
 
     val hcdConnection = AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "sampleHcd"), HCD))
     val hcdLocation   = Await.result(locationService.resolve(hcdConnection, 5.seconds), 10.seconds)

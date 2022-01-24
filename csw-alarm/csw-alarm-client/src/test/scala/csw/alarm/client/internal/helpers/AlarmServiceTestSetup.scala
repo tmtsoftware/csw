@@ -52,7 +52,7 @@ class AlarmServiceTestSetup
 
   import csw.alarm.client.internal.AlarmRomaineCodec._
 
-  val connsFactory: RedisConnectionsFactory                          = new RedisConnectionsFactory(resolver, alarmServer, new RomaineFactory(redisClient))
+  val connsFactory: RedisConnectionsFactory = new RedisConnectionsFactory(resolver, alarmServer, new RomaineFactory(redisClient))
   val testMetadataApi: RedisAsyncApi[MetadataKey, AlarmMetadata]     = connsFactory.asyncApi[MetadataKey, AlarmMetadata]
   val testSeverityApi: RedisAsyncApi[SeverityKey, FullAlarmSeverity] = connsFactory.asyncApi[SeverityKey, FullAlarmSeverity]
 
