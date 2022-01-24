@@ -68,7 +68,7 @@ object Common {
     autoCompilerPlugins := true,
     Global / cancelable := true, // allow ongoing test(or any task) to cancel with ctrl + c and still remain inside sbt
     scalafmtOnCompile := true,
-    unidocGenjavadocVersion := "0.17",
+    unidocGenjavadocVersion := "0.18",
     commands += Command.command("openSite") { state =>
       val uri = s"file://${Project.extract(state).get(siteDirectory)}/${docsParentDir.value}/${version.value}/index.html"
       state.log.info(s"Opening browser at $uri ...")
