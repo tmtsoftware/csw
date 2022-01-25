@@ -65,7 +65,7 @@ case class Key[S: ClassTag] private[generics] (keyName: String, keyType: KeyType
    */
   override def equals(that: Any): Boolean = {
     that match {
-      case that: Key[S] => this.keyName == that.keyName
+      case that: Key[?] => this.keyName == that.keyName
       case _            => false
     }
   }

@@ -83,7 +83,7 @@ lazy val `csw` = project
   .settings(Settings.multiJvmTestTask(multiJvmProjects))
   .settings(GithubRelease.githubReleases)
   .settings(
-    ghreleaseRepoOrg := "tmtsoftware",
+    ghreleaseRepoOrg  := "tmtsoftware",
     ghreleaseRepoName := "csw"
   )
   .settings(ghreleaseAssets := {
@@ -494,7 +494,7 @@ lazy val `csw-time-core` = crossProject(JSPlatform, JVMPlatform)
   .jvmSettings(libraryDependencies += Libs.`junit-4-13` % Test)
   .settings(
     libraryDependencies += Libs.`scalatest`.value % Test,
-    fork := false
+    fork                                         := false
   )
 
 lazy val `csw-time-scheduler` = project

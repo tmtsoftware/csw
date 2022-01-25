@@ -3,8 +3,8 @@ package csw.params.core.models
 case class ExposureNumber(exposureNumber: Int, subArray: Option[Int] = None) {
   override def toString: String =
     (exposureNumber, subArray) match {
-      case (exposureNumber, Some(subArray)) => s"${exposureNumber.formatted("%04d")}-${subArray.formatted("%02d")}"
-      case (exposureNumber, None)           => s"${exposureNumber.formatted("%04d")}"
+      case (exposureNumber, Some(subArray)) => s"${exposureNumber.toString.format("%04d")}-${subArray.toString.format("%02d")}"
+      case (exposureNumber, None)           => s"${exposureNumber.toString.format("%04d")}"
     }
 
   /** Returns the next exposure number */

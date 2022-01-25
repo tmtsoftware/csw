@@ -26,7 +26,7 @@ case class ObsId(programId: ProgramId, observationNumber: Int) {
    */
   def asOptional: Optional[ObsId] = Optional.of(new ObsId(programId, observationNumber))
 
-  override def toString: String = s"$programId-${observationNumber.formatted("%03d")}"
+  override def toString: String = s"$programId-${observationNumber.toString.format("%03d")}"
 }
 
 object ObsId {

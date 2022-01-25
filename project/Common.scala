@@ -23,14 +23,14 @@ object Common {
   val jsTestArg              = Test / testOptions := Seq(Tests.Argument("-oDF"))
 
   lazy val CommonSettings: Seq[Setting[_]] = Seq(
-    docsRepo := "https://github.com/tmtsoftware/tmtsoftware.github.io.git",
-    docsParentDir := "csw",
-    gitCurrentRepo := "https://github.com/tmtsoftware/csw",
+    docsRepo                                        := "https://github.com/tmtsoftware/tmtsoftware.github.io.git",
+    docsParentDir                                   := "csw",
+    gitCurrentRepo                                  := "https://github.com/tmtsoftware/csw",
     libraryDependencies += (Libs.`tmt-test-reporter` % Test),
-    organization := "com.github.tmtsoftware.csw",
-    organizationName := "TMT Org",
-    scalaVersion := Libs.ScalaVersion,
-    homepage := Some(url("https://github.com/tmtsoftware/csw")),
+    organization                                    := "com.github.tmtsoftware.csw",
+    organizationName                                := "TMT Org",
+    scalaVersion                                    := Libs.ScalaVersion,
+    homepage                                        := Some(url("https://github.com/tmtsoftware/csw")),
     resolvers += "jitpack" at "https://jitpack.io",
     scmInfo := Some(
       ScmInfo(url("https://github.com/tmtsoftware/csw"), "git@github.com:tmtsoftware/csw.git")
@@ -42,10 +42,10 @@ object Common {
       "-feature",
       "-unchecked",
       "-deprecation",
-      //-W Options
+      // -W Options
       "-Wdead-code",
       if (enableFatalWarnings) "-Wconf:any:error" else "-Wconf:any:warning-verbose",
-      //-X Options
+      // -X Options
       "-Xlint:_,-missing-interpolator",
       "-Xsource:3",
       "-Xcheckinit",
@@ -63,11 +63,11 @@ object Common {
     // we make use of it so that the version in class metadata (e.g. classOf[LocationService].getPackage.getSpecificationVersion)
     // and the maven repo match
     version := sys.env.getOrElse("JITPACK_VERSION", "0.1.0-SNAPSHOT"),
-    fork := true,
+    fork    := true,
     Test / javaOptions ++= Seq("-Dakka.actor.serialize-messages=on"),
-    autoCompilerPlugins := true,
-    Global / cancelable := true, // allow ongoing test(or any task) to cancel with ctrl + c and still remain inside sbt
-    scalafmtOnCompile := true,
+    autoCompilerPlugins     := true,
+    Global / cancelable     := true, // allow ongoing test(or any task) to cancel with ctrl + c and still remain inside sbt
+    scalafmtOnCompile       := true,
     unidocGenjavadocVersion := "0.18",
     commands += Command.command("openSite") { state =>
       val uri = s"file://${Project.extract(state).get(siteDirectory)}/${docsParentDir.value}/${version.value}/index.html"
@@ -77,7 +77,7 @@ object Common {
     },
     Global / excludeLintKeys := Set(
       SettingKey[Boolean]("ide-skip-project"),
-      aggregate //verify if this needs to be here or our configuration is wrong
+      aggregate // verify if this needs to be here or our configuration is wrong
     )
   )
 }

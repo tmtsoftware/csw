@@ -11,7 +11,7 @@ object Libs {
   val `mockito`            = "org.scalatestplus"      %% "mockito-3-4"        % "3.2.10.0"
 
   // Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
-  val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.3.0-alpha12"
+  val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.2.10"
 
   val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "76eb27c" // Apache 2.0
   val `akka-management-cluster-http` = "com.lightbend.akka.management" %% "akka-management-cluster-http" % "1.1.3"
