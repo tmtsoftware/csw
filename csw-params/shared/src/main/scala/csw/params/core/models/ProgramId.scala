@@ -8,7 +8,7 @@ package csw.params.core.models
  */
 case class ProgramId(semesterId: SemesterId, programNumber: Int) {
   require(programNumber >= 1 && programNumber <= 999, "Program Number should be integer in the range of 1 to 999")
-  override def toString: String = Separator.hyphenate(s"$semesterId", programNumber.toString.format("%03d"))
+  override def toString: String = Separator.hyphenate(s"$semesterId", "%03d".format(programNumber))
 }
 
 object ProgramId {
