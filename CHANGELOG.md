@@ -15,7 +15,6 @@ All notable changes to this project will be documented in this file.
 
 - Add `coaddsInExposure` and `coaddsDone` to OpticalExposureData ObserveEvent
 - Add `NOT_READY` choice to OperationalState
-- Add `nanometers` to Units
 
 ## [CSW v4.0.0] - 2021-09-23
 
