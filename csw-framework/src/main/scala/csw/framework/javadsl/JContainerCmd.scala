@@ -1,10 +1,10 @@
 package csw.framework.javadsl
 
+import akka.actor.typed.ActorRef
 import com.typesafe.config.Config
 import csw.framework.deploy.containercmd.ContainerCmd
 import csw.prefix.models.Subsystem
 
-import java.io.Closeable
 import java.util.Optional
 import scala.compat.java8.OptionConverters.*
 
@@ -23,7 +23,7 @@ object JContainerCmd {
    * alone without any container
    * @return actor ref of the container or supervisor of the component started without container
    */
-  def start(name: String, subsystem: Subsystem, args: Array[String], defaultConfig: Optional[Config]): Closeable =
+  def start(name: String, subsystem: Subsystem, args: Array[String], defaultConfig: Optional[Config]): ActorRef[_] =
     ContainerCmd.start(name, subsystem, args, defaultConfig.asScala)
 }
 // $COVERAGE-ON$
