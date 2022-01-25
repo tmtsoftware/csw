@@ -13,7 +13,7 @@ object Libs {
   // Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
   val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.2.10"
 
-  val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "76eb27c" // Apache 2.0
+  val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "0.6.0" // Apache 2.0
   val `akka-management-cluster-http` = "com.lightbend.akka.management" %% "akka-management-cluster-http" % "1.1.3"
   val `svnkit`        = "org.tmatesoft.svnkit" % "svnkit"        % "1.10.3"     // TMate Open Source License
   val `commons-codec` = "commons-codec"        % "commons-codec" % "1.15"       // Apache 2.0š
@@ -53,7 +53,7 @@ object Libs {
   val `caffeine`          = "com.github.ben-manes.caffeine" % "caffeine"        % "3.0.5"
   val netty               = "io.netty"                      % "netty-all"       % "4.1.73.Final"
   val `case-app`          = "com.github.alexarchambault"   %% "case-app"        % "2.0.6"
-  val `tmt-test-reporter` = "com.github.tmtsoftware"       %% "rtm"             % "644dbbc"
+  val `tmt-test-reporter` = "com.github.tmtsoftware"       %% "rtm"             % "0.3.0"
 }
 
 object Borer {
@@ -121,7 +121,7 @@ object Jooq {
 }
 
 object MSocket {
-  val Version = "ddc7540"
+  val Version = "0.6.0"
 
   val `msocket-api`      = dep("com.github.tmtsoftware.msocket" %%% "msocket-api" % Version)
   val `msocket-security` = "com.github.tmtsoftware.msocket" %% "msocket-security" % Version
