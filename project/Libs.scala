@@ -25,18 +25,19 @@ object Libs {
   val `scala-java-time` = dep("io.github.cquiroz" %%% "scala-java-time" % "2.3.0")
   val `scalatest`       = dep("org.scalatest" %%% "scalatest" % "3.2.10") // Apache License 2.0
 
-  val `jwt-core`     = "com.pauldijou"    %% "jwt-core"     % "5.0.0"
-  val `lettuce`      = "io.lettuce"        % "lettuce-core" % "6.1.6.RELEASE" // 6.1.5.RELEASE version is breaking some tests
-  val `reactor-core` = "io.projectreactor" % "reactor-core" % "3.4.14"
-  val `reactive-streams`  = "org.reactivestreams"      % "reactive-streams"  % "1.0.3"
-  val `akka-stream-kafka` = "com.typesafe.akka"       %% "akka-stream-kafka" % "3.0.0" // 2.1.1 version is breaking some tests
-  val `embedded-kafka`    = "io.github.embeddedkafka" %% "embedded-kafka"    % "3.0.0"
-  val `embedded-redis`    = "com.github.kstyrc"        % "embedded-redis"    % "0.6"
-  val `scala-compiler`    = "org.scala-lang"           % "scala-compiler"    % ScalaVersion
-  val `HdrHistogram`      = "org.hdrhistogram"         % "HdrHistogram"      % "2.1.12"
-  val `testng`            = "org.testng"               % "testng"            % "7.5.0"
-  val `junit-4-13`        = "org.scalatestplus"       %% "junit-4-13"        % "3.2.10.0"
-  val `testng-6-7`        = "org.scalatestplus"       %% "testng-6-7"        % "3.2.10.0"
+  val `jwt-core`         = "com.pauldijou"      %% "jwt-core"         % "5.0.0"
+  val `lettuce`          = "io.lettuce"          % "lettuce-core"     % "6.1.6.RELEASE"
+  val `reactor-core`     = "io.projectreactor"   % "reactor-core"     % "3.4.14"
+  val `reactive-streams` = "org.reactivestreams" % "reactive-streams" % "1.0.3"
+  val `akka-stream-kafka` =
+    "com.typesafe.akka" %% "akka-stream-kafka" % "2.1.0" // 2.1.1 version is breaking csw-event-client tests
+  val `embedded-kafka` = "io.github.embeddedkafka" %% "embedded-kafka" % "3.0.0"
+  val `embedded-redis` = "com.github.kstyrc"        % "embedded-redis" % "0.6"
+  val `scala-compiler` = "org.scala-lang"           % "scala-compiler" % ScalaVersion
+  val `HdrHistogram`   = "org.hdrhistogram"         % "HdrHistogram"   % "2.1.12"
+  val `testng`         = "org.testng"               % "testng"         % "7.5.0"
+  val `junit-4-13`     = "org.scalatestplus"       %% "junit-4-13"     % "3.2.10.0"
+  val `testng-6-7`     = "org.scalatestplus"       %% "testng-6-7"     % "3.2.10.0"
 
   val `scala-csv`             = "com.github.tototoshi" %% "scala-csv"             % "1.3.10"
   val `json-schema-validator` = "com.github.fge"        % "json-schema-validator" % "2.2.14" // LGPL/ASL
