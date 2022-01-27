@@ -9,12 +9,18 @@ The product is in a new repository: [csw](https://github.com/tmtsoftware/csw).
 
 All notable changes to this project will be documented in this file.
 
-## [Changes in Upcoming releases]
+## [CSW v4.0.1-RC1] - date
+This is a release candidate 1 for version 4.0.1 of the TMT Common Software for project stakeholders.
+See [here](https://tmtsoftware.github.io/csw/4.0.1-RC1/) for a detailed documentation of this version of the CSW software.
 
 ### Changes
 - Add `coaddsInExposure` and `coaddsDone` to OpticalExposureData ObserveEvent
 - Add `NOT_READY` choice to OperationalState
+- Add `csw-version` in Metadata of Registration object. This field is used while detecting csw version conflicts.
+- Added optional argument to Angle.raToString and Angle.deToString to return the format "hh:mm:ss.sss" or "dd:mm:ss.sss"
+- Add `coaddsInExposure` and `coaddsDone` params in `OpticalDetectorExposureData` Observe event
 
+ 
 ## [CSW v4.0.0] - 2021-09-23
 
 This is final release v4.0.0 of the TMT Common Software for project stakeholders.
