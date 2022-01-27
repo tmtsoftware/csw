@@ -66,7 +66,7 @@ final case class AkkaRegistration private[csw] (
  */
 final case class TcpRegistration(connection: TcpConnection, port: Int, metadata: Metadata) extends Registration {
 
-  //Used for JAVA API
+  // Used for JAVA API
   def this(connection: TcpConnection, port: Int) = this(connection, port, Metadata.empty)
 
   /**
@@ -99,7 +99,7 @@ final case class HttpRegistration(
     metadata: Metadata
 ) extends Registration {
 
-  //Used for JAVA API
+  // Used for JAVA API
   def this(connection: HttpConnection, port: Int, path: String, metadata: Metadata) =
     this(connection, port, path, NetworkType.Inside, metadata)
 

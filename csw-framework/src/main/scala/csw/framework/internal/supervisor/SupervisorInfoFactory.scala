@@ -38,7 +38,7 @@ private[framework] class SupervisorInfoFactory(containerPrefix: Prefix) {
     val richSystem                                          = new CswFrameworkSystem(system)
 
     async {
-      val cswCtxF            = CswContext.make(locationService, eventServiceFactory, alarmServiceFactory, componentInfo)(richSystem)
+      val cswCtxF = CswContext.make(locationService, eventServiceFactory, alarmServiceFactory, componentInfo)(richSystem)
       val supervisorBehavior = SupervisorBehaviorFactory.make(Some(containerRef), registrationFactory, await(cswCtxF))
       val actorRefF          = richSystem.spawnTyped(supervisorBehavior, componentInfo.prefix.toString)
       Some(SupervisorInfo(system, Component(await(actorRefF), componentInfo)))

@@ -19,7 +19,7 @@ import scala.collection.mutable.{ArraySeq => ArrayS}
 import scala.reflect.ClassTag
 
 object JParamCodecs extends ParamCodecs {
-  //just needed for the Java test, which should not exist
+  // just needed for the Java test, which should not exist
   val eqFrameCodec: Codec[EqFrame] = Codec.of[EqFrame]
 }
 object ParamCodecs extends ParamCodecs
@@ -69,14 +69,14 @@ trait ParamCodecsBase extends CommonCodecs {
     Codec.bimap[Array[Array[T]], MatrixData[T]](_.values, MatrixData.fromArrays)
 
   // ************************ Parameter Codecs ********************
-  //Do not replace these with bimap, due to an issue with borer https://github.com/sirthias/borer/issues/24
+  // Do not replace these with bimap, due to an issue with borer https://github.com/sirthias/borer/issues/24
   implicit lazy val javaByteArrayEnc: Encoder[Array[JByte]] = bytesEnc.contramap(_.map(x => x: Byte))
   implicit lazy val javaByteArrayDec: Decoder[Array[JByte]] = bytesDec.map(_.map(x => x: JByte))
 
   implicit def waCodec[T: ArrayEnc: ArrayDec]: Codec[ArrayS[T]] =
     Codec.bimap[Array[T], ArrayS[T]](_.array.asInstanceOf[Array[T]], x => x: ArrayS[T])
 
-  //Do not put the bytesEnc and bytesDec inside Codec, due to an issue with borer https://github.com/sirthias/borer/issues/24
+  // Do not put the bytesEnc and bytesDec inside Codec, due to an issue with borer https://github.com/sirthias/borer/issues/24
   implicit lazy val bytesEnc: Encoder[Array[Byte]] = Encoder.targetSpecific(
     cbor = Encoder.forByteArrayDefault,
     json = Encoder.forArray[Byte]

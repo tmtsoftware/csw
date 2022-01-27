@@ -110,7 +110,7 @@ object KeyType extends Enum[KeyType[_]] {
   case object AltAzCoordKey       extends SimpleKeyType[AltAzCoord]
   case object CoordKey            extends SimpleKeyType[Coord]
 
-  //scala
+  // scala
   case object BooleanKey extends SimpleKeyTypeWithUnits[Boolean](NoUnits)
   case object CharKey    extends SimpleKeyType[Char]
 

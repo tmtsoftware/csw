@@ -14,8 +14,8 @@ private[alarm] class Wiring {
   lazy val configClientService: ConfigClientService                 = ConfigClientFactory.clientApi(actorSystem, locationService)
   lazy val configUtils                                              = new ConfigUtils(configClientService)
   lazy val printLine: Any => Unit                                   = println
-  lazy val commandLineRunner                                        = new CommandLineRunner(actorRuntime, locationService, configUtils, printLine)
-  lazy val cliApp                                                   = new CliApp(commandLineRunner)
+  lazy val commandLineRunner = new CommandLineRunner(actorRuntime, locationService, configUtils, printLine)
+  lazy val cliApp            = new CliApp(commandLineRunner)
 }
 
 object Wiring {

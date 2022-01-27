@@ -42,7 +42,7 @@ object ParameterArgParser {
       case 'd' => DoubleKey.make(keyName, units).setAll(values.map(_.toDouble))
       case 'l' => LongKey.make(keyName, units).setAll(values.map(_.toLong))
       case 'b' => BooleanKey.make(keyName).setAll(values.map(_.toBoolean))
-      case _   => throw new RuntimeException(s"""
+      case _ => throw new RuntimeException(s"""
            |Unsupported key type [${keyArg.keyType}] provided.
            |Supported key types are:
            |i = IntKey

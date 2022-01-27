@@ -19,8 +19,8 @@ private[location] object ClusterConfirmationActor {
           case MemberUp(member) if member.address == cluster.selfMember.address       => receiveBehavior(Some(Done))
           case MemberWeaklyUp(member) if member.address == cluster.selfMember.address => receiveBehavior(Some(Done))
           case HasJoinedCluster(ref)                                                  => ref ! state; Behaviors.same
-          case Shutdown                                                               => Behaviors.stopped(() => cluster.subscriptions ! Unsubscribe(ctx.self))
-          case _                                                                      => Behaviors.same
+          case Shutdown => Behaviors.stopped(() => cluster.subscriptions ! Unsubscribe(ctx.self))
+          case _        => Behaviors.same
         }
       receiveBehavior()
     }

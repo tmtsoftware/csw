@@ -18,9 +18,9 @@ import scala.concurrent.ExecutionContext
 
 object SampleRoutes {
 
-  implicit val actorSystem: ActorSystem[_]   = ActorSystem(Behaviors.empty, "test")
-  implicit val ec: ExecutionContext          = actorSystem.executionContext
-  private val config: Config                 = ConfigFactory.parseString("""
+  implicit val actorSystem: ActorSystem[_] = ActorSystem(Behaviors.empty, "test")
+  implicit val ec: ExecutionContext        = actorSystem.executionContext
+  private val config: Config = ConfigFactory.parseString("""
       | auth-config {
       |  realm = TMT
       |  client-id = tmt-backend-app

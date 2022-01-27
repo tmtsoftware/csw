@@ -122,7 +122,7 @@ class FileAppenderTest extends AnyFunSuite with Matchers with BeforeAndAfterEach
     }
   }
 
-  //DEOPSCSW-151 : Manage log file size
+  // DEOPSCSW-151 : Manage log file size
   // CSW-78: PrefixRedesign for logging
   test("log file is rotated every day | DEOPSCSW-123, DEOPSCSW-649, DEOPSCSW-151") {
     fileAppender.append(expectedLogMsgJson1, "alternative")

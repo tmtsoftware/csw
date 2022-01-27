@@ -14,7 +14,7 @@ private[client] object AlarmRomaineCodec extends AlarmCodecs {
       x => Json.decode(x.getBytes()).to[A].value
     )
 
-  //Key Codecs
+  // Key Codecs
   implicit val metadataKeyRomaineCodec: RomaineCodec[MetadataKey]         = stringCodec.bimap(_.value, MetadataKey.apply)
   implicit val ackStatusKeyRomaineCodec: RomaineCodec[AckStatusKey]       = stringCodec.bimap(_.value, AckStatusKey.apply)
   implicit val alarmTimeKeyRomaineCodec: RomaineCodec[AlarmTimeKey]       = stringCodec.bimap(_.value, AlarmTimeKey.apply)
@@ -24,7 +24,7 @@ private[client] object AlarmRomaineCodec extends AlarmCodecs {
   implicit val severityKeyRomaineCodec: RomaineCodec[SeverityKey]  = stringCodec.bimap(_.value, SeverityKey.apply)
   implicit val initializingKeyCodec: RomaineCodec[InitializingKey] = stringCodec.bimap(_.value, InitializingKey.apply)
 
-  //value codecs
+  // value codecs
   implicit val metadataRomaineCodec: RomaineCodec[AlarmMetadata] = viaJsonCodec
   implicit val alarmTimeRomaineCodec: RomaineCodec[UTCTime]      = viaJsonCodec
   implicit val initializingCodec: RomaineCodec[Boolean]          = stringCodec.bimap(_.toString, _.toBoolean)

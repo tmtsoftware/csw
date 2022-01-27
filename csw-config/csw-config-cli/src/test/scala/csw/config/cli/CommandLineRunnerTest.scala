@@ -59,7 +59,7 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
     super.afterAll()
   }
 
-  //DEOPSCSW-72: Retrieve a configuration file to a specified file location on a local disk
+  // DEOPSCSW-72: Retrieve a configuration file to a specified file location on a local disk
   test(
     "should able to create a file in repo and read it from repo to local disk | DEOPSCSW-112, DEOPSCSW-43, DEOPSCSW-576, DEOPSCSW-72"
   ) {
@@ -242,24 +242,24 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
 
     //  create file
     val parsedCreateArgs: Option[Options] = argsParser.parse(createMinimalArgs)
-    val createConfigId                    = commandLineRunner.create(parsedCreateArgs.get) //user1
+    val createConfigId                    = commandLineRunner.create(parsedCreateArgs.get) // user1
     val createTS                          = Instant.now
 
     //  update file content
     val parsedUpdateArgs: Option[Options] = argsParser.parse(updateAllArgs)
-    val updateConfigId                    = commandLineRunner.update(parsedUpdateArgs.get) //user2
+    val updateConfigId                    = commandLineRunner.update(parsedUpdateArgs.get) // user2
 
     //  update file content
     val parsedUpdate2Args: Option[Options] = argsParser.parse(updateAllArgs)
-    val update2ConfigId                    = commandLineRunner.update(parsedUpdate2Args.get) //user3
+    val update2ConfigId                    = commandLineRunner.update(parsedUpdate2Args.get) // user3
 
     val setActiveArgs = List("setActiveVersion", relativeRepoPath, "--id", updateConfigId.id, "-c", comment)
-    commandLineRunner.setActiveVersion(argsParser.parse(setActiveArgs).get) //user4
+    commandLineRunner.setActiveVersion(argsParser.parse(setActiveArgs).get) // user4
 
     commandLineRunner.historyActive(argsParser.parse(historyActiveArgs).get).map(h => (h.id, h.author, h.comment)).toSet shouldBe
     Set((createConfigId, user1, "initializing active file with the first version"), (updateConfigId, user4, comment))
 
-    commandLineRunner.resetActiveVersion(argsParser.parse(resetActiveAllArgs).get) //user5
+    commandLineRunner.resetActiveVersion(argsParser.parse(resetActiveAllArgs).get) // user5
 
     commandLineRunner
       .historyActive(

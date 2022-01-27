@@ -20,7 +20,7 @@ class DetectorHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCo
 
   override def initialize(): Unit = {
     log.info("Initializing HCD Component TLA")
-    //#CSW-118 : publishing observe events for IR, Optical & WFS detectors
+    // #CSW-118 : publishing observe events for IR, Optical & WFS detectors
     val obsId                  = ObsId("2020A-001-123")
     val exposureId: ExposureId = ExposureId("2022A-001-123-IRIS-IMG-DRK1-0023")
 
@@ -30,7 +30,7 @@ class DetectorHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCo
     eventService.defaultPublisher.publish(observeStart)
     eventService.defaultPublisher.publish(exposureStart)
     eventService.defaultPublisher.publish(publishSuccess)
-    //#CSW-118
+    // #CSW-118
   }
 
   override def onGoOffline(): Unit = {}

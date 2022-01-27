@@ -75,17 +75,17 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
       case `onewayCmd`          => // Do nothing
       case `matcherCmd`         => processCommandWithMatcher(controlCommand)
       case `matcherFailedCmd`   => processCommandWithMatcher(controlCommand)
-      case `acceptedCmd`        => //mimic long running process by publishing any state
+      case `acceptedCmd`        => // mimic long running process by publishing any state
       case `matcherTimeoutCmd`  => processCommandWithMatcher(controlCommand)
       case `hcdCurrentStateCmd` => processCurrentStateOneway(controlCommand)
       case c                    => println(s"onOneway received an unknown command: $c")
     }
 
   private def processCurrentStateOneway(controlCommand: ControlCommand): Unit = {
-    //#subscribeCurrentState
+    // #subscribeCurrentState
     val currentState = CurrentState(prefix, StateName("HCDState"), controlCommand.paramSet)
     cswCtx.currentStatePublisher.publish(currentState)
-    //#subscribeCurrentState
+    // #subscribeCurrentState
   }
 
   private def processAcceptedSubmitCmd(cancelCommandId: Id, cancelCommandSetup: Setup): SubmitResponse = {

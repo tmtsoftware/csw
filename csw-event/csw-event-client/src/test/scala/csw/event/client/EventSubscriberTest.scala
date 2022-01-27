@@ -84,8 +84,8 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
       events(eventId)
     }
 
-  //DEOPSCSW-346: Subscribe to event irrespective of Publisher's existence
-  //DEOPSCSW-343: Unsubscribe based on prefix and event name
+  // DEOPSCSW-346: Subscribe to event irrespective of Publisher's existence
+  // DEOPSCSW-343: Unsubscribe based on prefix and event name
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_subscribe_an_event__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_346_DEOPSCSW_343(
       baseProperties: BaseProperties
@@ -109,8 +109,8 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     testProbe.expectNoMessage(2.seconds)
   }
 
-  //DEOPSCSW-338: Provide callback for Event alerts
-  //DEOPSCSW-343: Unsubscribe based on prefix and event name
+  // DEOPSCSW-338: Provide callback for Event alerts
+  // DEOPSCSW-343: Unsubscribe based on prefix and event name
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_subscribe_with_async_callback__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_338_DEOPSCSW_343(
       baseProperties: BaseProperties
@@ -134,8 +134,8 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     testProbe.expectNoMessage(200.millis)
   }
 
-  //DEOPSCSW-338: Provide callback for Event alerts
-  //DEOPSCSW-342: Subscription with consumption frequency
+  // DEOPSCSW-338: Provide callback for Event alerts
+  // DEOPSCSW-342: Subscription with consumption frequency
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_subscribe_with_async_callback_with_duration__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_338_DEOPSCSW_342(
       baseProperties: BaseProperties
@@ -162,8 +162,8 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     queue2.size shouldBe 3
   }
 
-  //DEOPSCSW-338: Provide callback for Event alerts
-  //DEOPSCSW-346: Subscribe to event irrespective of Publisher's existence
+  // DEOPSCSW-338: Provide callback for Event alerts
+  // DEOPSCSW-346: Subscribe to event irrespective of Publisher's existence
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_subscribe_with_callback__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_338_DEOPSCSW_346(
       baseProperties: BaseProperties
@@ -191,8 +191,8 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     testProbe.expectNoMessage(200.millis)
   }
 
-  //DEOPSCSW-338: Provide callback for Event alerts
-  //DEOPSCSW-342: Subscription with consumption frequency
+  // DEOPSCSW-338: Provide callback for Event alerts
+  // DEOPSCSW-342: Subscription with consumption frequency
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_subscribe_with_callback_with_duration__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_338_DEOPSCSW_342(
       baseProperties: BaseProperties
@@ -220,7 +220,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     queue2.size shouldBe 3
   }
 
-  //DEOPSCSW-339: Provide actor ref to alert about Event arrival
+  // DEOPSCSW-339: Provide actor ref to alert about Event arrival
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_subscribe_with_an_ActorRef__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_339(
       baseProperties: BaseProperties
@@ -241,8 +241,8 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     probe.expectNoMessage(200.millis)
   }
 
-  //DEOPSCSW-339: Provide actor ref to alert about Event arrival
-  //DEOPSCSW-342: Subscription with consumption frequency
+  // DEOPSCSW-339: Provide actor ref to alert about Event arrival
+  // DEOPSCSW-342: Subscription with consumption frequency
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_subscribe_with_an_ActorRef_with_duration__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_339_DEOPSCSW_342(
       baseProperties: BaseProperties
@@ -312,12 +312,12 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     val inbox4 = TestInbox[Event]()
     val inbox5 = TestInbox[Event]()
 
-    val eventPattern  = "*.movement.*" //subscribe to events with any prefix but event name containing 'movement'
-    val eventPattern2 = "*.move*"      //subscribe to events with any prefix but event name containing 'move'
+    val eventPattern  = "*.movement.*" // subscribe to events with any prefix but event name containing 'movement'
+    val eventPattern2 = "*.move*"      // subscribe to events with any prefix but event name containing 'move'
     val eventPattern3 =
-      "*.?ove" //subscribe to events with any prefix but event name matching any first  character followed by `ove`
-    val eventPattern4 = "test_prefix.*" //subscribe to all events with prefix `test_prefix` irresepective of event names
-    val eventPattern5 = "*"             //subscribe to all events with prefix `test_prefix` irresepective of event names
+      "*.?ove" // subscribe to events with any prefix but event name matching any first  character followed by `ove`
+    val eventPattern4 = "test_prefix.*" // subscribe to all events with prefix `test_prefix` irresepective of event names
+    val eventPattern5 = "*"             // subscribe to all events with prefix `test_prefix` irresepective of event names
 
     val subscription  = subscriber.pSubscribeCallback(Subsystem.CSW, eventPattern, inbox.ref ! _)
     val subscription2 = subscriber.pSubscribeCallback(Subsystem.CSW, eventPattern2, inbox2.ref ! _)
@@ -420,7 +420,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     seqF2.await.toSet shouldBe Set(Event.invalidEvent(event2.eventKey), event2)
   }
 
-  //DEOPSCSW-340: Provide most recently published event for subscribed prefix and name
+  // DEOPSCSW-340: Provide most recently published event for subscribed prefix and name
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_retrieve_recently_published_event_on_subscription__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_340(
       baseProperties: BaseProperties
@@ -446,7 +446,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     seqF.await shouldBe Seq(event2, event3)
   }
 
-  //DEOPSCSW-340: Provide most recently published event for subscribed prefix and name
+  // DEOPSCSW-340: Provide most recently published event for subscribed prefix and name
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_retrieve_InvalidEvent__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_340(
       baseProperties: BaseProperties
@@ -459,7 +459,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     seqF.await shouldBe Seq(Event.invalidEvent(eventKey))
   }
 
-  //DEOPSCSW-340: Provide most recently published event for subscribed prefix and name
+  // DEOPSCSW-340: Provide most recently published event for subscribed prefix and name
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_retrieve_valid_as_well_as_invalid_event_when_events_are_published_for_some_and_not_for_other_keys__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_340(
       baseProperties: BaseProperties
@@ -479,7 +479,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     seqF.await.toSet shouldBe Set(Event.invalidEvent(eventKey2), distinctEvent1)
   }
 
-  //DEOPSCSW-344: Retrieve recently published event using prefix and eventname
+  // DEOPSCSW-344: Retrieve recently published event using prefix and eventname
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_get_an_event_without_subscribing_for_it__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_344(
       baseProperties: BaseProperties
@@ -496,7 +496,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     eventF.await shouldBe event1
   }
 
-  //DEOPSCSW-344: Retrieve recently published event using prefix and eventname
+  // DEOPSCSW-344: Retrieve recently published event using prefix and eventname
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_get_InvalidEvent__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_344(
       baseProperties: BaseProperties
@@ -513,7 +513,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     event.eventName shouldBe eventName
   }
 
-  //DEOPSCSW-344: Retrieve recently published event using prefix and eventname
+  // DEOPSCSW-344: Retrieve recently published event using prefix and eventname
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_get_events_for_multiple_event_keys__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_344(
       baseProperties: BaseProperties
@@ -551,7 +551,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     (seqF.await should contain).inOrder(Event.invalidEvent(eventKey), Event.badEvent())
   }
 
-  //CSW-73: Make event pub/sub resuming
+  // CSW-73: Make event pub/sub resuming
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_resume_subscriber_after_exception__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395(
       baseProperties: BaseProperties
@@ -572,7 +572,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     cancellable.cancel()
   }
 
-  //CSW-73: Make event pub/sub resuming
+  // CSW-73: Make event pub/sub resuming
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_resume_async_subscriber_after_exception__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395(
       baseProperties: BaseProperties
@@ -598,7 +598,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     cancellable.cancel()
   }
 
-  //CSW-73: Make event pub/sub resuming
+  // CSW-73: Make event pub/sub resuming
   @Test(dataProvider = "redis-provider")
   def should_be_able_to_resume_pattern_subscriber_after_exception__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395(
       redisProps: RedisTestProps

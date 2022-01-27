@@ -34,7 +34,7 @@ class SampleHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
   private val log                           = loggerFactory.getLogger
 
-  //#worker-actor
+  // #worker-actor
   sealed trait WorkerCommand
   case class SendCommand(hcd: CommandService) extends WorkerCommand
 
@@ -59,7 +59,7 @@ class SampleHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext
     // Construct Setup command
     val sleepTimeKey: Key[Long]         = KeyType.LongKey.make("SleepTime")
     val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(5000).withUnits(Units.millisecond)
-    val setupCommand                    = Setup(componentInfo.prefix, CommandName("sleep"), Some(ObsId("2020A-001-123"))).add(sleepTimeParam)
+    val setupCommand = Setup(componentInfo.prefix, CommandName("sleep"), Some(ObsId("2020A-001-123"))).add(sleepTimeParam)
 
     // submit command and handle response
     hcd.submitAndWait(setupCommand).onComplete {
@@ -75,14 +75,14 @@ class SampleHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext
       case scala.util.Failure(ex) => log.error(s"Exception occured when sending command: ${ex.getMessage}")
     }
   }
-  //#worker-actor
+  // #worker-actor
 
   def handleUsingAsync(hcd: CommandService): Unit = {
 
     // Construct Setup command
     val sleepTimeKey: Key[Long]         = KeyType.LongKey.make("SleepTime")
     val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(5000).withUnits(Units.millisecond)
-    val setupCommand                    = Setup(componentInfo.prefix, CommandName("sleep"), Some(ObsId("2020A-001-123"))).add(sleepTimeParam)
+    val setupCommand = Setup(componentInfo.prefix, CommandName("sleep"), Some(ObsId("2020A-001-123"))).add(sleepTimeParam)
 
     async {
       await(hcd.submitAndWait(setupCommand)) match {
@@ -102,7 +102,7 @@ class SampleHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext
     // Construct Setup command
     val sleepTimeKey: Key[Long]         = KeyType.LongKey.make("SleepTime")
     val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(5000).withUnits(Units.millisecond)
-    val setupCommand                    = Setup(componentInfo.prefix, CommandName("sleep"), Some(ObsId("2020A-001-123"))).add(sleepTimeParam)
+    val setupCommand = Setup(componentInfo.prefix, CommandName("sleep"), Some(ObsId("2020A-001-123"))).add(sleepTimeParam)
 
     // Submit command, and handle validation response. Final response is returned as a Future
     val submitCommandResponseF: Future[SubmitResponse] = hcd.submitAndWait(setupCommand).map {
@@ -124,7 +124,7 @@ class SampleHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext
 
   }
 
-  //#initialize
+  // #initialize
   private var maybeEventSubscription: Option[EventSubscription] = None
   override def initialize(): Unit = {
     log.info("In Assembly initialize")
@@ -134,9 +134,9 @@ class SampleHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext
   override def onShutdown(): Unit = {
     log.info("Assembly is shutting down.")
   }
-  //#initialize
+  // #initialize
 
-  //#track-location
+  // #track-location
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {
     log.debug(s"onLocationTrackingEvent called: $trackingEvent")
     trackingEvent match {
@@ -146,9 +146,9 @@ class SampleHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext
       case LocationRemoved(_) => log.info("HCD no longer available")
     }
   }
-  //#track-location
+  // #track-location
 
-  //#subscribe
+  // #subscribe
   private val counterEventKey = EventKey(Prefix("CSW.samplehcd"), EventName("HcdCounter"))
   private val hcdCounterKey   = KeyType.IntKey.make("counter")
 
@@ -175,7 +175,7 @@ class SampleHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext
     log.info("Stopping subscription.")
     maybeEventSubscription.foreach(_.unsubscribe())
   }
-  //#subscribe
+  // #subscribe
 
   override def validateCommand(runId: Id, controlCommand: ControlCommand): ValidateCommandResponse = Accepted(runId)
 

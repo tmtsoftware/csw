@@ -21,8 +21,8 @@ import scala.concurrent.duration.DurationDouble
 
 class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
-  //DEOPSCSW-222: Locking a component for a specific duration
-  //CSW-86: Subsystem should be case-insensitive
+  // DEOPSCSW-222: Locking a component for a specific duration
+  // CSW-86: Subsystem should be case-insensitive
   test("should able to lock and unlock a component | DEOPSCSW-222") {
     val lockingStateProbe = TestProbe[LockingResponse]()
     val mocks             = frameworkTestMocks()

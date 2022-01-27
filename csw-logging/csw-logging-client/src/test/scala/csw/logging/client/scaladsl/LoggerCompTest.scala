@@ -40,13 +40,13 @@ class LoggerCompTest extends LoggingTestSuite {
   }
 
   def allComponentsStartLogging(): Unit = {
-    //componentName = IRIS
+    // componentName = IRIS
     sendMessagesToActor(irisSupervisorActorRef)
     irisTLA.startLogging()
-    //Generic Logger
+    // Generic Logger
     sendMessagesToActor(irisUtilActorRef)
     irisUtil.startLogging(logMsgMap)
-    //componentName = tromboneHcd
+    // componentName = tromboneHcd
     tromboneHcd.startLogging(logMsgMap)
     Thread.sleep(300)
   }

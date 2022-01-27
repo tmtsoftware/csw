@@ -34,10 +34,10 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
     log.info("Initializing Component TLA")
     Thread.sleep(100)
 
-    //#currentStatePublisher
+    // #currentStatePublisher
     // Publish the CurrentState using parameter set created using a sample Choice parameter
     currentStatePublisher.publish(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
-    //#currentStatePublisher
+    // #currentStatePublisher
 
     // DEOPSCSW-219: Discover component connection using HTTP protocol
     trackConnection(httpConnection)
@@ -110,7 +110,7 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
     Thread.sleep(500)
   }
 
-  //#onDiagnostic-mode
+  // #onDiagnostic-mode
   // While dealing with mutable state, make sure you create a worker actor to avoid concurrency issues
   // For functionality demonstration, we have simply used a mutable variable without worker actor
   var diagModeCancellable: Option[Cancellable] = None
@@ -124,13 +124,13 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
       case _ =>
     }
   }
-  //#onDiagnostic-mode
+  // #onDiagnostic-mode
 
-  //#onOperations-mode
+  // #onOperations-mode
   override def onOperationsMode(): Unit = {
     diagModeCancellable.foreach(_.cancel())
   }
-  //#onOperations-mode
+  // #onOperations-mode
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit =
     trackingEvent match {

@@ -29,7 +29,7 @@ class RolesTest extends AnyFunSuite with Matchers {
   test("containsUserRole should give false if user role for given subsystem is not present") {
     val subsystems      = Subsystem.values.toList
     val roles           = Roles(Set(s"${subsystems.head}-user"))
-    val randomSubsystem = RandomUtils.randomFrom(subsystems.tail) //random subsystem other than the one present in roles
+    val randomSubsystem = RandomUtils.randomFrom(subsystems.tail) // random subsystem other than the one present in roles
 
     roles.containsUserRole(randomSubsystem) shouldBe false
   }
@@ -44,7 +44,7 @@ class RolesTest extends AnyFunSuite with Matchers {
   test("containsEngRole should give false if eng role for given subsystem is not present") {
     val subsystems      = Subsystem.values.toList
     val roles           = Roles(Set(s"${subsystems.head}-eng"))
-    val randomSubsystem = RandomUtils.randomFrom(subsystems.tail) //random subsystem other than the one present in roles
+    val randomSubsystem = RandomUtils.randomFrom(subsystems.tail) // random subsystem other than the one present in roles
 
     roles.containsEngRole(randomSubsystem) shouldBe false
   }

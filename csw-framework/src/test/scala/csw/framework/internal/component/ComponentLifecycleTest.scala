@@ -167,7 +167,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     onewayResponseProbe.expectNoMessage(3.seconds)
   }
 
-  //DEOPSCSW-313: Support short running actions by providing immediate response
+  // DEOPSCSW-313: Support short running actions by providing immediate response
   test(
     "running component can send an immediate response to a submit command and avoid invoking further processing | DEOPSCSW-177, DEOPSCSW-179, DEOPSCSW-313"
   ) {
@@ -209,7 +209,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
 
     val idCaptor = ArgumentCaptor.forClass(classOf[Id])
 
-    //val invalid = Invalid(sc1.commandName, testId, OtherIssue("error from the test command"))
+    // val invalid = Invalid(sc1.commandName, testId, OtherIssue("error from the test command"))
     when(sampleHcdHandler.validateCommand(idCaptor.capture(), any[Setup]))
       .thenAnswer(arg => Invalid(arg.getArgument(0, classOf[Id]), OtherIssue("error from the test command")))
     doNothing.when(sampleHcdHandler).onOneway(any[Id], any[Setup])

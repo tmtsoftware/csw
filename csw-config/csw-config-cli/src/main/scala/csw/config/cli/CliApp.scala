@@ -13,7 +13,7 @@ class CliApp(commandLineRunner: CommandLineRunner) {
     options.op match {
       case "login"  => commandLineRunner.login(options)
       case "logout" => commandLineRunner.logout()
-      //adminApi
+      // adminApi
       case "create"             => commandLineRunner.create(options)
       case "update"             => commandLineRunner.update(options)
       case "get"                => commandLineRunner.get(options)
@@ -26,7 +26,7 @@ class CliApp(commandLineRunner: CommandLineRunner) {
       case "getActiveVersion"   => commandLineRunner.getActiveVersion(options)
       case "getActiveByTime"    => commandLineRunner.getActiveByTime(options)
       case "getMetadata"        => commandLineRunner.getMetadata(options)
-      //clientApi
+      // clientApi
       case "exists"    => commandLineRunner.exists(options)
       case "getActive" => commandLineRunner.getActive(options)
       case x           => throw new RuntimeException(s"Unknown operation: $x")

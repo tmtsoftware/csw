@@ -36,7 +36,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
   var commandHandler: ActorRef[CommandHandlerMsgs]                 = _
   val timeout: FiniteDuration                                      = 5.seconds
 
-  //#initialize-handler
+  // #initialize-handler
   override def initialize(): Unit = {
 
     // Initialization could include following steps :
@@ -67,49 +67,49 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
     }
 
   }
-  //#initialize-handler
+  // #initialize-handler
 
-  //#validateCommand-handler
+  // #validateCommand-handler
   override def validateCommand(runId: Id, controlCommand: ControlCommand): ValidateCommandResponse =
     controlCommand match {
       case _: Setup   => Accepted(runId) // validation for setup goes here
       case _: Observe => Accepted(runId) // validation for observe goes here
     }
-  //#validateCommand-handler
+  // #validateCommand-handler
 
-  //#onSubmit-handler
+  // #onSubmit-handler
   override def onSubmit(runId: Id, controlCommand: ControlCommand): SubmitResponse =
     controlCommand match {
       case setup: Setup     => submitSetup(runId, setup)     // includes logic to handle Submit with Setup config command
       case observe: Observe => submitObserve(runId, observe) // includes logic to handle Submit with Observe config command
     }
-  //#onSubmit-handler
+  // #onSubmit-handler
 
-  //#onOneway-handler
+  // #onOneway-handler
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit =
     controlCommand match {
       case setup: Setup     => onewaySetup(runId, setup)     // includes logic to handle Oneway with Setup config command
       case observe: Observe => onewayObserve(runId, observe) // includes logic to handle Oneway with Observe config command
     }
-  //#onOneway-handler
+  // #onOneway-handler
 
-  //#onGoOffline-handler
+  // #onGoOffline-handler
   override def onGoOffline(): Unit = {
     // do something when going offline
   }
-  //#onGoOffline-handler
+  // #onGoOffline-handler
 
-  //#onGoOnline-handler
+  // #onGoOnline-handler
   override def onGoOnline(): Unit = {
     // do something when going online
   }
-  //#onGoOnline-handler
+  // #onGoOnline-handler
 
-  //#onShutdown-handler
+  // #onShutdown-handler
   override def onShutdown(): Unit = {
     // clean up resources
   }
-  //#onShutdown-handler
+  // #onShutdown-handler
 
   override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = {
     // do something on Diagnostic Mode
@@ -119,13 +119,13 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
     // do something on Operations Mode
   }
 
-  //#onLocationTrackingEvent-handler
+  // #onLocationTrackingEvent-handler
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit =
     trackingEvent match {
       case LocationUpdated(location)   => // do something for the tracked location when it is updated
       case LocationRemoved(connection) => // do something for the tracked location when it is no longer available
     }
-  //#onLocationTrackingEvent-handler
+  // #onLocationTrackingEvent-handler
 
   private def processSetup(sc: Setup): Unit = {
     sc.commandName.toString match {
@@ -163,7 +163,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
    * Below methods are just here to show how exceptions can be used to either restart or stop supervisor
    * This are snipped in paradox documentation
    */
-  //#failureRestart-Exception
+  // #failureRestart-Exception
   case class HcdNotFoundException() extends FailureRestart("Could not resolve hcd location. Initialization failure.")
 
   private def resolveHcd(): Future[Option[AkkaLocation]] = {
@@ -180,7 +180,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
       case _ => Future.successful(None)
     }
   }
-  //#failureRestart-Exception
+  // #failureRestart-Exception
 
   // #failureStop-Exception
   case class ConfigNotAvailableException() extends FailureStop("Configuration not available. Initialization failure.")

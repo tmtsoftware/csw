@@ -62,9 +62,9 @@ private[client] trait StatusServiceModule extends StatusService {
       val originalStatus  = await(getStatus(alarmKey))
 
       val acknowledgedStatus = originalStatus.copy(
-        //reset operation acknowledges alarm
+        // reset operation acknowledges alarm
         acknowledgementStatus = Acknowledged,
-        //reset operation changes latched severity to current severity
+        // reset operation changes latched severity to current severity
         latchedSeverity = currentSeverity
       )
 

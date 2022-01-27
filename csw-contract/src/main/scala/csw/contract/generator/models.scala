@@ -13,9 +13,9 @@ class ModelType[T: Encoder: Decoder: ClassTag] private (val models: List[T]) {
 }
 
 object ModelType extends CommonCodecs {
-  def apply[T: Encoder: Decoder: ClassTag](models: T*): ModelType[T]      = new ModelType(models.toList)
-  def apply[T: Encoder: Decoder: ClassTag](models: List[T]): ModelType[T] = new ModelType(models)
-  def apply[T <: EnumEntry: Enum: ClassTag](enum: Enum[T]): ModelType[T]  = new ModelType(enum.values.toList)
+  def apply[T: Encoder: Decoder: ClassTag](models: T*): ModelType[T]       = new ModelType(models.toList)
+  def apply[T: Encoder: Decoder: ClassTag](models: List[T]): ModelType[T]  = new ModelType(models)
+  def apply[T <: EnumEntry: Enum: ClassTag](`enum`: Enum[T]): ModelType[T] = new ModelType(`enum`.values.toList)
 }
 
 class ModelSet private (val modelTypes: List[ModelType[_]])
