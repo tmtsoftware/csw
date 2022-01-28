@@ -27,6 +27,7 @@ jobs:
       - run: npm install -g junit-viewer
 
       - name: Get tag
+        id: tag
         uses: dawidd6/action-get-tag@v1
         with:
           #strip `v` prefix
