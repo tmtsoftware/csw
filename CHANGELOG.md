@@ -15,8 +15,6 @@ See [here](https://tmtsoftware.github.io/csw/4.0.1-RC1/) for a detailed document
 
 ### Changes
 - Add `NOT_READY` choice to OperationalState
-- Add `csw-version` in Metadata of Registration object. This field is used while detecting csw version conflicts.
-- Added optional argument to Angle.raToString and Angle.deToString to return the format "hh:mm:ss.sss" or "dd:mm:ss.sss"
 - Add `coaddsInExposure` and `coaddsDone` params in `OpticalDetectorExposureData` Observe event
 
 ### Documentation
