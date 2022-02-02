@@ -25,7 +25,7 @@ public interface JUnits {
     Units micron      = Units.micron$.MODULE$;
     Units micrometer  = Units.micrometer$.MODULE$;
     Units minute      = Units.minute$.MODULE$;
-    Units nanometers   = Units.nanometers$.MODULE$;
+    Units nanometer   = Units.nanometers$.MODULE$;
     Units newton      = Units.newton$.MODULE$;
     Units pascal      = Units.pascal$.MODULE$;
     Units radian      = Units.radian$.MODULE$;
