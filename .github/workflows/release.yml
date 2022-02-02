@@ -12,7 +12,7 @@ jobs:
       ESW_TS_VERSION: "0.3.0-RC1"
     steps:
       - uses: actions/checkout@v2
-      - uses: laughedelic/coursier-setup@v1
+      - uses: coursier/setup-action@v1.2.0-M2
         with:
           jvm: 11
           apps: sbt sbtn
