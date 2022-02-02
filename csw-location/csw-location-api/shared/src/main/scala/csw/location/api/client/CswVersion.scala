@@ -9,8 +9,8 @@ trait CswVersion {
 }
 
 object CswVersion {
-  //this method return a no-op instance of CswVersion
-  //which is to be used for scala-js
+  // this method return a no-op instance of CswVersion
+  // which is to be used for scala-js
   def noOp: CswVersion = new CswVersion {
     override def check(metadata: Metadata, prefix: Prefix): Boolean = true
     override def get: String                                        = "no-version"
