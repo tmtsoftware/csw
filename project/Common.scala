@@ -55,6 +55,7 @@ object Common {
     javacOptions ++= Seq(
       "-Xlint:unchecked"
     ),
+    javaOptions += "-Xmx2G",
     Compile / doc / javacOptions ++= Seq("-Xdoclint:none"),
     doc / javacOptions ++= Seq("--ignore-source-errors"),
     Test / testOptions ++= reporterOptions,
