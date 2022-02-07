@@ -17,7 +17,7 @@ addSbtPlugin("com.dwijnand"                      % "sbt-project-graph"         %
 addSbtPlugin("com.timushev.sbt"                  % "sbt-rewarn"                % "0.1.3")
 
 resolvers += "jitpack" at "https://jitpack.io"
-libraryDependencies += "com.github.tmtsoftware" % "sbt-docs" % "0.5.0"
+libraryDependencies += "com.github.tmtsoftware" % "sbt-docs" % "62893b8"
 
 classpathTypes += "maven-plugin"
 
