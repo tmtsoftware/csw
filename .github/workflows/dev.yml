@@ -22,7 +22,7 @@ jobs:
         with:
           jvm: 11
           apps: sbt sbtn
-      - uses: coursier/cache-action@v5
+      - uses: coursier/cache-action@v6
 
       - name: Configure ntp time
         run: |
@@ -65,7 +65,7 @@ jobs:
         with:
           jvm: 11
           apps: sbt sbtn
-      - uses: coursier/cache-action@v5
+      - uses: coursier/cache-action@v6
 
       - name: Docs Check
         run: |
