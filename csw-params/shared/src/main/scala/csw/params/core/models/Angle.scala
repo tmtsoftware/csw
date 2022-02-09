@@ -28,9 +28,9 @@ case class Angle(uas: Long) extends /*AnyVal with*/ Serializable with Ordered[An
 
   // Note: extending AnyVal is an optimization, since the value 'uas' is inlined, but it makes Java interop confusing...
 
-  //require(uas> - Angle.CIRCLE && uas < Angle.CIRCLE, "out of range, possible overflow ");
+  // require(uas> - Angle.CIRCLE && uas < Angle.CIRCLE, "out of range, possible overflow ");
 
-  //operators
+  // operators
   def +(a2: Angle): Angle                = new Angle(uas + a2.uas)
   def -(a2: Angle): Angle                = new Angle(uas - a2.uas)
   def *(a2: Double): Angle               = new Angle((uas * a2).toLong)
@@ -85,7 +85,7 @@ object Angle {
     def mas: Angle       = Angle((value * 1000).toLong)
   }
 
-  //implicit conversions
+  // implicit conversions
   implicit def long2angle(d: Long): AngleWrapperDouble     = new AngleWrapperDouble(d.toDouble)
   implicit def int2angle(d: Int): AngleWrapperDouble       = new AngleWrapperDouble(d.toDouble)
   implicit def double2angle(d: Double): AngleWrapperDouble = new AngleWrapperDouble(d)
@@ -197,15 +197,15 @@ object Angle {
    * </pre>
    */
   def parseRaDe(str: String): (Angle, Angle) = {
-    //20 54 05.689 +37 01 17.38, 10:12:45.3-45:17:50
+    // 20 54 05.689 +37 01 17.38, 10:12:45.3-45:17:50
     lazy val r1 = "([0-9]{2})[ :]([0-9]{2})[ :]([0-9]{2}\\.[0-9]+)[ ]?(\\+|-)([0-9]{2})[ :]([0-9]{2})[ :]([0-9]{2}\\.?[0-9]*)".r
-    //15h17m-11d10m, 15h17+89d15
+    // 15h17m-11d10m, 15h17+89d15
     lazy val r2 = "([0-9]{2})h([0-9]{2})[m]?(\\+|-)([0-9]{2})d([0-9]{2})[m]?".r
-    //275d11m15.6954s+17d59m59.876s
+    // 275d11m15.6954s+17d59m59.876s
     lazy val r3 = "([0-9]{2,3}d[0-9]{2}m[0-9]{2}\\.[0-9]+s)([\\+-][0-9]{2}d[0-9]{2}m[0-9]{2}\\.[0-9]+s)".r
-    //12.34567h-17.87654d
+    // 12.34567h-17.87654d
     lazy val r4 = "([0-9]{1,2}\\.[0-9]+)h([\\+-][0-9]{2}\\.[0-9]+)d".r
-    //350.123456d-17.33333d <=> 350.123456 -17.33333
+    // 350.123456d-17.33333d <=> 350.123456 -17.33333
     lazy val r5 = "([0-9]{1,3}\\.?[0-9]*)[d]?[ ]?([\\+-]?[0-9]{1,2}\\.?[0-9]*)[d]?".r
 
     str match {
@@ -340,13 +340,13 @@ object Angle {
    * @return distance of two points in radians
    */
   def distance(ra1: Double, de1: Double, ra2: Double, de2: Double): Double = {
-    //check ranges
+    // check ranges
     assertRa(ra1)
     assertRa(ra2)
     assertDe(de1)
     assertDe(de2)
 
-    //this code is from JH labs projection lib
+    // this code is from JH labs projection lib
     val dlat = math.sin((de2 - de1) / 2)
     val dlon = math.sin((ra2 - ra1) / 2)
     val r    = math.sqrt(dlat * dlat + Math.cos(de1) * Math.cos(de2) * dlon * dlon)

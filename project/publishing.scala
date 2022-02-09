@@ -7,8 +7,8 @@ object NoPublish extends AutoPlugin {
   override def projectSettings: Seq[Setting[_]] =
     Seq(
       publishArtifact := false,
-      publish := {},
-      publishLocal := {}
+      publish         := {},
+      publishLocal    := {}
     )
 }
 

@@ -350,7 +350,7 @@ object Dependencies {
       Libs.`scala-reflect`,
       Libs.`scala-java8-compat`,
       Keycloak.`keycloak-adapter-core`,
-      //TODO: make this as provided deps
+      // TODO: make this as provided deps
       Libs.`scalatest`.value,
       Libs.`embedded-redis`,
       Libs.`otj-pg-embedded`,
@@ -399,7 +399,7 @@ object Dependencies {
       Libs.`config`,
       Keycloak.`keycloak-installed`,
       Libs.`os-lib`,
-      //(legacy dependencies) required*
+      // (legacy dependencies) required*
       Libs.`scalatest`.value % Test,
       Libs.`mockito`         % Test
     )
@@ -415,7 +415,7 @@ object Dependencies {
       Keycloak.`keycloak-adapter-core`,
       AkkaHttp.`akka-http`,
       Libs.`scala-async`,
-      //(legacy dependencies) required*
+      // (legacy dependencies) required*
       Libs.`jboss-logging`,
       Libs.httpclient,
       Libs.`scalatest`.value % Test,

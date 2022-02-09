@@ -27,7 +27,7 @@ object Settings {
 
     Seq(
       MultiJvm / test / aggregate := false,
-      MultiJvm / test := Def.sequential(tasks).value
+      MultiJvm / test             := Def.sequential(tasks).value
     )
   }
 

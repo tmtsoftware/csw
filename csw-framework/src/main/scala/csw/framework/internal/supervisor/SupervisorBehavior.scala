@@ -111,7 +111,7 @@ private[framework] final class SupervisorBehavior(
     (lifecycleState, msg) match {
       case (SupervisorLifecycleState.Lock, LockAboutToTimeout(replyTo)) => replyTo ! LockExpiringShortly
       case (SupervisorLifecycleState.Lock, LockTimedout(replyTo)) => replyTo ! LockExpired; onLockTimeout()
-      //SupervisorLockMessage has Submit/Oneway as well along with Lock to allow commands from locking source
+      // SupervisorLockMessage has Submit/Oneway as well along with Lock to allow commands from locking source
       case (SupervisorLifecycleState.Lock, message: SupervisorLockMessage)                     => onRunning(message)
       case (SupervisorLifecycleState.Lock, message)                                            => ignore(message)
       case (_, commonMessage: ComponentCommonMessage)                                          => onCommon(commonMessage)
@@ -120,9 +120,9 @@ private[framework] final class SupervisorBehavior(
       case (SupervisorLifecycleState.Running, message: SupervisorInternalRunningMessage)       => onInternalRunning(message)
       case (SupervisorLifecycleState.Running, runningMessage: SupervisorRunningMessage)        => onRunning(runningMessage)
       case (SupervisorLifecycleState.RunningOffline, runningMessage: SupervisorRunningMessage) => onRunning(runningMessage)
-      case (_, GetComponentLogMetadata(replyTo))                                               => replyTo ! LogAdminUtil.getLogMetadata(prefix)
-      case (_, SetComponentLogLevel(logLevel))                                                 => LogAdminUtil.setComponentLogLevel(prefix, logLevel)
-      case (_, message)                                                                        => ignore(message)
+      case (_, GetComponentLogMetadata(replyTo)) => replyTo ! LogAdminUtil.getLogMetadata(prefix)
+      case (_, SetComponentLogLevel(logLevel))   => LogAdminUtil.setComponentLogLevel(prefix, logLevel)
+      case (_, message)                          => ignore(message)
     }
     this
   }
@@ -179,7 +179,7 @@ private[framework] final class SupervisorBehavior(
 
   private def onInitializeTimeout(): Unit = {
     log.error("Component TLA initialization timed out")
-    //TODO Alert operator somehow
+    // TODO Alert operator somehow
   }
 
   private def onComponentRunning(componentRef: ActorRef[RunningMessage]): Unit = {
@@ -194,7 +194,7 @@ private[framework] final class SupervisorBehavior(
   }
 
   private def registerWithLocationService(componentRef: ActorRef[RunningMessage]): Unit = {
-    //Honour DoNotRegister received in componentInfo
+    // Honour DoNotRegister received in componentInfo
     if (componentInfo.locationServiceUsage == DoNotRegister) ctx.self ! RegistrationNotRequired(componentRef)
     else
       (locationService.register(akkaRegistration) zip httpService.bindAndRegister()).onComplete {
@@ -270,7 +270,7 @@ private[framework] final class SupervisorBehavior(
         if (lockManager.allowCommand(cmdMsg)) runningComponent.get ! cmdMsg
         else cmdMsg.replyTo ! Locked(Id()) /// NOTE: Here creating new ID which is different than old impl
       case runningMessage: RunningMessage => handleRunningMessage(runningMessage)
-      case msg @ Running(_)               => log.info(s"Ignoring [$msg] message received from TLA as Supervisor already in Running state")
+      case msg @ Running(_) => log.info(s"Ignoring [$msg] message received from TLA as Supervisor already in Running state")
     }
 
   private def lockComponent(source: Prefix, replyTo: ActorRef[LockingResponse], leaseDuration: FiniteDuration): Unit = {
@@ -327,7 +327,7 @@ private[framework] final class SupervisorBehavior(
         case SupervisorLifecycleState.Restart  => spawn()
         case SupervisorLifecycleState.Shutdown => ctx.system.terminate()
         case SupervisorLifecycleState.Idle     => if (isStandalone) throw InitializationFailed
-        case _                                 => updateLifecycleState(SupervisorLifecycleState.Idle) // Change to idle and expect Restart/Shutdown from outside
+        case _ => updateLifecycleState(SupervisorLifecycleState.Idle) // Change to idle and expect Restart/Shutdown from outside
       }
       this
     case PostStop =>

@@ -58,9 +58,9 @@ object Units extends Enum[Units] {
   case object nanometer  extends Units("nm", "nanometers 10-9 m")
   case object newton      extends Units("N", "Newton: force")
   case object pascal      extends Units("Pa", "Pascal: pressure")
-  case object radian      extends Units("rad", "radian: angular measurement of the ratio between the length of an arc and its radius")
-  case object second      extends Units("s", "second: base unit of time in SI")
-  case object sday        extends Units("sday", "sidereal day is the time of one rotation of the Earth: 8.6164x10+4 s")
+  case object radian extends Units("rad", "radian: angular measurement of the ratio between the length of an arc and its radius")
+  case object second extends Units("s", "second: base unit of time in SI")
+  case object sday   extends Units("sday", "sidereal day is the time of one rotation of the Earth: 8.6164x10+4 s")
   case object steradian   extends Units("sr", "steradian: unit of solid angle in SI - rad+2")
   case object microarcsec extends Units("µas", "micro arcsec: angular measurement")
   case object volt        extends Units("V", "Volt: electric potential or electromotive force")
@@ -94,7 +94,7 @@ object Units extends Enum[Units] {
   case object count   extends Units("ct", "counts as for an encoder or detector")
   case object pix     extends Units("pix", "pixel")
 
-  //Datetime units
+  // Datetime units
   case object tai extends Units("TAI", "TAI time unit")
   case object utc extends Units("UTC", "UTC time unit")
 }

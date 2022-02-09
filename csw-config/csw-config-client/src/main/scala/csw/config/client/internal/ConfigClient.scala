@@ -243,7 +243,7 @@ private[config] class ConfigClient(
           case StatusCodes.OK if lengthOption.isDefined =>
             Future.successful(Some(ConfigData.from(response.entity.dataBytes, lengthOption.get)))
           case StatusCodes.OK =>
-            //Not consuming the file content will block the connection.
+            // Not consuming the file content will block the connection.
             response.entity.discardBytes()
             logger.error(EmptyResponse.getMessage, ex = EmptyResponse)
             throw EmptyResponse

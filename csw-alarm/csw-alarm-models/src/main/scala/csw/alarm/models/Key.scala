@@ -78,7 +78,7 @@ object Key {
     private[alarm] def apply(keyStr: String): AlarmKey =
       keyStr.split(KeySeparator) match {
         case Array(subsystem, component, name) => AlarmKey(Prefix(Subsystem.withNameInsensitive(subsystem), component), name)
-        case _                                 => throw new IllegalArgumentException(s"Unable to parse '$keyStr' to make AlarmKey object")
+        case _ => throw new IllegalArgumentException(s"Unable to parse '$keyStr' to make AlarmKey object")
       }
   }
 }

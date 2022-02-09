@@ -51,7 +51,7 @@ class CommandTest extends AnyFunSuite with Matchers {
     val opt        = Options(List(Prefix("csw.redisTest_misSpelledKey")), appConfigFile = Option(configFile))
     val c: Command = Command.parse(opt)
 
-    //due to mis-spelled key, false command is returned. which upon execution does nothing.
+    // due to mis-spelled key, false command is returned. which upon execution does nothing.
     c.commandText shouldBe "false"
   }
 

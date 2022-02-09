@@ -7,26 +7,27 @@ on:
 
 jobs:
   release:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     env:
-      ESW_TS_VERSION: "0.2.0"
+      ESW_TS_VERSION: "0.3.0"
     steps:
       - uses: actions/checkout@v2
-      - uses: laughedelic/coursier-setup@v1
+      - uses: coursier/setup-action@v1.2.0-M2
         with:
           jvm: 11
           apps: sbt sbtn
-      - uses: coursier/cache-action@v5
+      - uses: coursier/cache-action@v6
 
       - uses: actions/setup-node@v1
         with:
-          node-version: "14.x"
+          node-version: "16.x"
           registry-url: "https://registry.npmjs.org"
 
       - run: npm install -g junit-merge
       - run: npm install -g junit-viewer
 
       - name: Get tag
+        id: tag
         uses: dawidd6/action-get-tag@v1
         with:
           #strip `v` prefix
@@ -66,7 +67,7 @@ jobs:
       - name: Generate RTM
         if: always()
         run: |
-          cs launch --channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/apps.json rtm:0.2.0 -- target/RTM/testStoryMapping.txt tools/RTM/cswStoryToRequirementMap.csv target/RTM/testRequirementsMapping.txt
+          cs launch --channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/apps.json rtm:0.3.0 -- target/RTM/testStoryMapping.txt tools/RTM/cswStoryToRequirementMap.csv target/RTM/testRequirementsMapping.txt
 
       - name: Upload RTM
         if: always()

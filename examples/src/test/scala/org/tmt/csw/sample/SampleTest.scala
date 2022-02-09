@@ -19,16 +19,16 @@ import scala.concurrent.Await
 //#intro
 class SampleTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with AnyFunSuiteLike {
   import frameworkTestKit._
-  //#intro
+  // #intro
 
-  //#setup
+  // #setup
   override def beforeAll(): Unit = {
     super.beforeAll()
     spawnStandalone(com.typesafe.config.ConfigFactory.load("SampleStandalone.conf"))
   }
-  //#setup
+  // #setup
 
-  //#locate
+  // #locate
   import scala.concurrent.duration._
   test("Assembly should be locatable using Location Service") {
     val connection   = AkkaConnection(ComponentId(Prefix(CSW, "sample"), ComponentType.Assembly))
@@ -36,13 +36,13 @@ class SampleTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) wit
 
     akkaLocation.connection shouldBe connection
   }
-  //#locate
+  // #locate
 
   test("should be able to spawn a assembly without providing config file") {
 
-    //#spawn-assembly
+    // #spawn-assembly
     spawnAssembly(Prefix("TCS.sampleAssembly"), (ctx, cswCtx) => new SampleHandlers(ctx, cswCtx))
-    //#spawn-assembly
+    // #spawn-assembly
 
     val assemblyConnection = AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "sampleAssembly"), Assembly))
     val assemblyLocation   = Await.result(locationService.resolve(assemblyConnection, 5.seconds), 10.seconds)
@@ -51,7 +51,7 @@ class SampleTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) wit
 
   test("should be able to spawn a assembly with DefaultComponentHandlers") {
 
-    //#spawn-assembly-with-default-handlers
+    // #spawn-assembly-with-default-handlers
     spawnAssembly(
       Prefix("TCS.defaultAssembly"),
       (ctx, cswCtx) =>
@@ -68,7 +68,7 @@ class SampleTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) wit
           }
         }
     )
-    //#spawn-assembly-with-default-handlers
+    // #spawn-assembly-with-default-handlers
 
     val assemblyConnection = AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "defaultAssembly"), Assembly))
     val assemblyLocation   = Await.result(locationService.resolve(assemblyConnection, 5.seconds), 10.seconds)

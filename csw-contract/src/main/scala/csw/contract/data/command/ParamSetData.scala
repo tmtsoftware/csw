@@ -60,7 +60,7 @@ object ParamSetData {
   private val minorPlanetCoord = MinorPlanetCoord(Tag("GUIDER1"), 2000, 90.degree, 2.degree, 100.degree, 1.4, 0.234, 220.degree)
   private val cometCoord       = CometCoord(Tag("BASE"), 2000.0, 90.degree, 2.degree, 100.degree, 1.4, 0.234)
   private val altAzCoord       = AltAzCoord(Tag("BASE"), 301.degree, 42.5.degree)
-  private val p27              = CoordKey.make("CoordKey").set(eqCoord, solarSystemCoord, minorPlanetCoord, cometCoord, altAzCoord)
+  private val p27 = CoordKey.make("CoordKey").set(eqCoord, solarSystemCoord, minorPlanetCoord, cometCoord, altAzCoord)
 
   val paramSet: Set[Parameter[_]] =
     Set(

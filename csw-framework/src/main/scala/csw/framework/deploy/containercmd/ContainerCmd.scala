@@ -11,7 +11,6 @@ import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
 import csw.prefix.models.{Prefix, Subsystem}
 
-import java.io.Closeable
 import java.nio.file.Path
 import scala.async.Async.{async, await}
 import scala.concurrent.duration.DurationDouble
@@ -31,11 +30,8 @@ object ContainerCmd {
    * alone without any container
    * @return                  Actor ref of the container or supervisor of the component started without container
    */
-  def start(name: String, subsystem: Subsystem, args: Array[String], defaultConfig: Option[Config] = None): Closeable = {
-    val container = new ContainerCmd(name, subsystem, true, defaultConfig)
-    container.start(args)
-    () => container.shutdown()
-  }
+  def start(name: String, subsystem: Subsystem, args: Array[String], defaultConfig: Option[Config] = None): ActorRef[_] =
+    new ContainerCmd(name, subsystem, true, defaultConfig).start(args)
 }
 
 private[framework] class ContainerCmd(

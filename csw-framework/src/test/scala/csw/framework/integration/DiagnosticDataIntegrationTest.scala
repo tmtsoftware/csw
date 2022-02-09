@@ -63,7 +63,7 @@ class DiagnosticDataIntegrationTest extends FrameworkIntegrationSuite {
 
     supervisorRef ! DiagnosticMode(UTCTime.now(), "engineering")
 
-    eventProbe.expectMessageType[SystemEvent] //discard invalid event
+    eventProbe.expectMessageType[SystemEvent] // discard invalid event
     val diagnosticModeEvent = eventProbe.expectMessageType[SystemEvent]
     diagnosticModeEvent.eventKey shouldBe diagnosticKey
     diagnosticModeEvent.paramSet.head shouldBe diagnosticModeParam

@@ -46,7 +46,7 @@ class LocationAgent(
       // delay the registration of component after executing the command
       Thread.sleep(command.delay)
 
-      //Register all connections as Http or Tcp
+      // Register all connections as Http or Tcp
       val results = command.httpPath match {
         case Some(path) => Await.result(Future.traverse(prefixes)(registerHttpName(_, path, process.pid(), agentPrefix)), timeout)
         case None       => Await.result(Future.traverse(prefixes)(registerTcpName(_, process.pid(), agentPrefix)), timeout)

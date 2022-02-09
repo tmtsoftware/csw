@@ -4,7 +4,7 @@ import java.nio.file.{Files, Path, Paths}
 
 class ArgsUtil {
 
-  val relativeRepoPath          = "/path/hcd/trombone.conf"
+  val relativeRepoPath = "/path/hcd/trombone.conf"
   val inputFileContents: String = """
                            |axisName1 = tromboneAxis1
                            |axisName2 = tromboneAxis2

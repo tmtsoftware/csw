@@ -55,8 +55,8 @@ class DatabaseServiceFactoryTest extends AnyFunSuite with Matchers with BeforeAn
     typedSystem.whenTerminated.futureValue
   }
 
-  //DEOPSCSW-618: Integration with Location Service
-  //DEOPSCSW-606: Examples for storing and using authentication information
+  // DEOPSCSW-618: Integration with Location Service
+  // DEOPSCSW-606: Examples for storing and using authentication information
   test(
     "should create DSLContext using location service and dbName | DEOPSCSW-618, DEOPSCSW-621, DEOPSCSW-615, DEOPSCSW-620, DEOPSCSW-606"
   ) {
@@ -70,8 +70,8 @@ class DatabaseServiceFactoryTest extends AnyFunSuite with Matchers with BeforeAn
     resultSet should contain("box_office")
   }
 
-  //DEOPSCSW-618: Integration with Location Service
-  //DEOPSCSW-606: Examples for storing and using authentication information
+  // DEOPSCSW-618: Integration with Location Service
+  // DEOPSCSW-606: Examples for storing and using authentication information
   test(
     "should create DSLContext using location service, dbName, usernameHolder and passwordHolder | DEOPSCSW-618, DEOPSCSW-621, DEOPSCSW-615, DEOPSCSW-620, DEOPSCSW-606"
   ) {
@@ -97,7 +97,7 @@ class DatabaseServiceFactoryTest extends AnyFunSuite with Matchers with BeforeAn
     resultSet should contain("box_office")
   }
 
-  //DEOPSCSW-605: Examples for multiple database support
+  // DEOPSCSW-605: Examples for multiple database support
   test("should be able to connect to other database | DEOPSCSW-620, DEOPSCSW-621, DEOPSCSW-615, DEOPSCSW-605") {
     // create a new database
     testDsl.query("CREATE DATABASE postgres2").executeAsyncScala().futureValue

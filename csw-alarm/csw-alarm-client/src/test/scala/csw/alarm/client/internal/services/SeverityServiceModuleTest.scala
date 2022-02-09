@@ -70,17 +70,17 @@ class SeverityServiceModuleTest
     status.latchedSeverity shouldBe Disconnected
     status.shelveStatus shouldBe Unshelved
 
-    //set severity to Major
+    // set severity to Major
     val status1 = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
     status1.acknowledgementStatus shouldBe Unacknowledged
     status1.latchedSeverity shouldBe Major
     status1.shelveStatus shouldBe Unshelved
 
-    //get severity and assert
+    // get severity and assert
     val alarmSeverity = testSeverityApi.get(tromboneAxisHighLimitAlarmKey).await.get
     alarmSeverity shouldEqual Major
 
-    //wait for 1 second and assert expiry of severity
+    // wait for 1 second and assert expiry of severity
     Thread.sleep(1000)
     val severityAfter1Second = getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await
     severityAfter1Second shouldEqual Disconnected
@@ -462,7 +462,7 @@ class SeverityServiceModuleTest
 
     enclosureTempLowAlarm.isActive shouldBe false
     setSeverity(enclosureTempLowAlarmKey, Critical).await
-    testProbe.expectNoMessage(200.millis) //enclosureTempLowAlarmKey is inactive, hence aggregated severity is still Disconnected
+    testProbe.expectNoMessage(200.millis) // enclosureTempLowAlarmKey is inactive, hence aggregated severity is still Disconnected
 
     alarmSubscription.unsubscribe()
   }
@@ -500,10 +500,10 @@ class SeverityServiceModuleTest
 
       getStatus(alarmKey).await.latchedSeverity shouldBe oldLatchedSeverity
 
-      //set severity to new Severity
+      // set severity to new Severity
       val status = setSeverityAndGetStatus(alarmKey, newSeverity)
 
-      //get severity and assert
+      // get severity and assert
       status.latchedSeverity shouldEqual expectedLatchedSeverity
     }
   }
@@ -518,10 +518,10 @@ class SeverityServiceModuleTest
 
       getStatus(alarmKey).await.acknowledgementStatus shouldBe oldAckStatus
 
-      //set severity to new Severity
+      // set severity to new Severity
       val status = setSeverityAndGetStatus(alarmKey, newSeverity)
 
-      //get severity and assert
+      // get severity and assert
       status.acknowledgementStatus shouldEqual newAckStatus
     }
   }
@@ -543,7 +543,7 @@ class SeverityServiceModuleTest
 
       val status = getStatus(alarmKey).await
 
-      //get severity and assert
+      // get severity and assert
       status.acknowledgementStatus shouldEqual newAckStatus
     }
   }

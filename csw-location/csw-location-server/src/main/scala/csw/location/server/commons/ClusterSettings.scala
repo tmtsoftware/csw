@@ -60,68 +60,68 @@ private[csw] case class ClusterSettings(clusterName: String = Constants.ClusterN
 
   private def withEntry(key: String, value: Any): ClusterSettings = copy(values = values + (key -> value))
 
-  //This method should be used for testing only.
+  // This method should be used for testing only.
   def withEntries(entries: Map[String, Any]): ClusterSettings = copy(values = values ++ entries)
 
-  //InterfaceName should be ideally provided via env variables.
-  //It should contain the value where csw-cluster has to be started.
-  //This method should be used for testing only.
+  // InterfaceName should be ideally provided via env variables.
+  // It should contain the value where csw-cluster has to be started.
+  // This method should be used for testing only.
   def withInterface(name: String): ClusterSettings = withEntry(InterfaceNameKey, name)
 
-  //ManagementPort should ideally be provided via system properties.
-  //It is used to spawn akka cluster management service.
-  //This method should be used for testing only.
+  // ManagementPort should ideally be provided via system properties.
+  // It is used to spawn akka cluster management service.
+  // This method should be used for testing only.
   def withManagementPort(port: Int): ClusterSettings = withEntry(ManagementPortKey, port)
 
   def joinSeeds(seeds: String): ClusterSettings = withEntry(ClusterSeedsKey, seeds)
 
-  //Tries to connect to seed which is running locally on the provided port.
-  //This method should be used for testing only.
+  // Tries to connect to seed which is running locally on the provided port.
+  // This method should be used for testing only.
   @varargs
   def joinLocal(port: Int, ports: Int*): ClusterSettings = {
     val seeds = s"$hostname:$port" +: ports.map(port => s"$hostname:$port")
     joinSeeds(seeds.mkString(","))
   }
 
-  //clusterPort should be ideally provided via env variables.
+  // clusterPort should be ideally provided via env variables.
   def onPort(port: Int): ClusterSettings = withEntry(ClusterPortKey, port)
 
-  //Config values for ActorSystem should be first picked from system variable then from environment properties and
-  //then use the programmatically set variables.
+  // Config values for ActorSystem should be first picked from system variable then from environment properties and
+  // then use the programmatically set variables.
   private lazy val allValues = sys.env ++ sys.props ++ values
 
-  //If no interfaceName is provided then use empty value for it.
+  // If no interfaceName is provided then use empty value for it.
   private[location] def interfaceName: Option[String] = allValues.get(InterfaceNameKey).map(_.toString)
 
-  //Get the host address based on interfaceName provided.
-  //If it is empty then get the default ipv4 address to start the current ActorSystem on.
+  // Get the host address based on interfaceName provided.
+  // If it is empty then get the default ipv4 address to start the current ActorSystem on.
   def hostname: String = Networks.interface(interfaceName).hostname
 
   private[location] def publicInterfaceName: Option[String] = allValues.get(PublicInterfaceNameKey).map(_.toString)
 
   def publicHostname: String = Networks.publicInterface(publicInterfaceName).hostname
 
-  //Get the port for current ActorSystem to start. If no port is provided 0 will be used default.
-  //SeedNode should start on a fixed port and rest all can start on random port.
+  // Get the port for current ActorSystem to start. If no port is provided 0 will be used default.
+  // SeedNode should start on a fixed port and rest all can start on random port.
   private[location] def port: Int = allValues.getOrElse(ClusterPortKey, 0).toString.toInt
 
-  //Get the managementPort to start akka cluster management service.
+  // Get the managementPort to start akka cluster management service.
   private[location] def managementPort: Option[Any] = allValues.get(ManagementPortKey)
 
-  //Extract seeds [hostname1:port1,hostname2:port2] from CLUSTER_SEEDS environment variable
+  // Extract seeds [hostname1:port1,hostname2:port2] from CLUSTER_SEEDS environment variable
   private[location] def seeds = allValues.get(ClusterSeedsKey).toList.flatMap(_.toString.split(",")).map(_.trim)
 
-  //Prepare a list of seedNodes
+  // Prepare a list of seedNodes
   def seedNodes: List[String] = seeds.map(seed => s"akka://$clusterName@$seed")
 
-  //Prepare config for ActorSystem to join csw-cluster
+  // Prepare config for ActorSystem to join csw-cluster
   private[location] def config: Config = {
     val computedValues: Map[String, Any] = Map(
       "akka.remote.artery.canonical.hostname" -> hostname,
       "akka.remote.artery.canonical.port"     -> port,
       "akka.cluster.seed-nodes"               -> seedNodes.asJava,
       "akka.cluster.http.management.hostname" -> hostname,
-      "akka.management.http.port"             -> managementPort.getOrElse(19999), //management port will never start at 19999
+      "akka.management.http.port"             -> managementPort.getOrElse(19999), // management port will never start at 19999
       "startManagement"                       -> managementPort.isDefined
     )
 

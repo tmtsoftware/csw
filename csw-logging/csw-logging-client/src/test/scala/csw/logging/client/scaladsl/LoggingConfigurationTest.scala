@@ -216,7 +216,7 @@ class LoggingConfigurationTest extends AnyFunSuite with Matchers with BeforeAndA
 
     loggingSystem.getAppenders shouldBe List(FileAppender, StdOutAppender)
 
-    //*************************** Start Testing File Logs *****************************************
+    // *************************** Start Testing File Logs *****************************************
     val fileLogBuffer = FileUtils.read(testLogFilePathWithServiceName)
     fileLogBuffer.size shouldBe 1
 
@@ -225,9 +225,9 @@ class LoggingConfigurationTest extends AnyFunSuite with Matchers with BeforeAndA
     jsonFileLogMessage.getString(LoggingKeys.SEVERITY) shouldBe DEBUG.name
     jsonFileLogMessage.getString(LoggingKeys.CLASS) shouldBe className
     jsonFileLogMessage.getString(LoggingKeys.FILE) shouldBe fileName
-    //*************************** End Testing File Logs *********************************************
+    // *************************** End Testing File Logs *********************************************
 
-    //*************************** Start Testing StdOut Logs *****************************************
+    // *************************** Start Testing StdOut Logs *****************************************
     println(outStream.toString)
     parse(outStream.toString)
     stdOutLogBuffer.size shouldBe 2
@@ -243,7 +243,7 @@ class LoggingConfigurationTest extends AnyFunSuite with Matchers with BeforeAndA
     secondStdOutLogMessage.getString(LoggingKeys.SEVERITY) shouldBe DEBUG.name
     secondStdOutLogMessage.getString(LoggingKeys.CLASS) shouldBe className
     secondStdOutLogMessage.getString(LoggingKeys.FILE) shouldBe fileName
-    //*************************** End Testing StdOut Logs *******************************************
+    // *************************** End Testing StdOut Logs *******************************************
 
     // clean up
     stdOutLogBuffer.clear()

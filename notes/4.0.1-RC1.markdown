@@ -1,0 +1,11 @@
+## CSW - TMT Common Software v4.0.1-RC1
+
+This is release v4.0.1-RC1 of the TMT Common Software.
+
+See [CHANGELOG.md](CHANGELOG.md) for details of all releases.
+
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/4.0.1-RC1/
+- Scaladoc: https://tmtsoftware.github.io/csw/4.0.1-RC1/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/4.0.1-RC1/api/java/index.html

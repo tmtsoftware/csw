@@ -42,13 +42,13 @@ class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar 
   private val mocks                                            = new FrameworkTestMocks()
 
   class IdleContainer() {
-    private val testActor: ActorRef[Any]                        = TestProbe("test-probe").ref
-    private val metadata: Metadata                              = Metadata(Map("key1" -> "value1"))
-    val akkaRegistration: AkkaRegistration                      = AkkaRegistrationFactory.make(mock[AkkaConnection], testActor, metadata)
-    val locationService: LocationService                        = mock[LocationService]
-    val eventService: EventServiceFactory                       = mock[EventServiceFactory]
-    val alarmService: AlarmServiceFactory                       = mock[AlarmServiceFactory]
-    val registrationResult: RegistrationResult                  = mock[RegistrationResult]
+    private val testActor: ActorRef[Any]       = TestProbe("test-probe").ref
+    private val metadata: Metadata             = Metadata(Map("key1" -> "value1"))
+    val akkaRegistration: AkkaRegistration     = AkkaRegistrationFactory.make(mock[AkkaConnection], testActor, metadata)
+    val locationService: LocationService       = mock[LocationService]
+    val eventService: EventServiceFactory      = mock[EventServiceFactory]
+    val alarmService: AlarmServiceFactory      = mock[AlarmServiceFactory]
+    val registrationResult: RegistrationResult = mock[RegistrationResult]
     private[container] var supervisorInfos: Set[SupervisorInfo] = Set.empty
     var componentProbes: Set[TestProbe[ComponentMessage]]       = Set.empty
     val supervisorInfoFactory: SupervisorInfoFactory            = mock[SupervisorInfoFactory]
