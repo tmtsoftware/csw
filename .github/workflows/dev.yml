@@ -18,11 +18,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: laughedelic/coursier-setup@v1
+      - uses: coursier/setup-action@v1.2.0-M2
         with:
           jvm: 11
           apps: sbt sbtn
-      - uses: coursier/cache-action@v5
+      - uses: coursier/cache-action@v6
 
       - name: Configure ntp time
         run: |
@@ -61,11 +61,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: laughedelic/coursier-setup@v1
+      - uses: coursier/setup-action@v1.2.0-M2
         with:
           jvm: 11
           apps: sbt sbtn
-      - uses: coursier/cache-action@v5
+      - uses: coursier/cache-action@v6
 
       - name: Docs Check
         run: |

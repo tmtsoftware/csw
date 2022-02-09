@@ -9,14 +9,14 @@ jobs:
   release:
     runs-on: ubuntu-latest
     env:
-      ESW_TS_VERSION: "0.3.0-RC1"
+      ESW_TS_VERSION: "0.3.0"
     steps:
       - uses: actions/checkout@v2
-      - uses: laughedelic/coursier-setup@v1
+      - uses: coursier/setup-action@v1.2.0-M2
         with:
           jvm: 11
           apps: sbt sbtn
-      - uses: coursier/cache-action@v5
+      - uses: coursier/cache-action@v6
 
       - uses: actions/setup-node@v1
         with:
