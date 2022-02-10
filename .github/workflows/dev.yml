@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: coursier/setup-action@v1.2.0-M2
         with:
-          jvm: 11
+          jvm: temurin:1.17
           apps: sbt sbtn
       - uses: coursier/cache-action@v6
 
