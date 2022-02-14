@@ -1,8 +1,6 @@
 jdk:
   - adoptopenjdk17
 before_install:
-  - sdk install java 17.0.0-tem
-  - sdk use java 17.0.0-tem
   - export JITPACK_VERSION=$VERSION
   - wget https://repo1.maven.org/maven2/org/scala-sbt/sbt-launch/1.6.1/sbt-launch-1.6.1.jar
 install:
