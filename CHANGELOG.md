@@ -9,13 +9,12 @@ The product is in a new repository: [csw](https://github.com/tmtsoftware/csw).
 
 All notable changes to this project will be documented in this file.
 
+## Upcoming releases 
+- Add `nanometers` to Units
+
 ## [CSW v4.0.1] - 2022-02-09
 This is final release v4.0.1 of the TMT Common Software for project stakeholders.
 See [here](https://tmtsoftware.github.io/csw/4.0.1/) for a detailed documentation of this version of the CSW software.
-
-### Changes
-- Add `NOT_READY` choice to OperationalState
-- Add `coaddsInExposure` and `coaddsDone` params in `OpticalDetectorExposureData` Observe event
 
 ### Documentation
 - Reference paradox documentation: https://tmtsoftware.github.io/csw/4.0.1/
@@ -41,12 +40,14 @@ This is final release v4.0.0 of the TMT Common Software for project stakeholders
 See [here](https://tmtsoftware.github.io/csw/4.0.0/) for a detailed documentation of this version of the CSW software.
 
 ### Changes
+
 - Added migration guide for v3.0.0 -> v4.0.0
 
 ### Documentation
-- Reference paradox documentation: https://tmtsoftware.github.io/csw/4.0.0/
-- Scaladoc: https://tmtsoftware.github.io/csw/4.0.0/api/scala/index.html
-- Javadoc: https://tmtsoftware.github.io/csw/4.0.0/api/java/index.html
+
+- Reference paradox documentation: <https://tmtsoftware.github.io/csw/4.0.0/>
+- Scaladoc: <https://tmtsoftware.github.io/csw/4.0.0/api/scala/index.html>
+- Javadoc: <https://tmtsoftware.github.io/csw/4.0.0/api/java/index.html>
 
 ## [CSW v4.0.0-RC2] - 2021-09-09
 
@@ -54,14 +55,16 @@ This is a release candidate 2 for version 4.0.0 of the TMT Common Software for p
 See [here](https://tmtsoftware.github.io/csw/4.0.0-RC2/) for a detailed documentation of this version of the CSW software.
 
 ### Changes
+
 - Added logic to read MiniCrm configuration from config file and add defaults in `reference.conf` of project
 - Added helper `DatabaseTestKit` with embedded postgres in `FrameworkTestKit`
 - Added doc in technical section for Adding New Unit
 
 ### Documentation
-- Reference paradox documentation: https://tmtsoftware.github.io/csw/4.0.0-RC2/
-- Scaladoc: https://tmtsoftware.github.io/csw/4.0.0-RC2/api/scala/index.html
-- Javadoc: https://tmtsoftware.github.io/csw/4.0.0-RC2/api/java/index.html
+
+- Reference paradox documentation: <https://tmtsoftware.github.io/csw/4.0.0-RC2/>
+- Scaladoc: <https://tmtsoftware.github.io/csw/4.0.0-RC2/api/scala/index.html>
+- Javadoc: <https://tmtsoftware.github.io/csw/4.0.0-RC2/api/java/index.html>
 
 ## [CSW v4.0.0-RC1] - 2021-08-20
 
@@ -69,22 +72,24 @@ This is a release candidate 1 for version 4.0.0 of the TMT Common Software for p
 See [here](https://tmtsoftware.github.io/csw/4.0.0-RC1/) for a detailed documentation of this version of the CSW software.
 
 ### Changes
-- Added `JDefaultComponentHandlers` and `DefaultComponentHandlers` - default component handlers to create assembly or hcd in both scala and java 
+
+- Added `JDefaultComponentHandlers` and `DefaultComponentHandlers` - default component handlers to create assembly or hcd in both scala and java
 - Removed `allTags` and `allTagNames` method from `Coords` and `JCoords`
 - Updated app name's with `csw` prefix according to `apps.prod.json` in `osw-apps` repo.
 - Added UTC & TAI entries in units list.
-- Changed default unit for `UTCTimeKey` & `TAITimeKey` from `second` to `utc` & `tai` respectively. 
+- Changed default unit for `UTCTimeKey` & `TAITimeKey` from `second` to `utc` & `tai` respectively.
 - Added new `WrongCommandTypeIssue` entry in `CommandIssue`.
 - Removed `RaDec` from `KeyType`. Alternatively user can use `Coord` special KeyType to capture original use cases for RaDec.
 - Removed `Struct` from `Key`. It was mentioned in the earlier release that `Struct` will be removed.
 - Added ObserveEvent Factories for IRDetector, OpticalDetector, WFSDetector & Sequencer.
-- Subsystem list got updated as per https://docushare.tmt.org/docushare/dsweb/Services/Document-4780.
+- Subsystem list got updated as per <https://docushare.tmt.org/docushare/dsweb/Services/Document-4780>.
 - Added `initAlarms` & `getCurrentSeverity` methods in AlarmTestKit.
 
 ### Documentation
-- Reference paradox documentation: https://tmtsoftware.github.io/csw/4.0.0-RC1/
-- Scaladoc: https://tmtsoftware.github.io/csw/4.0.0-RC1/api/scala/index.html
-- Javadoc: https://tmtsoftware.github.io/csw/4.0.0-RC1/api/java/index.html
+
+- Reference paradox documentation: <https://tmtsoftware.github.io/csw/4.0.0-RC1/>
+- Scaladoc: <https://tmtsoftware.github.io/csw/4.0.0-RC1/api/scala/index.html>
+- Javadoc: <https://tmtsoftware.github.io/csw/4.0.0-RC1/api/java/index.html>
 
 ## [CSW v3.0.1] - 2021-01-28
 
@@ -92,12 +97,14 @@ This is patch release over v3.0.0 of the TMT Common Software for project stakeho
 See [here](https://tmtsoftware.github.io/csw/3.0.1/) for a detailed documentation of this version of the CSW software.
 
 ### Changes
+
 - Added migration guide for v2.0 -> v3.0
 
 ### Documentation
-- Reference paradox documentation: https://tmtsoftware.github.io/csw/3.0.1/
-- Scaladoc: https://tmtsoftware.github.io/csw/3.0.1/api/scala/index.html
-- Javadoc: https://tmtsoftware.github.io/csw/3.0.1/api/java/index.html
+
+- Reference paradox documentation: <https://tmtsoftware.github.io/csw/3.0.1/>
+- Scaladoc: <https://tmtsoftware.github.io/csw/3.0.1/api/scala/index.html>
+- Javadoc: <https://tmtsoftware.github.io/csw/3.0.1/api/java/index.html>
 
 ## [CSW v3.0.0] - 2021-01-22
 
@@ -105,14 +112,15 @@ This is the third major release of the TMT Common Software for project stakehold
 See [here](https://tmtsoftware.github.io/csw/3.0.0/) for a detailed documentation of this version of the CSW software.
 
 ### Changes
+
 - `->` method on a Key now takes a single parameter instead of varargs. For varargs, please use `set` method.<sup>[1](#3-0-0-1)</sup>
 - `->` method on a Key that took an array of values has been removed. Please use `setAll` method instead.<sup>[1](#3-0-0-1)</sup>
 - Removed usage of client-roles in favor of realm-roles in location server and config server HTTP routes.<sup>[1](#3-0-0-1)</sup>
 - Contract change for Location Service API for `registration` and `location` models to incorporate metadata.
   `Metadata` is additional information associated with `registration`.<sup>[1](#3-0-0-1)</sup>
 - Removed `RegistrationFactory` from `location-server` module. Instead, the following should be used by Scala and Java users to instantiate `AkkaRegistration`<sup>[1](#3-0-0-1)</sup>
-    - For Scala, use `AkkaRegistrationFactory`.  It has an API change to expect an `actorRef` instead of the URI of `actorRef`
-    - For Java, use the new`JAkkaRegistrationFactory`.
+  - For Scala, use `AkkaRegistrationFactory`.  It has an API change to expect an `actorRef` instead of the URI of `actorRef`
+  - For Java, use the new`JAkkaRegistrationFactory`.
 - Contract change for ComponentHandlers `initialize` and `onShutdown` methods, where the return type was changed from `Future[Unit]` to `Unit` i.e. from non-blocking to blocking.<sup>[1](#3-0-0-1)</sup>
 - Changed the installation of `csw-apps`. The `coursier` program to be used to install applications instead of downloading apps from release page.<sup>[2](#3.0.0-2)</sup>
 - `logging-aggregator-<some-version>.zip` will be available on the release page.<sup>[2](#3-0-0-2)</sup>
@@ -125,6 +133,7 @@ See [here](https://tmtsoftware.github.io/csw/3.0.0/) for a detailed documentatio
 - Added support for test story report generation in multi jvm test plugin<sup>[5](#3-0-0-5)</sup>
 
 ### Version Upgrades
+
 - Scala version upgrade to 2.13.3
 - SBT version upgrade to 1.4.2
 - Borer version upgrade to 1.6.2
@@ -134,9 +143,10 @@ See [here](https://tmtsoftware.github.io/csw/3.0.0/) for a detailed documentatio
 - Lettuce version upgrade 6.0.1.RELEASE
 
 ### Documentation
-- Reference paradox documentation: https://tmtsoftware.github.io/csw/3.0.0/
-- Scaladoc: https://tmtsoftware.github.io/csw/3.0.0/api/scala/index.html
-- Javadoc: https://tmtsoftware.github.io/csw/3.0.0/api/java/index.html
+
+- Reference paradox documentation: <https://tmtsoftware.github.io/csw/3.0.0/>
+- Scaladoc: <https://tmtsoftware.github.io/csw/3.0.0/api/scala/index.html>
+- Javadoc: <https://tmtsoftware.github.io/csw/3.0.0/api/java/index.html>
 
 ### Supporting Releases
 
@@ -152,13 +162,14 @@ This is a First minor release post Second major release of the TMT Common Softwa
 See [here](https://tmtsoftware.github.io/csw/2.0.1/) for a detailed documentation of this version of the CSW software.
 
 ### Changes
+
 - Updated giter8 template
 
 ### Documentation
-- Reference paradox documentation: https://tmtsoftware.github.io/csw/2.0.1/
-- Scaladoc: https://tmtsoftware.github.io/csw/2.0.1/api/scala/index.html
-- Javadoc: https://tmtsoftware.github.io/csw/2.0.1/api/java/index.html
 
+- Reference paradox documentation: <https://tmtsoftware.github.io/csw/2.0.1/>
+- Scaladoc: <https://tmtsoftware.github.io/csw/2.0.1/api/scala/index.html>
+- Javadoc: <https://tmtsoftware.github.io/csw/2.0.1/api/java/index.html>
 
 ## [CSW v2.0.0] - 2020-03-19
 
@@ -167,6 +178,7 @@ See [here](https://tmtsoftware.github.io/csw/2.0.0/) for a detailed documentatio
 Migration guide for v2.0.0 can be found [here](https://tmtsoftware.github.io/csw/2.0.0/migration_guide/migration-guides.html).
 
 ### Changes
+
 - Simplified CommandResponseManager and removed auto-completion of commands<sup>[1](#2-0-0-1)</sup>
 - Prefix has Subsystem in constructor<sup>[1](#2-0-0-1)</sup>
 - Log statements have subsystem and prefix along with componentName<sup>[1](#2-0-0-1)</sup>
@@ -182,6 +194,7 @@ To start all the CSW services, run `csw-services.sh start` command.
 `csw-services.sh` runs all services in the foreground, pressing `ctr+c` will stop all the services.<sup>[2](#2-0-0-2)</sup>
 
 ### Version Upgrades
+
 - Scala version upgrade to 2.13.1
 - SBT version upgrade to 1.3.7
 - Akka version upgrade to 2.6.3
@@ -189,9 +202,10 @@ To start all the CSW services, run `csw-services.sh start` command.
 - Borer version upgrade to 1.4.0
 
 ### Documentation
-- Reference paradox documentation: https://tmtsoftware.github.io/csw/2.0.0/
-- Scaladoc: https://tmtsoftware.github.io/csw/2.0.0/api/scala/index.html
-- Javadoc: https://tmtsoftware.github.io/csw/2.0.0/api/java/index.html
+
+- Reference paradox documentation: <https://tmtsoftware.github.io/csw/2.0.0/>
+- Scaladoc: <https://tmtsoftware.github.io/csw/2.0.0/api/scala/index.html>
+- Javadoc: <https://tmtsoftware.github.io/csw/2.0.0/api/java/index.html>
 
 ### Supporting Releases
 
@@ -205,6 +219,7 @@ This is the release candidate 1 for the release 1.1.0 of the TMT Common Software
 See [here](https://tmtsoftware.github.io/csw/1.1.0-RC1/) for a detailed documentation of this version of the CSW software.
 
 ### Changes
+
 - Simplified CommandResponseManager and removed auto-completion of commands
 - Prefix has Subsystem in constructor
 - Log statements have subsystem and prefix along with componentName
@@ -217,6 +232,7 @@ See [here](https://tmtsoftware.github.io/csw/1.1.0-RC1/) for a detailed document
 - JSON contracts for location and command service added in paradox documentation
 
 ### Version Upgrades
+
 - Scala version upgrade to 2.13.1
 - SBT version upgrade to 1.3.7
 - Akka version upgrade to 2.6.3
@@ -224,9 +240,10 @@ See [here](https://tmtsoftware.github.io/csw/1.1.0-RC1/) for a detailed document
 - Borer version upgrade to 1.4.0
 
 ### Documentation
-- Reference paradox documentation: https://tmtsoftware.github.io/csw/1.1.0-RC1/
-- Scaladoc: https://tmtsoftware.github.io/csw/1.1.0-RC1/api/scala/index.html
-- Javadoc: https://tmtsoftware.github.io/csw/1.1.0-RC1/api/java/index.html
+
+- Reference paradox documentation: <https://tmtsoftware.github.io/csw/1.1.0-RC1/>
+- Scaladoc: <https://tmtsoftware.github.io/csw/1.1.0-RC1/api/scala/index.html>
+- Javadoc: <https://tmtsoftware.github.io/csw/1.1.0-RC1/api/java/index.html>
 
 ## [CSW v1.0.0] - 2019-08-30
 
@@ -234,6 +251,7 @@ This is the first major release of the TMT Common Software for project stakehold
 See [here](https://tmtsoftware.github.io/csw/1.0.0/) for a detailed documentation of this version of the CSW software.
 
 ### Changes
+
 - Replaced Kryo serialization with Borer-CBOR for Akka actor messages<sup>[1](#1-0-0-1)</sup>
 - Replaced Play-JSON with Borer-JSON in Location service, Configuration Service and Admin Service<sup>[1](#1-0-0-1)</sup>
 - Made Location, Config, Logging and Alarm service models to be cross compilable for ScalaJs<sup>[2](#1-0-0-2)</sup>
@@ -242,20 +260,23 @@ See [here](https://tmtsoftware.github.io/csw/1.0.0/) for a detailed documentatio
 - Separated Command service docs technical from Framework docs<sup>[3](#1-0-0-3)</sup>
 
 ### Api changes
+
 - CommandService
-    - `submit` now returns its initial response (e.g. `Started`) instead of waiting for the final response<sup>[2](#1-0-0-2)</sup>
-    - Added `submitAndWait` which will submit the command and wait for its final response<sup>[2](#1-0-0-2)</sup>
-    - Rename `submitAll` to `submitAllAndWait` in Command service as it waits for final response of all commands<sup>[1](#1-0-0-1)</sup>
+  - `submit` now returns its initial response (e.g. `Started`) instead of waiting for the final response<sup>[2](#1-0-0-2)</sup>
+  - Added `submitAndWait` which will submit the command and wait for its final response<sup>[2](#1-0-0-2)</sup>
+  - Rename `submitAll` to `submitAllAndWait` in Command service as it waits for final response of all commands<sup>[1](#1-0-0-1)</sup>
 - `Prefix` creation will throw `NoSuchElementException` if invalid subsystem is provided<sup>[1](#1-0-0-1)</sup>
 - Replaced `ActorRef` with ActorRef `URI` in `AkkaRegistration`<sup>[2](#1-0-0-2)</sup>
 
 ### Version Upgrades
+
 - Scala version upgrade to 2.13.0
 
 ### Documentation
-- Reference paradox documentation: https://tmtsoftware.github.io/csw/1.0.0/
-- Scaladoc: https://tmtsoftware.github.io/csw/1.0.0/api/scala/index.html
-- Javadoc: https://tmtsoftware.github.io/csw/1.0.0/api/java/index.html
+
+- Reference paradox documentation: <https://tmtsoftware.github.io/csw/1.0.0/>
+- Scaladoc: <https://tmtsoftware.github.io/csw/1.0.0/api/scala/index.html>
+- Javadoc: <https://tmtsoftware.github.io/csw/1.0.0/api/java/index.html>
 
 ### Supporting Releases
 
@@ -289,16 +310,17 @@ See [here](https://tmtsoftware.github.io/csw/0.7.0/) for a detailed documentatio
 - Changed `EventPublisher` APIs with `eventGenerator` to allow optional publishing of events<sup>[1](#0-7-0-1)</sup>
 
 #### Version Upgrades
+
 - Migration to AdoptOpenJDK 11
 - Akka version upgrade to 2.5.23
 
 #### Bug Fixes
+
 - Get route of config server with path for empty config file gives 404 instead of 200 (DEOPSCSW-626)<sup>[1](#0-7-0-1)</sup>
 
 ### Supporting Releases
 
 <a name="0-7-0-1"></a>1: [CSW v0.7.0-RC1](https://github.com/tmtsoftware/csw/releases/tag/v0.7.0-RC1) - 2019-03-25<br>
-
 
 ## [CSW v0.6.0] - 2018-11-28
 
@@ -311,62 +333,62 @@ See [here](https://tmtsoftware.github.io/csw/0.6.0/) for a detailed documentatio
 
 - GitHub Repository Renamed
 
-    - The GitHub repository has been renamed from `csw-prod` to [csw](https://github.com/tmtsoftware/csw), while the old csw repository was renamed to `csw-prototype`.
+  - The GitHub repository has been renamed from `csw-prod` to [csw](https://github.com/tmtsoftware/csw), while the old csw repository was renamed to `csw-prototype`.
 
 #### API Changes
 
 - Package Name Changes
 
-    - The top level package in all modules has changed from `csw.services` to `csw`.
+  - The top level package in all modules has changed from `csw.services` to `csw`.
 
 - Command Service
 
-    -  `ComponentHandlers` (Implementation classes for HCDs and Assemblies) now receive a single
+  - `ComponentHandlers` (Implementation classes for HCDs and Assemblies) now receive a single
        `CswContext` object containing references to all the CSW services (Previously the services were passed as separate arguments).
 
-    - `CommandService.submit()` now returns a future with the final response.
+  - `CommandService.submit()` now returns a future with the final response.
         Previously it returned the initial response, which could be `Accepted` for a long running command.
         In csw-0.6.0 you can call `CommandService.query()` to get an initial `Started` response, if needed, after the call to `submit()`.
 
-    - `CommandService.query()` now waits for the initial command response, if it has not yet been received. Previously it returned `CommandNotAvailable` if called too early.
+  - `CommandService.query()` now waits for the initial command response, if it has not yet been received. Previously it returned `CommandNotAvailable` if called too early.
 
-    - There are now separate response types for submit, validation and query (Previously all used `CommandResponse`). A long running submit command now responds with `Started` (was `Accepted`).
+  - There are now separate response types for submit, validation and query (Previously all used `CommandResponse`). A long running submit command now responds with `Started` (was `Accepted`).
 
-    - The API for `ComponentHandlers` has changed. Now `onSubmit()` returns either `Started` for a
+  - The API for `ComponentHandlers` has changed. Now `onSubmit()` returns either `Started` for a
       long running command that will complete later, or it can complete the command immediately and return the response, such as `Completed` or `Error`.
 
-    - The `csw-messages` dependency was renamed to `csw-params` and is now compiled for both
+  - The `csw-messages` dependency was renamed to `csw-params` and is now compiled for both
       the JVM and ScalaJS.
 
 - Location Service
 
-    - It is no longer necessary for components (HCDs, assemblies) and applications to join the
+  - It is no longer necessary for components (HCDs, assemblies) and applications to join the
       location service cluster and no need to define any environment variables or system properties
       before starting the components or applications (Previously `CLUSTER_SEEDS` and `INTERFACE_NAME` had to be defined).
 
-    - Location service access is now via an HTTP server running on each host
+  - Location service access is now via an HTTP server running on each host
     (The HTTP servers form a cluster).
 
-    - Command line applications now use the HTTP API for location service, resulting in much
+  - Command line applications now use the HTTP API for location service, resulting in much
     faster startup times.
 
 - Event Service
 
-    - The event service has been updated to make sure events are published in order, even if the caller does not wait for the returned future to complete before publishing again.
+  - The event service has been updated to make sure events are published in order, even if the caller does not wait for the returned future to complete before publishing again.
 
 #### New Features
 
 - Alarm Service
 
-    - The Alarm Service API is now complete.
+  - The Alarm Service API is now complete.
 
 - New Template for Component Builders
 
-    - Updated giter8 template. You can create a new HCD or assembly project with `sbt new tmtsoftware/csw.g8`.
+  - Updated giter8 template. You can create a new HCD or assembly project with `sbt new tmtsoftware/csw.g8`.
 
 - Test Kits
 
-    - Test kits are now available that can start and stop CSW services inside tests so that
+  - Test kits are now available that can start and stop CSW services inside tests so that
       there is no need to run csw-services.sh before running the tests.
       See `ScalaTestFrameworkTestKit` and `FrameworkTestKit` (for Java).
 
@@ -376,7 +398,6 @@ See [here](https://tmtsoftware.github.io/csw/0.6.0/) for a detailed documentatio
 <a name="0-6-0-2"></a>2: [CSW v0.6.0-RC2](https://github.com/tmtsoftware/csw/releases/tag/v0.6.0-RC2) - 2018-11-15<br>
 <a name="0-6-0-3"></a>3: [CSW v0.6.0-RC3](https://github.com/tmtsoftware/csw/releases/tag/v0.6.0-RC3) - 2018-11-21<br>
 
-
 ## [CSW v0.5.0] - 2018-08-31
 
 This is version 0.5 the second release of the TMT Common Software for project stakeholders.
@@ -384,21 +405,29 @@ This release includes Event Service.
 See [here](https://tmtsoftware.github.io/csw/0.5.0/) for a detailed documentation of this version of the CSW software.
 
 #### New Features
+
 - Event Service
-    - API and programming documentation, updated examples
-    - Command Line Interface for testing
-    - Updated giter8 template
+  - API and programming documentation, updated examples
+  - Command Line Interface for testing
+  - Updated giter8 template
+
 #### Bug Fixes
+
 - Prefix missing in Akka location (CSW-11)
 - Protobuf serde fails for Java keys/parameters (DEOPSCSW-495)
+
 #### Requests
+
 - CurrentState missing StateName (CSW-1)
 - CurrentState pubsub by StateName
+
 #### Source Updates Needed
+
 - Akka update to typed actors may require your source to be updated - if you have problems, use tmt-scw-programming slack channel for help
 - Inclusion of Event Service requires an update to any Top Level Actor
 
 #### Planned for the Next Release (Coming Soon...)
+
 - Alarm Service including Examples, API and programming documentation
 
 ### Supporting Releases
@@ -456,8 +485,8 @@ This prototype version was provided as part of the CSW Final Design Review
 
 - Changed APIs for Event and Telemetry Service
 
-
 ### Added
+
 - Added [BlockingConfigManager](src/main/scala/csw/services/cs/core/BlockingConfigManager.scala)
   (a blocking API to the Config Service)
 
@@ -481,6 +510,7 @@ The main difference between Request and Submit is that Request can return a valu
 - Added Java APIs for most services (See the [javacsw](javacsw) and  [util](util) subprojects)
 
 ### Changed
+
 - Renamed the earlier Hornetq based `event` project to [event_old](event_old)
   and renamed the Redis based `kvs` project to [events](events).
   Classes with *KeyValueStore* in the name have been renamed to use *EventService*.

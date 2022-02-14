@@ -55,6 +55,7 @@ object Units extends Enum[Units] {
   case object micron      extends Units("µm", "micron: alias for micrometer")
   case object micrometer  extends Units("µm", "micron: 10-6 m")
   case object minute      extends Units("min", "minute 6x10+1 s")
+  case object nanometer   extends Units("nm", "nanometers 10-9 m")
   case object newton      extends Units("N", "Newton: force")
   case object pascal      extends Units("Pa", "Pascal: pressure")
   case object radian extends Units("rad", "radian: angular measurement of the ratio between the length of an arc and its radius")

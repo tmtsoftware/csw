@@ -47,6 +47,7 @@ The default unit for `UTCTimeKey` and `TAITimeKey` (in Scala and Java both) is `
 | micron      | µm                | micron: alias for micrometer |
 | micrometer  | µm                | micron: 10-6 m |
 | minute      | min               | minute 6x10+1 s |
+| nanometer   | nm                | nanometers 10-9 m |
 | newton      | N                 | Newton: force |
 | pascal      | Pa                | Pascal: pressure |
 | radian      | rad               | radian: angular measurement of the ratio between the length of an arc and its radius |
