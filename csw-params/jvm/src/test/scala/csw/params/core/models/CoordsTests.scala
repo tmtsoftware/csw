@@ -86,6 +86,9 @@ class CoordsTests extends AnyFunSpec with Matchers {
       val f1: EqFrame = ICRS
       val j1          = JsonSupport.writes(f1)
       JsonSupport.reads[EqFrame](j1) shouldEqual ICRS
+      val f2: EqFrame = FK5
+      val j2          = JsonSupport.writes(f2)
+      JsonSupport.reads[EqFrame](j2) shouldEqual FK5
     }
 
     it("should JSON an alt az") {

@@ -133,7 +133,7 @@
             "tag": "BASE",
             "ra": 659912250000,
             "dec": -109892300000,
-            "frame": "ICRS",
+            "frame": "FK5",
             "catalogName": "none",
             "pm": {
               "pmx": 0.5,

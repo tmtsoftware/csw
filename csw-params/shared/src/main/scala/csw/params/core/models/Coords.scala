@@ -134,7 +134,7 @@ object Coords {
           case dea: Angle  => dea
           case x           => throw new MatchError(x)
         },
-        ICRS,
+        frame,
         catalogName,
         ProperMotion(pmx, pmy)
       )

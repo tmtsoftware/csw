@@ -98,6 +98,9 @@ public class JCoordsTest {
         var f1 = ICRS();
         var j1 = JavaJsonSupport.writes(f1, JParamCodecs.eqFrameCodec().encoder());
         assertEquals(JavaJsonSupport.reads(j1, JParamCodecs.eqFrameCodec().decoder()), ICRS());
+        var f2 = FK5();
+        var j2 = JavaJsonSupport.writes(f2, JParamCodecs.eqFrameCodec().encoder());
+        assertEquals(JavaJsonSupport.reads(j2, JParamCodecs.eqFrameCodec().decoder()), FK5());
     }
 
     @Test
