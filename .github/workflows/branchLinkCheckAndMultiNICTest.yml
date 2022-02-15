@@ -15,7 +15,7 @@ jobs:
           ref: branch-4.0.x
       - uses: coursier/setup-action@v1.2.0-M2
         with:
-          jvm: 11
+          jvm: temurin:1.17
       - uses: coursier/cache-action@v6
       - run: sudo chmod 666 /var/run/docker.sock
 
