@@ -16,8 +16,7 @@ private[csw] object SupervisorBehaviorFactory {
       registrationFactory: RegistrationFactory,
       cswCtx: CswContext
   ): Behavior[ComponentMessage] = {
-    val componentHandlerClass    = Class.forName(cswCtx.componentInfo.componentHandlerClassName)
-    val componentBehaviorFactory = ComponentBehaviorFactory.make(componentHandlerClass)
+    val componentBehaviorFactory = ComponentBehaviorFactory.make(cswCtx.componentInfo.componentHandlerClassName)
     make(
       containerRef,
       registrationFactory,

@@ -51,6 +51,24 @@ object ComponentInfos {
     5.seconds
   )
 
+  val hcdInfoWithHandlerException: ComponentInfo = ComponentInfo(
+    Prefix("WFOS.SampleHcd"),
+    HCD,
+    "csw.common.components.framework.InvalidComponentHandlers",
+    RegisterOnly,
+    Set.empty,
+    5.seconds
+  )
+
+  val jHcdInfoWithHandlerException: ComponentInfo = ComponentInfo(
+    Prefix("WFOS.SampleHcd"),
+    HCD,
+    "csw.framework.javadsl.components.JInvalidComponentHandlers",
+    RegisterOnly,
+    Set.empty,
+    5.seconds
+  )
+
   val dummyInfo: ComponentInfo = ComponentInfo(Prefix("WFOS.dummyhcd"), HCD, "dummy", DoNotRegister)
 
   val containerInfo: ContainerInfo = ContainerInfo("container", Set(hcdInfo, assemblyInfo))

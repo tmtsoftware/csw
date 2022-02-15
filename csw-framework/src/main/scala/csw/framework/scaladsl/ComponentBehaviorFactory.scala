@@ -38,7 +38,8 @@ abstract class ComponentBehaviorFactory {
 
 object ComponentBehaviorFactory {
 
-  def make(componentHandlerClass: Class[?]): ComponentBehaviorFactory = {
+  def make(componentHandlerClassString: String): ComponentBehaviorFactory = {
+    val componentHandlerClass = Class.forName(componentHandlerClassString)
     if (verifyJavaHandler(componentHandlerClass)) {
       val jComponentBehaviorF: JComponentBehaviorFactory = (ctx, cswCtx) =>
         javaHandlerConstructor(componentHandlerClass).newInstance(ctx, cswCtx).asInstanceOf[JComponentHandlers]
