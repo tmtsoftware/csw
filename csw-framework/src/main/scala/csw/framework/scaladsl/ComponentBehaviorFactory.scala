@@ -41,12 +41,12 @@ object ComponentBehaviorFactory {
   def make(componentHandlerClass: Class[?]): ComponentBehaviorFactory = {
     if (verifyJavaHandler(componentHandlerClass)) {
       val jComponentBehaviorF: JComponentBehaviorFactory = (ctx, cswCtx) =>
-          javaHandlerConstructor(componentHandlerClass).newInstance(ctx, cswCtx).asInstanceOf[JComponentHandlers]
+        javaHandlerConstructor(componentHandlerClass).newInstance(ctx, cswCtx).asInstanceOf[JComponentHandlers]
       jComponentBehaviorF
     }
     else if (verifyScalaHandler(componentHandlerClass)) {
       val componentBehaviorF: ComponentBehaviorFactory = (ctx, cswCtx) =>
-      scalaHandlerConstructor(componentHandlerClass).newInstance(ctx, cswCtx).asInstanceOf[ComponentHandlers]
+        scalaHandlerConstructor(componentHandlerClass).newInstance(ctx, cswCtx).asInstanceOf[ComponentHandlers]
       componentBehaviorF
     }
     else throw new ComponentHandlerNotFoundException
@@ -54,16 +54,13 @@ object ComponentBehaviorFactory {
 
   private def verifyJavaHandler(componentHandlerClass: Class[?]): Boolean =
     componentHandlerClass.getDeclaredConstructors.exists(constructor => {
-      javaHandlerConstructor(classOf[JComponentHandlers])
-        .getParameterTypes.sameElements(constructor.getParameterTypes)
+      javaHandlerConstructor(classOf[JComponentHandlers]).getParameterTypes.sameElements(constructor.getParameterTypes)
     })
 
   private def verifyScalaHandler(componentHandlerClass: Class[?]): Boolean =
     componentHandlerClass.getDeclaredConstructors.exists(constructor => {
-      scalaHandlerConstructor(classOf[ComponentHandlers])
-        .getParameterTypes.sameElements(constructor.getParameterTypes)
+      scalaHandlerConstructor(classOf[ComponentHandlers]).getParameterTypes.sameElements(constructor.getParameterTypes)
     })
-
 
   private def scalaHandlerConstructor(clazz: Class[?]): Constructor[?] =
     clazz
