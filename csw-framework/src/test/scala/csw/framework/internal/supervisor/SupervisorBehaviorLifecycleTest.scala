@@ -13,15 +13,15 @@ import csw.command.client.messages.SupervisorInternalRunningMessage.{Registratio
 import csw.command.client.messages.{ContainerIdleMessage, SupervisorMessage, TopLevelActorMessage}
 import csw.command.client.models.framework.LocationServiceUsage.DoNotRegister
 import csw.command.client.models.framework.PubSub.{Publish, Subscribe, Unsubscribe}
-import csw.command.client.models.framework.ToComponentLifecycleMessage._
+import csw.command.client.models.framework.ToComponentLifecycleMessage.*
 import csw.command.client.models.framework.{ComponentInfo, LifecycleStateChanged, PubSub, SupervisorLifecycleState}
-import csw.common.components.framework.SampleComponentBehaviorFactory
+import csw.common.components.framework.SampleComponentHandlers
 import csw.common.extensions.CswContextExtensions.RichCswContext
-import csw.framework.ComponentInfos._
+import csw.framework.ComponentInfos.*
 import csw.framework.exceptions.InitializationFailed
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
-import org.mockito.Mockito._
+import org.mockito.Mockito.*
 import org.scalatest.BeforeAndAfterEach
 
 // DEOPSCSW-163: Provide admin facilities in the framework through Supervisor role
@@ -31,7 +31,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
   class TestData(compInfo: ComponentInfo) {
     val testMocks: FrameworkTestMocks = frameworkTestMocks()
-    import testMocks._
+    import testMocks.*
 
     val sampleHcdHandler: ComponentHandlers                        = mock[ComponentHandlers]
     val timerScheduler: TimerScheduler[SupervisorMessage]          = mock[TimerScheduler[SupervisorMessage]]
@@ -44,7 +44,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
             ctx,
             timerScheduler,
             None,
-            new SampleComponentBehaviorFactory,
+            (ctx, cswCtx) => new SampleComponentHandlers(ctx, cswCtx),
             registrationFactory,
             cswCtx.copy(compInfo)
           )
@@ -57,7 +57,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
   test("supervisor should start in Idle lifecycle state and spawn two actors | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181") {
     val testData = new TestData(hcdInfo)
-    import testData._
+    import testData.*
 
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]()
 
@@ -65,7 +65,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     supervisorLifecycleStateProbe.expectMessage(SupervisorLifecycleState.Idle)
 
     val spawnedEffects = supervisorBehaviorKit.retrieveAllEffects().map {
-      case s: Spawned[_] => s.childName
+      case s: Spawned[?] => s.childName
       case _             => ""
     }
 
@@ -79,8 +79,8 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     "supervisor should accept Running message and register with Location service when LocationServiceUsage is RegisterOnly | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181"
   ) {
     val testData = new TestData(hcdInfo)
-    import testData._
-    import testData.testMocks._
+    import testData.*
+    import testData.testMocks.*
     val supervisorLifecycleStateProbe            = TestProbe[SupervisorLifecycleState]()
     val childRef: ActorRef[TopLevelActorMessage] = supervisorBehaviorKit.childInbox(componentActorName).ref
 
@@ -98,8 +98,8 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     "supervisor should accept Running message and should not register when LocationServiceUsage is DoNotRegister | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181"
   ) {
     val testData = new TestData(hcdInfo.copy(locationServiceUsage = DoNotRegister))
-    import testData._
-    import testData.testMocks._
+    import testData.*
+    import testData.testMocks.*
     val supervisorLifecycleStateProbe            = TestProbe[SupervisorLifecycleState]()
     val childRef: ActorRef[TopLevelActorMessage] = supervisorBehaviorKit.childInbox(componentActorName).ref
 
@@ -119,7 +119,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     "supervisor should publish state change after successful registration with location service | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181"
   ) {
     val testData = new TestData(hcdInfo)
-    import testData._
+    import testData.*
 
     val supervisorLifecycleStateProbe            = TestProbe[SupervisorLifecycleState]()
     val childRef: ActorRef[TopLevelActorMessage] = supervisorBehaviorKit.childInbox(componentActorName).ref
@@ -142,7 +142,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     "supervisor should publish state change if locationServiceUsage is DoNotRegister | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181"
   ) {
     val testData = new TestData(hcdInfo)
-    import testData._
+    import testData.*
     val supervisorLifecycleStateProbe            = TestProbe[SupervisorLifecycleState]()
     val childRef: ActorRef[TopLevelActorMessage] = supervisorBehaviorKit.childInbox(componentActorName).ref
 
@@ -166,7 +166,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     "supervisor should handle LifecycleStateSubscription message by coordinating with pub sub actor | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181"
   ) {
     val testData = new TestData(hcdInfo)
-    import testData._
+    import testData.*
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]()
     val subscriberProbe               = TestProbe[LifecycleStateChanged]()
 
@@ -205,7 +205,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
   test("supervisor should handle lifecycle Restart message | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181") {
     val testData = new TestData(hcdInfo)
-    import testData._
+    import testData.*
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]()
 
     supervisorBehaviorKit.run(Restart)
@@ -215,7 +215,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
   test("supervisor should handle lifecycle GoOffline message | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181") {
     val testData = new TestData(hcdInfo)
-    import testData._
+    import testData.*
 
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]()
 
@@ -233,7 +233,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
   test("supervisor should handle lifecycle GoOnline message | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181") {
     val testData = new TestData(hcdInfo)
-    import testData._
+    import testData.*
     val supervisorLifecycleStateProbe                        = TestProbe[SupervisorLifecycleState]()
     val childComponentInbox: TestInbox[TopLevelActorMessage] = supervisorBehaviorKit.childInbox(componentActorName)
 
@@ -251,7 +251,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
   test("supervisor should handle Terminated signal for Idle lifecycle state | DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-181") {
     val testData = new TestData(hcdInfo)
-    import testData._
+    import testData.*
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]()
 
     val childComponentInbox: TestInbox[TopLevelActorMessage] = supervisorBehaviorKit.childInbox(componentActorName)

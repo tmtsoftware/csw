@@ -8,7 +8,7 @@ import akka.actor.typed.scaladsl.{Behaviors, TimerScheduler}
 import csw.command.client.messages.DiagnosticDataMessage.DiagnosticMode
 import csw.command.client.messages.FromComponentLifecycleMessage.Running
 import csw.command.client.messages.*
-import csw.common.components.framework.SampleComponentBehaviorFactory
+import csw.common.components.framework.SampleComponentHandlers
 import csw.common.extensions.CswContextExtensions.RichCswContext
 import csw.framework.ComponentInfos.*
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
@@ -26,7 +26,7 @@ import scala.concurrent.duration.FiniteDuration
 // DEOPSCSW-163: Provide admin facilities in the framework through Supervisor role
 class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
   val testMocks: FrameworkTestMocks = frameworkTestMocks()
-  import testMocks._
+  import testMocks.*
 
   val containerIdleMessageProbe: TestProbe[ContainerIdleMessage] = TestProbe[ContainerIdleMessage]()
   private val timerScheduler                                     = mock[TimerScheduler[SupervisorMessage]]
@@ -51,7 +51,7 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
     val effects: immutable.Seq[Effect] = supervisorBehaviorTestKit.retrieveAllEffects()
 
     val spawnedEffects = effects.map {
-      case s: Spawned[_] => s.childName
+      case s: Spawned[?] => s.childName
       case _             => ""
     }
 
@@ -117,7 +117,7 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
           ctx,
           timerScheduler,
           None,
-          new SampleComponentBehaviorFactory,
+          (ctx, cswCtx) => new SampleComponentHandlers(ctx, cswCtx),
           registrationFactory,
           cswCtx.copy(hcdInfo)
         )
