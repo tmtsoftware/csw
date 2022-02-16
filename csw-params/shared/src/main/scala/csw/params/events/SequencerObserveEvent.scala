@@ -148,7 +148,7 @@ case class SequencerObserveEvent(prefix: Prefix) {
     createObserveEvent(ObserveEventNames.DataWriteEnd, exposureId, filename)
 
   /**
-   * This event indicates the start of data acquisition that  results in a file produced for DMS. This is a potential metadata event for DMS.
+   * This event indicates that the detector system is preparing to start an exposure.
    * @param exposureId [[csw.params.core.models.ExposureId]] is an identifier in ESW/DMS for a single exposure.
    *                   The ExposureId follows the structure: 2020A-001-123-WFOS-IMG1-SCI0-0001 with an included ObsId or
    *                   when no ObsId is present, in the standalone format: 20200706-190204-WFOS-IMG1-SCI0-0001 with a UTC time
