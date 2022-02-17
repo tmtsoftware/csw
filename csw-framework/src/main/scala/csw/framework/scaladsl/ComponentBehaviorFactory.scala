@@ -58,10 +58,10 @@ object ComponentBehaviorFactory {
     else
       throw new ClassCastException(s"""
          |To load a component, you must provide one of the following:
-         |Subclass of ${classOf[ComponentHandlers]} having constructor parameter types:
+         |For Scala: Subclass of ${classOf[ComponentHandlers]} having constructor parameter types:
          |(${classOf[ActorContext[TopLevelActorMessage]]}, ${classOf[CswContext]})
          |OR
-         |Subclass of ${classOf[JComponentHandlers]} having constructor parameter types:
+         |For Java: Subclass of ${classOf[JComponentHandlers]} having constructor parameter types:
          |(${classOf[javadsl.ActorContext[TopLevelActorMessage]]}, ${classOf[JCswContext]}).
          |Received:
          |${componentHandlerClass.getDeclaredConstructors.last}
