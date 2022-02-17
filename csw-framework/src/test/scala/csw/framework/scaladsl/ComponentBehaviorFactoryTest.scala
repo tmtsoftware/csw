@@ -11,10 +11,11 @@ class ComponentBehaviorFactoryTest extends AnyFunSuite with Matchers {
       ComponentBehaviorFactory.make(componentHandlerClassName)
     }
     val expectedMessage = """
-      |Child of class csw.framework.scaladsl.ComponentHandlers having constructor parameter types:
+      |To load a component, you must provide one of the following:
+      |Subclass of class csw.framework.scaladsl.ComponentHandlers having constructor parameter types:
       |(interface akka.actor.typed.scaladsl.ActorContext, class csw.framework.models.CswContext)
       |OR
-      |Child of class csw.framework.javadsl.JComponentHandlers having constructor parameter types:
+      |Subclass of class csw.framework.javadsl.JComponentHandlers having constructor parameter types:
       |(interface akka.actor.typed.javadsl.ActorContext, class csw.framework.models.JCswContext).
       |Received:
       |public csw.common.components.framework.InvalidComponentHandlers(csw.framework.models.CswContext,akka.actor.typed.scaladsl.ActorContext)
@@ -32,10 +33,10 @@ class ComponentBehaviorFactoryTest extends AnyFunSuite with Matchers {
     val expectedMessage =
       """
         |To load a component, you must provide one of the following:
-        |Child of class csw.framework.scaladsl.ComponentHandlers having constructor parameter types:
+        |Subclass of class csw.framework.scaladsl.ComponentHandlers having constructor parameter types:
         |(interface akka.actor.typed.scaladsl.ActorContext, class csw.framework.models.CswContext)
         |OR
-        |Child of class csw.framework.javadsl.JComponentHandlers having constructor parameter types:
+        |Subclass of class csw.framework.javadsl.JComponentHandlers having constructor parameter types:
         |(interface akka.actor.typed.javadsl.ActorContext, class csw.framework.models.JCswContext).
         |Received:
         |csw.framework.javadsl.components.JInvalidComponentHandlers(csw.framework.models.JCswContext,akka.actor.typed.javadsl.ActorContext)
