@@ -40,8 +40,6 @@ private[framework] object ComponentBehaviorFactory {
 
   def make(componentHandlerClassPath: String): ComponentBehaviorFactory = {
     val componentHandlerClass: Class[_] = Class.forName(componentHandlerClassPath)
-    val componentHandlerClass2: Class[_] = classOf[ComponentHandlers]
-    val componentHandlerClass3: Class[_] = this.getClass
 
     if (JComponentBehaviorFactory.isValid(componentHandlerClass)) {
       JComponentBehaviorFactory.make(componentHandlerClass)
