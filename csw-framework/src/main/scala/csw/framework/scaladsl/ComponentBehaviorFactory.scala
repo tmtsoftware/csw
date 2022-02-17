@@ -7,8 +7,6 @@ import csw.framework.internal.component.ComponentBehavior
 import csw.framework.javadsl.{JComponentBehaviorFactory, JComponentHandlers}
 import csw.framework.models.{CswContext, JCswContext}
 
-import java.lang.reflect.Constructor
-
 /**
  * Base class for the factory for creating the behavior representing a component actor
  */
@@ -37,26 +35,21 @@ abstract class ComponentBehaviorFactory {
 }
 
 object ComponentBehaviorFactory {
-  private val scalaConstructorArgs     = Seq(classOf[ActorContext[TopLevelActorMessage]], classOf[CswContext])
-  private val javaConstructorArgs      = Seq(classOf[javadsl.ActorContext[TopLevelActorMessage]], classOf[JCswContext])
-  private val requiredJavaConstructor  = getConstructorFor(classOf[JComponentHandlers], javaConstructorArgs)
-  private val requiredScalaConstructor = getConstructorFor(classOf[ComponentHandlers], scalaConstructorArgs)
+  private val componentHandlerArgsType     = Seq(classOf[ActorContext[TopLevelActorMessage]], classOf[CswContext])
+  private val componentHandlersConstructor = ClassHelpers.getConstructorFor(classOf[ComponentHandlers], componentHandlerArgsType)
 
-  def make(componentHandlerClassString: String): ComponentBehaviorFactory = {
-    val componentHandlerClass = Class.forName(componentHandlerClassString)
+  private[framework] def make(componentHandlerClassPath: String): ComponentBehaviorFactory = {
+    val componentHandlerClass = Class.forName(componentHandlerClassPath)
 
-    if (verifyHandler(componentHandlerClass, requiredJavaConstructor)) {
-      val inputJavaConstructor = getConstructorFor(componentHandlerClass, javaConstructorArgs)
-      val bf: JComponentBehaviorFactory = (ctx, cswCtx) =>
-        inputJavaConstructor.newInstance(ctx, cswCtx).asInstanceOf[JComponentHandlers]
-      bf
+    if (JComponentBehaviorFactory.isValid(componentHandlerClass)) {
+      JComponentBehaviorFactory.make(componentHandlerClass)
     }
-    else if (verifyHandler(componentHandlerClass, requiredScalaConstructor)) {
-      val inputScalaConstructor = getConstructorFor(componentHandlerClass, scalaConstructorArgs)
-      (ctx, cswCtx) => inputScalaConstructor.newInstance(ctx, cswCtx).asInstanceOf[ComponentHandlers]
+    else if (ComponentBehaviorFactory.isValid(componentHandlerClass)) {
+      ComponentBehaviorFactory.make(componentHandlerClass)
     }
     else
-      throw new ClassCastException(s"""
+      throw new ClassCastException(
+        s"""
          |To load a component, you must provide one of the following:
          |For Scala: Subclass of ${classOf[ComponentHandlers]} having constructor parameter types:
          |(${classOf[ActorContext[TopLevelActorMessage]]}, ${classOf[CswContext]})
@@ -65,24 +58,17 @@ object ComponentBehaviorFactory {
          |(${classOf[javadsl.ActorContext[TopLevelActorMessage]]}, ${classOf[JCswContext]}).
          |Received:
          |${componentHandlerClass.getDeclaredConstructors.last}
-         |""".stripMargin)
+         |""".stripMargin
+      )
   }
 
-  private def verifyHandler(
-      inputHandlerClass: Class[?],
-      requiredConstructor: Constructor[?]
-  ): Boolean = {
-    // verify input class is assignable from ComponentHandler class && it's constructor has required parameters.
-    requiredConstructor.getDeclaringClass.isAssignableFrom(inputHandlerClass) &&
-    inputHandlerClass.getDeclaredConstructors.exists(constructor =>
-      requiredConstructor.getParameterTypes.sameElements(constructor.getParameterTypes)
-    )
-  }
+  // verify input class is assignable from ComponentHandler class && it's constructor has required parameters.
+  private def isValid(handlerClass: Class[?]): Boolean = ClassHelpers.verifyClass(handlerClass, componentHandlersConstructor)
 
-  private def getConstructorFor(clazz: Class[?], consArgs: Seq[Class[?]]): Constructor[?] = {
-    val constructor = clazz.getDeclaredConstructor(consArgs*)
-    constructor.setAccessible(true)
-    constructor
+  private[framework] def make(componentHandlerClass: Class[?]): ComponentBehaviorFactory = { (ctx, cswCtx) =>
+    ClassHelpers
+      .getConstructorFor(componentHandlerClass, componentHandlerArgsType)
+      .newInstance(ctx, cswCtx)
+      .asInstanceOf[ComponentHandlers]
   }
-
 }

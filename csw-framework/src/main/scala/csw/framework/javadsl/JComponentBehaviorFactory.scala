@@ -7,7 +7,7 @@ import csw.command.client.messages.TopLevelActorMessage
 import csw.config.client.javadsl.JConfigClientFactory
 import csw.event.client.internal.commons.EventServiceExt.RichEventService
 import csw.framework.models.{CswContext, JCswContext}
-import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
+import csw.framework.scaladsl.{ClassHelpers, ComponentBehaviorFactory, ComponentHandlers}
 import csw.location.client.extensions.LocationServiceExt.RichLocationService
 
 /**
@@ -16,7 +16,7 @@ import csw.location.client.extensions.LocationServiceExt.RichLocationService
 abstract class JComponentBehaviorFactory extends ComponentBehaviorFactory() {
 
   protected def handlers(ctx: scaladsl.ActorContext[TopLevelActorMessage], cswCtx: CswContext): ComponentHandlers = {
-    import cswCtx._
+    import cswCtx.*
     import ctx.executionContext
     jHandlers(
       ctx.asJava,
@@ -35,4 +35,21 @@ abstract class JComponentBehaviorFactory extends ComponentBehaviorFactory() {
   }
 
   protected[framework] def jHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: JCswContext): JComponentHandlers
+}
+
+object JComponentBehaviorFactory {
+  private val jComponentHandlerArgsType = Seq(classOf[ActorContext[TopLevelActorMessage]], classOf[JCswContext])
+  private val jComponentHandlersConstructor =
+    ClassHelpers.getConstructorFor(classOf[JComponentHandlers], JComponentBehaviorFactory.jComponentHandlerArgsType)
+
+  private[framework] def make(componentHandlerClass: Class[?]): JComponentBehaviorFactory = { (ctx, cswCtx) =>
+    ClassHelpers
+      .getConstructorFor(componentHandlerClass, jComponentHandlerArgsType)
+      .newInstance(ctx, cswCtx)
+      .asInstanceOf[JComponentHandlers]
+  }
+
+  // verify input class is assignable from JComponentHandler class && it's constructor has required parameters.
+  private[framework] def isValid(handlerClass: Class[?]): Boolean =
+    ClassHelpers.verifyClass(handlerClass, JComponentBehaviorFactory.jComponentHandlersConstructor)
 }
