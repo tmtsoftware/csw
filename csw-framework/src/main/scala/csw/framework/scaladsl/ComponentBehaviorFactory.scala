@@ -5,7 +5,7 @@ import akka.actor.typed.{ActorRef, Behavior, javadsl}
 import csw.command.client.messages.{FromComponentLifecycleMessage, TopLevelActorMessage}
 import csw.framework.internal.component.ComponentBehavior
 import csw.framework.javadsl.{JComponentBehaviorFactory, JComponentHandlers}
-import csw.framework.models.{ComponentHandlerNotFoundException, CswContext, JCswContext}
+import csw.framework.models.{CswContext, JCswContext}
 
 import java.lang.reflect.Constructor
 
@@ -37,39 +37,50 @@ abstract class ComponentBehaviorFactory {
 }
 
 object ComponentBehaviorFactory {
+  private val scalaConstructorArgs     = Seq(classOf[ActorContext[TopLevelActorMessage]], classOf[CswContext])
+  private val javaConstructorArgs      = Seq(classOf[javadsl.ActorContext[TopLevelActorMessage]], classOf[JCswContext])
+  private val requiredJavaConstructor  = getConstructorFor(classOf[JComponentHandlers], javaConstructorArgs)
+  private val requiredScalaConstructor = getConstructorFor(classOf[ComponentHandlers], scalaConstructorArgs)
 
   def make(componentHandlerClassString: String): ComponentBehaviorFactory = {
     val componentHandlerClass = Class.forName(componentHandlerClassString)
-    if (verifyJavaHandler(componentHandlerClass)) {
-      val jComponentBehaviorF: JComponentBehaviorFactory = (ctx, cswCtx) =>
-        javaHandlerConstructor(componentHandlerClass).newInstance(ctx, cswCtx).asInstanceOf[JComponentHandlers]
-      jComponentBehaviorF
+
+    if (verifyHandler(componentHandlerClass, requiredJavaConstructor)) {
+      val inputJavaConstructor = getConstructorFor(componentHandlerClass, javaConstructorArgs)
+      val bf: JComponentBehaviorFactory = (ctx, cswCtx) =>
+        inputJavaConstructor.newInstance(ctx, cswCtx).asInstanceOf[JComponentHandlers]
+      bf
     }
-    else if (verifyScalaHandler(componentHandlerClass)) {
-      val componentBehaviorF: ComponentBehaviorFactory = (ctx, cswCtx) =>
-        scalaHandlerConstructor(componentHandlerClass).newInstance(ctx, cswCtx).asInstanceOf[ComponentHandlers]
-      componentBehaviorF
+    else if (verifyHandler(componentHandlerClass, requiredScalaConstructor)) {
+      val inputScalaConstructor = getConstructorFor(componentHandlerClass, scalaConstructorArgs)
+      (ctx, cswCtx) => inputScalaConstructor.newInstance(ctx, cswCtx).asInstanceOf[ComponentHandlers]
     }
-    else throw new ComponentHandlerNotFoundException
+    else
+      throw new ClassCastException(s"""
+         |To load a component, you must provide one of the following:
+         |Child Class of ${classOf[ComponentHandlers]} having constructor parameter types:
+         |(${classOf[ActorContext[TopLevelActorMessage]]}, ${classOf[CswContext]})
+         |OR
+         |Child Class of ${classOf[JComponentHandlers]} having constructor parameter types:
+         |(${classOf[javadsl.ActorContext[TopLevelActorMessage]]}, ${classOf[JCswContext]}).
+         |Received:
+         |${componentHandlerClass.getDeclaredConstructors.last}
+         |""".stripMargin)
   }
 
-  private def verifyJavaHandler(componentHandlerClass: Class[?]): Boolean =
-    componentHandlerClass.getDeclaredConstructors.exists(constructor => {
-      javaHandlerConstructor(classOf[JComponentHandlers]).getParameterTypes.sameElements(constructor.getParameterTypes)
-    })
+  private def verifyHandler(
+      inputHandlerClass: Class[?],
+      requiredConstructor: Constructor[?]
+  ): Boolean = {
+    // verify input class is assignable from ComponentHandler class && it's constructor has required parameters.
+    requiredConstructor.getDeclaringClass.isAssignableFrom(inputHandlerClass) &&
+    inputHandlerClass.getDeclaredConstructors.exists(constructor =>
+      requiredConstructor.getParameterTypes.sameElements(constructor.getParameterTypes)
+    )
+  }
 
-  private def verifyScalaHandler(componentHandlerClass: Class[?]): Boolean =
-    componentHandlerClass.getDeclaredConstructors.exists(constructor => {
-      scalaHandlerConstructor(classOf[ComponentHandlers]).getParameterTypes.sameElements(constructor.getParameterTypes)
-    })
-
-  private def scalaHandlerConstructor(clazz: Class[?]): Constructor[?] =
-    clazz
-      .getDeclaredConstructor(classOf[ActorContext[TopLevelActorMessage]], classOf[CswContext])
-
-  private def javaHandlerConstructor(clazz: Class[?]): Constructor[?] = {
-    val constructor = clazz
-      .getDeclaredConstructor(classOf[javadsl.ActorContext[TopLevelActorMessage]], classOf[JCswContext])
+  private def getConstructorFor(clazz: Class[?], consArgs: Seq[Class[?]]): Constructor[?] = {
+    val constructor = clazz.getDeclaredConstructor(consArgs*)
     constructor.setAccessible(true)
     constructor
   }

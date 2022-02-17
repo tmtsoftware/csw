@@ -15,8 +15,7 @@ class InvalidComponentHandlers(cswCtx: CswContext, ctx: ActorContext[TopLevelAct
     extends ComponentHandlers(ctx, cswCtx) {
   import cswCtx.*
 
-  val log: Logger                   = loggerFactory.getLogger(ctx)
-
+  val log: Logger = loggerFactory.getLogger(ctx)
 
   override def initialize(): Unit = {
     log.info("Initializing Component TLA")
@@ -31,7 +30,6 @@ class InvalidComponentHandlers(cswCtx: CswContext, ctx: ActorContext[TopLevelAct
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = ???
 
   override def onShutdown(): Unit = ???
-
 
   override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = ???
 
