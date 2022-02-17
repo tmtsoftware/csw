@@ -10,7 +10,7 @@ import csw.framework.models.{CswContext, JCswContext}
 /**
  * Base class for the factory for creating the behavior representing a component actor
  */
-abstract class ComponentBehaviorFactory {
+private[framework] abstract class ComponentBehaviorFactory {
 
   /**
    * Implement this method for providing the component handlers to be used by component actor
@@ -34,12 +34,14 @@ abstract class ComponentBehaviorFactory {
       .narrow
 }
 
-object ComponentBehaviorFactory {
+private[framework] object ComponentBehaviorFactory {
   private val componentHandlerArgsType     = Seq(classOf[ActorContext[TopLevelActorMessage]], classOf[CswContext])
   private val componentHandlersConstructor = ClassHelpers.getConstructorFor(classOf[ComponentHandlers], componentHandlerArgsType)
 
-  private[framework] def make(componentHandlerClassPath: String): ComponentBehaviorFactory = {
-    val componentHandlerClass = Class.forName(componentHandlerClassPath)
+  def make(componentHandlerClassPath: String): ComponentBehaviorFactory = {
+    val componentHandlerClass: Class[_] = Class.forName(componentHandlerClassPath)
+    val componentHandlerClass2: Class[_] = classOf[ComponentHandlers]
+    val componentHandlerClass3: Class[_] = this.getClass
 
     if (JComponentBehaviorFactory.isValid(componentHandlerClass)) {
       JComponentBehaviorFactory.make(componentHandlerClass)
@@ -65,7 +67,7 @@ object ComponentBehaviorFactory {
   // verify input class is assignable from ComponentHandler class && it's constructor has required parameters.
   private def isValid(handlerClass: Class[?]): Boolean = ClassHelpers.verifyClass(handlerClass, componentHandlersConstructor)
 
-  private[framework] def make(componentHandlerClass: Class[?]): ComponentBehaviorFactory = { (ctx, cswCtx) =>
+  def make(componentHandlerClass: Class[?]): ComponentBehaviorFactory = { (ctx, cswCtx) =>
     ClassHelpers
       .getConstructorFor(componentHandlerClass, componentHandlerArgsType)
       .newInstance(ctx, cswCtx)

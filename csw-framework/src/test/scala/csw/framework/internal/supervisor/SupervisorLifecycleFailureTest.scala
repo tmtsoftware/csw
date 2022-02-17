@@ -2,15 +2,10 @@ package csw.framework.internal.supervisor
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.ActorRef
-import akka.actor.typed.scaladsl.ActorContext
 import csw.command.client.messages.CommandMessage.Submit
-import csw.command.client.messages.ComponentCommonMessage.{
-  ComponentStateSubscription,
-  GetSupervisorLifecycleState,
-  LifecycleStateSubscription
-}
+import csw.command.client.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.command.client.messages.SupervisorContainerCommonMessages.Restart
-import csw.command.client.messages.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
+import csw.command.client.messages.{ComponentMessage, ContainerIdleMessage}
 import csw.command.client.models.framework.{LifecycleStateChanged, PubSub, SupervisorLifecycleState}
 import csw.common.FrameworkAssertions.*
 import csw.common.components.framework.SampleComponentState.*
@@ -19,7 +14,7 @@ import csw.framework.ComponentInfos.*
 import csw.framework.exceptions.{FailureRestart, FailureStop}
 import csw.framework.internal.component.ComponentBehavior
 import csw.framework.models.CswContext
-import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
+import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.internal.LoggingSystem
@@ -71,7 +66,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     "handle TLA failure with FailureStop exception in initialize with Restart message | DEOPSCSW-178, DEOPSCSW-181, DEOPSCSW-180"
   ) {
     val testMocks = frameworkTestMocks()
-    import testMocks._
+    import testMocks.*
 
     val componentHandlers = createComponentHandlers(testMocks)
 
@@ -131,7 +126,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 
   test("handle TLA failure with FailureRestart exception in initialize | DEOPSCSW-178, DEOPSCSW-181, DEOPSCSW-180") {
     val testMocks = frameworkTestMocks()
-    import testMocks._
+    import testMocks.*
 
     val componentHandlers   = createComponentHandlers(testMocks)
     val failureRestartExMsg = "testing FailureRestart"
@@ -172,7 +167,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
   // DEOPSCSW-294 : FailureRestart exception from onDomainMsg, onSetup or onObserve component handlers results into unexpected message to supervisor
   test("handle TLA failure with FailureRestart exception in Running | DEOPSCSW-178, DEOPSCSW-181, DEOPSCSW-294") {
     val testMocks = frameworkTestMocks()
-    import testMocks._
+    import testMocks.*
 
     val componentHandlers   = createComponentHandlers(testMocks)
     val failureRestartExMsg = "testing FailureRestart"
@@ -218,12 +213,12 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
       testMocks: FrameworkTestMocks,
       componentHandlers: ComponentHandlers
   ): Unit = {
-    import testMocks._
+    import testMocks.*
 
     val supervisorBehavior = SupervisorBehaviorFactory.make(
       Some(mock[ActorRef[ContainerIdleMessage]]),
       registrationFactory,
-      new SampleBehaviorFactory(componentHandlers),
+      (_, _) => componentHandlers,
       new CswContext(
         cswCtx.locationService,
         cswCtx.eventService,
@@ -242,7 +237,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
   }
 
   private def createComponentHandlers(testMocks: FrameworkTestMocks) = {
-    import testMocks._
+    import testMocks.*
 
     createAnswers(compStateProbe)
 
@@ -263,11 +258,6 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     shutdownAnswer = _ =>
       compStateProbe.ref ! CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice)))
   }
-}
-
-class SampleBehaviorFactory(componentHandlers: ComponentHandlers) extends ComponentBehaviorFactory {
-  override protected def handlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext): ComponentHandlers =
-    componentHandlers
 }
 
 case class TestFailureStop(msg: String)    extends FailureStop(msg)
