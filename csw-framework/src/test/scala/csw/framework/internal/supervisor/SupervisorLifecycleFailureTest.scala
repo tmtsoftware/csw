@@ -3,7 +3,11 @@ package csw.framework.internal.supervisor
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.ActorRef
 import csw.command.client.messages.CommandMessage.Submit
-import csw.command.client.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
+import csw.command.client.messages.ComponentCommonMessage.{
+  ComponentStateSubscription,
+  GetSupervisorLifecycleState,
+  LifecycleStateSubscription
+}
 import csw.command.client.messages.SupervisorContainerCommonMessages.Restart
 import csw.command.client.messages.{ComponentMessage, ContainerIdleMessage}
 import csw.command.client.models.framework.{LifecycleStateChanged, PubSub, SupervisorLifecycleState}

@@ -7,7 +7,7 @@ import csw.command.client.models.framework.{ComponentInfo, LocationServiceUsage}
 import csw.framework.internal.supervisor.SupervisorBehaviorFactory
 import csw.framework.internal.wiring.{CswFrameworkSystem, FrameworkWiring}
 import csw.framework.models.CswContext
-import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
+import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.{ComponentType, Connection}
 import csw.prefix.models.Prefix
 
