@@ -9,7 +9,9 @@ The product is in a new repository: [csw](https://github.com/tmtsoftware/csw).
 
 All notable changes to this project will be documented in this file.
 
-## Upcoming releases 
+## Upcoming releases
+
+- Upgrade the project to jdk 17 (Update the INSTALL.md)
 - Add `nanometers` to Units
 
 ## [CSW v4.0.1] - 2022-02-09
