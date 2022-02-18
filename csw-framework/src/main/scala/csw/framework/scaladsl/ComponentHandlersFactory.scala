@@ -4,13 +4,13 @@ import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.typed.{ActorRef, Behavior, javadsl}
 import csw.command.client.messages.{FromComponentLifecycleMessage, TopLevelActorMessage}
 import csw.framework.internal.component.ComponentBehavior
-import csw.framework.javadsl.{JComponentBehaviorFactory, JComponentHandlers}
+import csw.framework.javadsl.{JComponentHandlersFactory, JComponentHandlers}
 import csw.framework.models.{CswContext, JCswContext}
 
 /**
  * Base class for the factory for creating the behavior representing a component actor
  */
-private[framework] abstract class ComponentBehaviorFactory {
+private[framework] abstract class ComponentHandlersFactory {
 
   /**
    * Implement this method for providing the component handlers to be used by component actor
@@ -19,7 +19,7 @@ private[framework] abstract class ComponentBehaviorFactory {
    * @param cswCtx provides access to csw services e.g. location, event, alarm, etc
    * @return componentHandlers to be used by this component
    */
-  protected def handlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext): ComponentHandlers
+  def handlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext): ComponentHandlers
 
   /**
    * Creates the [[akka.actor.typed.Behavior]] of the component
@@ -34,18 +34,18 @@ private[framework] abstract class ComponentBehaviorFactory {
       .narrow
 }
 
-private[framework] object ComponentBehaviorFactory {
+private[framework] object ComponentHandlersFactory {
   private val componentHandlerArgsType     = Seq(classOf[ActorContext[TopLevelActorMessage]], classOf[CswContext])
   private val componentHandlersConstructor = ClassHelpers.getConstructorFor(classOf[ComponentHandlers], componentHandlerArgsType)
 
-  def make(componentHandlerClassPath: String): ComponentBehaviorFactory = {
+  def make(componentHandlerClassPath: String): ComponentHandlersFactory = {
     val componentHandlerClass: Class[_] = Class.forName(componentHandlerClassPath)
 
-    if (JComponentBehaviorFactory.isValid(componentHandlerClass)) {
-      JComponentBehaviorFactory.make(componentHandlerClass)
+    if (JComponentHandlersFactory.isValid(componentHandlerClass)) {
+      JComponentHandlersFactory.make(componentHandlerClass)
     }
-    else if (ComponentBehaviorFactory.isValid(componentHandlerClass)) {
-      ComponentBehaviorFactory.make(componentHandlerClass)
+    else if (ComponentHandlersFactory.isValid(componentHandlerClass)) {
+      ComponentHandlersFactory.make(componentHandlerClass)
     }
     else
       throw new ClassCastException(
@@ -65,7 +65,7 @@ private[framework] object ComponentBehaviorFactory {
   // verify input class is assignable from ComponentHandler class && it's constructor has required parameters.
   private def isValid(handlerClass: Class[?]): Boolean = ClassHelpers.verifyClass(handlerClass, componentHandlersConstructor)
 
-  def make(componentHandlerClass: Class[?]): ComponentBehaviorFactory = { (ctx, cswCtx) =>
+  def make(componentHandlerClass: Class[?]): ComponentHandlersFactory = { (ctx, cswCtx) =>
     ClassHelpers
       .getConstructorFor(componentHandlerClass, componentHandlerArgsType)
       .newInstance(ctx, cswCtx)

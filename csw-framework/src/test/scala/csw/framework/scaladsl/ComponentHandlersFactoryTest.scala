@@ -4,11 +4,11 @@ import csw.framework.ComponentInfos
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 
-class ComponentBehaviorFactoryTest extends AnyFunSuite with Matchers {
-  test("Component Behavior factory should throw error when scala handler constructor not found | CSW-174") {
+class ComponentHandlersFactoryTest extends AnyFunSuite with Matchers {
+  test("Component Handlers factory should throw error when scala handler constructor not found | CSW-174") {
     val componentHandlerClassName = ComponentInfos.hcdInfoWithHandlerException.componentHandlerClassName
     val thrown = intercept[Exception] {
-      ComponentBehaviorFactory.make(componentHandlerClassName)
+      ComponentHandlersFactory.make(componentHandlerClassName)
     }
     val expectedMessage = """
       |To load a component, you must provide one of the following:
@@ -25,10 +25,10 @@ class ComponentBehaviorFactoryTest extends AnyFunSuite with Matchers {
 
   }
 
-  test("Component Behavior factory should throw error when java handler constructor not found | CSW-174") {
+  test("Component Handlers factory should throw error when java handler constructor not found | CSW-174") {
     val componentHandlerClassName = ComponentInfos.jHcdInfoWithHandlerException.componentHandlerClassName
     val thrown = intercept[Exception] {
-      ComponentBehaviorFactory.make(componentHandlerClassName)
+      ComponentHandlersFactory.make(componentHandlerClassName)
     }
     val expectedMessage =
       """
