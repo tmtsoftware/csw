@@ -50,7 +50,7 @@ class LocationAgent(settings: Settings) {
     catch {
       case NonFatal(e) =>
         ColoredConsole.RED.println(
-          "Make sure 'PGDATA' env variable should point to a location under your HOME dir, not the one used by the system postgres installation, which has protected permissions. It is recommended to create a data directory especially for use with the Database Service. e.g. for linux users: /home/username/postgres and for mac users: /usr/local/var/postgres"
+          "Make sure the PGDATA environment variable points to the Postgres data directory. For Mac users this can be the same as the system version: /usr/local/var/postgres. For Linux users, PGDATA must point to a different directory for which you have write permission (For example, ~/postgres), since the system version belongs to the root user."
         )
         throw e
     }
