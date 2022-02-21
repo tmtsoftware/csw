@@ -7,12 +7,14 @@ import csw.command.client.messages.TopLevelActorMessage
 import csw.config.client.javadsl.JConfigClientFactory
 import csw.event.client.internal.commons.EventServiceExt.RichEventService
 import csw.framework.models.{CswContext, JCswContext}
-import csw.framework.scaladsl.{ClassHelpers, ComponentHandlersFactory, ComponentHandlers}
+import csw.framework.scaladsl.{ComponentHandlers, ComponentHandlersFactory}
 import csw.location.client.extensions.LocationServiceExt.RichLocationService
 
 /**
  * Base class for the factory for creating the behavior representing a component actor
  */
+// The annotation is required to prevent a warning while interpreting a lambda into this SAM interface
+@FunctionalInterface
 abstract class JComponentHandlersFactory extends ComponentHandlersFactory() {
 
   def handlers(ctx: scaladsl.ActorContext[TopLevelActorMessage], cswCtx: CswContext): ComponentHandlers = {
@@ -35,21 +37,4 @@ abstract class JComponentHandlersFactory extends ComponentHandlersFactory() {
   }
 
   protected[framework] def jHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: JCswContext): JComponentHandlers
-}
-
-object JComponentHandlersFactory {
-  private val jComponentHandlerArgsType = Seq(classOf[ActorContext[TopLevelActorMessage]], classOf[JCswContext])
-  private val jComponentHandlersConstructor =
-    ClassHelpers.getConstructorFor(classOf[JComponentHandlers], JComponentHandlersFactory.jComponentHandlerArgsType)
-
-  private[framework] def make(componentHandlerClass: Class[?]): JComponentHandlersFactory = { (ctx, cswCtx) =>
-    ClassHelpers
-      .getConstructorFor(componentHandlerClass, jComponentHandlerArgsType)
-      .newInstance(ctx, cswCtx)
-      .asInstanceOf[JComponentHandlers]
-  }
-
-  // verify input class is assignable from JComponentHandler class && it's constructor has required parameters.
-  private[framework] def isValid(handlerClass: Class[?]): Boolean =
-    ClassHelpers.verifyClass(handlerClass, JComponentHandlersFactory.jComponentHandlersConstructor)
 }

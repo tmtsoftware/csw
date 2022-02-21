@@ -4,12 +4,14 @@ import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.typed.{ActorRef, Behavior, javadsl}
 import csw.command.client.messages.{FromComponentLifecycleMessage, TopLevelActorMessage}
 import csw.framework.internal.component.ComponentBehavior
-import csw.framework.javadsl.{JComponentHandlersFactory, JComponentHandlers}
+import csw.framework.javadsl.{JComponentHandlers, JComponentHandlersFactory}
 import csw.framework.models.{CswContext, JCswContext}
 
 /**
  * Base class for the factory for creating the behavior representing a component actor
  */
+// The annotation is required to prevent a warning while interpreting a lambda into this SAM interface
+@FunctionalInterface
 private[framework] abstract class ComponentHandlersFactory {
 
   /**
@@ -35,17 +37,16 @@ private[framework] abstract class ComponentHandlersFactory {
 }
 
 private[framework] object ComponentHandlersFactory {
-  private val componentHandlerArgsType     = Seq(classOf[ActorContext[TopLevelActorMessage]], classOf[CswContext])
-  private val componentHandlersConstructor = ClassHelpers.getConstructorFor(classOf[ComponentHandlers], componentHandlerArgsType)
-
   def make(componentHandlerClassPath: String): ComponentHandlersFactory = {
-    val componentHandlerClass: Class[_] = Class.forName(componentHandlerClassPath)
+    val inputClass = new InputClass(Class.forName(componentHandlerClassPath))
 
-    if (JComponentHandlersFactory.isValid(componentHandlerClass)) {
-      JComponentHandlersFactory.make(componentHandlerClass)
+    if (inputClass.isValid[JComponentHandlers]) {
+      // type scription is required to interpret the lambda as a SAM interface
+      inputClass.instantiateAs[JComponentHandlers]: JComponentHandlersFactory
     }
-    else if (ComponentHandlersFactory.isValid(componentHandlerClass)) {
-      ComponentHandlersFactory.make(componentHandlerClass)
+    else if (inputClass.isValid[ComponentHandlers]) {
+      // type scription is required to interpret the lambda as a SAM interface
+      inputClass.instantiateAs[ComponentHandlers]: ComponentHandlersFactory
     }
     else
       throw new ClassCastException(
@@ -57,18 +58,9 @@ private[framework] object ComponentHandlersFactory {
          |For Java: Subclass of ${classOf[JComponentHandlers]} having constructor parameter types:
          |(${classOf[javadsl.ActorContext[TopLevelActorMessage]]}, ${classOf[JCswContext]}).
          |Received:
-         |${componentHandlerClass.getDeclaredConstructors.last}
+         |${inputClass.inputClass.getDeclaredConstructors.last}
          |""".stripMargin
       )
   }
 
-  // verify input class is assignable from ComponentHandler class && it's constructor has required parameters.
-  private def isValid(handlerClass: Class[?]): Boolean = ClassHelpers.verifyClass(handlerClass, componentHandlersConstructor)
-
-  def make(componentHandlerClass: Class[?]): ComponentHandlersFactory = { (ctx, cswCtx) =>
-    ClassHelpers
-      .getConstructorFor(componentHandlerClass, componentHandlerArgsType)
-      .newInstance(ctx, cswCtx)
-      .asInstanceOf[ComponentHandlers]
-  }
 }
