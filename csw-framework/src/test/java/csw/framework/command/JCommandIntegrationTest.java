@@ -110,7 +110,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
     }
 
     @Test
-    public void testCommandExecutionBetweenComponents__DEOPSCSW_224_DEOPSCSW_317_DEOPSCSW_212_DEOPSCSW_227_DEOPSCSW_228_DEOPSCSW_217_DEOPSCSW_321_DEOPSCSW_234_DEOPSCSW_225_DEOPSCSW_229() throws Exception {
+    public void testCommandExecutionBetweenComponents__DEOPSCSW_224_DEOPSCSW_317_DEOPSCSW_212_DEOPSCSW_227_DEOPSCSW_228_DEOPSCSW_217_DEOPSCSW_321_DEOPSCSW_234_DEOPSCSW_225_DEOPSCSW_229_CSW_174() throws Exception {
 
         Key<Integer> encoder = JKeyType.IntKey().make("encoder", JUnits.encoder);
         Parameter<Integer> encoderValue = encoder.set(22, 23);
