@@ -75,16 +75,15 @@ private[framework] class ContainerCmd(
       defaultConfig: Option[Config]
   ): Future[ActorRef[_]] =
     async {
-      val config    = await(wiring.configUtils.getConfig(isLocal, inputFilePath, defaultConfig))
-      val container = config.hasPath("components")
-
-      val actorRef = await(createComponent(container, wiring, config))
+      val config          = await(wiring.configUtils.getConfig(isLocal, inputFilePath, defaultConfig))
+      val isContainerConf = config.hasPath("components")
+      val actorRef        = await(createComponent(isContainerConf, wiring, config))
       log.info(s"Component is successfully created with actor actorRef $actorRef")
       actorRef
     }
 
-  private def createComponent(container: Boolean, wiring: FrameworkWiring, config: Config): Future[ActorRef[_]] =
-    if (container) Container.spawn(config, wiring)
+  private def createComponent(isContainerConf: Boolean, wiring: FrameworkWiring, config: Config): Future[ActorRef[_]] =
+    if (isContainerConf) Container.spawn(config, wiring)
     else Standalone.spawn(config, wiring)
 
   private def shutdown(): Done = Await.result(wiring.actorRuntime.shutdown(), 10.seconds)
