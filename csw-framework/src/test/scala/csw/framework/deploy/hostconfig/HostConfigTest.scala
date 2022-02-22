@@ -17,7 +17,9 @@ class HostConfigTest extends AnyFunSuite with MockitoSugar with Matchers {
 
   mockedProcesses.foreach(p => when(p.pid()).thenReturn(1))
 
-  test("should parse host configuration file and invoke container cmd app with valid arguments | DEOPSCSW-174, DEOPSCSW-314") {
+  test(
+    "should parse host configuration file and invoke container cmd app with valid arguments | DEOPSCSW-174, DEOPSCSW-314, CSW-177"
+  ) {
     var actualScripts: List[(String, List[String])] = Nil
 
     var counter = 0
@@ -35,12 +37,10 @@ class HostConfigTest extends AnyFunSuite with MockitoSugar with Matchers {
 
     /*    ======== this is the host config file used in this test ========
       {
-        mode: "Container"
         configFilePath: "/csw-framework/src/resources/laser_container.conf"
         configFileLocation: "Local"
       },
       {
-        mode: "Standalone"
         configFilePath: "standalone.conf"
         configFileLocation: "Remote"
       }
@@ -49,7 +49,7 @@ class HostConfigTest extends AnyFunSuite with MockitoSugar with Matchers {
 
     val expectedScripts =
       List(
-        (containerCmdAppScript, List("standalone.conf", "--standalone")),
+        (containerCmdAppScript, List("standalone.conf")),
         (containerCmdAppScript, List("/csw-framework/src/resources/laser_container.conf", "--local"))
       )
 

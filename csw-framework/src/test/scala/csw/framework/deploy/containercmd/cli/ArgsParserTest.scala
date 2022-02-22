@@ -26,21 +26,15 @@ class ArgsParserTest extends scalatest.funsuite.AnyFunSuite with Matchers with B
       }
     }
 
-  test("should parse arguments when all arguments are provided") {
-    val args                     = Array("--standalone", "--local", inputFilePath)
-    val options: Option[Options] = silentParse(args)
-    options should contain(Options(standalone = true, local = true, Some(Paths.get(inputFilePath))))
-  }
-
-  test("should parse arguments with default value of false when standalone option is not provided") {
+  test("should parse arguments when all arguments are provided | CSW-177") {
     val args                     = Array("--local", inputFilePath)
     val options: Option[Options] = silentParse(args)
-    options should contain(Options(standalone = false, local = true, Some(Paths.get(inputFilePath))))
+    options should contain(Options(local = true, Some(Paths.get(inputFilePath))))
   }
 
-  test("should parse arguments with default value of false when local option is not provided") {
-    val args                     = Array("--standalone", inputFilePath)
+  test("should parse arguments with default value of false when local option is not provided | CSW-177") {
+    val args                     = Array(inputFilePath)
     val options: Option[Options] = silentParse(args)
-    options should contain(Options(standalone = true, local = false, Some(Paths.get(inputFilePath))))
+    options should contain(Options(local = false, Some(Paths.get(inputFilePath))))
   }
 }

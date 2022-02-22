@@ -15,6 +15,8 @@ All notable changes to this project will be documented in this file.
 - Add `nanometers` to Units
 - [Breaking] ComponentInfo now takes componentHandlerClassName instead of behaviorFactoryClassName.
   Follow migration guide(https://tmtsoftware.github.io/csw/migration_guide/migration_guide_4.0.0_to_5.0.0/migration-guide-4.0.0-to-5.0.0.html)
+- Starting Component in standalone or container mode is automatically derived based on config structure. So, 
+  - When using ContainerCmd App, used don't need to provide `--standalone` option anymore.
 
 ## [CSW v4.0.1] - 2022-02-09
 This is final release v4.0.1 of the TMT Common Software for project stakeholders.

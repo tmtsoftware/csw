@@ -102,7 +102,7 @@ class ContainerCmdTest(ignore: Int)
 
   test(
     s"${testPrefix} should able to start components in container mode and in standalone mode through configuration service" +
-      " | DEOPSCSW-171, DEOPSCSW-168, DEOPSCSW-182, DEOPSCSW-167, DEOPSCSW-43, DEOPSCSW-172, DEOPSCSW-216, DEOPSCSW-203, DEOPSCSW-169, DEOPSCSW-430"
+      " | DEOPSCSW-171, DEOPSCSW-168, DEOPSCSW-182, DEOPSCSW-167, DEOPSCSW-43, DEOPSCSW-172, DEOPSCSW-216, DEOPSCSW-203, DEOPSCSW-169, DEOPSCSW-430, CSW-177"
   ) {
 
     // start config server and upload laser_container.conf file
@@ -121,7 +121,7 @@ class ContainerCmdTest(ignore: Int)
 
       val maybeContainerLoc = resolveLgsfContainer().futureValue
 
-      //DEOPSCSW-430: Update AkkaLocation model to take Prefix model instead of Option[String]
+      // DEOPSCSW-430: Update AkkaLocation model to take Prefix model instead of Option[String]
       maybeContainerLoc.map(_.prefix).value shouldBe Prefix(s"${Container.entryName}.LGSF_Container")
       val containerRef = maybeContainerLoc.value.containerRef
 
@@ -235,7 +235,7 @@ class ContainerCmdTest(ignore: Int)
       // when sbt-assembly creates fat jar
       val standaloneConfFilePath = createStandaloneTmpFile()
 
-      val args = Array("--standalone", "--local", standaloneConfFilePath.toString)
+      val args = Array("--local", standaloneConfFilePath.toString)
       containerCmd.start(args)
       val supervisorRef = resolveEtonHcd().futureValue.value.componentRef
       assertThatSupervisorIsRunning(supervisorRef, testProbe, 5.seconds)
