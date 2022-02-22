@@ -3,6 +3,7 @@ package csw.params.events;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.*;
 import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JUnits;
 import csw.prefix.models.Prefix;
 import org.junit.Assert;
 import org.junit.Test;
@@ -137,8 +138,8 @@ public class JIRDetectorEventTest extends JUnitSuite {
         Parameter<Integer> readsCompleteParam = JKeyType.IntKey().make("readsComplete").set(readsComplete);
         Parameter<Integer> rampsInExposureParam = JKeyType.IntKey().make("rampsInExposure").set(rampsInExposure);
         Parameter<Integer> rampsCompleteParam = JKeyType.IntKey().make("rampsComplete").set(rampsComplete);
-        Parameter<Long> exposureTimeParam = JKeyType.LongKey().make("exposureTime").set(exposureTime);
-        Parameter<Long> remainingExposureTimeParam = JKeyType.LongKey().make("remainingExposureTime").set(remainingExposureTime);
+        Parameter<Long> exposureTimeParam = JKeyType.LongKey().make("exposureTime", JUnits.millisecond).set(exposureTime);
+        Parameter<Long> remainingExposureTimeParam = JKeyType.LongKey().make("remainingExposureTime", JUnits.millisecond).set(remainingExposureTime);
 
         Set<Parameter<?>> paramSet = new HashSet<>(10);
         paramSet.add(exposureIdParam);

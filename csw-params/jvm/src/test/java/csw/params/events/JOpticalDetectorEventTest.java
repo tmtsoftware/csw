@@ -6,6 +6,7 @@ import csw.params.core.models.Choices;
 import csw.params.core.models.ExposureId;
 import csw.params.core.models.ObsId;
 import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JUnits;
 import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
 import org.junit.Assert;
@@ -154,11 +155,11 @@ public class JOpticalDetectorEventTest extends JUnitSuite {
 
 
     private Set<Parameter<?>> getParamSetForExposureDataEvent(long exposureTime, long remainingExposureTime, int coaddsInExposure, int coaddsDone) {
-        Parameter<Long> exposureTimeParam = JKeyType.LongKey().make("exposureTime").set(exposureTime);
+        Parameter<Long> exposureTimeParam = JKeyType.LongKey().make("exposureTime", JUnits.millisecond).set(exposureTime);
         Parameter<Integer> coaddsInExposureParam = JKeyType.IntKey().make("coaddsInExposure").set(coaddsInExposure);
         Parameter<Integer> coaddsDoneParam = JKeyType.IntKey().make("coaddsDone").set(coaddsDone);
         Parameter<String> exposureIdParam = JKeyType.StringKey().make("exposureId").set(exposureId.toString());
-        Parameter<Long> remainingExposureTimeParam = JKeyType.LongKey().make("remainingExposureTime").set(remainingExposureTime);
+        Parameter<Long> remainingExposureTimeParam = JKeyType.LongKey().make("remainingExposureTime", JUnits.millisecond).set(remainingExposureTime);
 
         Set<Parameter<?>> paramSet = new HashSet<>(10);
         paramSet.add(exposureIdParam);
