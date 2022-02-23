@@ -173,7 +173,7 @@ private[framework] object ComponentBehavior {
       def handleValidate(runId: Id, commandMessage: CommandMessage, replyTo: ActorRef[ValidateResponse]): Unit = {
         // log.info(s"Invoking lifecycle handler's validateCommand hook with msg :[$commandMessage]")
         // converting runId to str and then taking last five chars of the string to print in log message.
-        val runIdStrSmall: String = runId.toString.takeRight(5)
+        val runIdStrSmall: String = runId.id.takeRight(5)
         log.info(s"Validate : runId :[$runIdStrSmall] with msg [$commandMessage]")
         val validationResponse = lifecycleHandlers.validateCommand(runId, commandMessage.command)
         replyTo ! validationResponse.asInstanceOf[ValidateResponse]
@@ -182,8 +182,8 @@ private[framework] object ComponentBehavior {
       def handleOneway(runId: Id, commandMessage: CommandMessage, replyTo: ActorRef[OnewayResponse]): Unit = {
         // log.info(s"Invoking lifecycle handler's validateCommand hook with msg :[$commandMessage]")
         // converting runId to str and then taking last five chars of the string to print in log message.
-        val runIdStrSmall: String = runId.toString.takeRight(5)
-        log.info(s"Oneway : runId :[$runIdStrSmall] with msg [$commandMessage]")
+        val runIdStrSmall: String = runId.id.takeRight(5)
+        log.info(s"Validate : runId :[$runIdStrSmall] with msg [$commandMessage]")
         val validationResponse = lifecycleHandlers.validateCommand(runId, commandMessage.command)
         replyTo ! validationResponse.asInstanceOf[OnewayResponse]
 
@@ -200,7 +200,7 @@ private[framework] object ComponentBehavior {
       def handleSubmit(runId: Id, commandMessage: CommandMessage, replyTo: ActorRef[SubmitResponse]): Unit = {
         // log.info(s"Invoking lifecycle handler's validateCommand hook with msg :[$commandMessage]")
         // converting runId to str and then taking last five chars of the string to print in log message.
-        val runIdStrSmall: String = runId.toString.takeRight(5)
+        val runIdStrSmall: String = runId.id.takeRight(5)
         log.info(s"Validate : runId :[$runIdStrSmall] with msg [$commandMessage]")
         lifecycleHandlers.validateCommand(runId, commandMessage.command) match {
           case Accepted(_) =>
