@@ -1,12 +1,13 @@
 package csw.testkit.internal
 
 import akka.actor.typed.ActorRef
-import csw.command.client.messages.ComponentMessage
+import akka.actor.typed.scaladsl.ActorContext
+import csw.command.client.messages.{ComponentMessage, TopLevelActorMessage}
 import csw.command.client.models.framework.{ComponentInfo, LocationServiceUsage}
 import csw.framework.internal.supervisor.SupervisorBehaviorFactory
 import csw.framework.internal.wiring.{CswFrameworkSystem, FrameworkWiring}
 import csw.framework.models.CswContext
-import csw.framework.scaladsl.ComponentBehaviorFactory
+import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.{ComponentType, Connection}
 import csw.prefix.models.Prefix
 
@@ -20,7 +21,7 @@ private[testkit] object SpawnComponent {
       frameworkWiring: FrameworkWiring,
       prefix: Prefix,
       componentType: ComponentType,
-      behaviorFactory: ComponentBehaviorFactory,
+      behaviorFactory: (ActorContext[TopLevelActorMessage], CswContext) => ComponentHandlers,
       locationServiceUsage: LocationServiceUsage,
       connections: Set[Connection],
       initializeTimeout: FiniteDuration

@@ -7,7 +7,7 @@ We’ll use the [sbt](https://www.scala-sbt.org/1.x/docs/index.html) build tool 
 ## Installation
 Supported Operating Systems are: CentOS and MacOS
  
-1.  Make sure you have coursier installed and set up along with Java AdoptOpenJDK 11 and sbt.
+1.  Make sure you have coursier installed and set up along with Java Eclipse Temurin 17 and sbt.
     Please refer to @ref:[coursier installation](../apps/csinstallation.md) for more details.
 2. Install IntelliJ 
 	- [MAC](https://www.jetbrains.com/idea/download/)
@@ -41,7 +41,7 @@ You will then see a dialog asking how to import the project.
 
 ![intellijImport](../images/gettingstarted/intellijImport.png)
 
-On the next dialog, click the Project JDK dropdown and select Java 11.
+On the next dialog, click the Project JDK dropdown and select Java 17.
 
 ![intellijJava](../images/gettingstarted/intellijJava.png)
 
@@ -55,35 +55,32 @@ structure.  Much of what is described below is described in more detail on the s
 
 As you can see in below snapshot, template will create three projects:
 
-    - `sample`
-    - `samplehcd`
-    - `sample-deploy`
+    - `csw-sampleassembly`
+    - `csw-samplehcd`
+    - `csw-sampledeploy`
     
 ![sample-project-structure](../images/gettingstarted/sampleProjectLayout.png)
 
-1. This shows where the module for the assembly is located, called `sample`
+1. This shows where the module for the assembly is located, called `csw-sampleassembly`
 
-2. The template generates handlers and factories for both Java and Scala.  Both are not required to develop a 
+2. The template generates handlers for both Java and Scala.  Both are not required to develop a 
 component.  After you choose which language you want to develop in, you can delete the other.  We encourage you
-to use Scala!  It has good support for asynchronous programming. 
+to use Scala!  It has good support for asynchronous programming.
 
-3. This is the factory for creating your component actor behavior, which is created by the framework.  This does
-not need to be modified.
+3. This is the handlers class where you implement your custom logic.
 
-4. This is the handlers class where you implement your custom logic.
+4. The template creates an example test fixture for testing your code in both Java and Scala.
 
-5. The template creates an example test fixture for testing your code in both Java and Scala.
-
-6. Sample component configuration files are created to facilitate testing.  The actual component configuration files
+5. Sample component configuration files are created to facilitate testing.  The actual component configuration files
 needed for running your component are located in the deploy module (see below). 
 
-7. The HCD code is in a separate module here.
+6. The HCD code is in a separate module here.
 
 The following diagram shows the deploy folder and the project folder:
 
 ![sample-deploy](../images/gettingstarted/sampleDeploy.png)
 
-1.  `sample-deploy` project is used to create a concrete implementation.  This allows for the construction of a complete binary
+1.  `csw-sampledeploy` project is used to create a concrete implementation.  This allows for the construction of a complete binary
 package bundled with all dependencies, and a launching application.  This part shows the configuration files used in
 component or container construction.
 

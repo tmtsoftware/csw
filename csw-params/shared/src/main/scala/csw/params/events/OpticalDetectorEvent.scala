@@ -22,8 +22,8 @@ object OpticalDetectorEvent extends DetectorEvent(ObserveEventNames.OpticalDetec
    *                   when the ExposureId is created.
    * @param coaddsInExposure The integer total number of coadds in the current exposure. Value should be constant during an exposure
    * @param coaddsDone Integer number of completed coadds from 1 to coaddsInExposure. Should be reset to 0 at the start of every exposure.
-   * @param exposureTime Length in seconds of the current exposure
-   * @param remainingExposureTime Number of seconds remaining in current exposure • Should count down in seconds – no faster than 1 Hz
+   * @param exposureTime Length in milliseconds of the current exposure
+   * @param remainingExposureTime Number of milliseconds remaining in current exposure • Should count down in seconds – no faster than 1 Hz
    * @return [[csw.params.events.ObserveEvent]]]
    */
   def exposureData(

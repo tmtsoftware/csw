@@ -23,8 +23,8 @@ object IRDetectorEvent extends DetectorEvent(ObserveEventNames.IRDetectorExposur
    * @param readsComplete Integer number of current completed read from 1 to  readsInRamp. Should be reset to 0 at the start of every ramp
    * @param rampsInExposure  The integer total number of ramps in the current exposure. Value should be constant during an exposure.
    * @param rampsComplete  Integer number of completed ramp from 1 to rampsInExposure. Should be reset to 0 at the start of every exposure.
-   * @param exposureTime Length in seconds of the current exposure
-   * @param remainingExposureTime Number of seconds remaining in current exposure • Should count down in seconds – no faster than 1 Hz
+   * @param exposureTime Length in milliseconds of the current exposure
+   * @param remainingExposureTime Number of milliseconds remaining in current exposure • Should count down in seconds – no faster than 1 Hz
    * @return [[csw.params.events.ObserveEvent]]
    */
   def exposureData(

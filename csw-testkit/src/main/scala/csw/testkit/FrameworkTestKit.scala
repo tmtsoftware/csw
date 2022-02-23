@@ -1,16 +1,18 @@
 package csw.testkit
 
 import akka.actor.typed
+import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.alarm.client.AlarmServiceFactory
-import csw.command.client.messages.{ComponentMessage, ContainerMessage}
+import csw.command.client.messages.{ComponentMessage, ContainerMessage, TopLevelActorMessage}
 import csw.command.client.models.framework.LocationServiceUsage
 import csw.config.api.scaladsl.ConfigClientService
 import csw.event.api.scaladsl.EventService
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
-import csw.framework.scaladsl.ComponentBehaviorFactory
+import csw.framework.models.CswContext
+import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.{ComponentType, Connection}
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.ActorSystemFactory
@@ -136,7 +138,7 @@ final class FrameworkTestKit private (
    */
   def spawnHCD(
       prefix: Prefix,
-      behaviorFactory: ComponentBehaviorFactory,
+      behaviorFactory: (ActorContext[TopLevelActorMessage], CswContext) => ComponentHandlers,
       locationServiceUsage: LocationServiceUsage = LocationServiceUsage.RegisterOnly,
       connections: Set[Connection] = Set.empty,
       initializeTimeout: FiniteDuration = 10.seconds
@@ -168,7 +170,7 @@ final class FrameworkTestKit private (
    */
   def spawnAssembly(
       prefix: Prefix,
-      behaviorFactory: ComponentBehaviorFactory,
+      behaviorFactory: (ActorContext[TopLevelActorMessage], CswContext) => ComponentHandlers,
       locationServiceUsage: LocationServiceUsage = LocationServiceUsage.RegisterOnly,
       connections: Set[Connection] = Set.empty,
       initializeTimeout: FiniteDuration = 10.seconds

@@ -2,7 +2,7 @@ package csw.params.events
 
 import csw.params.core.generics.KeyType.{BooleanKey, ChoiceKey, IntKey, LongKey, StringKey}
 import csw.params.core.generics.{GChoiceKey, Key, Parameter}
-import csw.params.core.models.{Choice, Choices, ExposureId, ObsId}
+import csw.params.core.models.{Choice, Choices, ExposureId, ObsId, Units}
 
 object ObserveEventKeys {
 
@@ -15,8 +15,8 @@ object ObserveEventKeys {
   val exposureInProgress: Key[Boolean] = BooleanKey.make("exposureInProgress")
   val abortInProgress: Key[Boolean]    = BooleanKey.make("abortInProgress")
   val isAborted: Key[Boolean]          = BooleanKey.make("isAborted")
-  val exposureTime: Key[Long]          = LongKey.make("exposureTime")
-  val remainingExposureTime: Key[Long] = LongKey.make("remainingExposureTime")
+  val exposureTime: Key[Long]          = LongKey.make("exposureTime", Units.millisecond)
+  val remainingExposureTime: Key[Long] = LongKey.make("remainingExposureTime", Units.millisecond)
   val readsInRamp: Key[Int]            = IntKey.make("readsInRamp")
   val readsComplete: Key[Int]          = IntKey.make("readsComplete")
   val rampsInExposure: Key[Int]        = IntKey.make("rampsInExposure")
