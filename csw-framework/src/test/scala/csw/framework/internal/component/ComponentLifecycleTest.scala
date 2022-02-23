@@ -10,7 +10,7 @@ import csw.command.client.messages.{FromComponentLifecycleMessage, TopLevelActor
 import csw.command.client.models.framework.ToComponentLifecycleMessage.*
 import csw.command.client.{CommandResponseManager, MiniCRM}
 import csw.framework.models.CswContext
-import csw.framework.scaladsl.ComponentHandlers
+import csw.framework.scaladsl.{ComponentHandlers, ComponentHandlersFactory}
 import csw.framework.{ComponentInfos, CurrentStatePublisher, FrameworkTestSuite}
 import csw.params.commands.CommandIssue.OtherIssue
 import csw.params.commands.CommandResponse.*
@@ -37,7 +37,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     when(commandResponseManager.commandResponseManagerActor).thenReturn(commandStatusServiceProbe.ref)
 
     val sampleHcdHandler: ComponentHandlers = mock[ComponentHandlers]
-    val factory                             = new TestComponentBehaviorFactory(sampleHcdHandler)
+    val factory: ComponentHandlersFactory   = (ctx, cswCtx) => sampleHcdHandler
 
     val cswCtx: CswContext = new CswContext(
       frameworkTestMocks().locationService,

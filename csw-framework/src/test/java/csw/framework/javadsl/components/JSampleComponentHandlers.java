@@ -133,7 +133,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
             return new CommandResponse.Completed(runId);
         } else if (controlCommand.commandName().equals(immediateResCmd())) {
             // Copy the input paramset to the output
-            Result result = new Result().madd(controlCommand.paramSet());
+            Result result = new Result().jMadd(controlCommand.paramType().jParamSet());
             return new CommandResponse.Completed(runId, result);
         } else if (controlCommand.commandName().equals(ComponentStateForCommand.matcherCmd())) {
             processCommandWithMatcher(controlCommand);

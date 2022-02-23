@@ -93,12 +93,12 @@ We will walk-through filling them in below.
 ## Constructing the Component
 
 After writing the component handlers, a developer needs to wire it up with the framework. In order to do this, the developer 
-needs to first implement a `ComponentBehaviorFactory`. This factory should be specified in a ComponentInfo configuration file for
+needs to specify handlers full class path in a ComponentInfo configuration file for
 the component (see example below). The `csw-framework` picks up the full class path of the
-`ComponentBehaviorFactory` from the file and the Supervisor spawns the component handlers using this factory in the process of
+`ComponentHandlers` from the file and the Supervisor spawns the component using these handlers in the process of
 booting the component. The factory is instantiated using Java reflection.
 
-Additional sample code to implement the `ComponentBehaviorFactory` can be found @ref:[here](../framework/creating-components.md) 
+Additional sample code to implement the `ComponentHandlers` can be found @ref:[here](../framework/creating-components.md) 
 
 #### *Tutorial: Developing an HCD*
 
@@ -119,7 +119,7 @@ Java
 
 @@@ note { title="What is a behaviorFactoryClassName?" }
 
-`behaviorFactoryClassName` refers to class name of the a concrete implementation of `ComponentBehaviorFactory`, which is `SampleHcdBehaviorFactory` for Scala in above example, `JSampleHcdBehaviorFactory` for Java.
+`componentHandlerClassName` refers to class name of the a concrete implementation of `ComponentHandlers`, which is `SampleHcdHandlers` for Scala in above example, `JSampleHcdHandlers` for Java.
 
 @@@
 

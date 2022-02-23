@@ -12,7 +12,7 @@ object ComponentInfos {
   val assemblyInfo: ComponentInfo = ComponentInfo(
     Prefix("WFOS.SampleAssembly"),
     Assembly,
-    "csw.common.components.framework.SampleComponentBehaviorFactory",
+    "csw.common.components.framework.SampleComponentHandlers",
     DoNotRegister,
     Set.empty
   )
@@ -20,7 +20,7 @@ object ComponentInfos {
   val assemblyInfoToSimulateFailure: ComponentInfo = ComponentInfo(
     Prefix("WFOS.Trombone"),
     Assembly,
-    "csw.common.components.framework.ComponentBehaviorFactoryToSimulateFailure",
+    "csw.common.components.framework.ComponentHandlerToSimulateFailure",
     DoNotRegister,
     Set.empty
   )
@@ -28,7 +28,7 @@ object ComponentInfos {
   val hcdInfo: ComponentInfo = ComponentInfo(
     Prefix("WFOS.SampleHcd"),
     HCD,
-    "csw.common.components.framework.SampleComponentBehaviorFactory",
+    "csw.common.components.framework.SampleComponentHandlers",
     RegisterOnly,
     Set.empty
   )
@@ -36,7 +36,7 @@ object ComponentInfos {
   val hcdInfoWithInitializeTimeout: ComponentInfo = ComponentInfo(
     Prefix("WFOS.SampleHcd"),
     HCD,
-    "csw.common.components.framework.SampleComponentBehaviorFactory",
+    "csw.common.components.framework.SampleComponentHandlers",
     RegisterOnly,
     Set.empty,
     50.millis
@@ -45,7 +45,25 @@ object ComponentInfos {
   val hcdInfoWithRunTimeout: ComponentInfo = ComponentInfo(
     Prefix("WFOS.SampleHcd"),
     HCD,
-    "csw.common.components.framework.SampleComponentBehaviorFactory",
+    "csw.common.components.framework.SampleComponentHandlers",
+    RegisterOnly,
+    Set.empty,
+    5.seconds
+  )
+
+  val hcdInfoWithHandlerException: ComponentInfo = ComponentInfo(
+    Prefix("WFOS.SampleHcd"),
+    HCD,
+    "csw.common.components.framework.InvalidComponentHandlers",
+    RegisterOnly,
+    Set.empty,
+    5.seconds
+  )
+
+  val jHcdInfoWithHandlerException: ComponentInfo = ComponentInfo(
+    Prefix("WFOS.SampleHcd"),
+    HCD,
+    "csw.framework.javadsl.components.JInvalidComponentHandlers",
     RegisterOnly,
     Set.empty,
     5.seconds

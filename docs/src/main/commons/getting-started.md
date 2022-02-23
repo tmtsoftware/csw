@@ -55,35 +55,32 @@ structure.  Much of what is described below is described in more detail on the s
 
 As you can see in below snapshot, template will create three projects:
 
-    - `sample`
-    - `samplehcd`
-    - `sample-deploy`
+    - `csw-sampleassembly`
+    - `csw-samplehcd`
+    - `csw-sampledeploy`
     
 ![sample-project-structure](../images/gettingstarted/sampleProjectLayout.png)
 
-1. This shows where the module for the assembly is located, called `sample`
+1. This shows where the module for the assembly is located, called `csw-sampleassembly`
 
-2. The template generates handlers and factories for both Java and Scala.  Both are not required to develop a 
+2. The template generates handlers for both Java and Scala.  Both are not required to develop a 
 component.  After you choose which language you want to develop in, you can delete the other.  We encourage you
-to use Scala!  It has good support for asynchronous programming. 
+to use Scala!  It has good support for asynchronous programming.
 
-3. This is the factory for creating your component actor behavior, which is created by the framework.  This does
-not need to be modified.
+3. This is the handlers class where you implement your custom logic.
 
-4. This is the handlers class where you implement your custom logic.
+4. The template creates an example test fixture for testing your code in both Java and Scala.
 
-5. The template creates an example test fixture for testing your code in both Java and Scala.
-
-6. Sample component configuration files are created to facilitate testing.  The actual component configuration files
+5. Sample component configuration files are created to facilitate testing.  The actual component configuration files
 needed for running your component are located in the deploy module (see below). 
 
-7. The HCD code is in a separate module here.
+6. The HCD code is in a separate module here.
 
 The following diagram shows the deploy folder and the project folder:
 
 ![sample-deploy](../images/gettingstarted/sampleDeploy.png)
 
-1.  `sample-deploy` project is used to create a concrete implementation.  This allows for the construction of a complete binary
+1.  `csw-sampledeploy` project is used to create a concrete implementation.  This allows for the construction of a complete binary
 package bundled with all dependencies, and a launching application.  This part shows the configuration files used in
 component or container construction.
 

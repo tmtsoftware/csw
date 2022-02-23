@@ -7,16 +7,18 @@ import csw.command.client.messages.TopLevelActorMessage
 import csw.config.client.javadsl.JConfigClientFactory
 import csw.event.client.internal.commons.EventServiceExt.RichEventService
 import csw.framework.models.{CswContext, JCswContext}
-import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
+import csw.framework.scaladsl.{ComponentHandlers, ComponentHandlersFactory}
 import csw.location.client.extensions.LocationServiceExt.RichLocationService
 
 /**
  * Base class for the factory for creating the behavior representing a component actor
  */
-abstract class JComponentBehaviorFactory extends ComponentBehaviorFactory() {
+// The annotation is required to prevent a warning while interpreting a lambda into this SAM interface
+@FunctionalInterface
+abstract class JComponentHandlersFactory extends ComponentHandlersFactory() {
 
-  protected def handlers(ctx: scaladsl.ActorContext[TopLevelActorMessage], cswCtx: CswContext): ComponentHandlers = {
-    import cswCtx._
+  def handlers(ctx: scaladsl.ActorContext[TopLevelActorMessage], cswCtx: CswContext): ComponentHandlers = {
+    import cswCtx.*
     import ctx.executionContext
     jHandlers(
       ctx.asJava,

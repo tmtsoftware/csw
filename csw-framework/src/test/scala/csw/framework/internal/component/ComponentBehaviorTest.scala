@@ -8,7 +8,7 @@ import csw.command.client.messages.TopLevelActorIdleMessage.Initialize
 import csw.command.client.messages.{FromComponentLifecycleMessage, TopLevelActorMessage}
 import csw.command.client.{CommandResponseManager, MiniCRM}
 import csw.framework.models.CswContext
-import csw.framework.scaladsl.ComponentHandlers
+import csw.framework.scaladsl.{ComponentHandlers, ComponentHandlersFactory}
 import csw.framework.{ComponentInfos, CurrentStatePublisher, FrameworkTestSuite}
 import csw.time.core.models.UTCTime
 import org.mockito.Mockito.{verify, when}
@@ -37,7 +37,7 @@ class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar with Ma
       ComponentInfos.hcdInfo
     )
 
-    val factory                             = new TestComponentBehaviorFactory(sampleComponentHandler)
+    val factory: ComponentHandlersFactory   = (ctx, cswCtx) => sampleComponentHandler
     private val behavior: Behavior[Nothing] = factory.make(supervisorProbe.ref, cswCtx)
     val componentBehaviorTestKit: BehaviorTestKit[TopLevelActorMessage] =
       BehaviorTestKit(behavior.asInstanceOf[Behavior[TopLevelActorMessage]])

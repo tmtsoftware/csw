@@ -7,7 +7,7 @@ AssemblyInfo
 :   @@@vars
     ```
     componentType = assembly
-    behaviorFactoryClassName = package.component.SampleAssembly
+    componentHandlerClassName = package.component.SampleAssemblyHandlers
     prefix = ESW.Sample_Assembly
     locationServiceUsage = RegisterAndTrackServices
     connections = [
@@ -24,7 +24,7 @@ HcdInfo
 :   @@@vars
     ```
     componentType = hcd
-    behaviorFactoryClassName = package.component.SampleHcd
+    componentHandlerClassName = package.component.SampleHcdHandlers
     prefix = ESW.Sample_Hcd
     locationServiceUsage = RegisterOnly
     ```
@@ -34,8 +34,8 @@ Following is the summary of properties in the ComponentInfo config/model:
 
 * **prefix** : A prefix is a valid subsystem to which this component belongs combined with the component's name.
 * **componentType** : The type of the component which could be `Container`, `Assembly`, `Hcd` or `Service`
-* **behaviorFactoryClassName** : The fully qualified name of the class which extends the factory class `ComponentBehaviorFactory`
-(or `JComponentBehaviorFactory`, if written in Java)
+* **componentHandlerClassName** : The fully qualified name of the class which extends the behaviorHandler class `ComponentHandlers`
+(or `JComponenthandlers`, if written in Java)
 * **connections** : A collection of `connections` of components or services which will be used by this component. This information can 
 be used in accordance with the `locationServiceUsage` property to automatically track these components or services by the framework.
 * **locationServiceUsage** : Indicates how the Location Service should be leveraged for this component by the framework. The following values are supported:

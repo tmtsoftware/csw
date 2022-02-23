@@ -1,13 +1,15 @@
 package csw.testkit.scaladsl
 
+import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
 import com.typesafe.config.Config
-import csw.command.client.messages.{ComponentMessage, ContainerMessage}
+import csw.command.client.messages.{ComponentMessage, ContainerMessage, TopLevelActorMessage}
 import csw.command.client.models.framework.LocationServiceUsage
-import csw.framework.scaladsl.ComponentBehaviorFactory
+import csw.framework.models.CswContext
+import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.Connection
 import csw.prefix.models.Prefix
-import csw.testkit._
+import csw.testkit.*
 
 import scala.concurrent.duration.FiniteDuration
 
@@ -34,7 +36,7 @@ abstract class ScalaTestFrameworkTestKit(val frameworkTestKit: FrameworkTestKit,
    *
    * @note Refer [[CSWService]] for supported services
    */
-  def this(services: CSWService*) = this(FrameworkTestKit(), services: _*)
+  def this(services: CSWService*) = this(FrameworkTestKit(), services*)
 
   /** Initialize testkit with provided actorSystem */
   def this(actorSystem: ActorSystem[SpawnProtocol.Command]) = this(FrameworkTestKit(actorSystem))
@@ -48,7 +50,7 @@ abstract class ScalaTestFrameworkTestKit(val frameworkTestKit: FrameworkTestKit,
   /** Delegate to framework testkit */
   def spawnHCD(
       prefix: Prefix,
-      behaviorFactory: ComponentBehaviorFactory,
+      behaviorFactory: (ActorContext[TopLevelActorMessage], CswContext) => ComponentHandlers,
       locationServiceUsage: LocationServiceUsage = LocationServiceUsage.RegisterOnly,
       connections: Set[Connection] = Set.empty,
       initializeTimeout: FiniteDuration = frameworkTestKit.timeout.duration
@@ -58,7 +60,7 @@ abstract class ScalaTestFrameworkTestKit(val frameworkTestKit: FrameworkTestKit,
   /** Delegate to framework testkit */
   def spawnAssembly(
       prefix: Prefix,
-      behaviorFactory: ComponentBehaviorFactory,
+      behaviorFactory: (ActorContext[TopLevelActorMessage], CswContext) => ComponentHandlers,
       locationServiceUsage: LocationServiceUsage = LocationServiceUsage.RegisterOnly,
       connections: Set[Connection] = Set.empty,
       initializeTimeout: FiniteDuration = frameworkTestKit.timeout.duration
@@ -71,7 +73,7 @@ abstract class ScalaTestFrameworkTestKit(val frameworkTestKit: FrameworkTestKit,
    */
   override protected def beforeAll(): Unit = {
     super.beforeAll()
-    frameworkTestKit.start(services: _*)
+    frameworkTestKit.start(services*)
   }
 
   /**

@@ -13,6 +13,8 @@ All notable changes to this project will be documented in this file.
 
 - Upgrade the project to jdk 17 (Update the INSTALL.md)
 - Add `nanometers` to Units
+- [Breaking] ComponentInfo now takes componentHandlerClassName instead of behaviorFactoryClassName.
+  Follow migration guide(https://tmtsoftware.github.io/csw/migration_guide/migration_guide_4.0.0_to_5.0.0/migration-guide-4.0.0-to-5.0.0.html)
 
 ## [CSW v4.0.1] - 2022-02-09
 This is final release v4.0.1 of the TMT Common Software for project stakeholders.

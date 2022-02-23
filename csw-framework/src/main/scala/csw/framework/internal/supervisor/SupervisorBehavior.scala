@@ -32,7 +32,7 @@ import csw.command.client.models.framework.ToComponentLifecycleMessage.{GoOfflin
 import csw.framework.exceptions.{FailureRestart, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehavior
 import csw.framework.models.CswContext
-import csw.framework.scaladsl.{ComponentBehaviorFactory, RegistrationFactory}
+import csw.framework.scaladsl.{ComponentHandlersFactory, RegistrationFactory}
 import csw.location.api.models
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
 import csw.location.api.models.{AkkaRegistration, ComponentId, Metadata}
@@ -62,14 +62,14 @@ private[framework] object SupervisorBehavior {
  * @param timerScheduler           provides support for scheduled `self` messages in an actor
  * @param maybeContainerRef        the container ref of the container under which this supervisor is started if
  *                                 it's not running in standalone mode
- * @param componentBehaviorFactory the factory for creating the component supervised by this Supervisor
+ * @param componentHandlersFactory the factory for creating the component supervised by this Supervisor
  * @note                           unlocking locked components is supported by admin only if `CSW_ADMIN_PREFIX` environment variable is set
  */
 private[framework] final class SupervisorBehavior(
     ctx: ActorContext[SupervisorMessage],
     timerScheduler: TimerScheduler[SupervisorMessage],
     maybeContainerRef: Option[ActorRef[ContainerIdleMessage]],
-    componentBehaviorFactory: ComponentBehaviorFactory,
+    componentHandlersFactory: ComponentHandlersFactory,
     registrationFactory: RegistrationFactory,
     cswCtx: CswContext
 ) extends AbstractBehavior[SupervisorMessage](ctx) {
@@ -351,7 +351,7 @@ private[framework] final class SupervisorBehavior(
 
   private def createTLA(): ActorRef[Nothing] = {
     val behavior = Behaviors
-      .supervise[Nothing](componentBehaviorFactory.make(ctx.self, cswCtx))
+      .supervise[Nothing](componentHandlersFactory.make(ctx.self, cswCtx))
       .onFailure[FailureRestart](
         SupervisorStrategy.restart.withLimit(3, 5.seconds).withLoggingEnabled(true)
       )

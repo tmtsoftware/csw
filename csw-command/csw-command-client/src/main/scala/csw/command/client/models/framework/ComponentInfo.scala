@@ -12,8 +12,8 @@ import scala.jdk.CollectionConverters._
  * @param prefix prefix for the component with `subsystem` and `name`
  * @param componentType
  *  : the type of the component as defined by [[csw.location.api.models.ComponentType]]
- * @param behaviorFactoryClassName
- *  : specifies the component to be created by name of the class of it's factory
+ * @param componentHandlerClassName
+ *  : specifies the component to be created by name of the class of it's handlers
  * @param locationServiceUsage
  *  : specifies component's usage of location service
  * @param connections : set of connections that will be used by this component for interaction
@@ -23,7 +23,7 @@ import scala.jdk.CollectionConverters._
 final case class ComponentInfo(
     prefix: Prefix,
     componentType: ComponentType,
-    behaviorFactoryClassName: String,
+    componentHandlerClassName: String,
     locationServiceUsage: LocationServiceUsage,
     connections: Set[Connection] = Set.empty,
     initializeTimeout: FiniteDuration = 10.seconds

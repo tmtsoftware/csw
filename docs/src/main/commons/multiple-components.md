@@ -36,7 +36,7 @@ Scala
 :    
 ```
 componentType = assembly
-behaviorFactoryClassName = "org.tmt.csw.sample.SampleBehaviorFactory"
+componentHandlerClassName = "org.tmt.csw.sample.SampleHandlers"
 prefix = "csw.sample"
 locationServiceUsage = RegisterAndTrackServices
 connections = [
@@ -52,7 +52,7 @@ Java
 :    
 ```
 componentType = assembly
-behaviorFactoryClassName = "org.tmt.csw.sample.JSampleBehaviorFactory"
+componentHandlerClassName = "org.tmt.csw.sample.JSampleHandlers"
 prefix = "csw.sample"
 locationServiceUsage = RegisterAndTrackServices
 connections = [

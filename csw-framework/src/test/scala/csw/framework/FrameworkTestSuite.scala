@@ -9,7 +9,7 @@ import csw.command.client.messages.{ComponentMessage, ContainerIdleMessage, TopL
 import csw.command.client.models.framework.ComponentInfo
 import csw.framework.internal.supervisor.SupervisorBehaviorFactory
 import csw.framework.models.CswContext
-import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
+import csw.framework.scaladsl.{ComponentHandlersFactory, ComponentHandlers}
 import csw.location.client.ActorSystemFactory
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.scaladsl.LoggerFactory
@@ -31,10 +31,10 @@ private[csw] abstract class FrameworkTestSuite extends AnyFunSuite with Matchers
     Await.result(typedSystem.whenTerminated, 5.seconds)
   }
 
-  def getSampleHcdWiring(componentHandlers: ComponentHandlers): ComponentBehaviorFactory =
+  def getSampleHcdWiring(componentHandlers: ComponentHandlers): ComponentHandlersFactory =
     (_: ActorContext[TopLevelActorMessage], _: CswContext) => componentHandlers
 
-  def getSampleAssemblyWiring(assemblyHandlers: ComponentHandlers): ComponentBehaviorFactory =
+  def getSampleAssemblyWiring(assemblyHandlers: ComponentHandlers): ComponentHandlersFactory =
     (_: ActorContext[TopLevelActorMessage], _: CswContext) => assemblyHandlers
 
   def createSupervisorAndStartTLA(
