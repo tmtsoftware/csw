@@ -171,10 +171,10 @@ private[framework] object ComponentBehavior {
         }
 
       def handleValidate(runId: Id, commandMessage: CommandMessage, replyTo: ActorRef[ValidateResponse]): Unit = {
-        // log.info(s"Invoking lifecycle handler's validateCommand hook with msg :[$commandMessage]")
         // converting runId to str and then taking last five chars of the string to print in log message.
         val runIdStrSmall: String = runId.id.takeRight(5)
-        log.info(s"Validate : runId :[$runIdStrSmall] with msg [$commandMessage]")
+        log.info(s"Validate : runId :[$runIdStrSmall] with [${commandMessage.command.commandName}]")
+        log.debug(s"Validate : runId :[$runIdStrSmall] with command parameters as [${commandMessage.command.paramSet}]")
         val validationResponse = lifecycleHandlers.validateCommand(runId, commandMessage.command)
         replyTo ! validationResponse.asInstanceOf[ValidateResponse]
       }
@@ -183,14 +183,15 @@ private[framework] object ComponentBehavior {
         // log.info(s"Invoking lifecycle handler's validateCommand hook with msg :[$commandMessage]")
         // converting runId to str and then taking last five chars of the string to print in log message.
         val runIdStrSmall: String = runId.id.takeRight(5)
-        log.info(s"Validate : runId :[$runIdStrSmall] with msg [$commandMessage]")
+        log.info(s"Validate : runId :[$runIdStrSmall] with [${commandMessage.command.commandName}]")
+        log.debug(s"Validate : runId :[$runIdStrSmall] with command parameters as [${commandMessage.command.paramSet}]")
         val validationResponse = lifecycleHandlers.validateCommand(runId, commandMessage.command)
         replyTo ! validationResponse.asInstanceOf[OnewayResponse]
 
         validationResponse match {
-          case Accepted(_) =>
+          case accepted: Accepted =>
             // log.info(s"Invoking lifecycle handler's onOneway hook with msg :[$commandMessage]")
-            log.info(s"Oneway : runId :[$runIdStrSmall] with msg [$commandMessage]")
+            log.info(s"Oneway : runId :[$runIdStrSmall];Validation Response as [$accepted]  with msg [$commandMessage]")
             lifecycleHandlers.onOneway(runId, commandMessage.command)
           case invalid: Invalid =>
             log.debug(s"Command not forwarded to TLA post validation. ValidationResponse was [$invalid]")
@@ -201,20 +202,24 @@ private[framework] object ComponentBehavior {
         // log.info(s"Invoking lifecycle handler's validateCommand hook with msg :[$commandMessage]")
         // converting runId to str and then taking last five chars of the string to print in log message.
         val runIdStrSmall: String = runId.id.takeRight(5)
-        log.info(s"Validate : runId :[$runIdStrSmall] with msg [$commandMessage]")
+        // log.info(s"Validate : runId :[$runIdStrSmall] with msg as [$commandMessage]")
+        log.info(s"Validate : runId :[$runIdStrSmall] with [${commandMessage.command.commandName}]")
+        log.debug(s"Validate : runId :[$runIdStrSmall] with command parameters as [${commandMessage.command.paramSet}]")
+
         lifecycleHandlers.validateCommand(runId, commandMessage.command) match {
-          case Accepted(_) =>
+          case accepted: Accepted =>
             // log.info(s"Invoking lifecycle handler's onSubmit hook with msg :[$commandMessage]")
-            log.info(s"Submit : runId :[$runIdStrSmall] with msg [$commandMessage]")
+            // log.info(s"Submit : runId :[$runIdStrSmall] with Validation Response as [$accepted]")
             val submitResponse = lifecycleHandlers.onSubmit(runId, commandMessage.command)
             submitResponse match {
               case started: Started =>
                 commandResponseManager.commandResponseManagerActor ! AddStarted(started)
+                log.info(s"Submit : runId :[$runIdStrSmall]; with Validation Response as [$accepted] and msg [$commandMessage]")
               case _ => // Do nothing
             }
             replyTo ! submitResponse
           case invalid: Invalid =>
-            log.debug(s"Command not forwarded to TLA post validation. ValidationResponse was [$invalid]")
+            log.debug(s"runId :[$runIdStrSmall], Command not forwarded to TLA post validation. ValidationResponse was [$invalid]")
             replyTo ! invalid
         }
       }
