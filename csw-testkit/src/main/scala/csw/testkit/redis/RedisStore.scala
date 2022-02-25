@@ -32,7 +32,7 @@ private[testkit] trait RedisStore extends EmbeddedRedis {
   def start(
       sentinelPort: Int = getFreePort,
       serverPort: Int = getFreePort,
-      keyspaceEvent: Boolean
+      keyspaceEvent: Boolean = false
   ): RegistrationResult = {
     val tuple = startSentinel(sentinelPort, serverPort, masterId, keyspaceEvent)
     redisSentinel = Some(tuple._1)
