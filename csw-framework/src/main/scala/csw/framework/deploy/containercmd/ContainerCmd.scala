@@ -48,7 +48,7 @@ private[framework] class ContainerCmd(
   def start(args: Array[String]): ActorRef[_] =
     new ArgsParser(name).parse(args.toList) match {
       case None => throw UnableToParseOptions
-      case Some(Options(standalone, isLocal, inputFilePath)) =>
+      case Some(Options(isLocal, inputFilePath)) =>
         LocationServerStatus.requireUpLocally()
 
         if (startLogging) wiring.actorRuntime.startLogging(name)
@@ -56,7 +56,7 @@ private[framework] class ContainerCmd(
         log.debug(s"$name started with following arguments [${args.mkString(",")}]")
 
         try {
-          val actorRef = Await.result(createF(standalone, isLocal, inputFilePath, defaultConfig), 30.seconds)
+          val actorRef = Await.result(createF(isLocal, inputFilePath, defaultConfig), 30.seconds)
           log.info(s"Component is successfully created with actor actorRef $actorRef")
           actorRef
         }
@@ -70,21 +70,21 @@ private[framework] class ContainerCmd(
 
   // fetch config file and start components in container mode or a single component in standalone mode
   private def createF(
-      standalone: Boolean,
       isLocal: Boolean,
       inputFilePath: Option[Path],
       defaultConfig: Option[Config]
   ): Future[ActorRef[_]] =
     async {
-      val config   = await(wiring.configUtils.getConfig(isLocal, inputFilePath, defaultConfig))
-      val actorRef = await(createComponent(standalone, wiring, config))
+      val config          = await(wiring.configUtils.getConfig(isLocal, inputFilePath, defaultConfig))
+      val isContainerConf = config.hasPath("components")
+      val actorRef        = await(createComponent(isContainerConf, wiring, config))
       log.info(s"Component is successfully created with actor actorRef $actorRef")
       actorRef
     }
 
-  private def createComponent(standalone: Boolean, wiring: FrameworkWiring, config: Config): Future[ActorRef[_]] =
-    if (standalone) Standalone.spawn(config, wiring)
-    else Container.spawn(config, wiring)
+  private def createComponent(isContainerConf: Boolean, wiring: FrameworkWiring, config: Config): Future[ActorRef[_]] =
+    if (isContainerConf) Container.spawn(config, wiring)
+    else Standalone.spawn(config, wiring)
 
   private def shutdown(): Done = Await.result(wiring.actorRuntime.shutdown(), 10.seconds)
 }

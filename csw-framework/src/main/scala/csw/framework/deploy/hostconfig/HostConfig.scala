@@ -8,7 +8,6 @@ import csw.framework.exceptions.UnableToParseOptions
 import csw.framework.internal.configparser.ConfigParser
 import csw.framework.internal.wiring.FrameworkWiring
 import csw.framework.models.ConfigFileLocation.{Local, Remote}
-import csw.framework.models.ContainerMode.{Container, Standalone}
 import csw.framework.models.{ContainerBootstrapInfo, HostBootstrapInfo}
 import csw.location.client.utils.LocationServerStatus
 import csw.logging.api.scaladsl.Logger
@@ -73,14 +72,10 @@ private[hostconfig] class HostConfig(name: String, subsystem: Subsystem, startLo
   private def bootstrapContainers(containerScript: String, bootstrapInfo: HostBootstrapInfo): Set[Process] =
     bootstrapInfo.containers
       .map {
-        case ContainerBootstrapInfo(Container, configPath, Remote) =>
+        case ContainerBootstrapInfo(configPath, Remote) =>
           executeScript(containerScript, configPath)
-        case ContainerBootstrapInfo(Container, configPath, Local) =>
+        case ContainerBootstrapInfo(configPath, Local) =>
           executeScript(containerScript, s"$configPath", "--local")
-        case ContainerBootstrapInfo(Standalone, configPath, Remote) =>
-          executeScript(containerScript, s"$configPath", "--standalone")
-        case ContainerBootstrapInfo(Standalone, configPath, Local) =>
-          executeScript(containerScript, s"$configPath", "--local", "--standalone")
       }
 
   // spawn a child process and start a container

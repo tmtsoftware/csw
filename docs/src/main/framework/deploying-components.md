@@ -12,9 +12,6 @@ application :
 * fully qualified path of the configuration file
 * **local** if the above path is a path to a file available on local disk. If this argument is not provided the file will be looked
 up in the Configuration Service using the same path.
-* **standalone** if the configuration file describes a component to be run in standalone mode. If this argument is not provided the 
-application expects a configuration file describing a container component and will use it to start a container with all the
-components as described in the file.
 
 Scala
 :   @@snip [ContainerCmdApp.scala](../../../../examples/src/main/scala/example/framework/ContainerCmdApp.scala) { #container-app }
@@ -30,11 +27,11 @@ It is not necessary to have name of the application as ContainerCmdApp/JContaine
 
 Starting a **standalone** component from a **local** configuration file
 
-    `./container-cmd-app --standalone --local /assembly/config/assembly.conf`
+    `./container-cmd-app --local /assembly/config/standalone-assembly.conf`
     
 Starting a **container** component from a configuration file available in **configuration service**
 
-    `./container-cmd-app /assembly/config/assembly.conf`
+    `./container-cmd-app /assembly/config/container-assembly.conf`
 
 ## Container for deployment
 

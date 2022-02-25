@@ -6,7 +6,6 @@ package csw.framework.models
  * @param configFileLocation indicator to fetch config file either from local machine or from Configuration service
  */
 private[framework] case class ContainerBootstrapInfo(
-    mode: ContainerMode,
     configFilePath: String,
     configFileLocation: ConfigFileLocation
 )

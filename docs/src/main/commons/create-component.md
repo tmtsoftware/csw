@@ -491,19 +491,19 @@ csw-services start
 Once the component is ready, it is started using the `ContainerCmd` object in a standalone mode. 
 The details for starting the `ContainerCmd` in a standalone mode can be found @ref:[here](../framework/deploying-components.md).
 
-There are various ways to build and run the project.  A simple way during development is to to use sbt to run it. 
+There are various ways to build and run the project.  A simple way during development is to use sbt to run it. 
 The sbt command `runMain` can be used to specify an application with a main method and run it with arguments specified at the command line.  When this
 command is executed, sbt will take care of any downloading of dependencies, compiling, or building necessary to run
 your application. 
 
 Our template includes a wrapper application around ContainerCmd that we can use in the deployment module.  To run our HCD in a standalone mode,
-go to the project root directory and type `sbt "<deploy-module>/runMain <mainClass> --local --standalone <path-to-config-file>"`, where
+go to the project root directory and type `sbt "<deploy-module>/runMain <mainClass> --local <path-to-standalone-config-file>"`, where
  
 - `<deploy-module>` is the name of the deployment module created by the template (`sample-deploy` if using defaults) 
 - `<mainClass>` is the full class name of our ContainerCmd application, which the template names `<package>.<name>deploy.<Name>ContainerCmdApp`.
 If you accept the defaults for the template, it will be `org.tmt.csw.sampledeploy.SampleContainerCmdApp`.  If you are having problems
 determining the class name, use `sbt <deploy-module>/run` and it will prompt you the possibilities.
-- `<path-to-config-file>` is the filename, which can be an absolute path or relative to the directory of the deployment module.  If using defaults,
+- `<path-to-standalone-config-file>` is the filename, which can be an absolute path or relative to the directory of the deployment module.  If using defaults,
 this would be `src/main/resources/SampleHcdStandalone.conf` for Scala, and `src/main/resources/JSampleHcdStandalone.conf` for Java.
 
 So if using the template defaults, the full command would be 
@@ -511,11 +511,11 @@ So if using the template defaults, the full command would be
 Scala
 :   
 ```
-sbt "sample-deploy/runMain org.tmt.csw.sampledeploy.SampleContainerCmdApp --local --standalone src/main/resources/SampleHcdStandalone.conf"
+sbt "sample-deploy/runMain org.tmt.csw.sampledeploy.SampleContainerCmdApp --local src/main/resources/SampleHcdStandalone.conf"
 ```
 
 Java
 :   
 ```
-sbt "sample-deploy/runMain org.tmt.csw.sampledeploy.SampleContainerCmdApp --local --standalone src/main/resources/JSampleHcdStandalone.conf"
+sbt "sample-deploy/runMain org.tmt.csw.sampledeploy.SampleContainerCmdApp --local src/main/resources/JSampleHcdStandalone.conf"
 ```
