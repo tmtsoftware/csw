@@ -65,7 +65,7 @@ final class AlarmTestKit private (
    * and then register's Alarm service with location service
    */
   def startAlarmService(sentinelPort: Int = getSentinelPort, serverPort: Int = getMasterPort): RegistrationResult =
-    start(sentinelPort, serverPort)
+    start(sentinelPort, serverPort, keyspaceEvent = true)
 
   /**
    * Java API to Start Alarm service

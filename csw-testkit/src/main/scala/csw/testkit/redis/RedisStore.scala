@@ -29,8 +29,12 @@ private[testkit] trait RedisStore extends EmbeddedRedis {
 
   private implicit lazy val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient
 
-  def start(sentinelPort: Int = getFreePort, serverPort: Int = getFreePort): RegistrationResult = {
-    val tuple = startSentinel(sentinelPort, serverPort, masterId)
+  def start(
+      sentinelPort: Int = getFreePort,
+      serverPort: Int = getFreePort,
+      keyspaceEvent: Boolean
+  ): RegistrationResult = {
+    val tuple = startSentinel(sentinelPort, serverPort, masterId, keyspaceEvent)
     redisSentinel = Some(tuple._1)
     redisServer = Some(tuple._2)
     val resultF = locationService.register(TcpRegistration(connection, sentinelPort))

@@ -29,9 +29,9 @@ import csw.testkit.redis.RedisStore
  *
  * }}}
  */
-final class EventTestKit private (_system: typed.ActorSystem[_], testKitSettings: TestKitSettings) extends RedisStore {
+final class EventTestKit private (_system: typed.ActorSystem[?], testKitSettings: TestKitSettings) extends RedisStore {
 
-  override implicit val system: typed.ActorSystem[_]    = _system
+  override implicit val system: typed.ActorSystem[?]    = _system
   override implicit lazy val timeout: Timeout           = testKitSettings.DefaultTimeout
   override protected lazy val masterId: String          = system.settings.config.getString("csw-event.redis.masterId")
   override protected lazy val connection: TcpConnection = EventServiceConnection.value
@@ -46,7 +46,7 @@ final class EventTestKit private (_system: typed.ActorSystem[_], testKitSettings
    * and then register's event service with location service
    */
   def startEventService(sentinelPort: Int = getSentinelPort, serverPort: Int = getMasterPort): RegistrationResult =
-    start(sentinelPort, serverPort)
+    start(sentinelPort, serverPort, keyspaceEvent = false)
 
   /**
    * Java API to Start Event service
@@ -78,7 +78,7 @@ object EventTestKit {
    * @return handle to EventTestKit which can be used to start and stop event service
    */
   def apply(
-      actorSystem: typed.ActorSystem[_] = typed.ActorSystem(Behaviors.empty, "alarm-testkit"),
+      actorSystem: typed.ActorSystem[?] = typed.ActorSystem(Behaviors.empty, "alarm-testkit"),
       testKitSettings: TestKitSettings = TestKitSettings(ConfigFactory.load())
   ): EventTestKit = new EventTestKit(actorSystem, testKitSettings)
 
@@ -88,7 +88,7 @@ object EventTestKit {
    * @param actorSystem
    * @return handle to EventTestKit which can be used to start and stop event service
    */
-  def create(actorSystem: typed.ActorSystem[_]): EventTestKit = apply(actorSystem)
+  def create(actorSystem: typed.ActorSystem[?]): EventTestKit = apply(actorSystem)
 
   /**
    * Java API to create a EventTestKit
