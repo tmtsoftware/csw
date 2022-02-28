@@ -38,10 +38,6 @@ object ObserveEventNames {
   val ObservePaused: EventName     = eventName("ObservePaused")
   val ObserveResumed: EventName    = eventName("ObserveResumed")
   val DowntimeStart: EventName     = eventName("DowntimeStart")
-  val OffsetStart: EventName       = eventName("OffsetStart")
-  val OffsetEnd: EventName         = eventName("OffsetEnd")
-  val InputRequestStart: EventName = eventName("InputRequestStart")
-  val InputRequestEnd: EventName   = eventName("InputRequestEnd")
 
   // DMS specific
   val MetadataAvailable: EventName = eventName("MetadataAvailable")
