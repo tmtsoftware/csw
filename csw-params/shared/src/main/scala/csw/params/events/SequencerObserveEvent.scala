@@ -1,5 +1,6 @@
 package csw.params.events
 
+import csw.params.core.generics.Parameter
 import csw.params.core.models.{ExposureId, ObsId}
 import csw.prefix.models.Prefix
 
@@ -195,6 +196,52 @@ case class SequencerObserveEvent(prefix: Prefix) {
     val obsIdParam          = ParamFactories.obsIdParam(obsId)
     val downtimeReasonParam = ParamFactories.downTimeReasonParam(reasonForDowntime)
     ObserveEvent(prefix, ObserveEventNames.DowntimeStart, Set(obsIdParam, downtimeReasonParam))
+  }
+
+  /**
+   * This event indicates the start of a telescope offset or dither
+   * @param obsId [[csw.params.core.models.ObsId]] Optional Parameter representing a unique observation id
+   * @param p [[java.lang.Double]] Represents telescope's xCoordinate offset
+   * @param q [[java.lang.Double]] Represents telescope's yCoordinate offset
+   * @return [[csw.params.events.ObserveEvent]]
+   */
+  def offsetStart(p: Double, q: Double, obsId: Option[ObsId] = None): ObserveEvent = {
+    val paramSet: Set[Parameter[?]] = obsId match {
+      case Some(value) => Set(ParamFactories.obsIdParam(value), ParamFactories.pOffsetParam(p), ParamFactories.qOffsetParam(q))
+      case None        => Set(ParamFactories.pOffsetParam(p), ParamFactories.qOffsetParam(q))
+    }
+    ObserveEvent(prefix, ObserveEventNames.OffsetStart, paramSet)
+  }
+
+  /**
+   * This event indicates the end of a telescope offset or dither
+   * @param obsId [[csw.params.core.models.ObsId]] Optional Parameter representing a unique observation id
+   * @return [[csw.params.events.ObserveEvent]]
+   */
+  def offsetEnd(obsId: Option[ObsId] = None): ObserveEvent = {
+    val paramSet: Set[Parameter[?]] = obsId match {
+      case Some(value) => Set(ParamFactories.obsIdParam(value))
+      case None        => Set.empty
+    }
+    ObserveEvent(prefix, ObserveEventNames.OffsetEnd, paramSet)
+  }
+
+  /**
+   * This event indicates the start of a request to the user for input
+   * @param obsId [[csw.params.core.models.ObsId]] Representing a unique observation id
+   * @return [[csw.params.events.ObserveEvent]]
+   */
+  def inputRequestStart(obsId: ObsId): ObserveEvent = {
+    ObserveEvent(prefix, ObserveEventNames.InputRequestStart, Set(ParamFactories.obsIdParam(obsId)))
+  }
+
+  /**
+   * This event indicates the end of a request to the user for input
+   * @param obsId [[csw.params.core.models.ObsId]] Representing a unique observation id
+   * @return [[csw.params.events.ObserveEvent]]
+   */
+  def inputRequestEnd(obsId: ObsId): ObserveEvent = {
+    ObserveEvent(prefix, ObserveEventNames.InputRequestEnd, Set(ParamFactories.obsIdParam(obsId)))
   }
 
   private def createObserveEvent(eventName: EventName, obsId: ObsId) =

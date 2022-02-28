@@ -86,5 +86,43 @@ class SequencerObserveEventTest extends AnyFunSpec with Matchers {
       event.eventName should ===(EventName("ObserveEvent.ObserveResumed"))
       event.source should ===(prefix)
     }
+
+    it("create offsetStart event | CSW-176") {
+      val event1 = sequencerObserveEvent.offsetStart(10.0, 20.0, Some(ObsId(obsId)))
+      val event2 = sequencerObserveEvent.offsetStart(10.0, 20.0)
+      event1.eventName should ===(EventName("ObserveEvent.OffsetStart"))
+      event1.source should ===(prefix)
+      event1.paramSet shouldBe Set(obsIdParam, ParamFactories.pOffsetParam(10.0), ParamFactories.qOffsetParam(20.0))
+
+      event2.eventName should ===(EventName("ObserveEvent.OffsetStart"))
+      event2.source should ===(prefix)
+      event2.paramSet shouldBe Set(ParamFactories.pOffsetParam(10.0), ParamFactories.qOffsetParam(20.0))
+    }
+
+    it("create offsetEnd event | CSW-176") {
+      val event1 = sequencerObserveEvent.offsetEnd(Some(ObsId(obsId)))
+      val event2 = sequencerObserveEvent.offsetEnd()
+      event1.eventName should ===(EventName("ObserveEvent.OffsetEnd"))
+      event1.source should ===(prefix)
+      event1.paramSet shouldBe Set(obsIdParam)
+
+      event2.eventName should ===(EventName("ObserveEvent.OffsetEnd"))
+      event2.source should ===(prefix)
+      event2.paramSet shouldBe Set.empty
+    }
+
+    it("create inputRequestStart event | CSW-176") {
+      val event = sequencerObserveEvent.inputRequestStart(ObsId(obsId))
+      event.eventName should ===(EventName("ObserveEvent.InputRequestStart"))
+      event.source should ===(prefix)
+      event.paramSet shouldBe Set(obsIdParam)
+    }
+
+    it("create inputRequestEnd event | CSW-176") {
+      val event = sequencerObserveEvent.inputRequestEnd(ObsId(obsId))
+      event.eventName should ===(EventName("ObserveEvent.InputRequestEnd"))
+      event.source should ===(prefix)
+      event.paramSet shouldBe Set(obsIdParam)
+    }
   }
 }
