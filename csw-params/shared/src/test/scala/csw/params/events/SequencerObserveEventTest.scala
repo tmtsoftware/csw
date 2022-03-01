@@ -3,11 +3,11 @@ package csw.params.events
 import csw.params.core.generics.KeyType.StringKey
 import csw.params.core.generics.Parameter
 import csw.params.core.models.{ExposureId, ObsId}
-import csw.prefix.models.Subsystem.ESW
 import csw.prefix.models.Prefix
+import csw.prefix.models.Subsystem.ESW
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
-import org.scalatest.prop.TableDrivenPropertyChecks._
+import org.scalatest.prop.TableDrivenPropertyChecks.*
 
 class SequencerObserveEventTest extends AnyFunSpec with Matchers {
   describe("SequencerObserveEvents") {
@@ -88,27 +88,17 @@ class SequencerObserveEventTest extends AnyFunSpec with Matchers {
     }
 
     it("create offsetStart event | CSW-176") {
-      val event1 = sequencerObserveEvent.offsetStart(10.0, 20.0, Some(ObsId(obsId)))
-      val event2 = sequencerObserveEvent.offsetStart(10.0, 20.0)
-      event1.eventName should ===(EventName("ObserveEvent.OffsetStart"))
-      event1.source should ===(prefix)
-      event1.paramSet shouldBe Set(obsIdParam, ParamFactories.pOffsetParam(10.0), ParamFactories.qOffsetParam(20.0))
-
-      event2.eventName should ===(EventName("ObserveEvent.OffsetStart"))
-      event2.source should ===(prefix)
-      event2.paramSet shouldBe Set(ParamFactories.pOffsetParam(10.0), ParamFactories.qOffsetParam(20.0))
+      val event = sequencerObserveEvent.offsetStart(ObsId(obsId), 10.0, 20.0)
+      event.eventName should ===(EventName("ObserveEvent.OffsetStart"))
+      event.source should ===(prefix)
+      event.paramSet shouldBe Set(obsIdParam, ParamFactories.pOffsetParam(10.0), ParamFactories.qOffsetParam(20.0))
     }
 
     it("create offsetEnd event | CSW-176") {
-      val event1 = sequencerObserveEvent.offsetEnd(Some(ObsId(obsId)))
-      val event2 = sequencerObserveEvent.offsetEnd()
+      val event1 = sequencerObserveEvent.offsetEnd(ObsId(obsId))
       event1.eventName should ===(EventName("ObserveEvent.OffsetEnd"))
       event1.source should ===(prefix)
       event1.paramSet shouldBe Set(obsIdParam)
-
-      event2.eventName should ===(EventName("ObserveEvent.OffsetEnd"))
-      event2.source should ===(prefix)
-      event2.paramSet shouldBe Set.empty
     }
 
     it("create inputRequestStart event | CSW-176") {

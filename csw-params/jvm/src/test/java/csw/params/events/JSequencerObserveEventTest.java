@@ -1,11 +1,8 @@
 package csw.params.events;
 
-import csw.params.core.generics.Key;
-import csw.params.core.generics.KeyType;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.ExposureId;
 import csw.params.core.models.ObsId;
-import csw.params.core.models.Units;
 import csw.params.javadsl.JKeyType;
 import csw.params.javadsl.JUnits;
 import csw.prefix.javadsl.JSubsystem;
@@ -13,7 +10,6 @@ import csw.prefix.models.Prefix;
 import org.junit.Assert;
 import org.junit.Test;
 import org.scalatestplus.junit.JUnitSuite;
-import scala.Option;
 
 import java.util.*;
 
@@ -85,30 +81,20 @@ public class JSequencerObserveEventTest extends JUnitSuite {
 
     @Test
     public void createOffsetStartObserveEventWithFixedParameterSet__CSW_176() {
-        ObserveEvent event = sequencerObserveEvent.offsetStart(10.0, 20.0, Option.apply(obsId));
-        ObserveEvent event2 = sequencerObserveEvent.offsetStart(10.0, 20.0, Option.empty());
+        ObserveEvent event = sequencerObserveEvent.offsetStart(obsId,10.0, 20.0);
         Set<Parameter<?>> paramSet = new HashSet<>(10);
         paramSet.add(pOffsetParam);
         paramSet.add(qOffsetParam);
         paramSet.add(obsIdParam);
 
-        Set<Parameter<?>> paramSet2 = new HashSet<>(10);
-        paramSet2.add(pOffsetParam);
-        paramSet2.add(qOffsetParam);
-
         Assert.assertEquals(paramSet, event.jParamSet());
         Assert.assertEquals("ObserveEvent.OffsetStart", event.eventName().name());
         Assert.assertEquals(prefix, event.source());
-
-        Assert.assertEquals(paramSet2, event2.jParamSet());
-        Assert.assertEquals("ObserveEvent.OffsetStart", event2.eventName().name());
-        Assert.assertEquals(prefix, event2.source());
     }
 
     @Test
     public void createOffsetEndObserveEventWithFixedParameterSet__CSW_176() {
-        ObserveEvent event = sequencerObserveEvent.offsetEnd(Option.apply(obsId));
-        ObserveEvent event2 = sequencerObserveEvent.offsetEnd(Option.empty());
+        ObserveEvent event = sequencerObserveEvent.offsetEnd(obsId);
         Set<Parameter<?>> paramSet = new HashSet<>(10);
         paramSet.add(obsIdParam);
 
@@ -118,9 +104,6 @@ public class JSequencerObserveEventTest extends JUnitSuite {
         Assert.assertEquals("ObserveEvent.OffsetEnd", event.eventName().name());
         Assert.assertEquals(prefix, event.source());
 
-        Assert.assertEquals(paramSet2, event2.jParamSet());
-        Assert.assertEquals("ObserveEvent.OffsetEnd", event2.eventName().name());
-        Assert.assertEquals(prefix, event2.source());
     }
 
     @Test

@@ -1,6 +1,5 @@
 package csw.params.events
 
-import csw.params.core.generics.Parameter
 import csw.params.core.models.{ExposureId, ObsId}
 import csw.prefix.models.Prefix
 
@@ -200,31 +199,25 @@ case class SequencerObserveEvent(prefix: Prefix) {
 
   /**
    * This event indicates the start of a telescope offset or dither
-   * @param obsId [[csw.params.core.models.ObsId]] Optional Parameter representing a unique observation id
+   * @param obsId [[csw.params.core.models.ObsId]] representing a unique observation id
    * @param p [[java.lang.Double]] Represents telescope's xCoordinate offset
    * @param q [[java.lang.Double]] Represents telescope's yCoordinate offset
    * @return [[csw.params.events.ObserveEvent]]
    */
-  def offsetStart(p: Double, q: Double, obsId: Option[ObsId] = None): ObserveEvent = {
-    val paramSet: Set[Parameter[?]] = obsId match {
-      case Some(value) => Set(ParamFactories.obsIdParam(value), ParamFactories.pOffsetParam(p), ParamFactories.qOffsetParam(q))
-      case None        => Set(ParamFactories.pOffsetParam(p), ParamFactories.qOffsetParam(q))
-    }
-    ObserveEvent(prefix, ObserveEventNames.OffsetStart, paramSet)
-  }
+  def offsetStart(obsId: ObsId, p: Double, q: Double): ObserveEvent =
+    ObserveEvent(
+      prefix,
+      ObserveEventNames.OffsetStart,
+      Set(ParamFactories.obsIdParam(obsId), ParamFactories.pOffsetParam(p), ParamFactories.qOffsetParam(q))
+    )
 
   /**
    * This event indicates the end of a telescope offset or dither
-   * @param obsId [[csw.params.core.models.ObsId]] Optional Parameter representing a unique observation id
+   * @param obsId [[csw.params.core.models.ObsId]] representing a unique observation id
    * @return [[csw.params.events.ObserveEvent]]
    */
-  def offsetEnd(obsId: Option[ObsId] = None): ObserveEvent = {
-    val paramSet: Set[Parameter[?]] = obsId match {
-      case Some(value) => Set(ParamFactories.obsIdParam(value))
-      case None        => Set.empty
-    }
-    ObserveEvent(prefix, ObserveEventNames.OffsetEnd, paramSet)
-  }
+  def offsetEnd(obsId: ObsId): ObserveEvent =
+    ObserveEvent(prefix, ObserveEventNames.OffsetEnd, Set(ParamFactories.obsIdParam(obsId)))
 
   /**
    * This event indicates the start of a request to the user for input
