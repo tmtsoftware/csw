@@ -197,6 +197,46 @@ case class SequencerObserveEvent(prefix: Prefix) {
     ObserveEvent(prefix, ObserveEventNames.DowntimeStart, Set(obsIdParam, downtimeReasonParam))
   }
 
+  /**
+   * This event indicates the start of a telescope offset or dither
+   * @param obsId [[csw.params.core.models.ObsId]] representing a unique observation id
+   * @param p [[java.lang.Double]] Represents telescope's xCoordinate offset
+   * @param q [[java.lang.Double]] Represents telescope's yCoordinate offset
+   * @return [[csw.params.events.ObserveEvent]]
+   */
+  def offsetStart(obsId: ObsId, p: Double, q: Double): ObserveEvent =
+    ObserveEvent(
+      prefix,
+      ObserveEventNames.OffsetStart,
+      Set(ParamFactories.obsIdParam(obsId), ParamFactories.pOffsetParam(p), ParamFactories.qOffsetParam(q))
+    )
+
+  /**
+   * This event indicates the end of a telescope offset or dither
+   * @param obsId [[csw.params.core.models.ObsId]] representing a unique observation id
+   * @return [[csw.params.events.ObserveEvent]]
+   */
+  def offsetEnd(obsId: ObsId): ObserveEvent =
+    ObserveEvent(prefix, ObserveEventNames.OffsetEnd, Set(ParamFactories.obsIdParam(obsId)))
+
+  /**
+   * This event indicates the start of a request to the user for input
+   * @param obsId [[csw.params.core.models.ObsId]] Representing a unique observation id
+   * @return [[csw.params.events.ObserveEvent]]
+   */
+  def inputRequestStart(obsId: ObsId): ObserveEvent = {
+    ObserveEvent(prefix, ObserveEventNames.InputRequestStart, Set(ParamFactories.obsIdParam(obsId)))
+  }
+
+  /**
+   * This event indicates the end of a request to the user for input
+   * @param obsId [[csw.params.core.models.ObsId]] Representing a unique observation id
+   * @return [[csw.params.events.ObserveEvent]]
+   */
+  def inputRequestEnd(obsId: ObsId): ObserveEvent = {
+    ObserveEvent(prefix, ObserveEventNames.InputRequestEnd, Set(ParamFactories.obsIdParam(obsId)))
+  }
+
   private def createObserveEvent(eventName: EventName, obsId: ObsId) =
     ObserveEvent(prefix, eventName, Set(ParamFactories.obsIdParam(obsId)))
 

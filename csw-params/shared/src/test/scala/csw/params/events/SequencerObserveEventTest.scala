@@ -3,11 +3,11 @@ package csw.params.events
 import csw.params.core.generics.KeyType.StringKey
 import csw.params.core.generics.Parameter
 import csw.params.core.models.{ExposureId, ObsId}
-import csw.prefix.models.Subsystem.ESW
 import csw.prefix.models.Prefix
+import csw.prefix.models.Subsystem.ESW
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
-import org.scalatest.prop.TableDrivenPropertyChecks._
+import org.scalatest.prop.TableDrivenPropertyChecks.*
 
 class SequencerObserveEventTest extends AnyFunSpec with Matchers {
   describe("SequencerObserveEvents") {
@@ -85,6 +85,34 @@ class SequencerObserveEventTest extends AnyFunSpec with Matchers {
       val event = sequencerObserveEvent.observeResumed()
       event.eventName should ===(EventName("ObserveEvent.ObserveResumed"))
       event.source should ===(prefix)
+    }
+
+    it("create offsetStart event | CSW-176") {
+      val event = sequencerObserveEvent.offsetStart(ObsId(obsId), 10.0, 20.0)
+      event.eventName should ===(EventName("ObserveEvent.OffsetStart"))
+      event.source should ===(prefix)
+      event.paramSet shouldBe Set(obsIdParam, ParamFactories.pOffsetParam(10.0), ParamFactories.qOffsetParam(20.0))
+    }
+
+    it("create offsetEnd event | CSW-176") {
+      val event1 = sequencerObserveEvent.offsetEnd(ObsId(obsId))
+      event1.eventName should ===(EventName("ObserveEvent.OffsetEnd"))
+      event1.source should ===(prefix)
+      event1.paramSet shouldBe Set(obsIdParam)
+    }
+
+    it("create inputRequestStart event | CSW-176") {
+      val event = sequencerObserveEvent.inputRequestStart(ObsId(obsId))
+      event.eventName should ===(EventName("ObserveEvent.InputRequestStart"))
+      event.source should ===(prefix)
+      event.paramSet shouldBe Set(obsIdParam)
+    }
+
+    it("create inputRequestEnd event | CSW-176") {
+      val event = sequencerObserveEvent.inputRequestEnd(ObsId(obsId))
+      event.eventName should ===(EventName("ObserveEvent.InputRequestEnd"))
+      event.source should ===(prefix)
+      event.paramSet shouldBe Set(obsIdParam)
     }
   }
 }
