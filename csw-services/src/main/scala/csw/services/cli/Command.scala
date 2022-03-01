@@ -52,7 +52,7 @@ object Command {
         new Start(true, config, event, alarm, database, auth, insideInterfaceName, outsideInterfaceName)
       }
       // mark all flags=true when no option is provided to start command
-      else new Start(true, true, true, true, false, true, insideInterfaceName, outsideInterfaceName)
+      else new Start(true, true, true, true, true, true, insideInterfaceName, outsideInterfaceName)
     }
   }
 
