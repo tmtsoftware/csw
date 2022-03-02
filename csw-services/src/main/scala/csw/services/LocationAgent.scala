@@ -50,7 +50,7 @@ class LocationAgent(settings: Settings) {
     catch {
       case NonFatal(e) =>
         ColoredConsole.RED.println(
-          "Make sure 'PGDATA' env variable is set where postgres is installed e.g. for mac: /usr/local/var/postgres"
+          "Make sure the PGDATA environment variable points to the Postgres data directory. For Mac users this can be the same as the system version: /usr/local/var/postgres. For Linux users, PGDATA must point to a different directory for which you have write permission (For example, ~/postgres), since the system version belongs to the root user."
         )
         throw e
     }
