@@ -353,7 +353,7 @@ object Dependencies {
       // TODO: make this as provided deps
       Libs.`scalatest`.value,
       Libs.`embedded-redis`,
-      Libs.`otj-pg-embedded`,
+      Libs.`io.zonky.test`,
       Libs.`junit-4-13`,
       Libs.`mockito`
     )
@@ -390,7 +390,7 @@ object Dependencies {
       Libs.`scalatest`.value % Test,
       Libs.`junit-4-13`      % Test,
       Akka.`akka-actor`      % Test,
-      Libs.`otj-pg-embedded` % Test
+      Libs.`io.zonky.test` % Test
     )
   )
 

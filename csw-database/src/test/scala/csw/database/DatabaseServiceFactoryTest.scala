@@ -2,7 +2,6 @@ package csw.database
 
 import akka.actor.typed
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import csw.database.DatabaseServiceFactory.{ReadPasswordHolder, ReadUsernameHolder}
 import csw.database.commons.{DBTestHelper, DatabaseServiceConnection}
 import csw.database.scaladsl.JooqExtentions.{RichQuery, RichResultQuery}
@@ -10,6 +9,7 @@ import csw.location.api.models
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.server.http.HTTPLocationService
+import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
 import org.jooq.DSLContext
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.funsuite.AnyFunSuite

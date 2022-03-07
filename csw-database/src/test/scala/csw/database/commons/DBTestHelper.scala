@@ -1,15 +1,14 @@
 package csw.database.commons
 
-import java.nio.file.Paths
-
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import csw.commons.ResourceReader
 import csw.database.DatabaseServiceFactory
 import csw.database.DatabaseServiceFactory.{ReadPasswordHolder, ReadUsernameHolder}
+import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
 import org.jooq.DSLContext
 import org.scalatest.concurrent.ScalaFutures
 
+import java.nio.file.Paths
 import scala.concurrent.duration.DurationInt
 
 object DBTestHelper extends ScalaFutures {
