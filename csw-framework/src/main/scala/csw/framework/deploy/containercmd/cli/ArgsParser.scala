@@ -13,10 +13,6 @@ private[containercmd] class ArgsParser(name: String) {
   val parser: OptionParser[Options] = new scopt.OptionParser[Options](name) {
     head(name, BuildInfo.version)
 
-    opt[Unit]("standalone") action { (_, c) =>
-      c.copy(standalone = true)
-    } text "Optional: if provided then run component in standalone mode else run in container"
-
     opt[Unit]("local") action { (_, c) =>
       c.copy(local = true)
     } text "Optional: if provided then run using the file on local file system else fetch it from config service"

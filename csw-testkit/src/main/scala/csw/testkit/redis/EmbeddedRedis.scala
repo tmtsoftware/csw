@@ -7,9 +7,11 @@ private[testkit] trait EmbeddedRedis {
   def startSentinel(
       sentinelPort: Int = getFreePort,
       serverPort: Int = getFreePort,
-      masterId: String
+      masterId: String,
+      keyspaceEvent: Boolean
   ): (RedisSentinel, RedisServer) = {
-    val redisServer = RedisServer.builder().port(serverPort).setting("notify-keyspace-events K$x").build()
+    val keyspaceEventStr = if (keyspaceEvent) "notify-keyspace-events K$x" else "notify-keyspace-events \"\""
+    val redisServer      = RedisServer.builder().port(serverPort).setting(keyspaceEventStr).build()
 
     val redisSentinel: RedisSentinel = RedisSentinel
       .builder()

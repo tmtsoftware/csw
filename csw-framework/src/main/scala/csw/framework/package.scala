@@ -136,8 +136,6 @@ package csw
  *    # This is a host configuration file which contains list of containers to be spawned by host configuration app
  *    containers: [
  *        {
- *          # mode can be one of Container or Standalone
- *          mode: "Container"
  *          # path of individual container configuration file
  *          configFilePath: "/resources/assemblyContainer.conf"
  *          # provide 'Remote' if file needs to fetched from config service else
@@ -145,7 +143,6 @@ package csw
  *          configFileLocation: "Local"
  *        },
  *        {
- *          mode: "Standalone"
  *          configFilePath: "/resources/hcdStandalone.conf"
  *          configFileLocation: "Local"
  *        }
