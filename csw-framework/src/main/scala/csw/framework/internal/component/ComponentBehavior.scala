@@ -171,19 +171,23 @@ private[framework] object ComponentBehavior {
         }
 
       def handleValidate(runId: Id, commandMessage: CommandMessage, replyTo: ActorRef[ValidateResponse]): Unit = {
-        // converting runId to str and then taking last five chars of the string to print in log message.
         val runIdStrSmall: String = runId.id.takeRight(5)
-        log.info(s"Validate:runId:[$runIdStrSmall] with [${commandMessage.command.commandName}]")
-        //  log.debug(s"Validate:runId:[$runIdStrSmall] with command parameters as [${commandMessage.command.paramSet}]")
-        val validationResponse = lifecycleHandlers.validateCommand(runId, commandMessage.command)
+        val validationResponse    = lifecycleHandlers.validateCommand(runId, commandMessage.command)
         replyTo ! validationResponse.asInstanceOf[ValidateResponse]
+
+        validationResponse match {
+          case accepted: Accepted =>
+            log.info(s"Validate:runId:[$runIdStrSmall] is Accepted for [${commandMessage.command.commandName}]")
+          case invalid: Invalid =>
+            log.info(s"Validate:runId:[$runIdStrSmall] is Invalid with [$validationResponse]")
+        }
+
       }
 
       def handleOneway(runId: Id, commandMessage: CommandMessage, replyTo: ActorRef[OnewayResponse]): Unit = {
         // converting runId to str and then taking last five chars of the string to print in log message.
         val runIdStrSmall: String = runId.id.takeRight(5)
         log.info(s"Validate:runId:[$runIdStrSmall] with [${commandMessage.command.commandName}]")
-        // log.debug(s"Validate:runId:[$runIdStrSmall] with command parameters as [${commandMessage.command.paramSet}]")
         val validationResponse = lifecycleHandlers.validateCommand(runId, commandMessage.command)
         replyTo ! validationResponse.asInstanceOf[OnewayResponse]
 
@@ -192,32 +196,25 @@ private[framework] object ComponentBehavior {
             log.info(s"Oneway:runId:[$runIdStrSmall] with msg [$commandMessage]")
             lifecycleHandlers.onOneway(runId, commandMessage.command)
           case invalid: Invalid =>
-            log.info(s"Command not forwarded to TLA post validation.")
+            log.info(s"Oneway:runId:[$runIdStrSmall] - Command not forwarded to TLA post validation.")
         }
       }
 
       def handleSubmit(runId: Id, commandMessage: CommandMessage, replyTo: ActorRef[SubmitResponse]): Unit = {
-        // converting runId to str and then taking last five chars of the string to print in log message.
         val runIdStrSmall: String = runId.id.takeRight(5)
-        // log.debug(s"Validate : runId :[$runIdStrSmall] with command parameters as [${commandMessage.command.paramSet}]")
+        log.info(s"Submit:runId:[$runIdStrSmall] with [${commandMessage}]")
         lifecycleHandlers.validateCommand(runId, commandMessage.command) match {
           case accepted: Accepted =>
-            log.info(
-              s"Validate:runId:[$runIdStrSmall] with [${commandMessage.command.commandName}] and Validation Response:[Accepted]"
-            )
             val submitResponse = lifecycleHandlers.onSubmit(runId, commandMessage.command)
+            log.info(s"Submit:runId:[$runIdStrSmall] with response:[$submitResponse]")
             submitResponse match {
               case started: Started =>
                 commandResponseManager.commandResponseManagerActor ! AddStarted(started)
-                log.info(s"Submit:runId:[$runIdStrSmall] with response:[$commandMessage]")
               case _ => // Do nothing
             }
             replyTo ! submitResponse
           case invalid: Invalid =>
-            log.info(
-              s"Validate:runId:[$runIdStrSmall]  with [${commandMessage.command.commandName}] and Validation Response: [Invalid]"
-            )
-            // log.debug(s"runId :[$runIdStrSmall], Command not forwarded to TLA post validation. ValidationResponse was [$invalid]")
+            log.info(s"Validate:runId:[$runIdStrSmall] is Invalid")
             replyTo ! invalid
         }
       }
