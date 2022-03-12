@@ -13,7 +13,6 @@ More details about implementing ComponentHandlers can be found @ref:[here](./cre
 #### *Tutorial: Developing an Assembly*
 
 If using the giter8 template with the default parameters, our `ComponentHandlers` class will be the `SampleHandlers` class (`JSampleHandlers` in Java),
-and the factory will be `SampleBehaviorFactory` (`JSampleBehaviorFactory` in Java).
 
 Like we did for the HCD, let's add some log messages for the `initialize` and `onShutdown` hooks, but not the 
 `onTrackingLocationEvent` hook.  We'll cover that in more detail later.
