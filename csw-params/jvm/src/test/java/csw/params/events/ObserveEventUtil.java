@@ -13,4 +13,12 @@ public class ObserveEventUtil {
         operationalStateChoices.add(new Choice(JOperationalState.NOT_READY().entryName()));
         return operationalStateChoices;
     }
+
+    public static HashSet<Choice> getCoordinateSystemChoices() {
+        HashSet<Choice> coordinateSystemChoices = new HashSet<>();
+        coordinateSystemChoices.add(new Choice(JCoordinateSystem.RADEC().entryName()));
+        coordinateSystemChoices.add(new Choice(JCoordinateSystem.XY().entryName()));
+        coordinateSystemChoices.add(new Choice(JCoordinateSystem.ALTAZ().entryName()));
+        return coordinateSystemChoices;
+    }
 }

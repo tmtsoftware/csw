@@ -1,6 +1,8 @@
 package csw.params.events;
 
 import csw.params.core.generics.Parameter;
+import csw.params.core.models.Choice;
+import csw.params.core.models.Choices;
 import csw.params.core.models.ExposureId;
 import csw.params.core.models.ObsId;
 import csw.params.javadsl.JKeyType;
@@ -22,9 +24,13 @@ public class JSequencerObserveEventTest extends JUnitSuite {
     final Parameter<String> downTimeParam = ObserveEventKeys.downTimeReason().set("infra failure");
     final Parameter<Double> pOffsetParam = JKeyType.DoubleKey().make("p", JUnits.arcsec).set(10.0);
     final Parameter<Double> qOffsetParam = JKeyType.DoubleKey().make("q", JUnits.arcsec).set(20.0);
+    HashSet<Choice> coordinateSystemChoices = ObserveEventUtil.getCoordinateSystemChoices();
+    Parameter<Choice> coordianateSystemParam = JKeyType.ChoiceKey().make("coordinateSystem", Choices.fromChoices(coordinateSystemChoices)).set(new Choice(JCoordinateSystem.XY().entryName()));
+
     final SequencerObserveEvent sequencerObserveEvent = new SequencerObserveEvent(prefix);
     String filename = "some/nested/folder/file123.conf";
     Parameter<String> filenameParam = ObserveEventKeys.filename().set(filename);
+
     @Test
     public void createObserveEventwithObsIdParameters__CSW_125() {
         List<TestData> testData = new ArrayList<>(Arrays.asList(
@@ -81,9 +87,10 @@ public class JSequencerObserveEventTest extends JUnitSuite {
 
     @Test
     public void createOffsetStartObserveEventWithFixedParameterSet__CSW_176() {
-        ObserveEvent event = sequencerObserveEvent.offsetStart(obsId,10.0, 20.0);
+        ObserveEvent event = sequencerObserveEvent.offsetStart(obsId, JCoordinateSystem.XY(), 10.0, 20.0);
         Set<Parameter<?>> paramSet = new HashSet<>(10);
         paramSet.add(pOffsetParam);
+        paramSet.add(coordianateSystemParam);
         paramSet.add(qOffsetParam);
         paramSet.add(obsIdParam);
 
@@ -97,8 +104,6 @@ public class JSequencerObserveEventTest extends JUnitSuite {
         ObserveEvent event = sequencerObserveEvent.offsetEnd(obsId);
         Set<Parameter<?>> paramSet = new HashSet<>(10);
         paramSet.add(obsIdParam);
-
-        Set<Parameter<?>> paramSet2 = new HashSet<>(10);
 
         Assert.assertEquals(paramSet, event.jParamSet());
         Assert.assertEquals("ObserveEvent.OffsetEnd", event.eventName().name());

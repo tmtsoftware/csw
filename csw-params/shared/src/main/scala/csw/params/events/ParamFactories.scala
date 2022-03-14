@@ -10,7 +10,7 @@ object ObserveEventKeys {
   val exposureId: Key[String] = StringKey.make("exposureId")
   val detector: Key[String]   = StringKey.make("detector")
   val operationalState: GChoiceKey = ChoiceKey
-    .make("operationalState", Choices.fromChoices(OperationalState.toChoices: _*))
+    .make("operationalState", Choices.fromChoices(OperationalState.toChoices*))
   val errorMessage: Key[String]        = StringKey.make("errorMessage")
   val exposureInProgress: Key[Boolean] = BooleanKey.make("exposureInProgress")
   val abortInProgress: Key[Boolean]    = BooleanKey.make("abortInProgress")
@@ -27,6 +27,8 @@ object ObserveEventKeys {
   val filename: Key[String]            = StringKey.make("filename")
   val pOffSet: Key[Double]             = DoubleKey.make("p", Units.arcsec)
   val qOffSet: Key[Double]             = DoubleKey.make("q", Units.arcsec)
+  val coordinateSystem: GChoiceKey = ChoiceKey
+    .make("coordinateSystem", Choices.fromChoices(CoordinateSystem.toChoices*))
 }
 
 // commonly used params factories
@@ -70,6 +72,9 @@ object ParamFactories {
   def downTimeReasonParam(reasonForDownTime: String): Parameter[String] = ObserveEventKeys.downTimeReason.set(reasonForDownTime)
 
   def filenameParam(filename: String): Parameter[String] = ObserveEventKeys.filename.set(filename)
+
+  def coordinateSystemParam(coordinateSystem: CoordinateSystem): Parameter[Choice] =
+    ObserveEventKeys.coordinateSystem.set(Choice(coordinateSystem.entryName))
 
   def pOffsetParam(pOffset: Double): Parameter[Double] = ObserveEventKeys.pOffSet.set(pOffset)
 

@@ -88,10 +88,15 @@ class SequencerObserveEventTest extends AnyFunSpec with Matchers {
     }
 
     it("create offsetStart event | CSW-176") {
-      val event = sequencerObserveEvent.offsetStart(ObsId(obsId), 10.0, 20.0)
+      val event = sequencerObserveEvent.offsetStart(ObsId(obsId), CoordinateSystem.XY, 10.0, 20.0)
       event.eventName should ===(EventName("ObserveEvent.OffsetStart"))
       event.source should ===(prefix)
-      event.paramSet shouldBe Set(obsIdParam, ParamFactories.pOffsetParam(10.0), ParamFactories.qOffsetParam(20.0))
+      event.paramSet shouldBe Set(
+        obsIdParam,
+        ParamFactories.coordinateSystemParam(CoordinateSystem.XY),
+        ParamFactories.pOffsetParam(10.0),
+        ParamFactories.qOffsetParam(20.0)
+      )
     }
 
     it("create offsetEnd event | CSW-176") {

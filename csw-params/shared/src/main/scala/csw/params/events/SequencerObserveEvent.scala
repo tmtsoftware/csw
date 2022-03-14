@@ -200,15 +200,21 @@ case class SequencerObserveEvent(prefix: Prefix) {
   /**
    * This event indicates the start of a telescope offset or dither
    * @param obsId [[csw.params.core.models.ObsId]] representing a unique observation id
+   * @param coordinateSystem [[CoordinateSystem]] Represents coordinate system
    * @param p [[java.lang.Double]] Represents telescope's xCoordinate offset
    * @param q [[java.lang.Double]] Represents telescope's yCoordinate offset
    * @return [[csw.params.events.ObserveEvent]]
    */
-  def offsetStart(obsId: ObsId, p: Double, q: Double): ObserveEvent =
+  def offsetStart(obsId: ObsId, coordinateSystem: CoordinateSystem, p: Double, q: Double): ObserveEvent =
     ObserveEvent(
       prefix,
       ObserveEventNames.OffsetStart,
-      Set(ParamFactories.obsIdParam(obsId), ParamFactories.pOffsetParam(p), ParamFactories.qOffsetParam(q))
+      Set(
+        ParamFactories.obsIdParam(obsId),
+        ParamFactories.coordinateSystemParam(coordinateSystem),
+        ParamFactories.pOffsetParam(p),
+        ParamFactories.qOffsetParam(q)
+      )
     )
 
   /**
