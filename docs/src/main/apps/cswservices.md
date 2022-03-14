@@ -63,6 +63,12 @@ csw-services start
   
 If only  specific services are to be started then following options can be used along with the `start` command.
   
+- --location | -l if provided, starts location service.
+
+    ```bash
+    // This starts location service only
+    csw-services start -l
+    ```
 - --config | -c if provided, starts configuration service.
 
     ```bash
