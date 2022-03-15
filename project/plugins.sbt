@@ -15,6 +15,7 @@ addSbtPlugin("org.scala-js"                      % "sbt-scalajs"               %
 addSbtPlugin("com.github.cb372"                  % "sbt-explicit-dependencies" % "0.2.16")
 addSbtPlugin("com.dwijnand"                      % "sbt-project-graph"         % "0.4.0")
 addSbtPlugin("com.timushev.sbt"                  % "sbt-rewarn"                % "0.1.3")
+addSbtPlugin("de.heikoseeberger"                 % "sbt-header"                % "5.6.5")
 
 resolvers += "jitpack" at "https://jitpack.io"
 libraryDependencies += "com.github.tmtsoftware" % "sbt-docs" % "115000a"

@@ -29,7 +29,7 @@ object Common {
     gitCurrentRepo                                  := "https://github.com/tmtsoftware/csw",
     libraryDependencies += (Libs.`tmt-test-reporter` % Test),
     organization                                    := "com.github.tmtsoftware.csw",
-    organizationName                                := "TMT Org",
+    organizationName                                := "Thirty Meter Telescope International Observatory",
     scalaVersion                                    := Libs.ScalaVersion,
     homepage                                        := Some(url("https://github.com/tmtsoftware/csw")),
     resolvers += "jitpack" at "https://jitpack.io",
