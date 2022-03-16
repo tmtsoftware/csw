@@ -68,16 +68,16 @@ private:
     sem_t *Sem;
 
     // Mutex to protect the condition variables
-    pthread_mutex_t WaitMutex;
+    pthread_mutex_t WaitMutex{};
 
     // Condition variables for signaling the start and end of the 
     // scan
-    pthread_cond_t ScanStart;
-    pthread_cond_t ScanEnd;
+    pthread_cond_t ScanStart{};
+    pthread_cond_t ScanEnd{};
 
     // Flags for synchonizing with the start and end of the scan.
-    bool StartFlag;
-    bool EndFlag;
+    bool StartFlag{};
+    bool EndFlag{};
 
     // The number of ticks between each run of the scan
     int WaitTicks;

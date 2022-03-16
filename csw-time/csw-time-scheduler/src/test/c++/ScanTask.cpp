@@ -4,16 +4,12 @@
 // D L Terrett
 // Copyright STFC All Rights Reserved
 
-#include <cerrno>
 #include <pthread.h>
 #include <sched.h>
 #include <semaphore.h>
-#include <sys/stat.h>
 #include <fcntl.h>
 #include <cstdio>
-#include <sys/mman.h>
 #include <ctime>
-#include <unistd.h>
 #include <vector>
 #include "ScanTask.h"
 
@@ -104,12 +100,8 @@ void ScanTask::makeRealTime() {
 // This is the thread start routine for the scheduler thread.
 
 extern "C" [[noreturn]] void *ScanTask::scheduler(void *) {
-    timespec startTime{};
-    timespec ts{};
-
 // Loop forever.
     for (;;) {
-        clock_gettime(CLOCK_REALTIME, &startTime);
         // For each scan task...
         for (auto Task: Tasks) {
             auto *task = static_cast<ScanTask *>(Task);
@@ -129,26 +121,17 @@ extern "C" [[noreturn]] void *ScanTask::scheduler(void *) {
             --(task->TickCount);
         }
 
-        // Try to make up for time taken by task
-        clock_gettime(CLOCK_REALTIME, &ts);
-        const double t1Nanos = double(startTime.tv_sec) * 1000.0 * 1000.0 * 1000.0 + double(startTime.tv_nsec);
-        const double t2Nanos = double(ts.tv_sec) * 1000.0 * 1000.0 * 1000.0 + double(ts.tv_nsec);
-        long diffNanos = long(t2Nanos - t1Nanos);
-
-        // Wait for the one tick (1ms)
-        struct timespec interval{};
-        interval.tv_sec = 0;
-        interval.tv_nsec = 1000000 - diffNanos;
-        if (interval.tv_nsec > 0) {
-            while (nanosleep(&interval, &interval) != 0) {
-                if (errno == EINTR) {
-                    continue;
-                }
-                perror("nanosleep");
-            }
+        timespec deadline{};
+        clock_gettime(CLOCK_MONOTONIC, &deadline);
+        // round to next ms
+        long d = deadline.tv_nsec + 1000 * 1000;
+        deadline.tv_nsec = d - d % (1000 * 1000);
+        if (deadline.tv_nsec >= 1000000000) {
+            deadline.tv_nsec -= 1000000000;
+            deadline.tv_sec++;
         }
+        clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &deadline, nullptr);
     }
-//    return nullptr;
 }
 
 //   Starts the scheduler thread.

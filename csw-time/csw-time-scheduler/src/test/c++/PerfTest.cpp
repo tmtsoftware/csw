@@ -24,8 +24,8 @@ private:
         if (count > 1000 / intervalMs)
             jitterMicrosecs = (jitterMicrosecs * (count - 1) + diffMicrosecs) / count;
         if (count % (1000 / intervalMs) == 0) {
-            printf("%s (%d ms): jitter = %ld microsecs (%ld ms)\n", name, intervalMs, jitterMicrosecs,
-                   jitterMicrosecs / 1000L);
+            printf("%s (%d ms): jitter = %ld microsecs (%g ms)\n", name, intervalMs, jitterMicrosecs,
+                   double(jitterMicrosecs) / 1000.0);
         }
         clock_gettime(CLOCK_REALTIME, &startTime);
     }
