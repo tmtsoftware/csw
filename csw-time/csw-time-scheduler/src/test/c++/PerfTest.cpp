@@ -64,7 +64,7 @@ int main() {
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "EndlessLoop"
     for (;;) {
-        nanosleep((const struct timespec[]) {{0, 50000L}}, nullptr);
+        nanosleep((const struct timespec[]) {{0, 500000L}}, nullptr);
     }
 
 #pragma clang diagnostic pop
