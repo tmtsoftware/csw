@@ -1,0 +1,17 @@
+.snippet-button {
+    float: right;
+    vertical-align: middle;
+    padding: 0.25em 0.25em;
+    border: 1px solid #ddd;
+    margin: 0.25em;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.copy-snippet {
+    visibility: hidden;
+}
+
+.snippet-button:hover {
+    background: #c5cae9;
+}

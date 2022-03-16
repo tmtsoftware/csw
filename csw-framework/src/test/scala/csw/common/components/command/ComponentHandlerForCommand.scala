@@ -82,10 +82,8 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
     }
 
   private def processCurrentStateOneway(controlCommand: ControlCommand): Unit = {
-    // #subscribeCurrentState
     val currentState = CurrentState(prefix, StateName("HCDState"), controlCommand.paramSet)
     cswCtx.currentStatePublisher.publish(currentState)
-    // #subscribeCurrentState
   }
 
   private def processAcceptedSubmitCmd(cancelCommandId: Id, cancelCommandSetup: Setup): SubmitResponse = {

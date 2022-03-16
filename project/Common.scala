@@ -21,8 +21,8 @@ object Common {
 
   val MaybeCoverage: Plugins = if (enableCoverage) Coverage else Plugins.empty
   val jsTestArg              = Test / testOptions := Seq(Tests.Argument("-oDF"))
-
   lazy val CommonSettings: Seq[Setting[_]] = Seq(
+    
     docsRepo                                        := "https://github.com/tmtsoftware/tmtsoftware.github.io.git",
     docsParentDir                                   := "csw",
     gitCurrentRepo                                  := "https://github.com/tmtsoftware/csw",

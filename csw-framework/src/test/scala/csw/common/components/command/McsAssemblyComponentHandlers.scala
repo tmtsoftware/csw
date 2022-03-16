@@ -70,7 +70,6 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
     }
   }
 
-  // #queryF
   private def processLongRunningCommand(prunId: Id, controlCommand: ControlCommand): Unit = {
     // Could be different components, can't actually submit parallel commands to an HCD
     val shortSetup  = Setup(assemblyPrefix, shortRunning, None)
@@ -123,7 +122,6 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
       }
     }
   }
-  // #queryF
 
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = {}
 

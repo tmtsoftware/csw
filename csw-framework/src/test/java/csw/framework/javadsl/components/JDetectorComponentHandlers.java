@@ -104,15 +104,11 @@ public class JDetectorComponentHandlers extends JComponentHandlers {
     public void onGoOnline() {
     }
 
-    //#onDiagnostic-mode
     @Override
     public void onDiagnosticMode(UTCTime startTime, String hint) {
     }
-    //#onDiagnostic-mode
 
-    //#onOperations-mode
     @Override
     public void onOperationsMode() {
     }
-    //#onOperations-mode
 }

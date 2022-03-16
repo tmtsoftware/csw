@@ -14,6 +14,8 @@ import csw.location.api.models.*;
 import csw.logging.api.javadsl.ILogger;
 import csw.params.commands.*;
 import csw.params.core.generics.Key;
+import csw.params.core.generics.Parameter;
+import csw.params.core.generics.ParameterSetType;
 import csw.params.core.models.Id;
 import csw.params.events.Event;
 import csw.params.events.EventKey;
@@ -24,10 +26,7 @@ import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
 import csw.time.core.models.UTCTime;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -187,7 +186,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     CommandName cmd = setup.commandName();
     if (cmd.equals(immediateCommand)) {
       // Assembly preforms a calculation or reads state information storing in a result
-      return new Completed(runId, new Result().madd(resultKey.set(1000L)));
+      return new Completed(runId, new Result().add(resultKey.set(1000L)));
     }
     //#immediate-command
     if (cmd.equals(shortCommand)) {

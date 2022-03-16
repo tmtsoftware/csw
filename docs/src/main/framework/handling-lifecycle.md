@@ -269,10 +269,10 @@ Unsupported hints should be rejected by a component.
 The example shows one usage of `onDiagnosticMode` handler.
 
 Scala
-:   @@snip [SampleComponentHandlers.scala](../../../../csw-framework/src/test/scala/csw/common/components/framework/SampleComponentHandlers.scala) { #onDiagnostic-mode }
+:   @@snip [SampleComponentHandlers.scala](../../../../examples/src/main/scala/org/tmt/csw/sample/CurrentStateExampleComponentHandlers.scala) { #onDiagnostic-mode }
 
 Java
-:   @@snip [JSampleComponentHandlers.java](../../../../csw-framework/src/test/java/csw/framework/javadsl/components/JSampleComponentHandlers.java) { #onDiagnostic-mode }
+:   @@snip [JSampleComponentHandlers.java](../../../../examples/src/main/java/org/tmt/csw/sample/JCurrentStateExampleComponentHandlers.java) { #onDiagnostic-mode }
 
 ### onOperationsMode
 
@@ -286,7 +286,7 @@ process an `onOperationsMode` handler call. The component should return completi
 The example shows one usage of `onOperationsMode` handler.
 
 Scala
-:   @@snip [SampleComponentHandlers.scala](../../../../csw-framework/src/test/scala/csw/common/components/framework/SampleComponentHandlers.scala) { #onOperations-mode }
+:   @@snip [SampleComponentHandlers.scala](../../../../examples/src/main/scala/org/tmt/csw/sample/CurrentStateExampleComponentHandlers.scala) { #onOperations-mode }
 
 Java
-:   @@snip [JSampleComponentHandlers.java](../../../../csw-framework/src/test/java/csw/framework/javadsl/components/JSampleComponentHandlers.java) { #onOperations-mode }
+:   @@snip [JSampleComponentHandlers.java](../../../../examples/src/main/java/org/tmt/csw/sample/JCurrentStateExampleComponentHandlers.java) { #onOperations-mode }

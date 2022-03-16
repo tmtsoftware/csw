@@ -30,7 +30,6 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
     }
   }
 
-  // #updateCommand
   override def onSubmit(runId: Id, controlCommand: ControlCommand): SubmitResponse = {
     controlCommand.commandName match {
       case `longRunning` =>
@@ -38,7 +37,6 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
           commandResponseManager.updateCommand(Completed(runId))
         }
         Started(runId)
-      // #updateCommand
       case `mediumRunning` =>
         timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plusSeconds(3))) {
           commandResponseManager.updateCommand(Completed(runId))

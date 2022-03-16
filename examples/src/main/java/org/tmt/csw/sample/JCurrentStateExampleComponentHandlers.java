@@ -1,4 +1,4 @@
-package csw.framework.javadsl.components;
+package org.tmt.csw.sample;
 
 import akka.actor.Cancellable;
 import akka.actor.typed.javadsl.ActorContext;
@@ -7,8 +7,6 @@ import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
 import csw.command.client.CommandResponseManager;
 import csw.command.client.messages.TopLevelActorMessage;
-import csw.common.components.command.ComponentStateForCommand;
-import csw.common.components.framework.SampleComponentState;
 import csw.event.api.javadsl.IEventService;
 import csw.framework.CurrentStatePublisher;
 import csw.framework.javadsl.JComponentHandlers;
@@ -38,21 +36,21 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static csw.common.components.command.ComponentStateForCommand.*;
+import static org.tmt.csw.sample.ComponentStateForCommand.*;
 
 @SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "unused"})
-public class JSampleComponentHandlers extends JComponentHandlers {
+public class JCurrentStateExampleComponentHandlers extends JComponentHandlers {
 
     // Demonstrating logger accessibility in Java Component handlers
     private final ILogger log;
     private final CommandResponseManager commandResponseManager;
     private final CurrentStatePublisher currentStatePublisher;
-    private final CurrentState currentState = new CurrentState(SampleComponentState.prefix(), new StateName("testStateName"));
+    private final CurrentState currentState = new CurrentState(prefix(), new StateName("testStateName"));
     private final ActorContext<TopLevelActorMessage> actorContext;
     private final IEventService eventService;
     private Optional<Cancellable> diagModeCancellable = Optional.empty();
 
-    JSampleComponentHandlers(ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
+    JCurrentStateExampleComponentHandlers(ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
         super(ctx, cswCtx);
         this.currentStatePublisher = cswCtx.currentStatePublisher();
         this.log = cswCtx.loggerFactory().getLogger(getClass());
@@ -68,8 +66,10 @@ public class JSampleComponentHandlers extends JComponentHandlers {
             Thread.sleep(100);
         } catch (InterruptedException ignored) {
         }
+        //#currentStatePublisher
         CurrentState initState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.initChoice()));
         currentStatePublisher.publish(initState);
+        //#currentStatePublisher
     }
 
     @Override
@@ -82,6 +82,8 @@ public class JSampleComponentHandlers extends JComponentHandlers {
             // This is special because test doesn't want these other CurrentState values published
             return new CommandResponse.Accepted(runId);
         } else if (controlCommand.commandName().equals(crmAddOrUpdateCmd())) {
+            return new CommandResponse.Accepted(runId);
+        } else if (controlCommand.commandName().equals(matcherCmd())) {
             return new CommandResponse.Accepted(runId);
         } else {
             // All other tests
@@ -145,6 +147,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         return new CommandResponse.Completed(runId);
     }
 
+    //#updateCommand
     private CommandResponse.SubmitResponse crmAddOrUpdate(Setup setup, Id runId) {
         // This simulates some worker task doing something that finishes after onSubmit returns
         Runnable task = () -> commandResponseManager.updateCommand(new Completed(runId));
@@ -156,13 +159,16 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         // Return Started from onSubmit
         return new Started(runId);
     }
+    //#updateCommand
 
     private void processCurrentStateOnewayCommand(Setup setup) {
+        //#currentStatePublisher
         Key<Integer> encoder = JKeyType.IntKey().make("encoder", JUnits.encoder);
         int expectedEncoderValue = setup.jGet(encoder).orElseThrow().head();
 
-        CurrentState currentState = new CurrentState(prefix(), new StateName("HCDState")).add(encoder().set(expectedEncoderValue));
+        CurrentState currentState = new CurrentState(prefix(), new StateName("HCDState")).add(encoder.set(expectedEncoderValue));
         currentStatePublisher.publish(currentState);
+        //#currentStatePublisher
     }
 
     private void processOnewayCommand(ControlCommand controlCommand) {
@@ -244,6 +250,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         currentStatePublisher.publish(onlineState);
     }
 
+    //#onDiagnostic-mode
     @Override
     public void onDiagnosticMode(UTCTime startTime, String hint) {
         if (hint.equals("engineering")) {
@@ -261,9 +268,12 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         }
         // other supported diagnostic modes go here
     }
+    //#onDiagnostic-mode
 
+    //#onOperations-mode
     @Override
     public void onOperationsMode() {
         diagModeCancellable.map(Cancellable::cancel); // cancel diagnostic mode
     }
+    //#onOperations-mode
 }

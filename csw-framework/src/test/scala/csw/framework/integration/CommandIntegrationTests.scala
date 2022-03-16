@@ -183,14 +183,12 @@ class CommandIntegrationTests extends FrameworkIntegrationSuite {
     val submitAllSetup2       = Setup(seqPrefix, longRunningCmd, obsId)
     val submitAllinvalidSetup = Setup(seqPrefix, invalidCmd, obsId)
 
-    // #submitAll
     val submitAllF        = filterAssemblyCS.submitAllAndWait(List(submitAllSetup1, submitAllSetup2, submitAllinvalidSetup))
     val submitAllResponse = Await.result(submitAllF, timeout.duration)
     submitAllResponse.length shouldBe 3
     submitAllResponse(0) shouldBe a[Completed]
     submitAllResponse(1) shouldBe a[Completed]
     submitAllResponse(2) shouldBe a[Invalid]
-    // #submitAll
 
     // Make sure we can return a result
     val k1 = KeyType.IntKey.make("encoder")
