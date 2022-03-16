@@ -1,8 +1,5 @@
 package csw.time.scheduler.api
 
-import java.time.temporal.ChronoUnit
-import java.time.{Duration, Instant}
-
 import akka.actor.testkit.typed.scaladsl
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.scaladsl.Behaviors
@@ -13,6 +10,10 @@ import org.HdrHistogram.Histogram
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.funsuite.AnyFunSuiteLike
 
+import java.time.temporal.ChronoUnit
+import java.time.{Duration, Instant}
+import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt
 
@@ -23,8 +24,33 @@ class TimeServiceSchedulerPerfTest extends AnyFunSuiteLike with BeforeAndAfterAl
   private implicit val scheduler: Scheduler               = sys.scheduler
   private val timeService                                 = new TimeServiceSchedulerFactory().make()
 
+  type PercentileType = (Long, Long, Long)
+
+  private val averageTable =
+    new mutable.LinkedHashMap[(Int, Int, Int), (PercentileType, PercentileType)].empty
+
+  def createRow(scenario: (Int, Int, Int), result: PercentileType): String = {
+    s"${scenario._1},${scenario._2},${scenario._3},${result._1},${result._2},${result._3}"
+  }
+  override protected def afterAll(): Unit = {
+    val a = averageTable.foldLeft(("", ""))((res, data) => {
+      val scenario = data._1
+      val result   = data._2
+      (res._1 + createRow(scenario, result._1) + "\n", res._2 + createRow(scenario, result._2) + "\n")
+    })
+
+    val header = "Offset (in millis),Schedulers,No. of Tasks ran, 50%tile (in µs), 65%tile (in µs), 98.5%tile (in µs)"
+    println("jitter calculated from previous tasks")
+    println(header)
+    println(a._1)
+
+    println("jitter calculated from first tasks")
+    println(header)
+    println(a._2)
+  }
+
   for (scenario <- TestSettings.all) {
-    import scenario._
+    import scenario.*
     ignore(s"Offset:$offset Schedulers:$nSchedulers Warmup:$warmup Tasks:$nTasks") {
       val xs: List[(TestProbe[UTCTime], Cancellable)] = (1 to nSchedulers).map { _ =>
         val testProbe = scaladsl.TestProbe[UTCTime]()(sys)
@@ -34,6 +60,9 @@ class TimeServiceSchedulerPerfTest extends AnyFunSuiteLike with BeforeAndAfterAl
         }
         (testProbe, cancellable)
       }.toList
+
+      val diffInMicrosArray: ArrayBuffer[(Long, Long, Long)]   = mutable.ArrayBuffer.empty[PercentileType]
+      val jitterINMicrosArray: ArrayBuffer[(Long, Long, Long)] = mutable.ArrayBuffer.empty[PercentileType]
 
       xs.foreach { case (probe, cancellable) =>
         probe.receiveMessages(warmup, 100.hours) // Do not record warmup tasks
@@ -62,6 +91,21 @@ class TimeServiceSchedulerPerfTest extends AnyFunSuiteLike with BeforeAndAfterAl
 
           histogramForConsistency.recordValue(jitterInMicros)
         }
+        diffInMicrosArray.append(
+          (
+            histogram.getValueAtPercentile(50),
+            histogram.getValueAtPercentile(65),
+            histogram.getValueAtPercentile(98.5)
+          )
+        )
+        jitterINMicrosArray.append(
+          (
+            histogramForConsistency.getValueAtPercentile(50),
+            histogramForConsistency.getValueAtPercentile(65),
+            histogramForConsistency.getValueAtPercentile(98.5)
+          )
+        )
+
         println(
           "===========================Jitter(us) in Percentile [WRT Previous-Time | WRT Start-Time] ========================"
         )
@@ -73,6 +117,19 @@ class TimeServiceSchedulerPerfTest extends AnyFunSuiteLike with BeforeAndAfterAl
         cancellable.cancel()
       }
 
+      averageTable.update((offset, nSchedulers, nTasks), (calcAverage(diffInMicrosArray), calcAverage(jitterINMicrosArray)))
     }
+  }
+
+  def calcAverage(list: mutable.ArrayBuffer[PercentileType]): PercentileType = {
+    val fiftyPer              = list.map(_._1.toDouble)
+    val sixtyFivePer          = list.map(_._2.toDouble)
+    val ninetyEightAndHalfPer = list.map(_._3.toDouble)
+
+    (
+      Math.round(fiftyPer.sum / fiftyPer.length),
+      Math.round(sixtyFivePer.sum / sixtyFivePer.length),
+      Math.round(ninetyEightAndHalfPer.sum / ninetyEightAndHalfPer.length)
+    )
   }
 }
