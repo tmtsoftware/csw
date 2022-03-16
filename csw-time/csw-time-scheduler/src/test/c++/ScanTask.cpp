@@ -23,7 +23,7 @@ using std::vector;
 bool ScanTask::RealTime = false;
 
 // XXX Note: This value must be null (or properly initialized) on MacOS if not being used for scheduling
-pthread_attr_t ScanTask::Tattr  ;
+pthread_attr_t ScanTask::Tattr;
 
 vector<void *>ScanTask::Tasks;
 
@@ -32,7 +32,7 @@ vector<void *>ScanTask::Tasks;
     initialises the semaphore and the mutexes and creates the 
     scan thread.
 */
-ScanTask::ScanTask(const char* name, int waitticks, int prio) :
+ScanTask::ScanTask(const char *name, int waitticks, int prio) :
         WaitTicks(waitticks), TickCount(0) {
 
 // Initialise the semaphore (not shared between processes and 
@@ -50,7 +50,7 @@ ScanTask::ScanTask(const char* name, int waitticks, int prio) :
     ScanEnd = PTHREAD_COND_INITIALIZER;
 
     pthread_t threadId;
-    pthread_attr_t* attr = nullptr;
+    pthread_attr_t *attr = nullptr;
 
 // Create the scan thread.
     if (RealTime) {
@@ -104,12 +104,14 @@ void ScanTask::makeRealTime() {
 // This is the thread start routine for the scheduler thread.
 
 extern "C" [[noreturn]] void *ScanTask::scheduler(void *) {
+    timespec startTime{};
+    timespec ts{};
 
 // Loop forever.
     for (;;) {
-
+        clock_gettime(CLOCK_REALTIME, &startTime);
         // For each scan task...
-        for (auto Task : Tasks) {
+        for (auto Task: Tasks) {
             auto *task = static_cast<ScanTask *>(Task);
 
             // If the counter has reached zero...
@@ -127,13 +129,23 @@ extern "C" [[noreturn]] void *ScanTask::scheduler(void *) {
             --(task->TickCount);
         }
 
+        // Try to make up for time taken by task
+        clock_gettime(CLOCK_REALTIME, &ts);
+        const double t1Nanos = double(startTime.tv_sec) * 1000.0 * 1000.0 * 1000.0 + double(startTime.tv_nsec);
+        const double t2Nanos = double(ts.tv_sec) * 1000.0 * 1000.0 * 1000.0 + double(ts.tv_nsec);
+        long diffNanos = long(t2Nanos - t1Nanos);
+
         // Wait for the one tick (1ms)
         struct timespec interval{};
         interval.tv_sec = 0;
-        interval.tv_nsec = 1000000;
-        while (nanosleep(&interval, &interval) != 0) {
-            if (errno == EINTR) continue;
-            perror("nanosleep");
+        interval.tv_nsec = 1000000 - diffNanos;
+        if (interval.tv_nsec > 0) {
+            while (nanosleep(&interval, &interval) != 0) {
+                if (errno == EINTR) {
+                    continue;
+                }
+                perror("nanosleep");
+            }
         }
     }
 //    return nullptr;
@@ -142,9 +154,9 @@ extern "C" [[noreturn]] void *ScanTask::scheduler(void *) {
 //   Starts the scheduler thread.
 
 void ScanTask::startScheduler() {
-    pthread_attr_t* attr = nullptr;
+    pthread_attr_t *attr = nullptr;
 
-   // Create the scheduler thread with the highest possible priority.
+    // Create the scheduler thread with the highest possible priority.
     if (RealTime) {
         struct sched_param sched{};
         sched.sched_priority = sched_get_priority_max(SCHED_FIFO);

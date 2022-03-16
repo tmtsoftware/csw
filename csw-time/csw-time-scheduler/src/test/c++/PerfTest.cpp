@@ -20,12 +20,12 @@ private:
         count++;
         const double t1Nanos = double(startTime.tv_sec) * 1000.0 * 1000.0 * 1000.0 + double(startTime.tv_nsec);
         const double t2Nanos = double(ts.tv_sec) * 1000.0 * 1000.0 * 1000.0 + double(ts.tv_nsec);
-//        printf("XXX %s: time (ms): %ld\n", name, long(t2Nanos - t1Nanos)/(1000*1000));
         long diffMicrosecs = long(fabs(((t2Nanos - t1Nanos) - intervalNanos) / 1000));
-        if (count > 1000/intervalMs)
+        if (count > 1000 / intervalMs)
             jitterMicrosecs = (jitterMicrosecs * (count - 1) + diffMicrosecs) / count;
         if (count % (1000 / intervalMs) == 0) {
-            printf("%s (%d ms): jitter = %ld microsecs (%ld ms)\n", name, intervalMs, jitterMicrosecs, jitterMicrosecs/1000L);
+            printf("%s (%d ms): jitter = %ld microsecs (%ld ms)\n", name, intervalMs, jitterMicrosecs,
+                   jitterMicrosecs / 1000L);
         }
         clock_gettime(CLOCK_REALTIME, &startTime);
     }
@@ -41,6 +41,10 @@ public:
 };
 
 int main() {
+    struct timespec res{};
+    clock_getres(CLOCK_REALTIME, &res);
+    printf("Clock resolution: %ld ns\n", res.tv_nsec);
+
     MyTask task1a("1-ms-task-A", 1);
     MyTask task1b("1-ms-task-B", 1);
 
@@ -60,9 +64,9 @@ int main() {
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "EndlessLoop"
     for (;;) {
-//        nanosleep((const struct timespec[]) {{0, 500000L}}, nullptr);
         nanosleep((const struct timespec[]) {{0, 50000L}}, nullptr);
     }
+
 #pragma clang diagnostic pop
 //    return 0;
 }
