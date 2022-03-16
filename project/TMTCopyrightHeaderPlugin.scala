@@ -1,8 +1,8 @@
-import de.heikoseeberger.sbtheader.{CommentCreator, CommentStyle, HeaderPlugin}
+import de.heikoseeberger.sbtheader.{AutomateHeaderPlugin, CommentCreator, CommentStyle, HeaderPlugin}
 import sbt.Keys._
 import sbt._
 
-object CopyHeaderPlugin extends AutoPlugin {
+object TMTCopyrightHeaderPlugin extends AutoPlugin {
   import HeaderPlugin.autoImport._
   val currentYear = "2022"
 
@@ -11,6 +11,7 @@ object CopyHeaderPlugin extends AutoPlugin {
   override def trigger: PluginTrigger = allRequirements
 
   override def projectSettings: Seq[Setting[_]] = {
+    AutomateHeaderPlugin.projectSettings ++
     Seq(
       headerLicense := Some(
         HeaderLicense.Custom(
@@ -19,7 +20,6 @@ object CopyHeaderPlugin extends AutoPlugin {
               |""".stripMargin
         )
       ),
-      //      headerLicense := Some(HeaderLicense.ALv2("2022", organizationName.value, HeaderLicenseStyle.SpdxSyntax)),
       headerMappings := headerMappings.value ++ Map(
         HeaderFileType.scala -> cStyleComment,
         HeaderFileType.java  -> cStyleComment
