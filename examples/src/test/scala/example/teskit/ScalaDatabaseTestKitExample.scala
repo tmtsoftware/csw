@@ -9,7 +9,7 @@ import scala.concurrent.duration.DurationInt
 
 //#CSW-161
 //#scalatest-database-testkit
-class ScalaDatabaseTestKitExampleTest extends ScalaTestFrameworkTestKit(DatabaseServer) with AnyFunSuiteLike {
+class ScalaDatabaseTestKitExample extends ScalaTestFrameworkTestKit(DatabaseServer) with AnyFunSuiteLike {
   import frameworkTestKit.databaseTestKit.*
 
   test("test using dsl context") {

@@ -14,7 +14,7 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
 // DEOPSCSW-196: Command Payloads for variable command content
-class CommandsTest extends AnyFunSpec with Matchers {
+class CommandsExample extends AnyFunSpec with Matchers {
 
   // #obsid
   val obsId: ObsId = ObsId("2020A-001-123")

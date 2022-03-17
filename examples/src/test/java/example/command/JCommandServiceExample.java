@@ -55,7 +55,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static csw.params.commands.CommandResponse.*;
 import static org.tmt.csw.sample.ComponentStateForCommand.*;
 
-public class JCommandExample extends JUnitSuite {
+public class JCommandServiceExample extends JUnitSuite {
     private static final ActorSystem<SpawnProtocol.Command> hcdActorSystem = ActorSystemFactory.remote(SpawnProtocol.create(), "test");
 
     private static JHTTPLocationService jHttpLocationService;

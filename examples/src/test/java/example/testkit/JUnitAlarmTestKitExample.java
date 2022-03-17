@@ -15,7 +15,7 @@ import org.scalatestplus.junit.JUnitSuite;
 import java.util.Arrays;
 
 //#junit-alarm-testkit
-class JUnitAlarmTestKitExampleTest extends JUnitSuite {
+class JUnitAlarmTestKitExample extends JUnitSuite {
 
     @ClassRule
     public static final FrameworkTestKitJunitResource testKit =

@@ -17,7 +17,7 @@ import org.tmt.csw.samplehcd.SampleHcdHandlers
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
 
-class TestKitsExampleTest extends AnyFunSuiteLike with BeforeAndAfterAll with Matchers with OptionValues {
+class TestKitsExample extends AnyFunSuiteLike with BeforeAndAfterAll with Matchers with OptionValues {
 
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(InternalLoggerFactory.getDefaultFactory)

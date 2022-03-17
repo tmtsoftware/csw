@@ -30,7 +30,7 @@ import scala.async.Async.*
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-class CommandExample()
+class CommandServiceExample
     extends ScalaTestFrameworkTestKit(EventServer)
     with AnyFunSuiteLike
     with MockitoSugar
@@ -60,7 +60,7 @@ class CommandExample()
         AkkaConnection(models.ComponentId(Prefix(Subsystem.CSW, "samplehcd"), ComponentType.HCD)),
         15.seconds
       )
-    //wait for sampleHcd to be up & running before spawning assembly, as it requires sample hcd to be running.
+    // wait for sampleHcd to be up & running before spawning assembly, as it requires sample hcd to be running.
     Await.result(sampleHcdLocF, 10.seconds).get
     val assemblyConf = ConfigFactory.load("commanding_assembly.conf")
     spawnContainer(assemblyConf)

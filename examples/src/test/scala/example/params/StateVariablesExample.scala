@@ -11,7 +11,7 @@ import csw.time.core.models.UTCTime
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
-class StateVariablesTest extends AnyFunSpec with Matchers {
+class StateVariablesExample extends AnyFunSpec with Matchers {
   describe("Examples of State variables") {
 
     it("should show usages of DemandState") {

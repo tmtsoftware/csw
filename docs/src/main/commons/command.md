@@ -214,10 +214,10 @@ is possible to handle an `Invalid` response locally, but in most cases it must s
 shows how to process individual responses from a `submit`:
 
 Scala/submit w/invalid response
-:   @@snip [CommandExample.scala](../../../../examples/src/test/scala/example/command/CommandExample.scala) { #invalidCmd }
+:   @@snip [CommandServiceExample.scala](../../../../examples/src/test/scala/example/command/CommandServiceExample.scala) { #invalidCmd }
 
 Java/submit w/invalid response
-:   @@snip [JCommandExample.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #invalidSubmitCmd }
+:   @@snip [JCommandServiceExample.java](../../../../examples/src/test/java/example/command/JCommandServiceExample.java) { #invalidSubmitCmd }
 
 The handling an immediate completion command looks the same from the command sender's perspective, but can be challenging on the side of the
 component handling the command. Because `submit` returns a `Future[SubmitResponse]` and `onSetup` returns `SubmitResponse`, an immediate completion
@@ -243,10 +243,10 @@ commands look the same from the command sender's perspective when using `submitA
 This example shows an immediate completion command using `submitAndWait`.
 
 Scala/submitAndWait w/immediate-response
-:   @@snip [CommandExample.scala](../../../../examples/src/test/scala/example/command/CommandExample.scala) { #immediate-response }
+:   @@snip [CommandServiceExample.scala](../../../../examples/src/test/scala/example/command/CommandServiceExample.scala) { #immediate-response }
 
 Java/submitAndWait w/immediate-response
-:   @@snip [JCommandExample.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #immediate-response }
+:   @@snip [JCommandServiceExample.java](../../../../examples/src/test/java/example/command/JCommandServiceExample.java) { #immediate-response }
 
 Several examples have been shown of sending a command that is long-running. The following examples show an Assembly that issues a
 command to an HCD with `submitAndWait` and returns `Started`. When `submitAndWait` returns with a final response, the parent is updated
@@ -256,7 +256,7 @@ Scala/submitAndWait w/immediate-response
 :   @@snip [CurrentStateExampleComponentHandlers.scala](../../../../examples/src/main/scala/org/tmt/csw/sample/CurrentStateExampleComponentHandlers.scala) { #longRunning }
 
 Java/submitAndWait w/immediate-response
-:   @@snip [JCommandExample.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #longRunning }
+:   @@snip [JCommandServiceExample.java](../../../../examples/src/test/java/example/command/JCommandServiceExample.java) { #longRunning }
 
 ### oneway
 
@@ -268,10 +268,10 @@ Oneway is useful for communication between an Assembly when it needs to send com
 validated on the destination and the validation response is returned, but no other responses are provided.
 
 Scala
-:   @@snip [CommandExample.scala](../../../../examples/src/test/scala/example/command/CommandExample.scala) { #oneway }
+:   @@snip [CommandServiceExample.scala](../../../../examples/src/test/scala/example/command/CommandServiceExample.scala) { #oneway }
 
 Java
-:   @@snip [JCommandExample.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #oneway }
+:   @@snip [JCommandServiceExample.java](../../../../examples/src/test/java/example/command/JCommandServiceExample.java) { #oneway }
 
 ### validate
 
@@ -279,10 +279,10 @@ Sometimes it may be useful to test whether or not a component can execute a comm
 actions. The `validate` message can be used for this purpose. `Validate` returns a `ValidateResponse` of `Accepted`, `Invalid`, or `Locked`.
 
 Scala
-:   @@snip [CommandExample.scala](../../../../examples/src/test/scala/example/command/CommandExample.scala) { #validate }
+:   @@snip [CommandServiceExample.scala](../../../../examples/src/test/scala/example/command/CommandServiceExample.scala) { #validate }
 
 Java
-:   @@snip [JCommandExample.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #validate }
+:   @@snip [JCommandServiceExample.java](../../../../examples/src/test/java/example/command/JCommandServiceExample.java) { #validate }
 
 ### query
 
@@ -292,10 +292,10 @@ the `query` method of `CommandService` can be used as shown in the
 following example without using the Future returned by `submitAndWait`, which provides the final completion notification.
 
 Scala/submit w/query
-:   @@snip [CommandExample.scala](../../../../examples/src/test/scala/example/command/CommandExample.scala) { #queryLongRunning }
+:   @@snip [CommandServiceExample.scala](../../../../examples/src/test/scala/example/command/CommandServiceExample.scala) { #queryLongRunning }
 
 Java/submit w/query
-:   @@snip [JCommandExample.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #queryLongRunning }
+:   @@snip [JCommandServiceExample.java](../../../../examples/src/test/java/example/command/JCommandServiceExample.java) { #queryLongRunning }
 
 ### queryFinal
 
@@ -307,10 +307,10 @@ possible to just start actions with `submitAndWait` and use the returned Future 
 you can use the runId returned by `submitAndWait` with `queryFinal`.
 
 Scala/submitAndWait long running/queryFinal
-:   @@snip [CommandExample.scala](../../../../examples/src/test/scala/example/command/CommandExample.scala) { #queryFinalWithSubmitAndWait }
+:   @@snip [CommandServiceExample.scala](../../../../examples/src/test/scala/example/command/CommandServiceExample.scala) { #queryFinalWithSubmitAndWait }
 
 Java/submitAndWait long running/queryFinal
-:   @@snip [JCommandExample.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #queryFinal }
+:   @@snip [JCommandServiceExample.java](../../../../examples/src/test/java/example/command/JCommandServiceExample.java) { #queryFinal }
 
 ### submitAllAndWait
 
@@ -322,10 +322,10 @@ as a Future, `submitAllAndWait` returns a list of `SubmitResponse`s as a future,
 all the commands in the list have completed.
 
 Scala/query usage
-:   @@snip [CommandExample.scala](../../../../examples/src/test/scala/example/command/CommandExample.scala) { #submitAll }
+:   @@snip [CommandServiceExample.scala](../../../../examples/src/test/scala/example/command/CommandServiceExample.scala) { #submitAll }
 
 Java/query usage
-:   @@snip [JCommandExample.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #submitAll }
+:   @@snip [JCommandServiceExample.java](../../../../examples/src/test/java/example/command/JCommandServiceExample.java) { #submitAll }
 
 In the first example, three commands are sent and the result is a list with three `SubmitResponse`s.
 The last one returned invalid and was not executed.
@@ -353,10 +353,10 @@ The example sends a `Setup` with an encoder parameter value to the HCD as a `one
 causes the HCD to publish `CurrentState` with the value that was sent to it.
 
 Scala
-:   @@snip [CommandExample.scala](../../../../examples/src/test/scala/example/command/CommandExample.scala) { #subscribeCurrentState }
+:   @@snip [CommandServiceExample.scala](../../../../examples/src/test/scala/example/command/CommandServiceExample.scala) { #subscribeCurrentState }
 
 Java
-:   @@snip [JCommandExample.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #subscribeCurrentState }
+:   @@snip [JCommandServiceExample.java](../../../../examples/src/test/java/example/command/JCommandServiceExample.java) { #subscribeCurrentState }
 
 The second part of the example shows the code in the HCD. When the HCD receives the `oneway` message, it extracts
 the encoder value and publishes a CurrentState item with the encoder parameter.
@@ -396,10 +396,10 @@ The developer is not limited to these `StateMatcher`s. Any class the implements 
 interface can be provided to a `Matcher`.
   
 Scala
-:   @@snip [CommandExample.scala](../../../../examples/src/test/scala/example/command/CommandExample.scala) { #matcher }
+:   @@snip [CommandServiceExample.scala](../../../../examples/src/test/scala/example/command/CommandServiceExample.scala) { #matcher }
 
 Java
-:   @@snip [JCommandExample.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #matcher }
+:   @@snip [JCommandServiceExample.java](../../../../examples/src/test/java/example/command/JCommandServiceExample.java) { #matcher }
 
 One important point is that the `matcher` is created and must be shutdown when you are finished with it using
 the `stop` method of the matcher as shown in the example.
@@ -410,7 +410,7 @@ the `stop` method of the matcher as shown in the example.
  and implements much of the boilerplate of the previous example.
 
 Scala
-:   @@snip [CommandExample.scala](../../../../examples/src/test/scala/example/command/CommandExample.scala) { #onewayAndMatch }
+:   @@snip [CommandServiceExample.scala](../../../../examples/src/test/scala/example/command/CommandServiceExample.scala) { #onewayAndMatch }
 
 Java
-:   @@snip [JCommandExample.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #onewayAndMatch }
+:   @@snip [JCommandServiceExample.java](../../../../examples/src/test/java/example/command/JCommandServiceExample.java) { #onewayAndMatch }

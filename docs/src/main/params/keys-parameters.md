@@ -36,10 +36,10 @@ A key is **unique** in a `ParameterSet` since it is a Set.
 | TaiTime         | KeyType.TAITimeKey          | JKeyType.TAITimeKey           |
 
 Scala
-:   @@snip [KeysAndParametersTest.scala](../../../../examples/src/test/scala/example/params/KeysAndParametersTest.scala) { #primitives }
+:   @@snip [KeysAndParametersExample.scala](../../../../examples/src/test/scala/example/params/KeysAndParametersExample.scala) { #primitives }
 
 Java
-:   @@snip [JKeysAndParametersTest.java](../../../../examples/src/test/java/example/params/JKeysAndParametersTest.java) { #primitives }
+:   @@snip [JKeysAndParametersExample.java](../../../../examples/src/test/java/example/params/JKeysAndParametersExample.java) { #primitives }
 
 ## Arrays
 
@@ -53,10 +53,10 @@ Java
 | DoubleArray     | KeyType.DoubleArrayKey      | JKeyType.DoubleArrayKey       |
 
 Scala
-:   @@snip [KeysAndParametersTest.scala](../../../../examples/src/test/scala/example/params/KeysAndParametersTest.scala) { #arrays }
+:   @@snip [KeysAndParametersExample.scala](../../../../examples/src/test/scala/example/params/KeysAndParametersExample.scala) { #arrays }
 
 Java
-:   @@snip [JKeysAndParametersTest.java](../../../../examples/src/test/java/example/params/JKeysAndParametersTest.java) { #arrays }
+:   @@snip [JKeysAndParametersExample.java](../../../../examples/src/test/java/example/params/JKeysAndParametersExample.java) { #arrays }
 
 ## Matrices
 
@@ -70,10 +70,10 @@ Java
 | DoubleMatrix    | KeyType.DoubleMatrixKey     | JKeyType.DoubleMatrixKey      |
 
 Scala
-:   @@snip [KeysAndParametersTest.scala](../../../../examples/src/test/scala/example/params/KeysAndParametersTest.scala) { #matrices }
+:   @@snip [KeysAndParametersExample.scala](../../../../examples/src/test/scala/example/params/KeysAndParametersExample.scala) { #matrices }
 
 Java
-:   @@snip [JKeysAndParametersTest.java](../../../../examples/src/test/java/example/params/JKeysAndParametersTest.java) { #matrices }
+:   @@snip [JKeysAndParametersExample.java](../../../../examples/src/test/java/example/params/JKeysAndParametersExample.java) { #matrices }
 
 
 ## Domain Specific Types
@@ -105,10 +105,10 @@ the key for any of the coordinate types.
 The following example demonstrates the basic usage of the coordinate parameter types:
 
 Scala
-:   @@snip [KeysAndParametersTest.scala](../../../../examples/src/test/scala/example/params/KeysAndParametersTest.scala) { #coords }
+:   @@snip [KeysAndParametersExample.scala](../../../../examples/src/test/scala/example/params/KeysAndParametersExample.scala) { #coords }
 
 Java
-:   @@snip [JKeysAndParametersTest.java](../../../../examples/src/test/java/example/params/JKeysAndParametersTest.java) { #coords }
+:   @@snip [JKeysAndParametersExample.java](../../../../examples/src/test/java/example/params/JKeysAndParametersExample.java) { #coords }
 
 ### Struct
 
@@ -119,13 +119,13 @@ Struct got removed in 4.0.0 version.
 A key for a choice item similar to an enumeration.
 
 Scala
-:   @@snip [KeysAndParametersTest.scala](../../../../examples/src/test/scala/example/params/KeysAndParametersTest.scala) { #choice }
+:   @@snip [KeysAndParametersExample.scala](../../../../examples/src/test/scala/example/params/KeysAndParametersExample.scala) { #choice }
 
 Java
-:   @@snip [JKeysAndParametersTest.java](../../../../examples/src/test/java/example/params/JKeysAndParametersTest.java) { #choice }
+:   @@snip [JKeysAndParametersExample.java](../../../../examples/src/test/java/example/params/JKeysAndParametersExample.java) { #choice }
 
 
 ## Source Code for Examples
 
-* [Scala Example]($github.base_url$/examples/src/test/scala/example/params/KeysAndParametersTest.scala)
-* [Java Example]($github.base_url$/examples/src/test/java/example/params/JKeysAndParametersTest.java)
+* [Scala Example]($github.base_url$/examples/src/test/scala/example/params/KeysAndParametersExample.scala)
+* [Java Example]($github.base_url$/examples/src/test/java/example/params/JKeysAndParametersExample.java)

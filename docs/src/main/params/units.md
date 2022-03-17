@@ -104,12 +104,12 @@ The default unit for `UTCTimeKey` and `TAITimeKey` (in Scala and Java both) is `
 ## Usage Examples
 
 Scala
-:   @@snip [KeysAndParametersTest.scala](../../../../examples/src/test/scala/example/params/KeysAndParametersTest.scala) { #units }
+:   @@snip [KeysAndParametersExample.scala](../../../../examples/src/test/scala/example/params/KeysAndParametersExample.scala) { #units }
 
 Java
-:   @@snip [JKeysAndParametersTest.java](../../../../examples/src/test/java/example/params/JKeysAndParametersTest.java) { #units }
+:   @@snip [JKeysAndParametersExample.java](../../../../examples/src/test/java/example/params/JKeysAndParametersExample.java) { #units }
 
 ## Source Code for Examples
 
-* [Scala Example]($github.base_url$/examples/src/test/scala/example/params/KeysAndParametersTest.scala)
-* [Java Example]($github.base_url$/examples/src/test/java/example/params/JKeysAndParametersTest.java)
+* [Scala Example]($github.base_url$/examples/src/test/scala/example/params/KeysAndParametersExample.scala)
+* [Java Example]($github.base_url$/examples/src/test/java/example/params/JKeysAndParametersExample.java)

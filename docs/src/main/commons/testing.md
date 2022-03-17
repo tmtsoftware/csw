@@ -35,10 +35,10 @@ When you really want granular level access to testkits, then only you would want
 You can create instance of `FrameworkTestKit` as shown below:
 
 Scala
-:   @@snip [TestKitsExampleTest.scala](../../../../examples/src/test/scala/example/teskit/TestKitsExampleTest.scala) { #framework-testkit }
+:   @@snip [TestKitsExample.scala](../../../../examples/src/test/scala/example/teskit/TestKitsExample.scala) { #framework-testkit }
 
 Java
-:   @@snip [TestKitsExampleTest.scala](../../../../examples/src/test/java/example/testkit/JTestKitsExampleTest.java) { #framework-testkit }
+:   @@snip [TestKitsExample.scala](../../../../examples/src/test/java/example/testkit/JTestKitsExample.java) { #framework-testkit }
 
 @@@ note
 
@@ -66,27 +66,27 @@ Use the `spawnContainer` method provided by `FrameworkTestKit` to start componen
 The example below shows how to spawn container or component in standalone mode using the Framework testkit.
 
 Scala
-:   @@snip [TestKitsExampleTest.scala](../../../../examples/src/test/scala/example/teskit/TestKitsExampleTest.scala) { #spawn-using-testkit }
+:   @@snip [TestKitsExample.scala](../../../../examples/src/test/scala/example/teskit/TestKitsExample.scala) { #spawn-using-testkit }
 
 Java
-:   @@snip [JTestKitsExampleTest.scala](../../../../examples/src/test/java/example/testkit/JTestKitsExampleTest.java) { #spawn-using-testkit }
+:   @@snip [JTestKitsExample.scala](../../../../examples/src/test/java/example/testkit/JTestKitsExample.java) { #spawn-using-testkit }
 
 Other ways to spawn Assembly and HCD in the standalone mode using Framework testkit.
 
 ## Spawning a HCD
 
 Scala
-:   @@snip [TestKitsExampleTest.scala](../../../../examples/src/test/scala/example/teskit/TestKitsExampleTest.scala) { #spawn-hcd }
+:   @@snip [TestKitsExample.scala](../../../../examples/src/test/scala/example/teskit/TestKitsExample.scala) { #spawn-hcd }
 
 ## Spawning an Assembly
 
 Scala
-:   @@snip [TestKitsExampleTest.scala](../../../../examples/src/test/scala/example/teskit/TestKitsExampleTest.scala) { #spawn-assembly }
+:   @@snip [TestKitsExample.scala](../../../../examples/src/test/scala/example/teskit/TestKitsExample.scala) { #spawn-assembly }
 
 Full source at GitHub
 
-- [Scala]($github.base_url$/examples/src/test/scala/example/teskit/TestKitsExampleTest.scala)
-- [Java]($github.base_url$/examples/src/test/java/example/testkit/JTestKitsExampleTest.java)
+- [Scala]($github.base_url$/examples/src/test/scala/example/teskit/TestKitsExample.scala)
+- [Java]($github.base_url$/examples/src/test/java/example/testkit/JTestKitsExample.java)
 
 ## Test Framework Integration
 
@@ -114,10 +114,10 @@ If you are using JUnit then you can use `csw.testkit.javadsl.FrameworkTestKitJun
 The example below shows the usage of `ScalaTestFrameworkTestKit` and `FrameworkTestKitJunitResource` and how you can start the above mentioned services as per your need.
 
 Scala
-:   @@snip [ScalaTestExampleIntegrationTest.scala](../../../../examples/src/test/scala/example/teskit/ScalaTestIntegrationExampleTest.scala) { #scalatest-testkit }
+:   @@snip [ScalaTestExampleIntegration.scala](../../../../examples/src/test/scala/example/teskit/ScalaTestIntegrationExample.scala) { #scalatest-testkit }
 
 Java
-:   @@snip [JUnitIntegrationExampleTest.scala](../../../../examples/src/test/java/example/testkit/JUnitIntegrationExampleTest.java) { #junit-testkit }
+:   @@snip [JUnitIntegrationExample.scala](../../../../examples/src/test/java/example/testkit/JUnitIntegrationExample.java) { #junit-testkit }
 
 @@@ note
 
@@ -139,10 +139,10 @@ an alarm for testing purposes.
 The example below shows the usage `initAlarms` & `getCurrentSeverity` methods using `AlarmTestKit`.
 
 Scala
-: @@snip [ScalaAlarmTestKitExampleTest.scala](../../../../examples/src/test/scala/example/teskit/ScalaAlarmTestKitExampleTest.scala) { #scalatest-alarm-testkit }
+: @@snip [ScalaAlarmTestKitExample.scala](../../../../examples/src/test/scala/example/teskit/ScalaAlarmTestKitExample.scala) { #scalatest-alarm-testkit }
 
 Java
-:   @@snip [JUnitAlarmTestKitExampleTest.scala](../../../../examples/src/test/java/example/testkit/JUnitAlarmTestKitExampleTest.java) { #junit-alarm-testkit }
+:   @@snip [JUnitAlarmTestKitExample.scala](../../../../examples/src/test/java/example/testkit/JUnitAlarmTestKitExample.java) { #junit-alarm-testkit }
 
 ### Using dslContext provided by DatabaseTestKit
 
@@ -153,10 +153,10 @@ The `DatabaseTestKit` also provides methods to create database client and execut
 The example below shows the usage `dslContext` & `databaseServiceFactory` methods using `DatabaseTestKit`.
 
 Scala
-: @@snip [ScalaDatabaseTestKitExampleTest.scala](../../../../examples/src/test/scala/example/teskit/ScalaDatabaseTestKitExampleTest.scala) { #scalatest-database-testkit }
+: @@snip [ScalaDatabaseTestKitExample.scala](../../../../examples/src/test/scala/example/teskit/ScalaDatabaseTestKitExample.scala) { #scalatest-database-testkit }
 
 Java
-:   @@snip [JUnitDatabaseTestKitExampleTest.scala](../../../../examples/src/test/java/example/testkit/JUnitDatabaseTestKitExampleTest.java) { #junit-database-testkit }
+:   @@snip [JUnitDatabaseTestKitExample.scala](../../../../examples/src/test/java/example/testkit/JUnitDatabaseTestKitExample.java) { #junit-database-testkit }
 
 ## Unit Tests
 

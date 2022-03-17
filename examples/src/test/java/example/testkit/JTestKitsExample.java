@@ -23,7 +23,7 @@ import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
-public class JTestKitsExampleTest extends JUnitSuite {
+public class JTestKitsExample extends JUnitSuite {
 
     //#framework-testkit
     private static final FrameworkTestKit frameworkTestKit = FrameworkTestKit.create();

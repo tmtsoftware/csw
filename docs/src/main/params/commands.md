@@ -10,10 +10,10 @@ An `ObsID`, or observation ID, indicates the observation the command is associat
 It can be constructed by creating an instance of `ObsId`. 
 
 Scala
-:   @@snip [CommandsTest.scala](../../../../examples/src/test/scala/example/params/CommandsTest.scala) { #obsid }
+:   @@snip [CommandsExample.scala](../../../../examples/src/test/scala/example/params/CommandsExample.scala) { #obsid }
 
 Java
-:   @@snip [JCommandsTest.java](../../../../examples/src/test/java/example/params/JCommandsTest.java) { #obsid }
+:   @@snip [JCommandsExample.java](../../../../examples/src/test/java/example/params/JCommandsExample.java) { #obsid }
 
 ## Prefix
 
@@ -25,10 +25,10 @@ An example of a valid string prefix is "nfiraos.ncc.trombone".
 See below examples:
 
 Scala
-:   @@snip [CommandsTest.scala](../../../../examples/src/test/scala/example/params/CommandsTest.scala) { #prefix }
+:   @@snip [CommandsExample.scala](../../../../examples/src/test/scala/example/params/CommandsExample.scala) { #prefix }
 
 Java
-:   @@snip [JCommandsTest.java](../../../../examples/src/test/java/example/params/JCommandsTest.java) { #prefix }
+:   @@snip [JCommandsExample.java](../../../../examples/src/test/java/example/params/JCommandsExample.java) { #prefix }
 
 ## CommandName
 
@@ -47,10 +47,10 @@ following arguments to create a `Setup` command.
  * **paramSet:** Optional Set of Parameters. Default is empty.
  
 Scala
-:   @@snip [CommandsTest.scala](../../../../examples/src/test/scala/example/params/CommandsTest.scala) { #setup }
+:   @@snip [CommandsExample.scala](../../../../examples/src/test/scala/example/params/CommandsExample.scala) { #setup }
 
 Java
-:   @@snip [JCommandsTest.java](../../../../examples/src/test/java/example/params/JCommandsTest.java) { #setup }
+:   @@snip [JCommandsExample.java](../../../../examples/src/test/java/example/params/JCommandsExample.java) { #setup }
  
  
 ## Observe Command
@@ -58,29 +58,29 @@ Java
 This command describes a science observation. It is intended to only be sent to Science Detector Assemblies and Sequencers.
 
 Scala
-:   @@snip [CommandsTest.scala](../../../../examples/src/test/scala/example/params/CommandsTest.scala) { #observe }
+:   @@snip [CommandsExample.scala](../../../../examples/src/test/scala/example/params/CommandsExample.scala) { #observe }
 
 Java
-:   @@snip [JCommandsTest.java](../../../../examples/src/test/java/example/params/JCommandsTest.java) { #observe }
+:   @@snip [JCommandsExample.java](../../../../examples/src/test/java/example/params/JCommandsExample.java) { #observe }
 
 ## Wait Command
 
 This command causes a Sequencer to wait until notified.  It can only be sent to Sequencers.
 
 Scala
-:   @@snip [CommandsTest.scala](../../../../examples/src/test/scala/example/params/CommandsTest.scala) { #wait }
+:   @@snip [CommandsExample.scala](../../../../examples/src/test/scala/example/params/CommandsExample.scala) { #wait }
 
 Java
-:   @@snip [JCommandsTest.java](../../../../examples/src/test/java/example/params/JCommandsTest.java) { #wait }
+:   @@snip [JCommandsExample.java](../../../../examples/src/test/java/example/params/JCommandsExample.java) { #wait }
 
 ## JSON serialization
 Commands can be serialized to JSON. The library has provided **JsonSupport** helper class and methods to serialize Setup, Observe and Wait commands.
 
 Scala
-:   @@snip [CommandsTest.scala](../../../../examples/src/test/scala/example/params/CommandsTest.scala) { #json-serialization }
+:   @@snip [CommandsExample.scala](../../../../examples/src/test/scala/example/params/CommandsExample.scala) { #json-serialization }
 
 Java
-:   @@snip [JCommandsTest.java](../../../../examples/src/test/java/example/params/JCommandsTest.java) { #json-serialization }
+:   @@snip [JCommandsExample.java](../../../../examples/src/test/java/example/params/JCommandsExample.java) { #json-serialization }
 
 ## Unique Key constraint
 
@@ -98,10 +98,10 @@ parameters based on key.
 Here are some examples that illustrate this point:
 
 Scala
-:   @@snip [CommandsTest.scala](../../../../examples/src/test/scala/example/params/CommandsTest.scala) { #unique-key }
+:   @@snip [CommandsExample.scala](../../../../examples/src/test/scala/example/params/CommandsExample.scala) { #unique-key }
 
 Java
-:   @@snip [JCommandsTest.java](../../../../examples/src/test/java/example/params/JCommandsTest.java) { #unique-key }
+:   @@snip [JCommandsExample.java](../../../../examples/src/test/java/example/params/JCommandsExample.java) { #unique-key }
 
 ## Cloning a Command
 
@@ -110,13 +110,13 @@ If you wish to resubmit a previously sent Setup, the `cloneCommand` method must 
 to create a new command from existing parameters, but with a new `RunId`.
 
 Scala
-:   @@snip [CommandsTest.scala](../../../../examples/src/test/scala/example/params/CommandsTest.scala) { #clone-command }
+:   @@snip [CommandsExample.scala](../../../../examples/src/test/scala/example/params/CommandsExample.scala) { #clone-command }
 
 Java
-:   @@snip [JCommandsTest.java](../../../../examples/src/test/java/example/params/JCommandsTest.java) { #clone-command }
+:   @@snip [JCommandsExample.java](../../../../examples/src/test/java/example/params/JCommandsExample.java) { #clone-command }
 
 
 # Source Code for Examples
 
-* [Scala Example]($github.base_url$/examples/src/test/scala/example/params/CommandsTest.scala)
-* [Java Example]($github.base_url$/examples/src/test/java/example/params/JCommandsTest.java)
+* [Scala Example]($github.base_url$/examples/src/test/scala/example/params/CommandsExample.scala)
+* [Java Example]($github.base_url$/examples/src/test/java/example/params/JCommandsExample.java)
