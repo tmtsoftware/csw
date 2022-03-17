@@ -9,6 +9,7 @@ import csw.location.api.models
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaLocation, ComponentType}
 import csw.location.api.scaladsl.LocationService
+import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.commands.*
 import csw.params.commands.CommandIssue.IdNotAvailableIssue
@@ -44,7 +45,7 @@ class CommandExample()
   implicit private val patience: PatienceConfig                        = PatienceConfig(5.seconds, 100.millis)
   val locationService: LocationService                                 = frameworkTestKit.locationService
   private val loggerFactory                                            = new LoggerFactory(Prefix(CSW, "command.example"))
-  val log                                                              = loggerFactory.getLogger
+  val log: Logger                                                      = loggerFactory.getLogger
   test(s"$prefix sender of command should receive appropriate responses") {
     implicit val timeout: Timeout     = 5.seconds
     implicit val ec: ExecutionContext = typedSystem.executionContext
@@ -59,8 +60,9 @@ class CommandExample()
         AkkaConnection(models.ComponentId(Prefix(Subsystem.CSW, "samplehcd"), ComponentType.HCD)),
         15.seconds
       )
-    val sampleHcdLocation: AkkaLocation = Await.result(sampleHcdLocF, 10.seconds).get
-    val assemblyConf                    = ConfigFactory.load("commanding_assembly.conf")
+    //wait for sampleHcd to be up & running before spawning assembly, as it requires sample hcd to be running.
+    Await.result(sampleHcdLocF, 10.seconds).get
+    val assemblyConf = ConfigFactory.load("commanding_assembly.conf")
     spawnContainer(assemblyConf)
     // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
     // #resolve-hcd-and-create-commandservice
@@ -213,7 +215,9 @@ class CommandExample()
         // Ignore anything other than invalid
       }
     }
-    Await.ready(oneWayF, timeout.duration)
+    oneWayF.map(_ => {
+      // do something
+    })
     // #oneway
 
     // #validate
@@ -251,7 +255,7 @@ class CommandExample()
     val submitAllResponse = Await.result(submitAllF, timeout.duration)
     // #submitAll
     submitAllResponse.length shouldBe 3
-    submitAllResponse(0) shouldBe a[Completed]
+    submitAllResponse.head shouldBe a[Completed]
     submitAllResponse(1) shouldBe a[Completed]
     submitAllResponse(2) shouldBe a[Invalid]
 
@@ -262,7 +266,7 @@ class CommandExample()
     val submitAllResponse2 = Await.result(submitAllF2, timeout.duration)
     // #submitAllInvalid
     submitAllResponse2.length shouldBe 2
-    submitAllResponse2(0) shouldBe a[Completed]
+    submitAllResponse2.head shouldBe a[Completed]
     submitAllResponse2(1) shouldBe a[Invalid]
 
     // #subscribeCurrentState
@@ -302,7 +306,7 @@ class CommandExample()
     commandResponse shouldBe a[Completed]
 
     // #onewayAndMatch
-    val onewayMatchF: Future[SubmitResponse with MatchingResponse] = async {
+    val onewayMatchF: Future[SubmitResponse & MatchingResponse] = async {
       await(assemblyCmdService.onewayAndMatch(setupWithMatcher, demandMatcher)) match {
         case i: Invalid =>
           // Command was not accepted

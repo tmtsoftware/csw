@@ -136,7 +136,6 @@ class CommandServiceTest(ignore: Int)
       Await.result(Standalone.spawn(assemblyConf, wiring), 5.seconds)
       enterBarrier("spawned")
 
-      println(Await.result(locationService.list, 10.seconds))
       // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
       val assemblyLocF =
         locationService.resolve(

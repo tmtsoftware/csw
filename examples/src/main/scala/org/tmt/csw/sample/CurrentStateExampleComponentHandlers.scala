@@ -53,7 +53,6 @@ class CurrentStateExampleComponentHandlers(ctx: ActorContext[TopLevelActorMessag
   override def initialize(): Unit = {
     log.info("Initializing Assembly Component TLA")
     // #currentStatePublisher
-    Thread.sleep(100)
     // Publish the CurrentState using parameter set created using a sample Choice parameter
     currentStatePublisher.publish(CurrentState(filterAsmPrefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
     // #currentStatePublisher
