@@ -217,7 +217,7 @@ Scala/submit w/invalid response
 :   @@snip [CommandExample.scala](../../../../examples/src/test/scala/example/command/CommandExample.scala) { #invalidCmd }
 
 Java/submit w/invalid response
-:   @@snip [JCommandIntegrationTest.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #invalidSubmitCmd }
+:   @@snip [JCommandExample.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #invalidSubmitCmd }
 
 The handling an immediate completion command looks the same from the command sender's perspective, but can be challenging on the side of the
 component handling the command. Because `submit` returns a `Future[SubmitResponse]` and `onSetup` returns `SubmitResponse`, an immediate completion
@@ -246,7 +246,7 @@ Scala/submitAndWait w/immediate-response
 :   @@snip [CommandExample.scala](../../../../examples/src/test/scala/example/command/CommandExample.scala) { #immediate-response }
 
 Java/submitAndWait w/immediate-response
-:   @@snip [JCommandIntegrationTest.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #immediate-response }
+:   @@snip [JCommandExample.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #immediate-response }
 
 Several examples have been shown of sending a command that is long-running. The following examples show an Assembly that issues a
 command to an HCD with `submitAndWait` and returns `Started`. When `submitAndWait` returns with a final response, the parent is updated
@@ -256,7 +256,7 @@ Scala/submitAndWait w/immediate-response
 :   @@snip [CurrentStateExampleComponentHandlers.scala](../../../../examples/src/main/scala/org/tmt/csw/sample/CurrentStateExampleComponentHandlers.scala) { #longRunning }
 
 Java/submitAndWait w/immediate-response
-:   @@snip [JCommandIntegrationTest.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #longRunning }
+:   @@snip [JCommandExample.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #longRunning }
 
 ### oneway
 
@@ -271,7 +271,7 @@ Scala
 :   @@snip [CommandExample.scala](../../../../examples/src/test/scala/example/command/CommandExample.scala) { #oneway }
 
 Java
-:   @@snip [JCommandIntegrationTest.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #oneway }
+:   @@snip [JCommandExample.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #oneway }
 
 ### validate
 
@@ -282,7 +282,7 @@ Scala
 :   @@snip [CommandExample.scala](../../../../examples/src/test/scala/example/command/CommandExample.scala) { #validate }
 
 Java
-:   @@snip [JCommandIntegrationTest.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #validate }
+:   @@snip [JCommandExample.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #validate }
 
 ### query
 
@@ -295,7 +295,7 @@ Scala/submit w/query
 :   @@snip [CommandExample.scala](../../../../examples/src/test/scala/example/command/CommandExample.scala) { #queryLongRunning }
 
 Java/submit w/query
-:   @@snip [JCommandIntegrationTest.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #queryLongRunning }
+:   @@snip [JCommandExample.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #queryLongRunning }
 
 ### queryFinal
 
@@ -310,7 +310,7 @@ Scala/submitAndWait long running/queryFinal
 :   @@snip [CommandExample.scala](../../../../examples/src/test/scala/example/command/CommandExample.scala) { #queryFinalWithSubmitAndWait }
 
 Java/submitAndWait long running/queryFinal
-:   @@snip [JCommandIntegrationTest.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #queryFinal }
+:   @@snip [JCommandExample.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #queryFinal }
 
 ### submitAllAndWait
 
@@ -325,7 +325,7 @@ Scala/query usage
 :   @@snip [CommandExample.scala](../../../../examples/src/test/scala/example/command/CommandExample.scala) { #submitAll }
 
 Java/query usage
-:   @@snip [JCommandIntegrationTest.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #submitAll }
+:   @@snip [JCommandExample.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #submitAll }
 
 In the first example, three commands are sent and the result is a list with three `SubmitResponse`s.
 The last one returned invalid and was not executed.
@@ -356,7 +356,7 @@ Scala
 :   @@snip [CommandExample.scala](../../../../examples/src/test/scala/example/command/CommandExample.scala) { #subscribeCurrentState }
 
 Java
-:   @@snip [JCommandIntegrationTest.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #subscribeCurrentState }
+:   @@snip [JCommandExample.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #subscribeCurrentState }
 
 The second part of the example shows the code in the HCD. When the HCD receives the `oneway` message, it extracts
 the encoder value and publishes a CurrentState item with the encoder parameter.
@@ -396,10 +396,10 @@ The developer is not limited to these `StateMatcher`s. Any class the implements 
 interface can be provided to a `Matcher`.
   
 Scala
-:   @@snip [LongRunningCommandTest.scala](../../../../examples/src/test/scala/example/command/CommandExample.scala) { #matcher }
+:   @@snip [CommandExample.scala](../../../../examples/src/test/scala/example/command/CommandExample.scala) { #matcher }
 
 Java
-:   @@snip [JCommandIntegrationTest.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #matcher }
+:   @@snip [JCommandExample.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #matcher }
 
 One important point is that the `matcher` is created and must be shutdown when you are finished with it using
 the `stop` method of the matcher as shown in the example.
@@ -413,4 +413,4 @@ Scala
 :   @@snip [CommandExample.scala](../../../../examples/src/test/scala/example/command/CommandExample.scala) { #onewayAndMatch }
 
 Java
-:   @@snip [JCommandIntegrationTest.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #onewayAndMatch }
+:   @@snip [JCommandExample.java](../../../../examples/src/test/java/example/command/JCommandExample.java) { #onewayAndMatch }

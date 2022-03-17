@@ -35,7 +35,7 @@ started in the superclass's `beforeAll` method. In the Java version, we must cre
 services we want to start passed into the constructor of this object.
 
 Scala
-:   @@snip [AssemblyTest.scala](../../../../examples/src/test/scala/org/tmt/csw/sample/SampleTest.scala) { #intro }
+:   @@snip [SampleTest.scala](../../../../examples/src/test/scala/org/tmt/csw/sample/SampleTest.scala) { #intro }
 
 Java
 :   @@snip [JSampleAssemblyTest.java](../../../../examples/src/test/java/org/tmt/csw/sample/JSampleTest.java) { #intro }
@@ -144,12 +144,12 @@ Scala
 Spawning an Assembly
 
 Scala
-:   @@snip [AssemblyTest.scala](../../../../examples/src/test/scala/org/tmt/csw/sample/SampleTest.scala) { #spawn-assembly }
+:   @@snip [SampleTest.scala](../../../../examples/src/test/scala/org/tmt/csw/sample/SampleTest.scala) { #spawn-assembly }
 
 ### Spawning a Component using DefaultComponentHandlers
 
 Scala
-:   @@snip [AssemblyTest.scala](../../../../examples/src/test/scala/org/tmt/csw/sample/SampleTest.scala) { #spawn-assembly-with-default-handlers }
+:   @@snip [SampleTest.scala](../../../../examples/src/test/scala/org/tmt/csw/sample/SampleTest.scala) { #spawn-assembly-with-default-handlers }
 
 Full source at GitHub
 

@@ -27,13 +27,13 @@ Hcd/Java
 Examples for case 2:
 
 Assembly/Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/example/framework/components/assembly/TCSAssemblyCompHandlers.scala) { #component-handlers-class }
+:   @@snip [TCSAssemblyCompHandlers.scala](../../../../examples/src/main/scala/example/framework/components/assembly/TCSAssemblyCompHandlers.scala) { #component-handlers-class }
 
 Assembly/Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/example/framework/components/assembly/JTCSAssemblyCompHandlers.java) { #jcomponent-handlers-class }
+:   @@snip [JTCSAssemblyCompHandlers.java](../../../../examples/src/main/java/example/framework/components/assembly/JTCSAssemblyCompHandlers.java) { #jcomponent-handlers-class }
 
 Hcd/Scala
-:   @@snip [HcdComponentHandlers.scala](../../../../examples/src/main/scala/example/framework/components/hcd/TCSHcdCompHandlers.scala) { #component-handlers-class }
+:   @@snip [TCSHcdCompHandlers.scala](../../../../examples/src/main/scala/example/framework/components/hcd/TCSHcdCompHandlers.scala) { #component-handlers-class }
 
 Hcd/Java
 :   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/example/framework/components/hcd/JTCSHcdCompHandlers.java) { #jcomponent-handlers-class }
