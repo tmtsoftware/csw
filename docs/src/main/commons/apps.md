@@ -25,7 +25,7 @@ Docker setup is installed and running before starting the Elastic stack. To know
 
 For the host setup, follow the below given steps:
 
-* Install [Docker](https://www.docker.com/products/container-runtime) version **18.09+**
+* Install [Docker](https://www.docker.com/products/container-runtime/) version **18.09+**
 * Install [Docker Compose](https://docs.docker.com/compose/install/) version **1.24.0+**
 
 On distributions which have SELinux enabled out-of-the-box, you will need to either re-context the files or set SELinux
