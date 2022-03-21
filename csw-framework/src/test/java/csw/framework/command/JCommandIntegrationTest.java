@@ -97,11 +97,10 @@ public class JCommandIntegrationTest extends JUnitSuite {
     }
 
     private static AkkaLocation getLocation() throws Exception {
-        RedisClient redisClient = null;
-        FrameworkWiring wiring = FrameworkWiring.make(hcdActorSystem, redisClient);
+        FrameworkWiring wiring = FrameworkWiring.make(hcdActorSystem, (RedisClient) null);
         Await.result(Standalone.spawn(ConfigFactory.load("aps_hcd_java.conf"), wiring), new FiniteDuration(5, TimeUnit.SECONDS));
 
-        AkkaConnection akkaConnection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.IRIS, "Test_Component_Running_Long_Command_Java"), JComponentType.HCD));
+        AkkaConnection akkaConnection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.IRIS, "test_component_running_long_command_java"), JComponentType.HCD));
         CompletableFuture<Optional<AkkaLocation>> eventualLocation = locationService.resolve(akkaConnection, java.time.Duration.ofSeconds(5));
         Optional<AkkaLocation> maybeLocation = eventualLocation.get();
         Assert.assertTrue(maybeLocation.isPresent());
@@ -145,9 +144,8 @@ public class JCommandIntegrationTest extends JUnitSuite {
         CompletableFuture<SubmitResponse> invalidCommandF =
                 hcdCmdService.submitAndWait(invalidSetup, timeout).thenApply(
                         response -> {
-                            if (response instanceof Invalid) {
+                            if (response instanceof Invalid invalid) {
                                 // Cast the response to get the issue
-                                CommandResponse.Invalid invalid = (Invalid) response;
                                 assert (invalid.issue().reason().contains("failure"));
                             } else {
                                 // Just do something to make the test fail
@@ -166,9 +164,8 @@ public class JCommandIntegrationTest extends JUnitSuite {
                         response -> {
                             if (response instanceof Started) {
                                 //do something with completed result
-                            } else if (response instanceof Invalid) {
+                            } else if (response instanceof Invalid invalid) {
                                 // Cast the response to get the issue
-                                Invalid invalid = (Invalid) response;
                                 assert (invalid.issue().reason().contains("failure"));
                             }
                             return response;
@@ -329,10 +326,9 @@ public class JCommandIntegrationTest extends JUnitSuite {
         CompletableFuture<SubmitResponse> mediumSubmit = hcdCmdService.submitAndWait(qfAllSetup2, timeout);
         CompletableFuture<SubmitResponse> longSubmit = hcdCmdService.submitAndWait(qfAllSetup3, timeout);
 
-        
-
-
-
+        longSubmit.get();
+        mediumSubmit.get();
+        shortSubmit.get();
         // Subscriber code
         int expectedEncoderValue = 234;
         Setup currStateSetup = new Setup(prefix(), hcdCurrentStateCmd(), Optional.empty()).add(encoder.set(expectedEncoderValue));
