@@ -1,6 +1,7 @@
 package org.tmt.csw.sample
 
 import akka.actor.Cancellable
+import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.ActorContext
 import akka.stream.ThrottleMode
 import akka.stream.scaladsl.{Sink, Source}
@@ -36,15 +37,15 @@ class CurrentStateExampleComponentHandlers(ctx: ActorContext[TopLevelActorMessag
   import ComponentStateForCommand.*
   import cswCtx.*
 
-  private val log: Logger                   = loggerFactory.getLogger(ctx)
-  private implicit val ec: ExecutionContext = ctx.executionContext
-  private implicit val actorSystem          = ctx.system
-  private implicit val timeout: Timeout     = 15.seconds
-  private val filterHCDConnection           = AkkaConnection(ComponentId(Prefix(Subsystem.CSW, "samplehcd"), HCD))
-  val locationService: LocationService      = cswCtx.locationService
+  private val log: Logger                                = loggerFactory.getLogger(ctx)
+  private implicit val ec: ExecutionContext              = ctx.executionContext
+  private implicit val actorSystem: ActorSystem[Nothing] = ctx.system
+  private implicit val timeout: Timeout                  = 15.seconds
+  private val filterHCDConnection                        = AkkaConnection(ComponentId(Prefix(Subsystem.CSW, "samplehcd"), HCD))
+  val locationService: LocationService                   = cswCtx.locationService
 
   private val filterHCDLocation    = Await.result(locationService.resolve(filterHCDConnection, 5.seconds), 5.seconds)
-  var hcdComponent: CommandService = CommandServiceFactory.make(filterHCDLocation.get)(ctx.system)
+  val hcdComponent: CommandService = CommandServiceFactory.make(filterHCDLocation.get)(ctx.system)
 
   private val longRunning       = Setup(seqPrefix, longRunningCmdToHcd, None)
   private val shortRunning      = Setup(seqPrefix, shorterHcdCmd, None)

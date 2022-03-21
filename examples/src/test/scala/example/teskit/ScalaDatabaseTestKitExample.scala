@@ -18,6 +18,7 @@ class ScalaDatabaseTestKitExample extends ScalaTestFrameworkTestKit(DatabaseServ
   }
 
   test("test using database service factory") {
+    // Usage of Await.result is fine in test scope here, as `databaseServiceFactory().makeDsl()` returns Future.
     val queryDsl = Await.result(databaseServiceFactory().makeDsl(frameworkTestKit.locationService, "postgres"), 2.seconds)
     // .. queries, assertions etc.
   }

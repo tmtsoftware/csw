@@ -33,7 +33,7 @@ class TestKitsExample extends AnyFunSuiteLike with BeforeAndAfterAll with Matche
   override protected def afterAll(): Unit = frameworkTestKit.shutdown()
   // #framework-testkit
 
-  import frameworkTestKit._
+  import frameworkTestKit.*
 
   test("framework testkit example for spawning container") {
     // #spawn-using-testkit

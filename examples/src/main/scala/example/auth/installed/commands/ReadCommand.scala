@@ -7,21 +7,25 @@ import akka.http.scaladsl.unmarshalling.Unmarshaller
 import example.auth.installed.commands.ReadCommand.convertToString
 
 import scala.concurrent.duration.DurationLong
-import scala.concurrent.{Await, ExecutionContext}
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 // #read-command
 class ReadCommand(implicit val actorSystem: typed.ActorSystem[_]) extends AppCommand {
+  implicit lazy val ec = actorSystem.executionContext
   override def run(): Unit = {
-    val url      = "http://localhost:7000/data"
-    val response = Await.result(Http().singleRequest(HttpRequest(uri = Uri(url))), 2.seconds)
-    println(convertToString(response.entity))
+    val url = "http://localhost:7000/data"
+    Http()
+      .singleRequest(HttpRequest(uri = Uri(url)))
+      .map(response => {
+        convertToString(response.entity).map(println)
+      })
   }
 }
 // #read-command
 
 object ReadCommand {
-  def convertToString(entity: ResponseEntity)(implicit actorSystem: typed.ActorSystem[_]): String = {
+  def convertToString(entity: ResponseEntity)(implicit actorSystem: typed.ActorSystem[_]): Future[String] = {
     implicit val ec: ExecutionContext = actorSystem.executionContext
-    Await.result(Unmarshaller.stringUnmarshaller(entity), 2.seconds)
+    Unmarshaller.stringUnmarshaller(entity)
   }
 }

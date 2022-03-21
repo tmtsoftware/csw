@@ -240,8 +240,13 @@ class CommandServiceExample
 
     // #query
     // Check on a command that was completed in the past
-    val queryValue = Await.result(assemblyCmdService.query(longRunningRunId), timeout.duration)
+    val queryResponseF = assemblyCmdService.query(longRunningRunId)
+    queryResponseF
+      .map(queryValue => {
+        queryValue // Completed
+      })
     // #query
+    val queryValue = Await.result(queryResponseF, timeout.duration)
     queryValue shouldBe a[Completed]
 
     val submitAllSetup1       = Setup(prefix, immediateCmd, obsId)
@@ -252,8 +257,15 @@ class CommandServiceExample
     val submitAllF: Future[List[SubmitResponse]] = async {
       await(assemblyCmdService.submitAllAndWait(List(submitAllSetup1, submitAllSetup2, submitAllinvalidSetup)))
     }
-    val submitAllResponse = Await.result(submitAllF, timeout.duration)
+    submitAllF.map(submitAllResponse => {
+      // do something with submitAllResponse
+      submitAllResponse.length // 3
+      submitAllResponse.head   // [Completed]
+      submitAllResponse(1)     // [Completed]
+      submitAllResponse(2)     // [Invalid]
+    })
     // #submitAll
+    val submitAllResponse = Await.result(submitAllF, timeout.duration)
     submitAllResponse.length shouldBe 3
     submitAllResponse.head shouldBe a[Completed]
     submitAllResponse(1) shouldBe a[Completed]
@@ -263,8 +275,13 @@ class CommandServiceExample
     val submitAllF2: Future[List[SubmitResponse]] = async {
       await(assemblyCmdService.submitAllAndWait(List(submitAllSetup1, submitAllinvalidSetup, submitAllSetup2)))
     }
-    val submitAllResponse2 = Await.result(submitAllF2, timeout.duration)
+    submitAllF2.map(submitAllResponse2 => {
+      submitAllResponse2.length // 2
+      submitAllResponse2.head   // [Completed]
+      submitAllResponse2(1)     // [Invalid]
+    })
     // #submitAllInvalid
+    val submitAllResponse2 = Await.result(submitAllF2, timeout.duration)
     submitAllResponse2.length shouldBe 2
     submitAllResponse2.head shouldBe a[Completed]
     submitAllResponse2(1) shouldBe a[Invalid]
@@ -300,9 +317,11 @@ class CommandServiceExample
     // Submit command as a oneway and if the command is successfully validated,
     // check for matching of demand state against current state
     val matchResponseF: Future[MatchingResponse] = assemblyCmdService.onewayAndMatch(setupWithMatcher, demandMatcher)
-
-    val commandResponse = Await.result(matchResponseF, timeout.duration)
+    matchResponseF.map(commandResponse => {
+      commandResponse // [Completed]
+    })
     // #matcher
+    val commandResponse = Await.result(matchResponseF, timeout.duration)
     commandResponse shouldBe a[Completed]
 
     // #onewayAndMatch
