@@ -96,11 +96,10 @@ public class JCommandIntegrationTest {
     }
 
     private static AkkaLocation getLocation() throws Exception {
-        RedisClient redisClient = null;
-        FrameworkWiring wiring = FrameworkWiring.make(hcdActorSystem, redisClient);
+        FrameworkWiring wiring = FrameworkWiring.make(hcdActorSystem, (RedisClient) null);
         Await.result(Standalone.spawn(ConfigFactory.load("aps_hcd_java.conf"), wiring), new FiniteDuration(5, TimeUnit.SECONDS));
 
-        AkkaConnection akkaConnection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.IRIS, "Test_Component_Running_Long_Command_Java"), JComponentType.HCD));
+        AkkaConnection akkaConnection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.IRIS, "test_component_running_long_command_java"), JComponentType.HCD));
         CompletableFuture<Optional<AkkaLocation>> eventualLocation = locationService.resolve(akkaConnection, java.time.Duration.ofSeconds(5));
         Optional<AkkaLocation> maybeLocation = eventualLocation.get();
         Assert.assertTrue(maybeLocation.isPresent());
@@ -362,7 +361,9 @@ public class JCommandIntegrationTest {
         CompletableFuture<SubmitResponse> shortSubmit = hcdCmdService.submitAndWait(qfAllSetup1, timeout);
         CompletableFuture<SubmitResponse> mediumSubmit = hcdCmdService.submitAndWait(qfAllSetup2, timeout);
         CompletableFuture<SubmitResponse> longSubmit = hcdCmdService.submitAndWait(qfAllSetup3, timeout);
-
+        shortSubmit.get();
+        mediumSubmit.get();
+        longSubmit.get();
 
         //#queryF
 

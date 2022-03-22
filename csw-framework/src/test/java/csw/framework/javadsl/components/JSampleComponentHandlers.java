@@ -30,7 +30,9 @@ import csw.params.javadsl.JKeyType;
 import csw.params.javadsl.JUnits;
 import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
+import csw.time.core.models.TMTTime;
 import csw.time.core.models.UTCTime;
+import csw.time.scheduler.api.TimeServiceScheduler;
 
 import java.time.Duration;
 import java.util.Optional;
@@ -47,6 +49,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     private final ILogger log;
     private final CommandResponseManager commandResponseManager;
     private final CurrentStatePublisher currentStatePublisher;
+    private final TimeServiceScheduler timeServiceScheduler;
     private final CurrentState currentState = new CurrentState(SampleComponentState.prefix(), new StateName("testStateName"));
     private final ActorContext<TopLevelActorMessage> actorContext;
     private final IEventService eventService;
@@ -55,6 +58,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     JSampleComponentHandlers(ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
         super(ctx, cswCtx);
         this.currentStatePublisher = cswCtx.currentStatePublisher();
+        timeServiceScheduler = cswCtx.timeServiceScheduler();
         this.log = cswCtx.loggerFactory().getLogger(getClass());
         this.commandResponseManager = cswCtx.commandResponseManager();
         this.actorContext = ctx;
@@ -80,10 +84,16 @@ public class JSampleComponentHandlers extends JComponentHandlers {
 
     @Override
     public CommandResponse.ValidateCommandResponse validateCommand(Id runId, ControlCommand controlCommand) {
-        if (controlCommand.commandName().equals(hcdCurrentStateCmd())) {
-            // This is special because test doesn't want these other CurrentState values published
+        if (controlCommand.commandName().equals(longRunning())) {
+            return new CommandResponse.Accepted(runId);
+        } else if (controlCommand.commandName().equals(shortRunning())) {
+            return new CommandResponse.Accepted(runId);
+        } else if (controlCommand.commandName().equals(mediumRunning())) {
             return new CommandResponse.Accepted(runId);
         } else if (controlCommand.commandName().equals(crmAddOrUpdateCmd())) {
+            return new CommandResponse.Accepted(runId);
+        } else if (controlCommand.commandName().equals(hcdCurrentStateCmd())) {
+            // This is special because test doesn't want these other CurrentState values published
             return new CommandResponse.Accepted(runId);
         } else {
             // All other tests
@@ -107,6 +117,18 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         // Adding item from CommandMessage paramset to ensure things are working
         if (controlCommand.commandName().equals(crmAddOrUpdateCmd())) {
             return crmAddOrUpdate((Setup) controlCommand, runId);
+        } else if (controlCommand.commandName().equals(longRunning())) {
+            TMTTime utcTime = new UTCTime(UTCTime.now().value().plusSeconds(5L));
+            timeServiceScheduler.scheduleOnce(utcTime, () -> commandResponseManager.updateCommand(new Completed(runId)));
+            return new Started(runId);
+        } else if (controlCommand.commandName().equals(mediumRunning())) {
+            TMTTime utcTime = new UTCTime(UTCTime.now().value().plusSeconds(3L));
+            timeServiceScheduler.scheduleOnce(utcTime, () -> commandResponseManager.updateCommand(new Completed(runId)));
+            return new Started(runId);
+        } else if (controlCommand.commandName().equals(shortRunning())) {
+            TMTTime utcTime = new UTCTime(UTCTime.now().value().plusSeconds(1L));
+            timeServiceScheduler.scheduleOnce(utcTime, () -> commandResponseManager.updateCommand(new Completed(runId)));
+            return new Started(runId);
         } else {
             CurrentState submitState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.submitCommandChoice()));
             currentStatePublisher.publish(submitState);
