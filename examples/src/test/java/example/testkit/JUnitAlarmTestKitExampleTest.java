@@ -10,12 +10,11 @@ import csw.testkit.javadsl.FrameworkTestKitJunitResource;
 import csw.testkit.javadsl.JCSWService;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.scalatestplus.junit.JUnitSuite;
 
 import java.util.Arrays;
 
 //#junit-alarm-testkit
-class JUnitAlarmTestKitExampleTest extends JUnitSuite {
+class JUnitAlarmTestKitExampleTest {
 
     @ClassRule
     public static final FrameworkTestKitJunitResource testKit =

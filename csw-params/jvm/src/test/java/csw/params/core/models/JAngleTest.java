@@ -1,14 +1,13 @@
 package csw.params.core.models;
 
 import org.junit.Test;
-import org.scalatestplus.junit.JUnitSuite;
 import scala.Tuple2;
 
 import static org.junit.Assert.*;
 import static csw.params.core.models.JAngle.*;
 
 // Tests the Angle class usage from Java (including helper methods in JAngle)
-public class JAngleTest extends JUnitSuite {
+public class JAngleTest {
     private final double delta = 0.00000001;
 
     // Basic parsing of radec as strings

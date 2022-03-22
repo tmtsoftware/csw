@@ -14,7 +14,6 @@ import csw.logging.client.commons.LoggingKeys$;
 import csw.logging.client.internal.LoggingSystem;
 import csw.logging.client.utils.TestAppender;
 import org.junit.*;
-import org.scalatestplus.junit.JUnitSuite;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 
@@ -30,7 +29,7 @@ import static csw.logging.client.utils.Eventually.eventually;
 // DEOPSCSW-158: Logging service API implementation details to be hidden from component developer
 // DEOPSCSW-271: API change
 // DEOPSCSW-278: Create Java API without arguments as suppliers
-public class JLoggerImplAPITest extends JUnitSuite {
+public class JLoggerImplAPITest {
 
     private final ILogger logger = JGenericLoggerFactory.getLogger(getClass());
 

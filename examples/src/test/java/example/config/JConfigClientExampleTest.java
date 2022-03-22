@@ -18,7 +18,6 @@ import csw.testkit.ConfigTestKit;
 import csw.testkit.javadsl.FrameworkTestKitJunitResource;
 import csw.testkit.javadsl.JCSWService;
 import org.junit.*;
-import org.scalatestplus.junit.JUnitSuite;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -31,7 +30,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-public class JConfigClientExampleTest extends JUnitSuite {
+public class JConfigClientExampleTest {
 
     // DEOPSCSW-592: Create csw testkit for component writers
     @ClassRule

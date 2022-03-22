@@ -5,7 +5,6 @@ import csw.params.core.models.Choices;
 import csw.params.javadsl.JKeyType;
 import org.junit.Assert;
 import org.junit.Test;
-import org.scalatestplus.junit.JUnitSuite;
 
 import java.util.Arrays;
 import java.util.List;
@@ -14,7 +13,7 @@ import static csw.params.javadsl.JUnits.kilometer;
 
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-190: Implement Unit Support
-public class JChoiceKeyTypeTest extends JUnitSuite {
+public class JChoiceKeyTypeTest {
     private final String keyName = " choiceKey";
     private final Choices choices = Choices.from("A", "B", "C");
 

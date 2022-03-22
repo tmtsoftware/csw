@@ -10,7 +10,6 @@ import csw.time.core.models.TAITime;
 import csw.time.core.models.UTCTime;
 import org.junit.Assert;
 import org.junit.Test;
-import org.scalatestplus.junit.JUnitSuite;
 
 import java.util.*;
 
@@ -18,7 +17,7 @@ import static csw.params.core.models.Coords.*;
 import static csw.params.core.models.JCoords.*;
 
 @SuppressWarnings({"unused", "RedundantCast", "unchecked", "ArraysAsListWithZeroOrOneArgument"})
-public class JKeysAndParametersTest extends JUnitSuite {
+public class JKeysAndParametersTest {
 
     @Test
     public void showUsageOfPrimitiveTypes() {

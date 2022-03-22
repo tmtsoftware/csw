@@ -13,13 +13,12 @@ import csw.alarm.models.Key.AlarmKey;
 import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
 import org.junit.Test;
-import org.scalatestplus.junit.JUnitSuite;
 
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 
 //CSW-83:Alarm models should take prefix
-public class JAlarmRefreshActorTest extends JUnitSuite {
+public class JAlarmRefreshActorTest {
     private final ActorSystem<SpawnProtocol.Command> typedSystem = ActorSystem.apply(SpawnProtocol.create(), "SpawnProtocolGuardian");
 
     // DEOPSCSW-507: Auto-refresh utility for component developers

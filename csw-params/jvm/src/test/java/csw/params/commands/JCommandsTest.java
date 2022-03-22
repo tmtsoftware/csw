@@ -10,7 +10,6 @@ import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
 import org.junit.Assert;
 import org.junit.Test;
-import org.scalatestplus.junit.JUnitSuite;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -18,7 +17,7 @@ import java.util.stream.Collectors;
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-185: Easy to Use Syntax/Api
 // DEOPSCSW-320: Add command type in Setup, observe and wait
-public class JCommandsTest extends JUnitSuite {
+public class JCommandsTest {
 
     private final Key<Integer> encoderIntKey = JKeyType.IntKey().make("encoder", JUnits.encoder);
     private final Key<String> epochStringKey = JKeyType.StringKey().make("epoch", JUnits.year);

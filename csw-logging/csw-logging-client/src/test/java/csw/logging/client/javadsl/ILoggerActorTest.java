@@ -17,7 +17,6 @@ import csw.logging.models.Level;
 import csw.logging.models.Level$;
 import csw.prefix.models.Prefix;
 import org.junit.*;
-import org.scalatestplus.junit.JUnitSuite;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 
@@ -30,7 +29,7 @@ import static csw.logging.client.utils.Eventually.eventually;
 // CSW-78: PrefixRedesign for logging
 // CSW-86: Subsystem should be case-insensitive
 // DEOPSCSW-316: Improve Logger accessibility for component developers
-public class ILoggerActorTest extends JUnitSuite {
+public class ILoggerActorTest {
     protected static final ActorSystem<SpawnProtocol.Command> actorSystem = ActorSystem.create(SpawnProtocol.create(), "base-system");
     protected static LoggingSystem loggingSystem;
 

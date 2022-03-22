@@ -11,11 +11,10 @@ import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
 import org.junit.Assert;
 import org.junit.Test;
-import org.scalatestplus.junit.JUnitSuite;
 
 import java.util.*;
 
-public class JOpticalDetectorEventTest extends JUnitSuite {
+public class JOpticalDetectorEventTest {
     final Prefix sourcePrefix = new Prefix(JSubsystem.ESW, "filter.wheel");
     final ObsId obsId = ObsId.apply("2020A-001-123");
 

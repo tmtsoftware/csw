@@ -18,7 +18,6 @@ import csw.logging.client.internal.LoggingSystem;
 import csw.logging.client.utils.TestAppender;
 import csw.prefix.models.Prefix;
 import org.junit.*;
-import org.scalatestplus.junit.JUnitSuite;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 
@@ -31,7 +30,7 @@ import static csw.logging.client.utils.Eventually.eventually;
 // DEOPSCSW-280 SPIKE: Introduce Akkatyped in logging
 // CSW-78: PrefixRedesign for logging
 // CSW-86: Subsystem should be case-insensitive
-public class ILoggerMutableActorTest extends JUnitSuite {
+public class ILoggerMutableActorTest {
     protected static final ActorSystem<SpawnProtocol.Command> actorSystem = ActorSystem.create(SpawnProtocol.create(), "base-system");
     protected static LoggingSystem loggingSystem;
 

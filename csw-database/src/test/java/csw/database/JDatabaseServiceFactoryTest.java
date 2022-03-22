@@ -13,7 +13,6 @@ import org.jooq.DSLContext;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.scalatestplus.junit.JUnitSuite;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 
@@ -30,7 +29,7 @@ import static org.junit.Assert.assertTrue;
 //DEOPSCSW-620: Session Creation to access data
 //DEOPSCSW-621: Session creation to access data with single connection
 //DEOPSCSW-615: DB service accessible to CSW component developers
-public class JDatabaseServiceFactoryTest extends JUnitSuite {
+public class JDatabaseServiceFactoryTest {
 
     private static final Integer port = 5432;
     private static JHTTPLocationService jHttpLocationService;

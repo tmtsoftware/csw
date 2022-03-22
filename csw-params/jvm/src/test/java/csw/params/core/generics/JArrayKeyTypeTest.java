@@ -5,7 +5,6 @@ import csw.params.core.models.ArrayData;
 import csw.params.core.models.Units;
 import org.junit.Assert;
 import org.junit.Test;
-import org.scalatestplus.junit.JUnitSuite;
 
 import java.util.List;
 
@@ -15,7 +14,7 @@ import static csw.params.javadsl.JUnits.*;
 // DEOPSCSW-190: Implement Unit Support
 // DEOPSCSW-184: Change configurations - attributes and values
 @SuppressWarnings("unchecked")
-public class JArrayKeyTypeTest extends JUnitSuite {
+public class JArrayKeyTypeTest {
 
     private void commonAssertions(String keyName, KeyType<?> keyType, ArrayData<?>[] testData, Parameter<?> parameter, Units unit) {
         Assert.assertEquals(keyName, keyName);

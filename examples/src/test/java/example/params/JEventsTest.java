@@ -19,7 +19,6 @@ import csw.params.javadsl.JUnits;
 import csw.time.core.models.UTCTime;
 import org.junit.Assert;
 import org.junit.Test;
-import org.scalatestplus.junit.JUnitSuite;
 import play.api.libs.json.JsValue;
 import play.api.libs.json.Json;
 
@@ -31,7 +30,7 @@ import java.util.stream.Collectors;
 
 //DEOPSCSW-331: Event Service Accessible to all CSW component builders
 @SuppressWarnings("unchecked")
-public class JEventsTest extends JUnitSuite {
+public class JEventsTest {
 
     @Test
     public void showUsageOfEventTime__DEOPSCSW_331() {
