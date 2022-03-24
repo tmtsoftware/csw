@@ -66,7 +66,7 @@ object Common {
     // and the maven repo match
     version := sys.env.getOrElse("JITPACK_VERSION", "0.1.0-SNAPSHOT"),
     fork    := true,
-    Test / javaOptions ++= Seq("-Dakka.actor.serialize-messages=on", s"-DRTM_PATH=${file(".").getAbsolutePath + "/target/RTM"}"),
+    Test / javaOptions ++= Seq("-Dakka.actor.serialize-messages=on", s"-DRTM_PATH=${file("./target/RTM").getAbsolutePath}"),
     autoCompilerPlugins     := true,
     Global / cancelable     := true, // allow ongoing test(or any task) to cancel with ctrl + c and still remain inside sbt
     scalafmtOnCompile       := true,
