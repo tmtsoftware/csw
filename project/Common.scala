@@ -10,8 +10,6 @@ object Common {
   private val enableCoverage: Boolean      = sys.props.get("enableCoverage").contains("true")
   val storyReport: Boolean                 = sys.props.get("generateStoryReport").contains("true")
 
-  sys.props.update("RTM_PATH", file(".").getAbsolutePath + "/target/RTM")
-
   private val reporterOptions: Seq[Tests.Argument] =
     // "-oDF" - show full stack traces and test case durations
     // -C - to give fully qualified name of the custom reporter
@@ -68,7 +66,7 @@ object Common {
     // and the maven repo match
     version := sys.env.getOrElse("JITPACK_VERSION", "0.1.0-SNAPSHOT"),
     fork    := true,
-    Test / javaOptions ++= Seq("-Dakka.actor.serialize-messages=on"),
+    Test / javaOptions ++= Seq("-Dakka.actor.serialize-messages=on", s"-DRTM_PATH=${file(".").getAbsolutePath + "/target/RTM"}"),
     autoCompilerPlugins     := true,
     Global / cancelable     := true, // allow ongoing test(or any task) to cancel with ctrl + c and still remain inside sbt
     scalafmtOnCompile       := true,
