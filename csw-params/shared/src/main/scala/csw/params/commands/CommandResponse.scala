@@ -43,7 +43,7 @@ object CommandResponse {
    * Responses returned can be Invalid, Started, Completed, Error, Cancelled, Locked
    */
   sealed trait SubmitResponse extends CommandResponse {
-
+    def typeName: String = this.getClass.getSimpleName
     def withRunId(runId: Id): SubmitResponse
   }
 

@@ -9,14 +9,14 @@ import csw.command.client.messages.FromComponentLifecycleMessage.Running
 import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.TopLevelActorCommonMessage.{TrackingEventReceived, UnderlyingHookFailed}
 import csw.command.client.messages.TopLevelActorIdleMessage.Initialize
-import csw.command.client.messages._
+import csw.command.client.messages.*
 import csw.command.client.models.framework.LocationServiceUsage.RegisterAndTrackServices
 import csw.command.client.models.framework.ToComponentLifecycleMessage
 import csw.command.client.models.framework.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.logging.api.scaladsl.Logger
-import csw.params.commands.CommandResponse._
+import csw.params.commands.CommandResponse.*
 import csw.params.core.models.Id
 
 import scala.concurrent.blocking
@@ -37,9 +37,9 @@ private[framework] object ComponentBehavior {
       lifecycleHandlers: ComponentHandlers,
       cswCtx: CswContext
   ): Behavior[TopLevelActorMessage] =
-    Behaviors.setup(ctx => {
-      import cswCtx._
-
+    Behaviors.setup(factory = ctx => {
+      import cswCtx.*
+      val fiveChars   = 5
       val log: Logger = loggerFactory.getLogger(ctx)
 
       var lifecycleState: ComponentLifecycleState = ComponentLifecycleState.Idle
@@ -171,14 +171,14 @@ private[framework] object ComponentBehavior {
         }
 
       def handleValidate(runId: Id, commandMessage: CommandMessage, replyTo: ActorRef[ValidateResponse]): Unit = {
-
-        val runIdStrSmall: String = runId.id.takeRight(5)
-        val validationResponse    = lifecycleHandlers.validateCommand(runId, commandMessage.command)
+        val runIdStrSmall      = runId.id.takeRight(fiveChars)
+        val validationResponse = lifecycleHandlers.validateCommand(runId, commandMessage.command)
         replyTo ! validationResponse.asInstanceOf[ValidateResponse]
-
         validationResponse match {
           case accepted: Accepted =>
-            log.info(s"Validate:runId:[$runIdStrSmall] with [${commandMessage.command.commandName}]")
+            log.info(
+              s"Validate:runId:[$runIdStrSmall] with response as $accepted for command name [${commandMessage.command.commandName}]"
+            )
           case invalid: Invalid =>
             log.info(s"Validate:runId:[$runIdStrSmall] with msg [${invalid.issue}]")
         }
@@ -186,28 +186,26 @@ private[framework] object ComponentBehavior {
       }
 
       def handleOneway(runId: Id, commandMessage: CommandMessage, replyTo: ActorRef[OnewayResponse]): Unit = {
-
-        val runIdStrSmall: String = runId.id.takeRight(5)
-        log.info(s"Oneway:runId:[$runIdStrSmall] with msg [${commandMessage}]")
+        val runIdStrSmall = runId.id.takeRight(fiveChars)
+        log.info(s"Oneway:runId:[$runIdStrSmall] with msg [$commandMessage]")
         val validationResponse = lifecycleHandlers.validateCommand(runId, commandMessage.command)
         replyTo ! validationResponse.asInstanceOf[OnewayResponse]
-
+        lifecycleHandlers.onOneway(runId, commandMessage.command)
         validationResponse match {
           case accepted: Accepted =>
-            val onewayResponse = lifecycleHandlers.onOneway(runId, commandMessage.command)
-            log.info(s"Oneway with response:[$onewayResponse]")
+            log.info(s"Oneway:runId:[$runIdStrSmall]  with response:[$accepted]")
           case invalid: Invalid =>
             log.info(s"Oneway:runId:[$runIdStrSmall] with [${invalid.issue}]-Command not forwarded to TLA post validation.")
         }
       }
 
       def handleSubmit(runId: Id, commandMessage: CommandMessage, replyTo: ActorRef[SubmitResponse]): Unit = {
-        val runIdStrSmall: String = runId.id.takeRight(5)
-        log.info(s"Submit:runId:[$runIdStrSmall] with msg[${commandMessage}]")
+        val runIdStrSmall = runId.id.takeRight(fiveChars)
+        log.info(s"Submit:runId:[$runIdStrSmall] with msg[$commandMessage]")
+        val submitResponse = lifecycleHandlers.onSubmit(runId, commandMessage.command)
+        log.info(s"Submit:runId:$runIdStrSmall handler response:${submitResponse.typeName}")
         lifecycleHandlers.validateCommand(runId, commandMessage.command) match {
-          case accepted: Accepted =>
-            val submitResponse = lifecycleHandlers.onSubmit(runId, commandMessage.command)
-            log.info(s"Submit with response:[$submitResponse]")
+          case _: Accepted =>
             submitResponse match {
               case started: Started =>
                 commandResponseManager.commandResponseManagerActor ! AddStarted(started)
