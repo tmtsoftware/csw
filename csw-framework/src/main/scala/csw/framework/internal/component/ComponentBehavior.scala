@@ -190,10 +190,11 @@ private[framework] object ComponentBehavior {
         log.info(s"Oneway:runId:[$runIdStrSmall] with msg [$commandMessage]")
         val validationResponse = lifecycleHandlers.validateCommand(runId, commandMessage.command)
         replyTo ! validationResponse.asInstanceOf[OnewayResponse]
-        lifecycleHandlers.onOneway(runId, commandMessage.command)
+
         validationResponse match {
           case accepted: Accepted =>
             log.info(s"Oneway:runId:[$runIdStrSmall]  with response:[$accepted]")
+            lifecycleHandlers.onOneway(runId, commandMessage.command)
           case invalid: Invalid =>
             log.info(s"Oneway:runId:[$runIdStrSmall] with [${invalid.issue}]-Command not forwarded to TLA post validation.")
         }
@@ -202,10 +203,10 @@ private[framework] object ComponentBehavior {
       def handleSubmit(runId: Id, commandMessage: CommandMessage, replyTo: ActorRef[SubmitResponse]): Unit = {
         val runIdStrSmall = runId.id.takeRight(fiveChars)
         log.info(s"Submit:runId:[$runIdStrSmall] with msg[$commandMessage]")
-        val submitResponse = lifecycleHandlers.onSubmit(runId, commandMessage.command)
-        log.info(s"Submit:runId:$runIdStrSmall handler response:${submitResponse.typeName}")
         lifecycleHandlers.validateCommand(runId, commandMessage.command) match {
           case _: Accepted =>
+            val submitResponse = lifecycleHandlers.onSubmit(runId, commandMessage.command)
+            log.info(s"Submit:runId:$runIdStrSmall handler response:${submitResponse.typeName}")
             submitResponse match {
               case started: Started =>
                 commandResponseManager.commandResponseManagerActor ! AddStarted(started)
