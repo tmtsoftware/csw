@@ -22,7 +22,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
-public class JResultTest {
+public class JResultExample {
 
     //#runid
     Id runId = Id.apply();

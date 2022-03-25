@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 
 //DEOPSCSW-331: Event Service Accessible to all CSW component builders
 @SuppressWarnings("unchecked")
-public class JEventsTest {
+public class JEventsExample {
 
     @Test
     public void showUsageOfEventTime__DEOPSCSW_331() {

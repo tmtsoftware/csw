@@ -11,16 +11,18 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.params.commands.CommandResponse.SubmitResponse
 import csw.params.commands.{CommandName, Sequence, Setup}
 import csw.prefix.models.{Prefix, Subsystem}
+import example.sequencerCommandService.SequencerCommandServiceExample.sequencerCommandService
 
-import scala.concurrent.Await
+import scala.async.Async.{async, await}
+import scala.concurrent.{Await, ExecutionContextExecutor, Future}
 import scala.concurrent.duration.DurationLong
 
 object SequencerCommandServiceExample extends App {
 
   implicit lazy val typedSystem: ActorSystem[SpawnProtocol.Command] =
     ActorSystemFactory.remote(SpawnProtocol(), "sequencer-system")
-
-  private val locationService = HttpLocationServiceFactory.makeLocalClient(typedSystem)
+  implicit lazy val ec: ExecutionContextExecutor = typedSystem.executionContext
+  private val locationService                    = HttpLocationServiceFactory.makeLocalClient(typedSystem)
 
   // #create-sequencer-command-service
   private val connection             = AkkaConnection(ComponentId(Prefix(Subsystem.CSW, "sequencer"), ComponentType.Sequencer))
@@ -32,17 +34,24 @@ object SequencerCommandServiceExample extends App {
   // #submit-sequence
   val sequence: Sequence        = Sequence(Setup(Prefix("test.move"), CommandName("command-1"), None))
   implicit val timeout: Timeout = Timeout(10.seconds)
+  async {
+    val initialResponse: SubmitResponse             = await(sequencerCommandService.submit(sequence))
+    val queryResponseF: Future[SubmitResponse]      = sequencerCommandService.query(initialResponse.runId)
+    val queryFinalResponseF: Future[SubmitResponse] = sequencerCommandService.queryFinal(initialResponse.runId)
+    await(queryResponseF)
+    await(queryFinalResponseF)
+  }.map(_ => {
+    // do something once all is finished
+  })
 
-  private val initialResponse: SubmitResponse = Await.result(sequencerCommandService.submit(sequence), 5.seconds)
-
-  private val queryResponse: SubmitResponse = Await.result(sequencerCommandService.query(initialResponse.runId), 5.seconds)
-
-  private val queryFinalResponse: SubmitResponse =
-    Await.result(sequencerCommandService.queryFinal(initialResponse.runId), 5.seconds)
   // #submit-sequence
 
   // #submitAndWait
-  private val finalResponse: SubmitResponse = Await.result(sequencerCommandService.submitAndWait(sequence), 5.seconds)
+  sequencerCommandService
+    .submitAndWait(sequence)
+    .map(finalResponse => {
+      // do something with finalResponse
+    })
   // #submitAndWait
 
 }

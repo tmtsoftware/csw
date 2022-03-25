@@ -1,56 +1,62 @@
-package csw.common.components.command
+package org.tmt.csw.sample
 
+import akka.actor.Cancellable
+import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.ActorContext
+import akka.stream.ThrottleMode
+import akka.stream.scaladsl.{Sink, Source}
 import akka.util.Timeout
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.CommandResponseManager.{OverallFailure, OverallSuccess}
 import csw.command.client.CommandServiceFactory
 import csw.command.client.messages.TopLevelActorMessage
-import csw.common.components.command.CommandComponentState._
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.ComponentType.HCD
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{ComponentId, TrackingEvent}
+import csw.location.api.scaladsl.LocationService
 import csw.logging.api.scaladsl.Logger
+import csw.params.commands.*
 import csw.params.commands.CommandIssue.OtherIssue
-import csw.params.commands.CommandResponse._
-import csw.params.commands._
+import csw.params.commands.CommandResponse.*
+import csw.params.core.generics.KeyType
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
+import csw.params.events.SystemEvent
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.time.core.models.UTCTime
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.concurrent.{Await, ExecutionContext}
 import scala.util.{Failure, Success}
 
-class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
+class CurrentStateExampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
     extends ComponentHandlers(ctx, cswCtx) {
 
-  import cswCtx._
+  import ComponentStateForCommand.*
+  import cswCtx.*
 
-  private val log: Logger                   = loggerFactory.getLogger(ctx)
-  private implicit val ec: ExecutionContext = ctx.executionContext
-  private implicit val timeout: Timeout     = 15.seconds
-
-  private val filterHCDConnection = AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "FilterHCD"), HCD))
-  // val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient(ctx.system, clientMat)
+  private val log: Logger                                = loggerFactory.getLogger(ctx)
+  private implicit val ec: ExecutionContext              = ctx.executionContext
+  private implicit val actorSystem: ActorSystem[Nothing] = ctx.system
+  private implicit val timeout: Timeout                  = 15.seconds
+  private val filterHCDConnection                        = AkkaConnection(ComponentId(Prefix(Subsystem.CSW, "samplehcd"), HCD))
+  val locationService: LocationService                   = cswCtx.locationService
 
   private val filterHCDLocation    = Await.result(locationService.resolve(filterHCDConnection, 5.seconds), 5.seconds)
-  var hcdComponent: CommandService = CommandServiceFactory.make(filterHCDLocation.get)(ctx.system)
+  val hcdComponent: CommandService = CommandServiceFactory.make(filterHCDLocation.get)(ctx.system)
 
   private val longRunning       = Setup(seqPrefix, longRunningCmdToHcd, None)
   private val shortRunning      = Setup(seqPrefix, shorterHcdCmd, None)
   private val shortRunningError = Setup(seqPrefix, shorterHcdErrorCmd, None)
 
   override def initialize(): Unit = {
-    // DEOPSCSW-153: Accessibility of logging service to other CSW components
     log.info("Initializing Assembly Component TLA")
-
-    Thread.sleep(100)
+    // #currentStatePublisher
     // Publish the CurrentState using parameter set created using a sample Choice parameter
     currentStatePublisher.publish(CurrentState(filterAsmPrefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
+    // #currentStatePublisher
   }
 
   override def onGoOffline(): Unit =
@@ -61,8 +67,11 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
 
   def validateCommand(runId: Id, command: ControlCommand): ValidateCommandResponse = {
     command.commandName match {
+      case `longRunning`   => Accepted(runId)
+      case `mediumRunning` => Accepted(runId)
+      case `shortRunning`  => Accepted(runId)
       case `immediateCmd` | `longRunningCmd` | `longRunningCmdToAsm` | `longRunningCmdToAsmComp` | `longRunningCmdToAsmInvalid` |
-          `longRunningCmdToAsmCActor` | `cmdWithBigParameter` =>
+          `longRunningCmdToAsmCActor` | `cmdWithBigParameter` | `hcdCurrentStateCmd` | `matcherCmd` =>
         Accepted(runId)
       case `invalidCmd` =>
         Invalid(runId, OtherIssue("Invalid"))
@@ -76,23 +85,47 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   }
 
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = {
-    processCommand(runId, controlCommand)
+    processCommandWithMatcher(controlCommand)
   }
-
+  private def processCommandWithMatcher(controlCommand: ControlCommand): Unit =
+    controlCommand.commandName match {
+      case `hcdCurrentStateCmd` =>
+        processCurrentStateOneway(controlCommand)
+      case `matcherTimeoutCmd` => Thread.sleep(1000)
+      case `matcherFailedCmd` =>
+        Source(1 to 10)
+          .map(i =>
+            currentStatePublisher.publish(
+              CurrentState(controlCommand.source, StateName("testStateName"), Set(KeyType.IntKey.make("encoder").set(i * 1)))
+            )
+          )
+          .throttle(1, 100.millis, 1, ThrottleMode.Shaping)
+          .runWith(Sink.ignore)
+      case _ =>
+        Source(1 to 10)
+          .map(i =>
+            currentStatePublisher.publish(
+              CurrentState(controlCommand.source, StateName("testStateName"), Set(KeyType.IntKey.make("encoder").set(i * 10)))
+            )
+          )
+          .throttle(1, 100.millis, 1, ThrottleMode.Shaping)
+          .runWith(Sink.ignore)
+    }
   def processCommand(runId: Id, command: ControlCommand): SubmitResponse =
     command.commandName match {
       case `immediateCmd` =>
         Completed(runId)
-
+      // #longRunning
       case `longRunningCmd` =>
         // A local assembly command that takes some time returning Started
         timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plusSeconds(2))) {
           // After time expires, send final update
-          commandResponseManager.updateCommand(Completed(runId))
+          commandResponseManager.updateCommand(Completed(runId, Result(encoder.set(20))))
         }
         // Starts long-runing and returns started
         Started(runId)
-
+      // #longRunning
+      // #queryFinalAll
       case `longRunningCmdToAsm` =>
         hcdComponent.submitAndWait(longRunning).foreach {
           case _: Completed =>
@@ -113,7 +146,7 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
         commandResponseManager.queryFinalAll(long, shorter).onComplete {
           case Success(response) =>
             response match {
-              case OverallSuccess(r) =>
+              case OverallSuccess(_) =>
                 commandResponseManager.updateCommand(Completed(runId))
               case OverallFailure(responses) =>
                 commandResponseManager.updateCommand(Error(runId, s"$responses"))
@@ -122,7 +155,7 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
             commandResponseManager.updateCommand(Error(runId, ex.toString))
         }
         Started(runId)
-
+      // #queryFinalAll
       case `longRunningCmdToAsmInvalid` =>
         val long    = hcdComponent.submitAndWait(longRunning)
         val shorter = hcdComponent.submitAndWait(shortRunningError)
@@ -152,9 +185,32 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
     Thread.sleep(500)
   }
 
+  private def processCurrentStateOneway(controlCommand: ControlCommand): Unit = {
+    val currentState = CurrentState(prefix, StateName("HCDState"), controlCommand.paramSet)
+    cswCtx.currentStatePublisher.publish(currentState)
+  }
+
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {}
 
-  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = {}
+  // #onDiagnostic-mode
+  // While dealing with mutable state, make sure you create a worker actor to avoid concurrency issues
+  // For functionality demonstration, we have simply used a mutable variable without worker actor
+  var diagModeCancellable: Option[Cancellable] = None
 
-  override def onOperationsMode(): Unit = {}
+  override def onDiagnosticMode(startTime: UTCTime, hint: String): Unit = {
+    hint match {
+      case "engineering" =>
+        val event = SystemEvent(prefix, diagnosticDataEventName).add(diagnosticModeParam)
+        diagModeCancellable.foreach(_.cancel()) // cancel previous diagnostic publishing
+        diagModeCancellable = Some(eventService.defaultPublisher.publish(Some(event), startTime, 200.millis))
+      case _ =>
+    }
+  }
+  // #onDiagnostic-mode
+
+  // #onOperations-mode
+  override def onOperationsMode(): Unit = {
+    diagModeCancellable.foreach(_.cancel())
+  }
+  // #onOperations-mode
 }

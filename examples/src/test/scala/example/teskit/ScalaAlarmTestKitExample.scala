@@ -9,7 +9,7 @@ import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
 import org.scalatest.funsuite.AnyFunSuiteLike
 
 //#scalatest-alarm-testkit
-class ScalaAlarmTestKitExampleTest extends ScalaTestFrameworkTestKit(AlarmServer) with AnyFunSuiteLike {
+class ScalaAlarmTestKitExample extends ScalaTestFrameworkTestKit(AlarmServer) with AnyFunSuiteLike {
   import frameworkTestKit.alarmTestKit._
   test("test initializing alarms via config") {
     initAlarms(ConfigFactory.parseResources("valid-alarms.conf"))

@@ -45,10 +45,10 @@ decoding of ADTs.
 Usage of Cbor for Event encoding and decoding is shown below:
 
 Scala
-:   @@snip [EventsTest.scala](../../../../../examples/src/test/scala/example/params/EventsTest.scala) { #cbor }
+:   @@snip [EventsExample.scala](../../../../../examples/src/test/scala/example/params/EventsExample.scala) { #cbor }
 
 Java
-:   @@snip [JEventServiceCreationExamples.java](../../../../../examples/src/test/java/example/params/JEventsTest.java) { #cbor }
+:   @@snip [JEventsExample.java](../../../../../examples/src/test/java/example/params/JEventsExample.java) { #cbor }
   
 
 ## Tooling

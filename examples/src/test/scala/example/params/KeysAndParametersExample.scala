@@ -10,7 +10,7 @@ import csw.time.core.models.{TAITime, UTCTime}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
-class KeysAndParametersTest extends AnyFunSpec with Matchers {
+class KeysAndParametersExample extends AnyFunSpec with Matchers {
   // DEOPSCSW-196: Command Payloads for variable command content
   describe("Examples of keys and parameters") {
 

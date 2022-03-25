@@ -66,11 +66,9 @@ class LongRunningCommandTest(ignore: Int)
       val assemblyLongSetup = Setup(prefix, longRunning, Some(obsId))
       val probe             = TestProbe[CurrentState]()
 
-      //#subscribeCurrentState
       // subscribe to the current state of an assembly component and use a callback which forwards each received
       // element to a test probe actor
       assemblyCommandService.subscribeCurrentState(probe.ref ! _)
-      //#subscribeCurrentState
 
       // assemblyLongSetup does the following:
       // send submit with setup to assembly running in JVM-2
@@ -83,13 +81,11 @@ class LongRunningCommandTest(ignore: Int)
       // it is a long-running command.  Then it monitors the various events that are generated to make sure
       // the test is running properly.  A queryFinal is then used to wait for the assembly command to complete
       // after all the subcommands to the HCDs have completed
-      //#subscribe-for-result
       val test1InitialFuture   = assemblyCommandService.submit(assemblyLongSetup)
       val test1InitialResponse = Await.result(test1InitialFuture, 2.seconds)
       test1InitialResponse shouldBe a[Started]
       val test1RunId = test1InitialResponse.runId
 
-      //#subscribe-for-result
       // verify that commands gets completed in following sequence
       // ShortSetup => MediumSetup => LongSetup
       probe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shortCmdCompleted))))
@@ -103,10 +99,8 @@ class LongRunningCommandTest(ignore: Int)
       test1Final.runId shouldBe test1RunId
       // End of Test 1
 
-      //#submit
       // Test 2 shows that submitAndWait can send the same command and wait for final completion
       val test2Response = assemblyCommandService.submitAndWait(assemblyLongSetup)
-      //#submit
 
       val test2Final = Await.result(test2Response, 20.seconds)
       test2Final shouldBe a[Completed]
@@ -114,7 +108,6 @@ class LongRunningCommandTest(ignore: Int)
 
       // Test 3 starts the long running command and uses query to examine the status of the command
       // prior to joining for completion with queryFinal allowing some work
-      //#query-response
       val test3InitialResponse = Await.result(assemblyCommandService.submit(assemblyLongSetup), 5.seconds)
       val test3RunId           = test3InitialResponse.runId
 
@@ -124,7 +117,6 @@ class LongRunningCommandTest(ignore: Int)
       val test3QueryResponse: Future[SubmitResponse] = assemblyCommandService.query(test3RunId)
 
       // Command is still just started
-      //#query-response
       test3QueryResponse.map(_ shouldBe Started(test3RunId))
 
       // Use the initial future to determine the when completed
@@ -138,13 +130,11 @@ class LongRunningCommandTest(ignore: Int)
       val assemblyInvalidSetup = Setup(prefix, invalidCmd, Some(obsId))
 
       // First test sends two commands that complete immediately successfully
-      //#submitAll
       val assemblyInitSetup = Setup(prefix, initCmd, Some(obsId))
       val assemblyMoveSetup = Setup(prefix, moveCmd, Some(obsId))
 
       val multiResponse1: Future[List[SubmitResponse]] =
         assemblyCommandService.submitAllAndWait(List(assemblyInitSetup, assemblyMoveSetup))
-      //#submitAll
 
       whenReady(multiResponse1, PatienceConfiguration.Timeout(5.seconds)) { result =>
         result.length shouldBe 2

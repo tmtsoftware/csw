@@ -1,7 +1,6 @@
 package example.location
 
 import java.net.InetAddress
-
 import akka.actor.typed
 import akka.actor.typed.SpawnProtocol
 import akka.actor.typed.scaladsl.Behaviors
@@ -15,15 +14,17 @@ import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.scaladsl.{LoggerFactory, LoggingSystemFactory}
 import csw.prefix.models.{Prefix, Subsystem}
+import example.location.LocationServiceExampleComponentApp.system
 
-import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
+import scala.concurrent.duration.*
+import scala.concurrent.{Await, ExecutionContextExecutor, Future}
 
 /**
  * An example that shows how to register a component actor with the location service.
  */
 object LocationServiceExampleComponentApp extends App {
   implicit val system: typed.ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol(), "example-system")
+  implicit val ec: ExecutionContextExecutor                     = system.executionContext
   private val locationService                                   = HttpLocationServiceFactory.makeLocalClient
 
   // #create-logging-system
@@ -44,7 +45,7 @@ object LocationServiceExampleComponent {
   // Message sent from client once location has been resolved
   case class ClientMessage(replyTo: typed.ActorRef[_])
 
-  def behaviour(locationService: LocationService): Behaviors.Receive[ClientMessage] =
+  def behaviour(locationService: LocationService)(implicit ec: ExecutionContextExecutor): Behaviors.Receive[ClientMessage] =
     Behaviors.receive[ClientMessage]((ctx, msg) => {
       val log: Logger = new LoggerFactory(Prefix("csw.my-component-name")).getLogger(ctx)
       log.info("In actor LocationServiceExampleComponent")
@@ -56,9 +57,10 @@ object LocationServiceExampleComponent {
             ctx.self
           )
         )
-      Await.result(registrationResult, 5.seconds)
 
-      log.info("LocationServiceExampleComponent registered.")
+      registrationResult.map(_ => {
+        log.info("LocationServiceExampleComponent registered.")
+      })
       msg match {
         case ClientMessage(replyTo) =>
           log.info(s"Received scala client message from: $replyTo")

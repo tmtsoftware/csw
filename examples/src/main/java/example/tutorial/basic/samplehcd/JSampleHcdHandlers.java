@@ -185,7 +185,7 @@ public class JSampleHcdHandlers extends JComponentHandlers {
                         return Behaviors.same();
                     } else if (msg instanceof Finished) {
                         Finished finished = (Finished) msg;
-                        cswCtx.commandResponseManager().updateCommand(new Completed(finished.runId, new Result().madd(resultKey.set(finished.sleepTime))));
+                        cswCtx.commandResponseManager().updateCommand(new Completed(finished.runId, new Result().add(resultKey.set(finished.sleepTime))));
                         return Behaviors.stopped();
                     } else {
                         return Behaviors.stopped();

@@ -14,7 +14,7 @@ import org.junit.Test;
 import java.util.Arrays;
 
 //#junit-alarm-testkit
-class JUnitAlarmTestKitExampleTest {
+class JUnitAlarmTestKitExample {
 
     @ClassRule
     public static final FrameworkTestKitJunitResource testKit =

@@ -13,10 +13,10 @@ The PubSub feature of the HCD provides `CurrentState` values to the PubSub subsc
 A state variable that indicates the demand or requested state.
 
 Scala
-:   @@snip [StateVariablesTest.scala](../../../../examples/src/test/scala/example/params/StateVariablesTest.scala) { #demandstate }
+:   @@snip [StateVariablesExample.scala](../../../../examples/src/test/scala/example/params/StateVariablesExample.scala) { #demandstate }
 
 Java
-:   @@snip [JStateVariablesTest.java](../../../../examples/src/test/java/example/params/JStateVariablesTest.java) { #demandstate }
+:   @@snip [JStateVariablesExample.java](../../../../examples/src/test/java/example/params/JStateVariablesExample.java) { #demandstate }
 
 
 ## CurrentState
@@ -24,20 +24,20 @@ Java
 A state variable that is published by a component that describes its internal state. Used by Assemblies to determine command completion in Command Service.
 
 Scala
-:   @@snip [StateVariablesTest.scala](../../../../examples/src/test/scala/example/params/StateVariablesTest.scala) { #currentstate }
+:   @@snip [StateVariablesExample.scala](../../../../examples/src/test/scala/example/params/StateVariablesExample.scala) { #currentstate }
 
 Java
-:   @@snip [JStateVariablesTest.java](../../../../examples/src/test/java/example/params/JStateVariablesTest.java) { #currentstate }
+:   @@snip [JStateVariablesExample.java](../../../../examples/src/test/java/example/params/JStateVariablesExample.java) { #currentstate }
 
 
 ## JSON Serialization
 State variables can be serialized to JSON. The library has provided **JsonSupport** helper class and methods to serialize DemandState and CurrentState.
 
 Scala
-:   @@snip [StateVariablesTest.scala](../../../../examples/src/test/scala/example/params/StateVariablesTest.scala) { #json-serialization }
+:   @@snip [StateVariablesExample.scala](../../../../examples/src/test/scala/example/params/StateVariablesExample.scala) { #json-serialization }
 
 Java
-:   @@snip [JStateVariablesTest.java](../../../../examples/src/test/java/example/params/JStateVariablesTest.java) { #json-serialization }
+:   @@snip [JStateVariablesExample.java](../../../../examples/src/test/java/example/params/JStateVariablesExample.java) { #json-serialization }
 
 ## Unique Key Constraint
 
@@ -55,12 +55,12 @@ parameters based on key.
 Here are some examples that illustrate this point:
 
 Scala
-:   @@snip [StateVariablesTest.scala](../../../../examples/src/test/scala/example/params/StateVariablesTest.scala) { #unique-key }
+:   @@snip [StateVariablesExample.scala](../../../../examples/src/test/scala/example/params/StateVariablesExample.scala) { #unique-key }
 
 Java
-:   @@snip [JStateVariablesTest.java](../../../../examples/src/test/java/example/params/JStateVariablesTest.java) { #unique-key }
+:   @@snip [JStateVariablesExample.java](../../../../examples/src/test/java/example/params/JStateVariablesExample.java) { #unique-key }
 
 ## Source Code for Examples
 
-* [Scala Example]($github.base_url$/examples/src/test/scala/example/params/StateVariablesTest.scala)
-* [Java Example]($github.base_url$/examples/src/test/java/example/params/JStateVariablesTest.java)
+* [Scala Example]($github.base_url$/examples/src/test/scala/example/params/StateVariablesExample.scala)
+* [Java Example]($github.base_url$/examples/src/test/java/example/params/JStateVariablesExample.java)

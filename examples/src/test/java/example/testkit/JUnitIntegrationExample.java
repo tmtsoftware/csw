@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
-public class JUnitIntegrationExampleTest {
+public class JUnitIntegrationExample {
 
     @ClassRule
     public static final FrameworkTestKitJunitResource testKit =

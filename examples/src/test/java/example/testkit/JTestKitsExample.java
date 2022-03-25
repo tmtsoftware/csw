@@ -22,7 +22,7 @@ import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
-public class JTestKitsExampleTest {
+public class JTestKitsExample {
 
     //#framework-testkit
     private static final FrameworkTestKit frameworkTestKit = FrameworkTestKit.create();

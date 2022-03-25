@@ -22,7 +22,7 @@ A subscriber can subscribe to all `CurrentState` published by an HCD or to speci
 `StateName`. The publisher does not need to do anything special to support these features.
 
 Scala
-:   @@snip [SampleComponentHandlers.scala](../../../../csw-framework/src/test/scala/csw/common/components/framework/SampleComponentHandlers.scala) { #currentStatePublisher }
+:   @@snip [SampleComponentHandlers.scala](../../../../examples/src/main/scala/org/tmt/csw/sample/CurrentStateExampleComponentHandlers.scala) { #currentStatePublisher }
 
 Java
-:   @@snip [JSampleComponentHandlers.java](../../../../csw-framework/src/test/java/csw/framework/javadsl/components/JSampleComponentHandlers.java) { #currentStatePublisher }
+:   @@snip [JSampleComponentHandlers.java](../../../../examples/src/main/java/org/tmt/csw/sample/JCurrentStateExampleComponentHandlers.java) { #currentStatePublisher }

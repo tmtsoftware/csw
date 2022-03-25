@@ -17,7 +17,7 @@ import static csw.params.core.models.Coords.*;
 import static csw.params.core.models.JCoords.*;
 
 @SuppressWarnings({"unused", "RedundantCast", "unchecked", "ArraysAsListWithZeroOrOneArgument"})
-public class JKeysAndParametersTest {
+public class JKeysAndParametersExample {
 
     @Test
     public void showUsageOfPrimitiveTypes() {

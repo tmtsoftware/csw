@@ -14,7 +14,7 @@ import java.util.concurrent.TimeoutException;
 
 //#CSW-161
 //#junit-database-testkit
-class JUnitDatabaseTestKitExampleTest {
+class JUnitDatabaseTestKitExample {
 
     @ClassRule
     public static final FrameworkTestKitJunitResource testKit =

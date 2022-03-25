@@ -9,7 +9,7 @@ import csw.prefix.models.Prefix
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
-class ResultTest extends AnyFunSpec with Matchers {
+class ResultExample extends AnyFunSpec with Matchers {
 
   // #runid
   val runId: Id = Id()
