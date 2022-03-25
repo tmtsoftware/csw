@@ -206,7 +206,7 @@ private[framework] object ComponentBehavior {
         lifecycleHandlers.validateCommand(runId, commandMessage.command) match {
           case _: Accepted =>
             val submitResponse = lifecycleHandlers.onSubmit(runId, commandMessage.command)
-            log.info(s"Submit:runId:$runIdStrSmall handler response:${submitResponse.typeName}")
+            log.info(s"Submit:runId:[$runIdStrSmall] with handler response:${submitResponse.typeName}")
             submitResponse match {
               case started: Started =>
                 commandResponseManager.commandResponseManagerActor ! AddStarted(started)
