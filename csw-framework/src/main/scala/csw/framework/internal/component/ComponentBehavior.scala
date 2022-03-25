@@ -171,6 +171,7 @@ private[framework] object ComponentBehavior {
         }
 
       def handleValidate(runId: Id, commandMessage: CommandMessage, replyTo: ActorRef[ValidateResponse]): Unit = {
+
         val runIdStrSmall: String = runId.id.takeRight(5)
         val validationResponse    = lifecycleHandlers.validateCommand(runId, commandMessage.command)
         replyTo ! validationResponse.asInstanceOf[ValidateResponse]
@@ -185,6 +186,7 @@ private[framework] object ComponentBehavior {
       }
 
       def handleOneway(runId: Id, commandMessage: CommandMessage, replyTo: ActorRef[OnewayResponse]): Unit = {
+
         val runIdStrSmall: String = runId.id.takeRight(5)
         log.info(s"Oneway:runId:[$runIdStrSmall] with msg [${commandMessage}]")
         val validationResponse = lifecycleHandlers.validateCommand(runId, commandMessage.command)

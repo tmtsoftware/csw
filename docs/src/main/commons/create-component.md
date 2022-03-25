@@ -117,7 +117,7 @@ Java
 :   @@snip [JSampleHcdStandalone.conf](../../../../examples/src/main/resources/JSampleHcdStandalone.conf)
 
 
-@@@ note { title="What is a behaviorFactoryClassName?" }
+@@@ note { title="What is a componentHandlerClassName?" }
 
 `componentHandlerClassName` refers to class name of the a concrete implementation of `ComponentHandlers`, which is `SampleHcdHandlers` for Scala in above example, `JSampleHcdHandlers` for Java.
 

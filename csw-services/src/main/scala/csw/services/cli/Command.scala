@@ -8,6 +8,9 @@ object Command {
   @CommandName("start")
   @HelpMessage("starts all the CSW services by default if no other option is provided")
   final case class Start(
+      @HelpMessage("start location server")
+      @Short("l")
+      location: Boolean = false,
       @HelpMessage("start config server")
       @Short("c")
       config: Boolean = false,
@@ -35,6 +38,7 @@ object Command {
 
   object Start {
     def apply(
+        location: Boolean = false,
         config: Boolean = false,
         event: Boolean = false,
         alarm: Boolean = false,
@@ -42,11 +46,14 @@ object Command {
         auth: Boolean = false,
         insideInterfaceName: Option[String] = None,
         outsideInterfaceName: Option[String] = None
-    ): Start =
+    ): Start = {
+      if (location || config || event || alarm || database || auth) {
+        // always start location server if explicitly started or any other service is started
+        new Start(true, config, event, alarm, database, auth, insideInterfaceName, outsideInterfaceName)
+      }
       // mark all flags=true when no option is provided to start command
-      if (config || event || alarm || database || auth)
-        new Start(config, event, alarm, database, auth, insideInterfaceName, outsideInterfaceName)
-      else new Start(true, true, true, true, true, insideInterfaceName, outsideInterfaceName)
+      else new Start(true, true, true, true, true, true, insideInterfaceName, outsideInterfaceName)
+    }
   }
 
 }

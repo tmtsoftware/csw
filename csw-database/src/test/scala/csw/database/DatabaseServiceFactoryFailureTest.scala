@@ -1,9 +1,9 @@
 package csw.database
 
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import csw.database.commons.DBTestHelper
 import csw.database.exceptions.DatabaseException
+import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
 import org.scalatest.concurrent.ScalaFutures.convertScalaFuture
 import org.scalatest.BeforeAndAfterAll
 

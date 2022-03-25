@@ -2,13 +2,13 @@ package csw.testkit.database
 
 import akka.actor.typed
 import akka.util.Timeout
-import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import csw.commons.ResourceReader
 import csw.database.commons.DatabaseServiceConnection
 import csw.location.api.models.TcpRegistration
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.testkit.internal.TestKitUtils
+import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
 
 import java.nio.file.Paths
 

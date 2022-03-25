@@ -20,9 +20,9 @@ The above command does the following things:
    1. It installs Java Eclipse Temurin JDK 17.
 
 
-Once jvm installed - include the output of command `cs java --jvm temurin:1.17 --env -m offline` in your respective shell profiles
-- In Fish: add `eval (cs java --jvm temurin:1.17 --env -m offline)` into fish.config
-- In Zsh: add `eval $(cs java --jvm temurin:1.17 --env -m offline)` into .zshrc
+Once jvm installed - include the output of command `cs java --jvm temurin:1.17 --env` in your respective shell profiles
+- In Fish: add `eval (cs java --jvm temurin:1.17 --env)` into fish.config
+- In Zsh: add `eval $(cs java --jvm temurin:1.17 --env)` into .zshrc
 
 Above config will set the required environment variable(e.g., JAVA_HOME) into your shell.
 

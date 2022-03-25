@@ -1,11 +1,10 @@
 package csw.database
 
 import java.util.concurrent.CompletionException
-
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import csw.database.commons.DBTestHelper
 import csw.database.scaladsl.JooqExtentions.{RichQueries, RichQuery, RichResultQuery}
+import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
 import org.jooq.DSLContext
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.BeforeAndAfterAll

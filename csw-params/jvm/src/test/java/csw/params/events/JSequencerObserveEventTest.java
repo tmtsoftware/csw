@@ -1,9 +1,12 @@
 package csw.params.events;
 
 import csw.params.core.generics.Parameter;
+import csw.params.core.models.Choice;
+import csw.params.core.models.Choices;
 import csw.params.core.models.ExposureId;
 import csw.params.core.models.ObsId;
 import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JUnits;
 import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
 import org.junit.Assert;
@@ -19,9 +22,15 @@ public class JSequencerObserveEventTest extends JUnitSuite {
     final Parameter<String> exposureIdParam = ObserveEventKeys.exposureId().set(exposureId.toString());
     final Parameter<String> obsIdParam = ObserveEventKeys.obsId().set(obsId.toString());
     final Parameter<String> downTimeParam = ObserveEventKeys.downTimeReason().set("infra failure");
+    final Parameter<Double> pOffsetParam = JKeyType.DoubleKey().make("p", JUnits.arcsec).set(10.0);
+    final Parameter<Double> qOffsetParam = JKeyType.DoubleKey().make("q", JUnits.arcsec).set(20.0);
+    HashSet<Choice> coordinateSystemChoices = ObserveEventUtil.getCoordinateSystemChoices();
+    Parameter<Choice> coordianateSystemParam = JKeyType.ChoiceKey().make("coordinateSystem", Choices.fromChoices(coordinateSystemChoices)).set(new Choice(JCoordinateSystem.XY().entryName()));
+
     final SequencerObserveEvent sequencerObserveEvent = new SequencerObserveEvent(prefix);
     String filename = "some/nested/folder/file123.conf";
-    Parameter<String> filenameParam = JKeyType.StringKey().make("filename").set(filename);
+    Parameter<String> filenameParam = ObserveEventKeys.filename().set(filename);
+
     @Test
     public void createObserveEventwithObsIdParameters__CSW_125() {
         List<TestData> testData = new ArrayList<>(Arrays.asList(
@@ -73,6 +82,54 @@ public class JSequencerObserveEventTest extends JUnitSuite {
 
         Assert.assertEquals(paramSet, event.jParamSet());
         Assert.assertEquals("ObserveEvent.DowntimeStart", event.eventName().name());
+        Assert.assertEquals(prefix, event.source());
+    }
+
+    @Test
+    public void createOffsetStartObserveEventWithFixedParameterSet__CSW_176() {
+        ObserveEvent event = sequencerObserveEvent.offsetStart(obsId, JCoordinateSystem.XY(), 10.0, 20.0);
+        Set<Parameter<?>> paramSet = new HashSet<>(10);
+        paramSet.add(pOffsetParam);
+        paramSet.add(coordianateSystemParam);
+        paramSet.add(qOffsetParam);
+        paramSet.add(obsIdParam);
+
+        Assert.assertEquals(paramSet, event.jParamSet());
+        Assert.assertEquals("ObserveEvent.OffsetStart", event.eventName().name());
+        Assert.assertEquals(prefix, event.source());
+    }
+
+    @Test
+    public void createOffsetEndObserveEventWithFixedParameterSet__CSW_176() {
+        ObserveEvent event = sequencerObserveEvent.offsetEnd(obsId);
+        Set<Parameter<?>> paramSet = new HashSet<>(10);
+        paramSet.add(obsIdParam);
+
+        Assert.assertEquals(paramSet, event.jParamSet());
+        Assert.assertEquals("ObserveEvent.OffsetEnd", event.eventName().name());
+        Assert.assertEquals(prefix, event.source());
+
+    }
+
+    @Test
+    public void createInputRequestStartObserveEventWithFixedParameterSet__CSW_176() {
+        ObserveEvent event = sequencerObserveEvent.inputRequestStart(obsId);
+        Set<Parameter<?>> paramSet = new HashSet<>(10);
+        paramSet.add(obsIdParam);
+
+        Assert.assertEquals(paramSet, event.jParamSet());
+        Assert.assertEquals("ObserveEvent.InputRequestStart", event.eventName().name());
+        Assert.assertEquals(prefix, event.source());
+    }
+
+    @Test
+    public void createInputRequestEndObserveEventWithFixedParameterSet__CSW_176() {
+        ObserveEvent event = sequencerObserveEvent.inputRequestEnd(obsId);
+        Set<Parameter<?>> paramSet = new HashSet<>(10);
+        paramSet.add(obsIdParam);
+
+        Assert.assertEquals(paramSet, event.jParamSet());
+        Assert.assertEquals("ObserveEvent.InputRequestEnd", event.eventName().name());
         Assert.assertEquals(prefix, event.source());
     }
 

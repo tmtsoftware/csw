@@ -5,5 +5,5 @@ before_install:
   - export JITPACK_VERSION=$VERSION
   - wget https://repo1.maven.org/maven2/org/scala-sbt/sbt-launch/1.6.1/sbt-launch-1.6.1.jar
 install:
-  - eval $(./coursier java --jvm temurin:1.17 --env -m offline)
+  - eval $(./coursier java --jvm temurin:1.17 --env)
   - java -Xms2048m -Xmx2048m -XX:ReservedCodeCacheSize=512m -jar sbt-launch-1.6.1.jar -Dsbt.log.noformat=true clean publishM2
