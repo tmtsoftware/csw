@@ -28,7 +28,7 @@ import static csw.params.javadsl.JUnits.NoUnits;
 import static csw.params.javadsl.JUnits.meter;
 
 @SuppressWarnings("unchecked")
-public class JStateVariablesTest extends JUnitSuite {
+public class JStateVariablesExample extends JUnitSuite {
 
     @Test
     public void showUsageOfDemandState() {

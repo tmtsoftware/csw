@@ -11,7 +11,7 @@ import org.scalatestplus.junit.JUnitSuite;
 
 import java.util.Arrays;
 
-public class JUnitIntegrationExampleTest extends JUnitSuite {
+public class JUnitIntegrationExample extends JUnitSuite {
 
     @ClassRule
     public static final FrameworkTestKitJunitResource testKit =

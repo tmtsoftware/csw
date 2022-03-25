@@ -19,10 +19,10 @@ For more on Cbor, refer to the @ref:[technical doc](../technical/params/params.m
 Each event includes its time of creation in UTC format. You can access that eventTime as follows:
 
 Scala
-: @@snip [EventsTest.scala](../../../../examples/src/test/scala/example/params/EventsTest.scala) { #eventtime }
+: @@snip [EventsExample.scala](../../../../examples/src/test/scala/example/params/EventsExample.scala) { #eventtime }
 
 Java
-: @@snip [JEventsTest.java](../../../../examples/src/test/java/example/params/JEventsTest.java) { #eventtime }
+: @@snip [JEventsExample.java](../../../../examples/src/test/java/example/params/JEventsExample.java) { #eventtime }
 
 ## System Event
 
@@ -31,10 +31,10 @@ the output of an algorithm in one component that is used as an input to another.
 to publish internal state or status values of a component that may be of interest to other components in the system.
 
 Scala
-:   @@snip [EventsTest.scala](../../../../examples/src/test/scala/example/params/EventsTest.scala) { #systemevent }
+:   @@snip [EventsExample.scala](../../../../examples/src/test/scala/example/params/EventsExample.scala) { #systemevent }
 
 Java
-:   @@snip [JEventsTest.java](../../../../examples/src/test/java/example/params/JEventsTest.java) { #systemevent }
+:   @@snip [JEventsExample.java](../../../../examples/src/test/java/example/params/JEventsExample.java) { #systemevent }
 
 ## Observe Event
 
@@ -249,20 +249,20 @@ The downtime will be started by the downtimeStart event and ended by the next ob
 The following snippet shows how to create a observe event
 
 Scala
-:   @@snip [EventsTest.scala](../../../../examples/src/test/scala/example/params/EventsTest.scala) { #observe-event }
+:   @@snip [EventsExample.scala](../../../../examples/src/test/scala/example/params/EventsExample.scala) { #observe-event }
 
 Java
-:   @@snip [JEventsTest.java](../../../../examples/src/test/java/example/params/JEventsTest.java) { #observe-event }
+:   @@snip [JEventsExample.java](../../../../examples/src/test/java/example/params/JEventsExample.java) { #observe-event }
 
 ## JSON Serialization
 
 Events can be serialized to JSON. The library has provided **JsonSupport** helper class and methods to serialize Status, Observe and System events.
 
 Scala
-:   @@snip [CommandsTest.scala](../../../../examples/src/test/scala/example/params/EventsTest.scala) { #json-serialization }
+:   @@snip [EventsExample.scala](../../../../examples/src/test/scala/example/params/EventsExample.scala) { #json-serialization }
 
 Java
-:   @@snip [JEventsTest.java](../../../../examples/src/test/java/example/params/JEventsTest.java) { #json-serialization }
+:   @@snip [JEventsExample.java](../../../../examples/src/test/java/example/params/JEventsExample.java) { #json-serialization }
 
 ## Unique Key Constraint
 
@@ -280,7 +280,7 @@ parameters based on key.
 Here are some examples that illustrate this point:
 
 Scala
-:   @@snip [CommandsTest.scala](../../../../examples/src/test/scala/example/params/EventsTest.scala) { #unique-key }
+:   @@snip [EventsExample.scala](../../../../examples/src/test/scala/example/params/EventsExample.scala) { #unique-key }
 
 Java
-:   @@snip [JEventsTest.java](../../../../examples/src/test/java/example/params/JEventsTest.java) { #unique-key }
+:   @@snip [JEventsExample.java](../../../../examples/src/test/java/example/params/JEventsExample.java) { #unique-key }

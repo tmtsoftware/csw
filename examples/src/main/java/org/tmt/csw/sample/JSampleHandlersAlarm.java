@@ -75,8 +75,7 @@ public class JSampleHandlersAlarm extends JComponentHandlers {
     private ActorRef<WorkerCommand> createWorkerActor() {
         return actorContext.spawn(
                 Behaviors.receiveMessage(msg -> {
-                    if (msg instanceof SendCommand) {
-                        SendCommand command = (SendCommand) msg;
+                    if (msg instanceof SendCommand command) {
                         log.trace("WorkerActor received SendCommand message.");
                         handle(command.hcd);
                     } else {
@@ -144,10 +143,9 @@ public class JSampleHandlersAlarm extends JComponentHandlers {
     @Override
     public void onLocationTrackingEvent(TrackingEvent trackingEvent) {
         log.debug(() -> "onLocationTrackingEvent called: " + trackingEvent.toString());
-        if (trackingEvent instanceof LocationUpdated) {
-            LocationUpdated updated = (LocationUpdated) trackingEvent;
+        if (trackingEvent instanceof LocationUpdated updated) {
             Location location = updated.location();
-            ICommandService hcd = CommandServiceFactory.jMake((AkkaLocation) (location), actorContext.getSystem());
+            ICommandService hcd = CommandServiceFactory.jMake(location, actorContext.getSystem());
             commandSender.tell(new SendCommand(hcd));
         } else if (trackingEvent instanceof LocationRemoved) {
             log.info("HCD no longer available");
@@ -161,8 +159,7 @@ public class JSampleHandlersAlarm extends JComponentHandlers {
     //#subscribe
     private void processEvent(Event event) {
         log.info("Event received: " + event.eventKey());
-        if (event instanceof SystemEvent) {
-            SystemEvent sysEvent = (SystemEvent) event;
+        if (event instanceof SystemEvent sysEvent) {
             if (event.eventKey().equals(counterEventKey)) {
                 int counter = sysEvent.parameter(hcdCounterKey).head();
                 log.info("Counter = " + counter);

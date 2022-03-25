@@ -56,7 +56,7 @@ sub-commands to finish. In the `OverallSuccess` case `commandResponseManager.upd
 If one or more of the sub-commands fails, the negative response of the first failed command is returned to the parent.
 
 Scala
-:   @@snip [McsAssemblyComponentHandlers.scala](../../../../examples/src/main/scala/example/tutorial/basic/sampleassembly/SampleAssemblyHandlers.scala) { #queryF }
+:   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/example/tutorial/basic/sampleassembly/SampleAssemblyHandlers.scala) { #queryF }
 
 Java
 :   @@snip [JCommandIntegrationTest.java](../../../../examples/src/main/java/example/tutorial/basic/sampleassembly/JSampleAssemblyHandlers.java) { #queryF }

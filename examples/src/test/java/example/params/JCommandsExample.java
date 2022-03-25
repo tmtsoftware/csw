@@ -26,7 +26,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
-public class JCommandsTest extends JUnitSuite {
+public class JCommandsExample extends JUnitSuite {
     //#obsid
     final ObsId obsId = ObsId.apply("2020A-001-123");
     //#obsid

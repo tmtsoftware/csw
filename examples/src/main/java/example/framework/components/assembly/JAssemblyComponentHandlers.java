@@ -210,24 +210,6 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                 //commandResponseManager.addSubCommand(sc.runId(), subCommand2.runId());
                 //#addSubCommand
 
-                //#subscribe-to-command-response-manager
-                // subscribe to the status of original command received and publish the state when its status changes to
-                // Completed
-                /*
-                CommandResponse.SubmitResponse submitResponse = commandResponseManager
-                        .jQueryFinal(subCommand1.runId(), Timeout.create(Duration.ofSeconds(10)))
-                        .join();
-
-                if (submitResponse instanceof CommandResponse.Completed) {
-                    Key<String> stringKey = JKeyType.StringKey().make("sub-command-status");
-                    CurrentState currentState = new CurrentState(sc.source(), new StateName("testStateName"));
-                    currentStatePublisher.publish(currentState.madd(stringKey.set("complete")));
-                } else {
-                    // do something
-                }
-                */
-                //#subscribe-to-command-response-manager
-
                 //#updateSubCommand
                 // An original command is split into sub-commands and sent to a component.
                 // The result from submitting the sub-commands is used to update the CRM
@@ -243,18 +225,6 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                         });
                 //#updateSubCommand
 
-                //#query-command-response-manager
-                // query CommandResponseManager to get the current status of Command, for example: Accepted/Completed/Invalid etc.
-                /*
-                commandResponseManager
-                        .jQuery(subCommand1.runId(), Timeout.durationToTimeout(FiniteDuration.apply(5, "seconds")))
-                        .thenAccept(commandResponse -> {
-                            // may choose to publish current state to subscribers or do other operations
-                        });
-
-                //#query-command-response-manager
-                return new CommandResponse.Completed(sc.runId());
-*/
             default:
                 log.error("Invalid command [" + sc + "] received.");
                 return new CommandResponse.Invalid(runId, new CommandIssue.UnsupportedCommandIssue(sc.commandName().toString()));   //TODO Guessed

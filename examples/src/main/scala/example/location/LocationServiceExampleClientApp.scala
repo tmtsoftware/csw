@@ -2,7 +2,6 @@ package example.location
 
 import java.net.InetAddress
 
-import akka.Done
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior, SpawnProtocol}
 import akka.actor.{Actor, ActorSystem, Props, typed}
@@ -13,12 +12,12 @@ import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.location.api
 import csw.location.api.AkkaRegistrationFactory
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
-import csw.location.api.models._
+import csw.location.api.models.*
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.wrapper.LocationServerWiring
-import csw.logging.api.scaladsl._
+import csw.logging.api.scaladsl.*
 import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.scaladsl.{Keys, LoggerFactory, LoggingSystemFactory}
@@ -27,9 +26,9 @@ import example.location.ExampleMessages.{AllDone, CustomException, TrackingEvent
 import example.location.LocationServiceExampleClient.locationInfoToString
 
 import scala.annotation.nowarn
-import scala.async.Async._
+import scala.async.Async.*
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.concurrent.{Await, Future}
 
 /**
@@ -125,25 +124,35 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   // add some dummy registrations for illustrative purposes
 
   // dummy http connection
-  val httpPort       = 8080
-  val httpConnection = HttpConnection(api.models.ComponentId(Prefix(Subsystem.CSW, "configuration"), ComponentType.Service))
+  val httpPort = 8080
+  val httpConnection: HttpConnection = HttpConnection(
+    api.models.ComponentId(Prefix(Subsystem.CSW, "configuration"), ComponentType.Service)
+  )
 
   // When no network type is provided in httpRegistration, default is NetworkType.Private
-  val httpRegistration                  = HttpRegistration(httpConnection, httpPort, "path123")
-  val httpRegResult: RegistrationResult = Await.result(locationService.register(httpRegistration), 2.seconds)
-
+  val httpRegistration: HttpRegistration = HttpRegistration(httpConnection, httpPort, "path123")
+  private val httpRegResultF: Future[RegistrationResult] = locationService
+    .register(httpRegistration)
+  httpRegResultF
+    .map(httpRegResult => {
+      log.info(s"$httpRegResult successfully registered in location service")
+    })
   // When a service wants to register itself on Public network, it can provide NetworkType.Public in httpRegistration
-  val httpRegistrationOnPublicNetwork = HttpRegistration(httpConnection, httpPort, "path123", NetworkType.Outside)
-  val httpRegResultOnPublicNetwork: RegistrationResult =
-    Await.result(locationService.register(httpRegistrationOnPublicNetwork), 2.seconds)
-
+  val httpRegistrationOnPublicNetwork: HttpRegistration =
+    HttpRegistration(httpConnection, httpPort, "path123", NetworkType.Outside)
+  private val httpRegResultOnPublicNetworkF: Future[RegistrationResult] =
+    locationService.register(httpRegistrationOnPublicNetwork)
+  httpRegResultOnPublicNetworkF
+    .map(httpRegResultOnPublicNetwork => {
+      log.info(s"$httpRegResultOnPublicNetwork successfully registered in location service")
+    })
   // ************************************************************************************************************
 
   // import scaladsl adapter to implicitly convert UnTyped ActorRefs to Typed ActorRef[Nothing]
-  import akka.actor.typed.scaladsl.adapter._
+  import akka.actor.typed.scaladsl.adapter.*
 
   // dummy HCD connection
-  val hcdConnection = AkkaConnection(api.models.ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD))
+  val hcdConnection: AkkaConnection = AkkaConnection(api.models.ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD))
   val hcdRegistration: AkkaRegistration = AkkaRegistrationFactory.make(
     hcdConnection,
     context
@@ -160,19 +169,30 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
 
   // Register UnTyped ActorRef with Location service. Import scaladsl adapter to implicitly convert
   // UnTyped ActorRefs to Typed ActorRef[Nothing]
-  val hcdRegResult: RegistrationResult = Await.result(locationService.register(hcdRegistration), 2.seconds)
-
+  private val hcdRegResultF: Future[RegistrationResult] = locationService
+    .register(hcdRegistration)
+  hcdRegResultF
+    .map(hcdRegResult => {
+      log.info(s"$hcdRegResult successfully registered in location service")
+    })
   // ************************************************************************************************************
 
-  def behavior(): Behavior[String]    = Behaviors.setup { ctx => Behaviors.receiveMessage { msg => Behaviors.same } }
+  def behavior(): Behavior[String]    = Behaviors.setup { _ => Behaviors.receiveMessage { _ => Behaviors.same } }
   val typedActorRef: ActorRef[String] = context.system.spawn(behavior(), "typed-actor-ref")
 
-  val assemblyConnection = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "assembly1"), ComponentType.Assembly))
+  val assemblyConnection: AkkaConnection = AkkaConnection(
+    ComponentId(Prefix(Subsystem.NFIRAOS, "assembly1"), ComponentType.Assembly)
+  )
 
   // Register Typed ActorRef[String] with Location Service
   val assemblyRegistration: AkkaRegistration = AkkaRegistrationFactory.make(assemblyConnection, typedActorRef)
 
-  val assemblyRegResult: RegistrationResult = Await.result(locationService.register(assemblyRegistration), 2.seconds)
+  private val assemblyRegResultF: Future[RegistrationResult] = locationService
+    .register(assemblyRegistration)
+  assemblyRegResultF
+    .map(assemblyRegResult => {
+      log.info(s"$assemblyRegResult successfully registered in location service")
+    })
   // #Components-Connections-Registrations
 
   // #Components-Connections-Registrations-With-Metadata
@@ -180,14 +200,20 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
 
   // dummy http connection
   val httpPortForService = 8080
-  val httpConnectionForService = HttpConnection(
+  val httpConnectionForService: HttpConnection = HttpConnection(
     api.models.ComponentId(Prefix(Subsystem.CSW, "configuration"), ComponentType.Service)
   )
 
   // When no network type is provided in httpRegistration, default is NetworkType.Private
-  val httpRegistrationForService =
+  val httpRegistrationForService: HttpRegistration =
     HttpRegistration(httpConnectionForService, httpPortForService, "path123", Metadata(Map("key1" -> "value1")))
-  val httpRegResultForService: RegistrationResult = Await.result(locationService.register(httpRegistrationForService), 2.seconds)
+  private val httpRegResultForServiceF: Future[RegistrationResult] = locationService
+    .register(httpRegistrationForService)
+
+  httpRegResultForServiceF
+    .map(httpRegResultForService => {
+      log.info(s"$httpRegResultForService successfully registered in location service")
+    })
   // #Components-Connections-Registrations-With-Metadata
 
   // #find
@@ -201,22 +227,24 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
     Map(Keys.OBS_ID -> "foo_obs_id", "exampleConnection" -> exampleConnection.name)
   )
   // #log-info-map
-  val findResult: Option[AkkaLocation] = Await.result(locationService.find(exampleConnection), timeout)
+  locationService.find(exampleConnection).map {
+    case Some(findResult) =>
+      // #log-info
+      log.info(s"Result of the find call: $findResult")
+      // #log-info
+      val akkaLocation = findResult
+      // #typed-ref
+      // If the component type is HCD or Assembly, use this to get the correct ActorRef
+      val typedComponentRef: ActorRef[ComponentMessage] = akkaLocation.componentRef
 
-  // #log-info
-  log.info(s"Result of the find call: $findResult")
-  // #log-info
+      // If the component type is Container, use this to get the correct ActorRef
+      val typedContainerRef: ActorRef[ContainerMessage] = akkaLocation.containerRef
+    // #typed-ref
+    case None => // do something when nothing is found
+  }
+
   // #find
 
-  findResult.foreach(akkaLocation => {
-    // #typed-ref
-    // If the component type is HCD or Assembly, use this to get the correct ActorRef
-    val typedComponentRef: ActorRef[ComponentMessage] = akkaLocation.componentRef
-
-    // If the component type is Container, use this to get the correct ActorRef
-    val typedContainerRef: ActorRef[ContainerMessage] = akkaLocation.containerRef
-    // #typed-ref
-  })
   // #resolve
   // resolve connection to LocationServiceExampleComponent
   // [start LocationServiceExampleComponent after this command but before timeout]
@@ -234,30 +262,41 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
 
   // #list
   // list connections in location service
-  val connectionList: List[Location] = Await.result(locationService.list, timeout)
-  log.info("All Registered Connections:")
-  connectionList.foreach(c => log.info(s"--- ${locationInfoToString(c)}"))
+  locationService.list.map(connectionList => {
+    log.info("All Registered Connections:")
+    connectionList.foreach(c => log.info(s"--- ${locationInfoToString(c)}"))
+  })
+
   // #list
 
   // #filtering-component
   // filter connections based on component type
-  val componentList: List[Location] = Await.result(locationService.list(ComponentType.Assembly), timeout)
-  log.info("Registered Assemblies:")
-  componentList.foreach(c => log.info(s"--- ${locationInfoToString(c)}"))
+  locationService
+    .list(ComponentType.Assembly)
+    .map(componentList => {
+      log.info("Registered Assemblies:")
+      componentList.foreach(c => log.info(s"--- ${locationInfoToString(c)}"))
+    })
   // #filtering-component
 
   // #filtering-connection
   // filter connections based on connection type
-  val akkaList: List[Location] = Await.result(locationService.list(ConnectionType.AkkaType), timeout)
-  log.info("Registered Akka connections:")
-  akkaList.foreach(c => log.info(s"--- ${locationInfoToString(c)}"))
+  locationService
+    .list(ConnectionType.AkkaType)
+    .map(akkaList => {
+      log.info("Registered Akka connections:")
+      akkaList.foreach(c => log.info(s"--- ${locationInfoToString(c)}"))
+    })
   // #filtering-connection
 
   // #filtering-prefix
   // filter akka locations based on prefix
-  val akkaLocations: List[Location] = Await.result(locationService.listByPrefix("NFIRAOS.ncc"), timeout)
-  log.info("Registered akka locations for nfiraos.ncc")
-  akkaLocations.foreach(c => log.info(s"--- ${locationInfoToString(c)}"))
+  locationService
+    .listByPrefix("NFIRAOS.ncc")
+    .map(akkaLocations => {
+      log.info("Registered akka locations for nfiraos.ncc")
+      akkaLocations.foreach(c => log.info(s"--- ${locationInfoToString(c)}"))
+    })
   // #filtering-prefix
 
   if (resolveResult.isDefined) {
@@ -308,22 +347,24 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   override def postStop(): Unit = {
 
     // #unregister
-    val unregisterF: Future[Done] = async {
-      await(httpRegResult.unregister())
-      await(httpRegResultOnPublicNetwork.unregister())
-      await(hcdRegResult.unregister())
-      await(assemblyRegResult.unregister())
+    val unregisterF = async {
+      await(httpRegResultF.map(_.unregister()))
+      await(httpRegResultOnPublicNetworkF.map(_.unregister()))
+      await(hcdRegResultF.map(_.unregister()))
+      await(assemblyRegResultF.map(_.unregister()))
+    }.flatten
+    val eventualDone = async {
+      await(unregisterF)
+      // #unregister
+      // Gracefully shutdown actor system
+      await(context.system.terminate())
+      // #stop-logging-system
+      // Only call this once per application
+      await(loggingSystem.stop)
+      // #stop-logging-system
     }
-    Await.result(unregisterF, 5.seconds)
-    // #unregister
 
-    // Gracefully shutdown actor system
-    Await.result(context.system.terminate(), 20.seconds)
-
-    // #stop-logging-system
-    // Only call this once per application
-    Await.result(loggingSystem.stop, 30.seconds)
-    // #stop-logging-system
+    Await.result(eventualDone, 30.seconds)
   }
 
   @nowarn("msg=unreachable code")

@@ -24,7 +24,7 @@ import scala.concurrent.{Await, Future}
 
 // DEOPSCSW-89: Examples of  Configuration Service usage in Java and Scala
 // DEOPSCSW-592: Create csw testkit for component writers
-class ConfigClientExampleTest
+class ConfigClientExample
     extends ScalaTestFrameworkTestKit(ConfigServer)
     with AnyFunSuiteLike
     with BeforeAndAfterEach
@@ -59,10 +59,12 @@ class ConfigClientExampleTest
 
       // check if file exists with config service
       val exists: Boolean = await(clientApi.exists(filePath))
+      // exists returns true/false
+      // #exists
+
       exists shouldBe true
     }
     Await.result(doneF, 5.seconds)
-    // #exists
   }
 
   test("getActive | DEOPSCSW-89, DEOPSCSW-592") {
@@ -74,10 +76,11 @@ class ConfigClientExampleTest
       await(adminApi.create(filePath, ConfigData.fromString(defaultStrConf), annex = false, "First commit"))
 
       val activeFile: Option[ConfigData] = await(clientApi.getActive(filePath))
+      // activeFile.get returns content of defaultStrConf
+      // #getActive
       await(activeFile.get.toStringF(actorSystem)) shouldBe defaultStrConf
     }
     Await.result(doneF, 5.seconds)
-    // #getActive
   }
 
   test("create-update-delete | DEOPSCSW-89, DEOPSCSW-592") {
@@ -116,6 +119,10 @@ class ConfigClientExampleTest
         // store the config, at a specified path as a binary file in annex store
         val id3: ConfigId =
           await(adminApi.create(Paths.get("/hcd/trombone/debug.bin"), config3, annex = true, "new file from vendor"))
+        // id1 returns ConfigId(1)
+        // id2 returns ConfigId(3)
+        // id3 returns ConfigId(5)
+        // #create
 
         // CAUTION: for demo example setup these IDs are returned. Don't assume them in production setup.
         id1 shouldEqual ConfigId(1)
@@ -123,7 +130,6 @@ class ConfigClientExampleTest
         id3 shouldEqual ConfigId(5)
       }
     Await.result(futC, 2.seconds)
-    // #create
 
     // #update
     val futU = async {
@@ -132,22 +138,24 @@ class ConfigClientExampleTest
         adminApi
           .update(destPath, ConfigData.fromString(defaultStrConf), comment = "debug statements")
       )
-
+      // newId returns ConfigId(7)
+      // #update
       // validate the returned id
       newId shouldEqual ConfigId(7)
     }
     Await.result(futU, 2.seconds)
-    // #update
 
     // #delete
     val futD = async {
       val unwantedFilePath = Paths.get("/hcd/trombone/debug.bin")
       await(adminApi.delete(unwantedFilePath, "no longer needed"))
       // validates the file is deleted
-      await(adminApi.getLatest(unwantedFilePath)) shouldBe None
+      val maybeConfigData = await(adminApi.getLatest(unwantedFilePath))
+      // maybeConfigData returns None
+      // #delete
+      maybeConfigData shouldBe None
     }
     Await.result(futD, 2.seconds)
-    // #delete
   }
 
   test("getById | DEOPSCSW-89, DEOPSCSW-592") {
@@ -160,10 +168,11 @@ class ConfigClientExampleTest
 
       // validate
       val actualData = await(adminApi.getById(filePath, id)).get
+      // actualData returns defaultStrConf
+      // #getById
       await(actualData.toStringF(actorSystem)) shouldBe defaultStrConf
     }
     Await.result(doneF, 2.seconds)
-    // #getById
   }
 
   test("getLatest | DEOPSCSW-89, DEOPSCSW-592") {
@@ -180,10 +189,11 @@ class ConfigClientExampleTest
       // get the latest file
       val newConfigData = await(adminApi.getLatest(filePath)).get
       // validate
+      // newConfigData returns newContent
+      // #getLatest
       await(newConfigData.toStringF(actorSystem)) shouldBe newContent
     }
     Await.result(assertionF, 2.seconds)
-    // #getLatest
   }
 
   test("getByTime | DEOPSCSW-89, DEOPSCSW-592") {
@@ -199,13 +209,16 @@ class ConfigClientExampleTest
       await(adminApi.update(filePath, ConfigData.fromString(newContent), "changed!!"))
 
       val initialData: ConfigData = await(adminApi.getByTime(filePath, tInitial)).get
-      await(initialData.toStringF(actorSystem)) shouldBe defaultStrConf
+      // initialData returns defaultStrConf
 
       val latestData = await(adminApi.getByTime(filePath, Instant.now())).get
+      // latestData returns defaultStrConf
+      // #getByTime
+      await(initialData.toStringF(actorSystem)) shouldBe defaultStrConf
       await(latestData.toStringF(actorSystem)) shouldBe newContent
     }
     Await.result(assertionF, 2.seconds)
-    // #getByTime
+
   }
 
   test("list | DEOPSCSW-89, DEOPSCSW-592") {
@@ -226,39 +239,49 @@ class ConfigClientExampleTest
           adminApi.create(path, ConfigData.fromString(defaultStrConf), Annex == fileType, "initial commit")
         )
       }
+      // #list
       Await.result(createF, 2.seconds)
+    // #list
     }
 
-    val assertionF = async {
-      // retrieve list of all files; for demonstration purpose show validate return values
-      await(adminApi.list()).map(info => info.path).toSet shouldBe paths.map { case (path, _) =>
+    val responsesF = async {
+      // retrieve list of all files;
+      val allFilesF = await(adminApi.list()).map(info => info.path).toSet
+
+      // retrieve list of files based on type;
+      val allAnnexFilesF  = await(adminApi.list(Some(Annex))).map(info => info.path).toSet
+      val allNormalFilesF = await(adminApi.list(Some(FileType.Normal))).map(info => info.path).toSet
+
+      // retrieve list using pattern;
+      val confFilesByPatternF = await(adminApi.list(None, Some(".*.conf"))).map(info => info.path.toString).toSet
+
+      // retrieve list using pattern and file type;
+      val allNormalConfFilesF = await(adminApi.list(Some(FileType.Normal), Some(".*.conf"))).map(info => info.path.toString).toSet
+
+      val testConfF          = await(adminApi.list(Some(FileType.Normal), Some("test.*"))).map(info => info.path.toString).toSet
+      val allAnnexConfFilesF = await(adminApi.list(Some(Annex), Some("a/c.*"))).map(info => info.path.toString).toSet
+      // #list
+
+      // for correctness, validate return values
+      allFilesF shouldBe paths.map { case (path, _) =>
         path
       }.toSet
-
-      // retrieve list of files based on type; for demonstration purpose validate return values
-      await(adminApi.list(Some(Annex))).map(info => info.path).toSet shouldBe paths.collect {
-        case (path, fileType) if fileType == Annex => path
-      }.toSet
-      await(adminApi.list(Some(FileType.Normal))).map(info => info.path).toSet shouldBe paths.collect {
+      allNormalConfFilesF shouldBe Set("a/b/c/hcd/hcd.conf", "testing/test.conf")
+      allAnnexConfFilesF shouldBe Set("a/c/trombone.conf")
+      allNormalFilesF shouldBe paths.collect {
         case (path, fileType) if fileType == FileType.Normal => path
       }.toSet
-
-      // retrieve list using pattern; for demonstration purpose validate return values
-      await(adminApi.list(None, Some(".*.conf"))).map(info => info.path.toString).toSet shouldBe Set(
+      confFilesByPatternF shouldBe Set(
         "a/b/c/hcd/hcd.conf",
         "a/c/trombone.conf",
         "testing/test.conf"
       )
-      // retrieve list using pattern and file type; for demonstration purpose validate return values
-      await(adminApi.list(Some(FileType.Normal), Some(".*.conf"))).map(info => info.path.toString).toSet shouldBe
-      Set("a/b/c/hcd/hcd.conf", "testing/test.conf")
-      await(adminApi.list(Some(Annex), Some("a/c.*"))).map(info => info.path.toString).toSet shouldBe
-      Set("a/c/trombone.conf")
-      await(adminApi.list(Some(FileType.Normal), Some("test.*"))).map(info => info.path.toString).toSet shouldBe
-      Set("testing/test.conf")
+      allAnnexFilesF shouldBe paths.collect {
+        case (path, fileType) if fileType == Annex => path
+      }.toSet
+      testConfF shouldBe Set("testing/test.conf")
     }
-    Await.result(assertionF, 2.seconds)
-    // #list
+    Await.result(responsesF, 2.seconds)
   }
 
   test("history | DEOPSCSW-89, DEOPSCSW-592") {
@@ -275,17 +298,20 @@ class ConfigClientExampleTest
 
       // full file history
       val fullHistory = await(adminApi.history(filePath))
-      fullHistory.map(_.id) shouldBe List(id2, id1, id0)
-      fullHistory.map(_.comment) shouldBe List("third commit", "second commit", "first commit")
 
       // drop initial revision and take only update revisions
-      await(adminApi.history(filePath, tBeginUpdate, tEndUpdate)).map(_.id) shouldBe List(id2, id1)
+      val revisionsBetweenF = await(adminApi.history(filePath, tBeginUpdate, tEndUpdate)).map(_.id)
 
       // take last two revisions
-      await(adminApi.history(filePath, maxResults = 2)).map(_.id) shouldBe List(id2, id1)
+      val last2RevisionsF = await(adminApi.history(filePath, maxResults = 2)).map(_.id)
+      // #history
+      fullHistory.map(_.id) shouldBe List(id2, id1, id0)
+      fullHistory.map(_.comment) shouldBe List("third commit", "second commit", "first commit")
+      revisionsBetweenF shouldBe List(id2, id1)
+      last2RevisionsF shouldBe List(id2, id1)
     }
     Await.result(assertionF, 3.seconds)
-    // #history
+
   }
 
   test("historyActive-setActiveVersion-resetActiveVersion-getActiveVersion-getActiveByTime | DEOPSCSW-89, DEOPSCSW-592") {
@@ -294,10 +320,11 @@ class ConfigClientExampleTest
       val tBegin   = Instant.now()
       val filePath = Paths.get("/a/test.conf")
       // create will make the 1st revision active with a default comment
-      val id1 = await(adminApi.create(filePath, ConfigData.fromString(defaultStrConf), annex = false, "first"))
-      await(adminApi.historyActive(filePath)).map(_.id) shouldBe List(id1)
+      val id1      = await(adminApi.create(filePath, ConfigData.fromString(defaultStrConf), annex = false, "first"))
+      val activeId = await(adminApi.historyActive(filePath)).map(_.id)
+
       // ensure active version is set
-      await(adminApi.getActiveVersion(filePath)).get shouldBe id1
+      val activeVersionF = await(adminApi.getActiveVersion(filePath)).get
 
       // override the contents four times
       await(adminApi.update(filePath, ConfigData.fromString("changing contents"), "second"))
@@ -306,22 +333,38 @@ class ConfigClientExampleTest
       val id5 = await(adminApi.update(filePath, ConfigData.fromString("final final contents"), "fifth"))
 
       // update doesn't change the active revision
-      await(adminApi.historyActive(filePath)).map(_.id) shouldBe List(id1)
-
+      val idList = await(adminApi.historyActive(filePath)).map(_.id)
       // play with active version
       await(adminApi.setActiveVersion(filePath, id3, s"$id3 active"))
       await(adminApi.setActiveVersion(filePath, id4, s"$id4 active"))
-      await(adminApi.getActiveVersion(filePath)).get shouldBe id4
+      val id4F = await(adminApi.getActiveVersion(filePath)).get
       val tEnd = Instant.now()
       // reset active version to latest
       await(adminApi.resetActiveVersion(filePath, "latest active"))
-      await(adminApi.getActiveVersion(filePath)).get shouldBe id5
+      val id5F = await(adminApi.getActiveVersion(filePath)).get
+
       // finally set initial version as active
       await(adminApi.setActiveVersion(filePath, id1, s"$id1 active"))
-      await(adminApi.getActiveVersion(filePath)).get shouldBe id1
+      val id1F = await(adminApi.getActiveVersion(filePath)).get
 
-      // validate full history
+      //  get full history
       val fullHistory = await(adminApi.historyActive(filePath))
+
+      // drop initial revision and take only update revisions
+      val fragmentedHistory = await(adminApi.historyActive(filePath, tBegin, tEnd))
+
+      // take last three revisions
+      val last3Revisions = await(adminApi.historyActive(filePath, maxResults = 3)).map(_.id)
+
+      // get contents of active version at a specified instance
+      val initialContents       = await(adminApi.getActiveByTime(filePath, tBegin)).get
+      val initialContentsParseF = await(initialContents.toStringF(actorSystem))
+      // #active-file-mgmt
+
+      fragmentedHistory.size shouldBe 3
+      last3Revisions shouldBe List(id1, id5, id4)
+      initialContentsParseF shouldBe defaultStrConf
+      activeId shouldBe List(id1)
       fullHistory.map(_.id) shouldBe List(id1, id5, id4, id3, id1)
       fullHistory.map(_.comment) shouldBe List(
         s"$id1 active",
@@ -330,30 +373,24 @@ class ConfigClientExampleTest
         s"$id3 active",
         "initializing active file with the first version"
       )
-
-      // drop initial revision and take only update revisions
-      val fragmentedHistory = await(adminApi.historyActive(filePath, tBegin, tEnd))
-      fragmentedHistory.size shouldBe 3
-
-      // take last three revisions
-      await(adminApi.historyActive(filePath, maxResults = 3)).map(_.id) shouldBe List(id1, id5, id4)
-
-      // get contents of active version at a specified instance
-      val initialContents = await(adminApi.getActiveByTime(filePath, tBegin)).get
-      await(initialContents.toStringF(actorSystem)) shouldBe defaultStrConf
+      activeVersionF shouldBe id1
+      id4F shouldBe id4
+      id5F shouldBe id5
+      id1F shouldBe id1
+      idList shouldBe List(id1)
     }
     Await.result(assertionF, 5.seconds)
-    // #active-file-mgmt
   }
 
   test("getMetadata | DEOPSCSW-89, DEOPSCSW-592") {
     // #getMetadata
     val assertF = async {
       val metaData: ConfigMetadata = await(adminApi.getMetadata)
-      // repository path must not be empty
+      //  metaData.repoPath returns repository path
+      // #getMetadata
       metaData.repoPath should not be empty
     }
     Await.result(assertF, 2.seconds)
-    // #getMetadata
+
   }
 }

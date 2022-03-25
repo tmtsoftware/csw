@@ -120,43 +120,6 @@ public class JSampleHandlers extends JComponentHandlers {
     }
     //#worker-actor
 
-    private void handle2Stage(Id runId, ICommandService hcd) {
-
-        // Construct Setup command
-        Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime", JUnits.millisecond);
-        Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L);
-
-        Setup setupCommand = new Setup(cswCtx.componentInfo().prefix(), new CommandName("sleep"), Optional.of(ObsId.apply("2018A-P001-O123"))).add(sleepTimeParam);
-
-        Timeout submitTimeout = new Timeout(1, TimeUnit.SECONDS);
-        Timeout commandResponseTimeout = new Timeout(10, TimeUnit.SECONDS);
-
-        // Submit command, and handle validation response. Final response is returned as a Future
-        CompletableFuture<CommandResponse.SubmitResponse> submitCommandResponseF = hcd.submitAndWait(setupCommand, submitTimeout)
-                .thenApply(commandResponse -> {
-                    if (!(commandResponse instanceof CommandResponse.Invalid || commandResponse instanceof CommandResponse.Locked)) {
-                        return commandResponse;
-                    } else {
-                        log.error("Sleep command invalid");
-                        return new CommandResponse.Error(commandResponse.runId(), "test error");
-                    }
-                }).exceptionally(ex -> new CommandResponse.Error(runId, ex.getMessage()))
-                .toCompletableFuture();
-
-
-        // Wait for final response, and log result
-        submitCommandResponseF.toCompletableFuture().thenAccept(commandResponse -> {
-            if (commandResponse instanceof CommandResponse.Completed) {
-                log.info("Command completed successfully");
-            } else if (commandResponse instanceof CommandResponse.Error) {
-                CommandResponse.Error x = (CommandResponse.Error) commandResponse;
-                log.error(() -> "Command Completed with error: " + x.message());
-            } else {
-                log.error("Command failed");
-            }
-        });
-    }
-
     //#initialize
     private Optional<IEventSubscription> maybeEventSubscription = Optional.empty();
 

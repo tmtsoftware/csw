@@ -31,7 +31,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-public class JConfigClientExampleTest extends JUnitSuite {
+public class JConfigClientExample extends JUnitSuite {
 
     // DEOPSCSW-592: Create csw testkit for component writers
     @ClassRule
