@@ -50,7 +50,6 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     private final CommandResponseManager commandResponseManager;
     private final TimeServiceScheduler timeServiceScheduler;
     private final CurrentStatePublisher currentStatePublisher;
-    private final TimeServiceScheduler timeServiceScheduler;
     private final CurrentState currentState = new CurrentState(SampleComponentState.prefix(), new StateName("testStateName"));
     private final ActorContext<TopLevelActorMessage> actorContext;
     private final IEventService eventService;

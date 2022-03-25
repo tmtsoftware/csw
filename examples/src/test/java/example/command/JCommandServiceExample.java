@@ -39,7 +39,6 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.scalatestplus.junit.JUnitSuite;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
@@ -55,7 +54,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static csw.params.commands.CommandResponse.*;
 import static org.tmt.csw.sample.ComponentStateForCommand.*;
 
-public class JCommandServiceExample extends JUnitSuite {
+public class JCommandServiceExample {
     private static final ActorSystem<SpawnProtocol.Command> hcdActorSystem = ActorSystemFactory.remote(SpawnProtocol.create(), "test");
 
     private static JHTTPLocationService jHttpLocationService;
