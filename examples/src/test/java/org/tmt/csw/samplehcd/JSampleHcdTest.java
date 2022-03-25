@@ -33,7 +33,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.scalatestplus.junit.JUnitSuite;
 
 import java.time.Duration;
 import java.util.*;
@@ -43,7 +42,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 //#setup
-public class JSampleHcdTest extends JUnitSuite {
+public class JSampleHcdTest {
 
     @ClassRule
     public static final FrameworkTestKitJunitResource testKit =

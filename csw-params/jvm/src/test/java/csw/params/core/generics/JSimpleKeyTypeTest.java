@@ -5,7 +5,6 @@ import csw.time.core.models.TAITime;
 import csw.time.core.models.UTCTime;
 import org.junit.Assert;
 import org.junit.Test;
-import org.scalatestplus.junit.JUnitSuite;
 
 import java.time.Instant;
 
@@ -16,7 +15,7 @@ import static csw.params.javadsl.JUnits.*;
 // DEOPSCSW-190: Implement Unit Support
 // DEOPSCSW-184: Change configurations - attributes and values
 @SuppressWarnings({"RedundantCast", "unchecked"}) // false negative, test fails if you remove explicit type.
-public class JSimpleKeyTypeTest extends JUnitSuite {
+public class JSimpleKeyTypeTest {
 
     @Test
     public void testBooleanKeyParameter__DEOPSCSW_183_DEOPSCSW_185_DEOPSCSW_190_DEOPSCSW_184() {

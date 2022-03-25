@@ -15,7 +15,6 @@ import csw.prefix.javadsl.JSubsystem;
 import csw.time.core.models.UTCTime;
 import org.junit.Assert;
 import org.junit.Test;
-import org.scalatestplus.junit.JUnitSuite;
 import play.api.libs.json.JsValue;
 import play.api.libs.json.Json;
 
@@ -28,7 +27,7 @@ import static csw.params.javadsl.JUnits.NoUnits;
 import static csw.params.javadsl.JUnits.meter;
 
 @SuppressWarnings("unchecked")
-public class JStateVariablesExample extends JUnitSuite {
+public class JStateVariablesExample {
 
     @Test
     public void showUsageOfDemandState() {

@@ -15,9 +15,10 @@ object Common {
     // -C - to give fully qualified name of the custom reporter
     if (storyReport)
       Seq(
-        Tests.Argument(TestFrameworks.ScalaTest, "-oDF", "-C", "tmt.test.reporter.TestReporter")
+        Tests.Argument(TestFrameworks.ScalaTest, "-oDF", "-C", "tmt.test.reporter.TestReporter"),
+        Tests.Argument(TestFrameworks.JUnit, "-v", "--run-listener=tmt.test.reporter.JUnit4TestReporter")
       )
-    else Seq(Tests.Argument("-oDF"))
+    else Seq(Tests.Argument(TestFrameworks.JUnit, "-v"), Tests.Argument("-oDF"))
 
   val MaybeCoverage: Plugins = if (enableCoverage) Coverage else Plugins.empty
   val jsTestArg              = Test / testOptions := Seq(Tests.Argument("-oDF"))
@@ -65,7 +66,7 @@ object Common {
     // and the maven repo match
     version := sys.env.getOrElse("JITPACK_VERSION", "0.1.0-SNAPSHOT"),
     fork    := true,
-    Test / javaOptions ++= Seq("-Dakka.actor.serialize-messages=on"),
+    Test / javaOptions ++= Seq("-Dakka.actor.serialize-messages=on", s"-DRTM_PATH=${file("./target/RTM").getAbsolutePath}"),
     autoCompilerPlugins     := true,
     Global / cancelable     := true, // allow ongoing test(or any task) to cancel with ctrl + c and still remain inside sbt
     scalafmtOnCompile       := true,

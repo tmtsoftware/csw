@@ -7,7 +7,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.scalatestplus.junit.JUnitSuite;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,7 +19,7 @@ import static csw.params.javadsl.JUnits.*;
 // DEOPSCSW-184: Change configurations - attributes and values
 @SuppressWarnings("RedundantCast") // false negative, test fails if you remove explicit type.
 @RunWith(value = Parameterized.class)
-public class JMatrixKeyTypeTest extends JUnitSuite {
+public class JMatrixKeyTypeTest {
 
     private final String keyName;
     private final SimpleKeyType<MatrixData<?>> matrixKey;

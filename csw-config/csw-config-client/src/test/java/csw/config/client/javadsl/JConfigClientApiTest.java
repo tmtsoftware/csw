@@ -8,7 +8,6 @@ import csw.config.api.javadsl.IConfigService;
 import csw.config.client.JConfigClientBaseSuite;
 import csw.config.models.ConfigId;
 import org.junit.*;
-import org.scalatestplus.junit.JUnitSuite;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,7 +15,7 @@ import java.util.concurrent.ExecutionException;
 
 // DEOPSCSW-138:Split Config API into Admin API and Client API
 // DEOPSCSW-103: Java API for Configuration service
-public class JConfigClientApiTest extends JUnitSuite {
+public class JConfigClientApiTest {
 
     private static JConfigClientBaseSuite jConfigClientBaseSuite;
     private static IConfigService configService;

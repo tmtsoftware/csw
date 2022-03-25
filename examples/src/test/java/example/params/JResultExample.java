@@ -13,7 +13,6 @@ import csw.prefix.models.Prefix;
 import csw.prefix.javadsl.JSubsystem;
 import org.junit.Assert;
 import org.junit.Test;
-import org.scalatestplus.junit.JUnitSuite;
 import play.api.libs.json.JsValue;
 import play.api.libs.json.Json;
 
@@ -23,7 +22,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
-public class JResultExample extends JUnitSuite {
+public class JResultExample {
 
     //#runid
     Id runId = Id.apply();

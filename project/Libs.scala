@@ -31,13 +31,13 @@ object Libs {
   val `reactive-streams` = "org.reactivestreams" % "reactive-streams" % "1.0.3"
   val `akka-stream-kafka` =
     "com.typesafe.akka" %% "akka-stream-kafka" % "2.1.0" // 2.1.1 version is breaking csw-event-client tests
-  val `embedded-kafka` = "io.github.embeddedkafka" %% "embedded-kafka" % "3.0.0"
-  val `embedded-redis` = "com.github.kstyrc"        % "embedded-redis" % "0.6"
-  val `scala-compiler` = "org.scala-lang"           % "scala-compiler" % ScalaVersion
-  val `HdrHistogram`   = "org.hdrhistogram"         % "HdrHistogram"   % "2.1.12"
-  val `testng`         = "org.testng"               % "testng"         % "7.5.0"
-  val `junit-4-13`     = "org.scalatestplus"       %% "junit-4-13"     % "3.2.10.0"
-  val `testng-6-7`     = "org.scalatestplus"       %% "testng-6-7"     % "3.2.10.0"
+  val `embedded-kafka`   = "io.github.embeddedkafka" %% "embedded-kafka"  % "3.0.0"
+  val `embedded-redis`   = "com.github.kstyrc"        % "embedded-redis"  % "0.6"
+  val `scala-compiler`   = "org.scala-lang"           % "scala-compiler"  % ScalaVersion
+  val `HdrHistogram`     = "org.hdrhistogram"         % "HdrHistogram"    % "2.1.12"
+  val `testng`           = "org.testng"               % "testng"          % "7.5.0"
+  val `junit4-interface` = "com.github.sbt"           % "junit-interface" % "0.13.2"
+  val `testng-6-7`       = "org.scalatestplus"       %% "testng-6-7"      % "3.2.10.0"
 
   val `scala-csv`             = "com.github.tototoshi" %% "scala-csv"             % "1.3.10"
   val `json-schema-validator` = "com.github.fge"        % "json-schema-validator" % "2.2.14" // LGPL/ASL
@@ -53,7 +53,7 @@ object Libs {
   val `caffeine`          = "com.github.ben-manes.caffeine" % "caffeine"          % "3.0.5"
   val netty               = "io.netty"                      % "netty-all"         % "4.1.73.Final"
   val `case-app`          = "com.github.alexarchambault"   %% "case-app"          % "2.0.6"
-  val `tmt-test-reporter` = "com.github.tmtsoftware"       %% "rtm"               % "0.3.0"
+  val `tmt-test-reporter` = "com.github.tmtsoftware"       %% "rtm"               % "eb9092b"
 }
 
 object Borer {

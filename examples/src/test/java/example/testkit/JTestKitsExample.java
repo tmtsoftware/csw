@@ -17,13 +17,12 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.scalatestplus.junit.JUnitSuite;
 
 import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
-public class JTestKitsExample extends JUnitSuite {
+public class JTestKitsExample {
 
     //#framework-testkit
     private static final FrameworkTestKit frameworkTestKit = FrameworkTestKit.create();

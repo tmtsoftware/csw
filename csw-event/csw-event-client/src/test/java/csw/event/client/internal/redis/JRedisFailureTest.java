@@ -15,7 +15,6 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.scalatestplus.junit.JUnitSuite;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -27,7 +26,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 
 //DEOPSCSW-398: Propagate failure for publish api (eventGenerator)
-public class JRedisFailureTest extends JUnitSuite {
+public class JRedisFailureTest {
 
     private static RedisTestProps redisTestProps;
 

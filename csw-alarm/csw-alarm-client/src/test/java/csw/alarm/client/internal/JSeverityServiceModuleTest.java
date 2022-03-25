@@ -15,7 +15,6 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.scalatestplus.junit.JUnitSuite;
 import scala.concurrent.Await;
 import scala.concurrent.duration.FiniteDuration;
 
@@ -27,7 +26,7 @@ import static org.junit.Assert.*;
 
 // DEOPSCSW-444: Set severity api for component
 // CSW-83: Alarm models should take prefix
-public class JSeverityServiceModuleTest extends JUnitSuite {
+public class JSeverityServiceModuleTest {
 
     private static final AlarmServiceTestSetup alarmServiceTestSetup = new AlarmServiceTestSetup();
     private static final IAlarmService jAlarmService = alarmServiceTestSetup.jAlarmService();

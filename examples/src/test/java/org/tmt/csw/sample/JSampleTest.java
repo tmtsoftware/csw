@@ -13,7 +13,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.scalatestplus.junit.JUnitSuite;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -21,7 +20,7 @@ import java.util.concurrent.ExecutionException;
 
 // DEOPSCSW-39: examples of Location Service
 //#intro
-public class JSampleTest extends JUnitSuite {
+public class JSampleTest {
     @ClassRule
     public static final FrameworkTestKitJunitResource testKit =
             new FrameworkTestKitJunitResource(Arrays.asList(JCSWService.AlarmServer, JCSWService.EventServer));

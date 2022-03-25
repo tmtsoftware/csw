@@ -28,7 +28,6 @@ import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
 import msocket.api.Subscription;
 import org.junit.*;
-import org.scalatestplus.junit.JUnitSuite;
 import scala.concurrent.Await;
 import scala.concurrent.duration.FiniteDuration;
 
@@ -41,7 +40,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-public class JLocationServiceImplTest extends JUnitSuite {
+public class JLocationServiceImplTest {
 
     private static ServerWiring wiring;
 

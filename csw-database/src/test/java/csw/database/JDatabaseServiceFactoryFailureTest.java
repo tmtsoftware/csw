@@ -9,7 +9,6 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.scalatestplus.junit.JUnitSuite;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 
@@ -18,7 +17,7 @@ import java.util.concurrent.ExecutionException;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 //DEOPSCSW-615: DB service accessible to CSW component developers
-public class JDatabaseServiceFactoryFailureTest extends JUnitSuite {
+public class JDatabaseServiceFactoryFailureTest {
 
     private static ActorSystem<SpawnProtocol.Command> system;
     private static EmbeddedPostgres postgres;

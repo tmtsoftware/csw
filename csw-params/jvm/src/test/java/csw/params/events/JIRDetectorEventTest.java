@@ -7,13 +7,12 @@ import csw.params.javadsl.JUnits;
 import csw.prefix.models.Prefix;
 import org.junit.Assert;
 import org.junit.Test;
-import org.scalatestplus.junit.JUnitSuite;
 
 import java.util.*;
 
 import static csw.prefix.javadsl.JSubsystem.ESW;
 
-public class JIRDetectorEventTest extends JUnitSuite {
+public class JIRDetectorEventTest {
     Prefix sourcePrefix = new Prefix(ESW, "filter.wheel");
     ObsId obsId = ObsId.apply("2020A-001-123");
     Parameter<String> obsIdParam = JKeyType.StringKey().make("obsId").set(obsId.toString());

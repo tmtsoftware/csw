@@ -6,7 +6,6 @@ import csw.time.core.models.utils.TestProperties;
 import csw.time.core.models.utils.TestUtil;
 import org.junit.Assert;
 import org.junit.Test;
-import org.scalatestplus.junit.JUnitSuite;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -16,7 +15,7 @@ import java.time.ZonedDateTime;
 import static csw.time.core.utils.Eventually.eventually;
 import static org.junit.Assert.assertFalse;
 
-public class JTMTTimeHelperTest extends JUnitSuite {
+public class JTMTTimeHelperTest {
     private final TestProperties testProperties = JTestProperties.instance();
 
     //DEOPSCSW-541: PTP accuracy and precision while reading remote location time

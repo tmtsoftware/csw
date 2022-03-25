@@ -18,11 +18,11 @@ import csw.framework.internal.wiring.FrameworkWiring;
 import csw.framework.internal.wiring.Standalone;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.api.javadsl.JComponentType;
-import csw.location.client.ActorSystemFactory;
-import csw.location.client.javadsl.JHttpLocationServiceFactory;
 import csw.location.api.models.AkkaLocation;
 import csw.location.api.models.ComponentId;
 import csw.location.api.models.Connection.AkkaConnection;
+import csw.location.client.ActorSystemFactory;
+import csw.location.client.javadsl.JHttpLocationServiceFactory;
 import csw.location.server.http.JHTTPLocationService;
 import csw.params.commands.CommandIssue;
 import csw.params.commands.CommandResponse;
@@ -37,15 +37,14 @@ import csw.params.core.states.DemandState;
 import csw.params.core.states.StateName;
 import csw.params.javadsl.JKeyType;
 import csw.params.javadsl.JUnits;
-import csw.prefix.models.Prefix;
 import csw.prefix.javadsl.JSubsystem;
+import csw.prefix.models.Prefix;
 import io.lettuce.core.RedisClient;
 import msocket.api.Subscription;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.scalatestplus.junit.JUnitSuite;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
@@ -70,7 +69,7 @@ import static csw.common.components.command.ComponentStateForCommand.*;
 // DEOPSCSW-317: Use state values of HCD to determine command completion
 // DEOPSCSW-321: AkkaLocation provides wrapper for ActorRef[ComponentMessage]
 @SuppressWarnings("unchecked")
-public class JCommandIntegrationTest extends JUnitSuite {
+public class JCommandIntegrationTest {
     private static final ActorSystem<SpawnProtocol.Command> hcdActorSystem = ActorSystemFactory.remote(SpawnProtocol.create(), "test");
 
     private static JHTTPLocationService jHttpLocationService;
@@ -326,9 +325,9 @@ public class JCommandIntegrationTest extends JUnitSuite {
         CompletableFuture<SubmitResponse> mediumSubmit = hcdCmdService.submitAndWait(qfAllSetup2, timeout);
         CompletableFuture<SubmitResponse> longSubmit = hcdCmdService.submitAndWait(qfAllSetup3, timeout);
 
-        longSubmit.get();
-        mediumSubmit.get();
         shortSubmit.get();
+        mediumSubmit.get();
+        longSubmit.get();
         // Subscriber code
         int expectedEncoderValue = 234;
         Setup currStateSetup = new Setup(prefix(), hcdCurrentStateCmd(), Optional.empty()).add(encoder.set(expectedEncoderValue));

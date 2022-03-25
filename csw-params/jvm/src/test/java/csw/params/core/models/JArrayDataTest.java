@@ -2,11 +2,10 @@ package csw.params.core.models;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.scalatestplus.junit.JUnitSuite;
 
 // DEOPSCSW-183: Configure attributes and values
 @SuppressWarnings("RedundantCast") // false negative, test fails if you remove explicit type.
-public class JArrayDataTest extends JUnitSuite {
+public class JArrayDataTest {
 
     @Test
     public void shouldCreateArrayDataFromJavaArray__DEOPSCSW_183() {

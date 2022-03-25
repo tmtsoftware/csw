@@ -11,7 +11,6 @@ import csw.time.core.models.TAITime;
 import csw.time.scheduler.TimeServiceSchedulerFactory;
 import org.junit.Rule;
 import org.junit.Test;
-import org.scalatestplus.junit.JUnitSuite;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.time.Duration;
@@ -21,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 
-public class JTimeServiceSchedulerTest extends JUnitSuite {
+public class JTimeServiceSchedulerTest {
 
     @Rule
     public final TestKitJunitResource testKit = new TestKitJunitResource(ManualTime.config());

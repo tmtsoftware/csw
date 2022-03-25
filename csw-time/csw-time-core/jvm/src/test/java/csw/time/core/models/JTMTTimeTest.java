@@ -5,7 +5,6 @@ import csw.time.core.models.utils.JTestProperties;
 import csw.time.core.models.utils.TestProperties;
 import csw.time.core.models.utils.TestUtil;
 import org.junit.Test;
-import org.scalatestplus.junit.JUnitSuite;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.time.Duration;
@@ -15,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
-public class JTMTTimeTest extends JUnitSuite {
+public class JTMTTimeTest {
 
     private static final int TaiOffset = TimeConstants$.MODULE$.taiOffset();
     private final int jitter = 100;

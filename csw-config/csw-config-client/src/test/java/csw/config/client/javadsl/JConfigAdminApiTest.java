@@ -12,7 +12,6 @@ import csw.config.models.ConfigFileRevision;
 import csw.config.models.ConfigId;
 import csw.config.models.ConfigMetadata;
 import org.junit.*;
-import org.scalatestplus.junit.JUnitSuite;
 import scala.Some;
 
 import java.nio.file.Path;
@@ -32,7 +31,7 @@ import static org.mockito.Mockito.when;
 // DEOPSCSW-138: Split Config API into Admin API and Client API
 // DEOPSCSW-103: Java API for Configuration service
 @SuppressWarnings("unchecked")
-public class JConfigAdminApiTest extends JUnitSuite {
+public class JConfigAdminApiTest {
 
     private static JConfigClientBaseSuite jConfigClientBaseSuite;
     private static IConfigService configService;

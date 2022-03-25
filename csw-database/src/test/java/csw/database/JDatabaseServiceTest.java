@@ -14,7 +14,6 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.scalatestplus.junit.JUnitSuite;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 
@@ -29,7 +28,7 @@ import static org.junit.Assert.*;
 
 //DEOPSCSW-601: Create Database API
 //DEOPSCSW-616: Create a method to send a query (select) sql string to a database
-public class JDatabaseServiceTest extends JUnitSuite {
+public class JDatabaseServiceTest {
     private static ActorSystem<SpawnProtocol.Command> system;
     private static EmbeddedPostgres postgres;
     private static DSLContext dsl;

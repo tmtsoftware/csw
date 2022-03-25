@@ -17,7 +17,6 @@ import csw.params.javadsl.JUnits;
 import csw.time.core.models.UTCTime;
 import org.junit.Assert;
 import org.junit.Test;
-import org.scalatestplus.junit.JUnitSuite;
 import play.api.libs.json.JsValue;
 import play.api.libs.json.Json;
 
@@ -26,7 +25,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
-public class JCommandsExample extends JUnitSuite {
+public class JCommandsExample {
     //#obsid
     final ObsId obsId = ObsId.apply("2020A-001-123");
     //#obsid

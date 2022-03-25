@@ -50,6 +50,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     private final CommandResponseManager commandResponseManager;
     private final TimeServiceScheduler timeServiceScheduler;
     private final CurrentStatePublisher currentStatePublisher;
+    private final TimeServiceScheduler timeServiceScheduler;
     private final CurrentState currentState = new CurrentState(SampleComponentState.prefix(), new StateName("testStateName"));
     private final ActorContext<TopLevelActorMessage> actorContext;
     private final IEventService eventService;
@@ -82,8 +83,11 @@ public class JSampleComponentHandlers extends JComponentHandlers {
 
     @Override
     public CommandResponse.ValidateCommandResponse validateCommand(Id runId, ControlCommand controlCommand) {
-        if (controlCommand.commandName().equals(hcdCurrentStateCmd())) {
-            // This is special because test doesn't want these other CurrentState values published
+        if (controlCommand.commandName().equals(longRunning())) {
+            return new CommandResponse.Accepted(runId);
+        } else if (controlCommand.commandName().equals(shortRunning())) {
+            return new CommandResponse.Accepted(runId);
+        } else if (controlCommand.commandName().equals(mediumRunning())) {
             return new CommandResponse.Accepted(runId);
         } else if (controlCommand.commandName().equals(longRunning())) {
             return new CommandResponse.Accepted(runId);
@@ -92,6 +96,9 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         } else if (controlCommand.commandName().equals(mediumRunning())) {
             return new CommandResponse.Accepted(runId);
         } else if (controlCommand.commandName().equals(crmAddOrUpdateCmd())) {
+            return new CommandResponse.Accepted(runId);
+        } else if (controlCommand.commandName().equals(hcdCurrentStateCmd())) {
+            // This is special because test doesn't want these other CurrentState values published
             return new CommandResponse.Accepted(runId);
         } else {
             // All other tests

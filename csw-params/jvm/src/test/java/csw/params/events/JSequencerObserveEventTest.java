@@ -11,11 +11,10 @@ import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
 import org.junit.Assert;
 import org.junit.Test;
-import org.scalatestplus.junit.JUnitSuite;
 
 import java.util.*;
 
-public class JSequencerObserveEventTest extends JUnitSuite {
+public class JSequencerObserveEventTest {
     final Prefix prefix = new Prefix(JSubsystem.ESW, "filter.wheel");
     final ObsId obsId = ObsId.apply("2020A-001-123");
     final ExposureId exposureId = ExposureId.fromString("2021A-001-123-TCS-DET-SCI2-1234");

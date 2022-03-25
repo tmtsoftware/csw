@@ -9,12 +9,11 @@ import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
 import org.junit.Assert;
 import org.junit.Test;
-import org.scalatestplus.junit.JUnitSuite;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class JWFSDetectorEventTest extends JUnitSuite {
+public class JWFSDetectorEventTest {
     Prefix sourcePrefix = new Prefix(JSubsystem.ESW, "filter.wheel");
     ExposureId exposureId = ExposureId.fromString("2022A-001-123-IRIS-IMG-DRK1-0023");
 

@@ -6,7 +6,6 @@ import csw.testkit.javadsl.JCSWService;
 import org.jooq.DSLContext;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.scalatestplus.junit.JUnitSuite;
 
 import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
@@ -15,7 +14,7 @@ import java.util.concurrent.TimeoutException;
 
 //#CSW-161
 //#junit-database-testkit
-class JUnitDatabaseTestKitExample extends JUnitSuite {
+class JUnitDatabaseTestKitExample {
 
     @ClassRule
     public static final FrameworkTestKitJunitResource testKit =
