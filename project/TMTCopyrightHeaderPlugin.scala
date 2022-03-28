@@ -23,7 +23,8 @@ object TMTCopyrightHeaderPlugin extends AutoPlugin {
       headerMappings := headerMappings.value ++ Map(
         HeaderFileType.scala -> cStyleComment,
         HeaderFileType.java  -> cStyleComment
-      )
+      ),
+      headerSources / excludeFilter := HiddenFileFilter || "empty.scala"
     )
   }
 
