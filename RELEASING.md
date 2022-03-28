@@ -53,7 +53,7 @@ A milestone release is cut from master branch as we expect bug fixes / feedback 
 12. Update secondary packages versions if necessary (this step to be done only in milestone & RC release).
 13. Update latest RTM version in github and jenkins workflow files(this step to be done only in milestone & RC release).
 14. Update versions in `release.yml'` for other repos like `ESW_TS_VERSION` etc. which we will be releasing next. (These versions are used to create parameterized links in the documentation)
-15. Run command `headerCheck` inside sbt to verify if there are files without copyright header.
+15. Run command `headerCheckAll` inside sbt to verify if there are files without copyright header.
 16. Commit and push the changes to `branch-<major>.<minor>.x` branch.
 17. Make sure build is green for dev and paradox link check pipeline for this branch.
 18. Set `PROD=true` environment variable and Run `release.sh $VERSION$` script by providing version number argument (This triggers release workflow)
