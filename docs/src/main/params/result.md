@@ -5,7 +5,6 @@ as an argument to the `Completed` `SubmitResponse`.
 
 Creating a Result Requires:
 
- * **[Prefix](commands.html#Prefix)**
  * **[Set[Parameter]](keys-parameters.html)**
 
 Scala

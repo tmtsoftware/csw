@@ -4,7 +4,7 @@ TMT Observatory system is composed of many subsystems. The subsystems that are k
 System are predefined and the list is covered under the `Subsystem` enumeration. They are identified using an
 abbreviation typically of 3 or 4 letters.
 
-**Susbsystem** values are used to construct **[Prefix](commands.html#Prefix)** and are used in communication vehicles
+**Susbsystem** values are used to construct **[Source](commands.html#Source)** and are used in communication vehicles
 such as Commands, Events and States.
 
 @@@ note

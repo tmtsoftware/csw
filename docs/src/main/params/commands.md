@@ -15,7 +15,7 @@ Scala
 Java
 :   @@snip [JCommandsExample.java](../../../../examples/src/test/java/example/params/JCommandsExample.java) { #obsid }
 
-## Prefix
+## Source
 
 The source of the command is given by the prefix, which should be the full name of the component sending the command.
 A prefix can be constructed with a string, but must start with a valid subsystem as in [Subsystem](subsystem.html).
@@ -41,7 +41,7 @@ This command is used to describe a goal that a system should match. The componen
 following arguments to create a `Setup` command.
 
  
- * **[Prefix:](commands.html#Prefix)** the source of the command as described above 
+ * **[Source:](commands.html#Source)** the source of the command as described above 
  * **[CommandName:](commands.html#CommandName)** a simple string name for the command (no spaces)
  * **[ObsId:](commands.html#ObsId)**  an optional observation Id.
  * **paramSet:** Optional Set of Parameters. Default is empty.

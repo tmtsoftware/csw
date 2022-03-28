@@ -5,7 +5,6 @@ import csw.params.core.formats.JsonSupport
 import csw.params.core.generics.KeyType.DoubleMatrixKey
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models._
-import csw.prefix.models.Prefix
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -24,9 +23,6 @@ class ResultExample extends AnyFunSpec with Matchers {
       val k2: Key[Int]    = KeyType.IntKey.make("windspeed")
       val k3: Key[String] = KeyType.StringKey.make("filter")
       val k4: Key[Int]    = KeyType.IntKey.make("notUsed")
-
-      // prefixes
-      val prefix = Prefix("wfos.prog.cloudcover")
 
       // parameters
       val p1: Parameter[Int]    = k1.set(22)
@@ -111,9 +107,6 @@ class ResultExample extends AnyFunSpec with Matchers {
         Array(7.2, 8.2, 9.2)
       )
 
-      // prefixes
-      val prefix = Prefix("wfos.prog.cloudcover")
-
       // parameter
       val i1: Parameter[MatrixData[Double]] = k1.set(m1)
 
@@ -147,9 +140,6 @@ class ResultExample extends AnyFunSpec with Matchers {
       val encoderKey: Key[Int] = KeyType.IntKey.make("encoder")
       val filterKey: Key[Int]  = KeyType.IntKey.make("filter")
       val miscKey: Key[Int]    = KeyType.IntKey.make("misc.")
-
-      // prefix
-      val prefix = Prefix("wfos.blue.filter")
 
       // params
       val encParam1 = encoderKey.set(1)

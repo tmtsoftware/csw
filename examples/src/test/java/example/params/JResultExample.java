@@ -9,8 +9,6 @@ import csw.params.core.models.MatrixData;
 import csw.params.core.models.ObsId;
 import csw.params.javadsl.JKeyType;
 import csw.params.javadsl.JUnits;
-import csw.prefix.models.Prefix;
-import csw.prefix.javadsl.JSubsystem;
 import org.junit.Assert;
 import org.junit.Test;
 import play.api.libs.json.JsValue;
@@ -90,9 +88,6 @@ public class JResultExample {
         //ObsId
         ObsId obsId = ObsId.apply("2020A-001-123");
 
-        //prefix
-        Prefix prefix = Prefix.apply(JSubsystem.WFOS, "prog.cloudcover");
-
         //result
         Result result = new Result().add(i1);
 
@@ -119,9 +114,6 @@ public class JResultExample {
 
         //ObsId
         ObsId obsId = ObsId.apply("2020A-001-123");
-
-        //prefix
-        Prefix prefix = Prefix.apply(JSubsystem.WFOS, "blue.filter");
 
         //params
         Parameter<Integer> encParam1 = encoderKey.set(1);

@@ -25,22 +25,22 @@ class CommandsExample extends AnyFunSpec with Matchers {
 
       // #prefix
       // using constructor, supplying subsystem and prefix both
-      val prefix1: Prefix = Prefix("nfiraos.ncc.trombone")
+      val source1: Prefix = Prefix("nfiraos.ncc.trombone")
 
       // just by supplying prefix
-      val prefix2: Prefix = Prefix("tcs.mobie.blue.filter")
+      val source2: Prefix = Prefix("tcs.mobie.blue.filter")
 
       // invalid prefix string which does not contain valid subsystem in the beginning will throw an exception,
-      // val badPrefix: Prefix = Prefix("abcdefgh")
+      // val badSource: Prefix = Prefix("abcdefgh")
 
       // use implicit conversion to convert from String to Prefix
-      val prefix3: Prefix = Prefix("wfos.prog.cloudcover")
+      val source3: Prefix = Prefix("wfos.prog.cloudcover")
       // #prefix
 
       // validations
-      assert(prefix1.subsystem === Subsystem.NFIRAOS)
-      assert(prefix2.subsystem === Subsystem.TCS)
-      assert(prefix3.subsystem === Subsystem.WFOS)
+      assert(source1.subsystem === Subsystem.NFIRAOS)
+      assert(source2.subsystem === Subsystem.TCS)
+      assert(source3.subsystem === Subsystem.WFOS)
     }
   }
 
@@ -56,14 +56,14 @@ class CommandsExample extends AnyFunSpec with Matchers {
       val k4: Key[Float]  = KeyType.FloatKey.make("correction")
 
       // prefix
-      val prefix: Prefix = Prefix("wfos.red.detector")
+      val source: Prefix = Prefix("wfos.red.detector")
 
       // parameters
       val i1: Parameter[Int]    = k1.set(22)
       val i2: Parameter[String] = k2.set("A")
 
       // create Setup, add sequentially using add
-      val sc1: Setup = Setup(prefix, CommandName("move"), Some(obsId)).add(i1).add(i2)
+      val sc1: Setup = Setup(source, CommandName("move"), Some(obsId)).add(i1).add(i2)
 
       // access keys
       val k1Exists: Boolean = sc1.exists(k1) // true
@@ -85,7 +85,7 @@ class CommandsExample extends AnyFunSpec with Matchers {
       val b1: Parameter[Byte] = byteKey1.setAll(bytes1)
       val b2: Parameter[Byte] = byteKey2.setAll(bytes2)
 
-      val sc3: Setup = Setup(prefix, CommandName("move"), Some(obsId), Set(b1, b2))
+      val sc3: Setup = Setup(source, CommandName("move"), Some(obsId), Set(b1, b2))
 
       // remove a key
       val sc4: Setup = sc3.remove(b1)
@@ -115,14 +115,14 @@ class CommandsExample extends AnyFunSpec with Matchers {
       val k4: Key[UTCTime] = KeyType.UTCTimeKey.make("creation-time")
 
       // prefix
-      val prefix: Prefix = Prefix("wfos.red.detector")
+      val source: Prefix = Prefix("wfos.red.detector")
 
       // parameters
       val i1: Parameter[Boolean] = k1.set(true, false, true, false)
       val i2: Parameter[Int]     = k2.set(1, 2, 3, 4)
 
       // create Observe, add sequentially using add
-      val oc1: Observe = Observe(prefix, CommandName("move"), Some(obsId)).add(i1).add(i2)
+      val oc1: Observe = Observe(source, CommandName("move"), Some(obsId)).add(i1).add(i2)
 
       // access parameters using apply method
       val k1Param: Parameter[Boolean] = oc1.get(k1).get // true
@@ -167,10 +167,10 @@ class CommandsExample extends AnyFunSpec with Matchers {
       val i2: Parameter[Int]     = k2.set(1, 2, 3, 4)
 
       // prefix
-      val prefix: Prefix = Prefix("wfos.red.detector")
+      val source: Prefix = Prefix("wfos.red.detector")
 
       // create wait, add sequentially using add
-      val wc1: Wait = Wait(prefix, CommandName("move"), Some(obsId)).add(i1).add(i2)
+      val wc1: Wait = Wait(source, CommandName("move"), Some(obsId)).add(i1).add(i2)
 
       // access params using get method
       val k1Param: Option[Parameter[Boolean]] = wc1.get(k1)
@@ -218,15 +218,15 @@ class CommandsExample extends AnyFunSpec with Matchers {
       )
 
       // prefix
-      val prefix: Prefix = Prefix("wfos.red.detector")
+      val source: Prefix = Prefix("wfos.red.detector")
 
       // parameter
       val i1: Parameter[MatrixData[Double]] = k1.set(m1)
 
       // commands
-      val sc: Setup   = Setup(prefix, CommandName("move"), Some(obsId)).add(i1)
-      val oc: Observe = Observe(prefix, CommandName("move"), Some(obsId)).add(i1)
-      val wc: Wait    = Wait(prefix, CommandName("move"), Some(obsId)).add(i1)
+      val sc: Setup   = Setup(source, CommandName("move"), Some(obsId)).add(i1)
+      val oc: Observe = Observe(source, CommandName("move"), Some(obsId)).add(i1)
+      val wc: Wait    = Wait(source, CommandName("move"), Some(obsId)).add(i1)
 
       // json support - write
       val scJson: JsValue = JsonSupport.writeSequenceCommand(sc)
@@ -263,7 +263,7 @@ class CommandsExample extends AnyFunSpec with Matchers {
       val miscKey: Key[Int]    = KeyType.IntKey.make("misc.")
 
       // prefix
-      val prefix: Prefix = Prefix("wfos.red.detector")
+      val source: Prefix = Prefix("wfos.red.detector")
 
       // params
       val encParam1: Parameter[Int] = encoderKey.set(1)
@@ -279,7 +279,7 @@ class CommandsExample extends AnyFunSpec with Matchers {
       // Setup command with duplicate key via constructor
       val setup: Setup =
         Setup(
-          prefix,
+          source,
           CommandName("move"),
           Some(obsId),
           Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3)
@@ -315,19 +315,19 @@ class CommandsExample extends AnyFunSpec with Matchers {
   describe("Examples of clone command") {
     val k1             = KeyType.IntKey.make("itest")
     val commandName    = CommandName("command-name")
-    val prefix: Prefix = Prefix("wfos.red.detector")
+    val source: Prefix = Prefix("wfos.red.detector")
 
     val i1 = k1.set(1, 2, 3).withUnits(degree)
     /*
     it("clone command creates a command from existing command with a new RunId for Setup, Observe or Wait") {
       //#clone-command
-      val setup  = Setup(prefix, commandName, Some(obsId)).madd(i1)
+      val setup  = Setup(source, commandName, Some(obsId)).madd(i1)
       val setup2 = setup.cloneCommand
 
-      val observe  = Observe(prefix, commandName, Some(obsId)).madd(i1)
+      val observe  = Observe(source, commandName, Some(obsId)).madd(i1)
       val observe2 = observe.cloneCommand
 
-      val wait  = Wait(prefix, commandName, Some(obsId)).madd(i1)
+      val wait  = Wait(source, commandName, Some(obsId)).madd(i1)
       val wait2 = wait.cloneCommand
       //#clone-command
 
