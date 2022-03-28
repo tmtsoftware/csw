@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2022 Thirty Meter Telescope International Observatory
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 package csw.event.cli.args
 
 // Example of params: "k1:s=['Kevin O\\'Brien','Chicago, USA']|k2:i=[1,2,3,4]"

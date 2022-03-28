@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2022 Thirty Meter Telescope International Observatory
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 package csw.aas.core
 import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.adapters.rotation.AdapterTokenVerifier
