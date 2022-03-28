@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2022 Thirty Meter Telescope International Observatory
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 package csw.config.client
 
 import csw.config.server.commons.TestFutureExtension.RichFuture
