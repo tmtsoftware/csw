@@ -50,7 +50,7 @@ class TromboneHcd() {
 }
 
 object TromboneHcd {
-  val TRACE_LINE_NO = 22
+  val TRACE_LINE_NO = 27
   val DEBUG_LINE_NO = TRACE_LINE_NO + 1
   val INFO_LINE_NO  = TRACE_LINE_NO + 2
   val WARN_LINE_NO  = TRACE_LINE_NO + 3

@@ -56,7 +56,7 @@ object IRISLogMessages {
 
 object IRIS {
 
-  val TRACE_LINE_NO         = 26
+  val TRACE_LINE_NO         = 31
   val DEBUG_LINE_NO         = TRACE_LINE_NO + 1
   val INFO_LINE_NO          = TRACE_LINE_NO + 2
   val WARN_LINE_NO          = TRACE_LINE_NO + 3

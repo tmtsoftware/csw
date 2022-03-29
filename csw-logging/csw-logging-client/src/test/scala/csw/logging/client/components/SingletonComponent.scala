@@ -25,7 +25,7 @@ object SingletonComponent {
     log.fatal(logs("fatal"))
   }
 
-  val TRACE_LINE_NO = 15
+  val TRACE_LINE_NO = 20
   val DEBUG_LINE_NO = TRACE_LINE_NO + 1
   val INFO_LINE_NO  = TRACE_LINE_NO + 2
   val WARN_LINE_NO  = TRACE_LINE_NO + 3
@@ -45,5 +45,5 @@ object SingletonComponent {
     log.fatal(logs("fatal"), userMsgMap)
   }
 
-  val USER_TRACE_LINE_NO = 35
+  val USER_TRACE_LINE_NO = 40
 }
