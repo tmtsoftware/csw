@@ -1,3 +1,4 @@
+import com.typesafe.sbt.MultiJvmPlugin.MultiJvmKeys.MultiJvm
 import de.heikoseeberger.sbtheader.{AutomateHeaderPlugin, CommentCreator, CommentStyle, HeaderPlugin}
 import sbt.Keys._
 import sbt._

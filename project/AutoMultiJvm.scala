@@ -1,3 +1,5 @@
+import de.heikoseeberger.sbtheader.AutomateHeaderPlugin.autoImport
+import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.headerSettings
 import sbt.Keys.moduleName
 import sbt.{Def, _}
 
@@ -19,6 +21,8 @@ object AutoMultiJvm extends AutoPlugin {
       MergeStrategy.concat(tempDir, path, files.reverse)
   }
 
+  private val copyrightHeaderSettings: Seq[Setting[_]] = autoImport.automateHeaderSettings(MultiJvm) ++ headerSettings(MultiJvm)
+
   override def projectSettings: Seq[Setting[_]] =
     SbtMultiJvm.multiJvmSettings ++ Seq(
       MultiJvm / multiNodeHosts := multiNodeHostNames,
@@ -35,7 +39,7 @@ object AutoMultiJvm extends AutoPlugin {
           val oldStrategy = (MultiJvm / assembly / assemblyMergeStrategy).value
           oldStrategy(x)
       }
-    )
+    ) ++ copyrightHeaderSettings
 
   override def projectConfigurations: Seq[Configuration] = List(MultiJvm)
 
