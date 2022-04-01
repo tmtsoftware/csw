@@ -32,9 +32,3 @@ object CoordinateSystem extends Enum[CoordinateSystem] {
 
   def toChoices: Seq[Choice] = CoordinateSystem.values.map(x => Choice(x.entryName))
 }
-
-object JCoordinateSystem {
-  val RADEC: CoordinateSystem = CoordinateSystem.RADEC
-  val XY: CoordinateSystem    = CoordinateSystem.XY
-  val ALTAZ: CoordinateSystem = CoordinateSystem.ALTAZ
-}

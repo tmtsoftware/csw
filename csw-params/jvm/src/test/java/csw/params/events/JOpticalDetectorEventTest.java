@@ -11,6 +11,7 @@ import csw.params.core.models.Choices;
 import csw.params.core.models.ExposureId;
 import csw.params.core.models.ObsId;
 import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JOperationalState;
 import csw.params.javadsl.JUnits;
 import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
@@ -108,7 +109,7 @@ public class JOpticalDetectorEventTest {
                 false,
                 true,
                 "",
-                JOperationalState.READY()
+                JOperationalState.READY
         );
 
         Assert.assertEquals(paramSet, event.jParamSet());
@@ -144,7 +145,7 @@ public class JOpticalDetectorEventTest {
         Parameter<Boolean> isAborted = JKeyType.BooleanKey().make("isAborted").set(true);
         Parameter<String> errorMessage = JKeyType.StringKey().make("errorMessage").set("");
         HashSet<Choice> operationalStateChoices = ObserveEventUtil.getOperationalStateChoices();
-        Parameter<Choice> operationalState = JKeyType.ChoiceKey().make("operationalState", Choices.fromChoices(operationalStateChoices)).set(new Choice(JOperationalState.READY().entryName()));
+        Parameter<Choice> operationalState = JKeyType.ChoiceKey().make("operationalState", Choices.fromChoices(operationalStateChoices)).set(new Choice(JOperationalState.READY.entryName()));
 
 
         Set<Parameter<?>> paramSet = new HashSet<>(10);

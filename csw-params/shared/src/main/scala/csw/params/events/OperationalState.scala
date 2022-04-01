@@ -34,10 +34,3 @@ object OperationalState extends Enum[OperationalState] {
 
   def toChoices: Seq[Choice] = OperationalState.values.map(x => Choice(x.entryName))
 }
-
-object JOperationalState {
-  val READY: OperationalState     = OperationalState.READY
-  val ERROR: OperationalState     = OperationalState.ERROR
-  val BUSY: OperationalState      = OperationalState.BUSY
-  val NOT_READY: OperationalState = OperationalState.NOT_READY
-}

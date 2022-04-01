@@ -8,6 +8,7 @@ package csw.params.events;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.*;
 import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JOperationalState;
 import csw.params.javadsl.JUnits;
 import csw.prefix.models.Prefix;
 import org.junit.Assert;
@@ -102,7 +103,7 @@ public class JIRDetectorEventTest {
                 false,
                 true,
                 "",
-                JOperationalState.BUSY()
+                JOperationalState.BUSY
         );
 
         Assert.assertEquals(paramSet, event.jParamSet());
@@ -162,7 +163,7 @@ public class JIRDetectorEventTest {
         Parameter<Boolean> isAborted = JKeyType.BooleanKey().make("isAborted").set(true);
         Parameter<String> errorMessage = JKeyType.StringKey().make("errorMessage").set("");
         HashSet<Choice> operationalStateChoices = ObserveEventUtil.getOperationalStateChoices();
-        Parameter<Choice> operationalState = JKeyType.ChoiceKey().make("operationalState", Choices.fromChoices(operationalStateChoices)).set(new Choice(JOperationalState.BUSY().entryName()));
+        Parameter<Choice> operationalState = JKeyType.ChoiceKey().make("operationalState", Choices.fromChoices(operationalStateChoices)).set(new Choice(JOperationalState.BUSY.entryName()));
 
         Set<Parameter<?>> paramSet = new HashSet<>(10);
         paramSet.add(exposureIdParam);
