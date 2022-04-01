@@ -20,7 +20,7 @@ pipeline {
             steps {
                 sh "sbt clean"
                 sh "sbt scalafmtCheck"
-                sh "sbt -DenableFatalWarnings=true ';set every Seq(scalafmtOnCompile := false); scalastyle; test:compile; multi-jvm:compile;'"
+                // sh "sbt -DenableFatalWarnings=true ';set every Seq(scalafmtOnCompile := false); scalastyle; test:compile; multi-jvm:compile;'"
             }
         }
 
