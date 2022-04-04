@@ -32,6 +32,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
@@ -77,8 +78,8 @@ public class JConfigClientExample {
         adminApi.create(filePath, ConfigData.fromString(defaultStrConf), false, "commit config file").get();
 
         Boolean exists = clientApi.exists(filePath).get();
-        Assert.assertTrue(exists);
         //#exists
+        Assert.assertTrue(exists);
     }
 
     // DEOPSCSW-89: Examples of  Configuration Service usage in Java and Scala
@@ -91,8 +92,10 @@ public class JConfigClientExample {
         adminApi.create(filePath, ConfigData.fromString(defaultStrConf), false, "First commit").get();
 
         ConfigData activeFile = clientApi.getActive(filePath).get().orElseThrow();
-        Assert.assertEquals(activeFile.toJConfigObject(actorSystem).get().getString("foo.bar.baz"), "1234");
+        String value = activeFile.toJConfigObject(actorSystem).get().getString("foo.bar.baz");
+        // value = 1234
         //#getActive
+        Assert.assertEquals(value, "1234");
     }
 
     // DEOPSCSW-89: Examples of  Configuration Service usage in Java and Scala
@@ -109,25 +112,29 @@ public class JConfigClientExample {
 
         ConfigId id1 = adminApi.create(Paths.get("/hcd/trombone/overnight.conf"), config1, false, "review done").get();
         ConfigId id2 = adminApi.create(Paths.get("/hcd/trombone/firmware.bin"), config2, true, "smoke test done").get();
-
+        //id1 = 1
+        //id2 = 3
+        //#create
         //CAUTION: for demo example setup these IDs are returned. Don't assume them in production setup.
         Assert.assertEquals(id1, new ConfigId("1"));
         Assert.assertEquals(id2, new ConfigId("3"));
-        //#create
 
         //#update
         Path destPath = Paths.get("/hcd/trombone/overnight.conf");
         ConfigId newId = adminApi.update(destPath, ConfigData.fromString(defaultStrConf), "added debug statements").get();
-
+        //newId = 5
+        //#update
         //validate the returned id
         Assert.assertEquals(newId, new ConfigId("5"));
-        //#update
 
         //#delete
         Path unwantedFilePath = Paths.get("/hcd/trombone/overnight.conf");
         adminApi.delete(unwantedFilePath, "no longer needed").get();
-        Assert.assertEquals(adminApi.getLatest(unwantedFilePath).get(), Optional.empty());
+        Optional<ConfigData> expected = adminApi.getLatest(unwantedFilePath).get();
+        // expected = Optional.empty()
+
         //#delete
+        Assert.assertEquals(expected, Optional.empty());
     }
 
     // DEOPSCSW-89: Examples of  Configuration Service usage in Java and Scala
@@ -137,10 +144,11 @@ public class JConfigClientExample {
         Path filePath = Paths.get("/tmt/trombone/assembly/hcd.conf");
         ConfigId id = adminApi.create(filePath, ConfigData.fromString(defaultStrConf), false, "First commit").get();
 
-        //validate
         ConfigData actualData = adminApi.getById(filePath, id).get().orElseThrow();
-        Assert.assertEquals(defaultStrConf, actualData.toJStringF(actorSystem).get());
+        // actualData.toJStringF(actorSystem).get() = defaultStrConf
         //#getById
+        //validate
+        Assert.assertEquals(defaultStrConf, actualData.toJStringF(actorSystem).get());
     }
 
     // DEOPSCSW-89: Examples of  Configuration Service usage in Java and Scala
@@ -157,9 +165,11 @@ public class JConfigClientExample {
 
         //get the latest file
         ConfigData newConfigData = adminApi.getLatest(filePath).get().orElseThrow();
-        //validate
-        Assert.assertEquals(newConfigData.toJStringF(actorSystem).get(), newContent);
+        String filePathContent = newConfigData.toJStringF(actorSystem).get();
+        //filePathContent = newContent
         //#getLatest
+        //validate
+        Assert.assertEquals(filePathContent, newContent);
     }
 
     // DEOPSCSW-89: Examples of  Configuration Service usage in Java and Scala
@@ -177,11 +187,12 @@ public class JConfigClientExample {
         adminApi.update(filePath, ConfigData.fromString(newContent), "changed!!").get();
 
         ConfigData initialData = adminApi.getByTime(filePath, tInitial).get().orElseThrow();
-        Assert.assertEquals(defaultStrConf, initialData.toJStringF(actorSystem).get());
-
+        //initialData.toJStringF(actorSystem).get() = defaultStrConf
         ConfigData latestData = adminApi.getByTime(filePath, Instant.now()).get().orElseThrow();
-        Assert.assertEquals(newContent, latestData.toJStringF(actorSystem).get());
+        //latestData.toJStringF(actorSystem).get() = newContent
         //#getByTime
+        Assert.assertEquals(defaultStrConf, initialData.toJStringF(actorSystem).get());
+        Assert.assertEquals(newContent, latestData.toJStringF(actorSystem).get());
     }
 
     // DEOPSCSW-89: Examples of  Configuration Service usage in Java and Scala
@@ -202,7 +213,14 @@ public class JConfigClientExample {
         ConfigId fits1Id = adminApi.create(fits1Path, ConfigData.fromString(defaultStrConf), true, comment).get();
         ConfigId fits2Id = adminApi.create(fits2Path, ConfigData.fromString(defaultStrConf), false, comment).get();
         ConfigId testId = adminApi.create(testConfPath, ConfigData.fromString(defaultStrConf), true, comment).get();
-
+        //adminApi.list().get() = Set.of(tromboneId, hcdId, fits1Id, fits2Id, testId))
+        //adminApi.list(JFileType.Annex).get() = Set.of(tromboneId, fits1Id, testId)
+        //adminApi.list(JFileType.Normal).get() = Set.of(hcdId, fits2Id)
+        //adminApi.list(".*.conf").get() = Set.of(tromboneId, hcdId, testId)
+        //adminApi.list(JFileType.Annex, ".*.conf").get() = Set.of(tromboneId, testId)
+        //adminApi.list(JFileType.Annex, "a/c.*").get() = Set.of(tromboneId)
+        //adminApi.list(JFileType.Annex, "test.*").get() = Set.of(testId)
+        //#list
         //retrieve full list; for demonstration purpose validate return values
         Assert.assertEquals(Set.of(tromboneId, hcdId, fits1Id, fits2Id, testId),
                 adminApi.list().get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
@@ -223,7 +241,6 @@ public class JConfigClientExample {
                 adminApi.list(JFileType.Annex, "a/c.*").get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
         Assert.assertEquals(Set.of(testId),
                 adminApi.list(JFileType.Annex, "test.*").get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
-        //#list
     }
 
     // DEOPSCSW-89: Examples of  Configuration Service usage in Java and Scala
@@ -238,8 +255,12 @@ public class JConfigClientExample {
         ConfigId id1 = adminApi.update(filePath, ConfigData.fromString("changing contents"), "second commit").get();
         ConfigId id2 = adminApi.update(filePath, ConfigData.fromString("changing contents again"), "third commit").get();
         Instant tEndUpdate = Instant.now();
-
+        //adminApi.history(filePath).get().stream().map(ConfigFileRevision::id) = List.of(id2, id1, id0)
+        //adminApi.history(filePath).get().stream().map(ConfigFileRevision::comment) = List.of("third commit", "second commit", "first commit")
+        //adminApi.history(filePath, tBeginUpdate, tEndUpdate).get() = List.of(id2, id1)
+        //adminApi.history(filePath, 2).get().stream().map(ConfigFileRevision::id) = List.of(id2, id1)
         //full file history
+        //#history
         List<ConfigFileRevision> fullHistory = adminApi.history(filePath).get();
         Assert.assertEquals(List.of(id2, id1, id0),
                 fullHistory.stream().map(ConfigFileRevision::id).collect(Collectors.toList()));
@@ -252,7 +273,6 @@ public class JConfigClientExample {
         //take last two revisions
         Assert.assertEquals(List.of(id2, id1),
                 adminApi.history(filePath, 2).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()));
-        //#history
     }
 
     // DEOPSCSW-89: Examples of  Configuration Service usage in Java and Scala
@@ -264,10 +284,12 @@ public class JConfigClientExample {
 
         //create will make the 1st revision active with a default comment
         ConfigId id1 = adminApi.create(filePath, ConfigData.fromString(defaultStrConf), false, "first commit").get();
-        Assert.assertEquals(List.of(id1),
-                adminApi.historyActive(filePath).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()));
+        //adminApi.historyActive(filePath).get() = List.of(id1)
+        List<ConfigFileRevision> configFileRevisions = adminApi.historyActive(filePath).get();
+        //configFileRevisions = List.of(id1)
         //ensure active version is set
-        Assert.assertEquals(id1, adminApi.getActiveVersion(filePath).get().orElseThrow());
+        Optional<ConfigId> configId1 = adminApi.getActiveVersion(filePath).get();
+        //configId1 = id1
 
         //override the contents four times
         adminApi.update(filePath, ConfigData.fromString("changing contents"), "second").get();
@@ -276,41 +298,61 @@ public class JConfigClientExample {
         ConfigId id5 = adminApi.update(filePath, ConfigData.fromString("final final contents"), "fifth").get();
 
         //update doesn't change the active revision
-        Assert.assertEquals(id1, adminApi.getActiveVersion(filePath).get().orElseThrow());
+        Optional<ConfigId> configIdNow = adminApi.getActiveVersion(filePath).get();
+        //configIdNow = id1
 
         //play with active version
         adminApi.setActiveVersion(filePath, id3, "id3 active").get();
         adminApi.setActiveVersion(filePath, id4, "id4 active").get();
-        Assert.assertEquals(id4, adminApi.getActiveVersion(filePath).get().orElseThrow());
+        Optional<ConfigId> configId4 = adminApi.getActiveVersion(filePath).get();
+
         Instant tEnd = Instant.now();
 
         //reset active version to latest
         adminApi.resetActiveVersion(filePath, "latest active").get();
-        Assert.assertEquals(id5, adminApi.getActiveVersion(filePath).get().orElseThrow());
+        Optional<ConfigId> configId5 = adminApi.getActiveVersion(filePath).get();
+        //configId5 = id5
         //finally set initial version as active
         adminApi.setActiveVersion(filePath, id1, "id1 active").get();
-        Assert.assertEquals(id1, adminApi.getActiveVersion(filePath).get().orElseThrow());
+        Optional<ConfigId> configIdInitial = adminApi.getActiveVersion(filePath).get();
+        //configIdInitial = id1
 
         //validate full history
         List<ConfigFileRevision> fullHistory = adminApi.historyActive(filePath).get();
-        Assert.assertEquals(List.of(id1, id5, id4, id3, id1),
-                fullHistory.stream().map(ConfigFileRevision::id).collect(Collectors.toList()));
-        Assert.assertEquals(List.of("id1 active", "latest active", "id4 active", "id3 active",
-                "initializing active file with the first version"),
-                fullHistory.stream().map(ConfigFileRevision::comment).collect(Collectors.toList()));
+        //fullHistory.stream().map(ConfigFileRevision::id) = List.of(id1, id5, id4, id3, id1)
+        //fullHistory.stream().map(ConfigFileRevision::comment) = List.of("id1 active", "latest active", "id4 active", "id3 active",
+        //                "initializing active file with the first version")
+
 
         //drop initial revision and take only update revisions
         List<ConfigFileRevision> fragmentedHistory = adminApi.historyActive(filePath, tBegin, tEnd).get();
-        Assert.assertEquals(3, fragmentedHistory.size());
+        //fragmentedHistory.size() = 3
 
         //take last three revisions
-        Assert.assertEquals(List.of(id1, id5, id4),
-                adminApi.historyActive(filePath, 3).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()));
+        CompletableFuture<List<ConfigFileRevision>> maxHistory = adminApi.historyActive(filePath, 3);
+        //maxHistory.get() = List.of(id1, id5, id4)
+
 
         //get contents of active version at a specified instance
         String initialContents = adminApi.getActiveByTime(filePath, tBegin).get().orElseThrow().toJStringF(actorSystem).get();
-        Assert.assertEquals(defaultStrConf, initialContents);
+        //initialContents = defaultStrConf
         //#active-file-mgmt
+        Assert.assertEquals(List.of(id1),
+                configFileRevisions.stream().map(ConfigFileRevision::id).collect(Collectors.toList()));
+        Assert.assertEquals(id1, configId1.orElseThrow());
+        Assert.assertEquals(id1, configIdNow.orElseThrow());
+        Assert.assertEquals(id4, configId4.orElseThrow());
+        Assert.assertEquals(id5, configId5.orElseThrow());
+        Assert.assertEquals(id1, configIdInitial.orElseThrow());
+        Assert.assertEquals(List.of(id1, id5, id4, id3, id1),
+                fullHistory.stream().map(ConfigFileRevision::id).collect(Collectors.toList()));
+        Assert.assertEquals(List.of("id1 active", "latest active", "id4 active", "id3 active",
+                        "initializing active file with the first version"),
+                fullHistory.stream().map(ConfigFileRevision::comment).collect(Collectors.toList()));
+        Assert.assertEquals(3, fragmentedHistory.size());
+        Assert.assertEquals(List.of(id1, id5, id4),
+                maxHistory.get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()));
+        Assert.assertEquals(defaultStrConf, initialContents);
     }
 
     @Test
@@ -318,7 +360,8 @@ public class JConfigClientExample {
         //#getMetadata
         ConfigMetadata metadata = adminApi.getMetadata().get();
         //repository path must not be empty
-        Assert.assertNotEquals(metadata.repoPath(), "");
+        //metadata.repoPath() != ""
         //#getMetadata
+        Assert.assertNotEquals(metadata.repoPath(), "");
     }
 }

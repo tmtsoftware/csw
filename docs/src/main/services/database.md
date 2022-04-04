@@ -159,8 +159,26 @@ Java
   
 The reference for providing database properties is shown below:
 
-reference.conf
-:   @@snip [reference.conf](../../../../csw-database/src/main/resources/reference.conf)
+```
+csw-database.hikari-datasource {
+  dataSourceClassName = org.postgresql.ds.PGSimpleDataSource
+  dataSource {
+    serverName = <server_name>
+    portNumber = <port_number>
+    databaseName = <database_name>
+    user = <username>
+    password = <password>
+  }
+  
+  // Below are the default properties of HikariCP
+  autoCommit = true
+  connectionTimeout = 30000 (30 seconds)
+  idleTimeout = 600000 (10 minutes)
+  maxLifetime = 600000 (10 minutes)
+  maximumPoolSize = 10
+  minimumIdle = 10 (same as max pool size)
+}
+```
 
 In order to override any property shown above, it needs to be defined in `application.conf`.  For example. a sample application.conf
 can look as follows:

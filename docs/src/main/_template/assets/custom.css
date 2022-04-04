@@ -1,5 +1,7 @@
 .snippet-button {
-    float: right;
+    position: absolute;
+    bottom: 0.6rem;
+    right: 0.6rem;
     vertical-align: middle;
     padding: 0.25em 0.25em;
     border: 1px solid #ddd;
