@@ -122,6 +122,7 @@ public interface JUnits {
 
     // Others - engineering
     Units NoUnits = Units.NoUnits$.MODULE$;
+    Units bit     = Units.bit$.MODULE$;
     Units encoder = Units.encoder$.MODULE$;
     Units count   = Units.count$.MODULE$;
     Units mmhg = Units.mmhg$.MODULE$;
