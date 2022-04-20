@@ -23,12 +23,10 @@ public interface JUnits {
     Units elvolt      = Units.elvolt$.MODULE$;
     Units gauss       = Units.gauss$.MODULE$;
     Units gram        = Units.gram$.MODULE$;
-    Units hbar        = Units.hbar$.MODULE$;
     Units henry       = Units.hertz$.MODULE$;
     Units hertz       = Units.hertz$.MODULE$;
     Units hour        = Units.hour$.MODULE$;
     Units joule       = Units.joule$.MODULE$;
-    Units k           = Units.k$.MODULE$;
     Units kelvin      = Units.kelvin$.MODULE$;
     Units kilogram    = Units.kilogram$.MODULE$;
     Units kilometer   = Units.kilometer$.MODULE$;

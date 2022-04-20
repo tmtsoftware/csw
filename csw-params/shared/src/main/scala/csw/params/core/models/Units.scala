@@ -3,11 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-/*
- * Copyright (c) 2022 Thirty Meter Telescope International Observatory
- * SPDX-License-Identifier: Apache-2.0
- */
-
 package csw.params.core.models
 import enumeratum.{Enum, EnumEntry}
 
@@ -50,33 +45,31 @@ object Units extends Enum[Units] {
   case object arcmin      extends Units("arcmin", "arc minute; angular measurement")
   case object arcsec      extends Units("arcsec", "arc second: angular measurement")
   case object bar         extends Units("bar", "bar: metric ton of pressure")
-  case object candela     extends Units("candela ", "candela(lumen/sr) ")
+  case object candela     extends Units("candela ", "candela(lumen/sr)")
   case object day         extends Units("d", "day")
   case object degree      extends Units("deg", "degree: angular measurement 1/360 of full rotation")
   case object degC        extends Units("degC", "Degree Celsius K")
   case object degF        extends Units("degF", "Fahrenheit")
   case object elvolt      extends Units("eV", "electron volt")
   case object gauss       extends Units("gauss", "gauss")
-  case object gram        extends Units("g", "gram 10-3 kg")
-  case object hbar        extends Units("hbar", "hbar(Planck constant)")
+  case object gram        extends Units("g", "gram")
   case object hertz       extends Units("Hz", "frequency")
   case object henry       extends Units("henry", "Henry")
   case object hour        extends Units("h", "hour")
-  case object joule       extends Units("J", "Joule: energy N m")
-  case object k           extends Units("k", "k(Boltzmann constant)")
+  case object joule       extends Units("J", "Joule: energy")
   case object kelvin      extends Units("K", "Kelvin: temperature with a null point at absolute zero")
   case object kilogram    extends Units("kg", "kilogram, base unit of mass in SI")
-  case object kilometer   extends Units("km", "kilometers - 10+3 m")
+  case object kilometer   extends Units("km", "kilometers")
   case object liter       extends Units("l", "liter, metric unit of volume")
   case object lm          extends Units("lm", "lumen")
   case object lsun        extends Units("lsun", "solar luminosity")
   case object lx          extends Units("lx", "lux(lm/m2)")
-  case object mas         extends Units("mas", "milli arc second: angular measurement 10-3 arcsec")
+  case object mas         extends Units("mas", "milli arc second")
   case object me          extends Units("me", "me(electron_mass)")
   case object meter       extends Units("m", "meter: base unit of length in SI")
   case object microarcsec extends Units("µas", "micro arcsec: angular measurement")
-  case object millimeter  extends Units("mm", "millimeters - 10-3m")
-  case object millisecond extends Units("ms", "milliseconds - 10-3s")
+  case object millimeter  extends Units("mm", "millimeters")
+  case object millisecond extends Units("ms", "milliseconds")
   case object micron      extends Units("µm", "micron: alias for micrometer")
   case object micrometer  extends Units("µm", "micron")
   case object minute      extends Units("min", "minute")
@@ -88,7 +81,7 @@ object Units extends Enum[Units] {
   case object muB         extends Units("muB", "Bohr magneton")
   case object nanometer   extends Units("nm", "nanometers")
   case object newton      extends Units("N", "Newton: force")
-  case object ohm         extends Units("ohm", "Ohm ")
+  case object ohm         extends Units("ohm", "Ohm")
   case object pascal      extends Units("Pa", "Pascal: pressure")
   case object pi          extends Units("pi", "pi")
   case object pc          extends Units("pc", "parsec")
@@ -122,7 +115,7 @@ object Units extends Enum[Units] {
   case object cKayser extends Units("cKayser", "cKayser")
   case object crab
       extends Units("crab", "Crab: astrophotometrical unit for measurement of the intensity of Astrophysical X-ray sources")
-  case object damas     extends Units("d:m:s", "damas: degree arcminute arcsecond (sexagesimal angle from degree) ")
+  case object damas     extends Units("d:m:s", "damas: degree arcminute arcsecond (sexagesimal angle from degree)")
   case object e         extends Units("e", "electron charge")
   case object Earth     extends Units("earth", "earth (geo) unit")
   case object eps0      extends Units("eps0", "electric constant")
@@ -130,7 +123,7 @@ object Units extends Enum[Units] {
   case object G         extends Units(name = "G", "gravitation constant")
   case object geoMass   extends Units("geoMass", "Earth Mass")
   case object hm        extends Units("hm", "hour minutes (sexagesimal time from hours)")
-  case object hms       extends Units("hms", "hour minutes seconds (sexagesimal time from hours) ")
+  case object hms       extends Units("hms", "hour minutes seconds (sexagesimal time from hours)")
   case object hhmmss    extends Units("HH:MM:SS", "hour minutes seconds (sexagesimal time)")
   case object jansky    extends Units("Jy", "Jansky: spectral flux density ")
   case object jd        extends Units("jd", "Julian Day")
@@ -153,9 +146,9 @@ object Units extends Enum[Units] {
   // Imperial units
   case object barn  extends Units("barn", "barn: metric unit of area")
   case object cal   extends Units("cal", "thermochemical calorie: pre-SI metric unit of energy")
-  case object foot  extends Units("ft", "international foot - 1.2x10+1 inch")
+  case object foot  extends Units("ft", "international foot - 1.2E1 inch")
   case object inch  extends Units("inch", "international inch - 2.54 cm")
-  case object pound extends Units("lb", "international avoirdupois pound - 1.6x10+1 oz")
+  case object pound extends Units("lb", "international avoirdupois pound - 1.6E1 oz")
   case object mile  extends Units("mi", "international mile")
   case object ounce extends Units("oz", "international avoirdupois ounce")
   case object yard  extends Units("yd", "international yard - 3 ft")
@@ -163,16 +156,15 @@ object Units extends Enum[Units] {
   // Others - engineering
   case object NoUnits extends Units("none", "scalar - no units specified")
   case object bit     extends Units("bit", "bit: binary value of 0 or 1")
-  case object byte    extends Units("byte", "byte: 8 bits")
   case object encoder extends Units("enc", "encoder counts")
   case object count   extends Units("ct", "counts as for an encoder or detector")
-  case object mmhg    extends Units("mmHg", "mercury_mm")
+  case object mmhg    extends Units("mmHg", "millimetre of mercury is a manometric unit of pressure")
   case object percent extends Units("percent", "percentage")
   case object pix     extends Units("pix", "pixel")
 
   // Datetime units
   case object tai      extends Units("TAI", "TAI time unit")
   case object utc      extends Units("UTC", "UTC time unit")
-  case object date     extends Units("date", "date: Fully qualified date")
-  case object datetime extends Units("datetime", " Fully qualified date/time")
+  case object date     extends Units("date", "date")
+  case object datetime extends Units("datetime", "date/time")
 }
