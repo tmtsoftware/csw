@@ -41,7 +41,7 @@ This command is used to describe a goal that a system should match. The componen
 following arguments to create a `Setup` command.
 
  
- * **[Source:](commands.html#Source)** the source of the command as described above 
+ * **[Source:](commands.html#Source)** The source of the command is given by the prefix, which should be the full name of the component sending the command.
  * **[CommandName:](commands.html#CommandName)** a simple string name for the command (no spaces)
  * **[ObsId:](commands.html#ObsId)**  an optional observation Id.
  * **paramSet:** Optional Set of Parameters. Default is empty.
