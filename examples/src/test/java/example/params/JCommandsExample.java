@@ -63,8 +63,6 @@ public class JCommandsExample {
         Key<Integer> k3 = JKeyType.IntKey().make("filter");
         Key<Float> k4 = JKeyType.FloatKey().make("correction");
 
-        //Source of the command is given by the prefix
-        //Source should be full name of the component sending the command.
         Prefix source = Prefix.apply(JSubsystem.WFOS, "red.detector");
 
         //parameters
