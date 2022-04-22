@@ -128,7 +128,7 @@ object Units extends Enum[Units] {
   case object jovmass   extends Units("jovMass", "Jupiter mass")
   case object lightyear extends Units("lyr", "light year")
   case object mag       extends Units("mag", "stellar magnitude")
-  case object mjup      extends Units("Mjup", )
+  case object mjup      extends Units("Mjup", "Jupiter mass")
   case object mp        extends Units("mp", "proton_mass")
   case object minsec    extends Units("m:s", "minutes seconds (sexagesimal time from minutes)")
   case object msun      extends Units("Msun", "solar mass")
