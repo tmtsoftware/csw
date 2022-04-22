@@ -56,7 +56,6 @@ public interface JUnits {
     Units pi          = Units.pi$.MODULE$;
     Units pc          = Units.pc$.MODULE$;
     Units ppm         = Units.ppm$.MODULE$;
-    Units R           = Units.R$.MODULE$;
     Units radian      = Units.radian$.MODULE$;
     Units second      = Units.second$.MODULE$;
     Units sday        = Units.sday$.MODULE$;
@@ -82,8 +81,7 @@ public interface JUnits {
     Units crab      = Units.crab$.MODULE$;
     Units damas     = Units.damas$.MODULE$;
     Units e         = Units.e$.MODULE$;
-    Units Earth     = Units.Earth$.MODULE$;
-    Units eps0      = Units.eps0$.MODULE$;
+    Units earth     = Units.earth$.MODULE$;
     Units F         = Units.F$.MODULE$;
     Units G         = Units.G$.MODULE$;
     Units geomass   = Units.geoMass$.MODULE$;
