@@ -146,12 +146,12 @@ object Units extends Enum[Units] {
   // Imperial units
   case object barn  extends Units("barn", "barn: metric unit of area")
   case object cal   extends Units("cal", "thermochemical calorie: pre-SI metric unit of energy")
-  case object foot  extends Units("ft", "international foot - 1.2E1 inch")
-  case object inch  extends Units("inch", "international inch - 2.54 cm")
-  case object pound extends Units("lb", "international avoirdupois pound - 1.6E1 oz")
+  case object foot  extends Units("ft", "international foot")
+  case object inch  extends Units("inch", "international inch")
+  case object pound extends Units("lb", "international avoirdupois pound")
   case object mile  extends Units("mi", "international mile")
   case object ounce extends Units("oz", "international avoirdupois ounce")
-  case object yard  extends Units("yd", "international yard - 3 ft")
+  case object yard  extends Units("yd", "international yard")
 
   // Others - engineering
   case object NoUnits extends Units("none", "scalar - no units specified")
