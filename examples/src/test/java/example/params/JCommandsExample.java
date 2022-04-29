@@ -63,7 +63,6 @@ public class JCommandsExample {
         Key<Integer> k3 = JKeyType.IntKey().make("filter");
         Key<Float> k4 = JKeyType.FloatKey().make("correction");
 
-        //prefix
         Prefix source = Prefix.apply(JSubsystem.WFOS, "red.detector");
 
         //parameters
@@ -122,7 +121,8 @@ public class JCommandsExample {
         Key<Integer> k3 = JKeyType.IntKey().make("filter");
         Key<UTCTime> k4 = JKeyType.UTCTimeKey().make("creation-time");
 
-        //prefix
+        //Source of the command is given by the prefix
+        //Source should be full name of the component sending the command.
         Prefix source = Prefix.apply(JSubsystem.WFOS, "red.detector");
 
         //parameters
@@ -174,7 +174,8 @@ public class JCommandsExample {
         Key<Integer> k3 = JKeyType.IntKey().make("filter");
         Key<UTCTime> k4 = JKeyType.UTCTimeKey().make("creation-time");
 
-        //prefix
+        //Source of the command is given by the prefix
+        //Source should be full name of the component sending the command.
         Prefix source = Prefix.apply(JSubsystem.WFOS, "red.detector");
 
         //parameters
@@ -229,6 +230,8 @@ public class JCommandsExample {
         //parameter
         Parameter<MatrixData<Double>> i1 = k1.set(m1);
 
+        //Source of the command is given by the prefix
+        //Source should be full name of the component sending the command.
         Prefix source = Prefix.apply(JSubsystem.WFOS, "blue.filter");
 
         //commands
@@ -263,7 +266,8 @@ public class JCommandsExample {
         Key<Integer> filterKey = JKeyType.IntKey().make("filter");
         Key<Integer> miscKey = JKeyType.IntKey().make("misc.");
 
-        //prefix
+        //Source of the command is given by the prefix,
+        //Source should be full name of the component sending the command.
         Prefix source = Prefix.apply(JSubsystem.WFOS, "blue.filter");
 
         //params
