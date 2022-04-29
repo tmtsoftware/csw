@@ -60,7 +60,8 @@ class CommandsExample extends AnyFunSpec with Matchers {
       val k3: Key[Int]    = KeyType.IntKey.make("filter")
       val k4: Key[Float]  = KeyType.FloatKey.make("correction")
 
-      // prefix
+      //Source of the command is given by the prefix
+      //Source should be full name of the component sending the command.
       val source: Prefix = Prefix("wfos.red.detector")
 
       // parameters
@@ -119,7 +120,8 @@ class CommandsExample extends AnyFunSpec with Matchers {
       val k3: Key[Int]     = KeyType.IntKey.make("filter")
       val k4: Key[UTCTime] = KeyType.UTCTimeKey.make("creation-time")
 
-      // prefix
+      //Source of the command is given by the prefix
+      //Source should be full name of the component sending the command.
       val source: Prefix = Prefix("wfos.red.detector")
 
       // parameters
@@ -171,7 +173,8 @@ class CommandsExample extends AnyFunSpec with Matchers {
       val i1: Parameter[Boolean] = k1.set(true, false, true, false)
       val i2: Parameter[Int]     = k2.set(1, 2, 3, 4)
 
-      // prefix
+      //Source of the command is given by the prefix
+      //Source should be full name of the component sending the command.
       val source: Prefix = Prefix("wfos.red.detector")
 
       // create wait, add sequentially using add
@@ -222,7 +225,8 @@ class CommandsExample extends AnyFunSpec with Matchers {
         Array(7.2, 8.2, 9.2)
       )
 
-      // prefix
+      //Source of the command is given by the prefix
+      //Source should be full name of the component sending the command.
       val source: Prefix = Prefix("wfos.red.detector")
 
       // parameter
@@ -267,7 +271,8 @@ class CommandsExample extends AnyFunSpec with Matchers {
       val filterKey: Key[Int]  = KeyType.IntKey.make("filter")
       val miscKey: Key[Int]    = KeyType.IntKey.make("misc.")
 
-      // prefix
+      //Source of the command is given by the prefix
+      //Source should be full name of the component sending the command.
       val source: Prefix = Prefix("wfos.red.detector")
 
       // params
