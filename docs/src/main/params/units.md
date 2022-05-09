@@ -26,53 +26,53 @@ The default unit for `UTCTimeKey` and `TAITimeKey` (in Scala and Java both) is `
 
 | Name          | Abbreviation    | Description                                                                |
 | :-----------: |:--------------: | :--------------------------------------------------------------------------|
-| angstrom    | Angstrom          | angstrom|
-| alpha       | alpha             | alpha    |
-| ampere       | A                | ampere    |
+| angstrom    | Angstrom          | unit of length  |
+| alpha       | alpha             | fine structure constant    |
+| ampere      | A                 | unit of electrical current    |
 | arcmin      | arcmin            | arc minute; angular measurement |
 | arcsec      | arcsec            | arc second: angular measurement |
-| bar         | bar               | bar    |
-| candela     | candela           | candela    |
+| bar         | bar               | unit of pressure    |
+| candela     | candela           | unit of luminous intensity    |
 | day         | d                 | day - 24 hours |
 | degree      | deg               | degree: agular measurement 1/360 of full rotation |
 | degC        | degC              | degree celsius    |
-| degF        | degF               | Fahrenheit    |
+| degF        | degF              | Fahrenheit    |
 | elvolt      | eV                | electron volt  |
-| gauss       | gauss             | gauss  |
-| gram        | g                 | gram |
-| hertz       | Hz                | frequency |
-| henry       | henry             | henry  |
-| hour        | h                 | hour  |
-| joule       | J                 | Joule: energy N m |
-| kelvin      | K                 | Kelvin: temperature with a null point at absolute zero |
-| kilogram    | kg                | kilogram, base unit of mass in SI |
-| kilometer   | km                | kilometers |
-| liter       | l                 | liter, metric unit of volume |
-| lm          | lm                | lumen  |
+| gauss       | gauss             | unit of measurement of magnetic induction  |
+| gram        | g                 | unit of mass or weight |
+| hertz       | Hz                | SI unit of frequency |
+| henry       | henry             | unit of electrical inductance  |
+| hour        | h                 | unit of time  |
+| joule       | J                 | derived unit of energy |
+| kelvin      | K                 | base unit of temperature |
+| kilogram    | kg                | base unit of mass in SI |
+| kilometer   | km                | unit of length equal to 1,000 metres  |
+| liter       | l                 | metric unit of volume |
+| lm          | lm                | unit of luminous flux, or amount of light,  |
 | lsun        | lsun              | solar luminosity  |
-| lx          | lx                | lux  |
+| lx          | lx                | SI derived unit of illuminance measuring luminous flux per unit area  |
 | meter       | m                 | meter: base unit of length in SI |
 | mas         | mas               | milli arc second: angular measurement |
-| me          | me                | electron mass  |
-| meter       | m                 | meter  |
-| microarcsec | µas               | micro arcsec |
-| millimeter  | mm                | millimeters|
+| me          | me                | electron mass - mass of a stationary electron |
+| meter       | m                 | unit of length  |
+| microarcsec | µas               | micro arc second; angular measurement |
+| millimeter  | mm                | unit of length equal to 0.001 metre|
 | millisecond | ms                | milliseconds |
 | micron      | µm                | micron: alias for micrometer |
 | micrometer  | µm                | micron |
-| minute      | min               | minute |
-| MJD         | MJD               | Mod. Julian Date |
-| mol         | mol               | mole |
-| month       | month             | month |
+| minute      | min               | minute is a unit of time |
+| MJD         | MJD               | Modified Julian Date |
+| mol         | mol               | mole: Unit of amount of substance |
+| month       | month             | unit of time |
 | mmyy        | mmyy              | Month/Year |
 | mu0         | mu0               | magnetic constant |
-| muB         | muB               | bohr magneton |
+| muB         | muB               | moment of electrons is bohr magneton |
 | nanometer   | nm                | nanometers |
 | newton      | N                 | Newton: force |
-| ohm         | ohm               | ohm |
-| pascal      | Pa                | Pascal: pressure |
-| pi          | pi                | pi |
-| pc          | pc                | parsec |
+| ohm         | ohm               | ohm - unit of electric resistance  |
+| pascal      | Pa                | Pascal: unit of pressure |
+| pi          | pi                | pi is the ratio of the circumference of a circle to its diameter|
+| pc          | pc                | unit for expressing distances to stars and galaxies, |
 | ppm         | ppm               | part per million |
 | radian      | rad               | radian: angular measurement of the ratio between the length of an arc and its radius |
 | second      | s                 | second: base unit of time in SI |
@@ -80,8 +80,8 @@ The default unit for `UTCTimeKey` and `TAITimeKey` (in Scala and Java both) is `
 | steradian   | sr                | steradian: unit of solid angle in SI  |
 | volt        | V                 | Volt: electric potential or electromotive force |
 | watt        | W                 | Watt: power |
-| Wb          | Wb                | weber |
-| week        | wk                | week  |
+| Wb          | Wb                | Weber: SI derived unit of magnetic flux |
+| week        | wk                | week: 7 days  |
 | year        | yr                | year  |
 
 ## CGS Units
@@ -89,8 +89,8 @@ The default unit for `UTCTimeKey` and `TAITimeKey` (in Scala and Java both) is `
 | :-----------: |:--------------: | :-------------------------|
 | coulomb    | C                  | coulomb: electric charge |
 | centimeter | cm                 | centimeter |
-| D          | D                  | Debye(dipole) |
-| dyn        | dyn                | dyne |
+| D          | D                  | Debye(dipole) - electric dipole moments of molecules |
+| dyn        | dyn                | dyne is unit of force|
 | erg        | erg                | erg: CGS unit of energy |
 
 ## Astrophysical Units
@@ -99,19 +99,19 @@ The default unit for `UTCTimeKey` and `TAITimeKey` (in Scala and Java both) is `
 | au         | AU                 | astronomical unit: approximately the mean Earth-Sun distance |
 | a0         | a0                 | bohr radius |
 | c          | c                  | speed of light |
-| cKayser    | cKayser            | cKayser |
-| crab       | crab               | crab |
+| cKayser    | cKayser            | unit of wavenumber equal to reciprocal of a centimeter  |
+| crab       | crab               | unit for measurement of the intensity of Astrophysical X-ray sources |
 | damas      | damas              | degree minute arcsecond |
 | e          | e                  | electron charge |
 | earth      | earth              | earth unit |
-| F          | F                  | Farad |
-| G          | G                  | Gravitation Constant |
+| F          | F                  | Farad: SI derived unit of electrical capacitance |
+| G          | G                  | Gravitation Constant gives the constant of proportionality |
 | geoMass    | geoMass            | Earth Mass |
 | hm         | hm                 | hour minute |
 | hms        | hms                | hour minute seconds |
 | hhmmss     | HH:MM:SS           | hour minutes seconds(sexagesimal time) |
 | jansky     | Jy                 | Jansky: spectral flux density |
-| jd         | jd                 | Julian Day |
+| jd         | jd                 | Julian Day at an instant is Julian day number plus the fraction of a day since the preceding noon in Universal Time |
 | jovMass    | jovMass            | Jupiter Mass |
 | lightyear  | lyr                | light year  |
 | mag        | mag                | stellar magnitude |
@@ -123,9 +123,9 @@ The default unit for `UTCTimeKey` and `TAITimeKey` (in Scala and Java both) is `
 | rgeo       | Rgeo               | Earth radius |
 | rjup       | Rjup               | Jupiter radius |
 | rsun       | Rsun               | solar radius |
-| rydberg    | Rydberg            | Rydberg |
-| seimens    | seimens            | seimens |
-| tesla      | tesla              | tesla |
+| rydberg    | Rydberg            | unit of energy, Ry |
+| seimens    | seimens            | derived unit of electric conductance |
+| tesla      | tesla              | unit of magnetic induction  |
 | u          | u                  | atomic mass unit |
 
 
@@ -133,7 +133,7 @@ The default unit for `UTCTimeKey` and `TAITimeKey` (in Scala and Java both) is `
 ## Imperial Units
 | Name          | Abbreviation    | Description                                                                |
 | :-----------: |:--------------: | :--------------------------------------------------------------------------|
-| barn       | barn              | barn |
+| barn       | barn               | metric unit of area |
 | cal        | cal                | thermochemical calorie: pre-SI metric unit of energy |
 | foot       | ft                 | international foot |
 | inch       | inch               | international inch |
