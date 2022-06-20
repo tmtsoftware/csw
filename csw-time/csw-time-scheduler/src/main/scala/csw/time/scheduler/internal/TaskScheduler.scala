@@ -64,9 +64,11 @@ object TaskScheduler {
     def stop(): Unit = running.set(false)
 
     override def run(): Unit = {
+      var started = false
       while (running.get()) {
         sem.acquire()
-        if (maybeStartTime.isDefined && UTCTime.now().value.compareTo(maybeStartTime.get.value) >= 0) {
+        if (started || (maybeStartTime.isDefined && UTCTime.now().value.compareTo(maybeStartTime.get.value) >= 0)) {
+          started = true
           scan()
           if (once) {
             stop()
