@@ -192,4 +192,3 @@ class TimeServiceSchedulerNative extends TimeServiceScheduler {
     })
   }
 }
-
