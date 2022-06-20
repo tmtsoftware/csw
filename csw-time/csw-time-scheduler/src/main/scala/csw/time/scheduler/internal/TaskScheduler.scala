@@ -7,9 +7,13 @@ package csw.time.scheduler.internal
 
 import jnr.ffi.*
 import TaskScheduler.*
+import akka.actor.ActorRef
+import csw.time.core.models.{TMTTime, UTCTime}
+import csw.time.scheduler.api.{Cancellable, TimeServiceScheduler}
 
+import java.time.Duration
 import java.util.concurrent.{CopyOnWriteArrayList, Semaphore}
-import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
+import java.util.concurrent.atomic.{AtomicBoolean, AtomicLong}
 
 object TaskScheduler {
   val CLOCK_MONOTONIC = 1
@@ -44,13 +48,13 @@ object TaskScheduler {
 
   /**
    * Base class of tasks that can be scheduled
-   * @param name task name
    * @param waitTicks number of ticks between runs (one tick is one millisecond)
    */
-  abstract class ScanTask(val name: String, val waitTicks: Int) extends Runnable {
+  abstract class ScanTask(val waitTicks: Long, val once: Boolean = false, val maybeStartTime: Option[TMTTime] = None)
+      extends Runnable {
     private[internal] val sem = new Semaphore(1)
     sem.acquire()
-    private[internal] val tickCount = new AtomicInteger(0)
+    private[internal] val tickCount = new AtomicLong(0)
     private[internal] val running   = new AtomicBoolean(true)
     new Thread(this).start()
 
@@ -62,13 +66,16 @@ object TaskScheduler {
     override def run(): Unit = {
       while (running.get()) {
         sem.acquire()
-        try {
+        if (maybeStartTime.isDefined && UTCTime.now().value.compareTo(maybeStartTime.get.value) >= 0) {
           scan()
+          if (once) {
+            stop()
+          }
         }
       }
     }
     // method executed every waitTicks ticks
-    private[internal] def scan(): Unit
+    def scan(): Unit
   }
 }
 
@@ -77,18 +84,20 @@ class TaskScheduler {
   private val tasks    = new CopyOnWriteArrayList[ScanTask]()
   private val stopFlag = new AtomicBoolean(false)
 
-  def addTask(task: ScanTask): Unit    = tasks.add(task)
-  def removeTask(task: ScanTask): Unit = tasks.remove(task)
+  def addTask(task: ScanTask): Boolean    = tasks.add(task)
+  def removeTask(task: ScanTask): Boolean = tasks.remove(task)
 
   def start(): Unit = {
     import TaskScheduler.*
     val deadline = new Timespec(runtime)
 
+    // A tick is one ms
     while (!stopFlag.get()) {
       tasks.forEach { task =>
         if (task.tickCount.get() == 0) {
           task.tickCount.set(task.waitTicks)
           task.sem.release()
+          if (!task.running.get()) removeTask(task)
         }
         task.tickCount.getAndDecrement()
       }
@@ -118,47 +127,69 @@ class TaskScheduler {
   }
 }
 
-// ------------
+class TimeServiceSchedulerNative extends TimeServiceScheduler {
+  val sched = new TaskScheduler
 
-//noinspection ScalaStyle
-object ScanTaskPerfTestApp extends App {
-  val CLOCK_REALTIME = 0
-
-  class MyTask(name: String, intervalMs: Int) extends ScanTask(name, intervalMs) {
-    private val intervalNanos   = intervalMs * 1000.0 * 1000.0
-    private var count           = 0L
-    private val startTime       = new Timespec(runtime)
-    private var jitterMicrosecs = 0L
-    libc.clock_gettime(CLOCK_REALTIME, startTime)
-
-    override def scan(): Unit = {
-      count = count + 1
-      val ts = new Timespec(runtime)
-      libc.clock_gettime(CLOCK_REALTIME, ts)
-      val t1Nanos       = startTime.tv_sec.doubleValue() * 1000.0 * 1000.0 * 1000.0 + startTime.tv_nsec.doubleValue()
-      val t2Nanos       = ts.tv_sec.doubleValue() * 1000.0 * 1000.0 * 1000.0 + ts.tv_nsec.doubleValue()
-      val diffMicrosecs = Math.abs(((t2Nanos - t1Nanos) - intervalNanos) / 1000).toLong
-      if (count > 1000 / intervalMs)
-        jitterMicrosecs = (jitterMicrosecs * (count - 1) + diffMicrosecs) / count
-      if (count % (1000 / intervalMs) == 0) {
-        println(s"$name ($intervalMs ms): jitter = $jitterMicrosecs microsecs (${jitterMicrosecs / 1000.0} ms)")
-      }
-      libc.clock_gettime(CLOCK_REALTIME, startTime)
+  private def schedule(task: ScanTask): Cancellable = {
+    sched.addTask(task)
+    () => {
+      task.stop()
+      sched.removeTask(task)
     }
   }
 
-  val scheduler = new TaskScheduler()
-  scheduler.addTask(new MyTask("1-ms-task-A", 1))
-  scheduler.addTask(new MyTask("1-ms-task-B", 1))
+  override def scheduleOnce(startTime: TMTTime)(task: => Unit): Cancellable = {
+    schedule(new ScanTask(0, once = true, Some(startTime)) {
+      override def scan(): Unit = task
+    })
+  }
 
-  scheduler.addTask(new MyTask("10-ms-task-A", 10))
-  scheduler.addTask(new MyTask("10-ms-task-B", 10))
+  override def scheduleOnce(startTime: TMTTime, task: Runnable): Cancellable = {
+    schedule(new ScanTask(0, once = true, Some(startTime)) {
+      override def scan(): Unit = task.run()
+    })
+  }
 
-  scheduler.addTask(new MyTask("100-ms-task-A", 100))
-  scheduler.addTask(new MyTask("100-ms-task-B", 100))
+  override def scheduleOnce(startTime: TMTTime, receiver: ActorRef, message: Any): Cancellable = {
+    schedule(new ScanTask(0, once = true, Some(startTime)) {
+      override def scan(): Unit = receiver ! message
+    })
+  }
 
-  scheduler.addTask(new MyTask("1000-ms-task-A", 1000))
-  scheduler.addTask(new MyTask("1000-ms-task-B", 1000))
+  override def schedulePeriodically(interval: Duration)(task: => Unit): Cancellable = {
+    schedule(new ScanTask(interval.toMillis) {
+      override def scan(): Unit = task
+    })
+  }
 
-  scheduler.start()
+  override def schedulePeriodically(interval: Duration, task: Runnable): Cancellable = {
+    schedule(new ScanTask(interval.toMillis) {
+      override def scan(): Unit = task.run()
+    })
+  }
+
+  override def schedulePeriodically(interval: Duration, receiver: ActorRef, message: Any): Cancellable = {
+    schedule(new ScanTask(interval.toMillis) {
+      override def scan(): Unit = receiver ! message
+    })
+  }
+
+  override def schedulePeriodically(startTime: TMTTime, interval: Duration)(task: => Unit): Cancellable = {
+    schedule(new ScanTask(interval.toMillis, maybeStartTime = Some(startTime)) {
+      override def scan(): Unit = task
+    })
+  }
+
+  override def schedulePeriodically(startTime: TMTTime, interval: Duration, task: Runnable): Cancellable = {
+    schedule(new ScanTask(interval.toMillis, maybeStartTime = Some(startTime)) {
+      override def scan(): Unit = task.run()
+    })
+  }
+
+  override def schedulePeriodically(startTime: TMTTime, interval: Duration, receiver: ActorRef, message: Any): Cancellable = {
+    schedule(new ScanTask(interval.toMillis, maybeStartTime = Some(startTime)) {
+      override def scan(): Unit = receiver ! message
+    })
+  }
 }
+

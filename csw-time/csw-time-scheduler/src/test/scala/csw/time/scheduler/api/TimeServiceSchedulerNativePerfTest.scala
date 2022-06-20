@@ -22,7 +22,7 @@ import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt
 
-class TimeServiceSchedulerPerfTest extends AnyFunSuiteLike with BeforeAndAfterAll {
+class TimeServiceSchedulerNativePerfTest extends AnyFunSuiteLike with BeforeAndAfterAll {
 
   private val sys                                         = ActorSystem(Behaviors.empty, "test")
   private implicit val executionContext: ExecutionContext = sys.executionContext
