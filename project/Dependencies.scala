@@ -370,6 +370,7 @@ object Dependencies {
   val TimeScheduler = Def.setting(
     Seq(
       Akka.`akka-actor`,
+      Libs.`jnr-ffi`,
       Libs.`scalatest`.value          % Test,
       Libs.HdrHistogram               % Test,
       Akka.`akka-actor-testkit-typed` % Test

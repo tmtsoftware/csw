@@ -54,6 +54,7 @@ object Libs {
   val netty               = "io.netty"                      % "netty-all"         % "4.1.73.Final"
   val `case-app`          = "com.github.alexarchambault"   %% "case-app"          % "2.0.6"
   val `tmt-test-reporter` = "com.github.tmtsoftware"       %% "rtm"               % "7dded9abcc"
+  val `jnr-ffi`           = "com.github.jnr"                % "jnr-ffi"           % "2.2.12"
 }
 
 object Borer {
