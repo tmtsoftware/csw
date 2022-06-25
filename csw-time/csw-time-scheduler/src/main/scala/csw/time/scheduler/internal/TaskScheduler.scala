@@ -31,14 +31,20 @@ object TaskScheduler {
 
   // Represents the C timespec struct
   private[internal] class Timespec(val runtime: Runtime) extends Struct(runtime) {
-    // Struct types can be found as inner classes of the Struct class
     val tv_sec  = new SignedLong()
     val tv_nsec = new SignedLong()
 
-    // You can add your own methods of choice
     def setTime(sec: Long, nsec: Long): Unit = {
       tv_sec.set(sec)
       tv_nsec.set(nsec)
+    }
+
+    def incrTime(secIncr: Long, nanoIncr: Long): Unit = {
+      val seconds  = tv_sec.longValue() + secIncr
+      val nanos = tv_nsec.longValue() + nanoIncr
+      val (s, n)  = if (nanos >= 1000000000L) (seconds + 1, nanos - 1000000000) else (seconds, nanos)
+      tv_sec.set(s)
+      tv_nsec.set(n)
     }
   }
 
@@ -73,9 +79,12 @@ object TaskScheduler {
           case _: UTCTime => UTCTime.now()
           case _: TAITime => TAITime.now()
         }
-        val millis = Duration.between(currentTime.value, startTime.value).toMillis
-        if (millis > 0) {
-          Thread.sleep(millis)
+        val diff = Duration.between(currentTime.value, startTime.value)
+        if (!diff.isZero && !diff.isNegative) {
+          val deadline = new Timespec(runtime)
+          libc.clock_gettime(CLOCK_MONOTONIC, deadline)
+          deadline.incrTime(diff.getSeconds, diff.getNano)
+          libc.clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, deadline, null)
         }
       }
       sem.drainPermits()
