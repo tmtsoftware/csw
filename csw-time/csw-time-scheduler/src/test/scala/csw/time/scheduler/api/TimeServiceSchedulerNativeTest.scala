@@ -21,10 +21,9 @@ import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, ExecutionContext}
 
-
 class TimeServiceSchedulerNativeTest extends ScalaTestWithActorTestKit(ManualTime.config) with AnyFunSuiteLike {
 
-  private val manualTime                    = ManualTime()(system)
+  private val manualTime = ManualTime()(system)
 //  private implicit val scheduler: Scheduler = system.scheduler
   private implicit val ec: ExecutionContext = system.executionContext
 
@@ -55,7 +54,7 @@ class TimeServiceSchedulerNativeTest extends ScalaTestWithActorTestKit(ManualTim
     val cancellable: Cancellable = timeService.schedulePeriodically(Duration.ofMillis(100)) {
       buffer += atomicInt.getAndIncrement()
     }
-    Thread.sleep(520)
+    Thread.sleep(500)
     cancellable.cancel()
     buffer shouldBe ArrayBuffer(0, 1, 2, 3, 4, 5)
   }

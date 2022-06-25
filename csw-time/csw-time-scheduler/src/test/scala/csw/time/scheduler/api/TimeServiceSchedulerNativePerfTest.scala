@@ -27,7 +27,7 @@ class TimeServiceSchedulerNativePerfTest extends AnyFunSuiteLike with BeforeAndA
   private val sys                                         = ActorSystem(Behaviors.empty, "test")
   private implicit val executionContext: ExecutionContext = sys.executionContext
 //  private implicit val scheduler: Scheduler               = sys.scheduler
-  private val timeService                                 = new NativeTimeServiceSchedulerFactory().make()
+  private val timeService = new NativeTimeServiceSchedulerFactory().make()
 
   type PercentileType = (Long, Long, Long)
 

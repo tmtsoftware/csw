@@ -40,8 +40,8 @@ object TaskScheduler {
     }
 
     def incrTime(secIncr: Long, nanoIncr: Long): Unit = {
-      val seconds  = tv_sec.longValue() + secIncr
-      val nanos = tv_nsec.longValue() + nanoIncr
+      val seconds = tv_sec.longValue() + secIncr
+      val nanos   = tv_nsec.longValue() + nanoIncr
       val (s, n)  = if (nanos >= 1000000000L) (seconds + 1, nanos - 1000000000) else (seconds, nanos)
       tv_sec.set(s)
       tv_nsec.set(n)
@@ -85,9 +85,9 @@ object TaskScheduler {
           libc.clock_gettime(CLOCK_MONOTONIC, deadline)
           deadline.incrTime(diff.getSeconds, diff.getNano)
           libc.clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, deadline, null)
+          sem.drainPermits()
         }
       }
-      sem.drainPermits()
       while (running.get()) {
         sem.acquire()
         scan()
