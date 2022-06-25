@@ -8,16 +8,19 @@ package csw.time.scheduler.internal
 import jnr.ffi.*
 import TaskScheduler.*
 import akka.actor.ActorRef
-import csw.time.core.models.{TMTTime, UTCTime}
+import csw.time.core.models.{TAITime, TMTTime, UTCTime}
 import csw.time.scheduler.api.{Cancellable, TimeServiceScheduler}
 
-import java.time.Duration
+import java.time.{Duration, Instant}
 import java.util.concurrent.{CopyOnWriteArrayList, Semaphore}
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicLong}
 
 object TaskScheduler {
+  val CLOCK_REALTIME  = 0
   val CLOCK_MONOTONIC = 1
-  val TIMER_ABSTIME   = 1
+  val CLOCK_TAI       = 11
+
+  val TIMER_ABSTIME = 1
 
   private val libraryOptions = new java.util.HashMap[LibraryOption, Any]()
   // load immediately instead of lazily (ie on first use)
@@ -52,10 +55,10 @@ object TaskScheduler {
    */
   abstract class ScanTask(val waitTicks: Long, val once: Boolean = false, val maybeStartTime: Option[TMTTime] = None)
       extends Runnable {
-    private[internal] val sem = new Semaphore(1)
-    sem.acquire()
+    private[internal] val sem       = new Semaphore(1)
     private[internal] val tickCount = new AtomicLong(0)
     private[internal] val running   = new AtomicBoolean(true)
+//    sem.acquire()
     new Thread(this).start()
 
     /**
@@ -64,32 +67,42 @@ object TaskScheduler {
     def stop(): Unit = running.set(false)
 
     override def run(): Unit = {
-      var started = false
+      if (maybeStartTime.isDefined) {
+        val startTime = maybeStartTime.get
+        val currentTime = startTime match {
+          case _: UTCTime => UTCTime.now()
+          case _: TAITime => TAITime.now()
+        }
+        val millis = Duration.between(currentTime.value, startTime.value).toMillis
+        if (millis > 0) {
+          Thread.sleep(millis)
+        }
+      }
+      sem.drainPermits()
       while (running.get()) {
         sem.acquire()
-        if (started || (maybeStartTime.isDefined && UTCTime.now().value.compareTo(maybeStartTime.get.value) >= 0)) {
-          started = true
-          scan()
-          if (once) {
-            stop()
-          }
+        scan()
+        if (once) {
+          stop()
         }
       }
     }
+
     // method executed every waitTicks ticks
     def scan(): Unit
   }
 }
 
-class TaskScheduler {
+class TaskScheduler extends Runnable {
   // list of scheduled tasks
   private val tasks    = new CopyOnWriteArrayList[ScanTask]()
   private val stopFlag = new AtomicBoolean(false)
+  new Thread(this).start()
 
   def addTask(task: ScanTask): Boolean    = tasks.add(task)
   def removeTask(task: ScanTask): Boolean = tasks.remove(task)
 
-  def start(): Unit = {
+  def run(): Unit = {
     import TaskScheduler.*
     val deadline = new Timespec(runtime)
 
@@ -101,7 +114,7 @@ class TaskScheduler {
           task.sem.release()
           if (!task.running.get()) removeTask(task)
         }
-        task.tickCount.getAndDecrement()
+        if (task.tickCount.get() > 0) task.tickCount.getAndDecrement()
       }
       libc.clock_gettime(CLOCK_MONOTONIC, deadline)
       val tv_sec  = deadline.tv_sec.longValue()

@@ -9,10 +9,10 @@ import akka.actor.testkit.typed.scaladsl
 import akka.actor.testkit.typed.scaladsl.{ManualTime, ScalaTestWithActorTestKit}
 import akka.actor.typed
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.typed.{ActorSystem, Scheduler, SpawnProtocol}
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.testkit.TestProbe
 import csw.time.core.models.{TAITime, UTCTime}
-import csw.time.scheduler.TimeServiceSchedulerFactory
+import csw.time.scheduler.NativeTimeServiceSchedulerFactory
 import org.scalatest.funsuite.AnyFunSuiteLike
 
 import java.time.Duration
@@ -21,13 +21,14 @@ import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, ExecutionContext}
 
+
 class TimeServiceSchedulerNativeTest extends ScalaTestWithActorTestKit(ManualTime.config) with AnyFunSuiteLike {
 
   private val manualTime                    = ManualTime()(system)
-  private implicit val scheduler: Scheduler = system.scheduler
+//  private implicit val scheduler: Scheduler = system.scheduler
   private implicit val ec: ExecutionContext = system.executionContext
 
-  private val timeService = new TimeServiceSchedulerFactory().make()
+  private val timeService = new NativeTimeServiceSchedulerFactory().make()
 
   // DEOPSCSW-542: Schedule a task to execute in future
   List(
@@ -39,10 +40,7 @@ class TimeServiceSchedulerNativeTest extends ScalaTestWithActorTestKit(ManualTim
       val probeMsg  = "echo"
 
       val cancellable = timeService.scheduleOnce(idealScheduleTime())(testProbe.ref ! probeMsg)
-      manualTime.timePasses(500.millis)
-      // check immediately after 5 millis, there should be no message
-      testProbe.expectNoMessage(0.millis)
-      manualTime.timePasses(500.millis)
+      testProbe.expectNoMessage(999.millis)
       testProbe.expectMsg(probeMsg)
       cancellable.cancel()
     }
@@ -57,7 +55,7 @@ class TimeServiceSchedulerNativeTest extends ScalaTestWithActorTestKit(ManualTim
     val cancellable: Cancellable = timeService.schedulePeriodically(Duration.ofMillis(100)) {
       buffer += atomicInt.getAndIncrement()
     }
-    manualTime.timePasses(500.millis)
+    Thread.sleep(520)
     cancellable.cancel()
     buffer shouldBe ArrayBuffer(0, 1, 2, 3, 4, 5)
   }
@@ -75,9 +73,9 @@ class TimeServiceSchedulerNativeTest extends ScalaTestWithActorTestKit(ManualTim
     val cancellable: Cancellable = timeService.schedulePeriodically(startTime, Duration.ofMillis(100)) {
       buffer += atomicInt.getAndIncrement()
     }
-    manualTime.timePasses(1.seconds)
+    Thread.sleep(1020)
     buffer shouldBe ArrayBuffer(0)
-    manualTime.timePasses(500.millis)
+    Thread.sleep(500)
     cancellable.cancel()
     buffer shouldBe ArrayBuffer(0, 1, 2, 3, 4, 5)
   }
@@ -90,7 +88,7 @@ class TimeServiceSchedulerNativeTest extends ScalaTestWithActorTestKit(ManualTim
     val system: ActorSystem[SpawnProtocol.Command] = typed.ActorSystem(SpawnProtocol(), "test1")
     implicit val ec: ExecutionContext              = system.executionContext
 
-    val timeService = new TimeServiceSchedulerFactory()(system.scheduler).make()
+    val timeService = new NativeTimeServiceSchedulerFactory().make()
     val testProbe   = scaladsl.TestProbe[UTCTime]("blah")(system)
 
     val startTime    = UTCTime(UTCTime.now().value.plusSeconds(1))
@@ -115,7 +113,7 @@ class TimeServiceSchedulerNativeTest extends ScalaTestWithActorTestKit(ManualTim
     val system: ActorSystem[SpawnProtocol.Command] = typed.ActorSystem(SpawnProtocol(), "test1")
     implicit val ec: ExecutionContext              = system.executionContext
 
-    val timeService = new TimeServiceSchedulerFactory()(system.scheduler).make()
+    val timeService = new NativeTimeServiceSchedulerFactory().make()
 
     val testProbe = scaladsl.TestProbe[UTCTime]()(system)
 
@@ -149,7 +147,7 @@ class TimeServiceSchedulerNativeTest extends ScalaTestWithActorTestKit(ManualTim
     // hence separate instance of actor typedSystem is created here which does not use ManualConfig
     val system: ActorSystem[SpawnProtocol.Command] = typed.ActorSystem(SpawnProtocol(), "test1")
     implicit val ec: ExecutionContext              = system.executionContext
-    val timeService                                = new TimeServiceSchedulerFactory()(system.scheduler).make()
+    val timeService                                = new NativeTimeServiceSchedulerFactory().make()
     val testProbe                                  = scaladsl.TestProbe[UTCTime]()(system)
 
     val buffer: ArrayBuffer[Int] = ArrayBuffer.empty

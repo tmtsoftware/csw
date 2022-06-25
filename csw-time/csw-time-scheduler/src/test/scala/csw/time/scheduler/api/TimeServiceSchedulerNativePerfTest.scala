@@ -10,7 +10,7 @@ import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorSystem, Scheduler}
 import csw.time.core.models.UTCTime
-import csw.time.scheduler.TimeServiceSchedulerFactory
+import csw.time.scheduler.{NativeTimeServiceSchedulerFactory, TimeServiceSchedulerFactory}
 import org.HdrHistogram.Histogram
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.funsuite.AnyFunSuiteLike
@@ -26,8 +26,8 @@ class TimeServiceSchedulerNativePerfTest extends AnyFunSuiteLike with BeforeAndA
 
   private val sys                                         = ActorSystem(Behaviors.empty, "test")
   private implicit val executionContext: ExecutionContext = sys.executionContext
-  private implicit val scheduler: Scheduler               = sys.scheduler
-  private val timeService                                 = new TimeServiceSchedulerFactory().make()
+//  private implicit val scheduler: Scheduler               = sys.scheduler
+  private val timeService                                 = new NativeTimeServiceSchedulerFactory().make()
 
   type PercentileType = (Long, Long, Long)
 

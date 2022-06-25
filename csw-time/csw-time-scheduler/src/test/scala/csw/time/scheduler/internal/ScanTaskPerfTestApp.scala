@@ -46,6 +46,4 @@ object ScanTaskPerfTestApp extends App {
 
   scheduler.addTask(new MyTask("1000-ms-task-A", 1000))
   scheduler.addTask(new MyTask("1000-ms-task-B", 1000))
-
-  scheduler.start()
 }
