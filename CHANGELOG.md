@@ -11,13 +11,23 @@ All notable changes to this project will be documented in this file.
 
 ## Upcoming releases
 
+## [CSW v5.0.0-RC1] - 2022-09-14
+This is a release candidate 1 for version 5.0.0 of the TMT Common Software for project stakeholders.
+See [here](https://tmtsoftware.github.io/csw/5.0.0-RC1/) for a detailed documentation of this version of the CSW software.
+
+### Changes
 - Upgrade the project to jdk 17 (Update the INSTALL.md)
-- Add `nanometers` to Units
+- Added missing standard units
 - [Breaking] ComponentInfo now takes componentHandlerClassName instead of behaviorFactoryClassName.
   Follow migration guide(https://tmtsoftware.github.io/csw/migration_guide/migration_guide_4.0.0_to_5.0.0/migration-guide-4.0.0-to-5.0.0.html)
-- Starting Component in standalone or container mode is automatically derived based on config structure. So, 
-  - When using ContainerCmd App, used don't need to provide `--standalone` option anymore.
+- Starting Component in standalone or container mode is automatically derived based on config structure. So,
+    - When using ContainerCmd App, used don't need to provide `--standalone` option anymore.
 - Added `OffsetStart`, `OffsetEnd`, `InputRequestStart` & `InputRequestEnd` in Sequencer Observe Events.
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/5.0.0-RC1/
+- Scaladoc: https://tmtsoftware.github.io/csw/5.0.0-RC1/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/5.0.0-RC1/api/java/index.html
 
 ## [CSW v4.0.1] - 2022-02-09
 This is final release v4.0.1 of the TMT Common Software for project stakeholders.
