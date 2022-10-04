@@ -37,7 +37,7 @@ $ chcon -R system_u:object_r:admin_home_t:s0 docker-elk/
 ```
 To know more about running Docker for Mac please refer to this [link](https://docs.docker.com/desktop/install/mac-install/). For Windows, ensure that the
 "Shared Drives" feature is enabled for the `C:` drive (Docker for Windows > Settings > Shared Drives).
-See [Configuring Docker for Windows Shared Drives](https://docs.microsoft.com/en-us/archive/blogs/stevelasker/configuring-docker-for-windows-volumes) (MSDN Blog).
+See [Configuring Docker for Windows Shared Drives](https://learn.microsoft.com/en-us/archive/blogs/stevelasker/configuring-docker-for-windows-volumes) (MSDN Blog).
 
 Assuming that the developer has downloaded `logging-aggregator-<some-version>.zip` from [csw releases](https://github.com/tmtsoftware/csw/releases)
 and unzipped it, there is one folder, as follows, in `logging-aggregator-<some-version>`:
