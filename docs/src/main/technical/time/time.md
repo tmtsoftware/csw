@@ -167,7 +167,7 @@ adapters. This API is a part of the Linux kernel and synchronizes Linux
 clock with external time. The PTP Daemon protocol stack implements the
 specified rules of the synchronization by the IEEE 1588:2008 standard.
 The reliable and popular [LinuxPTP
-project](http://linuxptp.sourceforge.net/) is utilised as the PTP Daemon
+project](https://linuxptp.sourceforge.net/) is utilised as the PTP Daemon
 for TMT since it meets the general requirements of supporting PTP
 synchronization across the network. LinuxPTP updates the PHC API to set
 the correct time on the Linux kernel as well as the system wall clock.
