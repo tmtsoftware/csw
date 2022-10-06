@@ -9,7 +9,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     env:
-      ESW_TS_VERSION: "0.4.0-RC1"
+      ESW_TS_VERSION: "0.4.0-RC2"
     steps:
       - uses: actions/checkout@v2
       - uses: coursier/setup-action@v1.2.0-M2

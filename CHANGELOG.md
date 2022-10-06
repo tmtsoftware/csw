@@ -10,6 +10,12 @@ The product is in a new repository: [csw](https://github.com/tmtsoftware/csw).
 All notable changes to this project will be documented in this file.
 
 ## Upcoming releases
+n/a
+
+## [CSW v5.0.0-RC2] - 2022-10-06
+This is a release candidate 2 for version 5.0.0 of the TMT Common Software for project stakeholders.
+See [here](https://tmtsoftware.github.io/csw/5.0.0-RC2/) for a detailed documentation of this version of the CSW software.
+
 
 ## [CSW v5.0.0-RC1] - 2022-09-14
 This is a release candidate 1 for version 5.0.0 of the TMT Common Software for project stakeholders.
