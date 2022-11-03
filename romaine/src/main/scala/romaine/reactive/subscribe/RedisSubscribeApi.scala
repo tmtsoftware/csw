@@ -25,7 +25,7 @@ class RedisSubscribeApi[K, V](redisReactiveCommands: RedisPubSubReactiveCommands
   def close(): Future[Unit] =
     Future {
       blocking {
-        redisReactiveCommands.getStatefulConnection.close()
+        redisReactiveCommands.shutdown(true)
       }
     }
 }

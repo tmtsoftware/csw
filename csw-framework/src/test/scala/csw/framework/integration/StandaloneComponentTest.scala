@@ -6,7 +6,6 @@
 package csw.framework.integration
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
@@ -15,9 +14,9 @@ import csw.command.client.CommandServiceFactory
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.command.client.models.framework.SupervisorLifecycleState
-import csw.common.FrameworkAssertions._
+import csw.common.FrameworkAssertions.*
 import csw.common.components.framework.SampleComponentHandlers
-import csw.common.components.framework.SampleComponentState._
+import csw.common.components.framework.SampleComponentState.*
 import csw.common.utils.TestAppender
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.internal.component.ComponentBehavior
@@ -43,7 +42,7 @@ import scala.concurrent.duration.DurationLong
 // CSW-82: ComponentInfo should take prefix
 // CSW-86: Subsystem should be case-insensitive
 class StandaloneComponentTest extends FrameworkIntegrationSuite {
-  import testWiring._
+  import testWiring.*
   // all log messages will be captured in log buffer
   private val logBuffer                    = mutable.Buffer.empty[JsObject]
   private val testAppender                 = new TestAppender(x => logBuffer += Json.parse(x.toString).as[JsObject])
@@ -89,8 +88,7 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
 
     val supervisorCommandService = CommandServiceFactory.make(resolvedAkkaLocation)
 
-    val (_, akkaProbe) =
-      seedLocationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent](seedActorSystem.toClassic))(Keep.both).run()
+    val (_, akkaProbe) = seedLocationService.track(akkaConnection).toMat(TestSink[TrackingEvent]())(Keep.both).run()
     akkaProbe.requestNext() shouldBe a[LocationUpdated]
 
     // on shutdown, component unregisters from location service
