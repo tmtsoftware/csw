@@ -11,23 +11,22 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.stream.scaladsl.{Keep, Sink}
 import csw.event.api.scaladsl.SubscriptionModes
 import csw.event.client.helpers.TestFutureExt.RichFuture
-import csw.event.client.helpers.Utils._
-import csw.prefix.models.{Prefix, Subsystem}
-import csw.event.client.internal.kafka.KafkaTestProps
+import csw.event.client.helpers.Utils.*
 import csw.event.client.internal.redis.RedisTestProps
 import csw.event.client.internal.wiring.BaseProperties
 import csw.params.core.models.ObsId
-import csw.params.events.{Event, EventKey, EventName, IRDetectorEvent, OpticalDetectorEvent, SystemEvent, WFSDetectorEvent}
+import csw.params.events.*
+import csw.prefix.models.{Prefix, Subsystem}
 import org.scalatest.concurrent.Eventually
+import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.testng.TestNGSuite
-import org.testng.annotations._
+import org.testng.annotations.*
 
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.{immutable, mutable}
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
 import scala.util.Random
-import org.scalatest.matchers.should.Matchers
 
 //DEOPSCSW-331: Event Service Accessible to all CSW component builders
 //DEOPSCSW-334: Publish an event
@@ -40,27 +39,27 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 10.millis)
 
   var redisTestProps: RedisTestProps = _
-  var kafkaTestProps: KafkaTestProps = _
+//  var kafkaTestProps: KafkaTestProps = _
 
   @BeforeSuite
   def beforeAll(): Unit = {
     redisTestProps = RedisTestProps.createRedisProperties()
-    kafkaTestProps = KafkaTestProps.createKafkaProperties()
+//    kafkaTestProps = KafkaTestProps.createKafkaProperties()
     redisTestProps.start()
-    kafkaTestProps.start()
+//    kafkaTestProps.start()
   }
 
   @AfterSuite
   def afterAll(): Unit = {
     redisTestProps.shutdown()
-    kafkaTestProps.shutdown()
+//    kafkaTestProps.shutdown()
   }
 
   @DataProvider(name = "event-service-provider")
   def pubSubProvider: Array[Array[_ <: BaseProperties]] =
     Array(
-      Array(redisTestProps),
-      Array(kafkaTestProps)
+      Array(redisTestProps)
+//      Array(kafkaTestProps)
     )
 
   @DataProvider(name = "redis-provider")
@@ -95,7 +94,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   def should_be_able_to_subscribe_an_event__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_346_DEOPSCSW_343(
       baseProperties: BaseProperties
   ): Unit = {
-    import baseProperties._
+    import baseProperties.*
 
     val event1             = makeDistinctEvent(Random.nextInt())
     val eventKey: EventKey = event1.eventKey
@@ -120,7 +119,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   def should_be_able_to_subscribe_with_async_callback__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_338_DEOPSCSW_343(
       baseProperties: BaseProperties
   ): Unit = {
-    import baseProperties._
+    import baseProperties.*
 
     val event1    = makeEvent(1)
     val testProbe = TestProbe[Event]()
@@ -145,7 +144,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   def should_be_able_to_subscribe_with_async_callback_with_duration__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_338_DEOPSCSW_342(
       baseProperties: BaseProperties
   ): Unit = {
-    import baseProperties._
+    import baseProperties.*
 
     val queue: mutable.Queue[Event]  = new mutable.Queue[Event]()
     val queue2: mutable.Queue[Event] = new mutable.Queue[Event]()
@@ -173,7 +172,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   def should_be_able_to_subscribe_with_callback__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_338_DEOPSCSW_346(
       baseProperties: BaseProperties
   ): Unit = {
-    import baseProperties._
+    import baseProperties.*
 
     val listOfPublishedEvents: ArrayBuffer[Event] = ArrayBuffer.empty
 
@@ -202,7 +201,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   def should_be_able_to_subscribe_with_callback_with_duration__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_338_DEOPSCSW_342(
       baseProperties: BaseProperties
   ): Unit = {
-    import baseProperties._
+    import baseProperties.*
 
     val queue: mutable.Queue[Event]  = new mutable.Queue[Event]()
     val queue2: mutable.Queue[Event] = new mutable.Queue[Event]()
@@ -230,7 +229,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   def should_be_able_to_subscribe_with_an_ActorRef__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_339(
       baseProperties: BaseProperties
   ): Unit = {
-    import baseProperties._
+    import baseProperties.*
 
     val event1 = makeDistinctEvent(Random.nextInt())
 
@@ -252,7 +251,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   def should_be_able_to_subscribe_with_an_ActorRef_with_duration__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_339_DEOPSCSW_342(
       baseProperties: BaseProperties
   ): Unit = {
-    import baseProperties._
+    import baseProperties.*
     val inbox  = TestInbox[Event]()
     val event1 = makeEvent(205)
 
@@ -272,7 +271,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   def should_be_able_to_subscribe_an_event_with_pattern_from_different_subsystem__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_420(
       redisProps: RedisTestProps
   ): Unit = {
-    import redisProps._
+    import redisProps.*
 
     val testEvent1 = makeEventWithPrefix(1, Prefix("csw.prefix"))
     val testEvent2 = makeEventWithPrefix(2, Prefix("csw.prefix"))
@@ -302,7 +301,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   def should_be_able_to_subscribe_an_event_with_pattern_from_same_subsystem__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_420(
       redisProps: RedisTestProps
   ): Unit = {
-    import redisProps._
+    import redisProps.*
 
     val testEvent1 = makeEventForKeyName(EventName("movement.linear"), 1)
     val testEvent2 = makeEventForKeyName(EventName("movement.angular"), 2)
@@ -369,7 +368,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   // Pattern subscription doesn't work with embedded kafka hence not running it with the suite
   @Test(dataProvider = "redis-provider")
   def should_be_able_to_subscribe_all_observe_events__CSW_119(redisProps: RedisTestProps): Unit = {
-    import redisProps._
+    import redisProps.*
 
     val obsId          = ObsId("2020A-001-123")
     val irDetObsStart  = IRDetectorEvent.observeStart(Prefix("IRIS.det"), obsId)
@@ -403,7 +402,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   def should_be_able_to_make_independent_subscriptions__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395(
       baseProperties: BaseProperties
   ): Unit = {
-    import baseProperties._
+    import baseProperties.*
 
     val prefix        = Prefix("csw.prefix")
     val eventName1    = EventName("system1")
@@ -430,7 +429,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   def should_be_able_to_retrieve_recently_published_event_on_subscription__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_340(
       baseProperties: BaseProperties
   ): Unit = {
-    import baseProperties._
+    import baseProperties.*
 
     val event1   = makeEvent(1)
     val event2   = makeEvent(2)
@@ -456,7 +455,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   def should_be_able_to_retrieve_InvalidEvent__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_340(
       baseProperties: BaseProperties
   ): Unit = {
-    import baseProperties._
+    import baseProperties.*
     val eventKey = EventKey("csw.a.b.c")
 
     val (_, seqF) = subscriber.subscribe(Set(eventKey)).take(1).toMat(Sink.seq)(Keep.both).run()
@@ -469,7 +468,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   def should_be_able_to_retrieve_valid_as_well_as_invalid_event_when_events_are_published_for_some_and_not_for_other_keys__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_340(
       baseProperties: BaseProperties
   ): Unit = {
-    import baseProperties._
+    import baseProperties.*
     val distinctEvent1 = makeDistinctEvent(Random.nextInt())
     val distinctEvent2 = makeDistinctEvent(Random.nextInt())
 
@@ -489,7 +488,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   def should_be_able_to_get_an_event_without_subscribing_for_it__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_344(
       baseProperties: BaseProperties
   ): Unit = {
-    import baseProperties._
+    import baseProperties.*
 
     val event1   = makeDistinctEvent(Random.nextInt())
     val eventKey = event1.eventKey
@@ -506,7 +505,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   def should_be_able_to_get_InvalidEvent__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_344(
       baseProperties: BaseProperties
   ): Unit = {
-    import baseProperties._
+    import baseProperties.*
 
     val prefix    = Prefix("wfos.blue.test_filter")
     val eventName = EventName("move")
@@ -523,7 +522,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   def should_be_able_to_get_events_for_multiple_event_keys__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_344(
       baseProperties: BaseProperties
   ): Unit = {
-    import baseProperties._
+    import baseProperties.*
 
     val event1    = makeDistinctEvent(Random.nextInt())
     val eventKey1 = event1.eventKey
@@ -542,7 +541,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   def should_be_able_to_get_invalid_event_on_event_parse_failure__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395(
       baseProperties: BaseProperties
   ): Unit = {
-    import baseProperties._
+    import baseProperties.*
     val eventKey = makeEvent(0).eventKey
 
     val (subscription, seqF) = subscriber.subscribe(Set(eventKey)).take(2).toMat(Sink.seq)(Keep.both).run()
@@ -561,7 +560,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   def should_be_able_to_resume_subscriber_after_exception__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395(
       baseProperties: BaseProperties
   ): Unit = {
-    import baseProperties._
+    import baseProperties.*
     val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
     val event1                      = makeEvent(1)
 
@@ -583,7 +582,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
       baseProperties: BaseProperties
   ): Unit = {
     eventId = 0
-    import baseProperties._
+    import baseProperties.*
     val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
     val event1                      = makeEvent(1)
 
@@ -608,7 +607,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   def should_be_able_to_resume_pattern_subscriber_after_exception__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395(
       redisProps: RedisTestProps
   ): Unit = {
-    import redisProps._
+    import redisProps.*
     val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
 
     val cancellable = publisher.publish(eventGenerator(), 1.millis)
