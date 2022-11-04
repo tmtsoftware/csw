@@ -12,7 +12,7 @@ import reactor.core.publisher.FluxSink.OverflowStrategy
 import romaine.RedisResult
 
 import scala.compat.java8.FutureConverters.CompletionStageOps
-import scala.concurrent.{blocking, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 class RedisSubscribeApi[K, V](redisReactiveCommands: RedisPubSubReactiveCommands[K, V])(implicit ec: ExecutionContext)
     extends RedisReactiveApi[K, V] {
@@ -23,9 +23,5 @@ class RedisSubscribeApi[K, V](redisReactiveCommands: RedisPubSubReactiveCommands
       .map(x => RedisResult(x.getChannel, x.getMessage))
   def unsubscribe(keys: List[K]): Future[Done] = redisReactiveCommands.unsubscribe(keys: _*).toFuture.toScala.map(_ => Done)
   def close(): Future[Unit] =
-    Future {
-      blocking {
-        redisReactiveCommands.shutdown(true)
-      }
-    }
+    redisReactiveCommands.shutdown(true).toFuture.toScala.map(_ => Done)
 }
