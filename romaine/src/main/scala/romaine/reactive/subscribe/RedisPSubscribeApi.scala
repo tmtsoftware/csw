@@ -24,6 +24,6 @@ class RedisPSubscribeApi[K, V](redisReactiveCommands: RedisPubSubReactiveCommand
       .map(x => RedisResult(x.getChannel, x.getMessage))
 
   def unsubscribe(keys: List[K]): Future[Done] = redisReactiveCommands.punsubscribe(keys: _*).toFuture.toScala.map(_ => Done)
-  def close(): Future[Unit] =
-    redisReactiveCommands.shutdown(true).toFuture.toScala.map(_ => Done)
+//  def close(): Future[Unit] =
+//    redisReactiveCommands.shutdown(false).toFuture.toScala.map(_ => Done)
 }
