@@ -18,12 +18,13 @@ object Libs {
   val `svnkit`        = "org.tmatesoft.svnkit" % "svnkit"        % "1.10.8"     // TMate Open Source License
   val `commons-codec` = "commons-codec"        % "commons-codec" % "1.15"       // Apache 2.0š
   val `scala-reflect` = "org.scala-lang"       % "scala-reflect" % ScalaVersion // BSD-3
-  val `gson`          = "com.google.code.gson" % "gson"          % "2.10"      // Apache 2.0
+  val `gson`          = "com.google.code.gson" % "gson"          % "2.10"       // Apache 2.0
   val `play-json`     = "com.typesafe.play"   %% "play-json"     % "2.9.3"      // Apache 2.0
 
-  val `enumeratum`      = dep("com.beachape" %%% "enumeratum" % "1.7.0")  // MIT License
-  val `scala-java-time` = dep("io.github.cquiroz" %%% "scala-java-time" % "2.3.0")
-  val `scalatest`       = dep("org.scalatest" %%% "scalatest" % "3.2.14") // Apache License 2.0
+  val `enumeratum`                = dep("com.beachape" %%% "enumeratum" % "1.7.0")  // MIT License
+  val `scala-java-time`           = dep("io.github.cquiroz" %%% "scala-java-time" % "2.3.0")
+  val `scalajs-java-securerandom` = dep("org.scala-js" %%% "scalajs-java-securerandom" % "1.0.0")
+  val `scalatest`                 = dep("org.scalatest" %%% "scalatest" % "3.2.14") // Apache License 2.0
 
   val `jwt-core`         = "com.pauldijou"      %% "jwt-core"         % "5.0.0"
   val `lettuce`          = "io.lettuce"          % "lettuce-core"     % "6.2.1.RELEASE"

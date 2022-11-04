@@ -304,7 +304,8 @@ lazy val `csw-params` = crossProject(JSPlatform, JVMPlatform)
     fork := false
   )
   .jsSettings(
-    libraryDependencies += Libs.`scala-java-time`.value
+    libraryDependencies += Libs.`scala-java-time`.value,
+    libraryDependencies += Libs.`scalajs-java-securerandom`.value
   )
   .jvmSettings(
     libraryDependencies ++= Dependencies.ParamsJvm.value
