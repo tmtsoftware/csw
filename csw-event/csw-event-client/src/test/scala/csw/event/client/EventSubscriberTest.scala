@@ -610,13 +610,14 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     import redisProps.*
     val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
 
+    val subscription = subscriber.pSubscribeCallback(Subsystem.CSW, eventPattern, resumingCallback(queue))
+    Thread.sleep(1000)
+
     val cancellable = publisher.publish(eventGenerator(), 1.millis)
     Thread.sleep(500) // Needed for redis set which is fire and forget operation
 
-    val subscription = subscriber.pSubscribeCallback(Subsystem.CSW, eventPattern, resumingCallback(queue))
-    Thread.sleep(1000)
     subscription.unsubscribe().await
-    queue.size > 2 shouldBe true
+    queue.size > 10 shouldBe true
 
     cancellable.cancel()
   }
