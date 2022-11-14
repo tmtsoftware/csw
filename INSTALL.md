@@ -5,10 +5,16 @@
 * The CSW software is build using [sbt](https://www.scala-sbt.org).
 Be sure to install the latest version and add it to your shell path.
 
-* This version of CSW also requires [Java-11](https://openjdk.java.net/projects/jdk/11/).
-On Linux systems java can be installed using the standard tools (`yum` on CentOS, `dnf` on Fedora, `apt` on Ubuntu, etc.).
-On Macs, you can use [AdoptOpenJDK](https://github.com/AdoptOpenJDK/homebrew-openjdk),
-which is also available for [Linux](https://adoptopenjdk.net/installation.html?variant=openjdk11&jvmVariant=hotspot#x64_linux-jdk).
+* This version of CSW also requires [Java-17](https://openjdk.java.net/projects/jdk/17/).
+
+## Upgrading to Java 17
+
+If you have Java installed via Coursier then follow these instructions:
+- Re-install `cs` as described in [Coursier installation](https://get-coursier.io/docs/cli-installation#native-launcher) (this will make sure that jvm-indexes are updated).
+- Run the following command `cs java --jvm temurin:1.17` - this will upgrade Java to version 17.
+- Once Java is upgraded include command `eval $(cs java --jvm temurin:1.17 --env)` in your respective shell profiles (this will set the required environment variables (e.g., JAVA_HOME) into your shell).
+
+If you want to install Java 17 manually - the binary package for macOS or Linux can be downloaded from [Adoptium Temurin releases](https://adoptium.net/temurin/releases).
 
 ## Building the Software
 
