@@ -35,7 +35,8 @@ import csw.prefix.models.Subsystem.{LGSF, NFIRAOS, TCS}
 class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
 
   import cliWiring._
-  import commandLineRunner.alarmService._
+  val alarmService = commandLineRunner.alarmService
+  import alarmService._
 
   private val successMsg = "[SUCCESS] Command executed successfully."
   private val failureMsg = "[FAILURE] Failed to execute the command."

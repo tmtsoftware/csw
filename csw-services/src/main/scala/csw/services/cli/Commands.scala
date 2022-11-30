@@ -5,14 +5,12 @@
 
 package csw.services.cli
 
-import caseapp.{CommandName, HelpMessage, ExtraName => Short}
+import caseapp.{CommandName, HelpMessage, ExtraName as Short}
 
-sealed trait Command
-
-object Command {
+object Commands {
   @CommandName("start")
   @HelpMessage("starts all the CSW services by default if no other option is provided")
-  final case class Start(
+  final case class StartOptions(
       @HelpMessage("start location server")
       @Short("l")
       location: Boolean = false,
@@ -39,9 +37,9 @@ object Command {
       @HelpMessage("name of the outside interface")
       @Short("o")
       outsideInterfaceName: Option[String]
-  ) extends Command
+  )
 
-  object Start {
+  object StartOptions {
     def apply(
         location: Boolean = false,
         config: Boolean = false,
@@ -51,13 +49,13 @@ object Command {
         auth: Boolean = false,
         insideInterfaceName: Option[String] = None,
         outsideInterfaceName: Option[String] = None
-    ): Start = {
+    ): StartOptions = {
       if (location || config || event || alarm || database || auth) {
         // always start location server if explicitly started or any other service is started
-        new Start(true, config, event, alarm, database, auth, insideInterfaceName, outsideInterfaceName)
+        new StartOptions(true, config, event, alarm, database, auth, insideInterfaceName, outsideInterfaceName)
       }
       // mark all flags=true when no option is provided to start command
-      else new Start(true, true, true, true, true, true, insideInterfaceName, outsideInterfaceName)
+      else new StartOptions(true, true, true, true, true, true, insideInterfaceName, outsideInterfaceName)
     }
   }
 

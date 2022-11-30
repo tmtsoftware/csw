@@ -55,7 +55,7 @@ class ActorLoggingTest extends LoggingTestSuite {
       log.getString(LoggingKeys.FILE) shouldBe IRIS.FILE_NAME
       // todo : create method getNumber as extension to JsObject.
       log(LoggingKeys.LINE).as[Int] shouldBe logMsgLineNumber
-      log.getString(LoggingKeys.CLASS).toString shouldBe IRIS.CLASS_NAME
+      log.getString(LoggingKeys.CLASS).toString shouldBe (IRIS.CLASS_NAME + "#behavior")
       logMsgLineNumber += 1
     }
   }

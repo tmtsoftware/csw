@@ -23,7 +23,6 @@ object Common {
   val MaybeCoverage: Plugins = if (enableCoverage) Coverage else Plugins.empty
   val jsTestArg              = Test / testOptions := Seq(Tests.Argument("-oDF"))
   lazy val CommonSettings: Seq[Setting[_]] = Seq(
-    
     docsRepo                                        := "https://github.com/tmtsoftware/tmtsoftware.github.io.git",
     docsParentDir                                   := "csw",
     gitCurrentRepo                                  := "https://github.com/tmtsoftware/csw",
@@ -44,13 +43,13 @@ object Common {
       "-unchecked",
       "-deprecation",
       // -W Options
-      "-Wdead-code",
-      if (enableFatalWarnings) "-Wconf:any:error" else "-Wconf:any:warning-verbose",
+//      "-Wdead-code",
+//      if (enableFatalWarnings) "-Wconf:any:error" else "-Wconf:any:warning-verbose",
       // -X Options
-      "-Xlint:_,-missing-interpolator",
-      "-Xsource:3",
-      "-Xcheckinit",
-      "-Xasync"
+//      "-Xlint:_,-missing-interpolator",
+//      "-Xsource:3",
+//      "-Xcheckinit",
+//      "-Xasync"
       // -Y options are rarely needed, please look for -W equivalents
     ),
     javacOptions ++= Seq(

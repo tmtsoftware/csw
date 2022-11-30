@@ -22,7 +22,8 @@ class ConfigClientApiTest extends ConfigClientBaseSuite {
   private val serverWiring = ServerWiring.make(securityDirectives)
   private val httpService  = serverWiring.httpService
 
-  import serverWiring.actorRuntime._
+  val runtime = serverWiring.actorRuntime
+  import runtime._
 
   private val clientLocationService = HttpLocationServiceFactory.makeLocalClient
   private val testFileUtils         = new TestFileUtils(serverWiring.settings)

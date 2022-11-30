@@ -28,7 +28,8 @@ object Standalone {
    */
   def spawn(config: com.typesafe.config.Config, wiring: FrameworkWiring): Future[ActorRef[ComponentMessage]] = {
     import wiring._
-    import actorRuntime._
+    val runtime = wiring.actorRuntime
+    import runtime._
 
     val componentInfo = ConfigParser.parseStandalone(config)
     val richSystem    = new CswFrameworkSystem(actorRuntime.actorSystem)

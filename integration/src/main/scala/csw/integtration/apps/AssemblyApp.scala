@@ -24,7 +24,8 @@ object AssemblyApp extends App {
   locationWiring.actorRuntime.startLogging("Assembly", locationWiring.clusterSettings.hostname)
   locationWiring.locationHttpService.start().await
 
-  import locationWiring.actorRuntime._
+  val runtime = locationWiring.actorRuntime
+  import runtime._
 
   private val assemblyActorRef = actorSystem.spawn(behavior, "assembly")
   private val componentId      = ComponentId(Prefix(NFIRAOS, "assembly"), Assembly)

@@ -102,7 +102,7 @@ trait ParamCodecsBase extends CommonCodecs {
     encoder.write(w, value.asInstanceOf[Parameter[Any]])
   }
 
-  implicit lazy val paramDecExistential: Decoder[Parameter[_]] = { r: Reader =>
+  implicit lazy val paramDecExistential: Decoder[Parameter[_]] = { (r: Reader) =>
     r.tryReadMapHeader(1) || r.tryReadMapStart() || r.tryReadArrayHeader(1) || r.tryReadArrayStart()
     val keyTypeName = r.readString()
     val keyType     = KeyType.withNameInsensitive(keyTypeName)

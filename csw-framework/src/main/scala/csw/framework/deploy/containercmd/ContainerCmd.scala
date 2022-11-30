@@ -48,7 +48,8 @@ private[framework] class ContainerCmd(
   private val log: Logger = new LoggerFactory(Prefix(subsystem, name)).getLogger
 
   private lazy val wiring: FrameworkWiring = new FrameworkWiring
-  import wiring.actorRuntime.*
+  val runtime                              = wiring.actorRuntime
+  import runtime.*
 
   def start(args: Array[String]): ActorRef[_] =
     new ArgsParser(name).parse(args.toList) match {

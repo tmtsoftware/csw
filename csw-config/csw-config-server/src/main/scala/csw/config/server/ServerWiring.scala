@@ -17,13 +17,12 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
 /**
  * Server configuration
  */
-private[csw] class ServerWiring {
+class ServerWiring {
   lazy val actorSystem    = ActorSystem(SpawnProtocol(), "config-server")
   lazy val config: Config = actorSystem.settings.config
   lazy val settings       = new Settings(config)
 
-  lazy val actorRuntime = new ActorRuntime(actorSystem, settings)
-  import actorRuntime._
+  val actorRuntime = new ActorRuntime(actorSystem, settings)
 
   lazy val annexFileRepo    = new AnnexFileRepo(actorRuntime.blockingIoDispatcher)
   lazy val annexFileService = new AnnexFileService(settings, annexFileRepo, actorRuntime)
@@ -35,7 +34,7 @@ private[csw] class ServerWiring {
     HttpLocationServiceFactory.makeLocalClient(actorSystem)
 
   lazy val configHandlers     = new ConfigHandlers
-  lazy val securityDirectives = SecurityDirectives(config, locationService)
+  lazy val securityDirectives = SecurityDirectives(config, locationService)(actorRuntime.ec)
   lazy val configServiceRoute = new ConfigServiceRoute(configServiceFactory, actorRuntime, configHandlers, securityDirectives)
 
   lazy val httpService: HttpService = new HttpService(locationService, configServiceRoute, settings, actorRuntime)

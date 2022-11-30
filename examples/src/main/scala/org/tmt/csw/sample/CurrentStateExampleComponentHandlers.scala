@@ -72,9 +72,9 @@ class CurrentStateExampleComponentHandlers(ctx: ActorContext[TopLevelActorMessag
 
   def validateCommand(runId: Id, command: ControlCommand): ValidateCommandResponse = {
     command.commandName match {
-      case `longRunning`   => Accepted(runId)
-      case `mediumRunning` => Accepted(runId)
-      case `shortRunning`  => Accepted(runId)
+      case longRunning.commandName  => Accepted(runId)
+      case `mediumRunning`          => Accepted(runId)
+      case shortRunning.commandName => Accepted(runId)
       case `immediateCmd` | `longRunningCmd` | `longRunningCmdToAsm` | `longRunningCmdToAsmComp` | `longRunningCmdToAsmInvalid` |
           `longRunningCmdToAsmCActor` | `cmdWithBigParameter` | `hcdCurrentStateCmd` | `matcherCmd` =>
         Accepted(runId)

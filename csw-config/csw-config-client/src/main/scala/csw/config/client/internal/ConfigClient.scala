@@ -251,7 +251,7 @@ private[config] class ConfigClient(
             // Not consuming the file content will block the connection.
             response.entity.discardBytes()
             logger.error(EmptyResponse.getMessage, ex = EmptyResponse)
-            throw EmptyResponse
+            Future.failed(EmptyResponse)
           case StatusCodes.NotFound => Future.successful(None)
         }
       )

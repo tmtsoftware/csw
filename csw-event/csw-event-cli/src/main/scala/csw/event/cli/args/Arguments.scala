@@ -6,11 +6,10 @@
 package csw.event.cli.args
 
 import java.io.File
-
 import csw.params.events.EventKey
 import scopt.{OptionDef, OptionParser}
 
-import scala.concurrent.duration.DurationDouble
+import scala.concurrent.duration.{DurationDouble, DurationInt}
 
 trait Arguments { self: OptionParser[Options] =>
 

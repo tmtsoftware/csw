@@ -22,7 +22,7 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
 
 import scala.concurrent.{ExecutionContext, Future}
 
-object AuthDocumentation {
+class AuthDocumentation {
   private implicit val actorSystem: typed.ActorSystem[SpawnProtocol.Command] = typed.ActorSystem(SpawnProtocol(), "")
   private implicit val ec: ExecutionContext                                  = actorSystem.executionContext
 

@@ -12,6 +12,7 @@ import org.scalatest.matchers
 import matchers.should.Matchers._
 
 import scala.concurrent.duration.DurationDouble
+import scala.concurrent.duration.DurationInt
 import org.scalatest.funsuite.AnyFunSuite
 
 // DEOPSCSW-549: Time service api

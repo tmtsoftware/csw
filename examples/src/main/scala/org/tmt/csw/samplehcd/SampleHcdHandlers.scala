@@ -49,7 +49,6 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
             timeServiceScheduler.scheduleOnce(when) {
               commandResponseManager.updateCommand(CommandResponse.Completed(sleep.runId))
             }
-          case _ => log.error("Unsupported message type")
         }
         Behaviors.same
       }),

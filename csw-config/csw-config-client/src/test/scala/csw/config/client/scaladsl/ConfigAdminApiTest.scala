@@ -25,7 +25,8 @@ import org.mockito.Mockito.when
 class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
 
   override val serverWiring: ServerWiring = ServerWiring.make(securityDirectives)
-  import serverWiring.actorRuntime._
+  val actorRuntime                        = serverWiring.actorRuntime
+  import actorRuntime._
 
   private val httpService           = serverWiring.httpService
   private val clientLocationService = HttpLocationServiceFactory.makeLocalClient

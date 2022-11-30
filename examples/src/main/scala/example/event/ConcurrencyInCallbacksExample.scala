@@ -48,7 +48,7 @@ class ConcurrencyInCallbacksExample(publisher: EventPublisher)(implicit actorSys
 
             // This is the CORRECT way to publish the mutable state by sending a message to the Actor in which the mutable state is kept (which in this case, is self)
             // The Async API of Publisher is called since the eventGenerator callback returns a Future[Event]
-            cancellable = publisher.publishAsync((ctx.self ? GetTemperature).map(makeEvent), 50.millis)
+            cancellable = publisher.publishAsync((ctx.self ? GetTemperature.apply).map(makeEvent), 50.millis)
 
           case CancelPublishingTemperature => cancellable.cancel()
           case TemperatureRise(rise)       => currentTemperature = Temperature(currentTemperature.degrees + rise)

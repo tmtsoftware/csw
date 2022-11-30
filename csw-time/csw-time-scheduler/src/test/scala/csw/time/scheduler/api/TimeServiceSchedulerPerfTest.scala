@@ -72,7 +72,7 @@ class TimeServiceSchedulerPerfTest extends AnyFunSuiteLike with BeforeAndAfterAl
       xs.foreach { case (probe, cancellable) =>
         probe.receiveMessages(warmup, 100.hours) // Do not record warmup tasks
 
-        val times                   = probe.receiveMessages(nTasks, 1.hour).map { t: UTCTime => t }
+        val times                   = probe.receiveMessages(nTasks, 1.hour).map { (t: UTCTime) => t }
         val histogram               = new Histogram(3)
         val histogramForConsistency = new Histogram(3)
 

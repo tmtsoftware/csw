@@ -28,16 +28,16 @@ private[csw] class Wiring {
   lazy val settings       = new Settings(config)
   lazy val actorSystem    = ActorSystem(SpawnProtocol(), "config-cli", config)
   lazy val actorRuntime   = new ActorRuntime(actorSystem)
-  import actorRuntime._
 
-  lazy val locationService: LocationService           = HttpLocationServiceFactory.makeLocalClient(actorSystem)
-  lazy val authStore                                  = new FileAuthStore(settings.authStorePath)
-  lazy val nativeAuthAdapter: InstalledAppAuthAdapter = InstalledAppAuthAdapterFactory.make(config, locationService, authStore)
-  lazy val tokenFactory: TokenFactory                 = new CliTokenFactory(nativeAuthAdapter)
-  lazy val configService: ConfigService               = ConfigClientFactory.adminApi(actorSystem, locationService, tokenFactory)
-  lazy val printLine: Any => Unit                     = println
-  lazy val commandLineRunner = new CommandLineRunner(configService, actorRuntime, printLine, nativeAuthAdapter)
-  lazy val cliApp            = new CliApp(commandLineRunner)
+  lazy val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient(actorSystem)
+  lazy val authStore                        = new FileAuthStore(settings.authStorePath)
+  lazy val nativeAuthAdapter: InstalledAppAuthAdapter =
+    InstalledAppAuthAdapterFactory.make(config, locationService, authStore)(actorRuntime.ec)
+  lazy val tokenFactory: TokenFactory   = new CliTokenFactory(nativeAuthAdapter)
+  lazy val configService: ConfigService = ConfigClientFactory.adminApi(actorSystem, locationService, tokenFactory)
+  lazy val printLine: Any => Unit       = println
+  lazy val commandLineRunner            = new CommandLineRunner(configService, actorRuntime, printLine, nativeAuthAdapter)
+  lazy val cliApp                       = new CliApp(commandLineRunner)
 }
 
 private[config] object Wiring {

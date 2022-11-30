@@ -55,7 +55,7 @@ object CommandRoles {
 
   def from(config: Config): CommandRoles = {
     val entrySet = config.entrySet().asScala.toSet
-    val cmdRoles = entrySet.map { entry: util.Map.Entry[String, ConfigValue] =>
+    val cmdRoles = entrySet.map { (entry: util.Map.Entry[String, ConfigValue]) =>
       val cmdKey = entry.getKey
       val roles  = config.getStringList(cmdKey).asScala.toSet
       CommandKey(cmdKey) -> Roles(roles)

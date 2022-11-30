@@ -625,8 +625,8 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
   }
 
   describe("test longMatrixKey") {
-    val m1: Array[Array[Long]] = Array(Array(1, 2, 3), Array(4, 5, 6), Array(7, 8, 9))
-    val m2: Array[Array[Long]] = Array(Array(1, 2, 3, 4, 5), Array(10, 20, 30, 40, 50))
+    val m1: Array[Array[Long]] = Array(Array(1L, 2, 3), Array(4L, 5, 6), Array(7L, 8, 9))
+    val m2: Array[Array[Long]] = Array(Array(1L, 2, 3, 4, 5), Array(10L, 20, 30, 40, 50))
 
     val lm1: MatrixData[Long]     = MatrixData.fromArrays(m1)
     val lm2: MatrixData[Long]     = MatrixData.fromArrays(m2)
@@ -901,8 +901,8 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
   }
 
   describe("test doubleMatrixKey") {
-    val m1: Array[Array[Double]] = Array(Array(1, 2, 3), Array(4, 5, 6), Array(7, 8, 9))
-    val m2: Array[Array[Double]] = Array(Array(1, 2, 3, 4, 5), Array(10, 20, 30, 40, 50))
+    val m1: Array[Array[Double]] = Array(Array(1.0, 2, 3), Array(4.0, 5, 6), Array(7.0, 8, 9))
+    val m2: Array[Array[Double]] = Array(Array(1.0, 2, 3, 4, 5), Array(10.0, 20, 30, 40, 50))
 
     val lm1 = MatrixData.fromArrays(m1)
     val lm2 = MatrixData.fromArrays(m2)

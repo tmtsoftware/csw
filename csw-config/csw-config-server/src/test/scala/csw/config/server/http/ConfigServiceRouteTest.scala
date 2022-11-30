@@ -46,7 +46,8 @@ class ConfigServiceRouteTest
 
   val serverWiring: ServerWiring = ServerWiring.make(securityDirectives)
   import serverWiring._
-  import configServiceRoute.route
+  val csr = configServiceRoute
+  import csr.route
   import csw.config.models.codecs.ConfigCodecs._
   import csw.commons.http.codecs.ErrorCodecs._
 

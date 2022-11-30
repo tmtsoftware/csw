@@ -43,7 +43,8 @@ final class LocationTestKit private (testKitSettings: TestKitSettings, enableAut
     }
     else ServerWiring.make(Some(testKitSettings.LocationClusterPort), Some(testKitSettings.LocationHttpPort), enableAuth = false)
 
-  import locationWiring.actorRuntime._
+  val runtime = locationWiring.actorRuntime
+  import runtime._
 
   implicit lazy val timeout: Timeout = testKitSettings.DefaultTimeout
 

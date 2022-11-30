@@ -24,8 +24,8 @@ object Dependencies {
       Libs.`scala-async`,
       Libs.`scopt`,
       Libs.`enumeratum`.value,
-      Akka.`cluster-sharding`, // akka-management-cluster-http uses lower version, to avoid conflict, this needs to be overridden
-      Libs.`akka-management-cluster-http`,
+//      Akka.`cluster-sharding`, // akka-management-cluster-http uses lower version, to avoid conflict, this needs to be overridden
+//      Libs.`akka-management-cluster-http`,
       AkkaHttp.`akka-http`,
       AkkaHttp.`akka-http-spray-json`, // akka-cluster-management uses lower version, to avoid conflict, this needs to be overridden
       MSocket.`msocket-http`,
@@ -255,7 +255,7 @@ object Dependencies {
       Akka.`akka-stream-typed`,
       Akka.`akka-actor`,
       Akka.`akka-actor-typed`,
-      Libs.`akka-stream-kafka`,
+//      Libs.`akka-stream-kafka`,
       Libs.`lettuce`,
       Libs.`reactor-core`,
       Libs.`HdrHistogram`             % Test,
@@ -265,8 +265,8 @@ object Dependencies {
       Libs.`junit4-interface`         % Test,
       Libs.`mockito`                  % Test,
       Libs.`embedded-redis`           % Test,
-      Libs.`embedded-kafka`           % Test,
-      Libs.`testng-6-7`               % Test
+//      Libs.`embedded-kafka`           % Test,
+      Libs.`testng-6-7` % Test
     )
   )
 
@@ -347,7 +347,6 @@ object Dependencies {
       Akka.`akka-stream-typed`,
       Akka.`akka-actor-typed`,
       AkkaHttp.`akka-http`,
-      Libs.`scala-reflect`,
       Libs.`scala-java8-compat`,
       Keycloak.`keycloak-adapter-core`,
       // TODO: make this as provided deps
@@ -439,6 +438,7 @@ object Dependencies {
     Seq(
       Akka.`akka-actor`              % Provided,
       Akka.`akka-actor-typed`        % Provided,
+      Akka.`akka-stream`             % Provided,
       AkkaHttp.`akka-http`           % Provided,
       Borer.`borer-compat-akka`      % Provided,
       Borer.`borer-derivation`.value % Provided,

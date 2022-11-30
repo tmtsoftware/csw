@@ -24,7 +24,8 @@ class AnnexFileServiceTest extends AnyFunSuite with Matchers with BeforeAndAfter
   private val testFileUtils = new TestFileUtils(settings)
   private val annexFileDir  = Paths.get(wiring.settings.`annex-files-dir`).toFile
 
-  import actorRuntime._
+  val runtime = actorRuntime
+  import runtime._
 
   val contents =
     """

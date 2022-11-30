@@ -41,7 +41,8 @@ class CommandLineRunnerTest extends SeedData with Eventually with CommonCodecs {
   }
 
   import cliWiring._
-  import actorRuntime._
+  val runtime = actorRuntime
+  import runtime._
 
   // DEOPSCSW-431: [Event Cli] Get command
   test("should able to get events in json format | DEOPSCSW-431") {

@@ -21,7 +21,8 @@ object Main extends App {
   private def run(options: Options): Unit = {
     val wiring = Wiring.make(options.locationHost)
     import wiring._
-    import actorRuntime._
+    val runtime = actorRuntime
+    import runtime._
     startLogging(name)
 
     try cliApp.start(options)

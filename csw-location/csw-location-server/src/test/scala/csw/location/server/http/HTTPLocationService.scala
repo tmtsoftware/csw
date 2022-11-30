@@ -49,7 +49,7 @@ private[csw] trait HTTPLocationService
 
 }
 
-private[csw] class JHTTPLocationService extends HTTPLocationService
+class JHTTPLocationService extends HTTPLocationService
 
 private[csw] class HTTPLocationServiceOnPorts(clusterPort: Int, val httpPort: Int, auth: Boolean = false)
     extends HTTPLocationService {

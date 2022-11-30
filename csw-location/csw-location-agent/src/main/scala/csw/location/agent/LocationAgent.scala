@@ -37,7 +37,8 @@ class LocationAgent(
 
   private val timeout: FiniteDuration = 10.seconds
   import wiring._
-  import actorRuntime._
+  private val runtime = actorRuntime
+  import runtime._
 
   // registers provided list of service names with location service
   // and starts a external program in child process using provided command

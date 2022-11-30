@@ -26,7 +26,7 @@ import scala.util.Random
 class EventSubscriptionFrequencyTest extends TestNGSuite with Matchers with Eventually {
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 10.millis)
 
-  var redisTestProps: RedisTestProps = _
+  var redisTestProps: BaseProperties = _
 //  var kafkaTestProps: KafkaTestProps = _
 
   @BeforeSuite
@@ -44,14 +44,14 @@ class EventSubscriptionFrequencyTest extends TestNGSuite with Matchers with Even
   }
 
   @DataProvider(name = "event-service-provider")
-  def pubSubProvider: Array[Array[_ <: BaseProperties]] =
+  def pubSubProvider: Array[Array[BaseProperties]] =
     Array(
       Array(redisTestProps)
 //      Array(kafkaTestProps)
     )
 
   @DataProvider(name = "redis-provider")
-  def redisPubSubProvider: Array[Array[RedisTestProps]] =
+  def redisPubSubProvider: Array[Array[BaseProperties]] =
     Array(Array(redisTestProps))
 
   def events(name: EventName): immutable.Seq[Event] = for (i <- 1 to 1500) yield makeEventForKeyName(name, i)
