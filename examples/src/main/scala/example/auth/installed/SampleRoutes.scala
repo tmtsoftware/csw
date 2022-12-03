@@ -18,21 +18,13 @@ import csw.aas.http.SecurityDirectives
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import spray.json.DefaultJsonProtocol._
+import spray.json._
 
 import scala.concurrent.ExecutionContext
 
-object SampleRoutes {
+class SampleRoutes(securityDirectives: SecurityDirectives)(implicit actorSystem: ActorSystem[_]) {
 
-  implicit val actorSystem: ActorSystem[_] = ActorSystem(Behaviors.empty, "test")
-  implicit val ec: ExecutionContext        = actorSystem.executionContext
-  private val config: Config = ConfigFactory.parseString("""
-      | auth-config {
-      |  realm = TMT
-      |  client-id = tmt-backend-app
-      | }
-    """.stripMargin)
-  val locationService: LocationService       = HttpLocationServiceFactory.makeLocalClient
-  val securityDirectives: SecurityDirectives = SecurityDirectives(config, locationService)
+  import actorSystem.executionContext
   import securityDirectives._
 
   // #sample-routes
@@ -42,7 +34,7 @@ object SampleRoutes {
     pathPrefix("data") {
       get {                    // un-protected route for reading data
         pathEndOrSingleSlash { // e.g HTTP GET http://localhost:7000/data
-          complete(data)
+          complete(data.toJson)
         }
       } ~ sPost(RealmRolePolicy("admin")) { // only users with 'admin' role is allowed for this route
         parameter("value") { value =>       // e.g POST GET localhost:7000/data?value=abc
@@ -54,8 +46,22 @@ object SampleRoutes {
   // #sample-routes
 }
 
-object SampleServer extends App {
-  protected def routes: Route = SampleRoutes.routes
-  import SampleRoutes.actorSystem
-  Http().newServerAt("localhost", 7000).bind(routes)
+object SampleServer {
+  def main(args: Array[String]): Unit = {
+    implicit val actorSystem: ActorSystem[_] = ActorSystem(Behaviors.empty, "test")
+    implicit val ec: ExecutionContext        = actorSystem.executionContext
+
+    val config: Config = ConfigFactory.parseString("""
+        | auth-config {
+        |  realm = TMT
+        |  client-id = tmt-backend-app
+        | }
+      """.stripMargin)
+
+    val locationService: LocationService       = HttpLocationServiceFactory.makeLocalClient
+    val securityDirectives: SecurityDirectives = SecurityDirectives(config, locationService)
+    val sampleRoutes                           = new SampleRoutes(securityDirectives)
+
+    Http().newServerAt("localhost", 7000).bind(sampleRoutes.routes)
+  }
 }

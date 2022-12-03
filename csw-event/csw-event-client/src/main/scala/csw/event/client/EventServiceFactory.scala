@@ -14,7 +14,7 @@ import csw.event.client.internal.commons.serviceresolver.{
   EventServiceLocationResolver,
   EventServiceResolver
 }
-import csw.event.client.internal.kafka.KafkaEventService
+//import csw.event.client.internal.kafka.KafkaEventService
 import csw.event.client.internal.redis.RedisEventService
 import csw.event.client.models.EventStore
 import csw.event.client.models.EventStores.{KafkaStore, RedisStore}
@@ -81,7 +81,7 @@ class EventServiceFactory(store: EventStore = RedisStore()) {
     def masterId = system.settings.config.getString("csw-event.redis.masterId")
     store match {
       case RedisStore(client) => new RedisEventService(eventServiceResolver, masterId, client)
-      case KafkaStore         => new KafkaEventService(eventServiceResolver)
+      case KafkaStore         => throw new RuntimeException("kafka support is currently disabled")
     }
   }
 }

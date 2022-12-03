@@ -29,7 +29,7 @@ import csw.testkit.internal.{MockedAuthentication, TestKitUtils}
  * }}}
  */
 final class LocationTestKit private (testKitSettings: TestKitSettings, enableAuth: Boolean) extends MockedAuthentication {
-  private lazy val locationWiring =
+  final private lazy val locationWiring =
     if (enableAuth) {
       new ServerWiring(enableAuth) {
         override lazy val settings: Settings = new Settings(config) {

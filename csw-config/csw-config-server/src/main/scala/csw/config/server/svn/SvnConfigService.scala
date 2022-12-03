@@ -166,7 +166,7 @@ class SvnConfigService(settings: Settings, actorRuntime: ActorRuntime, svnRepo: 
       await(pathStatus(path)) match {
         case PathStatus.NormalSize =>
           log.info(s"Deleting normal file at path ${path.toString}")
-          await(svnRepo.delete(path, comment))
+          await(svnRepo.delete(path, comment)): Unit
         case PathStatus.Annex =>
           log.info(s"Deleting annex file at path ${path.toString}")
           await(svnRepo.delete(shaFilePath(path), comment))
@@ -229,7 +229,7 @@ class SvnConfigService(settings: Settings, actorRuntime: ActorRuntime, svnRepo: 
 
       if (present) {
         log.info(s"Updating active version for file with path ${path.toString}")
-        await(update(activePath, ConfigData.fromString(id.id), comment))
+        await(update(activePath, ConfigData.fromString(id.id), comment)): Unit
       }
       else {
         log.info(s"Setting active version for file with path ${path.toString}")

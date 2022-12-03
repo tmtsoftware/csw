@@ -6,21 +6,20 @@
 package csw.config.api.models
 
 import java.nio.file.Files
-
-import akka.actor.ActorSystem
+import akka.actor.{ActorSystem, typed}
 import akka.actor.typed.scaladsl.adapter.ClassicActorSystemOps
 import akka.testkit.TestKit
 import com.typesafe.config.{Config, ConfigException}
 import csw.config.api.ConfigData
 import csw.config.api.commons.TestFutureExtension.RichFuture
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers
 
 class ConfigDataTest extends TestKit(ActorSystem("test-system")) with AnyFunSuiteLike with Matchers {
 
-  implicit val typedSystem = system.toTyped
+  implicit val typedSystem: typed.ActorSystem[Nothing] = system.toTyped
 
   val expectedStringConfigData: String =
     """

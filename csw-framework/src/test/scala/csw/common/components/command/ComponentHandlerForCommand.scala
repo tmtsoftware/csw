@@ -5,6 +5,7 @@
 
 package csw.common.components.command
 
+import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.ActorContext
 import akka.stream.ThrottleMode
 import akka.stream.scaladsl.{Sink, Source}
@@ -13,7 +14,7 @@ import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.TrackingEvent
 import csw.params.commands.CommandIssue.{OtherIssue, WrongPrefixIssue}
-import csw.params.commands.CommandResponse._
+import csw.params.commands.CommandResponse.*
 import csw.params.commands.{ControlCommand, Result, Setup}
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.Id
@@ -31,8 +32,8 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
   private val cancelCmdId = KeyType.StringKey.make("cancelCmdId")
 
   import ComponentStateForCommand._
-  private implicit val actorSystem          = ctx.system
-  private implicit val ec: ExecutionContext = ctx.executionContext
+  private implicit val actorSystem: ActorSystem[Nothing] = ctx.system
+  private implicit val ec: ExecutionContext              = ctx.executionContext
 
   override def initialize(): Unit = {}
 

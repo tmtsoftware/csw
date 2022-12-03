@@ -53,7 +53,6 @@ class SampleHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCo
           case command: SendCommand =>
             log.trace(s"WorkerActor received SendCommand message.")
             handle(command.hcd)
-          case _ => log.error("Unsupported message type")
         }
         Behaviors.same
       }),

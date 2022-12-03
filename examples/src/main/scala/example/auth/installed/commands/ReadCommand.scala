@@ -16,7 +16,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 
 // #read-command
 class ReadCommand(implicit val actorSystem: typed.ActorSystem[_]) extends AppCommand {
-  implicit lazy val ec = actorSystem.executionContext
+  implicit lazy val ec: ExecutionContext = actorSystem.executionContext
   override def run(): Unit = {
     val url = "http://localhost:7000/data"
     Http()

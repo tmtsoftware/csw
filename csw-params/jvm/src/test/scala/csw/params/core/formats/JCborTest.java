@@ -90,8 +90,8 @@ public class JCborTest {
     @Test
     public void shouldAbleToConvertToAndFromParameterAndEvent__DEOPSCSW_495__CSW_147() {
         // ===== Test Parameter SERDE =====
-        byte[] byteArray = Cbor.encode(param, ParamCodecs$.MODULE$.paramEncExistential()).toByteArray();
-        Parameter<?> parameterFromBytes = Cbor.decode(byteArray, JInput.FromByteArrayProvider()).to(ParamCodecs$.MODULE$.paramDecExistential()).value();
+        byte[] byteArray = TestHelpers.cborParamEncode(param);
+        Parameter<?> parameterFromBytes = TestHelpers.cborParamDecode(byteArray);
 
         Assert.assertEquals(param, parameterFromBytes);
 

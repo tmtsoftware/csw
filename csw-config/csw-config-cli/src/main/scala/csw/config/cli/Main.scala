@@ -12,23 +12,25 @@ import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.network.utils.Networks
 
 // $COVERAGE-OFF$
-object Main extends App {
-  private val name = BuildInfo.name
+object Main {
+  def main(args: Array[String]): Unit = {
+    val name = BuildInfo.name
 
-  new ArgsParser(name).parse(args.toList).foreach(run)
+    new ArgsParser(name).parse(args.toList).foreach(run)
 
-  private def run(options: Options): Unit = {
-    LocationServerStatus.requireUp(options.locationHost)
+    def run(options: Options): Unit = {
+      LocationServerStatus.requireUp(options.locationHost)
 
-    val wiring = Wiring.make(options.locationHost)
-    import wiring._
-    LoggingSystemFactory.start(name, BuildInfo.version, Networks().hostname, actorSystem)
+      val wiring = Wiring.make(options.locationHost)
+      import wiring._
+      LoggingSystemFactory.start(name, BuildInfo.version, Networks().hostname, actorSystem)
 
-    try {
-      cliApp.start(options)
-    }
-    finally {
-      actorRuntime.shutdown()
+      try {
+        cliApp.start(options)
+      }
+      finally {
+        actorRuntime.shutdown()
+      }
     }
   }
 }

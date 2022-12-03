@@ -12,7 +12,7 @@ import akka.cluster.ddata.SelfUniqueAddress
 import akka.cluster.ddata.typed.scaladsl
 import akka.cluster.ddata.typed.scaladsl.{DistributedData, Replicator}
 import akka.cluster.typed.{Cluster, Join}
-import akka.management.scaladsl.AkkaManagement
+//import akka.management.scaladsl.AkkaManagement
 import akka.util.Timeout
 import csw.location.api.exceptions.CouldNotJoinCluster
 import csw.location.server.commons.ClusterConfirmationMessages.{HasJoinedCluster, Shutdown}
@@ -61,8 +61,8 @@ class CswCluster private (clusterSettings: ClusterSettings) {
   private def startClusterManagement(): Unit = {
     val startManagement = actorSystem.settings.config.getBoolean("startManagement")
     if (startManagement) {
-      val akkaManagement = AkkaManagement(actorSystem)
-      Await.result(akkaManagement.start(), 10.seconds)
+//      val akkaManagement = AkkaManagement(actorSystem)
+//      Await.result(akkaManagement.start(), 10.seconds)
     }
   }
   // $COVERAGE-ON$
@@ -78,7 +78,7 @@ class CswCluster private (clusterSettings: ClusterSettings) {
 
     val confirmationActorF: ActorRef[Any] = actorSystem.spawn(ClusterConfirmationActor.behavior(), "ClusterConfirmationActor")
     implicit val timeout: Timeout         = Timeout(5.seconds)
-    def statusF: Future[Option[Done]]     = confirmationActorF ? HasJoinedCluster
+    def statusF: Future[Option[Done]]     = confirmationActorF ? HasJoinedCluster.apply
     def status: Option[Done]              = Await.result(statusF, 5.seconds)
     val success                           = BlockingUtils.poll(status.isDefined, 20.seconds)
     if (!success) {

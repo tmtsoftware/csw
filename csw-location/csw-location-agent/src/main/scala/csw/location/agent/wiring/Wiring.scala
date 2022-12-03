@@ -10,7 +10,8 @@ import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 
 private[csw] class Wiring {
-  implicit lazy val actorSystem: ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol(), "location-agent")
-  lazy val actorRuntime                                             = new ActorRuntime(actorSystem)
-  lazy val locationService: LocationService                         = HttpLocationServiceFactory.makeLocalClient
+  implicit lazy val actorSystem: ActorSystem[SpawnProtocol.Command] =
+    ActorSystemFactory.remote(SpawnProtocol(), "location-agent")
+  final lazy val actorRuntime               = new ActorRuntime(actorSystem)
+  lazy val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient
 }

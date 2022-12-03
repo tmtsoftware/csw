@@ -7,14 +7,14 @@ package csw.event.client.perf.commons
 
 import java.time.Instant
 import java.util.concurrent.TimeUnit.SECONDS
-
 import akka.Done
+import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.stream.UniqueKillSwitch
 import akka.stream.scaladsl.{Keep, Source}
 import csw.event.api.scaladsl.{EventSubscriber, EventSubscription}
 import csw.event.client.perf.ocs.gateway.client.GatewayClient
 import csw.event.client.perf.reporter.{ResultReporter, TestRateReporter}
-import csw.event.client.perf.utils.EventUtils._
+import csw.event.client.perf.utils.EventUtils.*
 import csw.event.client.perf.wiring.{TestConfigs, TestWiring}
 import csw.params.events.{Event, EventKey, EventName, SystemEvent}
 import csw.prefix.models.Prefix
@@ -37,7 +37,7 @@ class PerfSubscriber(
   import testConfigs._
   import testWiring._
 
-  implicit val system = actorSystem
+  implicit val system: ActorSystem[SpawnProtocol.Command] = actorSystem
 
   private val subscriber: EventSubscriber =
     if (testConfigs.shareConnection) sharedSubscriber else testWiring.subscriber

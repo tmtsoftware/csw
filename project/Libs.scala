@@ -3,33 +3,35 @@ import sbt.Def.{setting => dep}
 import sbt._
 
 object Libs {
-  val ScalaVersion = "2.13.10"
+  val ScalaVersion = "3.2.1"
 
   val `scala-java8-compat` = "org.scala-lang.modules" %% "scala-java8-compat" % "1.0.2" // BSD 3-clause "New" or "Revised" License
-  val `scala-async`        = "org.scala-lang.modules" %% "scala-async"        % "1.0.1"
-  val `scopt`              = "com.github.scopt"       %% "scopt"              % "4.1.0" // MIT License
-  val `mockito`            = "org.scalatestplus"      %% "mockito-3-4"        % "3.2.10.0"
+  val `scala-async` = "com.github.rssh" %% "shim-scala-async-dotty-cps-async" % "0.9.11"
+
+  val `scopt`   = "com.github.scopt"  %% "scopt"       % "4.1.0" // MIT License
+  val `mockito` = "org.scalatestplus" %% "mockito-3-4" % "3.2.10.0"
 
   // Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
   val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.4.4"
 
-  val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "5841a60" // Apache 2.0
+  val `sourcecode`        = "com.lihaoyi"                              %% "sourcecode"        % "0.3.0"
+  val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "87cfa0b" // Apache 2.0
   val `akka-management-cluster-http` = "com.lightbend.akka.management" %% "akka-management-cluster-http" % "1.2.0"
   val `svnkit`        = "org.tmatesoft.svnkit" % "svnkit"        % "1.10.8"     // TMate Open Source License
   val `commons-codec` = "commons-codec"        % "commons-codec" % "1.15"       // Apache 2.0š
   val `scala-reflect` = "org.scala-lang"       % "scala-reflect" % ScalaVersion // BSD-3
   val `gson`          = "com.google.code.gson" % "gson"          % "2.10"       // Apache 2.0
-  val `play-json`     = "com.typesafe.play"   %% "play-json"     % "2.9.3"      // Apache 2.0
+  val `play-json`     = "com.typesafe.play"   %% "play-json"     % "2.10.0-RC7" // Apache 2.0
 
-  val `enumeratum`                = dep("com.beachape" %%% "enumeratum" % "1.7.0")  // MIT License
+  val `enumeratum`                = dep("com.github.mushtaq.enumeratum" %%% "enumeratum" % "3d87c50") // MIT License
   val `scala-java-time`           = dep("io.github.cquiroz" %%% "scala-java-time" % "2.3.0")
   val `scalajs-java-securerandom` = dep("org.scala-js" %%% "scalajs-java-securerandom" % "1.0.0")
-  val `scalatest`                 = dep("org.scalatest" %%% "scalatest" % "3.2.14") // Apache License 2.0
+  val `scalatest`                 = dep("org.scalatest" %%% "scalatest" % "3.2.14")                   // Apache License 2.0
 
-  val `jwt-core`         = "com.pauldijou"      %% "jwt-core"         % "5.0.0"
-  val `lettuce`          = "io.lettuce"          % "lettuce-core"     % "6.2.1.RELEASE"
-  val `reactor-core`     = "io.projectreactor"   % "reactor-core"     % "3.4.24"
-  val `reactive-streams` = "org.reactivestreams" % "reactive-streams" % "1.0.4"
+  val `jwt-core`         = "com.github.jwt-scala" %% "jwt-core"         % "9.1.2"
+  val `lettuce`          = "io.lettuce"            % "lettuce-core"     % "6.2.1.RELEASE"
+  val `reactor-core`     = "io.projectreactor"     % "reactor-core"     % "3.4.24"
+  val `reactive-streams` = "org.reactivestreams"   % "reactive-streams" % "1.0.4"
   val `akka-stream-kafka` =
     "com.typesafe.akka" %% "akka-stream-kafka" % "4.0.0" // 2.1.1 version is breaking csw-event-client tests
   val `embedded-kafka`   = "io.github.embeddedkafka" %% "embedded-kafka"  % "3.3.1"
@@ -53,12 +55,12 @@ object Libs {
   val `os-lib`            = "com.lihaoyi"                  %% "os-lib"            % "0.8.1"
   val `caffeine`          = "com.github.ben-manes.caffeine" % "caffeine"          % "3.1.1"
   val netty               = "io.netty"                      % "netty-all"         % "4.1.84.Final"
-  val `case-app`          = "com.github.alexarchambault"   %% "case-app"          % "2.0.6"
-  val `tmt-test-reporter` = "com.github.tmtsoftware"       %% "rtm"               % "f83c3d2"
+  val `case-app`          = "com.github.alexarchambault"   %% "case-app"          % "2.1.0-M20"
+  val `tmt-test-reporter` = "com.github.tmtsoftware.rtm"   %% "rtm"               % "c6a49ee"
 }
 
 object Borer {
-  val Version = "1.8.0"
+  val Version = "1.10.1"
   val Org     = "io.bullet"
 
   val `borer-core`        = dep(Org %%% "borer-core" % Version)
@@ -95,17 +97,19 @@ object Akka {
 }
 
 object AkkaHttp {
-  val Version = "10.4.0"
+  val Version = "10.5.0-M1"
 
   val `akka-http`            = "com.typesafe.akka" %% "akka-http"            % Version // ApacheV2
   val `akka-http-testkit`    = "com.typesafe.akka" %% "akka-http-testkit"    % Version // ApacheV2
   val `akka-http-spray-json` = "com.typesafe.akka" %% "akka-http-spray-json" % Version
 
-  val `akka-http-cors` = "ch.megard" %% "akka-http-cors" % "1.1.3"
+  val `akka-http-cors` = ("ch.megard" %% "akka-http-cors" % "1.1.3")
+    .exclude("com.typesafe.akka", "akka-http_2.13")
+
 }
 
 object Keycloak {
-  val Version = "18.0.2"
+  val Version = "16.1.0"
 
   val `keycloak-adapter-core` = "org.keycloak" % "keycloak-adapter-core"      % Version
   val `keycloak-core`         = "org.keycloak" % "keycloak-core"              % Version
@@ -122,7 +126,7 @@ object Jooq {
 }
 
 object MSocket {
-  val Version = "f1aa082"
+  val Version = "238eaf6"
 
   val `msocket-api`      = dep("com.github.tmtsoftware.msocket" %%% "msocket-api" % Version)
   val `msocket-security` = "com.github.tmtsoftware.msocket" %% "msocket-security" % Version

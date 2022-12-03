@@ -27,7 +27,7 @@ import scala.concurrent.{ExecutionContext, Future}
  */
 class FrameworkWiring {
   lazy val actorSystem: ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol(), "framework-system")
-  lazy val actorRuntime: ActorRuntime                      = new ActorRuntime(actorSystem)
+  final lazy val actorRuntime: ActorRuntime                = new ActorRuntime(actorSystem)
   lazy val locationService: LocationService                = HttpLocationServiceFactory.makeLocalClient(actorSystem)
   lazy val registrationFactory                             = new RegistrationFactory
   lazy val configClientService: ConfigClientService        = ConfigClientFactory.clientApi(actorSystem, locationService)

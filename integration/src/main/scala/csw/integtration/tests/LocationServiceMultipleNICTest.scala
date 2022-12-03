@@ -31,7 +31,9 @@ class LocationServiceMultipleNICTest extends AnyFunSuite with Matchers with Befo
   locationWiring.actorRuntime.startLogging("Test", locationWiring.clusterSettings.hostname)
   locationWiring.locationHttpService.start().futureValue
 
-  import locationWiring.actorRuntime._
+  val runtime = locationWiring.actorRuntime
+  import runtime._
+
   private val locationService = HttpLocationServiceFactory.makeLocalClient
 
   override def afterAll(): Unit = Await.result(locationWiring.actorRuntime.shutdown(), 5.seconds)

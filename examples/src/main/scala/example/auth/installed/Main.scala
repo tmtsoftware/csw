@@ -12,21 +12,24 @@ import csw.location.client.utils.LocationServerStatus
 import example.auth.installed.commands.{AppCommand, CommandFactory}
 
 // #main-app
-object Main extends App {
+object Main {
 
-  LocationServerStatus.requireUpLocally()
+  def main(args: Array[String]): Unit = {
+    LocationServerStatus.requireUpLocally()
 
-  implicit val actorSystem: ActorSystem[_] = ActorSystem(Behaviors.empty, "example-system")
+    implicit val actorSystem: ActorSystem[_] = ActorSystem(Behaviors.empty, "example-system")
 
-  val adapter: InstalledAppAuthAdapter = AdapterFactory.makeAdapter
+    val adapter: InstalledAppAuthAdapter = AdapterFactory.makeAdapter
 
-  val command: Option[AppCommand] = CommandFactory.makeCommand(adapter, args)
+    val command: Option[AppCommand] = CommandFactory.makeCommand(adapter, args)
 
-  try {
-    command.foreach(_.run())
+    try {
+      command.foreach(_.run())
+    }
+    finally {
+      actorSystem.terminate()
+    }
   }
-  finally {
-    actorSystem.terminate()
-  }
+
 }
 // #main-app

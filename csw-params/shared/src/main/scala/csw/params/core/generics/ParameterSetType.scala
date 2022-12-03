@@ -17,7 +17,7 @@ import scala.jdk.CollectionConverters._
  *
  * @tparam T the subclass of ParameterSetType
  */
-abstract class ParameterSetType[T <: ParameterSetType[T]] { self: T =>
+abstract class ParameterSetType[+T <: ParameterSetType[T]] { self: T =>
 
   /**
    * A name identifying the type of parameter set, such as "setup", "observe".

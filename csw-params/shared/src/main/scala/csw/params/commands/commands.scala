@@ -15,14 +15,14 @@ import csw.prefix.models.Prefix
 /**
  * Common trait representing commands in TMT like Setup, Observe and Wait
  */
-sealed trait Command { self: ParameterSetType[_] =>
+sealed trait Command extends ParameterSetType[Command] {
 
   /**
    * A helper to give access of public members of ParameterSetType
    *
    * @return a handle to ParameterSetType extended by concrete implementation of this class
    */
-  def paramType: ParameterSetType[_] = self
+  def paramType: ParameterSetType[_] = this
 
   /**
    * A name identifying the type of parameter set, such as "setup", "observe".
@@ -65,18 +65,18 @@ sealed trait Command { self: ParameterSetType[_] =>
    * @return the string representation of command
    */
   override def toString: String =
-    s"$typeName(paramSet=$paramSet, source=$source, commandName=$commandName, maybeObsId=$maybeObsId)"
+    s"${this.typeName}(paramSet=$paramSet, source=$source, commandName=$commandName, maybeObsId=$maybeObsId)"
 }
 
 /**
  * Marker trait for sequence parameter sets which is applicable to Sequencer type of components
  */
-sealed trait SequenceCommand extends Command { self: ParameterSetType[_] => }
+sealed trait SequenceCommand extends Command
 
 /**
  * Marker trait for control parameter sets which i applicable to Assembly and HCD type of components
  */
-sealed trait ControlCommand extends SequenceCommand { self: ParameterSetType[_] => }
+sealed trait ControlCommand extends SequenceCommand
 
 /**
  * A parameter set for setting telescope and instrument parameters.

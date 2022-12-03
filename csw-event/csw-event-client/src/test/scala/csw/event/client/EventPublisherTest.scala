@@ -17,7 +17,7 @@ import csw.params.core.generics.{Key, Parameter}
 import csw.params.events.{Event, EventKey, EventName, SystemEvent}
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.time.core.models.UTCTime
-import io.github.embeddedkafka.EmbeddedKafka
+//import io.github.embeddedkafka.EmbeddedKafka
 import org.scalatest.concurrent.Eventually
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.testng.TestNGSuite
@@ -36,11 +36,11 @@ import scala.util.Random
 //DEOPSCSW-395: Provide EventService handle to component developers
 //DEOPSCSW-515: Include Start Time in API
 //DEOPSCSW-516: Optionally Publish - API Change
-class EventPublisherTest extends TestNGSuite with Matchers with Eventually with EmbeddedKafka {
+class EventPublisherTest extends TestNGSuite with Matchers with Eventually /*with EmbeddedKafka*/ {
 
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 10.millis)
 
-  var redisTestProps: RedisTestProps = _
+  var redisTestProps: BaseProperties = _
 //  var kafkaTestProps: KafkaTestProps = _
 
   @BeforeSuite
@@ -58,7 +58,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
   }
 
   @DataProvider(name = "event-service-provider")
-  def pubSubProvider: Array[Array[_ <: BaseProperties]] =
+  def pubSubProvider: Array[Array[BaseProperties]] =
     Array(
       Array(redisTestProps)
 //      Array(kafkaTestProps)

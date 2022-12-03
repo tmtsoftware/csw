@@ -74,7 +74,7 @@ class RedisFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
     val event       = Utils.makeEvent(1)
     val eventStream = Source.single(event)
 
-    publisher.publish(eventStream, onError = testProbe.ref ! _)
+    publisher.publish(eventStream, onError = (x: PublishFailure) => testProbe.ref ! x)
 
     val failure = testProbe.expectMessageType[PublishFailure]
     failure.event shouldBe event
@@ -94,7 +94,7 @@ class RedisFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
 
     val event = Utils.makeEvent(1)
 
-    publisher.publish(Some(event), 20.millis, onError = testProbe.ref ! _)
+    publisher.publish(Some(event), 20.millis, onError = (x: PublishFailure) => testProbe.ref ! x)
 
     val failure = testProbe.expectMessageType[PublishFailure]
     failure.event shouldBe event
@@ -131,7 +131,7 @@ class RedisFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
 
     val event = Utils.makeEvent(1)
 
-    publisher.publishAsync(Future.successful(Some(event)), 20.millis, onError = testProbe.ref ! _)
+    publisher.publishAsync(Future.successful(Some(event)), 20.millis, onError = (x: PublishFailure) => testProbe.ref ! x)
 
     val failure = testProbe.expectMessageType[PublishFailure]
     failure.event shouldBe event
@@ -199,7 +199,7 @@ class RedisFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
 
     publisher.shutdown().await
 
-    publisher.publish(None, 20.millis, onError = testProbe.ref ! _)
+    publisher.publish(None, 20.millis, onError = (x: PublishFailure) => testProbe.ref ! x)
     testProbe.expectNoMessage()
 
     val startTime = UTCTime(UTCTime.now().value.plusMillis(200))
@@ -222,7 +222,7 @@ class RedisFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
 
     def eventGenerator(): Future[Option[Event]] = Future.successful(None)
 
-    publisher.publishAsync(eventGenerator(), 20.millis, onError = testProbe.ref ! _)
+    publisher.publishAsync(eventGenerator(), 20.millis, onError = (x: PublishFailure) => testProbe.ref ! x)
     testProbe.expectNoMessage()
 
     val startTime = UTCTime(UTCTime.now().value.plusMillis(200))
