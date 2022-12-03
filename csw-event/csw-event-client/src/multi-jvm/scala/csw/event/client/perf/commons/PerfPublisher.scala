@@ -9,14 +9,14 @@ import akka.Done
 import akka.actor.Cancellable
 import akka.stream.scaladsl.{Keep, Source}
 import csw.event.api.scaladsl.EventPublisher
-import csw.event.client.perf.utils.EventUtils._
+import csw.event.client.perf.utils.EventUtils.*
 import csw.event.client.perf.wiring.{TestConfigs, TestWiring}
 import csw.params.events.{EventName, SystemEvent}
 import csw.prefix.models.Prefix
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Future
-import scala.concurrent.duration.DurationLong
+import scala.concurrent.duration.{DurationInt, DurationLong}
 
 class PerfPublisher(
     prefix: Prefix,
