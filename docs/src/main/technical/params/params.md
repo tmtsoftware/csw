@@ -7,7 +7,7 @@ rely on this project for these models.
 Since these models are needed across platforms like C/Cpp, Scala/Java, Python etc
 this project also contains serialization support for these models. 
 [Cbor](https://cbor.io/) is used as default for Serialization and Deserialization of these models. 
-Comparisons were done with other popular formats like [Protocol Buffers](https://developers.google.com/protocol-buffers/),
+Comparisons were done with other popular formats like [Protocol Buffers](https://protobuf.dev),
 [Message Pack](https://msgpack.org/index.html) before finalizing on Cbor. 
 Cbor was finalized as it offers better performance and has much lesser overhead of maintenance as compared to protocol buffers.
 
