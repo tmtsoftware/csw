@@ -63,7 +63,7 @@ and concurrent task execution.
         TAI.
 
   - Various [clock quality
-    factors](http://www.ntp.org/ntpfaq/NTP-s-sw-clocks-quality.htm)
+    factors](http://www.ntp.org/ntpfaq/NTP-s-sw-clocks-quality/)
     determine the effectiveness of a time implementation.
 
 ## Overview of IEEE 1588
