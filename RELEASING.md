@@ -56,5 +56,6 @@ A milestone release is cut from master branch as we expect bug fixes / feedback 
 15. Run command `headerCheckAll` inside sbt to verify that all files have a copyright header.
 16. Commit and push the changes to `branch-<major>.<minor>.x` branch.
 17. Make sure build is green for dev and paradox link check pipeline for this branch.
-18. Set `PROD=true` environment variable and Run `release.sh $VERSION$` script by providing version number argument (This triggers release workflow)
+18. Set `PROD=true` environment variable and Run `release.sh $VERSION$` script by providing version number argument.  
+    For example, for version 5.0.1-RC, the command is `PROD=true ./release.sh v5.0.1-RC1`.  (This triggers release workflow)
 19. Applicable for final release only - Upgrade all the versions of all csw apps in [here](https://github.com/tmtsoftware/osw-apps/blob/master/apps.json)
