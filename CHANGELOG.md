@@ -12,6 +12,27 @@ All notable changes to this project will be documented in this file.
 ## Upcoming releases
 n/a
 
+## [CSW v5.0.1] - 2023-04-12
+This is the final release version v5.0.1 of the TMT Common Software for project stakeholders.
+See [here](https://tmtsoftware.github.io/csw/5.0.1/) for a detailed documentation of this version of the CSW software.
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/5.0.1/
+- Scaladoc: https://tmtsoftware.github.io/csw/5.0.1/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/5.0.1/api/java/index.html
+
+## [CSW v5.0.1-RC1] - 2023-03-24
+This is a release candidate 1 for version 5.0.1 of the TMT Common Software.
+See [here](https://tmtsoftware.github.io/csw/5.0.1-RC1/) for a detailed documentation of this version of the CSW software.
+
+### Changes
+- Fixed broken links in documentation.
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/5.0.1-RC1/
+- Scaladoc: https://tmtsoftware.github.io/csw/5.0.1-RC1/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/5.0.1-RC1/api/java/index.html
+
 ## [CSW v5.0.0] - 2022-11-14
 This is final release v5.0.0 of the TMT Common Software for project stakeholders.
 See [here](https://tmtsoftware.github.io/csw/5.0.0/) for a detailed documentation of this version of the CSW software.
@@ -22,12 +43,12 @@ See [here](https://tmtsoftware.github.io/csw/5.0.0/) for a detailed documentatio
 - Javadoc: https://tmtsoftware.github.io/csw/5.0.0/api/java/index.html
 
 ## [CSW v5.0.0-RC2] - 2022-10-06
-This is a release candidate 2 for version 5.0.0 of the TMT Common Software for project stakeholders.
+This is a release candidate 2 for version 5.0.0 of the TMT Common Software.
 See [here](https://tmtsoftware.github.io/csw/5.0.0-RC2/) for a detailed documentation of this version of the CSW software.
 
 
 ## [CSW v5.0.0-RC1] - 2022-09-14
-This is a release candidate 1 for version 5.0.0 of the TMT Common Software for project stakeholders.
+This is a release candidate 1 for version 5.0.0 of the TMT Common Software.
 See [here](https://tmtsoftware.github.io/csw/5.0.0-RC1/) for a detailed documentation of this version of the CSW software.
 
 ### Changes
