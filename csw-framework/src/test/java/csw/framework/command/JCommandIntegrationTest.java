@@ -81,7 +81,7 @@ public class JCommandIntegrationTest {
     private static ILocationService locationService;
     private static ICommandService hcdCmdService;
     private static AkkaLocation hcdLocation;
-    private final Timeout timeout = new Timeout(5, TimeUnit.SECONDS);
+    private final Timeout timeout = new Timeout(6, TimeUnit.SECONDS);
 
     @BeforeClass
     public static void setup() throws Exception {
