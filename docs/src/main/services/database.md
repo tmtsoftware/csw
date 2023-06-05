@@ -111,7 +111,7 @@ database login information in the source code.
 
 @@@ note
 See the [PostgreSQL docs](https://www.postgresql.org/docs/8.0/sql-createuser.html) or
-[this site](https://www.a2hosting.com/kb/developer-corner/postgresql/managing-postgresql-databases-and-users-from-the-command-line) 
+[this site](https://www.a2hosting.com/kb/developer-corner/postgresql/managing-postgresql-databases-and-users-from-the-command-line/) 
 for help with creating users, passwords, and roles in PostgreSQL.
 
 The [psql interactive CLI client](https://www.postgresql.org/docs/current/app-psql.html) is provided with PostgreSQL. It can
