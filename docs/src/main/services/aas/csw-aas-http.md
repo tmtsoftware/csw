@@ -1,7 +1,7 @@
 # Akka HTTP Adapter (csw-aas-http)
 
 This library is a security adapter for Akka HTTP server applications. `csw-aas` uses 
-[OpenId Connect](https://openid.net/connect/) for authentication and authorization.
+[OpenId Connect](https://openid.net/developers/how-connect-works/) for authentication and authorization.
 The authentication server used by AAS is [Keycloak](https://www.keycloak.org/).
 We recommended that you get familiar with Keycloak's documentation and configurations to
 fully leverage this adapter's features.
