@@ -2,20 +2,20 @@
 
 ### Introduction
 
-Authentication and Authorization Service provides suit of libraries which help to enforce authentication and authorization 
-for web applications and cli applications in TMT ecosystem.
+The Authentication and Authorization Service provides suite of libraries which help to enforce authentication and authorization 
+for web applications and CLI applications in the TMT ecosystem.
 
 It provides following libraries (aka adapters). For information on _using_ these adapters, refer to following sections:
 
-- @ref:[Akka HTTP Adapter - csw-aas-http](../../services/aas/csw-aas-http.md) - This is adapter which enables security for akka http server applications 
-- @ref:[Installed Auth Adapter - csw-aas-installed](../../services/aas/csw-aas-installed.md) - This is adapter which enables security for cli applications 
-- @extref[Javascript Adapter - ESW-TS](esw_ts:aas/auth-components.html) - This is adapter which enables security for javascript react applications
+- @ref:[Akka HTTP Adapter - csw-aas-http](../../services/aas/csw-aas-http.md) - enables security for Akka HTTP server applications 
+- @ref:[Installed Auth Adapter - csw-aas-installed](../../services/aas/csw-aas-installed.md) - enables security for CLI applications 
+- @extref[Javascript Adapter - ESW-TS](esw_ts:aas/auth-components.html) - enables security for Javascript React applications
 
-These adapters are written on top of [client adapters](https://www.keycloak.org/docs/latest/securing_apps/index.html#client-adapters) provided by keycloak.
+These adapters are written on top of [client adapters](https://www.keycloak.org/docs/latest/securing_apps/index.html) provided by Keycloak.
 
 ![AAS Adapters](aas-adapters.png) 
 
-For more information on internals of these adapters, refer to following sections:
+For more information on the internals of these adapters, refer to the following sections:
 
 - @ref:[Akka HTTP Adapter - csw-aas-http](./csw-aas-http.md) 
 - @ref:[Installed Auth Adapter - csw-aas-installed](./csw-aas-installed.md) 
