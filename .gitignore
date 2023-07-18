@@ -40,3 +40,4 @@ bin/
 *.rdb
 .bloop
 metals.sbt
+/csw-time/csw-time-scheduler/src/test/c++/cmake-build-debug
