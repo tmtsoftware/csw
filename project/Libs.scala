@@ -13,7 +13,7 @@ object Libs {
   // Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
   val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.2.10"
 
-  val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "0.6.0" // Apache 2.0
+  val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "0.6.0-pekko" // Apache 2.0
   val `pekko-management` = "org.apache.pekko" %% "pekko-management" % "0.0.0+758-aff55e07+20230718-0937-SNAPSHOT"
   val `svnkit`        = "org.tmatesoft.svnkit" % "svnkit"        % "1.10.3"     // TMate Open Source License
   val `commons-codec` = "commons-codec"        % "commons-codec" % "1.15"       // Apache 2.0š
