@@ -9,7 +9,7 @@ import java.io.InputStream
 import java.nio.file.{Files, Path, Paths}
 import java.time.Instant
 
-import akka.stream.scaladsl.StreamConverters
+import org.apache.pekko.stream.scaladsl.StreamConverters
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.commons.ResourceReader
 import csw.config.api.ConfigData
@@ -246,9 +246,9 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
 
   // DEOPSCSW-46: Unique identifier for configuration file version
   test("each revision of file should have unique identifier | DEOPSCSW-46") {
-    val tromboneHcdConf       = Paths.get("trombone/test/hcd/akka/hcd.conf")
-    val tromboneAssemblyConf  = Paths.get("trombone/test/assembly/akka/assembly.conf")
-    val tromboneContainerConf = Paths.get("trombone/test/container/akka/container.conf")
+    val tromboneHcdConf       = Paths.get("trombone/test/hcd/pekko/hcd.conf")
+    val tromboneAssemblyConf  = Paths.get("trombone/test/assembly/pekko/assembly.conf")
+    val tromboneContainerConf = Paths.get("trombone/test/container/pekko/container.conf")
     val binaryConfPath        = Paths.get("trombone/test/binary/binaryConf.bin")
     val expectedConfigIds     = List(ConfigId(1), ConfigId(3), ConfigId(5), ConfigId(7), ConfigId(9), ConfigId(10))
 
@@ -293,9 +293,9 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
   // DEOPSCSW-71: Retrieve any version of a configuration file using its unique id
   // DEOPSCSW-45: Saving version information for config. file
   test("should able to retrieve the specific version of file by config ID | DEOPSCSW-70, DEOPSCSW-71, DEOPSCSW-45") {
-    val tromboneHcdConf       = Paths.get("trombone/test/hcd/akka/hcd.conf")
-    val tromboneAssemblyConf  = Paths.get("trombone/test/assembly/akka/assembly.conf")
-    val tromboneContainerConf = Paths.get("trombone/test/container/akka/container.conf")
+    val tromboneHcdConf       = Paths.get("trombone/test/hcd/pekko/hcd.conf")
+    val tromboneAssemblyConf  = Paths.get("trombone/test/assembly/pekko/assembly.conf")
+    val tromboneContainerConf = Paths.get("trombone/test/container/pekko/container.conf")
     val redisConf             = Paths.get("redis/test/text/redis.conf")
 
     val configId1 = configService
@@ -1103,7 +1103,7 @@ abstract class ConfigServiceTest extends AnyFunSuite with Matchers with BeforeAn
     |csw-config-server.repository-dir=/test/csw-config-svn
     |csw-config-server.annex-dir=/test/csw-config-temp
     |csw-config-server.annex-min-file-size=333 MiB
-    |akka.http.server.parsing.max-content-length=500 MiB
+    |pekko.http.server.parsing.max-content-length=500 MiB
       """.stripMargin)
 
     val serverWiringMetadataTest = ServerWiring.make(config)

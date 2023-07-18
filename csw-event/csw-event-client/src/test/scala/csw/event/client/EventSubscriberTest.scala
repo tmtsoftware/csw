@@ -5,10 +5,10 @@
 
 package csw.event.client
 
-import akka.actor.testkit.typed.scaladsl.{TestInbox, TestProbe}
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.Behaviors
-import akka.stream.scaladsl.{Keep, Sink}
+import org.apache.pekko.actor.testkit.typed.scaladsl.{TestInbox, TestProbe}
+import org.apache.pekko.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.stream.scaladsl.{Keep, Sink}
 import csw.event.api.scaladsl.SubscriptionModes
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.helpers.Utils._

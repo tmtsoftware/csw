@@ -5,12 +5,12 @@
 
 package csw.event.client;
 
-import akka.actor.Cancellable;
-import akka.actor.testkit.typed.javadsl.TestInbox;
-import akka.actor.testkit.typed.javadsl.TestProbe;
-import akka.japi.Pair;
-import akka.stream.javadsl.Keep;
-import akka.stream.javadsl.Sink;
+import org.apache.pekko.actor.Cancellable;
+import org.apache.pekko.actor.testkit.typed.javadsl.TestInbox;
+import org.apache.pekko.actor.testkit.typed.javadsl.TestProbe;
+import org.apache.pekko.japi.Pair;
+import org.apache.pekko.stream.javadsl.Keep;
+import org.apache.pekko.stream.javadsl.Sink;
 import csw.event.api.javadsl.IEventSubscription;
 import csw.event.api.scaladsl.SubscriptionModes;
 import csw.event.client.helpers.Utils;

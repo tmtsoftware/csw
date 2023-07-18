@@ -171,7 +171,7 @@ package csw
  * The standalone configs service registers itself with the location service so that it
  * can be found by other applications.
  *
- * The contents of the files are exchanged using [Akka reactive streams](http://www.typesafe.com/activator/template/akka-stream-scala).
+ * The contents of the files are exchanged using [Pekko reactive streams](http://www.typesafe.com/activator/template/pekko-stream-scala).
  *
  * Detailed documentation of Config Server application is available at:
  * https://tmtsoftware.github.io/csw/apps/cswonfigserverapp.html

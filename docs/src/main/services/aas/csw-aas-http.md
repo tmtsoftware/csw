@@ -1,6 +1,6 @@
-# Akka HTTP Adapter (csw-aas-http)
+# Pekko HTTP Adapter (csw-aas-http)
 
-This library is a security adapter for Akka HTTP server applications. `csw-aas` uses 
+This library is a security adapter for Pekko HTTP server applications. `csw-aas` uses 
 [OpenId Connect](https://openid.net/developers/how-connect-works/) for authentication and authorization.
 The authentication server used by AAS is [Keycloak](https://www.keycloak.org/).
 We recommended that you get familiar with Keycloak's documentation and configurations to
@@ -8,13 +8,13 @@ fully leverage this adapter's features.
 
 This adapter provides authentication via security directives such as `sGet`, `sPost`, `sPut`, etc.
 These directives are used in routing and replace the default `get`, `post`, `put`, etc. directives
-from Akka HTTP.  This allows custom policies to be enforced at the routing level. 
+from Pekko HTTP.  This allows custom policies to be enforced at the routing level. 
 For authorization, these secure directives accept a wide range of policy expressions.  The usage of these 
 directives are described below.
 
 ## Dependencies
 
-To use the Akka HTTP Adapter (csw-aas-http), add this to your `build.sbt` file:
+To use the Pekko HTTP Adapter (csw-aas-http), add this to your `build.sbt` file:
 
 sbt
 :   @@@vars
@@ -25,7 +25,7 @@ sbt
     
 ## Prerequisites
 
-To run an Akka HTTP server app, which uses this adapter, we need
+To run an Pekko HTTP server app, which uses this adapter, we need
 
 * The Location Service running
 * An AAS instance running and registered with the Location Service
@@ -36,7 +36,7 @@ server on a local machine, you can make use of the @ref:[csw-services](../../app
 ## Application Configurations
 
 All auth related configurations go inside an `auth-config` block. There are two configurations 
-applicable for an Akka HTTP server application i.e. `realm`, & `client-id`. 
+applicable for an Pekko HTTP server application i.e. `realm`, & `client-id`. 
 
 THe `realm` has a default value of `TMT`, if not specified. Ideally all apps in TMT should not have to override
 this, however it might be useful to override this while testing your app.
@@ -65,7 +65,7 @@ auth-config {
 } 
 ```
 
-## Building a Secure Akka HTTP server application
+## Building a Secure Pekko HTTP server application
 
 The core of this adapter is the `SecurityDirectives` class. The recommended way to instantiate 
 `SecurityDirectives` is as shown below.
@@ -199,9 +199,9 @@ val policy = policy1 | (policy2 & (policy3 | policy4)) | policy5
 
 ## Directive Composition
 
-Since security directives extend from `akka.http.scaladsl.server.Directive`, they give you all the
+Since security directives extend from `pekko.http.scaladsl.server.Directive`, they give you all the
 benefits of a usual directive. These benefits include being able to label and [compose higher level
-directives](https://doc.akka.io/docs/akka-http/current/routing-dsl/directives/custom-directives.html#custom-directives).
+directives](https://doc.pekko.io/docs/pekko-http/current/routing-dsl/directives/custom-directives.html#custom-directives).
 
 With the help of directive labeling you could write a route like below:
 

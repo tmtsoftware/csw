@@ -5,7 +5,7 @@
 
 package csw.framework.internal.wiring
 
-import akka.actor.typed.ActorRef
+import org.apache.pekko.actor.typed.ActorRef
 import csw.command.client.messages.ComponentMessage
 import csw.framework.internal.configparser.ConfigParser
 import csw.framework.internal.supervisor.SupervisorBehaviorFactory

@@ -5,8 +5,8 @@
 
 package csw.framework.internal.container
 
-import akka.actor.typed._
-import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext}
+import org.apache.pekko.actor.typed._
+import org.apache.pekko.actor.typed.scaladsl.{AbstractBehavior, ActorContext}
 import csw.alarm.client.AlarmServiceFactory
 import csw.command.client.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.command.client.messages.ContainerIdleMessage.SupervisorsCreated
@@ -19,8 +19,8 @@ import csw.event.client.EventServiceFactory
 import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.models._
 import csw.framework.scaladsl.RegistrationFactory
-import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.models.{AkkaRegistration, ComponentId, ComponentType, Metadata}
+import csw.location.api.models.Connection.PekkoConnection
+import csw.location.api.models.{PekkoRegistration, ComponentId, ComponentType, Metadata}
 import csw.location.api.scaladsl.LocationService
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
@@ -31,11 +31,11 @@ import scala.util.{Failure, Success}
 /**
  * The Behavior of a Container of one or more components, represented as a mutable behavior.
  *
- * @param ctx                   the [[akka.actor.typed.scaladsl.ActorContext]] under which the actor instance of this behavior is created
+ * @param ctx                   the [[pekko.actor.typed.scaladsl.ActorContext]] under which the actor instance of this behavior is created
  * @param containerInfo         container related information as described in the configuration file
  * @param supervisorInfoFactory the factory for creating the Supervisors for components described in ContainerInfo
- * @param registrationFactory   the factory for creating a typed [[AkkaRegistration]] from
- *                              [[AkkaConnection]]
+ * @param registrationFactory   the factory for creating a typed [[PekkoRegistration]] from
+ *                              [[PekkoConnection]]
  * @param eventServiceFactory   the factory to create instance of event service to be used by components to use and/or create publishers and subscribers
  * @param locationService       the single instance of Location service created for a running application
  * @param loggerFactory         factory to create suitable logger instance
@@ -56,10 +56,10 @@ private[framework] final class ContainerBehavior(
   import ctx.executionContext
   private val log: Logger                = loggerFactory.getLogger(ctx)
   private val containerPrefix            = containerInfo.prefix
-  private val akkaConnection             = AkkaConnection(ComponentId(containerPrefix, ComponentType.Container))
+  private val pekkoConnection            = PekkoConnection(ComponentId(containerPrefix, ComponentType.Container))
   private val locationMetadata: Metadata = Metadata().withPid(ProcessHandle.current().pid())
-  private val akkaRegistration: AkkaRegistration =
-    registrationFactory.akkaTyped(akkaConnection, ctx.self, locationMetadata)
+  private val pekkoRegistration: PekkoRegistration =
+    registrationFactory.pekkoTyped(pekkoConnection, ctx.self, locationMetadata)
 
   // Set of successfully created supervisors for components
   var supervisors: Set[SupervisorInfo] = Set.empty
@@ -91,7 +91,7 @@ private[framework] final class ContainerBehavior(
   }
 
   /**
-   * Defines processing for a [[akka.actor.typed.Signal]] received by the actor instance
+   * Defines processing for a [[pekko.actor.typed.Signal]] received by the actor instance
    *
    * @return the existing behavior
    */
@@ -108,7 +108,7 @@ private[framework] final class ContainerBehavior(
       this
     case PostStop =>
       log.warn(s"Un-registering container from location service")
-      locationService.unregister(akkaConnection)
+      locationService.unregister(pekkoConnection)
       supervisors.foreach(_.component.supervisor ! Shutdown)
       this
   }
@@ -185,7 +185,7 @@ private[framework] final class ContainerBehavior(
 
     // Above (de)serialization is need as actorRefs shouldn't be shared across actorSystem by Reference,
     // they should be shared as via messages, or should be treated as Remote. Above (de)serialization treats ActorRef as remote.
-    // reffer to issue - https://discuss.lightbend.com/t/akka-typed-serialization/4336
+    // reffer to issue - https://discuss.lightbend.com/t/pekko-typed-serialization/4336
 
     info.copy(component = info.component.copy(supervisor = ref))
   }
@@ -202,10 +202,10 @@ private[framework] final class ContainerBehavior(
 
   private def registerWithLocationService(): Unit = {
     log.debug(
-      s"Container with connection :[${akkaRegistration.connection.name}] is registering with location service with ref :[${akkaRegistration.actorRefURI}]"
+      s"Container with connection :[${pekkoRegistration.connection.name}] is registering with location service with ref :[${pekkoRegistration.actorRefURI}]"
     )
-    locationService.register(akkaRegistration).onComplete {
-      case Success(_)         => log.info(s"Container Registration successful with connection: [$akkaConnection]")
+    locationService.register(pekkoRegistration).onComplete {
+      case Success(_)         => log.info(s"Container Registration successful with connection: [$pekkoConnection]")
       case Failure(throwable) => log.error(throwable.getMessage, ex = throwable)
     }
   }

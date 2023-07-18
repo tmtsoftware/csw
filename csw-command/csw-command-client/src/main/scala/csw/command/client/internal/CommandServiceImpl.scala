@@ -7,12 +7,12 @@ package csw.command.client.internal
 
 import java.util.concurrent.TimeoutException
 
-import akka.actor.typed.scaladsl.AskPattern._
-import akka.actor.typed.{ActorRef, ActorSystem}
-import akka.stream.scaladsl.{Keep, Sink, Source}
-import akka.stream.typed.scaladsl.ActorSource
-import akka.stream.{KillSwitches, OverflowStrategy}
-import akka.util.Timeout
+import org.apache.pekko.actor.typed.scaladsl.AskPattern._
+import org.apache.pekko.actor.typed.{ActorRef, ActorSystem}
+import org.apache.pekko.stream.scaladsl.{Keep, Sink, Source}
+import org.apache.pekko.stream.typed.scaladsl.ActorSource
+import org.apache.pekko.stream.{KillSwitches, OverflowStrategy}
+import org.apache.pekko.util.Timeout
 import csw.command.api.StateMatcher
 import csw.command.api.scaladsl.CommandService
 import csw.command.api.utils.CommandServiceExtension
@@ -71,7 +71,7 @@ private[command] class CommandServiceImpl(component: ActorRef[ComponentMessage])
     component ? (QueryFinal(commandRunId, _))
 
   /**
-   * Subscribe to the current state of a component corresponding to the [[AkkaLocation]] of the component
+   * Subscribe to the current state of a component corresponding to the [[PekkoLocation]] of the component
    *
    * @param names subscribe to states which have any of the provided value for name.
    *              If no states are provided, subscription in made to all the states.

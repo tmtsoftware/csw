@@ -7,7 +7,7 @@ package csw.logging.client.utils
 
 import java.net.InetAddress
 
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.logging.client.internal.LoggingSystem
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 import play.api.libs.json.{JsObject, Json}

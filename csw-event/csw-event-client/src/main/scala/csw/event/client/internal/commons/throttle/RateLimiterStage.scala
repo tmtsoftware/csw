@@ -5,8 +5,8 @@
 
 package csw.event.client.internal.commons.throttle
 
-import akka.stream.stage._
-import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
+import org.apache.pekko.stream.stage._
+import org.apache.pekko.stream.{Attributes, FlowShape, Inlet, Outlet}
 
 import scala.concurrent.duration.FiniteDuration
 

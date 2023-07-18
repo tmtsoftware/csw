@@ -5,7 +5,7 @@
 
 package csw.common.components.command
 
-import akka.actor.typed.scaladsl.ActorContext
+import org.apache.pekko.actor.typed.scaladsl.ActorContext
 import csw.command.client.messages.TopLevelActorMessage
 import csw.common.components.command.ComponentStateForCommand._
 import csw.framework.models.CswContext

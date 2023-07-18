@@ -7,7 +7,7 @@ package csw.framework.deploy.hostconfig
 
 import java.nio.file.Path
 
-import akka.Done
+import org.apache.pekko.Done
 import csw.framework.deploy.hostconfig.cli.{ArgsParser, Options}
 import csw.framework.exceptions.UnableToParseOptions
 import csw.framework.internal.configparser.ConfigParser

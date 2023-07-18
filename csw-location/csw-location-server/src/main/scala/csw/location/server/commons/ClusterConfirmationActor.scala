@@ -5,11 +5,11 @@
 
 package csw.location.server.commons
 
-import akka.Done
-import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{ActorRef, Behavior}
-import akka.cluster.ClusterEvent._
-import akka.cluster.typed.{Cluster, Subscribe, Unsubscribe}
+import org.apache.pekko.Done
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.actor.typed.{ActorRef, Behavior}
+import org.apache.pekko.cluster.ClusterEvent._
+import org.apache.pekko.cluster.typed.{Cluster, Subscribe, Unsubscribe}
 import csw.location.server.commons.ClusterConfirmationMessages.{HasJoinedCluster, Shutdown}
 
 private[location] object ClusterConfirmationActor {

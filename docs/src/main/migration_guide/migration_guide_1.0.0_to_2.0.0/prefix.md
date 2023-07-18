@@ -56,13 +56,13 @@ This allows registration of components from different subsystems with the same c
 For example, in CSW 1:
 
 ```scala
-val hcdConnection = AkkaConnection(ComponentId("hcd1"), ComponentType.HCD)
+val hcdConnection = PekkoConnection(ComponentId("hcd1"), ComponentType.HCD)
 ```
 
 becomes in CSW 2:
 
 ```scala
-val hcdConnection = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD))
+val hcdConnection = PekkoConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD))
 ```
 
 ## Alarm Service
@@ -138,7 +138,7 @@ For example, in CSW 1:
  "@name":"LocationServiceExampleClient",
  "@severity":"INFO",
  "@version":"0.1",
- "actor": "akka://csw-examples-locationServiceClient@10.131.23.195:53618/user/$a",
+ "actor": "pekko://csw-examples-locationServiceClient@10.131.23.195:53618/user/$a",
  "class":"csw.location.LocationServiceExampleClient",
  "file":"LocationServiceExampleClientApp.scala",
  "line":149,
@@ -157,7 +157,7 @@ becomes in CSW 2:
  "@severity":"INFO",
  "@version":"0.1",
  "actor":
-   "akka://csw-examples-locationServiceClient@10.131.23.195:53618/user/$a",
+   "pekko://csw-examples-locationServiceClient@10.131.23.195:53618/user/$a",
  "class":"csw.location.LocationServiceExampleClient",
  "file":"LocationServiceExampleClientApp.scala",
  "line":149,

@@ -5,10 +5,10 @@
 
 package csw.event.client.internal.redis
 
-import akka.Done
-import akka.actor.Cancellable
-import akka.actor.typed.ActorSystem
-import akka.stream.scaladsl.Source
+import org.apache.pekko.Done
+import org.apache.pekko.actor.Cancellable
+import org.apache.pekko.actor.typed.ActorSystem
+import org.apache.pekko.stream.scaladsl.Source
 import csw.event.api.exceptions.PublishFailure
 import csw.event.api.scaladsl.EventPublisher
 import csw.event.client.internal.commons.EventPublisherUtil

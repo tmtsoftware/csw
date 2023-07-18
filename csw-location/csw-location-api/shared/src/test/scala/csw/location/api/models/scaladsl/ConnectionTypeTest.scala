@@ -13,9 +13,9 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 class ConnectionTypeTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
   // DEOPSCSW-14: Codec for data model
-  test("ConnectionType should be any one of this types : 'http', 'tcp' and 'akka' | DEOPSCSW-14") {
+  test("ConnectionType should be any one of this types : 'http', 'tcp' and 'pekko' | DEOPSCSW-14") {
 
-    val expectedConnectionTypeValues = Set("http", "tcp", "akka")
+    val expectedConnectionTypeValues = Set("http", "tcp", "pekko")
 
     val actualConnectionTypeValues: Set[String] =
       ConnectionType.values.map(connectionType => connectionType.entryName).toSet

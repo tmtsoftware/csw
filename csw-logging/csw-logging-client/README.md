@@ -9,7 +9,7 @@ The high level features provided by this library are :
  *    - Asynchronous thread safe logging
  *    - Structured logging
  *    - Supports overriding default logging properties per component viz
- *    - Intercepting logs from akka/slf4j
+ *    - Intercepting logs from pekko/slf4j
  *    - Supports JSON logging
 
 The codebase in this module is based on [persist-logging library](https://github.com/nestorpersist/logging).

@@ -51,14 +51,14 @@ It must register its location information with Location Service so that other co
     * **ComponentName** : a name describing the component.
     * **ComponentType** : such as Container, Sequencer, HCD, Assembly, Service.
    
-* **ConnectionType** : the means to reach components. These are categorized as `Akka`, `HTTP`, or `Tcp` type connections.
+* **ConnectionType** : the means to reach components. These are categorized as `Pekko`, `HTTP`, or `Tcp` type connections.
 
 The location information is stored in the Location Service as **Registrations**.
 
 Some of the examples of the string representation of a connection are:
  
-* TromboneAssembly-assembly-akka 
-* TromboneHcd-hcd-akka 
+* TromboneAssembly-assembly-pekko 
+* TromboneHcd-hcd-pekko 
 * ConfigServer-service-http 
 * EventService-service-tcp
 
@@ -66,7 +66,7 @@ The `register` API takes a `Registration` parameter and returns a future registr
 If registration fails for some reason, the returned future will fail with an exception. 
 (Registration will fail if the `csw-location-server` application is not running or could not be found, or if the given component name was already registered.)
 
-`AkkaRegistrationFactory` can be used to instantiate `AkkaRegistration` using `AkkaConnection`, `Actor Ref` and optional `Metadata`.
+`PekkoRegistrationFactory` can be used to instantiate `PekkoRegistration` using `PekkoConnection`, `Actor Ref` and optional `Metadata`.
 The following example shows registration of both an UnTyped ActorRef and a Typed ActorRef:
  
 Scala
@@ -83,7 +83,7 @@ Location service supports to add additional information while registering connec
 Metadata given at point of registration is reflected in location model. This metadata information can be used to store additional info 
 e.g. agentId for any component running on that agent. Metadata field is optional while registration, if not provided location will be reflected with empty metadata
 
-Following example shows adding metadata in `HttpRegistration`. Similarly, metadata can be added in `AkkaRegistration` as well as `TcpRegistration`.
+Following example shows adding metadata in `HttpRegistration`. Similarly, metadata can be added in `PekkoRegistration` as well as `TcpRegistration`.
 Once location is registered `Metadata` associated can be used for any computation.
 
 Scala
@@ -95,8 +95,8 @@ Java
 
 @@@ note
 
-The `AkkaRegistration` api takes only Typed ActorRefs. Hence, to register an UnTyped ActorRef for an akka connection, it needs to be
-adapted to Typed `ActorRef[Nothing]`, using adapters provided by Akka.  The usage of the adapter is
+The `PekkoRegistration` api takes only Typed ActorRefs. Hence, to register an UnTyped ActorRef for an pekko connection, it needs to be
+adapted to Typed `ActorRef[Nothing]`, using adapters provided by Pekko.  The usage of the adapter is
 shown in the above snippet for both Scala and Java. 
 
 Also, note that for components, the registration will be taken care of via `csw-framework`. Hence, component developers won't register any connections during their development.
@@ -138,7 +138,7 @@ Java
 The logging output from the above example when the given component is not registered should include:
 
 ```
-[INFO] Attempting to find connection AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))
+[INFO] Attempting to find connection PekkoConnection(ComponentId(LocationServiceExampleComponent,Assembly))
 [INFO] Result of the find call: None 
 ```
 
@@ -153,24 +153,24 @@ Java
 The logging output from the above example should include:
 
 ```
-[INFO] Attempting to resolve AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly)) with a wait of 30 seconds ...
+[INFO] Attempting to resolve PekkoConnection(ComponentId(LocationServiceExampleComponent,Assembly)) with a wait of 30 seconds ...
 ```
 
 If you then start the LocationServiceExampleComponentApp, the following message will be logged:
 ```
-[INFO] Resolve result: LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
+[INFO] Resolve result: LocationServiceExampleComponent-assembly-pekko, component type=Assembly, connection type=PekkoType
 ```
 
 If not, eventually the operation will timeout and the output should read:
 ```
-[INFO] Timeout waiting for location AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly)) to resolve.
+[INFO] Timeout waiting for location PekkoConnection(ComponentId(LocationServiceExampleComponent,Assembly)) to resolve.
 ```
 
 @@@ note
 
-The `resolve` and `find` api returns the concrete `Location` type i.e. `Akkalocation`, `HttpLocation` or `TcpLocation` as demonstrated in this section. Once the Akka location
+The `resolve` and `find` api returns the concrete `Location` type i.e. `Pekkolocation`, `HttpLocation` or `TcpLocation` as demonstrated in this section. Once the Pekko location
 is found or resolved, we need to ascribe the type to the ActorRef, since the explicit type annotation is removed from the program before it is executed at run-time 
-(see [type erasure](https://en.wikipedia.org/wiki/Type_erasure)). Use following `AkkaLocation` API to get the correct Typed ActorRef:
+(see [type erasure](https://en.wikipedia.org/wiki/Type_erasure)). Use following `PekkoLocation` API to get the correct Typed ActorRef:
 
 Scala
 :   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/example/location/LocationServiceExampleClientApp.scala) { #typed-ref }
@@ -195,10 +195,10 @@ The log output from the above should contain:
 ```
 [INFO] All Registered Connections:
 [INFO] --- configuration-service-http, component type=Service, connection type=HttpType
-[INFO] --- hcd1-hcd-akka, component type=HCD, connection type=AkkaType
-[INFO] --- LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
+[INFO] --- hcd1-hcd-pekko, component type=HCD, connection type=PekkoType
+[INFO] --- LocationServiceExampleComponent-assembly-pekko, component type=Assembly, connection type=PekkoType
 [INFO] --- redis-service-tcp, component type=Service, connection type=TcpType
-[INFO] --- assembly1-assembly-akka, component type=Assembly, connection type=AkkaType
+[INFO] --- assembly1-assembly-pekko, component type=Assembly, connection type=PekkoType
 ```
 Other variants are filters using `ConnectionType`, `ComponentType`, and `hostname`.
 
@@ -214,8 +214,8 @@ The log output from the above code should contain:
 
 ```
 [INFO] Registered Assemblies:
-[INFO] --- LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
-[INFO] --- assembly1-assembly-akka, component type=Assembly, connection type=AkkaType
+[INFO] --- LocationServiceExampleComponent-assembly-pekko, component type=Assembly, connection type=PekkoType
+[INFO] --- assembly1-assembly-pekko, component type=Assembly, connection type=PekkoType
 ```
 
 Filtering by connection type is shown below:
@@ -229,13 +229,13 @@ Java
 The log output should contain:
 
 ```
-[INFO] Registered Akka connections:
-[INFO] --- hcd1-hcd-akka, component type=HCD, connection type=AkkaType
-[INFO] --- LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
-[INFO] --- assembly1-assembly-akka, component type=Assembly, connection type=AkkaType
+[INFO] Registered Pekko connections:
+[INFO] --- hcd1-hcd-pekko, component type=HCD, connection type=PekkoType
+[INFO] --- LocationServiceExampleComponent-assembly-pekko, component type=Assembly, connection type=PekkoType
+[INFO] --- assembly1-assembly-pekko, component type=Assembly, connection type=PekkoType
 ```
 
-Filtering akka connections by prefix is shown below:
+Filtering pekko connections by prefix is shown below:
 
 Scala
 :   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/example/location/LocationServiceExampleClientApp.scala) { #filtering-prefix }
@@ -246,9 +246,9 @@ Java
 The log output should contain:
 
 ```
-[INFO] Registered akka locations for nfiraos.ncc
-[INFO] --- nfiraos.ncc.hcd1-hcd-akka, component type=HCD, connection type=AkkaType
-[INFO] --- nfiraos.ncc.assembly1-assembly-akka, component type=Assembly, connection type=AkkaType
+[INFO] Registered pekko locations for nfiraos.ncc
+[INFO] --- nfiraos.ncc.hcd1-hcd-pekko, component type=HCD, connection type=PekkoType
+[INFO] --- nfiraos.ncc.assembly1-assembly-pekko, component type=Assembly, connection type=PekkoType
 ```
 
 ## Tracking and Subscribing
@@ -262,7 +262,7 @@ The `track` API returns two values:
   * A **source** that will emit a stream of `TrackingEvents` for the connection.  
   * A **KillSwitch** to turn off the stream when no longer needed.  
 
-The Akka stream API provides many building blocks to process this stream, such as Flow and Sink. 
+The Pekko stream API provides many building blocks to process this stream, such as Flow and Sink. 
 In the example below, `Sink.actorRef` is used to forward any location messages received to the current actor (self).
 
 A consumer can shut down the stream using the KillSwitch.
@@ -288,26 +288,26 @@ Java
 
 The log output should contain the following:
 ```
-[INFO] Starting to track AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly)) LocationUpdated(HttpLocation(HttpConnection(ComponentId(configuration,Service)),http://131.215.210.170:8080/path123))
-[INFO] Starting a subscription to AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))
-[INFO] Subscribing to connection LocationServiceExampleComponent-assembly-akka
-[INFO] Location updated LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
+[INFO] Starting to track PekkoConnection(ComponentId(LocationServiceExampleComponent,Assembly)) LocationUpdated(HttpLocation(HttpConnection(ComponentId(configuration,Service)),http://131.215.210.170:8080/path123))
+[INFO] Starting a subscription to PekkoConnection(ComponentId(LocationServiceExampleComponent,Assembly))
+[INFO] Subscribing to connection LocationServiceExampleComponent-assembly-pekko
+[INFO] Location updated LocationServiceExampleComponent-assembly-pekko, component type=Assembly, connection type=PekkoType
 [INFO] subscription event
-[INFO] Location updated LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
+[INFO] Location updated LocationServiceExampleComponent-assembly-pekko, component type=Assembly, connection type=PekkoType
 ```
 
 If you now stop the LocationServiceExampleComponentApp, it would log:
 ```
 [INFO] subscription event
-[INFO] Location removed AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))
-[INFO] Location removed AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))
+[INFO] Location removed PekkoConnection(ComponentId(LocationServiceExampleComponent,Assembly))
+[INFO] Location removed PekkoConnection(ComponentId(LocationServiceExampleComponent,Assembly))
 ```
 
 If you start the LocationServiceExampleComponentApp again, the log output should be:
 ```
 [INFO] subscription event
-[INFO] Location updated LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
-[INFO] Location updated LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
+[INFO] Location updated LocationServiceExampleComponent-assembly-pekko, component type=Assembly, connection type=PekkoType
+[INFO] Location updated LocationServiceExampleComponent-assembly-pekko, component type=Assembly, connection type=PekkoType
 ```
 
 Note: the line after the words "subscription event" in our example is generated by the subscription, and the other line is from

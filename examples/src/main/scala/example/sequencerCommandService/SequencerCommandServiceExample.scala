@@ -5,12 +5,12 @@
 
 package example.sequencerCommandService
 
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.util.Timeout
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.util.Timeout
 import csw.command.api.scaladsl.SequencerCommandService
 import csw.command.client.SequencerCommandServiceImpl
-import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
+import csw.location.api.models.Connection.PekkoConnection
+import csw.location.api.models.{PekkoLocation, ComponentId, ComponentType}
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.params.commands.CommandResponse.SubmitResponse
@@ -30,8 +30,8 @@ object SequencerCommandServiceExample extends App {
   private val locationService                    = HttpLocationServiceFactory.makeLocalClient(typedSystem)
 
   // #create-sequencer-command-service
-  private val connection             = AkkaConnection(ComponentId(Prefix(Subsystem.CSW, "sequencer"), ComponentType.Sequencer))
-  private val location: AkkaLocation = Await.result(locationService.resolve(connection, 5.seconds), 5.seconds).get
+  private val connection              = PekkoConnection(ComponentId(Prefix(Subsystem.CSW, "sequencer"), ComponentType.Sequencer))
+  private val location: PekkoLocation = Await.result(locationService.resolve(connection, 5.seconds), 5.seconds).get
 
   val sequencerCommandService: SequencerCommandService = new SequencerCommandServiceImpl(location)
   // #create-sequencer-command-service

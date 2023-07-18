@@ -5,13 +5,13 @@
 
 package csw.location
 
-import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.scaladsl.Behaviors
-import akka.stream.scaladsl.{Keep, Sink}
-import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.stream.scaladsl.{Keep, Sink}
+import csw.location.api.models.Connection.{PekkoConnection, HttpConnection, TcpConnection}
 import csw.location.api.models._
-import csw.location.api.{AkkaRegistrationFactory, models}
-import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
+import csw.location.api.{PekkoRegistrationFactory, models}
+import csw.logging.client.commons.PekkoTypedExtension.UserActorFactory
 import csw.prefix.models.{Prefix, Subsystem}
 
 class TrackLocationTestMultiJvmNode1 extends TrackLocationTest(0, "cluster")
@@ -28,8 +28,8 @@ class TrackLocationTest(ignore: Int, mode: String) extends helpers.LSNodeSpec(co
   test(
     s"${testPrefixWithSuite} two components should able to track same connection and single component should able to track two components | DEOPSCSW-26, DEOPSCSW-429"
   ) {
-    //create akka connection
-    val akkaConnection = AkkaConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneHcd"), ComponentType.HCD))
+    //create pekko connection
+    val pekkoConnection = PekkoConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneHcd"), ComponentType.HCD))
 
     //create http connection
     val httpConnection = HttpConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "Assembly1"), ComponentType.Assembly))
@@ -39,11 +39,11 @@ class TrackLocationTest(ignore: Int, mode: String) extends helpers.LSNodeSpec(co
 
     runOn(seed) {
       val actorRef = clusterSettings.system.spawn(Behaviors.empty, "trombone-hcd")
-      locationService.register(AkkaRegistrationFactory.make(akkaConnection, actorRef)).await
+      locationService.register(PekkoRegistrationFactory.make(pekkoConnection, actorRef)).await
       enterBarrier("Registration")
 
-      locationService.unregister(akkaConnection).await
-      enterBarrier("Akka-unregister")
+      locationService.unregister(pekkoConnection).await
+      enterBarrier("Pekko-unregister")
       enterBarrier("Http-unregister")
       enterBarrier("Tcp-unregister")
     }
@@ -54,24 +54,24 @@ class TrackLocationTest(ignore: Int, mode: String) extends helpers.LSNodeSpec(co
 
       val httpRegistration       = HttpRegistration(httpConnection, port, prefix)
       val httpRegistrationResult = locationService.register(httpRegistration).await
-      val akkaProbe              = TestProbe[TrackingEvent]("test-probe1")
+      val pekkoProbe              = TestProbe[TrackingEvent]("test-probe1")
       val tcpProbe               = TestProbe[TrackingEvent]("test-probe2")
 
-      locationService.track(akkaConnection).toMat(Sink.foreach(akkaProbe.ref.tell(_)))(Keep.left).run()
+      locationService.track(pekkoConnection).toMat(Sink.foreach(pekkoProbe.ref.tell(_)))(Keep.left).run()
       locationService.track(tcpConnection).toMat(Sink.foreach(tcpProbe.ref.tell(_)))(Keep.left).run()
 
-      val akkaEvent             = akkaProbe.expectMessageType[LocationUpdated]
-      val trackedAkkaConnection = akkaEvent.asInstanceOf[LocationUpdated].connection
-      trackedAkkaConnection shouldBe akkaConnection
+      val pekkoEvent             = pekkoProbe.expectMessageType[LocationUpdated]
+      val trackedPekkoConnection = pekkoEvent.asInstanceOf[LocationUpdated].connection
+      trackedPekkoConnection shouldBe pekkoConnection
 
       val tcpEvent: LocationUpdated = tcpProbe.expectMessageType[LocationUpdated]
       tcpEvent.connection shouldBe tcpConnection
 
       enterBarrier("Registration")
-      enterBarrier("Akka-unregister")
+      enterBarrier("Pekko-unregister")
 
-      val akkaRemovedEvent: LocationRemoved = akkaProbe.expectMessageType[LocationRemoved]
-      akkaRemovedEvent.connection shouldBe akkaConnection
+      val pekkoRemovedEvent: LocationRemoved = pekkoProbe.expectMessageType[LocationRemoved]
+      pekkoRemovedEvent.connection shouldBe pekkoConnection
 
       httpRegistrationResult.unregister().await
       enterBarrier("Http-unregister")
@@ -94,7 +94,7 @@ class TrackLocationTest(ignore: Int, mode: String) extends helpers.LSNodeSpec(co
       httpEvent.connection shouldBe httpConnection
 
       enterBarrier("Registration")
-      enterBarrier("Akka-unregister")
+      enterBarrier("Pekko-unregister")
       enterBarrier("Http-unregister")
 
       val httpRemovedEvent: TrackingEvent = httpProbe.expectMessageType[LocationRemoved]

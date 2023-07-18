@@ -5,9 +5,9 @@
 
 package csw.framework.containercmd.sample
 
-import akka.actor.testkit.typed.TestKitSettings
-import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
+import org.apache.pekko.actor.testkit.typed.TestKitSettings
+import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
+import org.apache.pekko.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.command.client.messages.ContainerCommonMessage.GetContainerLifecycleState
 import csw.command.client.messages.ContainerMessage

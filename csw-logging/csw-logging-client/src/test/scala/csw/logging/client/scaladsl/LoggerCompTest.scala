@@ -5,8 +5,8 @@
 
 package csw.logging.client.scaladsl
 
-import akka.actor.typed.ActorRef
-import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
+import org.apache.pekko.actor.typed.ActorRef
+import csw.logging.client.commons.PekkoTypedExtension.UserActorFactory
 import csw.logging.client.commons.LoggingKeys
 import csw.logging.client.components.IRISLogMessages._
 import csw.logging.client.components._

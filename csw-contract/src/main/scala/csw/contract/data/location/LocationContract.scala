@@ -5,7 +5,7 @@
 
 package csw.contract.data.location
 
-import akka.Done
+import org.apache.pekko.Done
 import csw.contract.ResourceFetcher
 import csw.contract.generator.ClassNameHelpers._
 import csw.contract.generator._
@@ -19,11 +19,11 @@ import csw.prefix.models.Subsystem
 
 object LocationContract extends LocationData with LocationServiceCodecs {
   private val models: ModelSet = ModelSet.models(
-    ModelType(akkaRegistration, httpRegistration, publicHttpRegistration, tcpRegistration),
-    ModelType(akkaLocation, httpLocation, tcpLocation),
+    ModelType(pekkoRegistration, httpRegistration, publicHttpRegistration, tcpRegistration),
+    ModelType(pekkoLocation, httpLocation, tcpLocation),
     ModelType(locationUpdated, locationRemoved),
     ModelType(ConnectionType),
-    ModelType[Connection](akkaConnection, httpConnection, tcpConnection),
+    ModelType[Connection](pekkoConnection, httpConnection, tcpConnection),
     ModelType(ComponentId(prefix, ComponentType.HCD)),
     ModelType(ComponentType),
     ModelType(
@@ -50,14 +50,14 @@ object LocationContract extends LocationData with LocationServiceCodecs {
   )
 
   private val httpRequests = new RequestSet[LocationRequest] {
-    requestType(akkaRegister, httpRegister, publicHttpRegister)
+    requestType(pekkoRegister, httpRegister, publicHttpRegister)
     requestType(unregister)
     requestType(unregisterAll)
     requestType(find)
     requestType(resolve)
     requestType(listEntries)
     requestType(listByComponentTypeHcd, listByComponentTypeAssembly)
-    requestType(listByAkkaConnectionType, listByHttpConnectionType)
+    requestType(listByPekkoConnectionType, listByHttpConnectionType)
     requestType(listByHostname)
     requestType(listByPrefix)
   }

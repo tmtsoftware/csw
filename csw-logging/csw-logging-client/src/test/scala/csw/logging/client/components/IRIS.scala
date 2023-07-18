@@ -5,8 +5,8 @@
 
 package csw.logging.client.components
 
-import akka.actor.typed.Behavior
-import akka.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.actor.typed.Behavior
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import csw.logging.api.scaladsl._
 import csw.logging.client.components.IRIS._
 import csw.logging.client.components.IRISLogMessages._

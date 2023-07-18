@@ -5,8 +5,8 @@
 
 package csw.command.client
 
-import akka.actor.testkit.typed.scaladsl.ActorTestKit
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.actor.testkit.typed.scaladsl.ActorTestKit
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.command.client.MiniCRM.MiniCRMMessage.*
 import csw.command.client.MiniCRM.{Responses, Starters, Waiters}
 import csw.params.commands.CommandIssue.IdNotAvailableIssue

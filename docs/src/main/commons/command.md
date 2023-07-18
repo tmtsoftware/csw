@@ -174,7 +174,7 @@ to determine completion. This can be more complicated than `submit`, but may be 
 A helper/wrapper is provided called `CommandService` that provides a convenient way to use the Command Service
 with a component from the Location Service.
 
-A `CommandService` instance is created using an `AkkaLocation` of the receiving component, discovered from the Location Service.
+A `CommandService` instance is created using an `PekkoLocation` of the receiving component, discovered from the Location Service.
 This `CommandService` instance has methods for communicating with the component. A new `CommandService` is
 created for each component for which commands are to be sent.
 
@@ -184,7 +184,7 @@ Note that the Scala examples are using async/await which simplifies handling the
 
 @@@
 
-This example shows creating a `Command Service` using `Akka Location` of the receiving component, discovered from the Location Service. Actor System is created here using Actor System Context `ctx` and is passed as implicit parameter to `make` method of `CommandServiceFactory`. In Java though the actor is passed explicitly as shown in the example.
+This example shows creating a `Command Service` using `Pekko Location` of the receiving component, discovered from the Location Service. Actor System is created here using Actor System Context `ctx` and is passed as implicit parameter to `make` method of `CommandServiceFactory`. In Java though the actor is passed explicitly as shown in the example.
 
 Scala/resolve hcd/create command service
 :   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/example/tutorial/basic/sampleassembly/SampleAssemblyHandlers.scala) { #resolve-hcd-and-create-commandservice }

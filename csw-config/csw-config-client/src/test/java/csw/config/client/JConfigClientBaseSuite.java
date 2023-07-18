@@ -5,8 +5,8 @@
 
 package csw.config.client;
 
-import akka.actor.typed.ActorSystem;
-import akka.actor.typed.SpawnProtocol;
+import org.apache.pekko.actor.typed.ActorSystem;
+import org.apache.pekko.actor.typed.SpawnProtocol;
 import csw.config.api.javadsl.IConfigClientService;
 import csw.config.api.javadsl.IConfigService;
 import csw.config.client.internal.ActorRuntime;

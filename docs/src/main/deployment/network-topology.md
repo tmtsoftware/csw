@@ -7,7 +7,7 @@ There are two network in this network topology.
 * Both these networks are withing VPN
 * A `process/service/component` which is accessible within `Inside` network is not protected by auth.
 * A `process/service/component` which is exposed to `Outside` network is protected by auth.
-* `Akka cluster` is formed in Inside network
+* `Pekko cluster` is formed in Inside network
 * A `machine` can connect to both networks using two NICs, if it has a use case, where the application in it
  needs to access both networks.
 * A `process/service/component` running in the `machine` can choose to bind and register itself to one network even if

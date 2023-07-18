@@ -5,8 +5,8 @@
 
 package csw.benchmark.logging;
 
-import akka.actor.typed.ActorSystem;
-import akka.actor.typed.SpawnProtocol;
+import org.apache.pekko.actor.typed.ActorSystem;
+import org.apache.pekko.actor.typed.SpawnProtocol;
 import csw.logging.api.javadsl.ILogger;
 import csw.logging.models.Level;
 import csw.logging.client.internal.LoggingSystem;
@@ -46,7 +46,7 @@ public class JE2ELoggingBenchmark {
     @Setup
     public void setup() {
         log = JGenericLoggerFactory.getLogger(getClass());
-        actorSystem = akka.actor.typed.ActorSystem.create(SpawnProtocol.create(), "JE2E");
+        actorSystem = org.apache.pekko.actor.typed.ActorSystem.create(SpawnProtocol.create(), "JE2E");
         LoggingSystem loggingSystem = JLoggingSystemFactory.start("JE2E-Bench", "SNAPSHOT-1.0", "localhost", actorSystem, List.of(JLogAppenderBuilders.FileAppender()));
         loggingSystem.setDefaultLogLevel(Level.INFO$.MODULE$);
         person = JPerson.createDummy();

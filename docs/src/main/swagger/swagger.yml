@@ -35,7 +35,7 @@ paths:
         Returns the current log level details for particular component. Response
         contains below details :
         1. DefaultLogLevel
-        2. AkkaLogLevel
+        2. PekkoLogLevel
         3. Slf4jLogLevel
         4. ComponentLogLevel
       summary: Get Log Metadata
@@ -83,7 +83,7 @@ paths:
           required: true
           description:
             Name of the component (This is connection name registered with
-            location service. Ex. trombone-hcd-akka).
+            location service. Ex. trombone-hcd-pekko).
           schema:
             type: string
       responses:
@@ -559,8 +559,8 @@ components:
           description: Default log level.
           allOf:
             - $ref: '#/components/schemas/Level'
-        akkaLevel:
-          description: Akka log level.
+        pekkoLevel:
+          description: Pekko log level.
           allOf:
             - $ref: '#/components/schemas/Level'
         slf4jLevel:

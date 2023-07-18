@@ -5,10 +5,10 @@
 
 package csw.config.server.http
 
-import akka.Done
-import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.Route
-import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
+import org.apache.pekko.Done
+import org.apache.pekko.http.scaladsl.model.StatusCodes
+import org.apache.pekko.http.scaladsl.server.Route
+import org.apache.pekko.http.cors.scaladsl.CorsDirectives.cors
 import csw.aas.http.AuthorizationPolicy.RealmRolePolicy
 import csw.aas.http.SecurityDirectives
 import csw.config.api.scaladsl.ConfigService

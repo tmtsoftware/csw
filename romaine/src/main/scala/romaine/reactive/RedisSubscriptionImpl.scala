@@ -4,8 +4,8 @@
  */
 
 package romaine.reactive
-import akka.Done
-import akka.stream.KillSwitch
+import org.apache.pekko.Done
+import org.apache.pekko.stream.KillSwitch
 import romaine.reactive.subscribe.RedisReactiveApi
 
 import scala.async.Async.{async, await}

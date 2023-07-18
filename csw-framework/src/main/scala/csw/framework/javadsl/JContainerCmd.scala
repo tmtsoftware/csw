@@ -5,7 +5,7 @@
 
 package csw.framework.javadsl
 
-import akka.actor.typed.ActorRef
+import org.apache.pekko.actor.typed.ActorRef
 import com.typesafe.config.Config
 import csw.framework.deploy.containercmd.ContainerCmd
 import csw.prefix.models.Subsystem

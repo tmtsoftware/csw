@@ -5,7 +5,7 @@
 
 package csw.framework.internal.supervisor
 
-import akka.actor.typed.ActorRef
+import org.apache.pekko.actor.typed.ActorRef
 import csw.command.client.messages.CommandMessage
 import csw.command.client.models.framework.LockingResponse
 import csw.command.client.models.framework.LockingResponse._

@@ -5,8 +5,8 @@
 
 package org.tmt.csw.samplehcd
 
-import akka.actor.Cancellable
-import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
+import org.apache.pekko.actor.Cancellable
+import org.apache.pekko.actor.typed.scaladsl.{ActorContext, Behaviors}
 import csw.command.client.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers

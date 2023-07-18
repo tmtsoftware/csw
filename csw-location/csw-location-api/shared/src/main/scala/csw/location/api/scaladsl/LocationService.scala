@@ -5,8 +5,8 @@
 
 package csw.location.api.scaladsl
 
-import akka.Done
-import akka.stream.scaladsl.Source
+import org.apache.pekko.Done
+import org.apache.pekko.stream.scaladsl.Source
 import csw.location.api.models._
 import msocket.api.Subscription
 

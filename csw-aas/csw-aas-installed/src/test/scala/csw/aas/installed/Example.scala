@@ -7,7 +7,7 @@ package csw.aas.installed
 
 import java.nio.file.Paths
 
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.aas.installed.scaladsl.FileAuthStore
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory

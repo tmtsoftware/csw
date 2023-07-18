@@ -5,13 +5,13 @@
 
 package csw.framework.integration
 
-import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.http.scaladsl.Http
-import akka.util.Timeout
+import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.http.scaladsl.Http
+import org.apache.pekko.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
-import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.client.extensions.PekkoLocationExt.RichPekkoLocation
 import csw.command.client.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.command.client.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.command.client.messages.SupervisorContainerCommonMessages.Shutdown
@@ -22,7 +22,7 @@ import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.location.api.models
 import csw.location.api.models.ComponentType.{Assembly, HCD}
-import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.Connection.PekkoConnection
 import csw.location.api.models.{ComponentId, ComponentType}
 import csw.location.client.ActorSystemFactory
 import csw.params.commands.CommandResponse._
@@ -41,11 +41,11 @@ class CommandIntegrationTests extends FrameworkIntegrationSuite {
 
   import testWiring.seedLocationService
 
-  private val wfosContainerConnection = AkkaConnection(
+  private val wfosContainerConnection = PekkoConnection(
     ComponentId(Prefix(Subsystem.Container, "WFOS_Container"), ComponentType.Container)
   )
-  private val filterAssemblyConnection = AkkaConnection(models.ComponentId(Prefix(Subsystem.WFOS, "FilterASS"), Assembly))
-  private val filterHCDConnection      = AkkaConnection(models.ComponentId(Prefix(Subsystem.WFOS, "FilterHCD"), HCD))
+  private val filterAssemblyConnection = PekkoConnection(models.ComponentId(Prefix(Subsystem.WFOS, "FilterASS"), Assembly))
+  private val filterHCDConnection      = PekkoConnection(models.ComponentId(Prefix(Subsystem.WFOS, "FilterHCD"), HCD))
   private implicit val containerActorSystem: ActorSystem[SpawnProtocol.Command] =
     ActorSystemFactory.remote(SpawnProtocol(), "container-system")
   val obsId                         = Some(ObsId("2020A-001-123"))

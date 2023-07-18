@@ -5,20 +5,20 @@
 
 package csw.benchmark.command
 
-import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed
-import akka.actor.typed.{ActorRef, SpawnProtocol}
+import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
+import org.apache.pekko.actor.typed
+import org.apache.pekko.actor.typed.{ActorRef, SpawnProtocol}
 import com.typesafe.config.Config
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.CommandServiceFactory
-import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.client.extensions.PekkoLocationExt.RichPekkoLocation
 import csw.command.client.messages.ComponentCommonMessage.GetSupervisorLifecycleState
 import csw.command.client.messages.ContainerCommonMessage.GetContainerLifecycleState
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.command.client.models.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
-import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
+import csw.location.api.models.Connection.PekkoConnection
+import csw.location.api.models.{PekkoLocation, ComponentId, ComponentType}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.network.utils.internal.BlockingUtils
 import csw.prefix.models.{Prefix, Subsystem}
@@ -36,17 +36,17 @@ object BenchmarkHelpers {
     val probe = TestProbe[SupervisorLifecycleState]()
 
     Standalone.spawn(config, wiring)
-    val akkaLocation: AkkaLocation =
+    val pekkoLocation: PekkoLocation =
       Await
         .result(
-          locationService.resolve(AkkaConnection(ComponentId(Prefix(Subsystem.CSW, "Perf"), ComponentType.HCD)), 5.seconds),
+          locationService.resolve(PekkoConnection(ComponentId(Prefix(Subsystem.CSW, "Perf"), ComponentType.HCD)), 5.seconds),
           5.seconds
         )
         .get
 
-    assertThatSupervisorIsRunning(akkaLocation.componentRef, probe, 5.seconds)
+    assertThatSupervisorIsRunning(pekkoLocation.componentRef, probe, 5.seconds)
 
-    CommandServiceFactory.make(akkaLocation)
+    CommandServiceFactory.make(pekkoLocation)
   }
 
   def assertThatContainerIsRunning(

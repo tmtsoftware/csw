@@ -7,7 +7,7 @@ package csw.event.api.javadsl
 
 import java.util.concurrent.CompletableFuture
 
-import akka.Done
+import org.apache.pekko.Done
 
 /**
  * An interface to represent a subscription. On subscribing to one or more Event Keys using the [[csw.event.api.javadsl.IEventSubscriber]],

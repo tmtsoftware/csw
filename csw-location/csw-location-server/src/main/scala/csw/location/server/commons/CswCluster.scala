@@ -5,19 +5,19 @@
 
 package csw.location.server.commons
 
-import akka.Done
-import akka.actor.typed.scaladsl.AskPattern._
-import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
-import akka.cluster.ddata.SelfUniqueAddress
-import akka.cluster.ddata.typed.scaladsl
-import akka.cluster.ddata.typed.scaladsl.{DistributedData, Replicator}
-import akka.cluster.typed.{Cluster, Join}
-import akka.management.scaladsl.AkkaManagement
-import akka.util.Timeout
+import org.apache.pekko.Done
+import org.apache.pekko.actor.typed.scaladsl.AskPattern._
+import org.apache.pekko.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
+import org.apache.pekko.cluster.ddata.SelfUniqueAddress
+import org.apache.pekko.cluster.ddata.typed.scaladsl
+import org.apache.pekko.cluster.ddata.typed.scaladsl.{DistributedData, Replicator}
+import org.apache.pekko.cluster.typed.{Cluster, Join}
+import org.apache.pekko.management.scaladsl.PekkoManagement
+import org.apache.pekko.util.Timeout
 import csw.location.api.exceptions.CouldNotJoinCluster
 import csw.location.server.commons.ClusterConfirmationMessages.{HasJoinedCluster, Shutdown}
 import csw.logging.api.scaladsl.Logger
-import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
+import csw.logging.client.commons.PekkoTypedExtension.UserActorFactory
 import csw.network.utils.internal.BlockingUtils
 
 import scala.concurrent.duration.DurationInt
@@ -53,16 +53,16 @@ class CswCluster private (clusterSettings: ClusterSettings) {
 
   /**
    * If `startManagement` flag is set to true (which is true only when a managementPort is defined in ClusterSettings)
-   * then an akka provided HTTP service is started at provided port. It provides services related to akka cluster management e.g see the members of the cluster and their status i.e. up or weakly up etc.
+   * then an pekko provided HTTP service is started at provided port. It provides services related to pekko cluster management e.g see the members of the cluster and their status i.e. up or weakly up etc.
    * Currently, cluster management service is started on `csw-location-server` which may help in production to monitor
-   * cluster status. But, it can be started on any machine that is a part of akka cluster.
+   * cluster status. But, it can be started on any machine that is a part of pekko cluster.
    */
   // $COVERAGE-OFF$
   private def startClusterManagement(): Unit = {
     val startManagement = actorSystem.settings.config.getBoolean("startManagement")
     if (startManagement) {
-      val akkaManagement = AkkaManagement(actorSystem)
-      Await.result(akkaManagement.start(), 10.seconds)
+      val pekkoManagement = PekkoManagement(actorSystem)
+      Await.result(pekkoManagement.start(), 10.seconds)
     }
   }
   // $COVERAGE-ON$
@@ -70,7 +70,7 @@ class CswCluster private (clusterSettings: ClusterSettings) {
   // When new member tries to join the cluster, location service makes sure that member is weakly up or up before returning handle to location service
   private def joinCluster(): Done = {
     // Check if seed nodes are provided to join csw-cluster
-    val emptySeeds = actorSystem.settings.config.getStringList("akka.cluster.seed-nodes").isEmpty
+    val emptySeeds = actorSystem.settings.config.getStringList("pekko.cluster.seed-nodes").isEmpty
     if (emptySeeds) {
       // If no seeds are provided (which happens only during testing), then create a single node cluster by joining to self
       cluster.manager ! Join(cluster.selfMember.address)

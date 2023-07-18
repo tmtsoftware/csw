@@ -13,7 +13,7 @@ import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.messages.LocationRequest.{Register, Unregister}
 import csw.location.api.messages.LocationStreamRequest.Track
 import csw.location.api.messages.{LocationRequest, LocationStreamRequest}
-import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
+import csw.location.api.models.Connection.{PekkoConnection, HttpConnection}
 import csw.location.api.models._
 import csw.prefix.models.Prefix
 import org.scalatest.BeforeAndAfterAll
@@ -32,21 +32,21 @@ class FilesGeneratorTest extends AnyFunSuite with Matchers with BeforeAndAfterAl
   }
 
   test("should generate samples for given services") {
-    val uri                                = new URI("some_path")
-    val locationService                    = "location-service"
-    val metadata: Metadata                 = Metadata().add("key1", "value")
-    val componentId: ComponentId           = ComponentId(Prefix("tcs.filter.wheel"), ComponentType.HCD)
-    val akkaConnection: AkkaConnection     = AkkaConnection(componentId)
-    val httpConnection: HttpConnection     = HttpConnection(componentId)
-    val akkaRegistration: AkkaRegistration = AkkaRegistration(akkaConnection, uri, metadata)
-    val httpRegistration: HttpRegistration = HttpRegistration(httpConnection, 2090, "somePath")
-    val akkaLocation: Location             = AkkaLocation(akkaConnection, uri, metadata)
-    val httpLocation: Location             = HttpLocation(httpConnection, uri, Metadata.empty)
-    val locationUpdated: TrackingEvent     = LocationUpdated(akkaLocation)
-    val akkaRegister: Register             = Register(akkaRegistration)
-    val httpRegister: Register             = Register(httpRegistration)
-    val unregister: Unregister             = Unregister(httpConnection)
-    val track: Track                       = Track(akkaConnection)
+    val uri                                  = new URI("some_path")
+    val locationService                      = "location-service"
+    val metadata: Metadata                   = Metadata().add("key1", "value")
+    val componentId: ComponentId             = ComponentId(Prefix("tcs.filter.wheel"), ComponentType.HCD)
+    val pekkoConnection: PekkoConnection     = PekkoConnection(componentId)
+    val httpConnection: HttpConnection       = HttpConnection(componentId)
+    val pekkoRegistration: PekkoRegistration = PekkoRegistration(pekkoConnection, uri, metadata)
+    val httpRegistration: HttpRegistration   = HttpRegistration(httpConnection, 2090, "somePath")
+    val pekkoLocation: Location              = PekkoLocation(pekkoConnection, uri, metadata)
+    val httpLocation: Location               = HttpLocation(httpConnection, uri, Metadata.empty)
+    val locationUpdated: TrackingEvent       = LocationUpdated(pekkoLocation)
+    val pekkoRegister: Register              = Register(pekkoRegistration)
+    val httpRegister: Register               = Register(httpRegistration)
+    val unregister: Unregister               = Unregister(httpConnection)
+    val track: Track                         = Track(pekkoConnection)
     val httpEndpoints: List[Endpoint] = List(
       Endpoint(
         requestType = "Register",
@@ -62,11 +62,11 @@ class FilesGeneratorTest extends AnyFunSuite with Matchers with BeforeAndAfterAl
       )
     )
     val models: ModelSet = ModelSet.models(
-      ModelType(akkaLocation, httpLocation),
+      ModelType(pekkoLocation, httpLocation),
       ModelType(locationUpdated)
     )
     val httpRequests = new RequestSet[LocationRequest] {
-      requestType(akkaRegister, httpRegister)
+      requestType(pekkoRegister, httpRegister)
       requestType(unregister)
     }
     val webSocketRequests = new RequestSet[LocationStreamRequest] {

@@ -10,9 +10,9 @@ import java.util
 import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
 
-import akka.Done
-import akka.actor.typed.ActorRef
-import akka.stream.javadsl.Source
+import org.apache.pekko.Done
+import org.apache.pekko.actor.typed.ActorRef
+import org.apache.pekko.stream.javadsl.Source
 import csw.params.events.{Event, EventKey}
 import csw.event.api.internal.EventServiceExts.RichEventSubscription
 import csw.event.api.javadsl.{IEventSubscriber, IEventSubscription}

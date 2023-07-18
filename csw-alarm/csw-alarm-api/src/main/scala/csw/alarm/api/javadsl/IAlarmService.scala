@@ -7,7 +7,7 @@ package csw.alarm.api.javadsl
 
 import java.util.concurrent.CompletableFuture
 
-import akka.Done
+import org.apache.pekko.Done
 import csw.alarm.api.scaladsl.AlarmService
 import csw.alarm.models.AlarmSeverity
 import csw.alarm.models.Key.AlarmKey

@@ -5,7 +5,7 @@
 
 package romaine.async
 
-import akka.Done
+import org.apache.pekko.Done
 import io.lettuce.core.api.async.RedisAsyncCommands
 import romaine.RedisResult
 import romaine.exceptions.RedisServerNotAvailable

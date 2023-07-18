@@ -5,8 +5,8 @@
 
 package csw.testkit
 
-import akka.http.scaladsl.Http
-import akka.util.Timeout
+import org.apache.pekko.http.scaladsl.Http
+import org.apache.pekko.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.aas.http.SecurityDirectives
 import csw.location.server.commons.{ClusterAwareSettings, ClusterSettings}
@@ -14,7 +14,7 @@ import csw.location.server.internal.{ServerWiring, Settings}
 import csw.testkit.internal.{MockedAuthentication, TestKitUtils}
 
 /**
- * LocationTestKit supports starting HTTP Location Server backed by Akka cluster and Distributed Data
+ * LocationTestKit supports starting HTTP Location Server backed by Pekko cluster and Distributed Data
  *
  * Example:
  * {{{

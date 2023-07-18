@@ -5,8 +5,8 @@
 
 package csw.framework.integration
 
-import akka.actor.testkit.typed.scaladsl.{TestInbox, TestProbe}
-import akka.util.Timeout
+import org.apache.pekko.actor.testkit.typed.scaladsl.{TestInbox, TestProbe}
+import org.apache.pekko.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
 import csw.command.client.models.framework.ContainerLifecycleState
@@ -16,7 +16,7 @@ import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.location.api.models
 import csw.location.api.models.ComponentType.Assembly
-import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.Connection.PekkoConnection
 import csw.params.commands
 import csw.params.commands.CommandName
 import csw.params.core.states.CurrentState
@@ -30,7 +30,7 @@ class TimeServiceIntegrationTest extends FrameworkIntegrationSuite {
 
   import testWiring._
 
-  private val filterAssemblyConnection = AkkaConnection(models.ComponentId(Prefix(Subsystem.TCS, "Filter"), Assembly))
+  private val filterAssemblyConnection = PekkoConnection(models.ComponentId(Prefix(Subsystem.TCS, "Filter"), Assembly))
   private val wiring                   = FrameworkWiring.make(seedActorSystem)
 
   override def afterAll(): Unit = {

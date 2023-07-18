@@ -7,9 +7,9 @@ package csw.event.client.internal.kafka
 
 import java.util.UUID
 
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.kafka.{ConsumerSettings, ProducerSettings}
+import org.apache.pekko.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import org.apache.pekko.kafka.{ConsumerSettings, ProducerSettings}
 import csw.event.api.scaladsl.EventService
 import csw.event.client.internal.commons.serviceresolver.EventServiceResolver
 
@@ -20,7 +20,7 @@ import scala.concurrent.Future
  * and [[csw.event.api.scaladsl.EventSubscriber]] backed by Kafka
  *
  * @param eventServiceResolver to get the connection information of event service
- * @param actorSystem actor system to be used by Producer and Consumer API of akka-stream-kafka
+ * @param actorSystem actor system to be used by Producer and Consumer API of pekko-connectors-kafka
  */
 // $COVERAGE-OFF$
 private[event] class KafkaEventService(eventServiceResolver: EventServiceResolver)(implicit

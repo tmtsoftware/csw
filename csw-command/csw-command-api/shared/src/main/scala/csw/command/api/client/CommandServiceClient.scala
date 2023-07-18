@@ -5,9 +5,9 @@
 
 package csw.command.api.client
 
-import akka.actor.typed.ActorSystem
-import akka.stream.scaladsl.Source
-import akka.util.Timeout
+import org.apache.pekko.actor.typed.ActorSystem
+import org.apache.pekko.stream.scaladsl.Source
+import org.apache.pekko.util.Timeout
 import csw.command.api.StateMatcher
 import csw.command.api.codecs.CommandServiceCodecs
 import csw.command.api.messages.CommandServiceRequest._

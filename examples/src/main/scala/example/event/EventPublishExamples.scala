@@ -5,9 +5,9 @@
 
 package example.event
 
-import akka.Done
-import akka.actor.Cancellable
-import akka.stream.scaladsl.{Keep, Source}
+import org.apache.pekko.Done
+import org.apache.pekko.actor.Cancellable
+import org.apache.pekko.stream.scaladsl.{Keep, Source}
 import csw.params.events._
 import csw.command.client.models.framework.ComponentInfo
 import csw.params.core.models.{Id, ObsId}

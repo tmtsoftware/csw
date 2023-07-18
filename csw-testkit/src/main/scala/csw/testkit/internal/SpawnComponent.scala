@@ -5,8 +5,8 @@
 
 package csw.testkit.internal
 
-import akka.actor.typed.ActorRef
-import akka.actor.typed.scaladsl.ActorContext
+import org.apache.pekko.actor.typed.ActorRef
+import org.apache.pekko.actor.typed.scaladsl.ActorContext
 import csw.command.client.messages.{ComponentMessage, TopLevelActorMessage}
 import csw.command.client.models.framework.{ComponentInfo, LocationServiceUsage}
 import csw.framework.internal.supervisor.SupervisorBehaviorFactory

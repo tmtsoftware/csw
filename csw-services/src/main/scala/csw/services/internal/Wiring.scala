@@ -5,8 +5,8 @@
 
 package csw.services.internal
 
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.http.scaladsl.Http.ServerBinding
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.http.scaladsl.Http.ServerBinding
 import csw.config.server.http.HttpService
 import csw.config.server.{ServerWiring => ConfigWiring}
 import csw.location.agent.wiring.{Wiring => AgentWiring}

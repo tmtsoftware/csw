@@ -5,8 +5,8 @@
 
 package csw.framework.deploy.containercmd
 
-import akka.Done
-import akka.actor.typed.ActorRef
+import org.apache.pekko.Done
+import org.apache.pekko.actor.typed.ActorRef
 import com.typesafe.config.Config
 import csw.framework.deploy.containercmd.cli.{ArgsParser, Options}
 import csw.framework.exceptions.UnableToParseOptions

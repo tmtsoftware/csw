@@ -5,11 +5,11 @@
 
 package csw.location.server.internal
 
-import akka.actor.typed.SpawnProtocol
-import akka.actor.typed.scaladsl.Behaviors
-import csw.location.api.AkkaRegistrationFactory
+import org.apache.pekko.actor.typed.SpawnProtocol
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
+import csw.location.api.PekkoRegistrationFactory
 import csw.location.api.extensions.ActorExtension.RichActor
-import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
+import csw.location.api.models.Connection.{PekkoConnection, HttpConnection}
 import csw.location.api.models.*
 import csw.location.client.ActorSystemFactory
 import csw.location.server.commons.CswCluster
@@ -43,19 +43,19 @@ class LocationServiceImplTest extends AnyFunSuite with Matchers with MockitoSuga
     locationService.getLocation(registration).uri.getHost shouldBe "some-private-ip"
   }
 
-  test("should not use public or private cluster hostname for Akka Registration | CSW-97") {
-    val componentId: ComponentId       = ComponentId(Prefix("tcs.filter.wheel"), ComponentType.HCD)
-    val akkaConnection: AkkaConnection = AkkaConnection(componentId)
-    val actorRef                       = system.systemActorOf(Behaviors.empty, "test-actor")
-    val akkaRegistration: AkkaRegistration =
-      AkkaRegistrationFactory.make(akkaConnection, actorRef)
+  test("should not use public or private cluster hostname for Pekko Registration | CSW-97") {
+    val componentId: ComponentId         = ComponentId(Prefix("tcs.filter.wheel"), ComponentType.HCD)
+    val pekkoConnection: PekkoConnection = PekkoConnection(componentId)
+    val actorRef                         = system.systemActorOf(Behaviors.empty, "test-actor")
+    val pekkoRegistration: PekkoRegistration =
+      PekkoRegistrationFactory.make(pekkoConnection, actorRef)
 
     when(mockCswCluster.hostname) thenReturn ("some-private-ip")
     when(mockCswCluster.publicHostname) thenReturn ("some-public-ip")
 
     val locationService = new LocationServiceImpl(mockCswCluster)
-    locationService.getLocation(akkaRegistration).uri shouldBe actorRef.toURI
-    locationService.getLocation(akkaRegistration).uri.toString should not include "some-private-ip"
-    locationService.getLocation(akkaRegistration).uri.toString should not include "some-public-ip"
+    locationService.getLocation(pekkoRegistration).uri shouldBe actorRef.toURI
+    locationService.getLocation(pekkoRegistration).uri.toString should not include "some-private-ip"
+    locationService.getLocation(pekkoRegistration).uri.toString should not include "some-public-ip"
   }
 }

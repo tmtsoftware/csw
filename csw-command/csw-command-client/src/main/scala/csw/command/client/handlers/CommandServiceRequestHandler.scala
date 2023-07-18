@@ -5,8 +5,8 @@
 
 package csw.command.client.handlers
 
-import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.Route
+import org.apache.pekko.http.scaladsl.server.Directives._
+import org.apache.pekko.http.scaladsl.server.Route
 import csw.aas.http.SecurityDirectives
 import csw.command.api.codecs.CommandServiceCodecs._
 import csw.command.api.messages.CommandServiceRequest

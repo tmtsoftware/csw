@@ -5,7 +5,7 @@
 
 package csw.event.cli.wiring
 
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.event.api.scaladsl.EventService
 import csw.event.cli.{CliApp, CommandLineRunner}
 import csw.event.client.EventServiceFactory

@@ -10,9 +10,9 @@ import java.util.Optional
 import java.util.concurrent.CompletableFuture
 import java.util.function.{Consumer, Supplier}
 
-import akka.Done
-import akka.actor.Cancellable
-import akka.stream.javadsl.Source
+import org.apache.pekko.Done
+import org.apache.pekko.actor.Cancellable
+import org.apache.pekko.stream.javadsl.Source
 import csw.event.api.exceptions.PublishFailure
 import csw.event.api.javadsl.IEventPublisher
 import csw.event.api.scaladsl.EventPublisher

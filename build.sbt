@@ -133,7 +133,7 @@ lazy val `csw-location-api` = crossProject(JSPlatform, JVMPlatform)
   .dependsOn(`csw-prefix`)
   .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
   .jvmConfigure(_.dependsOn(`csw-logging-client`).enablePlugins(MaybeCoverage))
-  //  the following setting was required by IntelliJ as it can not handle cross-compiled Akka types
+  //  the following setting was required by IntelliJ as it can not handle cross-compiled Pekko types
   .jsSettings(SettingKey[Boolean]("ide-skip-project") := true)
   .jsSettings(jsTestArg)
   .settings(libraryDependencies ++= Dependencies.LocationApi.value)
@@ -348,7 +348,7 @@ lazy val `csw-command-api` = crossProject(JSPlatform, JVMPlatform)
   )
   .jvmConfigure(_.enablePlugins(GenJavadocPlugin))
   .settings(libraryDependencies ++= Dependencies.CommandApi.value)
-  //  the following setting was required by IntelliJ as it can not handle cross-compiled Akka types
+  //  the following setting was required by IntelliJ as it can not handle cross-compiled Pekko types
   .jsSettings(SettingKey[Boolean]("ide-skip-project") := true)
   .jsSettings(jsTestArg)
   .settings(fork := false)
@@ -651,7 +651,7 @@ lazy val `csw-aas-http` = project
     `csw-commons` % "test->test"
   )
   .settings(
-    libraryDependencies ++= Dependencies.AuthAkkaHttpAdapter.value
+    libraryDependencies ++= Dependencies.AuthPekkoHttpAdapter.value
   )
 
 lazy val `csw-aas-installed` = project

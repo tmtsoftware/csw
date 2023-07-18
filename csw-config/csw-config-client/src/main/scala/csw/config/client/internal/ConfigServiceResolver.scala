@@ -5,7 +5,7 @@
 
 package csw.config.client.internal
 
-import akka.http.scaladsl.model.Uri
+import org.apache.pekko.http.scaladsl.model.Uri
 import csw.location.api.scaladsl.LocationService
 import csw.config.client.commons.ConfigServiceConnection
 

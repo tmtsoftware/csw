@@ -8,9 +8,9 @@ package csw.event.client.perf.reporter
 import java.io.PrintStream
 import java.util.concurrent.TimeUnit.SECONDS
 
-import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
-import akka.util.ByteString
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.actor.typed.{ActorRef, ActorSystem, Behavior}
+import org.apache.pekko.util.ByteString
 import csw.event.api.scaladsl.{EventSubscriber, EventSubscription}
 import csw.event.client.perf.utils.EventUtils
 import csw.event.client.perf.utils.EventUtils._

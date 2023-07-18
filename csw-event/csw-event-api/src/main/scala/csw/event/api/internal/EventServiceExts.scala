@@ -7,7 +7,7 @@ package csw.event.api.internal
 
 import java.util.concurrent.CompletableFuture
 
-import akka.Done
+import org.apache.pekko.Done
 import csw.event.api.javadsl.IEventSubscription
 import csw.event.api.scaladsl.EventSubscription
 

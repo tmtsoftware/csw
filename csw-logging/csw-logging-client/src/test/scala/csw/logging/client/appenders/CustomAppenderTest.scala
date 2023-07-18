@@ -7,8 +7,8 @@ package csw.logging.client.appenders
 
 import java.net.InetAddress
 
-import akka.actor.typed
-import akka.actor.typed.SpawnProtocol
+import org.apache.pekko.actor.typed
+import org.apache.pekko.actor.typed.SpawnProtocol
 import com.typesafe.config.ConfigFactory
 import csw.logging.api.scaladsl._
 import csw.logging.client.internal.JsonExtensions.RichJsObject

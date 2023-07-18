@@ -72,7 +72,7 @@ coming via [CswContext]($github.base_url$/csw-framework/src/main/scala/csw/frame
 
 ### Current State Pub/Sub Functionality
 
-The framework provides a way, based only on Akka, for one component to subscribe to `CurrentState` events provided in another component.
+The framework provides a way, based only on Pekko, for one component to subscribe to `CurrentState` events provided in another component.
 This can be used by an HCD to keep an Assembly up to date on its internal state asynchronously outside of commands. This can also be coupled with the use of 
 `Oneway` commands that do not provide completion responses to the sender as is done for `Submit`. 
 The provider of CurrentState can use [CurrentStatePublisher]($github.base_url$/csw-framework/src/main/scala/csw/framework/models/CswContext.scala#L42)

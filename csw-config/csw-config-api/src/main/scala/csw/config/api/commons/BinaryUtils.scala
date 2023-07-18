@@ -5,7 +5,7 @@
 
 package csw.config.api.commons
 
-import akka.util.ByteString
+import org.apache.pekko.util.ByteString
 
 /**
  * Utils for binary data

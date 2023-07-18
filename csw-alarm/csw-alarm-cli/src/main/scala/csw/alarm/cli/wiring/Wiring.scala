@@ -4,7 +4,7 @@
  */
 
 package csw.alarm.cli.wiring
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.alarm.cli.{CliApp, CommandLineRunner}
 import csw.config.api.scaladsl.ConfigClientService
 import csw.config.client.commons.ConfigUtils

@@ -4,7 +4,7 @@
  */
 
 package csw.command.api
-import akka.util.Timeout
+import org.apache.pekko.util.Timeout
 import csw.params.core.states.{CurrentState, StateName}
 import csw.prefix.models.Prefix
 

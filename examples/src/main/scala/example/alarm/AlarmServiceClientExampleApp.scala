@@ -5,10 +5,10 @@
 
 package example.alarm
 
-import akka.Done
-import akka.actor.typed
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.Done
+import org.apache.pekko.actor.typed
+import org.apache.pekko.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import com.typesafe.config._
 import csw.alarm.models.AlarmSeverity.Okay
 import csw.alarm.models.Key.{AlarmKey, ComponentKey, SubsystemKey}

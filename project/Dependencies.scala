@@ -13,42 +13,42 @@ object Dependencies {
   val LocationServer = Def.setting(
     Seq(
       Libs.`config`,
-      Akka.`akka-actor`,
-      Akka.`akka-actor-typed`,
-      Akka.`akka-stream`,
-      Akka.`akka-stream-typed`,
-      Akka.`akka-cluster`,
-      Akka.`akka-distributed-data`,
-      Akka.`akka-cluster-typed`,
-      AkkaHttp.`akka-http-cors`,
+      Pekko.`pekko-actor`,
+      Pekko.`pekko-actor-typed`,
+      Pekko.`pekko-stream`,
+      Pekko.`pekko-stream-typed`,
+      Pekko.`pekko-cluster`,
+      Pekko.`pekko-distributed-data`,
+      Pekko.`pekko-cluster-typed`,
+      PekkoHttp.`pekko-http-cors`,
       Libs.`scala-async`,
       Libs.`scopt`,
       Libs.`enumeratum`.value,
-      Akka.`cluster-sharding`, // akka-management-cluster-http uses lower version, to avoid conflict, this needs to be overridden
-      Libs.`akka-management-cluster-http`,
-      AkkaHttp.`akka-http`,
-      AkkaHttp.`akka-http-spray-json`, // akka-cluster-management uses lower version, to avoid conflict, this needs to be overridden
+      Pekko.`cluster-sharding`, // akka-management-cluster-http uses lower version, to avoid conflict, this needs to be overridden
+      Libs.`pekko-management`,
+      PekkoHttp.`pekko-http`,
+//      PekkoHttp.`pekko-http-spray-json`,
       MSocket.`msocket-http`,
       Libs.`scalatest`.value          % Test,
       Libs.`junit4-interface`         % Test,
       Libs.`mockito`                  % Test,
-      Akka.`akka-actor-testkit-typed` % Test,
+      Pekko.`pekko-actor-testkit-typed` % Test,
       Libs.`jboss-logging`            % Test,
       Libs.`embedded-keycloak`        % Test,
       Libs.netty                      % Test,
-      Akka.`akka-stream-testkit`      % Test,
-      AkkaHttp.`akka-http-testkit`    % Test
+      Pekko.`pekko-stream-testkit`      % Test,
+      PekkoHttp.`pekko-http-testkit`    % Test
     )
   )
 
   val LocationClient = Def.setting(
     Seq(
       Libs.`config`,
-      Akka.`akka-actor`,
-      Akka.`akka-stream`,
-      Akka.`akka-stream-typed`,
-      AkkaHttp.`akka-http`,
-      Akka.`akka-remote`,
+      Pekko.`pekko-actor`,
+      Pekko.`pekko-stream`,
+      Pekko.`pekko-stream-typed`,
+      PekkoHttp.`pekko-http`,
+      Pekko.`pekko-remote`,
       Libs.`scala-async`,
       Libs.`scala-java8-compat`,
       MSocket.`msocket-http`,
@@ -60,10 +60,10 @@ object Dependencies {
   val LocationAgent = Def.setting(
     Seq(
       Libs.`config`,
-      AkkaHttp.`akka-http`,
-      Akka.`akka-actor`,
-      Akka.`akka-stream`,
-      Akka.`akka-stream-typed`,
+      PekkoHttp.`pekko-http`,
+      Pekko.`pekko-actor`,
+      Pekko.`pekko-stream`,
+      Pekko.`pekko-stream-typed`,
       Libs.`scopt`,
       Libs.`scalatest`.value % Test
     )
@@ -80,43 +80,43 @@ object Dependencies {
 
   val ConfigApi = Def.setting(
     Seq(
-      Akka.`akka-actor`,
-      Akka.`akka-stream`,
-      Akka.`akka-stream-typed`,
-      AkkaHttp.`akka-http`,
+      Pekko.`pekko-actor`,
+      Pekko.`pekko-stream`,
+      Pekko.`pekko-stream-typed`,
+      PekkoHttp.`pekko-http`,
       Libs.`scalatest`.value     % Test,
-      Akka.`akka-stream-testkit` % Test
+      Pekko.`pekko-stream-testkit` % Test
     )
   )
 
   val ConfigServer = Def.setting(
     Seq(
       Libs.`enumeratum`.value,
-      Akka.`akka-stream`,
-      Akka.`akka-stream-typed`,
-      Akka.`akka-actor`,
-      Borer.`borer-compat-akka`,
+      Pekko.`pekko-stream`,
+      Pekko.`pekko-stream-typed`,
+      Pekko.`pekko-actor`,
+      Borer.`borer-compat-pekko`,
       Libs.`scala-async`,
       Libs.`scala-java8-compat`,
       Libs.`config`,
-      AkkaHttp.`akka-http`,
-      AkkaHttp.`akka-http-cors`,
+      PekkoHttp.`pekko-http`,
+      PekkoHttp.`pekko-http-cors`,
       Libs.svnkit,
       Libs.`scopt`,
       Libs.`scalatest`.value       % Test,
-      AkkaHttp.`akka-http-testkit` % Test,
-      Akka.`akka-stream-testkit`   % Test
+      PekkoHttp.`pekko-http-testkit` % Test,
+      Pekko.`pekko-stream-testkit`   % Test
     )
   )
 
   val ConfigClient = Def.setting(
     Seq(
       Libs.`config`,
-      Akka.`akka-actor`,
-      Akka.`akka-stream`,
-      Akka.`akka-stream-typed`,
-      Borer.`borer-compat-akka`,
-      AkkaHttp.`akka-http`,
+      Pekko.`pekko-actor`,
+      Pekko.`pekko-stream`,
+      Pekko.`pekko-stream-typed`,
+      Borer.`borer-compat-pekko`,
+      PekkoHttp.`pekko-http`,
       Libs.`scala-async`,
       Libs.`scala-java8-compat`,
       Libs.`scalatest`.value  % Test,
@@ -128,10 +128,10 @@ object Dependencies {
   val ConfigCli = Def.setting(
     Seq(
       Libs.`config`,
-      AkkaHttp.`akka-http`,
-      Akka.`akka-actor`,
-      Akka.`akka-stream`,
-      Akka.`akka-stream-typed`,
+      PekkoHttp.`pekko-http`,
+      Pekko.`pekko-actor`,
+      Pekko.`pekko-stream`,
+      Pekko.`pekko-stream-typed`,
       Libs.`scopt`,
       Libs.`scalatest`.value % Test
     )
@@ -152,8 +152,8 @@ object Dependencies {
       Libs.`play-json`,
       Libs.`scala-java8-compat`,
       Libs.`enumeratum`.value,
-      Akka.`akka-actor`,
-      Akka.`akka-actor-typed`,
+      Pekko.`pekko-actor`,
+      Pekko.`pekko-actor-typed`,
       Libs.`scalatest`.value  % Test,
       Libs.`junit4-interface` % Test,
       Borer.`borer-core`.value,
@@ -190,16 +190,16 @@ object Dependencies {
     Seq(
       Libs.`enumeratum`.value,
       Libs.`config`,
-      Akka.`akka-actor`,
-      Akka.`akka-stream`,
-      Akka.`akka-stream-typed`,
+      Pekko.`pekko-actor`,
+      Pekko.`pekko-stream`,
+      Pekko.`pekko-stream-typed`,
       Libs.`scala-async`,
       Libs.`scala-java8-compat`,
       Libs.`play-json`,
-      Akka.`akka-actor-typed`,
+      Pekko.`pekko-actor-typed`,
       Libs.`scopt`,
-      Akka.`akka-actor-testkit-typed` % Test,
-      Akka.`akka-stream-testkit`      % Test,
+      Pekko.`pekko-actor-testkit-typed` % Test,
+      Pekko.`pekko-stream-testkit`      % Test,
       Libs.`scalatest`.value          % Test,
       Libs.`junit4-interface`         % Test,
       Libs.`mockito`                  % Test
@@ -213,15 +213,15 @@ object Dependencies {
       Libs.`config`,
       Libs.`play-json`,
       Libs.`scala-java8-compat`,
-      Akka.`akka-stream`,
-      Akka.`akka-stream-typed`,
-      Akka.`akka-actor`,
-      Akka.`akka-actor-typed`,
-      AkkaHttp.`akka-http`,
+      Pekko.`pekko-stream`,
+      Pekko.`pekko-stream-typed`,
+      Pekko.`pekko-actor`,
+      Pekko.`pekko-actor-typed`,
+      PekkoHttp.`pekko-http`,
       Libs.`scala-async`,
       Libs.`caffeine`,
-      Akka.`akka-actor-testkit-typed` % Test,
-      Akka.`akka-stream-testkit`      % Test,
+      Pekko.`pekko-actor-testkit-typed` % Test,
+      Pekko.`pekko-stream-testkit`      % Test,
       Libs.`scalatest`.value          % Test,
       Libs.`junit4-interface`         % Test,
       Libs.`mockito`                  % Test
@@ -237,10 +237,10 @@ object Dependencies {
 
   val EventApi = Def.setting(
     Seq(
-      Akka.`akka-actor`,
-      Akka.`akka-stream`,
-      Akka.`akka-stream-typed`,
-      Akka.`akka-actor-typed`,
+      Pekko.`pekko-actor`,
+      Pekko.`pekko-stream`,
+      Pekko.`pekko-stream-typed`,
+      Pekko.`pekko-actor-typed`,
       Libs.`scala-java8-compat`
     )
   )
@@ -251,16 +251,16 @@ object Dependencies {
       Libs.`config`,
       Libs.`scala-async`,
       Libs.`scala-java8-compat`,
-      Akka.`akka-stream`,
-      Akka.`akka-stream-typed`,
-      Akka.`akka-actor`,
-      Akka.`akka-actor-typed`,
-      Libs.`akka-stream-kafka`,
+      Pekko.`pekko-stream`,
+      Pekko.`pekko-stream-typed`,
+      Pekko.`pekko-actor`,
+      Pekko.`pekko-actor-typed`,
+      Libs.`pekko-connectors-kafka`,
       Libs.`lettuce`,
       Libs.`reactor-core`,
       Libs.`HdrHistogram`             % Test,
-      Akka.`akka-multi-node-testkit`  % Test,
-      Akka.`akka-actor-testkit-typed` % Test,
+      Pekko.`pekko-multi-node-testkit`  % Test,
+      Pekko.`pekko-actor-testkit-typed` % Test,
       Libs.`scalatest`.value          % Test,
       Libs.`junit4-interface`         % Test,
       Libs.`mockito`                  % Test,
@@ -273,10 +273,10 @@ object Dependencies {
   val EventCli = Def.setting(
     Seq(
       Libs.`enumeratum`.value,
-      AkkaHttp.`akka-http`,
-      Akka.`akka-stream`,
-      Akka.`akka-stream-typed`,
-      Akka.`akka-actor`,
+      PekkoHttp.`pekko-http`,
+      Pekko.`pekko-stream`,
+      Pekko.`pekko-stream-typed`,
+      Pekko.`pekko-actor`,
       Libs.`play-json`,
       Libs.`scopt`,
       Libs.`scala-csv`,
@@ -296,10 +296,10 @@ object Dependencies {
 
   val AlarmApi = Def.setting(
     Seq(
-      Akka.`akka-actor`,
-      Akka.`akka-actor-typed`,
-      Akka.`akka-stream`,
-      Akka.`akka-stream-typed`,
+      Pekko.`pekko-actor`,
+      Pekko.`pekko-actor-typed`,
+      Pekko.`pekko-stream`,
+      Pekko.`pekko-stream-typed`,
       Libs.`scalatest`.value % Test
     )
   )
@@ -313,10 +313,10 @@ object Dependencies {
       Libs.`scala-async`,
       Libs.`json-schema-validator`,
       Libs.`scala-java8-compat`,
-      Akka.`akka-actor`,
-      Akka.`akka-actor-typed`,
-      Akka.`akka-stream`,
-      Akka.`akka-stream-typed`,
+      Pekko.`pekko-actor`,
+      Pekko.`pekko-actor-typed`,
+      Pekko.`pekko-stream`,
+      Pekko.`pekko-stream-typed`,
       Libs.`scalatest`.value  % Test,
       Libs.`junit4-interface` % Test,
       Libs.`mockito`          % Test
@@ -327,12 +327,12 @@ object Dependencies {
     Seq(
       Libs.`enumeratum`.value,
       Libs.`config`,
-      Akka.`akka-actor`,
-      Akka.`akka-actor-typed`,
-      Akka.`akka-stream`,
-      Akka.`akka-stream-typed`,
+      Pekko.`pekko-actor`,
+      Pekko.`pekko-actor-typed`,
+      Pekko.`pekko-stream`,
+      Pekko.`pekko-stream-typed`,
       Libs.`scala-async`,
-      AkkaHttp.`akka-http`,
+      PekkoHttp.`pekko-http`,
       Libs.`scopt`,
       Libs.`scalatest`.value % Test,
       Libs.`embedded-redis`  % Test
@@ -342,11 +342,11 @@ object Dependencies {
   val Testkit = Def.setting(
     Seq(
       Libs.`config`,
-      Akka.`akka-actor`,
-      Akka.`akka-stream`,
-      Akka.`akka-stream-typed`,
-      Akka.`akka-actor-typed`,
-      AkkaHttp.`akka-http`,
+      Pekko.`pekko-actor`,
+      Pekko.`pekko-stream`,
+      Pekko.`pekko-stream-typed`,
+      Pekko.`pekko-actor-typed`,
+      PekkoHttp.`pekko-http`,
       Libs.`scala-reflect`,
       Libs.`scala-java8-compat`,
       Keycloak.`keycloak-adapter-core`,
@@ -369,16 +369,16 @@ object Dependencies {
 
   val TimeScheduler = Def.setting(
     Seq(
-      Akka.`akka-actor`,
+      Pekko.`pekko-actor`,
       Libs.`scalatest`.value          % Test,
       Libs.HdrHistogram               % Test,
-      Akka.`akka-actor-testkit-typed` % Test
+      Pekko.`pekko-actor-testkit-typed` % Test
     )
   )
 
   val DatabaseClient = Def.setting(
     Seq(
-      Akka.`akka-actor-typed`,
+      Pekko.`pekko-actor-typed`,
       Libs.`config`,
       Libs.`postgresql`,
       Libs.`scala-java8-compat`,
@@ -389,7 +389,7 @@ object Dependencies {
       Jooq.`jooq-codegen`,
       Libs.`scalatest`.value  % Test,
       Libs.`junit4-interface` % Test,
-      Akka.`akka-actor`       % Test,
+      Pekko.`pekko-actor`       % Test,
       Libs.`io.zonky.test`    % Test
     )
   )
@@ -413,7 +413,7 @@ object Dependencies {
       MSocket.`msocket-security`,
       Keycloak.`keycloak-core`,
       Keycloak.`keycloak-adapter-core`,
-      AkkaHttp.`akka-http`,
+      PekkoHttp.`pekko-http`,
       Libs.`scala-async`,
       // (legacy dependencies) required*
       Libs.`jboss-logging`,
@@ -423,24 +423,24 @@ object Dependencies {
     )
   )
 
-  val AuthAkkaHttpAdapter = Def.setting(
+  val AuthPekkoHttpAdapter = Def.setting(
     Seq(
       Libs.`config`,
-      AkkaHttp.`akka-http`,
+      PekkoHttp.`pekko-http`,
       Libs.`play-json`,
       Libs.`scalatest`.value          % Test,
-      Akka.`akka-actor-testkit-typed` % Test,
-      AkkaHttp.`akka-http-testkit`    % Test,
+      Pekko.`pekko-actor-testkit-typed` % Test,
+      PekkoHttp.`pekko-http-testkit`    % Test,
       Libs.`mockito`                  % Test
     )
   )
 
   val Commons = Def.setting(
     Seq(
-      Akka.`akka-actor`              % Provided,
-      Akka.`akka-actor-typed`        % Provided,
-      AkkaHttp.`akka-http`           % Provided,
-      Borer.`borer-compat-akka`      % Provided,
+      Pekko.`pekko-actor`              % Provided,
+      Pekko.`pekko-actor-typed`        % Provided,
+      PekkoHttp.`pekko-http`           % Provided,
+      Borer.`borer-compat-pekko`      % Provided,
       Borer.`borer-derivation`.value % Provided,
       Libs.`scalatest`.value         % Test,
       Libs.`embedded-redis`          % Test
@@ -463,9 +463,9 @@ object Dependencies {
       Libs.`reactive-streams`,
       Libs.`scala-async`,
       Libs.`scala-java8-compat`,
-      Akka.`akka-stream`,
-      Akka.`akka-stream-typed`,
-      Akka.`akka-actor`,
+      Pekko.`pekko-stream`,
+      Pekko.`pekko-stream-typed`,
+      Pekko.`pekko-actor`,
       Libs.`scalatest`.value % Test
     )
   )
@@ -477,13 +477,13 @@ object Dependencies {
       Libs.`lettuce`,
       Jooq.`jooq`,
       Libs.`scala-async`,
-      Akka.`akka-actor`,
-      Akka.`akka-stream`,
-      Akka.`akka-stream-typed`,
-      Akka.`akka-actor-typed`,
-      AkkaHttp.`akka-http`,
-      AkkaHttp.`akka-http-cors`,
-      Akka.`akka-actor-testkit-typed`,
+      Pekko.`pekko-actor`,
+      Pekko.`pekko-stream`,
+      Pekko.`pekko-stream-typed`,
+      Pekko.`pekko-actor-typed`,
+      PekkoHttp.`pekko-http`,
+      PekkoHttp.`pekko-http-cors`,
+      Pekko.`pekko-actor-testkit-typed`,
       Libs.`scalatest`.value  % Test,
       Libs.`junit4-interface` % Test
     )
@@ -492,16 +492,16 @@ object Dependencies {
   val Benchmark = Def.setting(
     Seq(
       Libs.`config`,
-      Akka.`akka-actor`,
-      Akka.`akka-stream`,
-      Akka.`akka-stream-typed`,
-      Akka.`akka-actor-typed`,
-      AkkaHttp.`akka-http`,
+      Pekko.`pekko-actor`,
+      Pekko.`pekko-stream`,
+      Pekko.`pekko-stream-typed`,
+      Pekko.`pekko-actor-typed`,
+      PekkoHttp.`pekko-http`,
       Libs.`play-json`,
       Libs.`gson`,
       Jackson.`jackson-core`,
       Jackson.`jackson-databind`,
-      Akka.`akka-actor-testkit-typed`,
+      Pekko.`pekko-actor-testkit-typed`,
       Libs.`scalatest`.value  % Test,
       Libs.`junit4-interface` % Test
     )
@@ -512,14 +512,14 @@ object Dependencies {
       Libs.`scalatest`.value,
       Libs.`junit4-interface`,
       Libs.`mockito`,
-      Akka.`akka-actor`,
-      Akka.`akka-actor-typed`,
-      Akka.`akka-actor-testkit-typed`,
-      Akka.`akka-stream`,
-      Akka.`akka-stream-typed`,
-      Akka.`akka-stream-testkit`,
-      AkkaHttp.`akka-http`,
-      Akka.`akka-multi-node-testkit`,
+      Pekko.`pekko-actor`,
+      Pekko.`pekko-actor-typed`,
+      Pekko.`pekko-actor-testkit-typed`,
+      Pekko.`pekko-stream`,
+      Pekko.`pekko-stream-typed`,
+      Pekko.`pekko-stream-testkit`,
+      PekkoHttp.`pekko-http`,
+      Pekko.`pekko-multi-node-testkit`,
       Libs.`embedded-keycloak`,
       Libs.`lettuce`,
       Libs.`tmt-test-reporter`

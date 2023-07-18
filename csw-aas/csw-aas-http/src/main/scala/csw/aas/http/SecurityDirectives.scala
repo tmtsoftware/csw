@@ -5,8 +5,8 @@
 
 package csw.aas.http
 
-import akka.http.scaladsl.model.HttpMethods._
-import akka.http.scaladsl.server._
+import org.apache.pekko.http.scaladsl.model.HttpMethods._
+import org.apache.pekko.http.scaladsl.server._
 import com.typesafe.config.Config
 import csw.aas.core.TokenVerifier
 import csw.aas.core.commons.AuthLogger

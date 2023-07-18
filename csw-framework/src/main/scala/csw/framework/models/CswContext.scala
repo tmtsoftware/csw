@@ -4,7 +4,7 @@
  */
 
 package csw.framework.models
-import akka.actor.typed.{ActorSystem, Scheduler, SpawnProtocol}
+import org.apache.pekko.actor.typed.{ActorSystem, Scheduler, SpawnProtocol}
 import csw.alarm.api.scaladsl.AlarmService
 import csw.alarm.client.AlarmServiceFactory
 import csw.command.client.models.framework.ComponentInfo

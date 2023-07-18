@@ -9,10 +9,10 @@ import java.nio.ByteBuffer
 import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.{ExecutorService, Executors}
 
-import akka.Done
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.remote.testkit.{MultiNodeConfig, MultiNodeSpec, MultiNodeSpecCallbacks}
-import akka.testkit.ImplicitSender
+import org.apache.pekko.Done
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.remote.testkit.{MultiNodeConfig, MultiNodeSpec, MultiNodeSpecCallbacks}
+import org.apache.pekko.testkit.ImplicitSender
 import csw.event.api.scaladsl.{EventPublisher, EventSubscriber}
 import csw.event.client.perf.commons.PerfSubscriber
 import csw.event.client.perf.reporter._

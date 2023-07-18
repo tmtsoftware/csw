@@ -7,8 +7,8 @@ package csw.benchmark.command
 
 import java.util.concurrent.TimeUnit
 
-import akka.actor.typed.Scheduler
-import akka.util
+import org.apache.pekko.actor.typed.Scheduler
+import org.apache.pekko.util
 import com.typesafe.config.ConfigFactory
 import csw.benchmark.command.BenchmarkHelpers.spawnStandaloneComponent
 import csw.command.api.scaladsl.CommandService

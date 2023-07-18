@@ -52,17 +52,17 @@ SampleContainerInfo
           {
             prefix: wfos.Sample_Hcd_1
             componentType: hcd
-            connectionType: akka
+            connectionType: pekko
           },
           {
             prefix: wfos.Sample_Hcd_2
             componentType: hcd
-            connectionType: akka
+            connectionType: pekko
           },
           {
             prefix: wfos.Sample_Hcd_3
             componentType: hcd
-            connectionType: akka
+            connectionType: pekko
           }
         ]
       },

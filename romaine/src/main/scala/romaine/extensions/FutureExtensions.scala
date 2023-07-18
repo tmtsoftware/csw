@@ -5,7 +5,7 @@
 
 package romaine.extensions
 
-import akka.Done
+import org.apache.pekko.Done
 import romaine.exceptions.RedisOperationFailed
 
 import scala.concurrent.{ExecutionContext, Future}

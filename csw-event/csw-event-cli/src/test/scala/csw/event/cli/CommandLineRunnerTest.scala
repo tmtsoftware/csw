@@ -5,7 +5,7 @@
 
 package csw.event.cli
 
-import akka.stream.scaladsl.Sink
+import org.apache.pekko.stream.scaladsl.Sink
 import csw.commons.ResourceReader
 import csw.event.cli.IterableExtensions.RichStringIterable
 import csw.event.client.helpers.TestFutureExt.RichFuture

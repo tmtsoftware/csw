@@ -5,7 +5,7 @@
 
 package csw.location.server.http
 
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.aas.core.commons.AASConnection
 import csw.location.api.CswVersionJvm
 import csw.location.api.codec.LocationServiceCodecs

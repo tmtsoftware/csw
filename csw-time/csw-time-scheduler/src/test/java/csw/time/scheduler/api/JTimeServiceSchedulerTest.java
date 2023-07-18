@@ -5,13 +5,13 @@
 
 package csw.time.scheduler.api;
 
-import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
-import akka.actor.testkit.typed.javadsl.ManualTime;
-import akka.actor.testkit.typed.javadsl.TestKitJunitResource;
-import akka.actor.typed.internal.adapter.ActorSystemAdapter;
-import akka.testkit.TestProbe;
-import akka.testkit.javadsl.TestKit;
+import org.apache.pekko.actor.ActorRef;
+import org.apache.pekko.actor.ActorSystem;
+import org.apache.pekko.actor.testkit.typed.javadsl.ManualTime;
+import org.apache.pekko.actor.testkit.typed.javadsl.TestKitJunitResource;
+import org.apache.pekko.actor.typed.internal.adapter.ActorSystemAdapter;
+import org.apache.pekko.testkit.TestProbe;
+import org.apache.pekko.testkit.javadsl.TestKit;
 import csw.time.core.models.TAITime;
 import csw.time.scheduler.TimeServiceSchedulerFactory;
 import org.junit.Rule;
@@ -30,7 +30,7 @@ public class JTimeServiceSchedulerTest {
     @Rule
     public final TestKitJunitResource testKit = new TestKitJunitResource(ManualTime.config());
 
-    private final akka.actor.typed.ActorSystem<Void> typedSystem = testKit.system();
+    private final org.apache.pekko.actor.typed.ActorSystem<Void> typedSystem = testKit.system();
     private final ManualTime manualTime = ManualTime.get(typedSystem);
 
     private final TimeServiceScheduler timeServiceScheduler =

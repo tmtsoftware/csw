@@ -6,7 +6,7 @@ This is release v1.0.0-RC1 of the TMT Common Software.
 See [CHANGELOG.md](CHANGELOG.md) for details of all releases.
 
 ### Changes
-- Replaced Kryo serialization with Borer-CBOR for Akka actor messages
+- Replaced Kryo serialization with Borer-CBOR for Pekko actor messages
 - Replaced Play-JSON with Borer-JSON in Location service, Configuration Service and Admin Service
 - Made Location, Config and Alarm service models to be cross compilable for ScalaJs
 - Removed `BAD` and `TEST` subsystems

@@ -7,7 +7,7 @@ package csw.logging.client.internal
 
 import java.util.concurrent.ConcurrentHashMap
 
-import akka.actor.typed.ActorRef
+import org.apache.pekko.actor.typed.ActorRef
 import csw.logging.client.internal.TimeActorMessages.TimeActorMessage
 import csw.logging.client.models.ComponentLoggingState
 import csw.logging.models.Level
@@ -25,7 +25,7 @@ private[logging] object LoggingState {
   var defaultLogLevel: Level = Level.INFO
 
   var logLevel: Level      = Level.INFO
-  var akkaLogLevel: Level  = Level.INFO
+  var pekkoLogLevel: Level = Level.INFO
   var slf4jLogLevel: Level = Level.INFO
 
   // LogActor that gets instantiated when LoggingSystem starts
@@ -35,8 +35,8 @@ private[logging] object LoggingState {
   var doTime: Boolean                                     = false
   var timeActorOption: Option[ActorRef[TimeActorMessage]] = None
 
-  // use to sync akka logging actor shutdown
-  val akkaStopPromise: Promise[Unit] = Promise[Unit]()
+  // use to sync pekko logging actor shutdown
+  val pekkoStopPromise: Promise[Unit] = Promise[Unit]()
 
   // a concurrent map of prefix -> LoggingState
   val componentsLoggingState: ConcurrentHashMap[Prefix, ComponentLoggingState] = new ConcurrentHashMap()

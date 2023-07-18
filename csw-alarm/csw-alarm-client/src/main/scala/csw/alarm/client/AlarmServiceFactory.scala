@@ -5,7 +5,7 @@
 
 package csw.alarm.client
 
-import akka.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.ActorSystem
 import com.typesafe.config.ConfigFactory
 import csw.alarm.api.javadsl.IAlarmService
 import csw.alarm.api.scaladsl.{AlarmAdminService, AlarmService}

@@ -8,8 +8,8 @@ package csw.command.api.javadsl
 import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
 
-import akka.stream.javadsl.Source
-import akka.util.Timeout
+import org.apache.pekko.stream.javadsl.Source
+import org.apache.pekko.util.Timeout
 import csw.command.api.StateMatcher
 import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand
@@ -98,14 +98,14 @@ trait ICommandService {
   def queryFinal(commandRunId: Id, timeout: Timeout): CompletableFuture[SubmitResponse]
 
   /**
-   * Subscribe to all the current states of a component corresponding to the [[csw.location.api.models.AkkaLocation]] of the component
+   * Subscribe to all the current states of a component corresponding to the [[csw.location.api.models.PekkoLocation]] of the component
    *
    * @return  a stream of current states with Subscription as the materialized value which can be used to stop the subscription
    */
   def subscribeCurrentState(): Source[CurrentState, Subscription]
 
   /**
-   * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.AkkaLocation]] of the component
+   * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.PekkoLocation]] of the component
    *
    * @param names subscribe to states which have any of the provided value for name.
    *              If no states are provided, all the current states will be received.
@@ -114,7 +114,7 @@ trait ICommandService {
   def subscribeCurrentState(names: java.util.Set[StateName]): Source[CurrentState, Subscription]
 
   /**
-   * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.AkkaLocation]] of the component
+   * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.PekkoLocation]] of the component
    *
    * Note that callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
    *
@@ -124,7 +124,7 @@ trait ICommandService {
   def subscribeCurrentState(callback: Consumer[CurrentState]): Subscription
 
   /**
-   * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.AkkaLocation]] of the component
+   * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.PekkoLocation]] of the component
    *
    * Note that callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
    *

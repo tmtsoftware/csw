@@ -5,8 +5,8 @@
 
 package csw.event.client.internal.kafka
 
-import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.stream.scaladsl.Source
+import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
+import org.apache.pekko.stream.scaladsl.Source
 import csw.event.api.exceptions.PublishFailure
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.helpers.Utils

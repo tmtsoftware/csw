@@ -5,27 +5,27 @@
 
 package example.location;
 
-import akka.actor.AbstractActor;
-import akka.actor.ActorRef;
-import akka.actor.Props;
-import akka.actor.typed.ActorSystem;
-import akka.actor.typed.Behavior;
-import akka.actor.typed.SpawnProtocol;
-import akka.actor.typed.javadsl.Adapter;
-import akka.actor.typed.javadsl.Behaviors;
-import akka.japi.Pair;
-import akka.japi.pf.ReceiveBuilder;
-import akka.stream.KillSwitch;
-import akka.stream.javadsl.Keep;
-import akka.stream.javadsl.Sink;
-import csw.command.client.extensions.AkkaLocationExt;
+import org.apache.pekko.actor.AbstractActor;
+import org.apache.pekko.actor.ActorRef;
+import org.apache.pekko.actor.Props;
+import org.apache.pekko.actor.typed.ActorSystem;
+import org.apache.pekko.actor.typed.Behavior;
+import org.apache.pekko.actor.typed.SpawnProtocol;
+import org.apache.pekko.actor.typed.javadsl.Adapter;
+import org.apache.pekko.actor.typed.javadsl.Behaviors;
+import org.apache.pekko.japi.Pair;
+import org.apache.pekko.japi.pf.ReceiveBuilder;
+import org.apache.pekko.stream.KillSwitch;
+import org.apache.pekko.stream.javadsl.Keep;
+import org.apache.pekko.stream.javadsl.Sink;
+import csw.command.client.extensions.PekkoLocationExt;
 import csw.command.client.messages.ComponentMessage;
 import csw.command.client.messages.ContainerMessage;
-import csw.location.api.JAkkaRegistrationFactory;
+import csw.location.api.JPekkoRegistrationFactory;
 import csw.location.api.extensions.URIExtension;
 import csw.location.api.javadsl.*;
 import csw.location.api.models.*;
-import csw.location.api.models.Connection.AkkaConnection;
+import csw.location.api.models.Connection.PekkoConnection;
 import csw.location.api.models.Connection.HttpConnection;
 import csw.location.client.ActorSystemFactory;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
@@ -57,11 +57,11 @@ public class JLocationServiceExampleClient extends AbstractActor {
     private final ILogger log = new JLoggerFactory(Prefix.apply("csw.my-component-name")).getLogger(context(), getClass());
     private final ActorSystem<Void> typedSystem = Adapter.toTyped(this.system);
     //#create-location-service
-    private final akka.actor.ActorSystem system = context().system();
+    private final org.apache.pekko.actor.ActorSystem system = context().system();
     private final ILocationService locationService = JHttpLocationServiceFactory.makeLocalClient(Adapter.toTyped(system));
     //#create-location-service
 
-    private final AkkaConnection exampleConnection = LocationServiceExampleComponent.connection();
+    private final PekkoConnection exampleConnection = LocationServiceExampleComponent.connection();
 
     private IRegistrationResult httpRegResult;
     private IRegistrationResult httpRegResultonPublicNetwork;
@@ -112,7 +112,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         // ************************************************************************************************************
 
         // dummy HCD connection
-        AkkaConnection hcdConnection = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS, "hcd1"),
+        PekkoConnection hcdConnection = new PekkoConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS, "hcd1"),
                 JComponentType.HCD));
         ActorRef actorRefUntyped = getContext().actorOf(Props.create(AbstractActor.class, () -> new AbstractActor() {
                     @Override
@@ -126,20 +126,20 @@ public class JLocationServiceExampleClient extends AbstractActor {
         // Register UnTyped ActorRef with Location service. Use javadsl Adapter to convert UnTyped ActorRefs
         // to Typed ActorRef[Nothing]
 
-        akka.actor.typed.ActorRef actorRef = Adapter.toTyped(actorRefUntyped);
-        AkkaRegistration hcdRegistration = JAkkaRegistrationFactory.make(hcdConnection, actorRef);
+        org.apache.pekko.actor.typed.ActorRef actorRef = Adapter.toTyped(actorRefUntyped);
+        PekkoRegistration hcdRegistration = JPekkoRegistrationFactory.make(hcdConnection, actorRef);
         hcdRegResult = locationService.register(hcdRegistration).get();
 
         // ************************************************************************************************************
 
         Behavior<String> behavior = Behaviors.setup(ctx -> Behaviors.same());
-        akka.actor.typed.ActorRef<String> typedActorRef = Adapter.spawn(context(), behavior, "typed-actor-ref");
+        org.apache.pekko.actor.typed.ActorRef<String> typedActorRef = Adapter.spawn(context(), behavior, "typed-actor-ref");
 
-        AkkaConnection assemblyConnection = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS,
+        PekkoConnection assemblyConnection = new PekkoConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS,
                 "assembly1"), JComponentType.Assembly));
 
         // Register Typed ActorRef[String] with Location Service
-        AkkaRegistration assemblyRegistration = JAkkaRegistrationFactory.make(assemblyConnection, typedActorRef);
+        PekkoRegistration assemblyRegistration = JPekkoRegistrationFactory.make(assemblyConnection, typedActorRef);
 
 
         assemblyRegResult = locationService.register(assemblyRegistration).get();
@@ -174,7 +174,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
                 ));
         //#log-info-map
 
-        Optional<AkkaLocation> findResult = locationService.find(exampleConnection).get();
+        Optional<PekkoLocation> findResult = locationService.find(exampleConnection).get();
         if (findResult.isPresent()) {
             //#log-info
             log.info("Find result: " + connectionInfo(findResult.orElseThrow().connection()));
@@ -184,15 +184,15 @@ public class JLocationServiceExampleClient extends AbstractActor {
         }
         //#find
 
-        findResult.ifPresent(akkaLocation -> {
+        findResult.ifPresent(pekkoLocation -> {
             //#typed-ref
             // If the component type is HCD or Assembly, use this to get the correct ActorRef
-            akka.actor.typed.ActorRef<ComponentMessage> typedComponentRef =
-                    AkkaLocationExt.RichAkkaLocation(akkaLocation).componentRef(typedSystem);
+            org.apache.pekko.actor.typed.ActorRef<ComponentMessage> typedComponentRef =
+                    PekkoLocationExt.RichPekkoLocation(pekkoLocation).componentRef(typedSystem);
 
             // If the component type is Container, use this to get the correct ActorRef
-            akka.actor.typed.ActorRef<ContainerMessage> typedContainerRef =
-                    AkkaLocationExt.RichAkkaLocation(akkaLocation).containerRef(typedSystem);
+            org.apache.pekko.actor.typed.ActorRef<ContainerMessage> typedContainerRef =
+                    PekkoLocationExt.RichPekkoLocation(pekkoLocation).containerRef(typedSystem);
             //#typed-ref
         });
         //#resolve
@@ -208,7 +208,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         ));
         //#log-info-map-supplier
 
-        Optional<AkkaLocation> resolveResult = locationService.resolve(exampleConnection, waitForResolveLimit).get();
+        Optional<PekkoLocation> resolveResult = locationService.resolve(exampleConnection, waitForResolveLimit).get();
         if (resolveResult.isPresent()) {
             //#log-info-supplier
             log.info(() -> "Resolve result: " + connectionInfo(resolveResult.orElseThrow().connection()));
@@ -220,7 +220,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
 
         // example code showing how to get the actorRef for remote component and send it a message
         if (resolveResult.isPresent()) {
-            AkkaLocation loc = resolveResult.orElseThrow();
+            PekkoLocation loc = resolveResult.orElseThrow();
             ActorRef actorRef = Adapter.toClassic(new URIExtension.RichURI(loc.uri()).toActorRef(typedSystem));
 //            actorRef.tell(LocationServiceExampleComponent.ClientMessage, getSelf());
         }
@@ -248,16 +248,16 @@ public class JLocationServiceExampleClient extends AbstractActor {
 
         //#filtering-connection
         // filter connections based on connection type
-        List<Location> akkaList = locationService.list(JConnectionType.AkkaType).get();
-        log.info("Registered Akka connections:");
-        for (Location loc : akkaList) {
+        List<Location> pekkoList = locationService.list(JConnectionType.PekkoType).get();
+        log.info("Registered Pekko connections:");
+        for (Location loc : pekkoList) {
             log.info("--- " + connectionInfo(loc.connection()));
         }
         //#filtering-connection
 
         //#filtering-prefix
         List<Location> locations = locationService.listByPrefix("NFIRAOS.ncc").get();
-        log.info("Registered akka locations for nfiraos.ncc");
+        log.info("Registered pekko locations for nfiraos.ncc");
         for (Location loc : locations) {
             log.info("--- " + connectionInfo(loc.connection()));
         }
@@ -363,7 +363,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         loggingSystem = JLoggingSystemFactory.start("JLocationServiceExampleClient", "0.1", host, typedSystem);
         //#create-logging-system
 
-        akka.actor.ActorSystem untypedSystem = akka.actor.ActorSystem.create("test");
+        org.apache.pekko.actor.ActorSystem untypedSystem = org.apache.pekko.actor.ActorSystem.create("test");
         untypedSystem.actorOf(Props.create(JLocationServiceExampleClient.class), "LocationServiceExampleClient");
     }
 }

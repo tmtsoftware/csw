@@ -6,7 +6,7 @@
 package csw.config.cli
 
 import java.nio.file.{Files, Paths}
-import akka.actor.typed.scaladsl.adapter.*
+import org.apache.pekko.actor.typed.scaladsl.adapter.*
 import com.typesafe.config.ConfigFactory
 import csw.aas.installed.api.InstalledAppAuthAdapter
 import csw.commons.ResourceReader

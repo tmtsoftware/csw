@@ -5,8 +5,8 @@
 
 package csw.location.agent
 
-import akka.Done
-import akka.actor.CoordinatedShutdown
+import org.apache.pekko.Done
+import org.apache.pekko.actor.CoordinatedShutdown
 import csw.location.agent.commons.LocationAgentLogger
 import csw.location.agent.models.Command
 import csw.location.agent.wiring.Wiring

@@ -5,7 +5,7 @@
 
 package csw.logging.client.utils
 
-import akka.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.ActorSystem
 import csw.logging.client.appenders.{LogAppenderBuilder, StdOutAppender}
 import play.api.libs.json.JsObject
 

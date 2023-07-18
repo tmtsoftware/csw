@@ -5,10 +5,10 @@
 
 package csw.framework.internal.wiring
 
-import akka.actor.typed.SpawnProtocol.Spawn
-import akka.actor.typed.scaladsl.AskPattern.Askable
-import akka.actor.typed._
-import akka.util.Timeout
+import org.apache.pekko.actor.typed.SpawnProtocol.Spawn
+import org.apache.pekko.actor.typed.scaladsl.AskPattern.Askable
+import org.apache.pekko.actor.typed._
+import org.apache.pekko.util.Timeout
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble

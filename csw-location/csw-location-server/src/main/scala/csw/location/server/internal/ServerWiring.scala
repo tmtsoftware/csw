@@ -5,8 +5,8 @@
 
 package csw.location.server.internal
 
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.http.scaladsl.server.Route
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.http.scaladsl.server.Route
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.aas.http.SecurityDirectives
 import csw.location.api.codec.LocationServiceCodecs

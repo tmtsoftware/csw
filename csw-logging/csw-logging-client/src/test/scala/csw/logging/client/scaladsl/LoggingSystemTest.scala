@@ -7,7 +7,7 @@ package csw.logging.client.scaladsl
 
 import java.net.InetAddress
 
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import com.typesafe.config.ConfigFactory
 import csw.logging.client.appenders.{FileAppender, StdOutAppender}
 import csw.logging.client.exceptions.AppenderNotFoundException
@@ -36,25 +36,25 @@ class LoggingSystemTest extends AnyFunSuite with Matchers with BeforeAndAfterAll
     loggingSystem.getDefaultLogLevel.default.name shouldBe config
       .getString("logLevel")
       .toUpperCase
-    loggingSystem.getAkkaLevel.default.name shouldBe config
-      .getString("akkaLogLevel")
+    loggingSystem.getPekkoLevel.default.name shouldBe config
+      .getString("pekkoLogLevel")
       .toUpperCase
     loggingSystem.getSlf4jLevel.default.name shouldBe config
       .getString("slf4jLogLevel")
       .toUpperCase
   }
 
-  test("should be able to set log level for default logger, slf4j and akka | ") {
+  test("should be able to set log level for default logger, slf4j and pekko | ") {
     val logLevel      = "debug"
-    val akkaLogLevel  = "Error"
+    val pekkoLogLevel = "Error"
     val slf4jLogLevel = "INFO"
 
-    loggingSystem.setDefaultLogLevel(Level(akkaLogLevel))
-    loggingSystem.setAkkaLevel(Level(logLevel))
+    loggingSystem.setDefaultLogLevel(Level(pekkoLogLevel))
+    loggingSystem.setPekkoLevel(Level(logLevel))
     loggingSystem.setSlf4jLevel(Level(slf4jLogLevel))
 
-    loggingSystem.getDefaultLogLevel.current.name.toLowerCase shouldBe akkaLogLevel.toLowerCase
-    loggingSystem.getAkkaLevel.current.name.toLowerCase shouldBe logLevel.toLowerCase
+    loggingSystem.getDefaultLogLevel.current.name.toLowerCase shouldBe pekkoLogLevel.toLowerCase
+    loggingSystem.getPekkoLevel.current.name.toLowerCase shouldBe logLevel.toLowerCase
     loggingSystem.getSlf4jLevel.current.name.toLowerCase shouldBe slf4jLogLevel.toLowerCase
   }
 

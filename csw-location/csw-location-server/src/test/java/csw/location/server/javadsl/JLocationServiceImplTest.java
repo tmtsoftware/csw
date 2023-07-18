@@ -5,27 +5,27 @@
 
 package csw.location.server.javadsl;
 
-import akka.actor.testkit.typed.javadsl.TestProbe;
-import akka.actor.typed.*;
-import akka.actor.typed.javadsl.Adapter;
-import akka.actor.typed.javadsl.Behaviors;
-import akka.japi.Pair;
-import akka.stream.javadsl.Keep;
-import akka.stream.testkit.TestSubscriber;
-import akka.stream.testkit.scaladsl.TestSink;
+import org.apache.pekko.actor.testkit.typed.javadsl.TestProbe;
+import org.apache.pekko.actor.typed.*;
+import org.apache.pekko.actor.typed.javadsl.Adapter;
+import org.apache.pekko.actor.typed.javadsl.Behaviors;
+import org.apache.pekko.japi.Pair;
+import org.apache.pekko.stream.javadsl.Keep;
+import org.apache.pekko.stream.testkit.TestSubscriber;
+import org.apache.pekko.stream.testkit.scaladsl.TestSink;
 import csw.location.api.CswVersionJvm;
-import csw.location.api.JAkkaRegistrationFactory;
+import csw.location.api.JPekkoRegistrationFactory;
 import csw.location.api.commons.Constants;
 import csw.location.api.javadsl.*;
 import csw.location.api.models.*;
-import csw.location.api.models.Connection.AkkaConnection;
+import csw.location.api.models.Connection.PekkoConnection;
 import csw.location.api.models.Connection.HttpConnection;
 import csw.location.api.models.Connection.TcpConnection;
 import csw.location.client.ActorSystemFactory;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
 import csw.location.server.internal.ServerWiring;
 import csw.logging.api.javadsl.ILogger;
-import csw.logging.client.commons.AkkaTypedExtension;
+import csw.logging.client.commons.PekkoTypedExtension;
 import csw.logging.client.javadsl.JLoggerFactory;
 import csw.logging.client.utils.Eventually;
 import csw.network.utils.Networks;
@@ -49,15 +49,15 @@ public class JLocationServiceImplTest {
 
     private static ServerWiring wiring;
 
-    private static akka.actor.ActorSystem untypedSystem;
+    private static org.apache.pekko.actor.ActorSystem untypedSystem;
     private static ActorSystem<SpawnProtocol.Command> typedSystem;
     private static ILocationService locationService;
     private static final NetworkType insideNetwork = JNetworkType.Inside;
     private static String hostname;
 
-    private final ComponentId akkaHcdComponentId = new ComponentId(new Prefix(JSubsystem.CSW, "hcd1"),
+    private final ComponentId pekkoHcdComponentId = new ComponentId(new Prefix(JSubsystem.CSW, "hcd1"),
             JComponentType.HCD);
-    private final AkkaConnection akkaHcdConnection = new AkkaConnection(akkaHcdComponentId);
+    private final PekkoConnection pekkoHcdConnection = new PekkoConnection(pekkoHcdComponentId);
 
     private final ComponentId tcpServiceComponentId = new ComponentId(new Prefix(JSubsystem.CSW, "exampleTcpService")
             , JComponentType.Service);
@@ -109,24 +109,24 @@ public class JLocationServiceImplTest {
 
     @Test
     // DEOPSCSW-39: examples of Location Service
-    public void testLocationServiceRegisterWithAkkaHttpTcpAsSequence__DEOPSCSW_39() throws ExecutionException,
+    public void testLocationServiceRegisterWithPekkoHttpTcpAsSequence__DEOPSCSW_39() throws ExecutionException,
             InterruptedException {
         int port = 8080;
 
         Metadata metadata = new Metadata(Map.of("", ""));
-        AkkaRegistration akkaRegistration = JAkkaRegistrationFactory.make(akkaHcdConnection, actorRef, metadata);
+        PekkoRegistration pekkoRegistration = JPekkoRegistrationFactory.make(pekkoHcdConnection, actorRef, metadata);
         HttpRegistration httpRegistration = new HttpRegistration(httpServiceConnection, port, Path);
         TcpRegistration tcpRegistration = new TcpRegistration(tcpServiceConnection, port);
 
-        locationService.register(akkaRegistration).get();
+        locationService.register(pekkoRegistration).get();
         locationService.register(httpRegistration).get();
         locationService.register(tcpRegistration).get();
 
         Assert.assertEquals(3, locationService.list().get().size());
-        Assert.assertEquals(withCswVersion(akkaRegistration).location(hostname),
-                locationService.find(akkaHcdConnection).get().orElseThrow());
-        Assert.assertEquals(withCswVersion(akkaRegistration).metadata(),
-                locationService.find(akkaHcdConnection).get().orElseThrow().metadata());
+        Assert.assertEquals(withCswVersion(pekkoRegistration).location(hostname),
+                locationService.find(pekkoHcdConnection).get().orElseThrow());
+        Assert.assertEquals(withCswVersion(pekkoRegistration).metadata(),
+                locationService.find(pekkoHcdConnection).get().orElseThrow().metadata());
         Assert.assertEquals(withCswVersion(httpRegistration).location(hostname),
                 locationService.find(httpServiceConnection).get().orElseThrow());
         Assert.assertEquals(withCswVersion(tcpRegistration).location(hostname),
@@ -148,11 +148,11 @@ public class JLocationServiceImplTest {
     // DEOPSCSW-13: Java API for location service
     // DEOPSCSW-39: examples of Location Service
     @Test
-    public void testResolveAkkaConnection__DEOPSCSW_13_DEOPSCSW_39() throws ExecutionException, InterruptedException {
-        AkkaRegistration registration = JAkkaRegistrationFactory.make(akkaHcdConnection, actorRef);
+    public void testResolvePekkoConnection__DEOPSCSW_13_DEOPSCSW_39() throws ExecutionException, InterruptedException {
+        PekkoRegistration registration = JPekkoRegistrationFactory.make(pekkoHcdConnection, actorRef);
         locationService.register(registration).get();
         Assert.assertEquals(withCswVersion(registration).location(hostname),
-                locationService.find(akkaHcdConnection).get().orElseThrow());
+                locationService.find(pekkoHcdConnection).get().orElseThrow());
     }
 
     @Test
@@ -181,12 +181,12 @@ public class JLocationServiceImplTest {
     // DEOPSCSW-13: Java API for location service
     // DEOPSCSW-39: examples of Location Service
     @Test
-    public void testAkkaRegistration__DEOPSCSW_13_DEOPSCSW_39() throws ExecutionException, InterruptedException {
-        AkkaRegistration registration = JAkkaRegistrationFactory.make(akkaHcdConnection, actorRef);
+    public void testPekkoRegistration__DEOPSCSW_13_DEOPSCSW_39() throws ExecutionException, InterruptedException {
+        PekkoRegistration registration = JPekkoRegistrationFactory.make(pekkoHcdConnection, actorRef);
 
         locationService.register(registration).get();
         Assert.assertEquals(withCswVersion(registration).location(hostname),
-                locationService.find(akkaHcdConnection).get().orElseThrow());
+                locationService.find(pekkoHcdConnection).get().orElseThrow());
     }
 
     // DEOPSCSW-13: Java API for location service
@@ -197,9 +197,9 @@ public class JLocationServiceImplTest {
         HttpRegistration httpRegistration = new HttpRegistration(httpServiceConnection, 4000, "/svn/");
         locationService.register(httpRegistration).get();
 
-        //  Register Akka connection
-        AkkaRegistration akkaHcdRegistration = JAkkaRegistrationFactory.make(akkaHcdConnection, actorRef);
-        locationService.register(akkaHcdRegistration).get();
+        //  Register Pekko connection
+        PekkoRegistration pekkoHcdRegistration = JPekkoRegistrationFactory.make(pekkoHcdConnection, actorRef);
+        locationService.register(pekkoHcdRegistration).get();
 
         //  Register Tcp service
         TcpRegistration tcpServiceRegistration = new TcpRegistration(tcpServiceConnection, 80);
@@ -207,7 +207,7 @@ public class JLocationServiceImplTest {
 
         Set<Location> locations = Set.of(
                 withCswVersion(httpRegistration).location(hostname),
-                withCswVersion(akkaHcdRegistration).location(hostname),
+                withCswVersion(pekkoHcdRegistration).location(hostname),
                 withCswVersion(tcpServiceRegistration).location(hostname)
         );
 
@@ -222,27 +222,27 @@ public class JLocationServiceImplTest {
     public void testListComponentsByComponentType__DEOPSCSW_13_DEOPSCSW_24_DEOPSCSW_39() throws ExecutionException,
             InterruptedException {
         //  Register HCD type component
-        ComponentId akkaHcdComponentId = new ComponentId(new Prefix(JSubsystem.NFIRAOS, "tromboneHCD"),
+        ComponentId pekkoHcdComponentId = new ComponentId(new Prefix(JSubsystem.NFIRAOS, "tromboneHCD"),
                 JComponentType.HCD);
-        AkkaConnection akkaHcdConnection = new AkkaConnection(akkaHcdComponentId);
-        AkkaRegistration akkaHcdRegistration = JAkkaRegistrationFactory.make(akkaHcdConnection, actorRef);
-        locationService.register(akkaHcdRegistration).get();
+        PekkoConnection pekkoHcdConnection = new PekkoConnection(pekkoHcdComponentId);
+        PekkoRegistration pekkoHcdRegistration = JPekkoRegistrationFactory.make(pekkoHcdConnection, actorRef);
+        locationService.register(pekkoHcdRegistration).get();
 
         //  Register Assembly type component
-        ComponentId akkaAssemblyComponentId = new ComponentId(new Prefix(JSubsystem.NFIRAOS, "tromboneAssembly"),
+        ComponentId pekkoAssemblyComponentId = new ComponentId(new Prefix(JSubsystem.NFIRAOS, "tromboneAssembly"),
                 JComponentType.Assembly);
-        AkkaConnection akkaAssemblyConnection = new AkkaConnection(akkaAssemblyComponentId);
-        AkkaRegistration akkaAssemblyRegistration = JAkkaRegistrationFactory.make(akkaAssemblyConnection,
+        PekkoConnection pekkoAssemblyConnection = new PekkoConnection(pekkoAssemblyComponentId);
+        PekkoRegistration pekkoAssemblyRegistration = JPekkoRegistrationFactory.make(pekkoAssemblyConnection,
                 actorRef);
-        locationService.register(akkaAssemblyRegistration).get();
+        locationService.register(pekkoAssemblyRegistration).get();
 
         //  Register Container type component
-        ComponentId akkaContainerComponentId = new ComponentId(new Prefix(JSubsystem.NFIRAOS, "tromboneContainer"),
+        ComponentId pekkoContainerComponentId = new ComponentId(new Prefix(JSubsystem.NFIRAOS, "tromboneContainer"),
                 JComponentType.Container);
-        AkkaConnection akkaContainerConnection = new AkkaConnection(akkaContainerComponentId);
-        AkkaRegistration akkaContainerRegistration = JAkkaRegistrationFactory.make(akkaContainerConnection,
+        PekkoConnection pekkoContainerConnection = new PekkoConnection(pekkoContainerComponentId);
+        PekkoRegistration pekkoContainerRegistration = JPekkoRegistrationFactory.make(pekkoContainerConnection,
                 actorRef);
-        locationService.register(akkaContainerRegistration).get();
+        locationService.register(pekkoContainerRegistration).get();
 
         //  Register Tcp and Http Service
         ComponentId tcpComponentId = new ComponentId(new Prefix(JSubsystem.CSW, "redis"), JComponentType.Service);
@@ -257,15 +257,15 @@ public class JLocationServiceImplTest {
         locationService.register(httpServiceRegistration).get();
 
         //  Filter by HCD type
-        List<Location> hcdLocations = List.of(withCswVersion(akkaHcdRegistration).location(hostname));
+        List<Location> hcdLocations = List.of(withCswVersion(pekkoHcdRegistration).location(hostname));
         Assert.assertEquals(hcdLocations, locationService.list(JComponentType.HCD).get());
 
         //  Filter by Assembly type
-        List<Location> assemblyLocations = List.of(withCswVersion(akkaAssemblyRegistration).location(hostname));
+        List<Location> assemblyLocations = List.of(withCswVersion(pekkoAssemblyRegistration).location(hostname));
         Assert.assertEquals(assemblyLocations, locationService.list(JComponentType.Assembly).get());
 
         //  Filter by Container type
-        List<Location> containerLocations = List.of(withCswVersion(akkaContainerRegistration).location(hostname));
+        List<Location> containerLocations = List.of(withCswVersion(pekkoContainerRegistration).location(hostname));
         Assert.assertEquals(containerLocations, locationService.list(JComponentType.Container).get());
 
         //  Filter by Service type
@@ -287,13 +287,13 @@ public class JLocationServiceImplTest {
         TcpRegistration tcpRegistration = new TcpRegistration(tcpServiceConnection, 8080);
         locationService.register(tcpRegistration).get();
 
-        //  Register Akka connection
-        AkkaRegistration akkaRegistration = JAkkaRegistrationFactory.make(akkaHcdConnection, actorRef);
-        locationService.register(akkaRegistration).get();
+        //  Register Pekko connection
+        PekkoRegistration pekkoRegistration = JPekkoRegistrationFactory.make(pekkoHcdConnection, actorRef);
+        locationService.register(pekkoRegistration).get();
 
         Set<Location> locations = Set.of(
                 withCswVersion(tcpRegistration).location(hostname),
-                withCswVersion(akkaRegistration).location(hostname)
+                withCswVersion(pekkoRegistration).location(hostname)
         );
 
         Set<Location> actualSetOfLocations = Set.copyOf(locationService.list(hostname).get());
@@ -314,9 +314,9 @@ public class JLocationServiceImplTest {
         HttpRegistration httpRegistration = new HttpRegistration(httpServiceConnection, 4000, "/config/svn/");
         locationService.register(httpRegistration).get();
 
-        // Register Akka connection
-        AkkaRegistration akkaRegistration = JAkkaRegistrationFactory.make(akkaHcdConnection, actorRef);
-        locationService.register(akkaRegistration).get();
+        // Register Pekko connection
+        PekkoRegistration pekkoRegistration = JPekkoRegistrationFactory.make(pekkoHcdConnection, actorRef);
+        locationService.register(pekkoRegistration).get();
 
         //  filter by Tcp type
         List<Location> tcpLocations = List.of(withCswVersion(tcpRegistration).location(hostname));
@@ -326,38 +326,38 @@ public class JLocationServiceImplTest {
         List<Location> httpLocations = List.of(withCswVersion(httpRegistration).location(hostname));
         Assert.assertEquals(httpLocations, locationService.list(JConnectionType.HttpType).get());
 
-        //  filter by Akka type
-        List<Location> akkaLocations = List.of(withCswVersion(akkaRegistration).location(hostname));
-        Assert.assertEquals(akkaLocations, locationService.list(JConnectionType.AkkaType).get());
+        //  filter by Pekko type
+        List<Location> pekkoLocations = List.of(withCswVersion(pekkoRegistration).location(hostname));
+        Assert.assertEquals(pekkoLocations, locationService.list(JConnectionType.PekkoType).get());
     }
 
     //DEOPSCSW-308: Add prefix in Location service models
     //CSW-86: Subsystem should be case-insensitive
     @Test
-    public void testListakkaComponentsByPrefix__DEOPSCSW_308() throws ExecutionException, InterruptedException {
-        AkkaConnection akkaHcdConnection1 = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS, "ncc" +
+    public void testListpekkoComponentsByPrefix__DEOPSCSW_308() throws ExecutionException, InterruptedException {
+        PekkoConnection pekkoHcdConnection1 = new PekkoConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS, "ncc" +
                 ".trombone.hcd1"), JComponentType.HCD));
-        AkkaConnection akkaHcdConnection2 = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS, "ncc" +
+        PekkoConnection pekkoHcdConnection2 = new PekkoConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS, "ncc" +
                 ".trombone.assembly2"), JComponentType.HCD));
-        AkkaConnection akkaHcdConnection3 = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS, "ncc" +
+        PekkoConnection pekkoHcdConnection3 = new PekkoConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS, "ncc" +
                 ".trombone.hcd3"), JComponentType.HCD));
 
-        // Register Akka connection
-        AkkaRegistration akkaRegistration1 = JAkkaRegistrationFactory.make(akkaHcdConnection1, actorRef);
-        AkkaRegistration akkaRegistration2 = JAkkaRegistrationFactory.make(akkaHcdConnection2, actorRef);
-        AkkaRegistration akkaRegistration3 = JAkkaRegistrationFactory.make(akkaHcdConnection3, actorRef);
-        locationService.register(akkaRegistration1).get();
-        locationService.register(akkaRegistration2).get();
-        locationService.register(akkaRegistration3).get();
+        // Register Pekko connection
+        PekkoRegistration pekkoRegistration1 = JPekkoRegistrationFactory.make(pekkoHcdConnection1, actorRef);
+        PekkoRegistration pekkoRegistration2 = JPekkoRegistrationFactory.make(pekkoHcdConnection2, actorRef);
+        PekkoRegistration pekkoRegistration3 = JPekkoRegistrationFactory.make(pekkoHcdConnection3, actorRef);
+        locationService.register(pekkoRegistration1).get();
+        locationService.register(pekkoRegistration2).get();
+        locationService.register(pekkoRegistration3).get();
 
-        // filter akka locations by prefix
-        List<AkkaLocation> akkaLocations = List.of(
-                (AkkaLocation) withCswVersion(akkaRegistration1).location(hostname),
-                (AkkaLocation) withCswVersion(akkaRegistration2).location(hostname),
-                (AkkaLocation) withCswVersion(akkaRegistration3).location(hostname)
+        // filter pekko locations by prefix
+        List<PekkoLocation> pekkoLocations = List.of(
+                (PekkoLocation) withCswVersion(pekkoRegistration1).location(hostname),
+                (PekkoLocation) withCswVersion(pekkoRegistration2).location(hostname),
+                (PekkoLocation) withCswVersion(pekkoRegistration3).location(hostname)
         );
-        Assert.assertEquals(akkaLocations.size(), locationService.listByPrefix("NFIRAOS.ncc.trombone").get().size());
-        Assert.assertTrue(locationService.listByPrefix("NFIRAOS.ncc.trombone").get().containsAll(akkaLocations));
+        Assert.assertEquals(pekkoLocations.size(), locationService.listByPrefix("NFIRAOS.ncc.trombone").get().size());
+        Assert.assertTrue(locationService.listByPrefix("NFIRAOS.ncc.trombone").get().containsAll(pekkoLocations));
     }
 
     // DEOPSCSW-26: Track a connection
@@ -440,13 +440,13 @@ public class JLocationServiceImplTest {
     @Test
     public void testUnregisteringDeadActorByDeathWatch__DEOPSCSW_35() throws ExecutionException, InterruptedException {
         ComponentId componentId = new ComponentId(new Prefix(JSubsystem.NFIRAOS, "hcd1"), JComponentType.HCD);
-        AkkaConnection connection = new AkkaConnection(componentId);
+        PekkoConnection connection = new PekkoConnection(componentId);
 
         ActorRef<Object> actorRef =
-                AkkaTypedExtension.UserActorFactory(typedSystem).spawn(TestActor.behavior(), "test-actor",
+                PekkoTypedExtension.UserActorFactory(typedSystem).spawn(TestActor.behavior(), "test-actor",
                         Props.empty());
 
-        AkkaRegistration registration = JAkkaRegistrationFactory.make(connection, actorRef);
+        PekkoRegistration registration = JPekkoRegistrationFactory.make(connection, actorRef);
         Location location = withCswVersion(registration).location(hostname);
         IRegistrationResult registrationResult = locationService.register(registration).get();
         Assert.assertEquals(location, registrationResult.location());

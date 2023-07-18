@@ -5,7 +5,7 @@
 
 package example.database
 
-import akka.actor.typed.scaladsl.ActorContext
+import org.apache.pekko.actor.typed.scaladsl.ActorContext
 import csw.command.client.messages.TopLevelActorMessage
 import csw.database.DatabaseServiceFactory
 import csw.framework.models.CswContext

@@ -5,7 +5,7 @@
 
 package csw.config.cli.wiring
 
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.aas.installed.InstalledAppAuthAdapterFactory
 import csw.aas.installed.api.InstalledAppAuthAdapter
@@ -19,7 +19,7 @@ import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 
 /**
- * ClientCliWiring lazily joins the akka cluster and starts the app. After joining the cluster, it first resolves the location
+ * ClientCliWiring lazily joins the pekko cluster and starts the app. After joining the cluster, it first resolves the location
  * of config server using `ConfigServiceResolver` from `csw-config-client` and then starts the app catering cli features
  * over admin api of config service.
  */

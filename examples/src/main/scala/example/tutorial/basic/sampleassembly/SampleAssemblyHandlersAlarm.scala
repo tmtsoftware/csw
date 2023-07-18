@@ -5,8 +5,8 @@
 
 package example.tutorial.basic.sampleassembly
 
-import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
-import akka.util.Timeout
+import org.apache.pekko.actor.typed.scaladsl.{ActorContext, Behaviors}
+import org.apache.pekko.util.Timeout
 import csw.alarm.models.AlarmSeverity
 import csw.alarm.models.Key.AlarmKey
 import csw.command.api.scaladsl.CommandService
@@ -15,7 +15,7 @@ import csw.command.client.messages.TopLevelActorMessage
 import csw.event.api.scaladsl.EventSubscription
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.location.api.models.{AkkaLocation, LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.location.api.models.{PekkoLocation, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandResponse, ControlCommand, Setup}
 import csw.params.core.generics.{KeyType, Parameter}
@@ -105,7 +105,7 @@ class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCt
     log.debug(s"onLocationTrackingEvent called: $trackingEvent")
     trackingEvent match {
       case LocationUpdated(location) =>
-        val hcd = CommandServiceFactory.make(location.asInstanceOf[AkkaLocation])(ctx.system)
+        val hcd = CommandServiceFactory.make(location.asInstanceOf[PekkoLocation])(ctx.system)
         commandSender ! SendCommand(hcd)
       case LocationRemoved(_) => log.info("HCD no longer available")
     }

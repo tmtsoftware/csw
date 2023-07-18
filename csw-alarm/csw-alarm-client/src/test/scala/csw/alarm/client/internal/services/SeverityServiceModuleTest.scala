@@ -8,7 +8,7 @@ package csw.alarm.client.internal.services
 import java.net.InetAddress
 import java.time.Instant
 
-import akka.actor.testkit.typed.scaladsl.TestProbe
+import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
 import com.typesafe.config.ConfigFactory
 import csw.alarm.api.exceptions.{InactiveAlarmException, InvalidSeverityException, KeyNotFoundException}
 import csw.alarm.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}

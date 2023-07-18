@@ -44,8 +44,8 @@ jobs:
 
       - name: Unit and Component Tests
         run: |
-          sbt -DenableFatalWarnings=true -Dakka.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true 'csw-time/test:test'
-          sbt -DenableFatalWarnings=true -Dakka.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true -DdisableTimeTests 'test:test'
+          sbt -DenableFatalWarnings=true -Dpekko.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true 'csw-time/test:test'
+          sbt -DenableFatalWarnings=true -Dpekko.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true -DdisableTimeTests 'test:test'
 
       - name: Coverage Report
         run: |

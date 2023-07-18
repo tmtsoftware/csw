@@ -14,7 +14,7 @@ AssemblyInfo
         {
           prefix: "ESW.Sample_HCD"
           componentType: assembly
-          connectionType: akka
+          connectionType: pekko
         }
       ]
     ```

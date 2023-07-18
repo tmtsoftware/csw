@@ -5,12 +5,12 @@
 
 package csw.framework.integration
 
-import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.SpawnProtocol
-import akka.util.Timeout
+import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
+import org.apache.pekko.actor.typed.SpawnProtocol
+import org.apache.pekko.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
-import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.client.extensions.PekkoLocationExt.RichPekkoLocation
 import csw.command.client.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.command.client.models.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.common.FrameworkAssertions._
@@ -19,7 +19,7 @@ import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.location.api
 import csw.location.api.models.ComponentType.{Assembly, HCD}
-import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.Connection.PekkoConnection
 import csw.location.api.models.{ComponentId, HttpRegistration, TcpRegistration}
 import csw.location.client.ActorSystemFactory
 import csw.params.commands
@@ -35,14 +35,14 @@ import scala.concurrent.duration.DurationLong
 class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring.seedLocationService
 
-  private val filterAssemblyConnection = AkkaConnection(api.models.ComponentId(Prefix(Subsystem.TCS, "Filter"), Assembly))
-  private val disperserHcdConnection   = AkkaConnection(api.models.ComponentId(Prefix(Subsystem.TCS, "Disperser"), HCD))
+  private val filterAssemblyConnection = PekkoConnection(api.models.ComponentId(Prefix(Subsystem.TCS, "Filter"), Assembly))
+  private val disperserHcdConnection   = PekkoConnection(api.models.ComponentId(Prefix(Subsystem.TCS, "Disperser"), HCD))
 
   override def afterAll(): Unit = {
     super.afterAll()
   }
 
-  // DEOPSCSW-218: Discover component connection information using Akka protocol
+  // DEOPSCSW-218: Discover component connection information using Pekko protocol
   // DEOPSCSW-220: Access and Monitor components for current values
   // DEOPSCSW-221: Avoid sending commands to non-executing components
   test(
@@ -76,18 +76,18 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
     // assembly is tracking two HCD's, hence assemblyProbe will receive LocationUpdated event from two HCD's
     assemblyProbe.expectMessage(
       5.seconds,
-      CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(akkaLocationUpdatedChoice)))
+      CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(pekkoLocationUpdatedChoice)))
     )
     assemblyProbe.expectMessage(
       5.seconds,
-      CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(akkaLocationUpdatedChoice)))
+      CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(pekkoLocationUpdatedChoice)))
     )
 
     // if one of the HCD shuts down, then assembly should know and receive LocationRemoved event
     disperserComponentRef ! Shutdown
     assemblyProbe.expectMessage(
       5.seconds,
-      CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(akkaLocationRemovedChoice)))
+      CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(pekkoLocationRemovedChoice)))
     )
 
     implicit val timeout: Timeout = Timeout(100.millis)
@@ -114,15 +114,15 @@ class TrackConnectionsIntegrationTest extends FrameworkIntegrationSuite {
 
     val supervisorLifecycleStateProbe =
       TestProbe[SupervisorLifecycleState]("supervisor-lifecycle-state-probe")(componentActorSystem)
-    val akkaConnection = AkkaConnection(ComponentId(Prefix(Subsystem.IRIS, "IFS_Detector"), HCD))
+    val pekkoConnection = PekkoConnection(ComponentId(Prefix(Subsystem.IRIS, "IFS_Detector"), HCD))
 
     assertThatSupervisorIsRunning(assemblySupervisor, supervisorLifecycleStateProbe, 5.seconds)
 
-    val resolvedAkkaLocation = wiring.locationService.resolve(akkaConnection, 5.seconds).await.value
-    resolvedAkkaLocation.connection shouldBe akkaConnection
+    val resolvedPekkoLocation = wiring.locationService.resolve(pekkoConnection, 5.seconds).await.value
+    resolvedPekkoLocation.connection shouldBe pekkoConnection
 
     val assemblyProbe          = TestProbe[CurrentState]("assembly-state-probe")
-    val assemblyCommandService = CommandServiceFactory.make(resolvedAkkaLocation)(componentActorSystem)
+    val assemblyCommandService = CommandServiceFactory.make(resolvedPekkoLocation)(componentActorSystem)
     // Subscribe to component's current state
     assemblyCommandService.subscribeCurrentState(assemblyProbe.ref ! _)
 

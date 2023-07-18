@@ -5,7 +5,7 @@
 
 package csw.location.server.commons
 
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.location.api.commons.Constants
 import csw.location.api.models.NetworkType
@@ -16,13 +16,13 @@ import scala.annotation.varargs
 import scala.jdk.CollectionConverters._
 
 /**
- * ClusterSettings manages [[com.typesafe.config.Config]] values required by an [[akka.actor.typed.ActorSystem]] to boot. It configures mainly
+ * ClusterSettings manages [[com.typesafe.config.Config]] values required by an [[pekko.actor.typed.ActorSystem]] to boot. It configures mainly
  * four parameters of an `ActorSystem`, namely :
  *
  *  - name (Name is defaulted to a constant value so that ActorSystem joins the cluster while booting)
- *  - akka.remote.artery.canonical.hostname (The hostname to boot an ActorSystem on)
- *  - akka.remote.artery.canonical.port     (The port to boot an ActorSystem on)
- *  - akka.cluster.seed-nodes               (Seed Nodes of the cluster)
+ *  - pekko.remote.artery.canonical.hostname (The hostname to boot an ActorSystem on)
+ *  - pekko.remote.artery.canonical.port     (The port to boot an ActorSystem on)
+ *  - pekko.cluster.seed-nodes               (Seed Nodes of the cluster)
  *
  * ClusterSettings require three values namely :
  *  - interfaceName (The network interface where cluster is formed.)
@@ -30,14 +30,14 @@ import scala.jdk.CollectionConverters._
  *  - clusterPort (Specify port on which to start this service)
  *
  * The config values of the `ActorSystem` will be evaluated based on the above three settings as follows :
- *  - `akka.remote.artery.canonical.hostname` will be ipV4 address based on `interfaceName` from [[Networks]]
- *  - `akka.remote.artery.canonical.port` will be a random port or if `clusterPort` is specified that value will be picked
- *  - `akka.cluster.seed-nodes` will pick values of `clusterSeeds`
+ *  - `pekko.remote.artery.canonical.hostname` will be ipV4 address based on `interfaceName` from [[Networks]]
+ *  - `pekko.remote.artery.canonical.port` will be a random port or if `clusterPort` is specified that value will be picked
+ *  - `pekko.cluster.seed-nodes` will pick values of `clusterSeeds`
  *
  * If none of the settings are provided then defaults will be picked as follows :
- *  - `akka.remote.artery.canonical.hostname` will be ipV4 address from [[Networks]]
- *  - `akka.remote.artery.canonical.port` will be a random port
- *  - `akka.cluster.seed-nodes` will be empty
+ *  - `pekko.remote.artery.canonical.hostname` will be ipV4 address from [[Networks]]
+ *  - `pekko.remote.artery.canonical.port` will be a random port
+ *  - `pekko.cluster.seed-nodes` will be empty
  * and an `ActorSystem` will be created and a cluster will be formed with no Seed Nodes. It will self join the cluster.
  *
  * `ClusterSettings` can be given in three ways :
@@ -74,7 +74,7 @@ private[csw] case class ClusterSettings(clusterName: String = Constants.ClusterN
   def withInterface(name: String): ClusterSettings = withEntry(InterfaceNameKey, name)
 
   // ManagementPort should ideally be provided via system properties.
-  // It is used to spawn akka cluster management service.
+  // It is used to spawn pekko cluster management service.
   // This method should be used for testing only.
   def withManagementPort(port: Int): ClusterSettings = withEntry(ManagementPortKey, port)
 
@@ -110,24 +110,24 @@ private[csw] case class ClusterSettings(clusterName: String = Constants.ClusterN
   // SeedNode should start on a fixed port and rest all can start on random port.
   private[location] def port: Int = allValues.getOrElse(ClusterPortKey, 0).toString.toInt
 
-  // Get the managementPort to start akka cluster management service.
+  // Get the managementPort to start pekko cluster management service.
   private[location] def managementPort: Option[Any] = allValues.get(ManagementPortKey)
 
   // Extract seeds [hostname1:port1,hostname2:port2] from CLUSTER_SEEDS environment variable
   private[location] def seeds = allValues.get(ClusterSeedsKey).toList.flatMap(_.toString.split(",")).map(_.trim)
 
   // Prepare a list of seedNodes
-  def seedNodes: List[String] = seeds.map(seed => s"akka://$clusterName@$seed")
+  def seedNodes: List[String] = seeds.map(seed => s"pekko://$clusterName@$seed")
 
   // Prepare config for ActorSystem to join csw-cluster
   private[location] def config: Config = {
     val computedValues: Map[String, Any] = Map(
-      "akka.remote.artery.canonical.hostname" -> hostname,
-      "akka.remote.artery.canonical.port"     -> port,
-      "akka.cluster.seed-nodes"               -> seedNodes.asJava,
-      "akka.cluster.http.management.hostname" -> hostname,
-      "akka.management.http.port"             -> managementPort.getOrElse(19999), // management port will never start at 19999
-      "startManagement"                       -> managementPort.isDefined
+      "pekko.remote.artery.canonical.hostname" -> hostname,
+      "pekko.remote.artery.canonical.port"     -> port,
+      "pekko.cluster.seed-nodes"               -> seedNodes.asJava,
+      "pekko.cluster.http.management.hostname" -> hostname,
+      "pekko.management.http.port"             -> managementPort.getOrElse(19999), // management port will never start at 19999
+      "startManagement"                        -> managementPort.isDefined
     )
 
     log.debug(s"ClusterSettings using following configuration: [${computedValues.mkString(", ")}]")

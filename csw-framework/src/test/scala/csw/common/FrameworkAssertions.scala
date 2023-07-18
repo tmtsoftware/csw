@@ -5,8 +5,8 @@
 
 package csw.common
 
-import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.ActorRef
+import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
+import org.apache.pekko.actor.typed.ActorRef
 import csw.command.client.messages.ComponentCommonMessage.GetSupervisorLifecycleState
 import csw.command.client.messages.ContainerCommonMessage.GetContainerLifecycleState
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}

@@ -14,7 +14,7 @@ object Libs {
   val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.2.10"
 
   val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "0.6.0" // Apache 2.0
-  val `akka-management-cluster-http` = "com.lightbend.akka.management" %% "akka-management-cluster-http" % "1.1.3"
+  val `pekko-management` = "org.apache.pekko" %% "pekko-management" % "0.0.0+758-aff55e07+20230718-0937-SNAPSHOT"
   val `svnkit`        = "org.tmatesoft.svnkit" % "svnkit"        % "1.10.3"     // TMate Open Source License
   val `commons-codec` = "commons-codec"        % "commons-codec" % "1.15"       // Apache 2.0š
   val `scala-reflect` = "org.scala-lang"       % "scala-reflect" % ScalaVersion // BSD-3
@@ -29,8 +29,8 @@ object Libs {
   val `lettuce`          = "io.lettuce"          % "lettuce-core"     % "6.1.6.RELEASE"
   val `reactor-core`     = "io.projectreactor"   % "reactor-core"     % "3.4.14"
   val `reactive-streams` = "org.reactivestreams" % "reactive-streams" % "1.0.3"
-  val `akka-stream-kafka` =
-    "com.typesafe.akka" %% "akka-stream-kafka" % "2.1.0" // 2.1.1 version is breaking csw-event-client tests
+  // 2.1.1 version is breaking csw-event-client tests (pekko version based on 3.0.1)
+  val `pekko-connectors-kafka` = "org.apache.pekko" %% "pekko-connectors-kafka" % "0.0.0+1764-b25806f7-SNAPSHOT"
   val `embedded-kafka`   = "io.github.embeddedkafka" %% "embedded-kafka"  % "3.0.0"
   val `embedded-redis`   = "com.github.kstyrc"        % "embedded-redis"  % "0.6"
   val `scala-compiler`   = "org.scala-lang"           % "scala-compiler"  % ScalaVersion
@@ -57,12 +57,12 @@ object Libs {
 }
 
 object Borer {
-  val Version = "1.7.2"
+  val Version = "1.7.2-pekko"
   val Org     = "io.bullet"
 
   val `borer-core`        = dep(Org %%% "borer-core" % Version)
   val `borer-derivation`  = dep(Org %%% "borer-derivation" % Version)
-  val `borer-compat-akka` = Org %% "borer-compat-akka" % Version
+  val `borer-compat-pekko` = Org %% "borer-compat-pekko" % Version
 }
 
 object Jackson {
@@ -73,34 +73,34 @@ object Jackson {
   val `jackson-module-scala` = "com.fasterxml.jackson.module" %% "jackson-module-scala" % Version
 }
 
-object Akka {
-  val Version = "2.6.18" // all akka is Apache License 2.0
+object Pekko {
+  val Version = "1.0.0" // all pekko is Apache License 2.0
 
-  val `akka-stream`              = "com.typesafe.akka" %% "akka-stream"              % Version
-  val `akka-stream-typed`        = "com.typesafe.akka" %% "akka-stream-typed"        % Version
-  val `akka-remote`              = "com.typesafe.akka" %% "akka-remote"              % Version
-  val `akka-stream-testkit`      = "com.typesafe.akka" %% "akka-stream-testkit"      % Version
-  val `akka-actor`               = "com.typesafe.akka" %% "akka-actor"               % Version
-  val `akka-actor-typed`         = "com.typesafe.akka" %% "akka-actor-typed"         % Version
-  val `akka-actor-testkit-typed` = "com.typesafe.akka" %% "akka-actor-testkit-typed" % Version
-  val `akka-distributed-data`    = "com.typesafe.akka" %% "akka-distributed-data"    % Version
-  val `akka-multi-node-testkit`  = "com.typesafe.akka" %% "akka-multi-node-testkit"  % Version
-  val `akka-cluster-tools`       = "com.typesafe.akka" %% "akka-cluster-tools"       % Version
-  val `akka-cluster`             = "com.typesafe.akka" %% "akka-cluster"             % Version
-  val `akka-cluster-typed`       = "com.typesafe.akka" %% "akka-cluster-typed"       % Version
-  val `akka-slf4j`               = "com.typesafe.akka" %% "akka-slf4j"               % Version
+  val `pekko-stream`              = "org.apache.pekko" %% "pekko-stream"              % Version
+  val `pekko-stream-typed`        = "org.apache.pekko" %% "pekko-stream-typed"        % Version
+  val `pekko-remote`              = "org.apache.pekko" %% "pekko-remote"              % Version
+  val `pekko-stream-testkit`      = "org.apache.pekko" %% "pekko-stream-testkit"      % Version
+  val `pekko-actor`               = "org.apache.pekko" %% "pekko-actor"               % Version
+  val `pekko-actor-typed`         = "org.apache.pekko" %% "pekko-actor-typed"         % Version
+  val `pekko-actor-testkit-typed` = "org.apache.pekko" %% "pekko-actor-testkit-typed" % Version
+  val `pekko-distributed-data`    = "org.apache.pekko" %% "pekko-distributed-data"    % Version
+  val `pekko-multi-node-testkit`  = "org.apache.pekko" %% "pekko-multi-node-testkit"  % Version
+  val `pekko-cluster-tools`       = "org.apache.pekko" %% "pekko-cluster-tools"       % Version
+  val `pekko-cluster`             = "org.apache.pekko" %% "pekko-cluster"             % Version
+  val `pekko-cluster-typed`       = "org.apache.pekko" %% "pekko-cluster-typed"       % Version
+  val `pekko-slf4j`               = "org.apache.pekko" %% "pekko-slf4j"               % Version
   val `cluster-sharding` =
-    "com.typesafe.akka" %% "akka-cluster-sharding" % Version // required to maintaining the transitive dependency of akka-management-cluster-http
+    "org.apache.pekko" %% "pekko-cluster-sharding" % Version // required to maintaining the transitive dependency of akka-management-cluster-http
 }
 
-object AkkaHttp {
-  val Version = "10.2.7"
+object PekkoHttp {
+  val Version = "0.0.0+4470-61034832-SNAPSHOT"
 
-  val `akka-http`            = "com.typesafe.akka" %% "akka-http"            % Version // ApacheV2
-  val `akka-http-testkit`    = "com.typesafe.akka" %% "akka-http-testkit"    % Version // ApacheV2
-  val `akka-http-spray-json` = "com.typesafe.akka" %% "akka-http-spray-json" % Version
+  val `pekko-http`            = "org.apache.pekko" %% "pekko-http"            % Version
+  val `pekko-http-testkit`    = "org.apache.pekko" %% "pekko-http-testkit"    % Version
+  val `pekko-http-spray-json` = "org.apache.pekko" %% "pekko-http-spray-json" % Version
 
-  val `akka-http-cors` = "ch.megard" %% "akka-http-cors" % "1.1.2"
+  val `pekko-http-cors`       = "org.apache.pekko" %% "pekko-http-cors"       % Version
 }
 
 object Keycloak {
@@ -121,7 +121,8 @@ object Jooq {
 }
 
 object MSocket {
-  val Version = "0.6.0"
+//  val Version = "0.6.0"
+  val Version = "0.1.0-SNAPSHOT"
 
   val `msocket-api`      = dep("com.github.tmtsoftware.msocket" %%% "msocket-api" % Version)
   val `msocket-security` = "com.github.tmtsoftware.msocket" %% "msocket-security" % Version

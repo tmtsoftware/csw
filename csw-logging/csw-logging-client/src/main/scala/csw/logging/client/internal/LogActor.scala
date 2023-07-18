@@ -5,10 +5,10 @@
 
 package csw.logging.client.internal
 
-import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.typed.{Behavior, PostStop}
-import akka.event.LogSource
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import org.apache.pekko.actor.typed.{Behavior, PostStop}
+import org.apache.pekko.event.LogSource
 import csw.logging.client.appenders.LogAppender
 import csw.logging.client.commons.Category
 import csw.logging.client.internal.LogActorMessages._
@@ -18,8 +18,8 @@ import play.api.libs.json.JsObject
 import scala.concurrent.Promise
 
 /**
- * All log messages are routed to this single Akka Actor. There is one LogActor per logging system.
- * Logging messages from logging API, Java Slf4j and Akka loggers are sent to this actor.
+ * All log messages are routed to this single Pekko Actor. There is one LogActor per logging system.
+ * Logging messages from logging API, Java Slf4j and Pekko loggers are sent to this actor.
  * Messages are then forwarded to one or more configured appenders.
  */
 private[logging] object LogActor {
@@ -29,7 +29,7 @@ private[logging] object LogActor {
       appends: Seq[LogAppender],
       initLevel: Level,
       initSlf4jLevel: Level,
-      initAkkaLevel: Level
+      initPekkoLevel: Level
   ): Behavior[LogActorMessages] =
     Behaviors.setup { ctx =>
       import LogActorOperations._
@@ -40,7 +40,7 @@ private[logging] object LogActor {
       }
 
       var level: Level                = initLevel
-      var akkaLogLevel: Level         = initAkkaLevel
+      var pekkoLogLevel: Level        = initPekkoLevel
       var slf4jLogLevel: Level        = initSlf4jLevel
       var appenders: Seq[LogAppender] = appends
 
@@ -59,9 +59,9 @@ private[logging] object LogActor {
           jsonObject.foreach(json => append(json, Category.Common.name))
         }
 
-      def receiveLogAkkaMessage(logAkka: LogAkka): Unit =
-        if (logAkka.level >= LoggingState.akkaLogLevel) {
-          val jsonObject = generateLogAkkaJson(logAkka, akkaLogLevel)
+      def receiveLogPekkoMessage(logPekko: LogPekko): Unit =
+        if (logPekko.level >= LoggingState.pekkoLogLevel) {
+          val jsonObject = generateLogPekkoJson(logPekko, pekkoLogLevel)
           jsonObject.foreach(json => append(json, Category.Common.name))
         }
 
@@ -75,13 +75,13 @@ private[logging] object LogActor {
           case log: Log                     => receiveLog(log); Behaviors.same
           case logAltMessage: LogAltMessage => receiveAltMessage(logAltMessage); Behaviors.same
           case logSlf4J: LogSlf4j           => receiveLogSlf4j(logSlf4J); Behaviors.same
-          case logAkka: LogAkka             => receiveLogAkkaMessage(logAkka); Behaviors.same
+          case logPekko: LogPekko           => receiveLogPekkoMessage(logPekko); Behaviors.same
           case SetLevel(level1)             => level = level1; Behaviors.same
           case SetSlf4jLevel(level1)        => slf4jLogLevel = level1; Behaviors.same
-          case SetAkkaLevel(level1)         => akkaLogLevel = level1; Behaviors.same
+          case SetPekkoLevel(level1)        => pekkoLogLevel = level1; Behaviors.same
           case SetAppenders(_appenders)     => appenders = _appenders; Behaviors.same
-          case LastAkkaMessage              => akka.event.Logging(ctx.system.toClassic, this).error("DIE"); Behaviors.same
-          case StopLogging                  => Behaviors.stopped
+          case LastPekkoMessage => org.apache.pekko.event.Logging(ctx.system.toClassic, this).error("DIE"); Behaviors.same
+          case StopLogging      => Behaviors.stopped
         }
         .receiveSignal { case (_, PostStop) =>
           done.success(())

@@ -5,7 +5,7 @@
 
 package csw.config.server
 
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.aas.http.SecurityDirectives
 import csw.config.server.files._

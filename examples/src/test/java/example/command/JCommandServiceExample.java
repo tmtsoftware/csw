@@ -5,11 +5,11 @@
 
 package example.command;
 
-import akka.actor.testkit.typed.javadsl.TestInbox;
-import akka.actor.testkit.typed.javadsl.TestProbe;
-import akka.actor.typed.ActorSystem;
-import akka.actor.typed.SpawnProtocol;
-import akka.util.Timeout;
+import org.apache.pekko.actor.testkit.typed.javadsl.TestInbox;
+import org.apache.pekko.actor.testkit.typed.javadsl.TestProbe;
+import org.apache.pekko.actor.typed.ActorSystem;
+import org.apache.pekko.actor.typed.SpawnProtocol;
+import org.apache.pekko.util.Timeout;
 import com.typesafe.config.ConfigFactory;
 import csw.command.api.DemandMatcher;
 import csw.command.api.StateMatcher;
@@ -19,9 +19,9 @@ import csw.framework.internal.wiring.FrameworkWiring;
 import csw.framework.internal.wiring.Standalone;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.api.javadsl.JComponentType;
-import csw.location.api.models.AkkaLocation;
+import csw.location.api.models.PekkoLocation;
 import csw.location.api.models.ComponentId;
-import csw.location.api.models.Connection.AkkaConnection;
+import csw.location.api.models.Connection.PekkoConnection;
 import csw.location.client.ActorSystemFactory;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
 import csw.location.server.http.JHTTPLocationService;
@@ -65,7 +65,7 @@ public class JCommandServiceExample {
     private static JHTTPLocationService jHttpLocationService;
     private static ILocationService locationService;
     private static ICommandService hcdCmdService;
-    private static AkkaLocation hcdLocation;
+    private static PekkoLocation hcdLocation;
     private final Timeout timeout = new Timeout(20, TimeUnit.SECONDS);
 
     @BeforeClass
@@ -86,14 +86,14 @@ public class JCommandServiceExample {
     }
 
 
-    private static AkkaLocation getLocation() throws Exception {
+    private static PekkoLocation getLocation() throws Exception {
         RedisClient redisClient = null;
         FrameworkWiring wiring = FrameworkWiring.make(hcdActorSystem, redisClient);
         Await.result(Standalone.spawn(ConfigFactory.load("aps_hcd_java.conf"), wiring), new FiniteDuration(5, TimeUnit.SECONDS));
 
-        AkkaConnection akkaConnection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.IRIS, "test_component_running_long_command_java"), JComponentType.HCD));
-        CompletableFuture<Optional<AkkaLocation>> eventualLocation = locationService.resolve(akkaConnection, java.time.Duration.ofSeconds(5));
-        Optional<AkkaLocation> maybeLocation = eventualLocation.get();
+        PekkoConnection pekkoConnection = new PekkoConnection(new ComponentId(Prefix.apply(JSubsystem.IRIS, "test_component_running_long_command_java"), JComponentType.HCD));
+        CompletableFuture<Optional<PekkoLocation>> eventualLocation = locationService.resolve(pekkoConnection, java.time.Duration.ofSeconds(5));
+        Optional<PekkoLocation> maybeLocation = eventualLocation.get();
         Assert.assertTrue(maybeLocation.isPresent());
 
         return maybeLocation.orElseThrow();

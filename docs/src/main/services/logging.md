@@ -101,7 +101,7 @@ pretty=true
      "@severity":"INFO",
      "@version":"0.1",
      "actor":
-       "akka://csw-examples-locationServiceClient@10.131.23.195:53618/user/$a",
+       "pekko://csw-examples-locationServiceClient@10.131.23.195:53618/user/$a",
      "class":"csw.location.LocationServiceExampleClient",
      "file":"LocationServiceExampleClientApp.scala",
      "line":149,
@@ -114,7 +114,7 @@ pretty=true
 pretty=false
 :   @@@vars
     ```
-    {"@prefix":"my-subsystem.my-component-name","@subsystem":"my-subsystem","@componentName":"my-component-name","@host":"INsaloni.local","@name":"LocationServiceExampleClient","@severity":"INFO","@version":"0.1","actor":"akka://csw-examples-locationServiceClient@10.131.23.195:53618/user/$a","class":"csw.location.LocationServiceExampleClient","file":"LocationServiceExampleClientApp.scala","line":149,"message":"Result of the find call: None","timestamp":"2017-11-24T04:16:42.108Z"}
+    {"@prefix":"my-subsystem.my-component-name","@subsystem":"my-subsystem","@componentName":"my-component-name","@host":"INsaloni.local","@name":"LocationServiceExampleClient","@severity":"INFO","@version":"0.1","actor":"pekko://csw-examples-locationServiceClient@10.131.23.195:53618/user/$a","class":"csw.location.LocationServiceExampleClient","file":"LocationServiceExampleClientApp.scala","line":149,"message":"Result of the find call: None","timestamp":"2017-11-24T04:16:42.108Z"}
     ```
     @@@
     
@@ -145,7 +145,7 @@ Following Log levels are supported by csw-logging library
 * DEBUG
 * TRACE
 
-The library allows separate log levels for the component logging API (logLevel), Akka logging (akkaLogLevel), and Slf4J 
+The library allows separate log levels for the component logging API (logLevel), Pekko logging (pekkoLogLevel), and Slf4J 
 (slf4jLogLevel). The initial values of these are set in the configuration file as seen above. These can be overridden in the application.conf file.
 
 These values can also be changed dynamically by calling methods on `LoggingSystem` class.
@@ -163,7 +163,7 @@ All messages are logged by default as Json. Logs can contain following fields:
 * `actor`: The path for an actor when using ActorLogging
 * `class`: The class for ClassLogging or ActorLogging
 * `file`: The file containing the log call
-* `kind`: Either slf4j or akka. Not present for logger API
+* `kind`: Either slf4j or pekko. Not present for logger API
 * `line`: The line where the message was logged
 * `message`: The log message
 * `timestamp`: The UTC time when the message was logged
@@ -264,7 +264,7 @@ Scala
  "@severity":"INFO",
  "@version":"0.1",
  "actor":
-   "akka://csw-examples-locationServiceClient@10.131.23.195:53618/user/$a",
+   "pekko://csw-examples-locationServiceClient@10.131.23.195:53618/user/$a",
  "class":"csw.location.LocationServiceExampleClient",
  "file":"LocationServiceExampleClientApp.scala",
  "line":149,
@@ -285,7 +285,7 @@ Java
  "@severity":"INFO",
  "@version":"0.1",
  "actor":
-   "akka://csw-examples-locationServiceClient@10.131.23.195:53625/user/LocationServiceExampleClient",
+   "pekko://csw-examples-locationServiceClient@10.131.23.195:53625/user/LocationServiceExampleClient",
  "class":"csw.location.JLocationServiceExampleClient",
  "message":"Result of the find call : None",
  "timestamp":"2017-11-30T11:02:54.691Z"
@@ -303,10 +303,10 @@ Java (Supplier)
  "@name":"JLocationServiceExampleClient",
  "@severity":"INFO",
  "actor":
-   "akka://csw-examples-locationServiceClient@10.131.23.195:53625/user/LocationServiceExampleClient",
+   "pekko://csw-examples-locationServiceClient@10.131.23.195:53625/user/LocationServiceExampleClient",
  "class":"csw.location.JLocationServiceExampleClient",
  "message":
-   "Resolve result: LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType",
+   "Resolve result: LocationServiceExampleComponent-assembly-pekko, component type=Assembly, connection type=PekkoType",
  "timestamp":"2017-07-26T19:44:58.636Z"
 }
     ```
@@ -336,13 +336,13 @@ Scala
  "@severity":"INFO",
  "@version":"0.1",
  "actor":
-   "akka://csw-examples-locationServiceClient@10.131.23.195:53618/user/$a",
+   "pekko://csw-examples-locationServiceClient@10.131.23.195:53618/user/$a",
  "class":"csw.location.LocationServiceExampleClient",
- "exampleConnection":"LocationServiceExampleComponent-assembly-akka",
+ "exampleConnection":"LocationServiceExampleComponent-assembly-pekko",
  "file":"LocationServiceExampleClientApp.scala",
  "line":143,
  "message":
-   "Attempting to find AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))",
+   "Attempting to find PekkoConnection(ComponentId(LocationServiceExampleComponent,Assembly))",
  "obsId":"foo_obs_id",
  "timestamp":"2017-11-30T10:58:03.097Z"
 }
@@ -360,11 +360,11 @@ Java
  "@severity":"INFO",
  "@version":"0.1",
  "actor":
-   "akka://csw-examples-locationServiceClient@10.131.23.195:53625/user/LocationServiceExampleClient",
+   "pekko://csw-examples-locationServiceClient@10.131.23.195:53625/user/LocationServiceExampleClient",
  "class":"csw.location.JLocationServiceExampleClient",
- "exampleConnection":"LocationServiceExampleComponent-assembly-akka",
+ "exampleConnection":"LocationServiceExampleComponent-assembly-pekko",
  "message":
-   "Attempting to find AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))",
+   "Attempting to find PekkoConnection(ComponentId(LocationServiceExampleComponent,Assembly))",
  "obsId":"foo_obs_id",
  "timestamp":"2017-11-30T11:02:54.686Z"
 }
@@ -382,11 +382,11 @@ Java (Supplier)
  "@severity":"INFO",
  "@version":"0.1",
  "actor":
-   "akka://csw-examples-locationServiceClient@10.131.23.195:53625/user/LocationServiceExampleClient",
+   "pekko://csw-examples-locationServiceClient@10.131.23.195:53625/user/LocationServiceExampleClient",
  "class":"csw.location.JLocationServiceExampleClient",
- "exampleConnection":"LocationServiceExampleComponent-assembly-akka",
+ "exampleConnection":"LocationServiceExampleComponent-assembly-pekko",
  "message":
-   "Attempting to resolve AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly)) with a wait of 30 seconds...",
+   "Attempting to resolve PekkoConnection(ComponentId(LocationServiceExampleComponent,Assembly)) with a wait of 30 seconds...",
  "obsId":"foo_obs_id",
  "timestamp":"2017-11-24T04:22:02.589Z"
 }

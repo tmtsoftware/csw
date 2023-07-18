@@ -48,9 +48,9 @@ critical HTTP resource endpoints. E.g. ability to register/unregister components
 from a system operator machine present in @ref:[public network](../deployment/network-topology.md)
 
 **Preparation**:
-Identify machines to run Location Server and form Akka cluster and whose IP and port are known. Let's assume they are 3
+Identify machines to run Location Server and form Pekko cluster and whose IP and port are known. Let's assume they are 3
 for now and IP addresses are machine1 192.168.1.21, machine2 192.168.1.22 and machine3 192.168.1.23. Also, they
-will have dedicated port 3552 to run the Location Server akka interface. 
+will have dedicated port 3552 to run the Location Server pekko interface. 
 
 **Provisioning**:
 Make sure you set all necessary @ref[environment variables](../deployment/env-vars.md).
@@ -73,12 +73,12 @@ and AAS `enabled`.
     csw-location-server --clusterPort=3552 --outsideNetwork
     ``` `
 
-3.  Once the Akka cluster formation is done, start @ref:[AAS](../services/aas.md) 
+3.  Once the Pekko cluster formation is done, start @ref:[AAS](../services/aas.md) 
 on one of the node where Location Server is running in `local-only` mode, so that it can register itself to this
 Location Server without the need of authentication and authorization. 
 
 4.  Other Location Server instances including public mode instances will get location of AAS automatically using
- location server akka cluster.
+ location server pekko cluster.
 
 5.  Now if application in @ref:[public network](../deployment/network-topology.md) wants to access protected resources
 of Location Server, it can connect to any `public mode` Location Server, pass a valid token and access it.

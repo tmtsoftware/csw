@@ -5,7 +5,7 @@
 
 package csw.logging.client.appenders
 
-import akka.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.ActorSystem
 import csw.logging.client.commons.{Category, LoggingKeys}
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.models.Level

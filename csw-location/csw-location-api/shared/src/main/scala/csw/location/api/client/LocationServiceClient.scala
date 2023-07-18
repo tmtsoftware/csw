@@ -5,9 +5,9 @@
 
 package csw.location.api.client
 
-import akka.Done
-import akka.actor.typed.ActorSystem
-import akka.stream.scaladsl.Source
+import org.apache.pekko.Done
+import org.apache.pekko.actor.typed.ActorSystem
+import org.apache.pekko.stream.scaladsl.Source
 import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.messages.LocationRequest.*
 import csw.location.api.messages.LocationStreamRequest.Track

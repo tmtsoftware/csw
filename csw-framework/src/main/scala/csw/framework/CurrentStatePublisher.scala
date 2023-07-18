@@ -5,7 +5,7 @@
 
 package csw.framework
 
-import akka.actor.typed.ActorRef
+import org.apache.pekko.actor.typed.ActorRef
 import csw.command.client.models.framework.PubSub.{Publish, PublisherMessage}
 import csw.params.core.states.CurrentState
 

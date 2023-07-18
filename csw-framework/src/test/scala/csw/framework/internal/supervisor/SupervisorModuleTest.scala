@@ -5,7 +5,7 @@
 
 package csw.framework.internal.supervisor
 
-import akka.actor.testkit.typed.scaladsl.TestProbe
+import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
 import csw.command.api.DemandMatcher
 import csw.command.client.messages.CommandMessage.{Oneway, Submit}
 import csw.command.client.messages.ComponentCommonMessage.{
@@ -75,7 +75,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
         lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
         containerIdleMessageProbe.expectMessage(SupervisorLifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
-        verify(locationService).register(akkaRegistration)
+        verify(locationService).register(pekkoRegistration)
       }
     }
   }
@@ -346,8 +346,8 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         containerIdleMessageProbe.expectMessage(SupervisorLifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
         verify(locationService, times(1)).unregister(any[Connection])
-        verify(locationService, times(2)).register(akkaRegistration)
-        // this includes akka and http registrations before restart and after restart
+        verify(locationService, times(2)).register(pekkoRegistration)
+        // this includes pekko and http registrations before restart and after restart
         verify(locationService, times(4)).register(any[Registration])
       }
     }
@@ -431,7 +431,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
         supervisorRef ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref)
         supervisorLifecycleStateProbe.expectMessage(SupervisorLifecycleState.Running)
-        verify(locationService).register(akkaRegistration)
+        verify(locationService).register(pekkoRegistration)
       }
     }
   }

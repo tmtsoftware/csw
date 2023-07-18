@@ -5,7 +5,7 @@
 
 package csw.event.client.perf.reporter
 
-import akka.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.ActorSystem
 import csw.event.client.perf.utils.EventUtils._
 import org.HdrHistogram.Histogram
 

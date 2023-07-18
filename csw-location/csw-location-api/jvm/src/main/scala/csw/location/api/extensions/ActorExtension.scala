@@ -7,9 +7,9 @@ package csw.location.api.extensions
 
 import java.net.URI
 
-import akka.actor.typed.ActorRef
-import akka.actor.typed.scaladsl.adapter.TypedActorRefOps
-import akka.serialization.Serialization
+import org.apache.pekko.actor.typed.ActorRef
+import org.apache.pekko.actor.typed.scaladsl.adapter.TypedActorRefOps
+import org.apache.pekko.serialization.Serialization
 
 object ActorExtension {
   implicit class RichActor(actorRef: ActorRef[_]) {

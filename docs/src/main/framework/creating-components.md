@@ -1,7 +1,7 @@
 # Creating an Assembly or Hcd Component
 
 To create a component(Assembly or HCD), `ComponentHandlers` are needed. 
-These handlers are executed by an Akka Actor (Top Level Actor or TLA)
+These handlers are executed by an Pekko Actor (Top Level Actor or TLA)
 defined in the framework which handles the lifecycle and supervision of each component.
 
 There are two ways to create `ComponentHandlers`:
@@ -42,12 +42,12 @@ Hcd/Java
 
 **Converting a typed actor system to an untyped actor system** 
 
-The `ctx` available to the component is of type `akka.actor.typed.scaladsl.ActorContext` in Scala or `akka.actor.typed.javadsl.ActorContext` 
+The `ctx` available to the component is of type `pekko.actor.typed.scaladsl.ActorContext` in Scala or `pekko.actor.typed.javadsl.ActorContext` 
 in Java. This context can be used to get resources such as an actor system which is also typed. In order to get the untyped 
-version of an actor system or actor references, Akka has  provided some implicit extension methods in Scala and static
+version of an actor system or actor references, Pekko has  provided some implicit extension methods in Scala and static
 methods in Java which can be used by adding the following import: 
 
-* Scala: `import akka.actor.typed.scaladsl.adapter._`
-* Java: `import akka.actor.typed.javadsl.Adapter.*`
+* Scala: `import pekko.actor.typed.scaladsl.adapter._`
+* Java: `import pekko.actor.typed.javadsl.Adapter.*`
 
 @@@

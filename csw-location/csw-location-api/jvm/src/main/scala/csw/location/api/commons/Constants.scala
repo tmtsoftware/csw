@@ -10,7 +10,7 @@ private[csw] object Constants {
   // CRDT Key to hold list of all components registered with location service in the form of connection -> location
   val RegistryKey = "location-service-registry"
 
-  // `ClusterName` is used in `ClusterSettings`. It is the name of the cluster to start the akka cluster on.
+  // `ClusterName` is used in `ClusterSettings`. It is the name of the cluster to start the pekko cluster on.
   val ClusterName = "csw-location-server"
 
   // `RemoteActorSystemName` is used in `ActorSystemFactory` to create remote ActorSystem with this name

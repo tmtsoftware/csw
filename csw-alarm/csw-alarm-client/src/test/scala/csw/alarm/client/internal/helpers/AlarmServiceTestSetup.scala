@@ -5,8 +5,8 @@
 
 package csw.alarm.client.internal.helpers
 
-import akka.actor.typed
-import akka.actor.typed.SpawnProtocol
+import org.apache.pekko.actor.typed
+import org.apache.pekko.actor.typed.SpawnProtocol
 import com.typesafe.config.ConfigFactory
 import csw.alarm.api.internal.{MetadataKey, SeverityKey}
 import csw.alarm.api.javadsl.IAlarmService

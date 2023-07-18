@@ -7,7 +7,7 @@ package csw.logging.client.appenders
 
 import java.io.ByteArrayOutputStream
 
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import com.typesafe.config.ConfigFactory
 import csw.logging.client.commons.{Category, LoggingKeys}
 import csw.logging.client.internal.JsonExtensions.RichJsObject

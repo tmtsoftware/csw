@@ -5,10 +5,10 @@
 
 package csw.alarm.client.internal.services
 
-import akka.Done
-import akka.actor.typed
-import akka.actor.typed.ActorRef
-import akka.stream.scaladsl.{Sink, Source}
+import org.apache.pekko.Done
+import org.apache.pekko.actor.typed
+import org.apache.pekko.actor.typed.ActorRef
+import org.apache.pekko.stream.scaladsl.{Sink, Source}
 import csw.alarm.api.exceptions.{InactiveAlarmException, InvalidSeverityException, KeyNotFoundException}
 import csw.alarm.api.internal._
 import csw.alarm.api.scaladsl.AlarmSubscription

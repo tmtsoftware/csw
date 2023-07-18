@@ -5,8 +5,8 @@
 
 package csw.framework.internal.component
 
-import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
-import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal}
+import org.apache.pekko.actor.typed.scaladsl.{ActorContext, Behaviors}
+import org.apache.pekko.actor.typed.{ActorRef, Behavior, PostStop, Signal}
 import csw.command.client.MiniCRM.MiniCRMMessage.AddStarted
 import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
 import csw.command.client.messages.DiagnosticDataMessage.{DiagnosticMode, OperationsMode}
@@ -52,7 +52,7 @@ private[framework] object ComponentBehavior {
       ctx.self ! Initialize
 
       /*
-       * Defines processing for a akka.actor.typed.Signal received by the actor instance
+       * Defines processing for a pekko.actor.typed.Signal received by the actor instance
        * @return the existing behavior
        */
       def onSignal: PartialFunction[(ActorContext[TopLevelActorMessage], Signal), Behavior[TopLevelActorMessage]] = {

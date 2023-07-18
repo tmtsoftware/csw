@@ -5,12 +5,12 @@
 
 package csw.common.components.framework
 
-import akka.actor.Cancellable
-import akka.actor.typed.scaladsl.ActorContext
+import org.apache.pekko.actor.Cancellable
+import org.apache.pekko.actor.typed.scaladsl.ActorContext
 import csw.command.client.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.location.api.models.Connection.{PekkoConnection, HttpConnection, TcpConnection}
 import csw.location.api.models.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandIssue.OtherIssue
@@ -135,11 +135,11 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
     trackingEvent match {
       case LocationUpdated(location) =>
         location.connection match {
-          case _: AkkaConnection =>
+          case _: PekkoConnection =>
             Future {
               Thread.sleep(500)
               currentStatePublisher.publish(
-                CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(akkaLocationUpdatedChoice)))
+                CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(pekkoLocationUpdatedChoice)))
               )
             }
           case _: HttpConnection =>
@@ -153,9 +153,9 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
         }
       case LocationRemoved(connection) =>
         connection match {
-          case _: AkkaConnection =>
+          case _: PekkoConnection =>
             currentStatePublisher.publish(
-              CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(akkaLocationRemovedChoice)))
+              CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(pekkoLocationRemovedChoice)))
             )
           case _: HttpConnection =>
             currentStatePublisher.publish(

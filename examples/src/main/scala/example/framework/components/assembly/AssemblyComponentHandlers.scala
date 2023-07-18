@@ -7,8 +7,8 @@ package example.framework.components.assembly
 
 import java.nio.file.Paths
 
-import akka.actor.typed.scaladsl.ActorContext
-import akka.actor.typed.{ActorRef, ActorSystem}
+import org.apache.pekko.actor.typed.scaladsl.ActorContext
+import org.apache.pekko.actor.typed.{ActorRef, ActorSystem}
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.CommandServiceFactory
 import csw.command.client.messages.TopLevelActorMessage
@@ -171,13 +171,13 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
   // #failureRestart-Exception
   case class HcdNotFoundException() extends FailureRestart("Could not resolve hcd location. Initialization failure.")
 
-  private def resolveHcd(): Future[Option[AkkaLocation]] = {
+  private def resolveHcd(): Future[Option[PekkoLocation]] = {
     val maybeConnection = componentInfo.connections.find(connection => connection.componentId.componentType == ComponentType.HCD)
     maybeConnection match {
       case Some(hcd) =>
-        cswCtx.locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
-          case loc @ Some(akkaLocation) => loc
-          case None                     =>
+        cswCtx.locationService.resolve(hcd.of[PekkoLocation], 5.seconds).map {
+          case loc @ Some(pekkoLocation) => loc
+          case None                      =>
             // Hcd connection could not be resolved for this Assembly. One option to handle this could be to automatic restart which can give enough time
             // for the Hcd to be available
             throw HcdNotFoundException()
@@ -211,9 +211,9 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
     implicit val system: ActorSystem[Nothing] = ctx.system
 
     val eventualCommandService: Future[CommandService] =
-      cswCtx.locationService.resolve(hcdConnection.of[AkkaLocation], 5.seconds).map {
-        case Some(hcdLocation: AkkaLocation) => CommandServiceFactory.make(hcdLocation)
-        case _                               => throw HcdNotFoundException()
+      cswCtx.locationService.resolve(hcdConnection.of[PekkoLocation], 5.seconds).map {
+        case Some(hcdLocation: PekkoLocation) => CommandServiceFactory.make(hcdLocation)
+        case _                                => throw HcdNotFoundException()
       }
 
     eventualCommandService.foreach { commandService => hcd = commandService }

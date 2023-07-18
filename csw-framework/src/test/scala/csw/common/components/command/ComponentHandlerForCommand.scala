@@ -5,9 +5,9 @@
 
 package csw.common.components.command
 
-import akka.actor.typed.scaladsl.ActorContext
-import akka.stream.ThrottleMode
-import akka.stream.scaladsl.{Sink, Source}
+import org.apache.pekko.actor.typed.scaladsl.ActorContext
+import org.apache.pekko.stream.ThrottleMode
+import org.apache.pekko.stream.scaladsl.{Sink, Source}
 import csw.command.client.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers

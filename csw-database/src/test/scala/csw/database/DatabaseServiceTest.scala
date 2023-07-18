@@ -6,7 +6,7 @@
 package csw.database
 
 import java.util.concurrent.CompletionException
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.database.commons.DBTestHelper
 import csw.database.scaladsl.JooqExtentions.{RichQueries, RichQuery, RichResultQuery}
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres

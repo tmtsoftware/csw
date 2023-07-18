@@ -5,10 +5,10 @@
 
 package csw.time.scheduler.api
 
-import akka.actor.testkit.typed.scaladsl
-import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{ActorSystem, Scheduler}
+import org.apache.pekko.actor.testkit.typed.scaladsl
+import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.actor.typed.{ActorSystem, Scheduler}
 import csw.time.core.models.UTCTime
 import csw.time.scheduler.TimeServiceSchedulerFactory
 import org.HdrHistogram.Histogram

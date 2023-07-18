@@ -5,7 +5,7 @@
 
 package csw.event.client.perf.wiring
 
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.event.api.scaladsl.{EventPublisher, EventSubscriber}
 import csw.event.client.EventServiceFactory
 import csw.event.client.models.EventStores.{KafkaStore, RedisStore}

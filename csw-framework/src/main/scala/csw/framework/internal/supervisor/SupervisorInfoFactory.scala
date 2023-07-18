@@ -5,7 +5,7 @@
 
 package csw.framework.internal.supervisor
 
-import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
+import org.apache.pekko.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
 import csw.alarm.client.AlarmServiceFactory
 import csw.command.client.messages.ContainerIdleMessage
 import csw.command.client.models.framework.{Component, ComponentInfo, SupervisorInfo}

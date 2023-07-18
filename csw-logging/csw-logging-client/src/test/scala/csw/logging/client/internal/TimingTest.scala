@@ -8,9 +8,9 @@ package csw.logging.client.internal
 import java.nio.file.Paths
 import java.time.{ZoneId, ZoneOffset, ZonedDateTime}
 
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.logging.client.appenders.FileAppender
-import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
+import csw.logging.client.commons.PekkoTypedExtension.UserActorFactory
 import csw.logging.client.commons.LoggingKeys
 import csw.logging.client.components.IRIS
 import csw.logging.client.components.IRISLogMessages._

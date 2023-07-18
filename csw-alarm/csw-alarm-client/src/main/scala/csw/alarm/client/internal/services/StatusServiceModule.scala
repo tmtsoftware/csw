@@ -7,8 +7,8 @@ package csw.alarm.client.internal.services
 
 import java.time.Clock
 
-import akka.Done
-import akka.actor.typed
+import org.apache.pekko.Done
+import org.apache.pekko.actor.typed
 import csw.alarm.api.exceptions.KeyNotFoundException
 import csw.alarm.api.internal._
 import csw.alarm.client.internal.AlarmServiceLogger

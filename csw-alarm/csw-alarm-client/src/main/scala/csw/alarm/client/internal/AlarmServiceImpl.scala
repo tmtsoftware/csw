@@ -5,7 +5,7 @@
 
 package csw.alarm.client.internal
 
-import akka.actor.typed
+import org.apache.pekko.actor.typed
 import csw.alarm.api.scaladsl.AlarmAdminService
 import csw.alarm.client.internal.commons.Settings
 import csw.alarm.client.internal.redis.RedisConnectionsFactory

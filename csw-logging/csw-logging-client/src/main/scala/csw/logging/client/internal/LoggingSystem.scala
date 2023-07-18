@@ -8,11 +8,11 @@ package csw.logging.client.internal
 import java.nio.ByteBuffer
 import java.util.concurrent.CompletableFuture
 
-import akka.Done
-import akka.actor.typed.{ActorSystem, MailboxSelector, SpawnProtocol}
+import org.apache.pekko.Done
+import org.apache.pekko.actor.typed.{ActorSystem, MailboxSelector, SpawnProtocol}
 import ch.qos.logback.classic.LoggerContext
 import csw.logging.client.appenders.LogAppenderBuilder
-import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
+import csw.logging.client.commons.PekkoTypedExtension.UserActorFactory
 import csw.logging.client.commons.LoggingKeys
 import csw.logging.client.exceptions.AppenderNotFoundException
 import csw.logging.client.internal.LogActorMessages._
@@ -30,7 +30,7 @@ import scala.jdk.CollectionConverters._
 /**
  * This class is responsible for programmatic interaction with the configuration of the logging system. It initializes
  * appenders, starts the log actor and manages clean up of logging system. Until and unless this class is instantiated
- * all(akka, slf4j and tmt) the logs are enqueued in local queue. Once it is instantiated, the queue is emptied and all
+ * all(pekko, slf4j and tmt) the logs are enqueued in local queue. Once it is instantiated, the queue is emptied and all
  * the logs are forwarded to configured appenders.
  *
  * @param name    name of the service (to log).
@@ -54,12 +54,12 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
 
   LoggingState.logLevel = defaultLevel
 
-  private[this] val akkaLogLevelS = loggingConfig.getString("akkaLogLevel")
-  private[this] val defaultAkkaLogLevel: Level =
-    if (Level.hasLevel(akkaLogLevelS)) Level(akkaLogLevelS)
-    else throw new Exception(s"Bad value $akkaLogLevelS for csw-logging.akkaLogLevel")
+  private[this] val pekkoLogLevelS = loggingConfig.getString("pekkoLogLevel")
+  private[this] val defaultPekkoLogLevel: Level =
+    if (Level.hasLevel(pekkoLogLevelS)) Level(pekkoLogLevelS)
+    else throw new Exception(s"Bad value $pekkoLogLevelS for csw-logging.pekkoLogLevel")
 
-  LoggingState.akkaLogLevel = defaultAkkaLogLevel
+  LoggingState.pekkoLogLevel = defaultPekkoLogLevel
 
   private[this] val slf4jLogLevelS = loggingConfig.getString("slf4jLogLevel")
   private[this] val defaultSlf4jLogLevel: Level =
@@ -94,7 +94,7 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
   }
 
   private[this] val logActor = system.spawn(
-    LogActor.behavior(done, appenders, defaultLevel, defaultSlf4jLogLevel, defaultAkkaLogLevel),
+    LogActor.behavior(done, appenders, defaultLevel, defaultSlf4jLogLevel, defaultPekkoLogLevel),
     name = "LoggingActor",
     MailboxSelector.fromConfig("logging-dispatcher")
   )
@@ -133,20 +133,20 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
   }
 
   /**
-   * Get Akka logging levels
+   * Get Pekko logging levels
    *
-   * @return the current and default Akka logging levels.
+   * @return the current and default Pekko logging levels.
    */
-  def getAkkaLevel: Levels = Levels(LoggingState.akkaLogLevel, defaultAkkaLogLevel)
+  def getPekkoLevel: Levels = Levels(LoggingState.pekkoLogLevel, defaultPekkoLogLevel)
 
   /**
-   * Changes the Akka logger logging level.
+   * Changes the Pekko logger logging level.
    *
-   * @param level the new logging level for the Akka logger.
+   * @param level the new logging level for the Pekko logger.
    */
-  def setAkkaLevel(level: Level): Unit = {
-    LoggingState.akkaLogLevel = level
-    logActor ! SetAkkaLevel(level)
+  def setPekkoLevel(level: Level): Unit = {
+    LoggingState.pekkoLogLevel = level
+    logActor ! SetPekkoLevel(level)
   }
 
   /**
@@ -195,12 +195,12 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
   /**
    * Get the basic logging configuration values
    *
-   * @return LogMetadata which comprises of current root log level, akka log level, sl4j log level and component log level
+   * @return LogMetadata which comprises of current root log level, pekko log level, sl4j log level and component log level
    */
   def getLogMetadata(prefix: Prefix): LogMetadata =
     LogMetadata(
       getDefaultLogLevel.current,
-      getAkkaLevel.current,
+      getPekkoLevel.current,
       getSlf4jLevel.current,
       LoggingState.componentsLoggingState
         .getOrDefault(prefix, ComponentLoggingState(LoggingState.defaultLogLevel))
@@ -213,9 +213,9 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
    * @return future completes when the logging system is shut down.
    */
   def stop: Future[Done] = {
-    def stopAkka(): Future[Unit] = {
-      MessageHandler.sendMsg(LastAkkaMessage)
-      LoggingState.akkaStopPromise.future
+    def stopPekko(): Future[Unit] = {
+      MessageHandler.sendMsg(LastPekkoMessage)
+      LoggingState.pekkoStopPromise.future
     }
 
     def stopTimeActor(): Future[Unit] = {
@@ -243,7 +243,7 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
     loggerContext.stop()
 
     for {
-      _ <- stopAkka() zip stopTimeActor()
+      _ <- stopPekko() zip stopTimeActor()
       _ <- finishAppenders()
       _ <- stopLogger()
       _ <- stopAppenders()

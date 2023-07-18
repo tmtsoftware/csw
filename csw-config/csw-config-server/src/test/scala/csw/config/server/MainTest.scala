@@ -5,11 +5,11 @@
 
 package csw.config.server
 
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.Behaviors
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.Uri.Path
-import akka.http.scaladsl.model.{HttpRequest, StatusCodes, Uri}
+import org.apache.pekko.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.http.scaladsl.Http
+import org.apache.pekko.http.scaladsl.model.Uri.Path
+import org.apache.pekko.http.scaladsl.model.{HttpRequest, StatusCodes, Uri}
 import com.typesafe.config.ConfigFactory
 import csw.aas.core.commons.AASConnection
 import csw.config.server.commons.TestFutureExtension.RichFuture

@@ -1,9 +1,9 @@
-# csw-aas-http - Akka HTTP Adapter 
+# csw-aas-http - Pekko HTTP Adapter 
 
-This is security adapter for akka http server applications. It exposes security directives e.g. sGet, sPost etc which enforce
+This is security adapter for pekko http server applications. It exposes security directives e.g. sGet, sPost etc which enforce
 authentication and authorization based on authorization policies.
 
-In order for akka http server to utilize keycloak it has to be registered as keycloak client. Please refer to [keycloak documentation](https://www.keycloak.org/getting-started/getting-started-zip)
+In order for pekko http server to utilize keycloak it has to be registered as keycloak client. Please refer to [keycloak documentation](https://www.keycloak.org/getting-started/getting-started-zip)
 for details.
 
 ## Types of tokens
@@ -21,7 +21,7 @@ based on RealmRole policy.
 
 ## Request flow 
 
-When request comes to secure akka http server, it performs following steps.
+When request comes to secure pekko http server, it performs following steps.
 
 - Authentication 
 
@@ -35,24 +35,24 @@ it into `AccessToken` domain model.
 Authorization involves applying specified `AuthorizationPolicy` against `AccessToken`. Foe example, role based authorization 
 involves checking access to secure api against roles information present in access token.
  
-Following diagrams shows request flow for secure akka http server.
+Following diagrams shows request flow for secure pekko http server.
 
-![akka-http-workflow.png](akka-http-workflow.png) 
+![pekko-http-workflow.png](pekko-http-workflow.png) 
 
 
 
 The core of this adapter is the `SecurityDirectives` class. Following diagram shows request flow through different core classes
-of this adapter. `SecurityDirecives` provided by this adapter are used while writing akka http server. For detailing following
-diagram shows akka http server and security directives as separate. Diagram depicts happy flow of POST request secured using realm 
+of this adapter. `SecurityDirecives` provided by this adapter are used while writing pekko http server. For detailing following
+diagram shows pekko http server and security directives as separate. Diagram depicts happy flow of POST request secured using realm 
 role based authorization policy where server returns 200 OK code. When authentication and authorization is successful, application logic
 is executed and 200 OK is returned by server. e.g. create config file if user is authenticated and have admin role. 
 In case of errors, server return 401 (unauthorized) or 403 (forbidden) e.g. - If token verification fails for invalid or 
-expired token, `TokenVerifier` returns appropriate `TokenVerificationFailure` and akka http server returns 401. 
-If authorization policy check fails then `AccessToken` returns false and then akka http server return 403.
+expired token, `TokenVerifier` returns appropriate `TokenVerificationFailure` and pekko http server returns 401. 
+If authorization policy check fails then `AccessToken` returns false and then pekko http server return 403.
 
 ![aas-http-sequence-diagram](aas-http-sequence-diagram.png)
 
-## Asynchronous nature of Akka-HTTP Routing layer
+## Asynchronous nature of Pekko-HTTP Routing layer
 
-csw-aas-http uses `authenticateOAuth2Async` and `authorizeAsync` which are async variants of akka-http security directives. This allows 
-it to run without blocking routing layer of Akka HTTP, freeing it for other requests.
+csw-aas-http uses `authenticateOAuth2Async` and `authorizeAsync` which are async variants of pekko-http security directives. This allows 
+it to run without blocking routing layer of Pekko HTTP, freeing it for other requests.

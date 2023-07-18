@@ -5,7 +5,7 @@
 
 package csw.config.client.javadsl
 
-import akka.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.ActorSystem
 import csw.config.api.TokenFactory
 import csw.config.api.javadsl.{IConfigClientService, IConfigService}
 import csw.config.client.internal.{ActorRuntime, JConfigService}

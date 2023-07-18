@@ -6,8 +6,8 @@
 package csw.integtration.tests
 
 import csw.integtration.common.TestFutureExtension.RichFuture
-import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
+import csw.location.api.models.Connection.PekkoConnection
+import csw.location.api.models.{PekkoLocation, ComponentId, ComponentType}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.server.commons.ClusterAwareSettings
 import csw.location.server.internal.ServerWiring
@@ -38,11 +38,11 @@ class LocationServiceMultipleNICTest extends AnyFunSuite with Matchers with Befo
 
   test("should list and resolve component having multiple-nic's") {
     val componentId = ComponentId(Prefix(Subsystem.NFIRAOS, "assembly"), ComponentType.Assembly)
-    val connection  = AkkaConnection(componentId)
+    val connection  = PekkoConnection(componentId)
 
     try {
       eventually(locationService.list.await.size shouldBe 1)
-      locationService.find(connection).await.get shouldBe a[AkkaLocation]
+      locationService.find(connection).await.get shouldBe a[PekkoLocation]
     }
     catch {
       case NonFatal(e) => // this is required so that docker understands when test fails

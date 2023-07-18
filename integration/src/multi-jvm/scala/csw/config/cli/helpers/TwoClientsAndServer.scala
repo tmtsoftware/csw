@@ -6,7 +6,7 @@
 package csw.config.cli.helpers
 
 import csw.location.helpers.NMembersAndSeed
-import akka.remote.testconductor.RoleName
+import org.apache.pekko.remote.testconductor.RoleName
 import io.netty.util.internal.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 
 class TwoClientsAndServer extends NMembersAndSeed(2) {

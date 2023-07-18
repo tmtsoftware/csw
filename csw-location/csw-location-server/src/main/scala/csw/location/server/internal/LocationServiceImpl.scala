@@ -5,22 +5,22 @@
 
 package csw.location.server.internal
 
-import akka.Done
-import akka.actor.typed.scaladsl.AskPattern.*
-import akka.cluster.ddata.*
-import akka.cluster.ddata.Replicator.{ModifyFailure, NotFound, UpdateSuccess}
-import akka.cluster.ddata.typed.scaladsl.Replicator
-import akka.cluster.ddata.typed.scaladsl.Replicator.{Changed, GetSuccess}
-import akka.stream.OverflowStrategy
-import akka.stream.scaladsl.{Sink, Source}
-import akka.stream.typed.scaladsl.ActorSource
-import akka.util.Timeout
+import org.apache.pekko.Done
+import org.apache.pekko.actor.typed.scaladsl.AskPattern.*
+import org.apache.pekko.cluster.ddata.*
+import org.apache.pekko.cluster.ddata.Replicator.{ModifyFailure, NotFound, UpdateSuccess}
+import org.apache.pekko.cluster.ddata.typed.scaladsl.Replicator
+import org.apache.pekko.cluster.ddata.typed.scaladsl.Replicator.{Changed, GetSuccess}
+import org.apache.pekko.stream.OverflowStrategy
+import org.apache.pekko.stream.scaladsl.{Sink, Source}
+import org.apache.pekko.stream.typed.scaladsl.ActorSource
+import org.apache.pekko.util.Timeout
 import csw.location.api.CswVersionJvm
 import csw.location.api.client.CswVersion
 import csw.location.api.exceptions.*
 import csw.location.api.models.*
 import csw.location.api.models.ComponentType.{Assembly, HCD, Sequencer}
-import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
+import csw.location.api.models.Connection.{PekkoConnection, HttpConnection}
 import csw.location.api.models.NetworkType.Outside
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.server.commons.{CswCluster, LocationServiceLogger}
@@ -55,7 +55,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster, cswVersion: 
       val service = new Registry.Service(registration.connection)
 
       // Registering a location needs to read from other replicas to avoid duplicate location registration before performing the update
-      // This approach is inspired from Migration Guide section of https://github.com/patriknw/akka-data-replication
+      // This approach is inspired from Migration Guide section of https://github.com/patriknw/pekko-data-replication
       val initialValue = (replicator ? service.getByMajority).map {
         case x @ GetSuccess(_) => x.get(service.Key)
         case _                 => service.EmptyValue
@@ -102,7 +102,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster, cswVersion: 
 
   /**
    * Unregister the connection from CRDT
-   * HCD, Assembly and Sequencer components runs in a embedded mode where they registers akka and http connections
+   * HCD, Assembly and Sequencer components runs in a embedded mode where they registers pekko and http connections
    * hence we are unregistering both connections here
    */
   def unregister(connection: Connection): Future[Done] =
@@ -113,7 +113,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster, cswVersion: 
     }
 
   private def unregisterEmbeddedComponent(componentId: ComponentId): Future[Done] =
-    (unregister0(AkkaConnection(componentId)) zip unregister0(HttpConnection(componentId))).map(_ => Done)
+    (unregister0(PekkoConnection(componentId)) zip unregister0(HttpConnection(componentId))).map(_ => Done)
 
   private def unregister0(connection: Connection): Future[Done] = {
     log.info(s"Un-registering connection: [${connection.name}]")

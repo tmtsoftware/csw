@@ -5,7 +5,7 @@
 
 package csw.location.api.models.scaladsl
 
-import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.location.api.models.Connection.{PekkoConnection, HttpConnection, TcpConnection}
 import csw.location.api.models.{ComponentId, ComponentType, Connection}
 import csw.prefix.models.{Prefix, Subsystem}
 import org.scalatest.funsuite.AnyFunSuite
@@ -15,10 +15,10 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 // CSW-86: Subsystem should be case-insensitive
 class ConnectionTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
   // DEOPSCSW-14: Codec for data model
-  test("should able to form a string representation for akka connection for trombone HCD | DEOPSCSW-14") {
-    val expectedAkkaConnectionName = "NFIRAOS.tromboneHcd-HCD-akka"
-    val akkaConnection             = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneHcd"), ComponentType.HCD))
-    akkaConnection.name shouldBe expectedAkkaConnectionName
+  test("should able to form a string representation for pekko connection for trombone HCD | DEOPSCSW-14") {
+    val expectedPekkoConnectionName = "NFIRAOS.tromboneHcd-HCD-pekko"
+    val pekkoConnection             = PekkoConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneHcd"), ComponentType.HCD))
+    pekkoConnection.name shouldBe expectedPekkoConnectionName
   }
 
   // DEOPSCSW-14: Codec for data model
@@ -36,27 +36,27 @@ class ConnectionTest extends AnyFunSuite with Matchers with BeforeAndAfterAll wi
   }
 
   // DEOPSCSW-14: Codec for data model
-  test("should able to form a string representation for akka connection for trombone container | DEOPSCSW-14") {
-    val expectedAkkaConnectionName = "Container.tromboneContainer-Container-akka"
-    val akkaConnection =
-      AkkaConnection(ComponentId(Prefix(Subsystem.Container, "tromboneContainer"), ComponentType.Container))
-    akkaConnection.name shouldBe expectedAkkaConnectionName
+  test("should able to form a string representation for pekko connection for trombone container | DEOPSCSW-14") {
+    val expectedPekkoConnectionName = "Container.tromboneContainer-Container-pekko"
+    val pekkoConnection =
+      PekkoConnection(ComponentId(Prefix(Subsystem.Container, "tromboneContainer"), ComponentType.Container))
+    pekkoConnection.name shouldBe expectedPekkoConnectionName
   }
 
   // DEOPSCSW-14: Codec for data model
-  test("should able to form a string representation for akka connection for trombone assembly | DEOPSCSW-14") {
-    val expectedAkkaConnectionName = "NFIRAOS.tromboneAssembly-Assembly-akka"
-    val akkaConnection = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneAssembly"), ComponentType.Assembly))
-    akkaConnection.name shouldBe expectedAkkaConnectionName
+  test("should able to form a string representation for pekko connection for trombone assembly | DEOPSCSW-14") {
+    val expectedPekkoConnectionName = "NFIRAOS.tromboneAssembly-Assembly-pekko"
+    val pekkoConnection = PekkoConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneAssembly"), ComponentType.Assembly))
+    pekkoConnection.name shouldBe expectedPekkoConnectionName
   }
 
   // DEOPSCSW-14: Codec for data model
   test("should able to form a connection for components from a valid string representation | DEOPSCSW-14") {
-    Connection.from("nfiraos.tromboneAssembly-Assembly-akka") shouldBe
-    AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneAssembly"), ComponentType.Assembly))
+    Connection.from("nfiraos.tromboneAssembly-Assembly-pekko") shouldBe
+    PekkoConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneAssembly"), ComponentType.Assembly))
 
-    Connection.from("nfiraos.tromboneHcd-HCD-akka") shouldBe
-    AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneHcd"), ComponentType.HCD))
+    Connection.from("nfiraos.tromboneHcd-HCD-pekko") shouldBe
+    PekkoConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "tromboneHcd"), ComponentType.HCD))
 
     Connection.from("csw.redis-Service-tcp") shouldBe
     TcpConnection(ComponentId(Prefix(Subsystem.CSW, "redis"), ComponentType.Service))
@@ -67,7 +67,7 @@ class ConnectionTest extends AnyFunSuite with Matchers with BeforeAndAfterAll wi
 
   // DEOPSCSW-14: Codec for data model
   test("should not be able to form a connection for components from an invalid string representation | DEOPSCSW-14") {
-    val connection = "nfiraos.tromboneAssembly_assembly_akka"
+    val connection = "nfiraos.tromboneAssembly_assembly_pekko"
     val exception = intercept[IllegalArgumentException] {
       Connection.from(connection)
     }

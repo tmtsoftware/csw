@@ -5,7 +5,7 @@
 
 package csw.location.server.scaladsl
 
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.location.api.models.Connection.TcpConnection
 import csw.location.api.models.{ComponentId, ComponentType, TcpRegistration}
 import csw.location.server.commons.TestFutureExtension.RichFuture

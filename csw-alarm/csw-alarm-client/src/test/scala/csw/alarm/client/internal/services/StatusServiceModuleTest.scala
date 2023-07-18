@@ -7,7 +7,7 @@ package csw.alarm.client.internal.services
 
 import java.time.{Clock, LocalDateTime}
 
-import akka.stream.scaladsl.Sink
+import org.apache.pekko.stream.scaladsl.Sink
 import com.typesafe.config.ConfigFactory
 import csw.alarm.api.exceptions.KeyNotFoundException
 import csw.alarm.api.internal.SeverityKey

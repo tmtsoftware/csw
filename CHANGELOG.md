@@ -171,9 +171,9 @@ See [here](https://tmtsoftware.github.io/csw/3.0.0/) for a detailed documentatio
 - Removed usage of client-roles in favor of realm-roles in location server and config server HTTP routes.<sup>[1](#3-0-0-1)</sup>
 - Contract change for Location Service API for `registration` and `location` models to incorporate metadata.
   `Metadata` is additional information associated with `registration`.<sup>[1](#3-0-0-1)</sup>
-- Removed `RegistrationFactory` from `location-server` module. Instead, the following should be used by Scala and Java users to instantiate `AkkaRegistration`<sup>[1](#3-0-0-1)</sup>
-  - For Scala, use `AkkaRegistrationFactory`.  It has an API change to expect an `actorRef` instead of the URI of `actorRef`
-  - For Java, use the new`JAkkaRegistrationFactory`.
+- Removed `RegistrationFactory` from `location-server` module. Instead, the following should be used by Scala and Java users to instantiate `PekkoRegistration`<sup>[1](#3-0-0-1)</sup>
+  - For Scala, use `PekkoRegistrationFactory`.  It has an API change to expect an `actorRef` instead of the URI of `actorRef`
+  - For Java, use the new`JPekkoRegistrationFactory`.
 - Contract change for ComponentHandlers `initialize` and `onShutdown` methods, where the return type was changed from `Future[Unit]` to `Unit` i.e. from non-blocking to blocking.<sup>[1](#3-0-0-1)</sup>
 - Changed the installation of `csw-apps`. The `coursier` program to be used to install applications instead of downloading apps from release page.<sup>[2](#3.0.0-2)</sup>
 - `logging-aggregator-<some-version>.zip` will be available on the release page.<sup>[2](#3-0-0-2)</sup>
@@ -190,8 +190,8 @@ See [here](https://tmtsoftware.github.io/csw/3.0.0/) for a detailed documentatio
 - Scala version upgrade to 2.13.3
 - SBT version upgrade to 1.4.2
 - Borer version upgrade to 1.6.2
-- Akka version upgrade 2.6.10
-- Akka-http version upgrade 10.2.1
+- Pekko version upgrade 2.6.10
+- Pekko-http version upgrade 10.2.1
 - Keycloak version upgrade 11.0.2
 - Lettuce version upgrade 6.0.1.RELEASE
 
@@ -236,7 +236,7 @@ Migration guide for v2.0.0 can be found [here](https://tmtsoftware.github.io/csw
 - Prefix has Subsystem in constructor<sup>[1](#2-0-0-1)</sup>
 - Log statements have subsystem and prefix along with componentName<sup>[1](#2-0-0-1)</sup>
 - AlarmKey and ComponentKey is constructed from prefix instead of string<sup>[1](#2-0-0-1)</sup>
-- TcpLocation and HttpLocation has prefix along with AkkaLocation<sup>[1](#2-0-0-1)</sup>
+- TcpLocation and HttpLocation has prefix along with PekkoLocation<sup>[1](#2-0-0-1)</sup>
 - ComponentType is displayed to snake_case from lowercase<sup>[1](#2-0-0-1)</sup>
 - Subsystem is displayed in uppercase instead of lowercase<sup>[1](#2-0-0-1)</sup>
 - ArrayData and MatrixData does not require classtag for creation<sup>[1](#2-0-0-1)</sup>
@@ -250,7 +250,7 @@ To start all the CSW services, run `csw-services.sh start` command.
 
 - Scala version upgrade to 2.13.1
 - SBT version upgrade to 1.3.7
-- Akka version upgrade to 2.6.3
+- Pekko version upgrade to 2.6.3
 - Kafka version upgrade to 2.4.0
 - Borer version upgrade to 1.4.0
 
@@ -277,7 +277,7 @@ See [here](https://tmtsoftware.github.io/csw/1.1.0-RC1/) for a detailed document
 - Prefix has Subsystem in constructor
 - Log statements have subsystem and prefix along with componentName
 - AlarmKey and ComponentKey is constructed from prefix instead of string
-- TcpLocation and HttpLocation has prefix along with AkkaLocation
+- TcpLocation and HttpLocation has prefix along with PekkoLocation
 - ComponentType is displayed to snake_case from lowercase
 - Subsystem is displayed in uppercase instead of lowercase
 - ArrayData and MatrixData does not require classtag for creation
@@ -288,7 +288,7 @@ See [here](https://tmtsoftware.github.io/csw/1.1.0-RC1/) for a detailed document
 
 - Scala version upgrade to 2.13.1
 - SBT version upgrade to 1.3.7
-- Akka version upgrade to 2.6.3
+- Pekko version upgrade to 2.6.3
 - Kafka version upgrade to 2.4.0
 - Borer version upgrade to 1.4.0
 
@@ -305,7 +305,7 @@ See [here](https://tmtsoftware.github.io/csw/1.0.0/) for a detailed documentatio
 
 ### Changes
 
-- Replaced Kryo serialization with Borer-CBOR for Akka actor messages<sup>[1](#1-0-0-1)</sup>
+- Replaced Kryo serialization with Borer-CBOR for Pekko actor messages<sup>[1](#1-0-0-1)</sup>
 - Replaced Play-JSON with Borer-JSON in Location service, Configuration Service and Admin Service<sup>[1](#1-0-0-1)</sup>
 - Made Location, Config, Logging and Alarm service models to be cross compilable for ScalaJs<sup>[2](#1-0-0-2)</sup>
 - Removed `BAD` and `TEST` subsystems<sup>[1](#1-0-0-1)</sup>
@@ -319,7 +319,7 @@ See [here](https://tmtsoftware.github.io/csw/1.0.0/) for a detailed documentatio
   - Added `submitAndWait` which will submit the command and wait for its final response<sup>[2](#1-0-0-2)</sup>
   - Rename `submitAll` to `submitAllAndWait` in Command service as it waits for final response of all commands<sup>[1](#1-0-0-1)</sup>
 - `Prefix` creation will throw `NoSuchElementException` if invalid subsystem is provided<sup>[1](#1-0-0-1)</sup>
-- Replaced `ActorRef` with ActorRef `URI` in `AkkaRegistration`<sup>[2](#1-0-0-2)</sup>
+- Replaced `ActorRef` with ActorRef `URI` in `PekkoRegistration`<sup>[2](#1-0-0-2)</sup>
 
 ### Version Upgrades
 
@@ -365,7 +365,7 @@ See [here](https://tmtsoftware.github.io/csw/0.7.0/) for a detailed documentatio
 #### Version Upgrades
 
 - Migration to AdoptOpenJDK 11
-- Akka version upgrade to 2.5.23
+- Pekko version upgrade to 2.5.23
 
 #### Bug Fixes
 
@@ -466,7 +466,7 @@ See [here](https://tmtsoftware.github.io/csw/0.5.0/) for a detailed documentatio
 
 #### Bug Fixes
 
-- Prefix missing in Akka location (CSW-11)
+- Prefix missing in Pekko location (CSW-11)
 - Protobuf serde fails for Java keys/parameters (DEOPSCSW-495)
 
 #### Requests
@@ -476,7 +476,7 @@ See [here](https://tmtsoftware.github.io/csw/0.5.0/) for a detailed documentatio
 
 #### Source Updates Needed
 
-- Akka update to typed actors may require your source to be updated - if you have problems, use tmt-scw-programming slack channel for help
+- Pekko update to typed actors may require your source to be updated - if you have problems, use tmt-scw-programming slack channel for help
 - Inclusion of Event Service requires an update to any Top Level Actor
 
 #### Planned for the Next Release (Coming Soon...)
@@ -495,8 +495,8 @@ See [here](https://tmtsoftware.github.io/csw/0.4.0/) for a detailed description 
 
 ### Changed
 
-- Updated Location Service implementation is now based on Akka cluster for higher performance and proper operation in all required scenarios
-- New Command Service APIs - FDR version was based on Akka messages
+- Updated Location Service implementation is now based on Pekko cluster for higher performance and proper operation in all required scenarios
+- New Command Service APIs - FDR version was based on Pekko messages
 - Significant updates to Configuration Service implementation with some API changes
 - New Logging APIs
 - Updated to use latest Scala and Java versions and dependencies
@@ -534,7 +534,7 @@ This prototype version was provided as part of the CSW Final Design Review
 
 - Changed the Location Service APIs
 
-- Updated all dependency versions, Akka version
+- Updated all dependency versions, Pekko version
 
 - Changed APIs for Event and Telemetry Service
 

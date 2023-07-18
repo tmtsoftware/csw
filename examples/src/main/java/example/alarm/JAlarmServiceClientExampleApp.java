@@ -5,9 +5,9 @@
 
 package example.alarm;
 
-import akka.Done;
-import akka.actor.typed.ActorSystem;
-import akka.actor.typed.SpawnProtocol;
+import org.apache.pekko.Done;
+import org.apache.pekko.actor.typed.ActorSystem;
+import org.apache.pekko.actor.typed.SpawnProtocol;
 import csw.alarm.api.javadsl.IAlarmService;
 import csw.alarm.api.javadsl.JAlarmSeverity;
 import csw.alarm.client.AlarmServiceFactory;
@@ -24,7 +24,7 @@ public class JAlarmServiceClientExampleApp {
     private ActorSystem<SpawnProtocol.Command> actorSystem;
     private ILocationService jLocationService;
 
-    public JAlarmServiceClientExampleApp(akka.actor.typed.ActorSystem<SpawnProtocol.Command> actorSystem, ILocationService locationService) {
+    public JAlarmServiceClientExampleApp(org.apache.pekko.actor.typed.ActorSystem<SpawnProtocol.Command> actorSystem, ILocationService locationService) {
         this.actorSystem = actorSystem;
         this.jLocationService = locationService;
     }

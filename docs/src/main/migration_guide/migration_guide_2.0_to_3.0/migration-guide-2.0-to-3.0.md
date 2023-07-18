@@ -25,11 +25,11 @@ val paramWithShorts3: Parameter[Short] = k2.setAll(Array[Short](1, 2, 3, 4))
 - Additionally, Parameter `Key` names can no longer contain the characters `[`, `]` or `/`.
 
 ## Location Service
-- The `RegistrationFactory` class has been removed from `location-server` module.  In most cases, `AkkaRegistrationFactory`
- would have been used to create an `AkkaRegistration`, so this change should not affect most users.  
+- The `RegistrationFactory` class has been removed from `location-server` module.  In most cases, `PekkoRegistrationFactory`
+ would have been used to create an `PekkoRegistration`, so this change should not affect most users.  
  However, there has been a small API change to the usage of this class.  
-    - For Scala users, `AkkaRegistrationFactory` now takes an `actorRef` instead of URI of the `actorRef` being registered.
-    - For Java users, a new `JAkkaRegistrationFactory` has been created which should be used.
+    - For Scala users, `PekkoRegistrationFactory` now takes an `actorRef` instead of URI of the `actorRef` being registered.
+    - For Java users, a new `JPekkoRegistrationFactory` has been created which should be used.
 
 In 2.0, Scala usage might have looked like this:
 ```scala
@@ -39,27 +39,27 @@ def behavior(): Behavior[String] = Behaviors.setup { ctx =>
   }
 }
 val typedActorRef: ActorRef[String] = context.system.spawn(behavior(), "typed-actor-ref")
-val assemblyConnection = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "assembly1"), ComponentType.Assembly))
-val assemblyRegistration: AkkaRegistration = AkkaRegistrationFactory.make(assemblyConnection, typedActorRef.toURI)
+val assemblyConnection = PekkoConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "assembly1"), ComponentType.Assembly))
+val assemblyRegistration: PekkoRegistration = PekkoRegistrationFactory.make(assemblyConnection, typedActorRef.toURI)
 ```
 
 and in Java:
 ```java
 Behavior<String> behavior = Behaviors.setup(ctx -> Behaviors.same());
-akka.actor.typed.ActorRef<String> typedActorRef = Adapter.spawn(context(), behavior, "typed-actor-ref");
-AkkaConnection assemblyConnection = new AkkaConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS, "assembly1"), JComponentType.Assembly));
-AkkaRegistration assemblyRegistration = new RegistrationFactory().akkaTyped(assemblyConnection, typedActorRef);
+pekko.actor.typed.ActorRef<String> typedActorRef = Adapter.spawn(context(), behavior, "typed-actor-ref");
+PekkoConnection assemblyConnection = new PekkoConnection(new ComponentId(new Prefix(JSubsystem.NFIRAOS, "assembly1"), JComponentType.Assembly));
+PekkoRegistration assemblyRegistration = new RegistrationFactory().pekkoTyped(assemblyConnection, typedActorRef);
 ```    
 
 Now, in 3.0, the Scala code is similar, but when creating the registration, use the `actorRef` instead of the URI:
 
 ```scala
-val assemblyRegistration: AkkaRegistration = AkkaRegistrationFactory.make(assemblyConnection, typedActorRef)
+val assemblyRegistration: PekkoRegistration = PekkoRegistrationFactory.make(assemblyConnection, typedActorRef)
 ```
-and in Java, use `JAkkaRegistrationFactory`:
+and in Java, use `JPekkoRegistrationFactory`:
 
 ```java
-AkkaRegistration assemblyRegistration = JAkkaRegistrationFactory.make(assemblyConnection, typedActorRef);
+PekkoRegistration assemblyRegistration = JPekkoRegistrationFactory.make(assemblyConnection, typedActorRef);
 ```
 
 - There was also a change to the Location Service models to allow some metadata to be stored in the `location` and `registration` entities.

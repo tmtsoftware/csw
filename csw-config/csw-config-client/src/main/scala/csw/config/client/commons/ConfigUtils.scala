@@ -7,7 +7,7 @@ package csw.config.client.commons
 
 import java.nio.file.{Files, Path}
 
-import akka.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.config.api.exceptions.{FileNotFound, LocalFileNotFound, UnableToParseOptions}
 import csw.config.api.scaladsl.ConfigClientService

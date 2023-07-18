@@ -5,10 +5,10 @@
 
 package example.auth.installed.commands
 
-import akka.actor.typed
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.{HttpRequest, ResponseEntity, Uri}
-import akka.http.scaladsl.unmarshalling.Unmarshaller
+import org.apache.pekko.actor.typed
+import org.apache.pekko.http.scaladsl.Http
+import org.apache.pekko.http.scaladsl.model.{HttpRequest, ResponseEntity, Uri}
+import org.apache.pekko.http.scaladsl.unmarshalling.Unmarshaller
 import example.auth.installed.commands.ReadCommand.convertToString
 
 import scala.concurrent.duration.DurationLong

@@ -5,7 +5,7 @@
 
 package csw.command.client.cbor
 
-import akka.actor.typed.ActorRef
+import org.apache.pekko.actor.typed.ActorRef
 import csw.command.client.messages.CommandSerializationMarker.RemoteMsg
 import csw.command.client.messages.sequencer.CswSequencerMessage
 import csw.command.client.models.framework._
@@ -22,7 +22,7 @@ trait MessageCodecs extends MessageCodecsBase {
 }
 
 trait MessageCodecsBase extends ParamCodecs with LoggingCodecs with LocationCodecs {
-  implicit def actorRefCodec[T]: Codec[ActorRef[T]] = io.bullet.borer.compat.akka.typedActorRefCodec
+  implicit def actorRefCodec[T]: Codec[ActorRef[T]] = io.bullet.borer.compat.pekko.typedActorRefCodec
 
   protected def pubSubCodecValue[T: Encoder: Decoder]: Codec[PubSub[T]] = deriveAllCodecs
 

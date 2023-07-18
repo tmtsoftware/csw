@@ -8,9 +8,9 @@ package csw.event.client.perf.commons
 import java.time.Instant
 import java.util.concurrent.TimeUnit.SECONDS
 
-import akka.Done
-import akka.stream.UniqueKillSwitch
-import akka.stream.scaladsl.{Keep, Source}
+import org.apache.pekko.Done
+import org.apache.pekko.stream.UniqueKillSwitch
+import org.apache.pekko.stream.scaladsl.{Keep, Source}
 import csw.event.api.scaladsl.{EventSubscriber, EventSubscription}
 import csw.event.client.perf.ocs.gateway.client.GatewayClient
 import csw.event.client.perf.reporter.{ResultReporter, TestRateReporter}

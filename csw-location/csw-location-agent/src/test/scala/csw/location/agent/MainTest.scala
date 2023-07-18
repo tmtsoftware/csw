@@ -7,8 +7,8 @@ package csw.location.agent
 
 import java.net.URI
 
-import akka.actor.typed
-import akka.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.actor.typed
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import com.typesafe.config.ConfigFactory
 import csw.commons.ResourceReader
 import csw.location.api.models

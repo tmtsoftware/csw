@@ -7,7 +7,7 @@ package csw.command.client
 
 import java.util.concurrent.CompletableFuture
 
-import akka.actor.typed.{ActorRef, ActorSystem}
+import org.apache.pekko.actor.typed.{ActorRef, ActorSystem}
 import csw.command.client.CommandResponseManager.{OverallFailure, OverallResponse, OverallSuccess}
 import csw.command.client.MiniCRM.MiniCRMMessage.AddResponse
 import csw.params.commands.CommandResponse

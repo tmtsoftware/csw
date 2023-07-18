@@ -5,7 +5,7 @@
 
 package csw.framework.javadsl
 
-import akka.actor.typed.javadsl.ActorContext
+import org.apache.pekko.actor.typed.javadsl.ActorContext
 import csw.command.client.messages.TopLevelActorMessage
 import csw.framework.models.JCswContext
 import csw.location.api.models.TrackingEvent

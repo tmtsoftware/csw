@@ -8,8 +8,8 @@ package csw.config.cli
 import java.io.ByteArrayInputStream
 import java.nio.file.Paths
 
-import akka.actor.typed.scaladsl.adapter._
-import akka.remote.testconductor.RoleName
+import org.apache.pekko.actor.typed.scaladsl.adapter._
+import org.apache.pekko.remote.testconductor.RoleName
 import com.typesafe.config.ConfigFactory
 import csw.aas.core.deployment.AuthServiceLocation
 import csw.commons.ResourceReader

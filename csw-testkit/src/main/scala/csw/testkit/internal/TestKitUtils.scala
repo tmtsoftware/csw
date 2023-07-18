@@ -6,10 +6,10 @@
 package csw.testkit.internal
 import java.io.File
 
-import akka.Done
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.Http.ServerBinding
-import akka.util.Timeout
+import org.apache.pekko.Done
+import org.apache.pekko.http.scaladsl.Http
+import org.apache.pekko.http.scaladsl.Http.ServerBinding
+import org.apache.pekko.util.Timeout
 
 import scala.concurrent.{Await, Future}
 

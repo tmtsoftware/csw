@@ -5,8 +5,8 @@
 
 package csw.event.client
 
-import akka.actor.testkit.typed.scaladsl.TestInbox
-import akka.stream.scaladsl.Sink
+import org.apache.pekko.actor.testkit.typed.scaladsl.TestInbox
+import org.apache.pekko.stream.scaladsl.Sink
 import csw.event.api.scaladsl.SubscriptionModes
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.helpers.Utils.makeEventForKeyName

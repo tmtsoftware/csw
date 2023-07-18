@@ -5,7 +5,7 @@
 
 package csw.framework.internal.supervisor
 
-import akka.actor.testkit.typed.scaladsl.TestProbe
+import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
 import csw.command.client.messages.CommandMessage.Submit
 import csw.command.client.messages.ComponentCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}

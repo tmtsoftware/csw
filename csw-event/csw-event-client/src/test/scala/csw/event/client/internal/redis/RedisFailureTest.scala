@@ -5,8 +5,8 @@
 
 package csw.event.client.internal.redis
 
-import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.stream.scaladsl.{Keep, Sink, Source}
+import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
+import org.apache.pekko.stream.scaladsl.{Keep, Sink, Source}
 import csw.event.api.exceptions.{EventServerNotAvailable, PublishFailure}
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.helpers.Utils

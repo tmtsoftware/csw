@@ -5,9 +5,9 @@
 
 package csw.event.client
 
-import akka.actor.Cancellable
-import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.stream.scaladsl.{Keep, Sink, Source}
+import org.apache.pekko.actor.Cancellable
+import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
+import org.apache.pekko.stream.scaladsl.{Keep, Sink, Source}
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.helpers.Utils.{makeDistinctEvent, makeEvent, makeEventWithPrefix}
 import csw.params.core.generics.{Key, Parameter}

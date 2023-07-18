@@ -8,8 +8,8 @@ package csw.benchmark.time
 import java.time.Duration
 import java.util.concurrent.{CountDownLatch, TimeUnit}
 
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import csw.time.scheduler.TimeServiceSchedulerFactory
 import csw.time.scheduler.api.TimeServiceScheduler
 import org.openjdk.jmh.annotations.{OperationsPerInvocation, _}
@@ -40,7 +40,7 @@ class SchedulerBenchmark {
 
   // Refer :
   // 1. https://stackoverflow.com/questions/54132761/how-operationsperinvocation-number-is-used-for-calculating-percentile-latencies
-  // 2. https://discuss.lightbend.com/t/what-is-the-accuracy-of-akka-scheduler/3134
+  // 2. https://discuss.lightbend.com/t/what-is-the-accuracy-of-pekko-scheduler/3134
   @Benchmark
   @OperationsPerInvocation(OperationsPerInvocation)
   def schedulePeriodicallyBenchmark(): Unit = {

@@ -10,7 +10,7 @@ import java.nio.file.Path
 import java.time.Instant
 import java.util.regex.Pattern
 
-import akka.dispatch.MessageDispatcher
+import org.apache.pekko.dispatch.MessageDispatcher
 import csw.config.models.FileType
 import csw.config.server.Settings
 import csw.config.server.commons.ConfigServerLogger

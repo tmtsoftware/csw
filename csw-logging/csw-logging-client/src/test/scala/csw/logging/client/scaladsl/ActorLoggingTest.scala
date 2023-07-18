@@ -5,7 +5,7 @@
 
 package csw.logging.client.scaladsl
 
-import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
+import csw.logging.client.commons.PekkoTypedExtension.UserActorFactory
 import csw.logging.client.commons.LoggingKeys
 import csw.logging.client.components.IRIS
 import csw.logging.client.components.IRISLogMessages._

@@ -10,7 +10,7 @@
       "connection" : {
         "prefix" : "TCS.filter.wheel",
         "componentType" : "HCD",
-        "connectionType" : "akka"
+        "connectionType" : "pekko"
       }
     } ]
   }

@@ -4,10 +4,10 @@
  */
 
 package csw.alarm.cli
-import akka.Done
-import akka.actor.CoordinatedShutdown
-import akka.actor.typed.ActorRef
-import akka.stream.scaladsl.{Keep, Sink}
+import org.apache.pekko.Done
+import org.apache.pekko.actor.CoordinatedShutdown
+import org.apache.pekko.actor.typed.ActorRef
+import org.apache.pekko.stream.scaladsl.{Keep, Sink}
 import com.typesafe.config.ConfigFactory
 import csw.alarm.api.scaladsl.AlarmSubscription
 import csw.alarm.cli.args.Options

@@ -5,7 +5,7 @@
 
 package csw.framework.models
 
-import akka.actor.typed.SpawnProtocol
+import org.apache.pekko.actor.typed.SpawnProtocol
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.location.client.ActorSystemFactory
 import org.scalatest.funsuite.AnyFunSuite

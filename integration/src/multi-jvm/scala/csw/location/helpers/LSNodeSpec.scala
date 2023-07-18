@@ -5,10 +5,10 @@
 
 package csw.location.helpers
 
-import akka.actor.typed.scaladsl.adapter._
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.remote.testkit.{MultiNodeSpec, MultiNodeSpecCallbacks}
-import akka.testkit.ImplicitSender
+import org.apache.pekko.actor.typed.scaladsl.adapter._
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.remote.testkit.{MultiNodeSpec, MultiNodeSpecCallbacks}
+import org.apache.pekko.testkit.ImplicitSender
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.server.commons.ClusterSettings

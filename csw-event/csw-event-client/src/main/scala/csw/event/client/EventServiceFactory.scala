@@ -5,7 +5,7 @@
 
 package csw.event.client
 
-import akka.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.ActorSystem
 import csw.event.api.javadsl.IEventService
 import csw.event.api.scaladsl.EventService
 import csw.event.client.internal.commons.javawrappers.JEventService

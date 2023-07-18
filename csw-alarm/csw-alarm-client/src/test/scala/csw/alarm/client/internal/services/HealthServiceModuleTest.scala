@@ -5,7 +5,7 @@
 
 package csw.alarm.client.internal.services
 
-import akka.actor.testkit.typed.scaladsl.TestProbe
+import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
 import com.typesafe.config.ConfigFactory
 import csw.alarm.api.exceptions.{InactiveAlarmException, KeyNotFoundException}
 import csw.alarm.client.internal.helpers.AlarmServiceTestSetup

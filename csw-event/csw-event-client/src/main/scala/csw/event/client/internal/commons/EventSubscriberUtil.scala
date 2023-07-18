@@ -5,10 +5,10 @@
 
 package csw.event.client.internal.commons
 
-import akka.actor.typed.{ActorRef, ActorSystem}
-import akka.stream.FlowShape
-import akka.stream.scaladsl.{Keep, Sink, Source}
-import akka.stream.stage.GraphStage
+import org.apache.pekko.actor.typed.{ActorRef, ActorSystem}
+import org.apache.pekko.stream.FlowShape
+import org.apache.pekko.stream.scaladsl.{Keep, Sink, Source}
+import org.apache.pekko.stream.stage.GraphStage
 import csw.event.api.scaladsl.SubscriptionModes.{RateAdapterMode, RateLimiterMode}
 import csw.event.api.scaladsl.{EventSubscription, SubscriptionMode}
 import csw.event.client.internal.commons.EventStreamSupervisionStrategy.attributes

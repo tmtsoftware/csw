@@ -8,7 +8,7 @@ package csw.location.api.models
 import java.net.URI
 
 import csw.location.api.codec.LocationSerializable
-import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.location.api.models.Connection.{PekkoConnection, HttpConnection, TcpConnection}
 import csw.prefix.models.Prefix
 
 /**
@@ -39,7 +39,7 @@ sealed abstract class Location extends LocationSerializable {
 }
 
 /**
- * Represents a live Akka connection of an Actor
+ * Represents a live Pekko connection of an Actor
  *
  * @note Do not directly access actorRef from constructor, use one of component() or containerRef() method
  *       to get the correctly typed actor reference.
@@ -47,7 +47,7 @@ sealed abstract class Location extends LocationSerializable {
  * @param uri represents the actor URI of the component. Gateway or router for a component that other components will resolve and talk to.
  * @param metadata represents additional metadata information associated with location. Defaulted to empty is not provided while registration
  */
-final case class AkkaLocation(connection: AkkaConnection, uri: URI, metadata: Metadata) extends Location
+final case class PekkoLocation(connection: PekkoConnection, uri: URI, metadata: Metadata) extends Location
 
 /**
  * Represents a live Tcp connection

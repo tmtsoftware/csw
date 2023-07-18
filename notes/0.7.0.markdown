@@ -21,7 +21,7 @@ See [CHANGELOG.md](CHANGELOG.md) for details of all releases.
     
 ### Version Upgrades
 - Migration to AdoptOpenJDK 11
-- Akka version upgrade to 2.5.23
+- Pekko version upgrade to 2.5.23
 
 ### Documentation
 - Reference paradox documentation: https://tmtsoftware.github.io/csw/0.7.0/

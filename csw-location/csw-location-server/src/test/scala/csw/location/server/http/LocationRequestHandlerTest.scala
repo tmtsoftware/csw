@@ -5,9 +5,9 @@
 
 package csw.location.server.http
 
-import akka.Done
-import akka.http.scaladsl.server.directives.BasicDirectives
-import akka.http.scaladsl.testkit.ScalatestRouteTest
+import org.apache.pekko.Done
+import org.apache.pekko.http.scaladsl.server.directives.BasicDirectives
+import org.apache.pekko.http.scaladsl.testkit.ScalatestRouteTest
 import csw.aas.http.AuthorizationPolicy.RealmRolePolicy
 import csw.aas.http.SecurityDirectives
 import csw.commons.RandomUtils
@@ -15,7 +15,7 @@ import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.messages.LocationRequest
 import csw.location.api.messages.LocationRequest.*
 import csw.location.api.models.*
-import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.Connection.PekkoConnection
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.prefix.models.{Prefix, Subsystem}
 import msocket.http.post.{PostRouteFactory, ServerHttpCodecs}
@@ -69,9 +69,9 @@ class LocationRequestHandlerTest
   private val componentType           = randomComponentType
   private val hostname                = RandomUtils.randomString5()
   private val prefix                  = Prefix(subsystem, RandomUtils.randomString5())
-  private val connection              = AkkaConnection(ComponentId(prefix, componentType))
-  private val registration            = AkkaRegistration(connection, new URI(""), Metadata.empty)
-  private val location                = registration.location(hostname).asInstanceOf[AkkaLocation]
+  private val connection              = PekkoConnection(ComponentId(prefix, componentType))
+  private val registration            = PekkoRegistration(connection, new URI(""), Metadata.empty)
+  private val location                = registration.location(hostname).asInstanceOf[PekkoLocation]
   private val timeout                 = 5.seconds
   private val locations               = List(location)
   private val locationAdminRolePolicy = RealmRolePolicy("location-admin")
@@ -117,7 +117,7 @@ class LocationRequestHandlerTest
 
     Post("/post-endpoint", Find(connection).narrow) ~> route ~> check {
       verify(locationService).find(connection)
-      responseAs[Option[AkkaLocation]] should ===(maybeLocation)
+      responseAs[Option[PekkoLocation]] should ===(maybeLocation)
     }
   }
 
@@ -127,7 +127,7 @@ class LocationRequestHandlerTest
 
     Post("/post-endpoint", Resolve(connection, timeout).narrow) ~> route ~> check {
       verify(locationService).resolve(connection, timeout)
-      responseAs[Option[AkkaLocation]] should ===(maybeLocation)
+      responseAs[Option[PekkoLocation]] should ===(maybeLocation)
     }
   }
 

@@ -11,8 +11,8 @@ import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
 import java.{util => ju}
 
-import akka.Done
-import akka.stream.javadsl.Source
+import org.apache.pekko.Done
+import org.apache.pekko.stream.javadsl.Source
 import csw.location.api.models._
 import csw.location.api.scaladsl.LocationService
 import msocket.api.Subscription

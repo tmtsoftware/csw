@@ -5,9 +5,9 @@
 
 package csw.framework.integration
 
-import akka.actor.testkit.typed.scaladsl.{TestInbox, TestProbe}
-import akka.stream.scaladsl.{Keep, Sink}
-import akka.util.Timeout
+import org.apache.pekko.actor.testkit.typed.scaladsl.{TestInbox, TestProbe}
+import org.apache.pekko.stream.scaladsl.{Keep, Sink}
+import org.apache.pekko.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
 import csw.command.client.models.framework.ContainerLifecycleState
@@ -18,7 +18,7 @@ import csw.event.client.internal.commons.EventServiceConnection
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.location.api
 import csw.location.api.models.ComponentType.{Assembly, HCD}
-import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.Connection.PekkoConnection
 import csw.params.commands
 import csw.params.commands.CommandName
 import csw.params.core.states.{CurrentState, StateName}
@@ -39,8 +39,8 @@ class EventServiceIntegrationTest extends FrameworkIntegrationSuite with Eventua
   private var sentinel: RedisSentinel = _
   private var server: RedisServer     = _
 
-  private val filterAssemblyConnection = AkkaConnection(api.models.ComponentId(Prefix(Subsystem.TCS, "Filter"), Assembly))
-  private val disperserHcdConnection   = AkkaConnection(api.models.ComponentId(Prefix(Subsystem.TCS, "Disperser"), HCD))
+  private val filterAssemblyConnection = PekkoConnection(api.models.ComponentId(Prefix(Subsystem.TCS, "Filter"), Assembly))
+  private val disperserHcdConnection   = PekkoConnection(api.models.ComponentId(Prefix(Subsystem.TCS, "Disperser"), HCD))
   private val wiring                   = FrameworkWiring.make(seedActorSystem)
 
   override protected def beforeAll(): Unit = {

@@ -5,7 +5,7 @@
 
 package csw.location.client
 
-import akka.actor.typed.{ActorSystem => TypedActorSystem, Behavior}
+import org.apache.pekko.actor.typed.{ActorSystem => TypedActorSystem, Behavior}
 import com.typesafe.config.ConfigFactory
 import csw.location.api.commons.{Constants, LocationServiceLogger}
 import csw.logging.api.scaladsl.Logger
@@ -22,7 +22,7 @@ object ActorSystemFactory {
   private val log: Logger = LocationServiceLogger.getLogger
 
   private lazy val config = ConfigFactory
-    .parseString(s"akka.remote.artery.canonical.hostname = ${Networks().hostname}")
+    .parseString(s"pekko.remote.artery.canonical.hostname = ${Networks().hostname}")
     .withFallback(ConfigFactory.load().getConfig(Constants.RemoteActorSystemName))
     .withFallback(ConfigFactory.defaultApplication().resolve())
 

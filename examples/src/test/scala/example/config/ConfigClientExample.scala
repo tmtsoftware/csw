@@ -99,7 +99,7 @@ class ConfigClientExample
         {
           name: lgsTromboneHCD
           type: Hcd
-          connectionType: [akka]
+          connectionType: [pekko]
         }
         """.stripMargin
         val config1: ConfigData = ConfigData.fromString(configString)

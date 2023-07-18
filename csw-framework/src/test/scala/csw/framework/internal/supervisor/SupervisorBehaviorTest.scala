@@ -5,11 +5,11 @@
 
 package csw.framework.internal.supervisor
 
-import akka.actor.testkit.typed.Effect
-import akka.actor.testkit.typed.Effect.{Spawned, Watched}
-import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestInbox, TestProbe}
-import akka.actor.typed.Behavior
-import akka.actor.typed.scaladsl.{Behaviors, TimerScheduler}
+import org.apache.pekko.actor.testkit.typed.Effect
+import org.apache.pekko.actor.testkit.typed.Effect.{Spawned, Watched}
+import org.apache.pekko.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestInbox, TestProbe}
+import org.apache.pekko.actor.typed.Behavior
+import org.apache.pekko.actor.typed.scaladsl.{Behaviors, TimerScheduler}
 import csw.command.client.messages.DiagnosticDataMessage.DiagnosticMode
 import csw.command.client.messages.FromComponentLifecycleMessage.Running
 import csw.command.client.messages.*

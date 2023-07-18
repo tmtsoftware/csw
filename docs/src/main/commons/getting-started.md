@@ -101,11 +101,11 @@ If you want to add another component to the project, for example, with the name 
 
 1. Add external library dependencies required by `sample-io` in `Libs.scala` file, if it does not exist.
 ```
-val `akka-actor` = "com.typesafe.akka" %% "akka-actor" % "2.6.1"
+val `pekko-actor` = "com.typesafe.pekko" %% "pekko-actor" % "2.6.1"
 ```
 2. Map new/existing library dependencies in `Dependencies.scala` file against new project.
 ```
-val SampleIO = Seq( Libs.`akka-actor` )
+val SampleIO = Seq( Libs.`pekko-actor` )
 ```
 3. Include below snippet in `build.sbt` file, this will create new sbt project module.
 ```

@@ -5,7 +5,7 @@
 
 package csw.logging.client.internal
 
-import csw.logging.client.internal.LogActorMessages.LogAkka
+import csw.logging.client.internal.LogActorMessages.LogPekko
 import csw.logging.client.internal.LoggingState._
 import csw.logging.client.internal.TimeActorMessages.{TimeEnd, TimeStart}
 import csw.logging.models.RequestId
@@ -14,7 +14,7 @@ import csw.logging.models.RequestId
  * Acts as a single point of entry for messages from various loggers and redirects them to the log actor
  *
  *                      +-------------------------+                                    +------------------+
- *  --- akka logs ----> |     MessageHandler      |                                    |                  | --- forward to FileAppender ----->
+ *  --- pekko logs ----> |     MessageHandler      |                                    |                  | --- forward to FileAppender ----->
  *                      |   (Singleton object)    |                                    |     LogActor     |
  *  --- slf4j logs ---> |                         | --- when LoggingSystem starts ---> |                  | --- forward to StdOutAppender --->
  *                      |   starts on jvm bootup  |                                    |                  |
@@ -27,7 +27,7 @@ private[logging] object MessageHandler {
 
   /**
    * MessageHandler is a singleton object which will start at the bootup of jvm. If the `LoggingSystem` is not started
-   * (which is also responsible for starting `LogActor`) then all the log messages from akka, slf4j, tmt will be enqueued
+   * (which is also responsible for starting `LogActor`) then all the log messages from pekko, slf4j, tmt will be enqueued
    * in an in-memory mutable.Queue `msgs`. This will result in log messages to NOT appear in file or stdout. Once, the
    * `LoggingSystem` is instantiated, `msgs` is emptied and log messages are processed by forwarding them to `LogActor`.
    * As an effect they will now start appearing in file or std out.
@@ -40,10 +40,10 @@ private[logging] object MessageHandler {
       maybeLogActor.foreach(_ ! msg)
     }
 
-  // Route akka messages to common log actor
-  private[logging] def sendAkkaMsg(logAkka: LogAkka): Unit =
-    if (logAkka.msg == "DIE") akkaStopPromise.trySuccess(())
-    else sendMsg(logAkka)
+  // Route pekko messages to common log actor
+  private[logging] def sendPekkoMsg(logPekko: LogPekko): Unit =
+    if (logPekko.msg == "DIE") pekkoStopPromise.trySuccess(())
+    else sendMsg(logPekko)
 
   // Route time start messages to time actor
   private[logging] def timeStart(id: RequestId, name: String, uid: String): Unit =

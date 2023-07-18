@@ -7,8 +7,8 @@ package csw.testkit.javadsl
 
 import java.util.Collections
 
-import akka.actor.typed
-import akka.actor.typed.{ActorRef, SpawnProtocol}
+import org.apache.pekko.actor.typed
+import org.apache.pekko.actor.typed.{ActorRef, SpawnProtocol}
 import com.typesafe.config.Config
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.event.api.javadsl.IEventService

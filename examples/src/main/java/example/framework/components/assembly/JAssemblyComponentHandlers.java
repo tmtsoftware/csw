@@ -5,10 +5,10 @@
 
 package example.framework.components.assembly;
 
-import akka.actor.testkit.typed.javadsl.TestProbe;
-import akka.actor.typed.ActorRef;
-import akka.actor.typed.javadsl.ActorContext;
-import akka.util.Timeout;
+import org.apache.pekko.actor.testkit.typed.javadsl.TestProbe;
+import org.apache.pekko.actor.typed.ActorRef;
+import org.apache.pekko.actor.typed.javadsl.ActorContext;
+import org.apache.pekko.util.Timeout;
 import csw.command.api.javadsl.ICommandService;
 import csw.command.client.CommandResponseManager;
 import csw.command.client.CommandServiceFactory;
@@ -63,7 +63,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     private final int timeout = 10;
     private final TimeUnit timeUnit = TimeUnit.SECONDS;
 
-    public JAssemblyComponentHandlers(akka.actor.typed.javadsl.ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
+    public JAssemblyComponentHandlers(org.apache.pekko.actor.typed.javadsl.ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
         super(ctx, cswCtx);
         this.ctx = ctx;
         this.componentInfo = cswCtx.componentInfo();
@@ -104,7 +104,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         // required worker actors required by this assembly, also subscribe to HCD's filter wheel event stream
         mayBeConnection.map(connection ->
         {
-            Optional<AkkaLocation> hcdLocation;
+            Optional<PekkoLocation> hcdLocation;
             try {
                 hcdLocation = resolveHcd().get(timeout, timeUnit);
             } catch (InterruptedException | ExecutionException | TimeoutException ex) {
@@ -279,7 +279,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         }
     }
 
-    private CompletableFuture<Optional<AkkaLocation>> resolveHcd() {
+    private CompletableFuture<Optional<PekkoLocation>> resolveHcd() {
         // find a Hcd connection from the connections provided in componentInfo
         Optional<Connection> mayBeConnection = componentInfo.getConnections().stream()
                 .filter(connection -> connection.componentId().componentType() == JComponentType.HCD)
@@ -288,8 +288,8 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         // If an Hcd is found as a connection, resolve its location from location service and create other
         // required worker actors required by this assembly
         if (mayBeConnection.isPresent()) {
-            CompletableFuture<Optional<AkkaLocation>> resolve = locationService.resolve(mayBeConnection.orElseThrow().<AkkaLocation>of(), Duration.ofSeconds(5));
-            return resolve.thenCompose((Optional<AkkaLocation> resolvedHcd) -> {
+            CompletableFuture<Optional<PekkoLocation>> resolve = locationService.resolve(mayBeConnection.orElseThrow().<PekkoLocation>of(), Duration.ofSeconds(5));
+            return resolve.thenCompose((Optional<PekkoLocation> resolvedHcd) -> {
                 if (resolvedHcd.isPresent())
                     return CompletableFuture.completedFuture(resolvedHcd);
                 else
@@ -321,14 +321,14 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
     private void resolveHcdAndCreateCommandService() {
 
-        TypedConnection<AkkaLocation> hcdConnection = componentInfo.getConnections().stream()
+        TypedConnection<PekkoLocation> hcdConnection = componentInfo.getConnections().stream()
                 .filter(connection -> connection.componentId().componentType() == JComponentType.HCD)
-                .findFirst().orElseThrow().<AkkaLocation>of();
+                .findFirst().orElseThrow().<PekkoLocation>of();
 
         // #resolve-hcd-and-create-commandservice
-        CompletableFuture<Optional<AkkaLocation>> resolvedHcdLocation = locationService.resolve(hcdConnection, Duration.ofSeconds(5));
+        CompletableFuture<Optional<PekkoLocation>> resolvedHcdLocation = locationService.resolve(hcdConnection, Duration.ofSeconds(5));
 
-        CompletableFuture<ICommandService> eventualCommandService = resolvedHcdLocation.thenApply((Optional<AkkaLocation> hcdLocation) -> {
+        CompletableFuture<ICommandService> eventualCommandService = resolvedHcdLocation.thenApply((Optional<PekkoLocation> hcdLocation) -> {
             if (hcdLocation.isPresent())
                 return CommandServiceFactory.jMake(hcdLocation.orElseThrow(), ctx.getSystem());
             else

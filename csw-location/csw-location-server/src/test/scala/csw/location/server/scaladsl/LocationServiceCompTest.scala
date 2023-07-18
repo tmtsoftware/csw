@@ -5,26 +5,26 @@
 
 package csw.location.server.scaladsl
 
-import akka.actor.testkit.typed.scaladsl
-import akka.actor.typed
-import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.typed.{Behavior, SpawnProtocol}
-import akka.stream.scaladsl.{Keep, Sink}
-import akka.testkit.TestProbe
+import org.apache.pekko.actor.testkit.typed.scaladsl
+import org.apache.pekko.actor.typed
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import org.apache.pekko.actor.typed.{Behavior, SpawnProtocol}
+import org.apache.pekko.stream.scaladsl.{Keep, Sink}
+import org.apache.pekko.testkit.TestProbe
 import csw.location.api.exceptions.OtherLocationIsRegistered
 import csw.location.api.models.*
 import csw.location.api.models.ComponentType.{Assembly, HCD, Sequencer}
-import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.location.api.models.Connection.{PekkoConnection, HttpConnection, TcpConnection}
 import csw.location.api.scaladsl.LocationService
-import csw.location.api.{AkkaRegistrationFactory, CswVersionJvm, models}
+import csw.location.api.{PekkoRegistrationFactory, CswVersionJvm, models}
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.server.commons.ClusterAwareSettings
 import csw.location.server.commons.TestFutureExtension.RichFuture
 import csw.location.server.internal.LocationServiceFactory
 import csw.location.server.scaladsl.TestRegistrationExt.RichRegistration
-import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
+import csw.logging.client.commons.PekkoTypedExtension.UserActorFactory
 import csw.network.utils.Networks
 import csw.prefix.models.{Prefix, Subsystem}
 import io.netty.util.internal.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
@@ -68,7 +68,7 @@ class LocationServiceCompTest(mode: String)
     case "cluster" => LocationServiceFactory.make(ClusterAwareSettings)
   }
 
-  import AkkaRegistrationFactory.*
+  import PekkoRegistrationFactory.*
 
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 100.millis)
 
@@ -167,54 +167,54 @@ class LocationServiceCompTest(mode: String)
   // DEOPSCSW-23: Unregister a comp/service
   // DEOPSCSW-34: Resolve a connection
   test(
-    "should able to register, resolve, list and unregister akka location | DEOPSCSW-12, DEOPSCSW-16, DEOPSCSW-17, DEOPSCSW-20, DEOPSCSW-23, DEOPSCSW-34, DEOPSCSW-429"
+    "should able to register, resolve, list and unregister pekko location | DEOPSCSW-12, DEOPSCSW-16, DEOPSCSW-17, DEOPSCSW-20, DEOPSCSW-23, DEOPSCSW-34, DEOPSCSW-429"
   ) {
-    val componentId      = models.ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), HCD)
-    val connection       = AkkaConnection(componentId)
-    val actorRef         = typedSystem.spawn(Behaviors.empty, "my-actor-1")
-    val akkaRegistration = AkkaRegistrationFactory.make(connection, actorRef)
+    val componentId       = models.ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), HCD)
+    val connection        = PekkoConnection(componentId)
+    val actorRef          = typedSystem.spawn(Behaviors.empty, "my-actor-1")
+    val pekkoRegistration = PekkoRegistrationFactory.make(connection, actorRef)
 
-    // register, resolve & list akka connection for the first time
-    locationService.register(akkaRegistration).await.location.connection shouldBe connection
-    locationService.resolve(connection, 2.seconds).await.get shouldBe akkaRegistration
+    // register, resolve & list pekko connection for the first time
+    locationService.register(pekkoRegistration).await.location.connection shouldBe connection
+    locationService.resolve(connection, 2.seconds).await.get shouldBe pekkoRegistration
       .cswVersion(mode)
       .location(
         Networks().hostname
       )
-    locationService.list.await shouldBe List(akkaRegistration.cswVersion(mode).location(Networks().hostname))
+    locationService.list.await shouldBe List(pekkoRegistration.cswVersion(mode).location(Networks().hostname))
 
-    // unregister, resolve & list akka connection
+    // unregister, resolve & list pekko connection
     locationService.unregister(connection).await
     locationService.resolve(connection, 2.seconds).await shouldBe None
     locationService.list.await shouldBe List.empty
 
-    // re-register, resolve & list akka connection
-    locationService.register(akkaRegistration).await.location.connection shouldBe connection
-    locationService.resolve(connection, 2.seconds).await.get shouldBe akkaRegistration
+    // re-register, resolve & list pekko connection
+    locationService.register(pekkoRegistration).await.location.connection shouldBe connection
+    locationService.resolve(connection, 2.seconds).await.get shouldBe pekkoRegistration
       .cswVersion(mode)
       .location(
         Networks().hostname
       )
     locationService.list.await shouldBe List(
-      akkaRegistration.cswVersion(mode).location(Networks().hostname)
+      pekkoRegistration.cswVersion(mode).location(Networks().hostname)
     )
   }
 
   List(HCD, Assembly, Sequencer).foreach { compType =>
     test(
-      s"unregistering $compType should unregister both Akka and Http connection | DEOPSCSW-12, DEOPSCSW-16, DEOPSCSW-17, DEOPSCSW-20, DEOPSCSW-23, DEOPSCSW-34, DEOPSCSW-429"
+      s"unregistering $compType should unregister both Pekko and Http connection | DEOPSCSW-12, DEOPSCSW-16, DEOPSCSW-17, DEOPSCSW-20, DEOPSCSW-23, DEOPSCSW-34, DEOPSCSW-429"
     ) {
-      val prefix           = Prefix(Subsystem.NFIRAOS, "name")
-      val akkaConnection   = AkkaConnection(models.ComponentId(prefix, compType))
-      val httpConnection   = HttpConnection(models.ComponentId(prefix, compType))
-      val actorRef         = typedSystem.spawn(Behaviors.empty, "my-actor-1")
-      val akkaRegistration = AkkaRegistrationFactory.make(akkaConnection, actorRef)
-      val httpRegistration = HttpRegistration(httpConnection, 8088, "/")
+      val prefix            = Prefix(Subsystem.NFIRAOS, "name")
+      val pekkoConnection   = PekkoConnection(models.ComponentId(prefix, compType))
+      val httpConnection    = HttpConnection(models.ComponentId(prefix, compType))
+      val actorRef          = typedSystem.spawn(Behaviors.empty, "my-actor-1")
+      val pekkoRegistration = PekkoRegistrationFactory.make(pekkoConnection, actorRef)
+      val httpRegistration  = HttpRegistration(httpConnection, 8088, "/")
 
-      locationService.register(akkaRegistration).await.location.connection shouldBe akkaConnection
+      locationService.register(pekkoRegistration).await.location.connection shouldBe pekkoConnection
       locationService.register(httpRegistration).await.location.connection shouldBe httpConnection
 
-      locationService.unregister(akkaConnection).await
+      locationService.unregister(pekkoConnection).await
       locationService.list.await shouldBe empty
     }
   }
@@ -223,10 +223,10 @@ class LocationServiceCompTest(mode: String)
   // DEOPSCSW-35: CRDT detects comp/service crash
   // DEOPSCSW-36: Track a crashed service/comp
   test(
-    "akka location death watch actor should unregister services whose actorRef is terminated | DEOPSCSW-12, DEOPSCSW-16, DEOPSCSW-17, DEOPSCSW-20, DEOPSCSW-23, DEOPSCSW-34, DEOPSCSW-35, DEOPSCSW-36, DEOPSCSW-429"
+    "pekko location death watch actor should unregister services whose actorRef is terminated | DEOPSCSW-12, DEOPSCSW-16, DEOPSCSW-17, DEOPSCSW-20, DEOPSCSW-23, DEOPSCSW-34, DEOPSCSW-35, DEOPSCSW-36, DEOPSCSW-429"
   ) {
     val componentId = models.ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), HCD)
-    val connection  = AkkaConnection(componentId)
+    val connection  = PekkoConnection(componentId)
 
     val emptyBeh: Behavior[String] = Behaviors.receiveMessage {
       case "Kill" => Behaviors.stopped
@@ -302,7 +302,7 @@ class LocationServiceCompTest(mode: String)
 
   // DEOPSCSW-26: Track a connection  // TODO
   test(
-    "should able to track http and akka connection registered before tracking started | DEOPSCSW-12, DEOPSCSW-16, DEOPSCSW-17, DEOPSCSW-20, DEOPSCSW-23, DEOPSCSW-34, DEOPSCSW-26, DEOPSCSW-429"
+    "should able to track http and pekko connection registered before tracking started | DEOPSCSW-12, DEOPSCSW-16, DEOPSCSW-17, DEOPSCSW-20, DEOPSCSW-23, DEOPSCSW-34, DEOPSCSW-26, DEOPSCSW-429"
   ) {
     val hostname = Networks().hostname
     // create http registration
@@ -311,23 +311,23 @@ class LocationServiceCompTest(mode: String)
     val httpConnection   = HttpConnection(models.ComponentId(prefix, ComponentType.Assembly))
     val httpRegistration = HttpRegistration(httpConnection, port, prefix.toString)
 
-    // create akka registration
-    val akkaComponentId  = models.ComponentId(Prefix(Subsystem.CSW, "container1"), ComponentType.Container)
-    val akkaConnection   = AkkaConnection(akkaComponentId)
-    val actorRef         = typedSystem.spawn(Behaviors.empty, "container1-actor")
-    val akkaRegistration = AkkaRegistrationFactory.make(akkaConnection, actorRef)
+    // create pekko registration
+    val pekkoComponentId  = models.ComponentId(Prefix(Subsystem.CSW, "container1"), ComponentType.Container)
+    val pekkoConnection   = PekkoConnection(pekkoComponentId)
+    val actorRef          = typedSystem.spawn(Behaviors.empty, "container1-actor")
+    val pekkoRegistration = PekkoRegistrationFactory.make(pekkoConnection, actorRef)
 
-    val httpRegistrationResult = locationService.register(httpRegistration).await
-    val akkaRegistrationResult = locationService.register(akkaRegistration).await
-    val httpProbe              = scaladsl.TestProbe[TrackingEvent]("http-probe")
-    val akkaProbe              = scaladsl.TestProbe[TrackingEvent]("akka-probe")
+    val httpRegistrationResult  = locationService.register(httpRegistration).await
+    val pekkoRegistrationResult = locationService.register(pekkoRegistration).await
+    val httpProbe               = scaladsl.TestProbe[TrackingEvent]("http-probe")
+    val pekkoProbe              = scaladsl.TestProbe[TrackingEvent]("pekko-probe")
 
-    // start tracking both http and akka connections
-    val httpSwitch = locationService.track(httpConnection).toMat(Sink.foreach(httpProbe.ref.tell(_)))(Keep.left).run()
-    val akkaSwitch = locationService.track(akkaConnection).toMat(Sink.foreach(akkaProbe.ref.tell(_)))(Keep.left).run()
+    // start tracking both http and pekko connections
+    val httpSwitch  = locationService.track(httpConnection).toMat(Sink.foreach(httpProbe.ref.tell(_)))(Keep.left).run()
+    val pekkoSwitch = locationService.track(pekkoConnection).toMat(Sink.foreach(pekkoProbe.ref.tell(_)))(Keep.left).run()
 
     httpProbe.expectMessage(LocationUpdated(httpRegistration.cswVersion(mode).location(hostname)))
-    akkaProbe.expectMessage(LocationUpdated(akkaRegistration.cswVersion(mode).location(hostname)))
+    pekkoProbe.expectMessage(LocationUpdated(pekkoRegistration.cswVersion(mode).location(hostname)))
 
     // unregister http connection
     httpRegistrationResult.unregister().await
@@ -336,11 +336,11 @@ class LocationServiceCompTest(mode: String)
     // stop tracking http connection
     httpSwitch.cancel()
 
-    // unregister and stop tracking akka connection
-    akkaRegistrationResult.unregister().await
-    akkaProbe.expectMessage(LocationRemoved(akkaConnection))
+    // unregister and stop tracking pekko connection
+    pekkoRegistrationResult.unregister().await
+    pekkoProbe.expectMessage(LocationRemoved(pekkoConnection))
 
-    akkaSwitch.cancel()
+    pekkoSwitch.cancel()
   }
 
   // DEOPSCSW-26: Track a connection
@@ -445,7 +445,7 @@ class LocationServiceCompTest(mode: String)
   test(
     "should filter components with component type | DEOPSCSW-12, DEOPSCSW-16, DEOPSCSW-17, DEOPSCSW-20, DEOPSCSW-23, DEOPSCSW-34, DEOPSCSW-24, DEOPSCSW-429"
   ) {
-    val hcdConnection = AkkaConnection(models.ComponentId(Prefix(Subsystem.CSW, "hcd1"), HCD))
+    val hcdConnection = PekkoConnection(models.ComponentId(Prefix(Subsystem.CSW, "hcd1"), HCD))
     val actorRef      = typedSystem.spawn(Behaviors.empty, "my-actor-2")
 
     locationService.register(make(hcdConnection, actorRef)).await
@@ -468,13 +468,13 @@ class LocationServiceCompTest(mode: String)
   test(
     "should filter connections based on Connection type | DEOPSCSW-12, DEOPSCSW-16, DEOPSCSW-17, DEOPSCSW-20, DEOPSCSW-23, DEOPSCSW-34, DEOPSCSW-32, DEOPSCSW-429"
   ) {
-    val hcdAkkaConnection = AkkaConnection(models.ComponentId(Prefix(Subsystem.CSW, "hcd1"), HCD))
+    val hcdPekkoConnection = PekkoConnection(models.ComponentId(Prefix(Subsystem.CSW, "hcd1"), HCD))
     val actorRef = typedSystem.spawn(
       Behaviors.empty,
       "my-actor-3"
     )
 
-    locationService.register(make(hcdAkkaConnection, actorRef)).await
+    locationService.register(make(hcdPekkoConnection, actorRef)).await
 
     val redisTcpConnection = TcpConnection(models.ComponentId(Prefix(Subsystem.CSW, "redis"), ComponentType.Service))
     locationService.register(TcpRegistration(redisTcpConnection, 1234)).await
@@ -493,8 +493,8 @@ class LocationServiceCompTest(mode: String)
     val httpConnections = locationService.list(ConnectionType.HttpType).await
     httpConnections.map(_.connection).toSet shouldBe Set(assemblyHttpConnection)
 
-    val akkaConnections = locationService.list(ConnectionType.AkkaType).await
-    akkaConnections.map(_.connection).toSet shouldBe Set(hcdAkkaConnection)
+    val pekkoConnections = locationService.list(ConnectionType.PekkoType).await
+    pekkoConnections.map(_.connection).toSet shouldBe Set(hcdPekkoConnection)
   }
 
   // DEOPSCSW-12: Create location service API
@@ -508,18 +508,18 @@ class LocationServiceCompTest(mode: String)
     val httpConnection = HttpConnection(models.ComponentId(Prefix(Subsystem.CSW, "assembly1"), ComponentType.Assembly))
     locationService.register(HttpRegistration(httpConnection, 1234, "path123")).await
 
-    val akkaConnection = AkkaConnection(models.ComponentId(Prefix(Subsystem.CSW, "hcd1"), HCD))
+    val pekkoConnection = PekkoConnection(models.ComponentId(Prefix(Subsystem.CSW, "hcd1"), HCD))
     val actorRef = typedSystem.spawn(
       Behaviors.empty,
       "my-actor-4"
     )
 
-    locationService.register(make(akkaConnection, actorRef)).await
+    locationService.register(make(pekkoConnection, actorRef)).await
 
     locationService.list(Networks().hostname).await.map(_.connection).toSet shouldBe Set(
       tcpConnection,
       httpConnection,
-      akkaConnection
+      pekkoConnection
     )
 
     locationService.list("Invalid_hostname").await shouldBe List.empty
@@ -529,25 +529,25 @@ class LocationServiceCompTest(mode: String)
   // DEOPSCSW-12: Create location service API
   // CSW-86: Subsystem should be case-insensitive
   test(
-    "should filter akka connections based on prefix | DEOPSCSW-12, DEOPSCSW-16, DEOPSCSW-17, DEOPSCSW-20, DEOPSCSW-23, DEOPSCSW-34, DEOPSCSW-308, DEOPSCSW-429"
+    "should filter pekko connections based on prefix | DEOPSCSW-12, DEOPSCSW-16, DEOPSCSW-17, DEOPSCSW-20, DEOPSCSW-23, DEOPSCSW-34, DEOPSCSW-308, DEOPSCSW-429"
   ) {
-    val akkaConnection1 = AkkaConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "ncc.trombone.hcd1"), HCD))
-    val akkaConnection2 =
-      AkkaConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "ncc.trombone.assembly2"), ComponentType.Assembly))
-    val akkaConnection3 = AkkaConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "ncc.trombone.hcd3"), HCD))
+    val pekkoConnection1 = PekkoConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "ncc.trombone.hcd1"), HCD))
+    val pekkoConnection2 =
+      PekkoConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "ncc.trombone.assembly2"), ComponentType.Assembly))
+    val pekkoConnection3 = PekkoConnection(models.ComponentId(Prefix(Subsystem.NFIRAOS, "ncc.trombone.hcd3"), HCD))
 
     val actorRef  = typedSystem.spawn(Behaviors.empty, "")
     val actorRef2 = typedSystem.spawn(Behaviors.empty, "")
     val actorRef3 = typedSystem.spawn(Behaviors.empty, "")
 
-    locationService.register(make(akkaConnection1, actorRef)).await
-    locationService.register(make(akkaConnection2, actorRef2)).await
-    locationService.register(make(akkaConnection3, actorRef3)).await
+    locationService.register(make(pekkoConnection1, actorRef)).await
+    locationService.register(make(pekkoConnection2, actorRef2)).await
+    locationService.register(make(pekkoConnection3, actorRef3)).await
 
     locationService.listByPrefix("NFIRAOS.ncc.trombone").await.map(_.connection).toSet shouldBe Set(
-      akkaConnection1,
-      akkaConnection2,
-      akkaConnection3
+      pekkoConnection1,
+      pekkoConnection2,
+      pekkoConnection3
     )
   }
 

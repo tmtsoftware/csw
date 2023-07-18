@@ -5,8 +5,8 @@
 
 package example.auth.installed
 
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import csw.aas.installed.api.InstalledAppAuthAdapter
 import csw.location.client.utils.LocationServerStatus
 import example.auth.installed.commands.{AppCommand, CommandFactory}

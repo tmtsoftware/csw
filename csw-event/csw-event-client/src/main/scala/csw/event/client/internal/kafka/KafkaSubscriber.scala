@@ -5,11 +5,11 @@
 
 package csw.event.client.internal.kafka
 
-import akka.Done
-import akka.actor.typed.{ActorRef, ActorSystem}
-import akka.kafka.{ConsumerSettings, Subscription, Subscriptions, scaladsl}
-import akka.stream.StreamDetachedException
-import akka.stream.scaladsl.{Keep, Sink, Source}
+import org.apache.pekko.Done
+import org.apache.pekko.actor.typed.{ActorRef, ActorSystem}
+import org.apache.pekko.kafka.{ConsumerSettings, Subscription, Subscriptions, scaladsl}
+import org.apache.pekko.stream.StreamDetachedException
+import org.apache.pekko.stream.scaladsl.{Keep, Sink, Source}
 import csw.event.api.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
 import csw.event.client.internal.commons.{EventConverter, EventSubscriberUtil}
 import csw.event.client.utils.Utils
@@ -28,7 +28,7 @@ import scala.util.control.NonFatal
  * An implementation of [[csw.event.api.scaladsl.EventSubscriber]] API which uses Apache Kafka as the provider for publishing
  * and subscribing events.
  *
- * @param consumerSettings  future of settings for akka-streams-kafka API for Apache Kafka consumer
+ * @param consumerSettings  future of settings for pekko-streams-kafka API for Apache Kafka consumer
  * @param actorSystem to be used for performing asynchronous operations
  */
 // $COVERAGE-OFF$

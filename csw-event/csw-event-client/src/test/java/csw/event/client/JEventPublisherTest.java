@@ -5,12 +5,12 @@
 
 package csw.event.client;
 
-import akka.actor.Cancellable;
-import akka.actor.testkit.typed.javadsl.TestProbe;
-import akka.japi.function.Procedure;
-import akka.stream.javadsl.Keep;
-import akka.stream.javadsl.Sink;
-import akka.stream.javadsl.Source;
+import org.apache.pekko.actor.Cancellable;
+import org.apache.pekko.actor.testkit.typed.javadsl.TestProbe;
+import org.apache.pekko.japi.function.Procedure;
+import org.apache.pekko.stream.javadsl.Keep;
+import org.apache.pekko.stream.javadsl.Sink;
+import org.apache.pekko.stream.javadsl.Source;
 import csw.event.api.javadsl.IEventPublisher;
 import csw.event.api.javadsl.IEventSubscription;
 import csw.event.client.helpers.Utils;

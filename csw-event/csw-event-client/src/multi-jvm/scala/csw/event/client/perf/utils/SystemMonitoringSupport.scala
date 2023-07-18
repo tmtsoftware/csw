@@ -9,8 +9,8 @@ import java.io.{File, PrintWriter}
 import java.lang.ProcessBuilder.Redirect
 import java.time.Instant
 
-import akka.remote.testconductor.RoleName
-import akka.remote.testkit.MultiNodeSpec
+import org.apache.pekko.remote.testconductor.RoleName
+import org.apache.pekko.remote.testkit.MultiNodeSpec
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -99,7 +99,7 @@ trait SystemMonitoringSupport { multiNodeSpec: MultiNodeSpec =>
     if (exist(perfJavaFlamesPath) && isNode(nodes: _*)) {
       import scala.concurrent.ExecutionContext.Implicits.global
 
-      val afterDelay = akka.pattern.after(delay, system.scheduler)(Future.successful("GO!"))
+      val afterDelay = org.apache.pekko.pattern.after(delay, system.scheduler)(Future.successful("GO!"))
       afterDelay onComplete { it =>
         val perfCommand = s"$perfJavaFlamesPath $pid"
         println(s"[perf @ ${myself.name}($pid)][OUT]: " + perfCommand)

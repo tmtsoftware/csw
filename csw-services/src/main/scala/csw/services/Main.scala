@@ -5,7 +5,7 @@
 
 package csw.services
 
-import akka.actor.CoordinatedShutdown
+import org.apache.pekko.actor.CoordinatedShutdown
 import caseapp.core.RemainingArgs
 import caseapp.core.app.CommandApp
 import csw.logging.client.scaladsl.LoggingSystemFactory

@@ -8,11 +8,11 @@ package csw.config.client.internal
 import java.nio.{file => jnio}
 import java.time.Instant
 
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.Uri.{Path, Query}
-import akka.http.scaladsl.model._
-import akka.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
-import akka.http.scaladsl.unmarshalling.Unmarshal
+import org.apache.pekko.http.scaladsl.Http
+import org.apache.pekko.http.scaladsl.model.Uri.{Path, Query}
+import org.apache.pekko.http.scaladsl.model._
+import org.apache.pekko.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
+import org.apache.pekko.http.scaladsl.unmarshalling.Unmarshal
 import csw.commons.http.ErrorResponse
 import csw.commons.http.codecs.ErrorCodecs
 import csw.config.api.commons.{BinaryUtils, TokenMaskSupport}

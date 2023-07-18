@@ -5,7 +5,7 @@
 
 package csw.command.client.messages
 
-import akka.actor.typed.ActorRef
+import org.apache.pekko.actor.typed.ActorRef
 import csw.command.client.messages.CommandSerializationMarker._
 import csw.command.client.messages.sequencer.SequencerMsg
 import csw.command.client.models.framework.PubSub.SubscriberMessage

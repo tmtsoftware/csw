@@ -5,8 +5,8 @@
 
 package csw.event.client.internal.redis
 
-import akka.Done
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.Done
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import com.typesafe.config.ConfigFactory
 import csw.commons.redis.EmbeddedRedis
 import csw.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}

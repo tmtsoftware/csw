@@ -7,7 +7,7 @@ package csw.contract.data.command
 
 import java.util.concurrent.TimeUnit
 
-import akka.util.Timeout
+import org.apache.pekko.util.Timeout
 import csw.command.api.messages.CommandServiceRequest.{Oneway, Query, Submit, Validate}
 import csw.command.api.messages.CommandServiceStreamRequest.{QueryFinal, SubscribeCurrentState}
 import csw.params.commands.CommandIssue._

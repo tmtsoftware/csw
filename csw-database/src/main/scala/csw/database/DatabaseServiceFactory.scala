@@ -8,7 +8,7 @@ package csw.database
 import java.util.Properties
 import java.util.concurrent.CompletableFuture
 
-import akka.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 import csw.database.commons.{DatabaseLogger, DatabaseServiceLocationResolver}

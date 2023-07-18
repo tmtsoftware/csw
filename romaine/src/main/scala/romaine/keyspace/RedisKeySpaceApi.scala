@@ -5,8 +5,8 @@
 
 package romaine.keyspace
 
-import akka.Done
-import akka.stream.scaladsl.Source
+import org.apache.pekko.Done
+import org.apache.pekko.stream.scaladsl.Source
 import reactor.core.publisher.FluxSink.OverflowStrategy
 import romaine.async.RedisAsyncApi
 import romaine.codec.RomaineCodec

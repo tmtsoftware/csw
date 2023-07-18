@@ -9,7 +9,7 @@ This is as opposed to building a web application that runs in a browser.  To do 
 
 ## Dependencies
 
-To use the Akka HTTP Adapter (csw-aas-installed), add the following to your `build.sbt` file:
+To use the Pekko HTTP Adapter (csw-aas-installed), add the following to your `build.sbt` file:
 
 sbt
 :   @@@vars
@@ -63,7 +63,7 @@ auth-config {
 
 ## Building a CLI Application
 
-Let's say that we have an existing Akka HTTP application which has some open and 
+Let's say that we have an existing Pekko HTTP application which has some open and 
 some protected routes, and we want to build a CLI client which accesses these routes.
 
 Scala
@@ -71,7 +71,7 @@ Scala
 
 @@@ note
 To know more about how to create secure web APIs, please go through 
-@ref:[Akka HTTP Adapter - csw-aas-http](csw-aas-http.md)
+@ref:[Pekko HTTP Adapter - csw-aas-http](csw-aas-http.md)
 @@@
 
 We will create a CLI application that has following commands:

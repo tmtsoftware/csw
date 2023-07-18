@@ -4,7 +4,7 @@ The Logging Service library provides an advanced logging facility for CSW compon
 The Logger API for @scaladoc[scala](csw/logging/api/scaladsl/Logger) and @scaladoc[java](csw/logging/api/javadsl/ILogger) allows logging
 at different levels viz., `trace`, `debug`, `info`, `warn` and `error`.
 
-The library allows separate log levels for the logging API, Akka logging, and Slf4J.
+The library allows separate log levels for the logging API, Pekko logging, and Slf4J.
 Also, it provides ability to set different log levels for different components.
 To understand how to use the API, refer to @ref:[this doc](../../services/logging.md).  
 
@@ -21,7 +21,7 @@ For each container/standalone component, a new `csw.logging.client.internal.Logg
 
 * Spawning `csw.logging.client.internal.LogActor`. LogActor is the central component of Logging Service.
 All the messages of changing log level at runtime and logging at different levels go through the LogActor.
-Even external loggers `csw.logging.client.compat.AkkaLogger` and `csw.logging.client.compat.Slf4jAppender` 
+Even external loggers `csw.logging.client.compat.PekkoLogger` and `csw.logging.client.compat.Slf4jAppender` 
 send messages to `LogActor` in order to log messages to the 
 configured appenders (@scaladoc[StdOutAppender](csw/logging/client/appenders/StdOutAppender) and
 @scaladoc[FileAppender](csw/logging/client/appenders/FileAppender)).
@@ -30,7 +30,7 @@ configured appenders (@scaladoc[StdOutAppender](csw/logging/client/appenders/Std
 do logging of messages sent by services/components, `LoggerImpl` also sends messages to `LogActor`.
 
 * Load the default logging configurations from `logging.conf` and initialize `csw.logging.client.internal.LoggingState` which is 
-a singleton object keeping track of the current logging state (levels of logging API, akka, slf4j and various components) 
+a singleton object keeping track of the current logging state (levels of logging API, pekko, slf4j and various components) 
 of the application. `LoggingSystem` changes this `LoggingState` to change 
 logging level of services/components. And `LoggerImpl` picks up from this state inorder to decide if the message needs 
 to be logged or not depending on the current level set.
@@ -45,10 +45,10 @@ On any following logs of that component, the new `LoggingState` will be used in 
 to decide whether it needs to be logged or not.
 
 ### External Loggers 
-External loggers like AkkaLogger and Slf4jAppender are wired up such that any logs from those libraries
-(Akka and others that implement Slf4j like log4j, logback, tinylog etc) will go through our facade of AkkaLogger
-and Slf4jAppender respectively. For AkkaLogger, there is a configuration `akka.loggers` specified in `logging.conf` which does
-this wiring and for Slf4jAppender `logback.xml` is configured. AkkaLogger and Slf4jAppender then forward these logs to the `LogActor`.
+External loggers like PekkoLogger and Slf4jAppender are wired up such that any logs from those libraries
+(Pekko and others that implement Slf4j like log4j, logback, tinylog etc) will go through our facade of PekkoLogger
+and Slf4jAppender respectively. For PekkoLogger, there is a configuration `pekko.loggers` specified in `logging.conf` which does
+this wiring and for Slf4jAppender `logback.xml` is configured. PekkoLogger and Slf4jAppender then forward these logs to the `LogActor`.
 
 ### Hierarchy of LoggerFactories 
 

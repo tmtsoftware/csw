@@ -5,8 +5,8 @@
 
 package csw.framework.internal.pubsub
 
-import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{ActorRef, Behavior}
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.actor.typed.{ActorRef, Behavior}
 import csw.command.client.models.framework.PubSub
 import csw.command.client.models.framework.PubSub._
 import csw.logging.api.scaladsl.Logger

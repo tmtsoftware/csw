@@ -5,8 +5,8 @@
 
 package csw.framework.internal.supervisor
 
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.http.scaladsl.server.Route
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.http.scaladsl.server.Route
 import csw.location.api.models.Connection.HttpConnection
 import csw.location.api.models.{HttpRegistration, NetworkType}
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}

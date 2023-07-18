@@ -8,8 +8,8 @@ package csw.command.client.internal
 import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
 
-import akka.stream.javadsl.Source
-import akka.util.Timeout
+import org.apache.pekko.stream.javadsl.Source
+import org.apache.pekko.util.Timeout
 import csw.command.api.StateMatcher
 import csw.command.api.javadsl.ICommandService
 import csw.command.api.scaladsl.CommandService
