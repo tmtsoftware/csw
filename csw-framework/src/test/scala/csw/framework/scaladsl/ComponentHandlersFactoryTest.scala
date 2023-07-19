@@ -18,12 +18,12 @@ class ComponentHandlersFactoryTest extends AnyFunSuite with Matchers {
     val expectedMessage = """
       |To load a component, you must provide one of the following:
       |For Scala: Subclass of class csw.framework.scaladsl.ComponentHandlers having constructor parameter types:
-      |(interface pekko.actor.typed.scaladsl.ActorContext, class csw.framework.models.CswContext)
+      |(interface org.apache.pekko.actor.typed.scaladsl.ActorContext, class csw.framework.models.CswContext)
       |OR
       |For Java: Subclass of class csw.framework.javadsl.JComponentHandlers having constructor parameter types:
-      |(interface pekko.actor.typed.javadsl.ActorContext, class csw.framework.models.JCswContext).
+      |(interface org.apache.pekko.actor.typed.javadsl.ActorContext, class csw.framework.models.JCswContext).
       |Received:
-      |public csw.common.components.framework.InvalidComponentHandlers(csw.framework.models.CswContext,pekko.actor.typed.scaladsl.ActorContext)
+      |public csw.common.components.framework.InvalidComponentHandlers(csw.framework.models.CswContext,org.apache.pekko.actor.typed.scaladsl.ActorContext)
       |""".stripMargin
     assert(thrown.getClass === classOf[ClassCastException])
     assert(thrown.getMessage === expectedMessage)
@@ -39,12 +39,12 @@ class ComponentHandlersFactoryTest extends AnyFunSuite with Matchers {
       """
         |To load a component, you must provide one of the following:
         |For Scala: Subclass of class csw.framework.scaladsl.ComponentHandlers having constructor parameter types:
-        |(interface pekko.actor.typed.scaladsl.ActorContext, class csw.framework.models.CswContext)
+        |(interface org.apache.pekko.actor.typed.scaladsl.ActorContext, class csw.framework.models.CswContext)
         |OR
         |For Java: Subclass of class csw.framework.javadsl.JComponentHandlers having constructor parameter types:
-        |(interface pekko.actor.typed.javadsl.ActorContext, class csw.framework.models.JCswContext).
+        |(interface org.apache.pekko.actor.typed.javadsl.ActorContext, class csw.framework.models.JCswContext).
         |Received:
-        |csw.framework.javadsl.components.JInvalidComponentHandlers(csw.framework.models.JCswContext,pekko.actor.typed.javadsl.ActorContext)
+        |csw.framework.javadsl.components.JInvalidComponentHandlers(csw.framework.models.JCswContext,org.apache.pekko.actor.typed.javadsl.ActorContext)
         |""".stripMargin
     assert(thrown.getClass === classOf[ClassCastException])
     assert(thrown.getMessage === expectedMessage)
