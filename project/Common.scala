@@ -33,6 +33,7 @@ object Common {
     scalaVersion                                    := Libs.ScalaVersion,
     homepage                                        := Some(url("https://github.com/tmtsoftware/csw")),
     resolvers += "jitpack" at "https://jitpack.io",
+    resolvers += "apache pekko snapshots" at "https://repository.apache.org/content/groups/snapshots/",
     scmInfo := Some(
       ScmInfo(url("https://github.com/tmtsoftware/csw"), "git@github.com:tmtsoftware/csw.git")
     ),
