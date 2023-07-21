@@ -15,7 +15,6 @@ object Libs {
 
   val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "9d6378938e65435583ed9c431de6beecaf8ad7ec" // Apache 2.0
   val `pekko-management` = "org.apache.pekko" %% "pekko-management" % "0.0.0+759-7699b9ee+20230719-1236-SNAPSHOT"
-//  val `pekko-management` = "com.github.abrighton.incubator-pekko-management" %% "pekko-management" % "7699b9ee32fdb9275c49c27af3a656b7db0d63fb"
   val `svnkit`        = "org.tmatesoft.svnkit" % "svnkit"        % "1.10.3"     // TMate Open Source License
   val `commons-codec` = "commons-codec"        % "commons-codec" % "1.15"       // Apache 2.0š
   val `scala-reflect` = "org.scala-lang"       % "scala-reflect" % ScalaVersion // BSD-3
@@ -78,22 +77,22 @@ object Jackson {
 
 object Pekko {
   val Version = "1.0.0" // all pekko is Apache License 2.0
+    val Org = "org.apache.pekko"
 
-  val `pekko-stream`              = "org.apache.pekko" %% "pekko-stream"              % Version
-  val `pekko-stream-typed`        = "org.apache.pekko" %% "pekko-stream-typed"        % Version
-  val `pekko-remote`              = "org.apache.pekko" %% "pekko-remote"              % Version
-  val `pekko-stream-testkit`      = "org.apache.pekko" %% "pekko-stream-testkit"      % Version
-  val `pekko-actor`               = "org.apache.pekko" %% "pekko-actor"               % Version
-  val `pekko-actor-typed`         = "org.apache.pekko" %% "pekko-actor-typed"         % Version
-  val `pekko-actor-testkit-typed` = "org.apache.pekko" %% "pekko-actor-testkit-typed" % Version
-  val `pekko-distributed-data`    = "org.apache.pekko" %% "pekko-distributed-data"    % Version
-  val `pekko-multi-node-testkit`  = "org.apache.pekko" %% "pekko-multi-node-testkit"  % Version
-  val `pekko-cluster-tools`       = "org.apache.pekko" %% "pekko-cluster-tools"       % Version
-  val `pekko-cluster`             = "org.apache.pekko" %% "pekko-cluster"             % Version
-  val `pekko-cluster-typed`       = "org.apache.pekko" %% "pekko-cluster-typed"       % Version
-  val `pekko-slf4j`               = "org.apache.pekko" %% "pekko-slf4j"               % Version
-  val `cluster-sharding` =
-    "org.apache.pekko" %% "pekko-cluster-sharding" % Version // required to maintaining the transitive dependency of akka-management-cluster-http
+  val `pekko-stream`              = Org %% "pekko-stream"              % Version
+  val `pekko-stream-typed`        = Org %% "pekko-stream-typed"        % Version
+  val `pekko-remote`              = Org %% "pekko-remote"              % Version
+  val `pekko-stream-testkit`      = Org %% "pekko-stream-testkit"      % Version
+  val `pekko-actor`               = Org %% "pekko-actor"               % Version
+  val `pekko-actor-typed`         = Org %% "pekko-actor-typed"         % Version
+  val `pekko-actor-testkit-typed` = Org %% "pekko-actor-testkit-typed" % Version
+  val `pekko-distributed-data`    = Org %% "pekko-distributed-data"    % Version
+  val `pekko-multi-node-testkit`  = Org %% "pekko-multi-node-testkit"  % Version
+  val `pekko-cluster-tools`       = Org %% "pekko-cluster-tools"       % Version
+  val `pekko-cluster`             = Org %% "pekko-cluster"             % Version
+  val `pekko-cluster-typed`       = Org %% "pekko-cluster-typed"       % Version
+  val `pekko-slf4j`               = Org %% "pekko-slf4j"               % Version
+  val `cluster-sharding`          = Org %% "pekko-cluster-sharding" % Version // required to maintaining the transitive dependency of akka-management-cluster-http
 }
 
 object PekkoHttp {
@@ -105,6 +104,8 @@ object PekkoHttp {
   val `pekko-http-testkit`    = Org %% "pekko-http-testkit"    % Version
   val `pekko-http-spray-json` = Org %% "pekko-http-spray-json" % Version
   val `pekko-http-cors`       = Org %% "pekko-http-cors"       % Version
+//  val `pekko-http-core`       = Org %% "pekko-http-core"       % Version
+//  val `pekko-http-parsing`    = Org %% "pekko-http-parsing"    % Version
 }
 
 object Keycloak {
