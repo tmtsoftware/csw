@@ -197,6 +197,11 @@ object Dependencies {
       Libs.`scala-java8-compat`,
       Libs.`play-json`,
       Pekko.`pekko-actor-typed`,
+
+      // temp: Added to resolve snapshot version conflict before pekko-http release available
+      PekkoHttp.`pekko-http`,
+      PekkoHttp.`pekko-http-core`,
+
       Libs.`scopt`,
       Pekko.`pekko-actor-testkit-typed` % Test,
       Pekko.`pekko-stream-testkit`      % Test,
@@ -483,6 +488,10 @@ object Dependencies {
       Pekko.`pekko-actor-typed`,
       PekkoHttp.`pekko-http`,
       PekkoHttp.`pekko-http-cors`,
+
+      // temp: Added to resolve snapshot version conflict before pekko-http release available
+      PekkoHttp.`pekko-http-core`,
+
       Pekko.`pekko-actor-testkit-typed`,
       Libs.`scalatest`.value  % Test,
       Libs.`junit4-interface` % Test
