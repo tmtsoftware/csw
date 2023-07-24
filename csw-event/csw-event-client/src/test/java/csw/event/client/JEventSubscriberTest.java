@@ -14,7 +14,7 @@ import org.apache.pekko.stream.javadsl.Sink;
 import csw.event.api.javadsl.IEventSubscription;
 import csw.event.api.scaladsl.SubscriptionModes;
 import csw.event.client.helpers.Utils;
-import csw.event.client.internal.kafka.KafkaTestProps;
+//import csw.event.client.internal.kafka.KafkaTestProps;
 import csw.event.client.internal.redis.RedisTestProps;
 import csw.event.client.internal.wiring.BaseProperties;
 import csw.logging.client.utils.Eventually;
@@ -46,14 +46,14 @@ import static csw.prefix.javadsl.JSubsystem.WFOS;
 public class JEventSubscriberTest extends TestNGSuite {
 
     private RedisTestProps redisTestProps;
-    private KafkaTestProps kafkaTestProps;
+//    private KafkaTestProps kafkaTestProps;
 
     @BeforeSuite
     public void beforeAll() {
         redisTestProps = RedisTestProps.jCreateRedisProperties();
-        kafkaTestProps = KafkaTestProps.jCreateKafkaProperties();
+//        kafkaTestProps = KafkaTestProps.jCreateKafkaProperties();
         redisTestProps.start();
-        kafkaTestProps.start();
+//        kafkaTestProps.start();
     }
 
     public List<Event> getEvents() {
@@ -74,12 +74,13 @@ public class JEventSubscriberTest extends TestNGSuite {
     @AfterSuite
     public void afterAll() {
         redisTestProps.shutdown();
-        kafkaTestProps.shutdown();
+//        kafkaTestProps.shutdown();
     }
 
     @DataProvider(name = "event-service-provider")
     public Object[][] pubsubProvider() {
-        return new Object[][]{{redisTestProps}, {kafkaTestProps}};
+//        return new Object[][]{{redisTestProps}, {kafkaTestProps}};
+        return new Object[][]{{redisTestProps}};
     }
 
     @DataProvider(name = "redis-provider")

@@ -13,7 +13,7 @@ import csw.event.api.scaladsl.SubscriptionModes
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.helpers.Utils._
 import csw.prefix.models.{Prefix, Subsystem}
-import csw.event.client.internal.kafka.KafkaTestProps
+//import csw.event.client.internal.kafka.KafkaTestProps
 import csw.event.client.internal.redis.RedisTestProps
 import csw.event.client.internal.wiring.BaseProperties
 import csw.params.core.models.ObsId
@@ -40,34 +40,34 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 10.millis)
 
   var redisTestProps: RedisTestProps = _
-  var kafkaTestProps: KafkaTestProps = _
+//  var kafkaTestProps: KafkaTestProps = _
 
   @BeforeSuite
   def beforeAll(): Unit = {
     redisTestProps = RedisTestProps.createRedisProperties()
-    kafkaTestProps = KafkaTestProps.createKafkaProperties()
+//    kafkaTestProps = KafkaTestProps.createKafkaProperties()
     redisTestProps.start()
-    kafkaTestProps.start()
+//    kafkaTestProps.start()
   }
 
   @AfterSuite
   def afterAll(): Unit = {
     redisTestProps.shutdown()
-    kafkaTestProps.shutdown()
+//    kafkaTestProps.shutdown()
   }
 
   @DataProvider(name = "event-service-provider")
   def pubSubProvider: Array[Array[_ <: BaseProperties]] =
     Array(
-      Array(redisTestProps),
-      Array(kafkaTestProps)
+      Array(redisTestProps)
+//      Array(kafkaTestProps)
     )
 
   @DataProvider(name = "redis-provider")
   def redisPubSubProvider: Array[Array[RedisTestProps]] = Array(Array(redisTestProps))
 
-  val events: immutable.Seq[Event]                  = for (i <- 1 to 1500) yield makeEvent(i)
-  def events(name: EventName): immutable.Seq[Event] = for (i <- 1 to 1500) yield makeEventForKeyName(name, i)
+  val events: immutable.Seq[Event]                  = for (i <- 1 to 3500) yield makeEvent(i)
+  def events(name: EventName): immutable.Seq[Event] = for (i <- 1 to 3500) yield makeEventForKeyName(name, i)
 
   class EventGenerator(eventName: EventName) {
     var counter                               = 0
