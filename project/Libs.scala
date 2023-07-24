@@ -104,8 +104,8 @@ object PekkoHttp {
   val `pekko-http-testkit`    = Org %% "pekko-http-testkit"    % Version
   val `pekko-http-spray-json` = Org %% "pekko-http-spray-json" % Version
   val `pekko-http-cors`       = Org %% "pekko-http-cors"       % Version
-//  val `pekko-http-core`       = Org %% "pekko-http-core"       % Version
-//  val `pekko-http-parsing`    = Org %% "pekko-http-parsing"    % Version
+  val `pekko-http-core`       = Org %% "pekko-http-core"       % Version
+  val `pekko-http-parsing`    = Org %% "pekko-http-parsing"    % Version
 }
 
 object Keycloak {
