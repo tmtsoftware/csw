@@ -31,8 +31,8 @@ object Libs {
   val `reactive-streams` = "org.reactivestreams" % "reactive-streams" % "1.0.3"
   // 2.1.1 version is breaking csw-event-client tests (pekko version based on 3.0.1)
 //  val `pekko-connectors-kafka` = "org.apache.pekko" %% "pekko-connectors-kafka" % "???"
-  val `pekko-connectors-kafka` = "com.github.apache.incubator-pekko-connectors-kafka" %% "pekko-connectors-kafka" % "b25806f7cb90056685180f987221c8ae8c2d7c76"
-  val `embedded-kafka`   = "io.github.embeddedkafka" %% "embedded-kafka"  % "3.0.0"
+  val `pekko-connectors-kafka` = "com.github.apache.incubator-pekko-connectors-kafka" %% "pekko-connectors-kafka" % "be98654"
+  val `embedded-kafka`   = "io.github.embeddedkafka" %% "embedded-kafka"  % "3.5.0"
   val `embedded-redis`   = "com.github.kstyrc"        % "embedded-redis"  % "0.6"
   val `scala-compiler`   = "org.scala-lang"           % "scala-compiler"  % ScalaVersion
   val `HdrHistogram`     = "org.hdrhistogram"         % "HdrHistogram"    % "2.1.12"

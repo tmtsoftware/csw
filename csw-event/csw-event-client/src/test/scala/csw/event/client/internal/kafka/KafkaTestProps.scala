@@ -37,7 +37,7 @@ class KafkaTestProps(
     extends BaseProperties {
   private val brokers          = s"PLAINTEXT://${Networks().hostname}:$kafkaPort"
   private val brokerProperties = Map("listeners" -> brokers, "advertised.listeners" -> brokers) ++ additionalBrokerProps
-  val config                   = EmbeddedKafkaConfig(customBrokerProperties = brokerProperties, zooKeeperPort = getFreePort)
+  val config                   = EmbeddedKafkaConfig(kafkaPort = kafkaPort, zooKeeperPort = getFreePort, customBrokerProperties = brokerProperties)
 
   private val eventServiceFactory = new EventServiceFactory(KafkaStore)
   private lazy val producerSettings: ProducerSettings[String, String] =
