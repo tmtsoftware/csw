@@ -47,7 +47,7 @@ object Libs {
   val `jna`               = "net.java.dev.jna"              % "jna"               % "5.10.0"
   val `postgresql`        = "org.postgresql"                % "postgresql"        % "42.3.1"
   val `hikaricp`          = "com.zaxxer"                    % "HikariCP"          % "5.0.1" // Apache License 2.0
-  val `io.zonky.test`     = "io.zonky.test"                 % "embedded-postgres" % "1.3.1"
+  val `io.zonky.test`     = "io.zonky.test"                 % "embedded-postgres" % "2.0.4"
   val httpclient          = "org.apache.httpcomponents"     % "httpclient"        % "4.5.13"
   val `jboss-logging`     = "org.jboss.logging"             % "jboss-logging"     % "3.4.3.Final"
   val `config`            = "com.typesafe"                  % "config"            % "1.4.1"
