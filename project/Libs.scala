@@ -13,9 +13,9 @@ object Libs {
   // Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
   val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.2.10"
 
-  val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "9d6378938e65435583ed9c431de6beecaf8ad7ec" // Apache 2.0
+  val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "bffbc66" // Apache 2.0
 //  val `pekko-management` = "org.apache.pekko" %% "pekko-management" % "0.0.0+739-4bf7ccea-SNAPSHOT"
-  val `pekko-management` = "com.github.abrighton.incubator-pekko-management" %% "pekko-management" % "8fbe09fcf733d4aa969963b180f95634adabcbb1"
+  val `pekko-management` = "com.github.apache.incubator-pekko-management" %% "pekko-management" % "0187bd9"
   val `svnkit`        = "org.tmatesoft.svnkit" % "svnkit"        % "1.10.3"     // TMate Open Source License
   val `commons-codec` = "commons-codec"        % "commons-codec" % "1.15"       // Apache 2.0š
   val `scala-reflect` = "org.scala-lang"       % "scala-reflect" % ScalaVersion // BSD-3
@@ -31,8 +31,8 @@ object Libs {
   val `reactor-core`     = "io.projectreactor"   % "reactor-core"     % "3.4.14"
   val `reactive-streams` = "org.reactivestreams" % "reactive-streams" % "1.0.3"
   // 2.1.1 version is breaking csw-event-client tests (pekko version based on 3.0.1)
-//  val `pekko-connectors-kafka` = "org.apache.pekko" %% "pekko-connectors-kafka" % "???"
-  val `pekko-connectors-kafka` = "com.github.apache.incubator-pekko-connectors-kafka" %% "pekko-connectors-kafka" % "be98654"
+  val `pekko-connectors-kafka` = "org.apache.pekko" %% "pekko-connectors-kafka" % "1.0.0-RC1"
+//  val `pekko-connectors-kafka` = "com.github.apache.incubator-pekko-connectors-kafka" %% "pekko-connectors-kafka" % "1b4f010"
   val `embedded-kafka`   = "io.github.embeddedkafka" %% "embedded-kafka"  % "3.5.0"
   val `embedded-redis`   = "com.github.kstyrc"        % "embedded-redis"  % "0.6"
   val `scala-compiler`   = "org.scala-lang"           % "scala-compiler"  % ScalaVersion
@@ -59,7 +59,7 @@ object Libs {
 }
 
 object Borer {
-  val Version = "5875c8a597a82fabf740975a4f4c7d70c1eb5114"
+  val Version = "8dd3d11"
 //  val Org     = "io.bullet"
   val Org     = "com.github.tmtsoftware.borer"
 
@@ -77,7 +77,7 @@ object Jackson {
 }
 
 object Pekko {
-  val Version = "1.0.0" // all pekko is Apache License 2.0
+  val Version = "1.0.1" // all pekko is Apache License 2.0
     val Org = "org.apache.pekko"
 
   val `pekko-stream`              = Org %% "pekko-stream"              % Version
@@ -97,9 +97,9 @@ object Pekko {
 }
 
 object PekkoHttp {
-  val Version = "1.0.0-RC1"
-//  val Org = "org.apache.pekko"
-  val Org = "com.github.apache.incubator-pekko-http"
+  val Version = "1.0.0-RC2"
+  val Org = "org.apache.pekko"
+//  val Org = "com.github.apache.incubator-pekko-http"
 
   val `pekko-http`            = Org %% "pekko-http"            % Version
   val `pekko-http-testkit`    = Org %% "pekko-http-testkit"    % Version
@@ -128,7 +128,7 @@ object Jooq {
 
 object MSocket {
 //  val Version = "0.6.0"
-  val Version = "a08aa4868ac65ec601952c5cb00b5122b997daf3"
+  val Version = "7e22785"
 
   val `msocket-api`      = dep("com.github.tmtsoftware.msocket" %%% "msocket-api" % Version)
   val `msocket-security` = "com.github.tmtsoftware.msocket" %% "msocket-security" % Version

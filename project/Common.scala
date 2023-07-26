@@ -32,7 +32,7 @@ object Common {
     organizationName                                := "Thirty Meter Telescope International Observatory",
     scalaVersion                                    := Libs.ScalaVersion,
     homepage                                        := Some(url("https://github.com/tmtsoftware/csw")),
-    resolvers += "apache pekko snapshots" at "https://repository.apache.org/content/groups/snapshots/",
+    resolvers += "Apache Pekko Staging".at("https://repository.apache.org/content/groups/staging"),
     resolvers += "jitpack" at "https://jitpack.io",
     scmInfo := Some(
       ScmInfo(url("https://github.com/tmtsoftware/csw"), "git@github.com:tmtsoftware/csw.git")
