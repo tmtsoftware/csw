@@ -3,7 +3,7 @@ before_install:
   - chmod +x coursier
   - ./coursier java --jvm temurin:1.17
   - export JITPACK_VERSION=$VERSION
-  - wget https://repo1.maven.org/maven2/org/scala-sbt/sbt-launch/1.6.1/sbt-launch-1.6.1.jar
+  - wget https://repo1.maven.org/maven2/org/scala-sbt/sbt-launch/1.9.3/sbt-launch-1.9.3.jar
 install:
   - eval $(./coursier java --jvm temurin:1.17 --env)
-  - java -Xms2048m -Xmx2048m -XX:ReservedCodeCacheSize=512m -jar sbt-launch-1.6.1.jar -Dsbt.log.noformat=true clean publishM2
+  - java -Xms2048m -Xmx2048m -XX:ReservedCodeCacheSize=512m -jar sbt-launch-1.9.3.jar -Dsbt.log.noformat=true clean publishM2

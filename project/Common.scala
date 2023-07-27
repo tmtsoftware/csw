@@ -45,13 +45,13 @@ object Common {
       "-unchecked",
       "-deprecation",
       // -W Options
-      "-Wdead-code",
-      if (enableFatalWarnings) "-Wconf:any:error" else "-Wconf:any:warning-verbose",
+//      "-Wdead-code",
+//      if (enableFatalWarnings) "-Wconf:any:error" else "-Wconf:any:warning-verbose",
       // -X Options
-      "-Xlint:_,-missing-interpolator",
-      "-Xsource:3",
-      "-Xcheckinit",
-      "-Xasync"
+//      "-Xlint:_,-missing-interpolator",
+//      "-Xsource:3",
+//      "-Xcheckinit",
+//      "-Xasync"
       // -Y options are rarely needed, please look for -W equivalents
     ),
     javacOptions ++= Seq(

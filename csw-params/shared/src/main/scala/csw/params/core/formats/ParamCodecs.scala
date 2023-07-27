@@ -102,15 +102,16 @@ trait ParamCodecsBase extends CommonCodecs {
     encoder.write(w, value.asInstanceOf[Parameter[Any]])
   }
 
-  implicit lazy val paramDecExistential: Decoder[Parameter[_]] = { r: Reader =>
-    r.tryReadMapHeader(1) || r.tryReadMapStart() || r.tryReadArrayHeader(1) || r.tryReadArrayStart()
-    val keyTypeName = r.readString()
-    val keyType     = KeyType.withNameInsensitive(keyTypeName)
-    val paramCore   = keyType.paramCoreDecoder.read(r)
-    if (r.target != Cbor) {
-      r.tryReadBreak()
-    }
-    ParamCore.toParam(Map(keyTypeName -> paramCore))
+  implicit lazy val paramDecExistential: Decoder[Parameter[_]] = {
+    r: Reader =>
+      r.tryReadMapHeader(1) || r.tryReadMapStart() || r.tryReadArrayHeader(1) || r.tryReadArrayStart()
+      val keyTypeName = r.readString()
+      val keyType     = KeyType.withNameInsensitive(keyTypeName)
+      val paramCore   = keyType.paramCoreDecoder.read(r)
+      if (r.target != Cbor) {
+        r.tryReadBreak()
+      }
+      ParamCore.toParam(Map(keyTypeName -> paramCore))
   }
 
   // ************************ Event Codecs ********************

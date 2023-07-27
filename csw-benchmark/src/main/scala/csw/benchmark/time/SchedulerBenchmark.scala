@@ -40,7 +40,7 @@ class SchedulerBenchmark {
 
   // Refer :
   // 1. https://stackoverflow.com/questions/54132761/how-operationsperinvocation-number-is-used-for-calculating-percentile-latencies
-  // 2. https://discuss.lightbend.com/t/what-is-the-accuracy-of-pekko-scheduler/3134
+  // 2. https://discuss.lightbend.com/t/what-is-the-accuracy-of-akka-scheduler/3134
   @Benchmark
   @OperationsPerInvocation(OperationsPerInvocation)
   def schedulePeriodicallyBenchmark(): Unit = {
