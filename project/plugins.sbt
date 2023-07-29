@@ -17,6 +17,8 @@ addSbtPlugin("com.dwijnand"                      % "sbt-project-graph"         %
 addSbtPlugin("com.timushev.sbt"                  % "sbt-rewarn"                % "0.1.3")
 addSbtPlugin("de.heikoseeberger"                 % "sbt-header"                % "5.8.0")
 
+addDependencyTreePlugin
+
 ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
 
 resolvers += "jitpack" at "https://jitpack.io"

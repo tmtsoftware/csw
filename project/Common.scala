@@ -3,7 +3,6 @@ import org.scalafmt.sbt.ScalafmtPlugin.autoImport.scalafmtOnCompile
 import org.tmt.sbt.docs.DocKeys.{docsParentDir, docsRepo, gitCurrentRepo}
 import sbt.Keys._
 import sbt._
-import sbtunidoc.GenJavadocPlugin.autoImport.unidocGenjavadocVersion
 
 object Common {
   private val enableFatalWarnings: Boolean = sys.props.get("enableFatalWarnings").contains("true")
@@ -33,6 +32,7 @@ object Common {
     scalaVersion                                    := Libs.ScalaVersion,
     homepage                                        := Some(url("https://github.com/tmtsoftware/csw")),
     resolvers += "Apache Pekko Staging".at("https://repository.apache.org/content/groups/staging"),
+    resolvers += "Apache Pekko Snapshots".at("https://repository.apache.org/content/groups/snapshots"),
     resolvers += "jitpack" at "https://jitpack.io",
     scmInfo := Some(
       ScmInfo(url("https://github.com/tmtsoftware/csw"), "git@github.com:tmtsoftware/csw.git")
@@ -44,15 +44,9 @@ object Common {
       "-feature",
       "-unchecked",
       "-deprecation",
-      // -W Options
-//      "-Wdead-code",
-//      if (enableFatalWarnings) "-Wconf:any:error" else "-Wconf:any:warning-verbose",
-      // -X Options
-//      "-Xlint:_,-missing-interpolator",
-//      "-Xsource:3",
-//      "-Xcheckinit",
-//      "-Xasync"
-      // -Y options are rarely needed, please look for -W equivalents
+      "-source:3.0-migration",
+      "-explain",
+      "-explain-types"
     ),
     javacOptions ++= Seq(
       "-Xlint:unchecked"
@@ -70,8 +64,7 @@ object Common {
     Test / javaOptions ++= Seq("-Dpekko.actor.serialize-messages=on", s"-DRTM_PATH=${file("./target/RTM").getAbsolutePath}"),
     autoCompilerPlugins     := true,
     Global / cancelable     := true, // allow ongoing test(or any task) to cancel with ctrl + c and still remain inside sbt
-    scalafmtOnCompile       := true,
-    unidocGenjavadocVersion := "0.18",
+    scalafmtOnCompile       := false,
     commands += Command.command("openSite") { state =>
       val uri = s"file://${Project.extract(state).get(siteDirectory)}/${docsParentDir.value}/${version.value}/index.html"
       state.log.info(s"Opening browser at $uri ...")

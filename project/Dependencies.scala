@@ -352,7 +352,7 @@ object Dependencies {
       Pekko.`pekko-stream-typed`,
       Pekko.`pekko-actor-typed`,
       PekkoHttp.`pekko-http`,
-      Libs.`scala-reflect`,
+//      Libs.`scala-reflect`,
       Libs.`scala-java8-compat`,
       Keycloak.`keycloak-adapter-core`,
       // TODO: make this as provided deps
