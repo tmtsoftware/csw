@@ -23,7 +23,7 @@ import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
 import org.scalatest.*
 import org.scalatest.funsuite.AnyFunSuiteLike
 
-import cps.*
+import cps.compat.FutureAsync.*
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{Await, Future}
 

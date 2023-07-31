@@ -14,7 +14,7 @@ import csw.event.client.perf.wiring.{TestConfigs, TestWiring}
 import csw.params.events.{EventName, SystemEvent}
 import csw.prefix.models.Prefix
 
-import cps.*
+import cps.compat.FutureAsync.*
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
 

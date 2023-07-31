@@ -14,7 +14,7 @@ import csw.params.commands.ControlCommand
 import csw.params.core.states.CurrentState
 import msocket.portable.PortablePekko
 
-import cps.*
+import cps.compat.FutureAsync.*
 import scala.concurrent.{Future, Promise, TimeoutException}
 import scala.util.{Failure, Success}
 

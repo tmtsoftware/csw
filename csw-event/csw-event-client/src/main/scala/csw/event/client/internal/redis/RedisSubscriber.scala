@@ -21,7 +21,7 @@ import romaine.codec.RomaineCodec
 import romaine.exceptions.RedisServerNotAvailable
 import romaine.reactive.{RedisSubscription, RedisSubscriptionApi}
 
-import cps.*
+import cps.compat.FutureAsync.*
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 

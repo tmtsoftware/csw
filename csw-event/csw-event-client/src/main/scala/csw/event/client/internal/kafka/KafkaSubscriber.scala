@@ -18,7 +18,7 @@ import csw.prefix.models.Subsystem
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.common.TopicPartition
 
-import cps.*
+import cps.compat.FutureAsync.*
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 import scala.jdk.CollectionConverters.*

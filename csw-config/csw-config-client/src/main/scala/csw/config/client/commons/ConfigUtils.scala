@@ -12,7 +12,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 import csw.config.api.exceptions.{FileNotFound, LocalFileNotFound, UnableToParseOptions}
 import csw.config.api.scaladsl.ConfigClientService
 
-import cps.*
+import cps.compat.FutureAsync.*
 import scala.concurrent.Future
 
 class ConfigUtils(configClientService: ConfigClientService)(implicit system: ActorSystem[_]) {

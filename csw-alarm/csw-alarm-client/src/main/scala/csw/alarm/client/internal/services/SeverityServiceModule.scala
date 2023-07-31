@@ -23,7 +23,7 @@ import romaine.RedisResult
 import romaine.extensions.SourceExtensions.RichSource
 import romaine.reactive.RedisSubscription
 
-import cps.*
+import cps.compat.FutureAsync.*
 import scala.concurrent.Future
 
 private[client] trait SeverityServiceModule extends SeverityService {

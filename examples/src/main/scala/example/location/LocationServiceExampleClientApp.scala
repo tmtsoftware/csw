@@ -31,7 +31,7 @@ import example.location.ExampleMessages.{AllDone, CustomException, TrackingEvent
 import example.location.LocationServiceExampleClient.locationInfoToString
 
 import scala.annotation.nowarn
-import cps.*
+import cps.compat.FutureAsync.*
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.*
 import scala.concurrent.{Await, Future}

@@ -22,7 +22,7 @@ import csw.params.events.*
 import csw.prefix.models.Prefix
 import csw.time.core.models.UTCTime
 
-import cps.*
+import cps.compat.FutureAsync.*
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
 /**

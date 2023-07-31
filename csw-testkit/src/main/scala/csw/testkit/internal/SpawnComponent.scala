@@ -16,7 +16,7 @@ import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.{ComponentType, Connection}
 import csw.prefix.models.Prefix
 
-import cps.*
+import cps.compat.FutureAsync.*
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContextExecutor, Future}
 

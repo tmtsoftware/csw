@@ -9,7 +9,7 @@ import org.apache.pekko.http.scaladsl.model.Uri
 import csw.location.api.scaladsl.LocationService
 import csw.config.client.commons.ConfigServiceConnection
 
-import cps.*
+import cps.compat.FutureAsync.*
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble
 

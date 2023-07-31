@@ -8,7 +8,7 @@ import org.apache.pekko.Done
 import org.apache.pekko.stream.KillSwitch
 import romaine.reactive.subscribe.RedisReactiveApi
 
-import cps.*
+import cps.compat.FutureAsync.*
 import scala.concurrent.{ExecutionContext, Future}
 
 private class RedisSubscriptionImpl[K](

@@ -19,7 +19,7 @@ import csw.logging.api.scaladsl.Logger
 import org.jooq.impl.DSL
 import org.jooq.{DSLContext, SQLDialect}
 
-import cps.*
+import cps.compat.FutureAsync.*
 import scala.jdk.CollectionConverters.*
 import scala.jdk.FutureConverters.*
 import scala.concurrent.{ExecutionContext, Future}

@@ -17,7 +17,7 @@ import csw.logging.client.scaladsl.LoggerFactory
 import csw.prefix.models.{Prefix, Subsystem}
 
 import java.nio.file.Path
-import cps.*
+import cps.compat.FutureAsync.*
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, Future}
 import scala.util.control.NonFatal

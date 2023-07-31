@@ -24,7 +24,7 @@ import csw.params.events.*
 import csw.time.core.models.UTCTime
 import play.api.libs.json.Json
 
-import cps.*
+import cps.compat.FutureAsync.*
 import scala.concurrent.Future
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.util.{Failure, Success}

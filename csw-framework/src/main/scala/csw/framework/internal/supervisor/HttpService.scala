@@ -16,7 +16,7 @@ import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.logging.api.scaladsl.Logger
 import csw.network.utils.Networks
 
-import cps.*
+import cps.compat.FutureAsync.*
 import scala.concurrent.Future
 
 /**

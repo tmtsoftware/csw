@@ -26,7 +26,7 @@ import csw.config.models.*
 import csw.config.models.codecs.ConfigCodecs
 import csw.logging.api.scaladsl.Logger
 
-import cps.*
+import cps.compat.FutureAsync.*
 import scala.concurrent.Future
 
 /**

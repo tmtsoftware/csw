@@ -24,7 +24,7 @@ import csw.alarm.models.ShelveStatus.{Shelved, Unshelved}
 import csw.alarm.models.*
 import csw.time.core.models.UTCTime
 
-import cps.*
+import cps.compat.FutureAsync.*
 import scala.jdk.DurationConverters.*
 import scala.concurrent.Future
 

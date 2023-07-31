@@ -19,7 +19,7 @@ import csw.config.server.{ActorRuntime, Settings}
 import csw.logging.api.scaladsl.Logger
 import org.tmatesoft.svn.core.wc.SVNRevision
 
-import cps.*
+import cps.compat.FutureAsync.*
 import scala.concurrent.Future
 
 class SvnConfigService(settings: Settings, actorRuntime: ActorRuntime, svnRepo: SvnRepo, annexFileService: AnnexFileService)

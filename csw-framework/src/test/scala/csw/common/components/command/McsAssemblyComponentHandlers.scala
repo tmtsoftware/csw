@@ -22,7 +22,7 @@ import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
 import csw.time.core.models.UTCTime
 
-import cps.*
+import cps.compat.FutureAsync.*
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
