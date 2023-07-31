@@ -5,9 +5,9 @@
 
 package csw.params.core.formats
 
-import csw.params.commands.CommandIssue._
-import csw.params.commands._
-import csw.params.core.models._
+import csw.params.commands.CommandIssue.*
+import csw.params.commands.*
+import csw.params.core.models.*
 import csw.params.events.{Event, EventName, ObserveEvent, SystemEvent}
 import csw.params.testdata.ParamSetData
 import csw.prefix.models.Prefix

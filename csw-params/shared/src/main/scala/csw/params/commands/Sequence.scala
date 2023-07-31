@@ -7,7 +7,7 @@ package csw.params.commands
 
 import csw.serializable.CommandSerializable
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 /**
  * a sequence of [[csw.params.commands.SequenceCommand]]

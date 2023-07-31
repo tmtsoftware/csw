@@ -7,14 +7,14 @@ package csw.contract.data.location
 
 import org.apache.pekko.Done
 import csw.contract.ResourceFetcher
-import csw.contract.generator.ClassNameHelpers._
-import csw.contract.generator._
+import csw.contract.generator.ClassNameHelpers.*
+import csw.contract.generator.*
 import csw.location.api.codec.LocationServiceCodecs
-import csw.location.api.exceptions._
-import csw.location.api.messages.LocationRequest._
+import csw.location.api.exceptions.*
+import csw.location.api.messages.LocationRequest.*
 import csw.location.api.messages.LocationStreamRequest.Track
 import csw.location.api.messages.{LocationRequest, LocationStreamRequest}
-import csw.location.api.models._
+import csw.location.api.models.*
 import csw.prefix.models.Subsystem
 
 object LocationContract extends LocationData with LocationServiceCodecs {

@@ -5,10 +5,10 @@
 
 package csw.params.core.generics
 
-import csw.params.commands._
+import csw.params.commands.*
 import csw.params.core.models.{Id, ObsId}
 import csw.params.core.states.{CurrentState, DemandState, StateName}
-import csw.params.events._
+import csw.params.events.*
 import csw.prefix.models.Prefix
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers

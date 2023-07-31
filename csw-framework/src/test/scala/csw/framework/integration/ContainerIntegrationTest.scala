@@ -22,14 +22,14 @@ import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, S
 import csw.command.client.models.framework.PubSub.Subscribe
 import csw.command.client.models.framework.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.command.client.models.framework.{Components, ContainerLifecycleState, LifecycleStateChanged, SupervisorLifecycleState}
-import csw.common.FrameworkAssertions._
-import csw.common.components.framework.SampleComponentState._
+import csw.common.FrameworkAssertions.*
+import csw.common.components.framework.SampleComponentState.*
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.location.api.models
 import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.location.api.models.Connection.{PekkoConnection, HttpConnection}
-import csw.location.api.models._
+import csw.location.api.models.*
 import csw.location.client.ActorSystemFactory
 import csw.params.core.states.{CurrentState, StateName}
 import csw.prefix.models.{Prefix, Subsystem}

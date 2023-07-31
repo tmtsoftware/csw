@@ -11,7 +11,7 @@ import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import org.apache.pekko.stream.scaladsl.{Keep, Sink}
 import csw.event.api.scaladsl.SubscriptionModes
 import csw.event.client.helpers.TestFutureExt.RichFuture
-import csw.event.client.helpers.Utils._
+import csw.event.client.helpers.Utils.*
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.event.client.internal.kafka.KafkaTestProps
 import csw.event.client.internal.redis.RedisTestProps
@@ -20,7 +20,7 @@ import csw.params.core.models.ObsId
 import csw.params.events.{Event, EventKey, EventName, IRDetectorEvent, OpticalDetectorEvent, SystemEvent, WFSDetectorEvent}
 import org.scalatest.concurrent.Eventually
 import org.scalatestplus.testng.TestNGSuite
-import org.testng.annotations._
+import org.testng.annotations.*
 
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.{immutable, mutable}

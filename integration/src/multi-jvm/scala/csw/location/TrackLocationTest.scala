@@ -9,7 +9,7 @@ import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
 import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import org.apache.pekko.stream.scaladsl.{Keep, Sink}
 import csw.location.api.models.Connection.{PekkoConnection, HttpConnection, TcpConnection}
-import csw.location.api.models._
+import csw.location.api.models.*
 import csw.location.api.{PekkoRegistrationFactory, models}
 import csw.logging.client.commons.PekkoTypedExtension.UserActorFactory
 import csw.prefix.models.{Prefix, Subsystem}

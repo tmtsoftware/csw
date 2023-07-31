@@ -5,7 +5,7 @@
 
 package csw.command.client
 
-import org.apache.pekko.actor.typed.scaladsl.AskPattern._
+import org.apache.pekko.actor.typed.scaladsl.AskPattern.*
 import org.apache.pekko.actor.typed.{ActorRef, ActorSystem}
 import org.apache.pekko.util.Timeout
 import csw.command.api.scaladsl.SequencerCommandService

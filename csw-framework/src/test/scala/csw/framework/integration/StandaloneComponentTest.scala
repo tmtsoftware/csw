@@ -15,9 +15,9 @@ import csw.command.client.CommandServiceFactory
 import csw.command.client.extensions.PekkoLocationExt.RichPekkoLocation
 import csw.command.client.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.command.client.models.framework.SupervisorLifecycleState
-import csw.common.FrameworkAssertions._
+import csw.common.FrameworkAssertions.*
 import csw.common.components.framework.SampleComponentHandlers
-import csw.common.components.framework.SampleComponentState._
+import csw.common.components.framework.SampleComponentState.*
 import csw.common.utils.TestAppender
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.internal.component.ComponentBehavior

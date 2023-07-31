@@ -18,9 +18,9 @@ import csw.alarm.models.{AlarmSeverity, AutoRefreshSeverityMessage}
 import csw.alarm.api.scaladsl.AlarmService
 import csw.alarm.client.internal.auto_refresh.AlarmRefreshActor
 
-import scala.compat.java8.FutureConverters.CompletionStageOps
+import scala.jdk.FutureConverters.*
 import scala.concurrent.duration.FiniteDuration
-import csw.logging.client.commons.PekkoTypedExtension._
+import csw.logging.client.commons.PekkoTypedExtension.*
 object AlarmRefreshActorFactory {
 
   /**
@@ -69,7 +69,7 @@ object AlarmRefreshActorFactory {
       actorSystem: ActorSystem[SpawnProtocol.Command]
   ): ActorRef[AutoRefreshSeverityMessage] =
     make(
-      (key: AlarmKey, severity: AlarmSeverity) => setSeverity(key, severity).toScala,
+      (key: AlarmKey, severity: AlarmSeverity) => setSeverity(key, severity).asScala,
       FiniteDuration(refreshInterval.toNanos, TimeUnit.NANOSECONDS)
     )(actorSystem)
 }

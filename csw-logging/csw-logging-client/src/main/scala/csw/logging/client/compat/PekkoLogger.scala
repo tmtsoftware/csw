@@ -6,7 +6,7 @@
 package csw.logging.client.compat
 
 import org.apache.pekko.actor.Actor
-import org.apache.pekko.event.Logging._
+import org.apache.pekko.event.Logging.*
 import csw.logging.client.internal.LogActorMessages.LogPekko
 import csw.logging.client.internal.MessageHandler
 import csw.logging.models.Level

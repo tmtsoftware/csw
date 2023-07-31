@@ -15,7 +15,7 @@ import csw.alarm.client.internal.extensions.TimeExtensions
 import csw.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
 import csw.alarm.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
-import csw.alarm.models.AlarmSeverity._
+import csw.alarm.models.AlarmSeverity.*
 import csw.alarm.models.FullAlarmSeverity.Disconnected
 import csw.alarm.models.Key.AlarmKey
 import csw.alarm.models.ShelveStatus.{Shelved, Unshelved}

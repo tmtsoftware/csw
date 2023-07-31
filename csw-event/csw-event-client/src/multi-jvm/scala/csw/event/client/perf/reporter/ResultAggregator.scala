@@ -13,7 +13,7 @@ import org.apache.pekko.actor.typed.{ActorRef, ActorSystem, Behavior}
 import org.apache.pekko.util.ByteString
 import csw.event.api.scaladsl.{EventSubscriber, EventSubscription}
 import csw.event.client.perf.utils.EventUtils
-import csw.event.client.perf.utils.EventUtils._
+import csw.event.client.perf.utils.EventUtils.*
 import csw.params.events.{Event, SystemEvent}
 import org.HdrHistogram.Histogram
 

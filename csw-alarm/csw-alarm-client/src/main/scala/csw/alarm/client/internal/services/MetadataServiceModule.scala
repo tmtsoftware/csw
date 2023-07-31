@@ -17,7 +17,7 @@ import csw.alarm.models.Key.{AlarmKey, GlobalKey}
 import csw.alarm.models.{AlarmMetadata, AlarmStatus, Key}
 import romaine.RedisResult
 
-import scala.async.Async.{async, await}
+import cps.*
 import scala.concurrent.Future
 
 private[client] trait MetadataServiceModule extends MetadataService {

@@ -16,7 +16,7 @@ import csw.event.client.internal.wiring.BaseProperties
 import csw.params.events.{Event, EventKey, EventName}
 import org.scalatest.concurrent.Eventually
 import org.scalatestplus.testng.TestNGSuite
-import org.testng.annotations._
+import org.testng.annotations.*
 
 import scala.collection.{immutable, mutable}
 import scala.concurrent.duration.DurationLong

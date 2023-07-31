@@ -13,7 +13,7 @@ import csw.command.client.CommandServiceFactory
 import csw.command.client.extensions.PekkoLocationExt.RichPekkoLocation
 import csw.command.client.models.framework.SupervisorLifecycleState
 import csw.common.FrameworkAssertions.assertThatSupervisorIsRunning
-import csw.common.components.framework.SampleComponentState._
+import csw.common.components.framework.SampleComponentState.*
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.location.api.models

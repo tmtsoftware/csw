@@ -7,12 +7,12 @@ package csw.common.components.command
 
 import org.apache.pekko.actor.typed.scaladsl.ActorContext
 import csw.command.client.messages.TopLevelActorMessage
-import csw.common.components.command.ComponentStateForCommand._
+import csw.common.components.command.ComponentStateForCommand.*
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.TrackingEvent
 import csw.params.commands.CommandIssue.UnsupportedCommandIssue
-import csw.params.commands.CommandResponse._
+import csw.params.commands.CommandResponse.*
 import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
 import csw.time.core.models.UTCTime

@@ -14,7 +14,7 @@ import csw.location.api.scaladsl.LocationService
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.server.internal.{ServerWiring => LocationWiring}
-import csw.services._
+import csw.services.*
 import csw.services.cli.Command.Start
 import csw.services.utils.ColoredConsole
 import org.tmt.embedded_keycloak.impl.StopHandle

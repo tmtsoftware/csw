@@ -19,7 +19,7 @@ import org.tmt.embedded_keycloak.utils.BearerToken
 import org.tmt.embedded_keycloak.{EmbeddedKeycloak, KeycloakData, Settings}
 
 import scala.concurrent.Await
-import scala.concurrent.ExecutionContext.Implicits._
+import scala.concurrent.ExecutionContext.Implicits.*
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
 class AuthIntegrationTestMultiJvmNode1 extends AuthIntegrationTest

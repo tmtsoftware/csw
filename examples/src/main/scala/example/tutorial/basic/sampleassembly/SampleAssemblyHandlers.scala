@@ -18,16 +18,16 @@ import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.{PekkoLocation, ComponentId, ComponentType, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.location.api.models.Connection.PekkoConnection
 import csw.params.commands.CommandIssue.{MissingKeyIssue, ParameterValueOutOfRangeIssue, UnsupportedCommandIssue}
-import csw.params.commands.CommandResponse._
+import csw.params.commands.CommandResponse.*
 import csw.params.commands.{CommandIssue, ControlCommand, Observe, Result, Setup}
 import csw.params.core.generics.KeyType
 import csw.params.core.models.Id
-import csw.params.events._
+import csw.params.events.*
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.time.core.models.UTCTime
-import example.tutorial.basic.shared.SampleInfo._
+import example.tutorial.basic.shared.SampleInfo.*
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
 /**

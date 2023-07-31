@@ -7,7 +7,7 @@ package csw.params.testdata
 
 import java.time.Instant
 
-import csw.params.core.generics.KeyType._
+import csw.params.core.generics.KeyType.*
 import csw.params.core.generics.Parameter
 import csw.params.core.models.Coords.EqFrame.FK5
 import csw.params.core.models.Coords.SolarSystemObject.Venus

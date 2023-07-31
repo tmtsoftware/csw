@@ -11,15 +11,15 @@ import org.apache.pekko.Done
 import csw.event.api.javadsl.IEventSubscription
 import csw.event.api.scaladsl.EventSubscription
 
-import scala.compat.java8.FutureConverters.FutureOps
+import scala.jdk.FutureConverters.*
 
 private[event] object EventServiceExts {
   implicit class RichEventSubscription(val eventSubscription: EventSubscription) {
     def asJava: IEventSubscription = {
       new IEventSubscription {
-        override def unsubscribe(): CompletableFuture[Done] = eventSubscription.unsubscribe().toJava.toCompletableFuture
+        override def unsubscribe(): CompletableFuture[Done] = eventSubscription.unsubscribe().asJava.toCompletableFuture
 
-        override def ready(): CompletableFuture[Done] = eventSubscription.ready().toJava.toCompletableFuture
+        override def ready(): CompletableFuture[Done] = eventSubscription.ready().asJava.toCompletableFuture
       }
     }
   }

@@ -9,13 +9,13 @@ import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
 import csw.command.client.messages.CommandMessage.Submit
 import csw.command.client.messages.ComponentCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
 import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
-import csw.command.client.models.framework.LockingResponse._
+import csw.command.client.models.framework.LockingResponse.*
 import csw.command.client.models.framework.{LifecycleStateChanged, LockingResponse, PubSub, SupervisorLifecycleState}
 import csw.common.components.framework.SampleComponentState.{choiceKey, initChoice, prefix}
 import csw.common.utils.LockCommandFactory
 import csw.framework.ComponentInfos.assemblyInfo
 import csw.framework.FrameworkTestSuite
-import csw.params.commands.CommandResponse._
+import csw.params.commands.CommandResponse.*
 import csw.params.commands.{CommandName, Setup}
 import csw.params.core.models.ObsId
 import csw.params.core.states.{CurrentState, StateName}

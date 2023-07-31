@@ -19,7 +19,7 @@ import csw.location.api.models
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 
-import scala.async.Async._
+import cps.*
 import scala.concurrent.{ExecutionContext, Future}
 
 trait BaseProperties {

@@ -13,7 +13,7 @@ import java.{util => ju}
 
 import org.apache.pekko.Done
 import org.apache.pekko.stream.javadsl.Source
-import csw.location.api.models._
+import csw.location.api.models.*
 import csw.location.api.scaladsl.LocationService
 import msocket.api.Subscription
 

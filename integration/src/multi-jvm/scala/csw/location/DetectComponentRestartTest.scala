@@ -6,7 +6,7 @@
 package csw.location
 
 import org.apache.pekko.actor.typed.scaladsl.Behaviors
-import org.apache.pekko.actor.typed.scaladsl.adapter._
+import org.apache.pekko.actor.typed.scaladsl.adapter.*
 import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import org.apache.pekko.testkit.TestProbe
 import csw.location.api.PekkoRegistrationFactory
@@ -20,7 +20,7 @@ import csw.prefix.models.{Prefix, Subsystem}
 import io.netty.util.internal.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 
 import scala.concurrent.Await
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.util.Try
 
 class DetectComponentRestartTestMultiJvmNode1 extends DetectComponentRestartTest(0, "cluster")

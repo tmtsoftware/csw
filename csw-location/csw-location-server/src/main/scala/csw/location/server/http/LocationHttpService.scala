@@ -9,7 +9,7 @@ import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import org.apache.pekko.http.scaladsl.Http
 import org.apache.pekko.http.scaladsl.server.Directives.handleRejections
 import org.apache.pekko.http.scaladsl.server.{RejectionHandler, Route}
-import org.apache.pekko.http.cors.scaladsl.CorsDirectives._
+import org.apache.pekko.http.cors.scaladsl.CorsDirectives.*
 import csw.location.server.internal.{ActorRuntime, Settings}
 
 import scala.concurrent.Future

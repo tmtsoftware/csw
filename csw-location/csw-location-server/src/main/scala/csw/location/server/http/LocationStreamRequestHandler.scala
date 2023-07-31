@@ -5,7 +5,7 @@
 
 package csw.location.server.http
 
-import csw.location.api.codec.LocationServiceCodecs._
+import csw.location.api.codec.LocationServiceCodecs.*
 import csw.location.api.messages.LocationStreamRequest
 import csw.location.api.messages.LocationStreamRequest.Track
 import csw.location.api.scaladsl.LocationService

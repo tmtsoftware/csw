@@ -14,7 +14,7 @@ import com.typesafe.config.{Config, ConfigException}
 import csw.config.api.ConfigData
 import csw.config.api.commons.TestFutureExtension.RichFuture
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers
 

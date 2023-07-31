@@ -7,7 +7,7 @@ package csw.services
 
 import csw.location.agent.wiring.Wiring
 import csw.location.agent.{Main => LocationAgentMain}
-import csw.services.internal.FutureExt._
+import csw.services.internal.FutureExt.*
 import csw.services.internal.{ManagedService, Settings}
 import csw.services.utils.{ColoredConsole, ResourceReader}
 

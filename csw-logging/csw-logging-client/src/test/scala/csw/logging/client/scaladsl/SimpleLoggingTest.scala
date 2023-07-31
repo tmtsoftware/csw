@@ -5,7 +5,7 @@
 
 package csw.logging.client.scaladsl
 
-import java.time._
+import java.time.*
 import java.time.format.DateTimeFormatter
 
 import csw.logging.client.commons.{LoggingKeys, TMTDateTimeFormatter}
@@ -14,11 +14,11 @@ import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.internal.LoggingState
 import csw.logging.client.utils.LoggingTestSuite
 import csw.logging.models.Level
-import csw.logging.models.Level._
+import csw.logging.models.Level.*
 import csw.prefix.models.Prefix
 import csw.prefix.models.Subsystem.CSW
 import org.scalatest.concurrent.Eventually
-import org.scalatest.prop.TableDrivenPropertyChecks._
+import org.scalatest.prop.TableDrivenPropertyChecks.*
 import play.api.libs.json.JsObject
 
 // DEOPSCSW-158: Logging service API implementation details to be hidden from component developer

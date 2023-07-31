@@ -10,7 +10,7 @@ import java.net.URI
 import csw.event.client.internal.commons.EventServiceConnection
 import csw.location.api.scaladsl.LocationService
 
-import scala.async.Async._
+import cps.*
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{ExecutionContext, Future}
 

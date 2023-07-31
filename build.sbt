@@ -328,7 +328,8 @@ lazy val `csw-framework` = project
   )
   .enablePlugins(CswBuildInfo, MaybeCoverage)
   .settings(
-    libraryDependencies ++= Dependencies.Framework.value
+    libraryDependencies ++= Dependencies.Framework.value,
+    excludeDependencies ++= Seq(ExclusionRule("org.scala-lang.modules", "scala-java8-compat_2.13"))
   )
 
 /* ================= Command Service ============== */
@@ -395,7 +396,10 @@ lazy val `csw-event-client` = project
     `csw-commons`         % "test->test"
   )
   .enablePlugins(AutoMultiJvm, MaybeCoverage)
-  .settings(libraryDependencies ++= Dependencies.EventClient.value)
+  .settings(
+    libraryDependencies ++= Dependencies.EventClient.value,
+    excludeDependencies ++= Seq(ExclusionRule("org.scala-lang.modules", "scala-java8-compat_2.13"))
+  )
 
 lazy val `csw-event-cli` = project
   .in(file("csw-event/csw-event-cli"))
@@ -406,7 +410,9 @@ lazy val `csw-event-cli` = project
     `csw-config-server` % "test->test"
   )
   .enablePlugins(CswBuildInfo, MaybeCoverage)
-  .settings(libraryDependencies ++= Dependencies.EventCli.value)
+  .settings(libraryDependencies ++= Dependencies.EventCli.value,
+    excludeDependencies ++= Seq(ExclusionRule("org.scala-lang.modules", "scala-java8-compat_2.13"))
+  )
 
 /* ================= Alarm Service ============== */
 lazy val `csw-alarm` = project
@@ -588,7 +594,7 @@ lazy val examples = project
   )
   .enablePlugins(CswBuildInfo)
   .settings(
-    libraryDependencies ++= Dependencies.Examples.value,
+    libraryDependencies ++= Dependencies.Examples.value
 //    scalacOptions ++= Seq("-Xlint:-unused,-inaccessible", "-Ywarn-dead-code:false")
   )
 

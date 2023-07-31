@@ -10,7 +10,7 @@ import csw.params.extensions.OptionConverters.RichOption
 
 import java.util.NoSuchElementException
 import scala.annotation.varargs
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 /**
  * The base trait for various parameter set types (commands or events)

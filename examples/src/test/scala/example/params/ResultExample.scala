@@ -9,7 +9,7 @@ import csw.params.commands.Result
 import csw.params.core.formats.JsonSupport
 import csw.params.core.generics.KeyType.DoubleMatrixKey
 import csw.params.core.generics.{Key, KeyType, Parameter}
-import csw.params.core.models._
+import csw.params.core.models.*
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 

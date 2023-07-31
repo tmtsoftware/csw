@@ -11,7 +11,7 @@ import csw.framework.deploy.containercmd.ContainerCmd
 import csw.prefix.models.Subsystem
 
 import java.util.Optional
-import scala.compat.java8.OptionConverters.*
+import scala.jdk.OptionConverters.*
 
 // $COVERAGE-OFF$
 /**

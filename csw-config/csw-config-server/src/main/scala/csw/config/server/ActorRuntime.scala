@@ -16,7 +16,7 @@ import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.network.utils.Networks
 
-import scala.compat.java8.FutureConverters.FutureOps
+import scala.jdk.FutureConverters.*
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
 /**
@@ -39,5 +39,5 @@ private[config] class ActorRuntime(_typedSystem: ActorSystem[SpawnProtocol.Comma
     typedSystem.whenTerminated
   }
 
-  def jShutdown(): CompletableFuture[Done] = shutdown().toJava.toCompletableFuture
+  def jShutdown(): CompletableFuture[Done] = shutdown().asJava.toCompletableFuture
 }

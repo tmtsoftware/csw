@@ -14,8 +14,8 @@ import csw.location.api.models.Connection.{PekkoConnection, HttpConnection, TcpC
 import csw.location.api.models.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandIssue.OtherIssue
-import csw.params.commands.CommandResponse._
-import csw.params.commands._
+import csw.params.commands.CommandResponse.*
+import csw.params.commands.*
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
 import csw.params.events.{Event, EventName, SystemEvent}

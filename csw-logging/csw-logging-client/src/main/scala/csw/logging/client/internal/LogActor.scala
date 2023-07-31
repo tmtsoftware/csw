@@ -11,7 +11,7 @@ import org.apache.pekko.actor.typed.{Behavior, PostStop}
 import org.apache.pekko.event.LogSource
 import csw.logging.client.appenders.LogAppender
 import csw.logging.client.commons.Category
-import csw.logging.client.internal.LogActorMessages._
+import csw.logging.client.internal.LogActorMessages.*
 import csw.logging.models.Level
 import play.api.libs.json.JsObject
 

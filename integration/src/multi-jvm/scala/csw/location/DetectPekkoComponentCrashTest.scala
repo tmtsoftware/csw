@@ -10,7 +10,7 @@ import org.apache.pekko.actor.typed.SpawnProtocol
 import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import org.apache.pekko.stream.scaladsl.{Keep, Sink}
 import csw.location.api.models.Connection.{PekkoConnection, HttpConnection}
-import csw.location.api.models._
+import csw.location.api.models.*
 import csw.location.api.{PekkoRegistrationFactory, models}
 import csw.location.client.ActorSystemFactory
 import csw.logging.client.commons.PekkoTypedExtension.UserActorFactory
@@ -19,7 +19,7 @@ import org.scalatest.OptionValues
 import org.scalatest.concurrent.Eventually
 
 import scala.concurrent.Await
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 class DetectPekkoComponentCrashTestMultiJvmNode1 extends DetectPekkoComponentCrashTest(0, "cluster")
 

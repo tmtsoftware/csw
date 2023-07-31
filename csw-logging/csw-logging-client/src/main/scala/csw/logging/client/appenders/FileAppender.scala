@@ -5,7 +5,7 @@
 
 package csw.logging.client.appenders
 
-import java.io._
+import java.io.*
 import java.time.temporal.ChronoUnit
 import java.time.{LocalDateTime, ZoneId, ZoneOffset, ZonedDateTime}
 

@@ -6,7 +6,7 @@
 package csw.location.server.commons
 
 import org.apache.pekko.Done
-import org.apache.pekko.actor.typed.scaladsl.AskPattern._
+import org.apache.pekko.actor.typed.scaladsl.AskPattern.*
 import org.apache.pekko.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
 import org.apache.pekko.cluster.ddata.SelfUniqueAddress
 import org.apache.pekko.cluster.ddata.typed.scaladsl

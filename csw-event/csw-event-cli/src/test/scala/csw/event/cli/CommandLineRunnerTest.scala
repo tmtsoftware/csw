@@ -13,11 +13,11 @@ import csw.params.core.formats.JsonSupport
 import csw.params.core.generics.KeyType.{IntKey, StringKey}
 import csw.params.core.models.Id
 import csw.params.core.models.Units.meter
-import csw.params.events._
+import csw.params.events.*
 import csw.prefix.codecs.CommonCodecs
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.SpanSugar.convertDoubleToGrainOfTime
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import scala.collection.{immutable, mutable}
 

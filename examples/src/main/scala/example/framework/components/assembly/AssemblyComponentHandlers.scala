@@ -16,10 +16,10 @@ import csw.config.api.ConfigData
 import csw.framework.exceptions.{FailureRestart, FailureStop}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.location.api.models._
+import csw.location.api.models.*
 import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandResponse.{Accepted, Completed, SubmitResponse, ValidateCommandResponse}
-import csw.params.commands._
+import csw.params.commands.*
 import csw.params.core.models.Id
 import csw.time.core.models.UTCTime
 

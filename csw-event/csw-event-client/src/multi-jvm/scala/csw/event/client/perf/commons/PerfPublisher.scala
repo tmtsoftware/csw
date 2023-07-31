@@ -9,12 +9,12 @@ import org.apache.pekko.Done
 import org.apache.pekko.actor.Cancellable
 import org.apache.pekko.stream.scaladsl.{Keep, Source}
 import csw.event.api.scaladsl.EventPublisher
-import csw.event.client.perf.utils.EventUtils._
+import csw.event.client.perf.utils.EventUtils.*
 import csw.event.client.perf.wiring.{TestConfigs, TestWiring}
 import csw.params.events.{EventName, SystemEvent}
 import csw.prefix.models.Prefix
 
-import scala.async.Async.{async, await}
+import cps.*
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
 

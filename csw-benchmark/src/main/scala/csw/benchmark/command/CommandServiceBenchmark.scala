@@ -17,7 +17,7 @@ import csw.params.commands
 import csw.params.commands.CommandName
 import csw.params.commands.CommandResponse.SubmitResponse
 import csw.prefix.models.Prefix
-import org.openjdk.jmh.annotations._
+import org.openjdk.jmh.annotations.*
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt

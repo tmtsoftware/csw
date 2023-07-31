@@ -13,7 +13,7 @@ import org.apache.pekko.remote.testconductor.RoleName
 import org.apache.pekko.remote.testkit.MultiNodeSpec
 
 import scala.concurrent.Future
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.io.Source
 import scala.util.Random
 

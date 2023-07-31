@@ -9,12 +9,12 @@ import org.apache.pekko.actor.typed.ActorSystem
 import org.apache.pekko.util.Timeout
 import csw.command.api.StateMatcher
 import csw.command.api.scaladsl.CommandService
-import csw.params.commands.CommandResponse._
+import csw.params.commands.CommandResponse.*
 import csw.params.commands.ControlCommand
 import csw.params.core.states.CurrentState
 import msocket.portable.PortablePekko
 
-import scala.async.Async._
+import cps.*
 import scala.concurrent.{Future, Promise, TimeoutException}
 import scala.util.{Failure, Success}
 

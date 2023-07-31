@@ -10,7 +10,7 @@ import org.apache.pekko.actor.typed
 import org.apache.pekko.actor.typed.ActorRef
 import org.apache.pekko.stream.scaladsl.{Sink, Source}
 import csw.alarm.api.exceptions.{InactiveAlarmException, InvalidSeverityException, KeyNotFoundException}
-import csw.alarm.api.internal._
+import csw.alarm.api.internal.*
 import csw.alarm.api.scaladsl.AlarmSubscription
 import csw.alarm.client.internal.commons.Settings
 import csw.alarm.client.internal.redis.RedisConnectionsFactory
@@ -23,7 +23,7 @@ import romaine.RedisResult
 import romaine.extensions.SourceExtensions.RichSource
 import romaine.reactive.RedisSubscription
 
-import scala.async.Async.{async, await}
+import cps.*
 import scala.concurrent.Future
 
 private[client] trait SeverityServiceModule extends SeverityService {

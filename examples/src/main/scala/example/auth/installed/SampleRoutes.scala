@@ -8,16 +8,16 @@ package example.auth.installed
 import org.apache.pekko.actor.typed.ActorSystem
 import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import org.apache.pekko.http.scaladsl.Http
-import org.apache.pekko.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
+import org.apache.pekko.http.scaladsl.marshallers.sprayjson.SprayJsonSupport.*
 import org.apache.pekko.http.scaladsl.model.StatusCodes
-import org.apache.pekko.http.scaladsl.server.Directives._
+import org.apache.pekko.http.scaladsl.server.Directives.*
 import org.apache.pekko.http.scaladsl.server.Route
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.aas.http.AuthorizationPolicy.RealmRolePolicy
 import csw.aas.http.SecurityDirectives
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import spray.json.DefaultJsonProtocol._
+import spray.json.DefaultJsonProtocol.*
 
 import scala.concurrent.ExecutionContext
 

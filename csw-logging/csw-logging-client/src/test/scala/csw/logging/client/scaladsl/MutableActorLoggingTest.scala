@@ -9,7 +9,7 @@ import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import csw.logging.models.Level.ERROR
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.LogCommand
-import csw.logging.client.LogCommand._
+import csw.logging.client.LogCommand.*
 import csw.logging.client.commons.PekkoTypedExtension.UserActorFactory
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.utils.LoggingTestSuite

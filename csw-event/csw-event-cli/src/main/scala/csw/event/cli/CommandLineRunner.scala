@@ -20,11 +20,11 @@ import csw.event.cli.wiring.ActorRuntime
 import csw.params.core.formats.JsonSupport
 import csw.params.core.generics.Parameter
 import csw.params.core.models.Id
-import csw.params.events._
+import csw.params.events.*
 import csw.time.core.models.UTCTime
 import play.api.libs.json.Json
 
-import scala.async.Async.{async, await}
+import cps.*
 import scala.concurrent.Future
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.util.{Failure, Success}

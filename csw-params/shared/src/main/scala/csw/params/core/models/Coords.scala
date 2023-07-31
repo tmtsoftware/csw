@@ -5,8 +5,8 @@
 
 package csw.params.core.models
 import csw.params.core.models.Coords.EqFrame.ICRS
-import csw.params.core.models.Coords._
-import enumeratum._
+import csw.params.core.models.Coords.*
+import enumeratum.*
 
 import scala.collection.immutable
 

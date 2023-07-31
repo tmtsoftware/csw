@@ -6,8 +6,8 @@
 package csw.location.server.internal
 
 import org.apache.pekko.actor.typed.ActorRef
-import org.apache.pekko.cluster.ddata.Replicator._
-import org.apache.pekko.cluster.ddata._
+import org.apache.pekko.cluster.ddata.Replicator.*
+import org.apache.pekko.cluster.ddata.*
 import org.apache.pekko.cluster.ddata.typed.scaladsl.Replicator
 import csw.location.api.commons.Constants
 import csw.location.api.models.{Connection, Location}

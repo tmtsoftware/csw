@@ -10,7 +10,7 @@ import java.nio.file.{Files, Path, Paths}
 
 import org.apache.pekko.actor.testkit.typed.TestKitSettings
 import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
-import org.apache.pekko.actor.typed.scaladsl.AskPattern._
+import org.apache.pekko.actor.typed.scaladsl.AskPattern.*
 import org.apache.pekko.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
@@ -22,7 +22,7 @@ import csw.command.client.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.command.client.models.framework.PubSub.Subscribe
 import csw.command.client.models.framework.ToComponentLifecycleMessage.GoOffline
 import csw.command.client.models.framework.{Components, ContainerLifecycleState, SupervisorLifecycleState}
-import csw.common.FrameworkAssertions._
+import csw.common.FrameworkAssertions.*
 import csw.config.api.ConfigData
 import csw.config.client.scaladsl.ConfigClientFactory
 import csw.config.server.commons.TestFileUtils

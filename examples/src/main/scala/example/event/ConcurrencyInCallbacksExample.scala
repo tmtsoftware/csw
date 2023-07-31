@@ -6,7 +6,7 @@
 package example.event
 
 import org.apache.pekko.actor.Cancellable
-import org.apache.pekko.actor.typed.scaladsl.AskPattern._
+import org.apache.pekko.actor.typed.scaladsl.AskPattern.*
 import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import org.apache.pekko.actor.typed.{ActorRef, ActorSystem, Behavior}
 import org.apache.pekko.util.Timeout
@@ -14,7 +14,7 @@ import csw.event.api.scaladsl.EventPublisher
 import csw.params.core.generics.{Key, KeyType}
 import csw.params.events.{EventName, SystemEvent}
 import csw.prefix.models.Prefix
-import example.event.TemperatureMessage._
+import example.event.TemperatureMessage.*
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationDouble

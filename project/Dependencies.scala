@@ -21,7 +21,7 @@ object Dependencies {
       Pekko.`pekko-distributed-data`,
       Pekko.`pekko-cluster-typed`,
       PekkoHttp.`pekko-http-cors`,
-      Libs.`scala-async`,
+      Libs.`dotty-cps-async`.value,
       Libs.`scopt`,
       Libs.`enumeratum`.value,
       Pekko.`cluster-sharding`, // akka-management-cluster-http uses lower version, to avoid conflict, this needs to be overridden
@@ -49,8 +49,7 @@ object Dependencies {
       Pekko.`pekko-stream-typed`,
       PekkoHttp.`pekko-http`,
       Pekko.`pekko-remote`,
-      Libs.`scala-async`,
-      Libs.`scala-java8-compat`,
+      Libs.`dotty-cps-async`.value,
       MSocket.`msocket-http`,
       Libs.`scalatest`.value  % Test,
       Libs.`junit4-interface` % Test
@@ -73,7 +72,6 @@ object Dependencies {
     Seq(
       Libs.`enumeratum`.value,
       Libs.`config`,
-      Libs.`scala-java8-compat`,
       Libs.`scalatest`.value % Test
     )
   )
@@ -96,8 +94,7 @@ object Dependencies {
       Pekko.`pekko-stream-typed`,
       Pekko.`pekko-actor`,
       Borer.`borer-compat-pekko`,
-      Libs.`scala-async`,
-      Libs.`scala-java8-compat`,
+      Libs.`dotty-cps-async`.value,
       Libs.`config`,
       PekkoHttp.`pekko-http`,
       PekkoHttp.`pekko-http-cors`,
@@ -117,8 +114,7 @@ object Dependencies {
       Pekko.`pekko-stream-typed`,
       Borer.`borer-compat-pekko`,
       PekkoHttp.`pekko-http`,
-      Libs.`scala-async`,
-      Libs.`scala-java8-compat`,
+      Libs.`dotty-cps-async`.value,
       Libs.`scalatest`.value  % Test,
       Libs.`junit4-interface` % Test,
       Libs.`mockito`          % Test
@@ -150,7 +146,6 @@ object Dependencies {
       Libs.`config`,
       Libs.`logback-classic`,
       Libs.`play-json`,
-      Libs.`scala-java8-compat`,
       Libs.`enumeratum`.value,
       Pekko.`pekko-actor`,
       Pekko.`pekko-actor-typed`,
@@ -193,8 +188,7 @@ object Dependencies {
       Pekko.`pekko-actor`,
       Pekko.`pekko-stream`,
       Pekko.`pekko-stream-typed`,
-      Libs.`scala-async`,
-      Libs.`scala-java8-compat`,
+      Libs.`dotty-cps-async`.value,
       Libs.`play-json`,
       Pekko.`pekko-actor-typed`,
 
@@ -217,13 +211,12 @@ object Dependencies {
       Libs.`enumeratum`.value,
       Libs.`config`,
       Libs.`play-json`,
-      Libs.`scala-java8-compat`,
       Pekko.`pekko-stream`,
       Pekko.`pekko-stream-typed`,
       Pekko.`pekko-actor`,
       Pekko.`pekko-actor-typed`,
       PekkoHttp.`pekko-http`,
-      Libs.`scala-async`,
+      Libs.`dotty-cps-async`.value,
       Libs.`caffeine`,
       Pekko.`pekko-actor-testkit-typed` % Test,
       Pekko.`pekko-stream-testkit`      % Test,
@@ -235,7 +228,7 @@ object Dependencies {
 
   val CommandApi = Def.setting(
     Seq(
-      Libs.`scala-async`,
+      Libs.`dotty-cps-async`.value,
       MSocket.`msocket-api`.value
     )
   )
@@ -246,7 +239,6 @@ object Dependencies {
       Pekko.`pekko-stream`,
       Pekko.`pekko-stream-typed`,
       Pekko.`pekko-actor-typed`,
-      Libs.`scala-java8-compat`
     )
   )
 
@@ -254,8 +246,7 @@ object Dependencies {
     Seq(
       Libs.`enumeratum`.value,
       Libs.`config`,
-      Libs.`scala-async`,
-      Libs.`scala-java8-compat`,
+      Libs.`dotty-cps-async`.value,
       Pekko.`pekko-stream`,
       Pekko.`pekko-stream-typed`,
       Pekko.`pekko-actor`,
@@ -285,7 +276,7 @@ object Dependencies {
       Libs.`play-json`,
       Libs.`scopt`,
       Libs.`scala-csv`,
-      Libs.`scala-async`,
+      Libs.`dotty-cps-async`.value,
       Libs.`scalatest`.value % Test,
       Libs.`embedded-redis`  % Test
     )
@@ -315,9 +306,8 @@ object Dependencies {
       Libs.`reactor-core`,
       Libs.`config`,
       Libs.`play-json`,
-      Libs.`scala-async`,
+      Libs.`dotty-cps-async`.value,
       Libs.`json-schema-validator`,
-      Libs.`scala-java8-compat`,
       Pekko.`pekko-actor`,
       Pekko.`pekko-actor-typed`,
       Pekko.`pekko-stream`,
@@ -336,7 +326,7 @@ object Dependencies {
       Pekko.`pekko-actor-typed`,
       Pekko.`pekko-stream`,
       Pekko.`pekko-stream-typed`,
-      Libs.`scala-async`,
+      Libs.`dotty-cps-async`.value,
       PekkoHttp.`pekko-http`,
       Libs.`scopt`,
       Libs.`scalatest`.value % Test,
@@ -353,7 +343,6 @@ object Dependencies {
       Pekko.`pekko-actor-typed`,
       PekkoHttp.`pekko-http`,
 //      Libs.`scala-reflect`,
-      Libs.`scala-java8-compat`,
       Keycloak.`keycloak-adapter-core`,
       // TODO: make this as provided deps
       Libs.`scalatest`.value,
@@ -386,8 +375,7 @@ object Dependencies {
       Pekko.`pekko-actor-typed`,
       Libs.`config`,
       Libs.`postgresql`,
-      Libs.`scala-java8-compat`,
-      Libs.`scala-async`,
+      Libs.`dotty-cps-async`.value,
       Libs.`hikaricp`,
       Jooq.`jooq`,
       Jooq.`jooq-meta`,
@@ -419,7 +407,7 @@ object Dependencies {
       Keycloak.`keycloak-core`,
       Keycloak.`keycloak-adapter-core`,
       PekkoHttp.`pekko-http`,
-      Libs.`scala-async`,
+      Libs.`dotty-cps-async`.value,
       // (legacy dependencies) required*
       Libs.`jboss-logging`,
       Libs.httpclient,
@@ -466,8 +454,7 @@ object Dependencies {
       Libs.`enumeratum`.value,
       Libs.`reactor-core`,
       Libs.`reactive-streams`,
-      Libs.`scala-async`,
-      Libs.`scala-java8-compat`,
+      Libs.`dotty-cps-async`.value,
       Pekko.`pekko-stream`,
       Pekko.`pekko-stream-typed`,
       Pekko.`pekko-actor`,
@@ -481,7 +468,7 @@ object Dependencies {
       Libs.`config`,
       Libs.`lettuce`,
       Jooq.`jooq`,
-      Libs.`scala-async`,
+      Libs.`dotty-cps-async`.value,
       Pekko.`pekko-actor`,
       Pekko.`pekko-stream`,
       Pekko.`pekko-stream-typed`,

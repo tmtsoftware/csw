@@ -12,7 +12,7 @@ import csw.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
 import csw.alarm.models.AlarmHealth
 import csw.alarm.models.AlarmHealth.{Bad, Good, Ill}
-import csw.alarm.models.AlarmSeverity._
+import csw.alarm.models.AlarmSeverity.*
 import csw.alarm.models.FullAlarmSeverity.Disconnected
 import csw.alarm.models.Key.{ComponentKey, GlobalKey, SubsystemKey}
 import csw.alarm.models.ShelveStatus.Shelved

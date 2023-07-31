@@ -8,7 +8,7 @@ package csw.services
 import csw.aas.core.deployment.AuthServiceLocation
 import csw.location.api.scaladsl.LocationService
 import csw.prefix.models.Subsystem
-import csw.services.internal.FutureExt._
+import csw.services.internal.FutureExt.*
 import csw.services.internal.{ManagedService, Settings}
 import org.tmt.embedded_keycloak.KeycloakData.{ApplicationUser, Client, Realm}
 import org.tmt.embedded_keycloak.impl.StopHandle

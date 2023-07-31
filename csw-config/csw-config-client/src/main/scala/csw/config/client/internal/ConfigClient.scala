@@ -10,23 +10,23 @@ import java.time.Instant
 
 import org.apache.pekko.http.scaladsl.Http
 import org.apache.pekko.http.scaladsl.model.Uri.{Path, Query}
-import org.apache.pekko.http.scaladsl.model._
+import org.apache.pekko.http.scaladsl.model.*
 import org.apache.pekko.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
 import org.apache.pekko.http.scaladsl.unmarshalling.Unmarshal
 import csw.commons.http.ErrorResponse
 import csw.commons.http.codecs.ErrorCodecs
 import csw.config.api.commons.{BinaryUtils, TokenMaskSupport}
-import csw.config.api.exceptions._
+import csw.config.api.exceptions.*
 import csw.config.api.internal.ConfigStreamExts.RichSource
 import csw.config.api.scaladsl.ConfigService
 import csw.config.api.{ConfigData, TokenFactory}
 import csw.config.client.HttpCodecs
 import csw.config.client.commons.ConfigClientLogger
-import csw.config.models._
+import csw.config.models.*
 import csw.config.models.codecs.ConfigCodecs
 import csw.logging.api.scaladsl.Logger
 
-import scala.async.Async._
+import cps.*
 import scala.concurrent.Future
 
 /**

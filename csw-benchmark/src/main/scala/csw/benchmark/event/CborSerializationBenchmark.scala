@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit
 
 import csw.params.core.formats.EventCbor
 import csw.params.events.SystemEvent
-import org.openjdk.jmh.annotations._
+import org.openjdk.jmh.annotations.*
 
 // RUN using this command: csw-benchmark/jmh:run -f 1 -wi 5 -i 5 csw.benchmark.event.CborSerializationBenchmark
 @State(Scope.Benchmark)

@@ -5,7 +5,7 @@
 
 package csw.params.core.states
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 /**
  * Combines multiple CurrentState objects together

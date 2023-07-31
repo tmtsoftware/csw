@@ -17,7 +17,7 @@ import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.duration.DurationInt
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 // DEOPSCSW-167: Creation and Deployment of Standalone Components
 // DEOPSCSW-170: Starting component using a file format

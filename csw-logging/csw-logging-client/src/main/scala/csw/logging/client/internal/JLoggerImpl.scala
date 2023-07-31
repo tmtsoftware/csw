@@ -13,7 +13,7 @@ import csw.logging.api.scaladsl.Logger
 import csw.logging.macros.SourceFactory
 import csw.logging.models.{AnyId, noId}
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 private[logging] class JLoggerImpl(log: Logger, cls: Class[_]) extends ILogger {
 

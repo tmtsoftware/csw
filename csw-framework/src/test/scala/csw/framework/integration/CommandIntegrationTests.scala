@@ -15,9 +15,9 @@ import csw.command.client.extensions.PekkoLocationExt.RichPekkoLocation
 import csw.command.client.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.command.client.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.command.client.messages.SupervisorContainerCommonMessages.Shutdown
-import csw.command.client.models.framework._
-import csw.common.FrameworkAssertions._
-import csw.common.components.command.CommandComponentState._
+import csw.command.client.models.framework.*
+import csw.common.FrameworkAssertions.*
+import csw.common.components.command.CommandComponentState.*
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.location.api.models
@@ -25,7 +25,7 @@ import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.location.api.models.Connection.PekkoConnection
 import csw.location.api.models.{ComponentId, ComponentType}
 import csw.location.client.ActorSystemFactory
-import csw.params.commands.CommandResponse._
+import csw.params.commands.CommandResponse.*
 import csw.params.commands.Setup
 import csw.params.core.generics.KeyType
 import csw.params.core.models.{ObsId, Units}

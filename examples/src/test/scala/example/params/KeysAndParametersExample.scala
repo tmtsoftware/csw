@@ -10,7 +10,7 @@ import csw.params.core.generics.{GChoiceKey, Key, KeyType, Parameter}
 import csw.params.core.models.Coords.EqFrame.FK5
 import csw.params.core.models.Coords.SolarSystemObject.Venus
 import csw.params.core.models.Units.NoUnits
-import csw.params.core.models._
+import csw.params.core.models.*
 import csw.time.core.models.{TAITime, UTCTime}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers

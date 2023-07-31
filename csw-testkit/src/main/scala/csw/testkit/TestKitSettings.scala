@@ -9,7 +9,7 @@ import org.apache.pekko.actor.typed.ActorSystem
 import org.apache.pekko.util.Timeout
 import com.typesafe.config.Config
 
-import scala.compat.java8.DurationConverters.DurationOps
+import scala.jdk.DurationConverters.*
 
 object TestKitSettings {
 

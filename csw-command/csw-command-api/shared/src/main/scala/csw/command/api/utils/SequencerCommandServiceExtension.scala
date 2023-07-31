@@ -7,7 +7,7 @@ package csw.command.api.utils
 
 import org.apache.pekko.util.Timeout
 import csw.command.api.scaladsl.SequencerCommandService
-import csw.params.commands.CommandResponse._
+import csw.params.commands.CommandResponse.*
 import csw.params.commands.Sequence
 
 import scala.concurrent.{ExecutionContext, Future}

@@ -8,7 +8,7 @@ package csw.aas.http
 import org.apache.pekko.actor.typed
 import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import org.apache.pekko.http.scaladsl.Http
-import org.apache.pekko.http.scaladsl.server.Directives._
+import org.apache.pekko.http.scaladsl.server.Directives.*
 import org.apache.pekko.http.scaladsl.server.Route
 import csw.aas.http.AuthorizationPolicy.RealmRolePolicy
 import csw.location.api.scaladsl.LocationService

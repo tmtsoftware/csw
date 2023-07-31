@@ -18,7 +18,7 @@ import io.lettuce.core.{RedisClient, RedisURI}
 import romaine.RomaineFactory
 import romaine.async.RedisAsyncApi
 
-import scala.async.Async._
+import cps.*
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 import scala.concurrent.{Await, Future}
 import scala.util.control.NonFatal

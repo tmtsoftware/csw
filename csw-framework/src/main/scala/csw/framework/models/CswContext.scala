@@ -22,7 +22,7 @@ import csw.params.core.states.CurrentState
 import csw.time.scheduler.TimeServiceSchedulerFactory
 import csw.time.scheduler.api.TimeServiceScheduler
 
-import scala.async.Async.{async, await}
+import cps.*
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
 /**

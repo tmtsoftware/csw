@@ -16,13 +16,13 @@ import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.{PekkoLocation, TrackingEvent}
 import csw.params.commands.CommandIssue.UnsupportedCommandIssue
-import csw.params.commands.CommandResponse._
+import csw.params.commands.CommandResponse.*
 import csw.params.commands.{CommandIssue, ControlCommand, Setup}
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
 import csw.time.core.models.UTCTime
 
-import scala.async.Async._
+import cps.*
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}

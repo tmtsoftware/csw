@@ -7,13 +7,13 @@ package csw.common.components.command
 
 import org.apache.pekko.actor.typed.scaladsl.ActorContext
 import csw.command.client.messages.TopLevelActorMessage
-import csw.common.components.command.CommandComponentState._
+import csw.common.components.command.CommandComponentState.*
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.TrackingEvent
 import csw.logging.api.scaladsl.Logger
-import csw.params.commands.CommandResponse._
-import csw.params.commands._
+import csw.params.commands.CommandResponse.*
+import csw.params.commands.*
 import csw.params.core.models.{ExposureId, Id, ObsId}
 import csw.params.events.{IRDetectorEvent, OpticalDetectorEvent, WFSDetectorEvent}
 import csw.time.core.models.UTCTime

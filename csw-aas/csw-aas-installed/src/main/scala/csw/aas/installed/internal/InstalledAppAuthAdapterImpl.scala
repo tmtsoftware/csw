@@ -8,7 +8,7 @@ package csw.aas.installed.internal
 import csw.aas.core.TokenVerificationFailure.TokenExpired
 import csw.aas.core.TokenVerifier
 import csw.aas.core.deployment.AuthConfig
-import csw.aas.installed.api._
+import csw.aas.installed.api.*
 import csw.aas.installed.utils.Conversions.RichEitherTFuture
 import msocket.security.models.AccessToken
 import org.keycloak.adapters.installed.KeycloakInstalled

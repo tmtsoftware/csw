@@ -8,7 +8,7 @@ package org.tmt.csw.sample
 import csw.framework.scaladsl.DefaultComponentHandlers
 import csw.location.api.models.ComponentType.Assembly
 import csw.location.api.models.Connection.PekkoConnection
-import csw.location.api.models._
+import csw.location.api.models.*
 import csw.params.commands.CommandResponse.{Completed, Started}
 import csw.params.commands.{CommandResponse, ControlCommand}
 import csw.params.core.models.Id

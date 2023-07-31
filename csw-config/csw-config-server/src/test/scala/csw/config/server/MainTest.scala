@@ -20,7 +20,7 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.server.http.HTTPLocationService
 import org.tmatesoft.svn.core.SVNException
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 // DEOPSCSW-130: Command line App for HTTP server
 class MainTest extends HTTPLocationService {

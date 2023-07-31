@@ -14,7 +14,7 @@ import csw.logging.models.Level.INFO
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.appenders.FileAppender
 import csw.logging.client.internal.{LoggerImpl, LoggingSystem}
-import org.openjdk.jmh.annotations._
+import org.openjdk.jmh.annotations.*
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong

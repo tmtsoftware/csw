@@ -5,7 +5,7 @@
 
 package csw.event.client.perf
 
-import org.apache.pekko.actor.typed.scaladsl.adapter._
+import org.apache.pekko.actor.typed.scaladsl.adapter.*
 import org.apache.pekko.actor.{ActorSystem, typed}
 import csw.event.client.EventServiceFactory
 import csw.event.client.helpers.Utils

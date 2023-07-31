@@ -8,7 +8,7 @@ package csw.logging.client.scaladsl
 import csw.logging.client.commons.PekkoTypedExtension.UserActorFactory
 import csw.logging.client.commons.LoggingKeys
 import csw.logging.client.components.IRIS
-import csw.logging.client.components.IRISLogMessages._
+import csw.logging.client.components.IRISLogMessages.*
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.utils.LoggingTestSuite
 import csw.logging.models.Level

@@ -15,7 +15,7 @@ import csw.logging.client.appenders.LogAppenderBuilder
 import csw.logging.client.commons.PekkoTypedExtension.UserActorFactory
 import csw.logging.client.commons.LoggingKeys
 import csw.logging.client.exceptions.AppenderNotFoundException
-import csw.logging.client.internal.LogActorMessages._
+import csw.logging.client.internal.LogActorMessages.*
 import csw.logging.client.internal.TimeActorMessages.TimeDone
 import csw.logging.client.models.ComponentLoggingState
 import csw.logging.models.{Level, Levels, LogMetadata}
@@ -23,9 +23,9 @@ import csw.prefix.models.Prefix
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsObject, Json}
 
-import scala.compat.java8.FutureConverters.FutureOps
+import scala.jdk.FutureConverters.*
 import scala.concurrent.{ExecutionContext, Future, Promise}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 /**
  * This class is responsible for programmatic interaction with the configuration of the logging system. It initializes
@@ -250,7 +250,7 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
     } yield Done
   }
 
-  def javaStop(): CompletableFuture[Done] = stop.toJava.toCompletableFuture
+  def javaStop(): CompletableFuture[Done] = stop.asJava.toCompletableFuture
 
   private def getAppenderInstance(appender: String): LogAppenderBuilder = {
     try {

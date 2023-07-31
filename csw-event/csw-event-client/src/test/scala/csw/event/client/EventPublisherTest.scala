@@ -16,13 +16,13 @@ import csw.params.events.{EventName, SystemEvent}
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.event.client.internal.kafka.KafkaTestProps
 import csw.event.client.internal.redis.{InitializationEvent, RedisTestProps}
-import csw.event.client.internal.wiring._
+import csw.event.client.internal.wiring.*
 import csw.params.events.{Event, EventKey}
 import csw.time.core.models.UTCTime
 import io.github.embeddedkafka.EmbeddedKafka
 import org.scalatest.concurrent.Eventually
 import org.scalatestplus.testng.TestNGSuite
-import org.testng.annotations._
+import org.testng.annotations.*
 
 import scala.collection.{immutable, mutable}
 import scala.concurrent.Future

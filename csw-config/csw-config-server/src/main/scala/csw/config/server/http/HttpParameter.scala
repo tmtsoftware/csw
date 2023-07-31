@@ -10,7 +10,7 @@ import java.time.Instant
 import java.util.regex.{Pattern, PatternSyntaxException}
 
 import org.apache.pekko.http.scaladsl.model.headers.HttpEncoding
-import org.apache.pekko.http.scaladsl.server._
+import org.apache.pekko.http.scaladsl.server.*
 import org.apache.pekko.http.scaladsl.server.directives.{DebuggingDirectives, LoggingMagnet}
 import csw.config.api.ConfigData
 import csw.config.api.commons.TokenMaskSupport

@@ -7,8 +7,8 @@ package csw.logging.client.commons
 
 import org.apache.pekko.actor.typed.Scheduler
 import org.apache.pekko.actor.typed.SpawnProtocol.Spawn
-import org.apache.pekko.actor.typed._
-import org.apache.pekko.actor.typed.scaladsl.AskPattern._
+import org.apache.pekko.actor.typed.*
+import org.apache.pekko.actor.typed.scaladsl.AskPattern.*
 import org.apache.pekko.util.Timeout
 
 import scala.concurrent.Await

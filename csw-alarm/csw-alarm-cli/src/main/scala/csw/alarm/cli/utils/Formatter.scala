@@ -8,8 +8,8 @@ package csw.alarm.cli.utils
 import csw.alarm.cli.args.Options
 import csw.alarm.client.internal.models.Alarm
 import csw.alarm.commons.Separators.KeySeparator
-import csw.alarm.models.Key._
-import csw.alarm.models._
+import csw.alarm.models.Key.*
+import csw.alarm.models.*
 import csw.prefix.models.Prefix
 
 object Formatter {

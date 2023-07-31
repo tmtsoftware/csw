@@ -9,7 +9,7 @@ import csw.params.core.models.{ExposureId, ObsId}
 import csw.prefix.models.Prefix
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
-import org.scalatest.prop.TableDrivenPropertyChecks._
+import org.scalatest.prop.TableDrivenPropertyChecks.*
 
 class IRDetectorEventTest extends AnyFunSpec with Matchers {
   describe("IR detector") {

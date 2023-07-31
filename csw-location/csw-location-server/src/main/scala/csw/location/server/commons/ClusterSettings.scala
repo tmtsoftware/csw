@@ -13,7 +13,7 @@ import csw.logging.api.scaladsl.Logger
 import csw.network.utils.Networks
 
 import scala.annotation.varargs
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 /**
  * ClusterSettings manages [[com.typesafe.config.Config]] values required by an [[pekko.actor.typed.ActorSystem]] to boot. It configures mainly

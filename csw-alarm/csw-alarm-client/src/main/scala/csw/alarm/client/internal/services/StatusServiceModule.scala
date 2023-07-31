@@ -10,7 +10,7 @@ import java.time.Clock
 import org.apache.pekko.Done
 import org.apache.pekko.actor.typed
 import csw.alarm.api.exceptions.KeyNotFoundException
-import csw.alarm.api.internal._
+import csw.alarm.api.internal.*
 import csw.alarm.client.internal.AlarmServiceLogger
 import csw.alarm.client.internal.commons.Settings
 import csw.alarm.client.internal.extensions.TimeExtensions.RichClock
@@ -21,17 +21,17 @@ import csw.alarm.models.AlarmSeverity.Okay
 import csw.alarm.models.FullAlarmSeverity.Disconnected
 import csw.alarm.models.Key.{AlarmKey, GlobalKey}
 import csw.alarm.models.ShelveStatus.{Shelved, Unshelved}
-import csw.alarm.models._
+import csw.alarm.models.*
 import csw.time.core.models.UTCTime
 
-import scala.async.Async.{async, await}
-import scala.compat.java8.DurationConverters.DurationOps
+import cps.*
+import scala.jdk.DurationConverters.*
 import scala.concurrent.Future
 
 private[client] trait StatusServiceModule extends StatusService {
-  self: SeverityService with MetadataService =>
+  self: SeverityService & MetadataService =>
 
-  implicit val actorSystem: typed.ActorSystem[_]
+  implicit val actorSystem: typed.ActorSystem[?]
   def settings: Settings
   val redisConnectionsFactory: RedisConnectionsFactory
   import redisConnectionsFactory._

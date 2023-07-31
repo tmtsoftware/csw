@@ -7,9 +7,9 @@ package csw.params.core.formats
 
 import java.nio.charset.StandardCharsets
 
-import csw.params.commands._
+import csw.params.commands.*
 import csw.params.core.states.StateVariable
-import csw.params.events._
+import csw.params.events.*
 import io.bullet.borer.{Decoder, Encoder, Json}
 import play.api.libs.json.{Json => PJson, _}
 

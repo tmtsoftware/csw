@@ -8,7 +8,7 @@ package csw.command.client.cbor
 import org.apache.pekko.actor.typed.ActorRef
 import csw.command.client.messages.CommandSerializationMarker.RemoteMsg
 import csw.command.client.messages.sequencer.CswSequencerMessage
-import csw.command.client.models.framework._
+import csw.command.client.models.framework.*
 import csw.location.api.codec.LocationCodecs
 import csw.logging.models.codecs.LoggingCodecs
 import csw.params.core.formats.ParamCodecs

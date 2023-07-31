@@ -5,11 +5,11 @@
 
 package csw.commons.http
 
-import org.apache.pekko.http.scaladsl.model._
+import org.apache.pekko.http.scaladsl.model.*
 import org.apache.pekko.util.ByteString
 import io.bullet.borer.Json
-import csw.commons.http.codecs.ErrorCodecs._
-import io.bullet.borer.compat.pekko._
+import csw.commons.http.codecs.ErrorCodecs.*
+import io.bullet.borer.compat.pekko.*
 
 /**
  * Internal API used by HTTP servers for exception handling.

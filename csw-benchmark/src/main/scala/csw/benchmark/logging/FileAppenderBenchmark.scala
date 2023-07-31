@@ -13,7 +13,7 @@ import org.apache.pekko.actor.typed.SpawnProtocol
 import csw.benchmark.logging.mock.LogActorMock
 import csw.logging.client.appenders.FileAppender
 import csw.logging.client.internal.LoggingSystem
-import org.openjdk.jmh.annotations._
+import org.openjdk.jmh.annotations.*
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong

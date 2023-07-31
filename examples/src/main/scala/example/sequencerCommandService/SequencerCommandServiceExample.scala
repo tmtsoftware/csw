@@ -18,7 +18,7 @@ import csw.params.commands.{CommandName, Sequence, Setup}
 import csw.prefix.models.{Prefix, Subsystem}
 import example.sequencerCommandService.SequencerCommandServiceExample.sequencerCommandService
 
-import scala.async.Async.{async, await}
+import cps.*
 import scala.concurrent.{Await, ExecutionContextExecutor, Future}
 import scala.concurrent.duration.DurationLong
 

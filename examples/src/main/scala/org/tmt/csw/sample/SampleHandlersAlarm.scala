@@ -16,15 +16,15 @@ import csw.event.api.scaladsl.EventSubscription
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.{PekkoLocation, LocationRemoved, LocationUpdated, TrackingEvent}
-import csw.params.commands.CommandResponse._
+import csw.params.commands.CommandResponse.*
 import csw.params.commands.{CommandName, CommandResponse, ControlCommand, Setup}
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.{Id, ObsId, Units}
-import csw.params.events._
+import csw.params.events.*
 import csw.prefix.models.Prefix
 import csw.time.core.models.UTCTime
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.util.{Failure, Success}
 

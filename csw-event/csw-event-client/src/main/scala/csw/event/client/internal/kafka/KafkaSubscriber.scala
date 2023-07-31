@@ -13,15 +13,15 @@ import org.apache.pekko.stream.scaladsl.{Keep, Sink, Source}
 import csw.event.api.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
 import csw.event.client.internal.commons.{EventConverter, EventSubscriberUtil}
 import csw.event.client.utils.Utils
-import csw.params.events._
+import csw.params.events.*
 import csw.prefix.models.Subsystem
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.common.TopicPartition
 
-import scala.async.Async.{async, await}
+import cps.*
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 
 /**

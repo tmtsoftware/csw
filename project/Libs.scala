@@ -5,8 +5,7 @@ import sbt._
 object Libs {
   val ScalaVersion = "3.3.0"
 
-  val `scala-java8-compat` = "org.scala-lang.modules" %% "scala-java8-compat" % "1.0.2" // BSD 3-clause "New" or "Revised" License
-  val `scala-async` = "com.github.rssh" %% "shim-scala-async-dotty-cps-async" % "0.9.16"
+  val `dotty-cps-async` = dep("com.github.rssh" %%% "dotty-cps-async" % "0.9.17")
 
   val `scopt`   = "com.github.scopt"  %% "scopt"       % "4.1.0" // MIT License
   val `mockito` = "org.scalatestplus" %% "mockito-3-4" % "3.2.10.0"
@@ -15,14 +14,13 @@ object Libs {
   val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.4.7"
 
   val `sourcecode`        = "com.lihaoyi"                              %% "sourcecode"        % "0.3.0"
-  val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "87cfa0b" // Apache 2.0
+  val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "933b2a9" // Apache 2.0
   val `pekko-management`  = "org.apache.pekko"                         %% "pekko-management"  % "0.0.0+761-0187bd97-SNAPSHOT"
   val `svnkit`        = "org.tmatesoft.svnkit" % "svnkit"        % "1.10.11"    // TMate Open Source License
   val `commons-codec` = "commons-codec"        % "commons-codec" % "1.15"       // Apache 2.0š
   val `gson`          = "com.google.code.gson" % "gson"          % "2.10.1"     // Apache 2.0
   val `play-json`     = "com.typesafe.play"   %% "play-json"     % "2.10.0-RC9" // Apache 2.0
 
-//  val `enumeratum`                = dep("com.github.mushtaq.enumeratum" %%% "enumeratum" % "3d87c50") // MIT License
   val `enumeratum`                = dep("com.beachape" %%% "enumeratum" % "1.7.3") // MIT License
   val `scala-java-time`           = dep("io.github.cquiroz" %%% "scala-java-time" % "2.5.0")
   val `scalajs-java-securerandom` = dep("org.scala-js" %%% "scalajs-java-securerandom" % "1.0.0")
@@ -32,7 +30,6 @@ object Libs {
   val `lettuce`          = "io.lettuce"            % "lettuce-core"     % "6.2.1.RELEASE"
   val `reactor-core`     = "io.projectreactor"     % "reactor-core"     % "3.4.24"
   val `reactive-streams` = "org.reactivestreams"   % "reactive-streams" % "1.0.4"
-  // 2.1.1 version is breaking csw-event-client tests (pekko version based on 3.0.1)
   val `pekko-connectors-kafka` = "org.apache.pekko"        %% "pekko-connectors-kafka" % "1.0.0-RC1"
   val `embedded-kafka`         = "io.github.embeddedkafka" %% "embedded-kafka"         % "3.5.0"
   val `embedded-redis`         = "com.github.kstyrc"        % "embedded-redis"         % "0.6"
@@ -130,7 +127,7 @@ object Jooq {
 
 object MSocket {
 //  val Version = "0.6.0"
-  val Version = "2283412"
+  val Version = "4031f22"
 
   val `msocket-api`      = dep("com.github.tmtsoftware.msocket" %%% "msocket-api" % Version)
   val `msocket-security` = "com.github.tmtsoftware.msocket" %% "msocket-security" % Version

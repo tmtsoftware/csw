@@ -15,7 +15,7 @@ import csw.location.api.PekkoRegistrationFactory
 import csw.location.api.exceptions.LocalPekkoActorRegistrationNotAllowed
 import csw.location.api.extensions.ActorExtension.RichActor
 import csw.location.api.models.Connection.{PekkoConnection, HttpConnection, TcpConnection}
-import csw.location.api.models._
+import csw.location.api.models.*
 import csw.location.client.ActorSystemFactory
 import csw.logging.client.commons.PekkoTypedExtension.UserActorFactory
 import csw.network.utils.Networks

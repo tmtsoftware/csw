@@ -14,8 +14,8 @@ import csw.params.commands.CommandResponse
 import csw.params.commands.CommandResponse.SubmitResponse
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.jdk.CollectionConverters._
-import scala.jdk.FutureConverters._
+import scala.jdk.CollectionConverters.*
+import scala.jdk.FutureConverters.*
 
 /**
  * Wrapper API for interacting with Command Response Manager of a component

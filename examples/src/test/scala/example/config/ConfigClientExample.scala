@@ -20,10 +20,10 @@ import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.testkit.scaladsl.CSWService.ConfigServer
 import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
-import org.scalatest._
+import org.scalatest.*
 import org.scalatest.funsuite.AnyFunSuiteLike
 
-import scala.async.Async._
+import cps.*
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{Await, Future}
 

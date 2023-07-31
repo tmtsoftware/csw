@@ -9,7 +9,7 @@ import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.location.api.models.Connection.TcpConnection
 import csw.location.api.models.{ComponentId, ComponentType, TcpRegistration}
 import csw.location.server.commons.TestFutureExtension.RichFuture
-import csw.location.server.commons._
+import csw.location.server.commons.*
 import csw.location.server.internal.LocationServiceFactory
 import csw.prefix.models.{Prefix, Subsystem}
 import org.scalatest.funsuite.AnyFunSuite

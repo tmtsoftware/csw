@@ -10,7 +10,7 @@ import org.apache.pekko.http.scaladsl.model.MediaTypes.`application/json`
 import org.apache.pekko.http.scaladsl.model.{ContentTypeRange, MediaType}
 import org.apache.pekko.http.scaladsl.unmarshalling.{FromEntityUnmarshaller, Unmarshaller}
 import org.apache.pekko.util.ByteString
-import io.bullet.borer.compat.pekko._
+import io.bullet.borer.compat.pekko.*
 import io.bullet.borer.{Decoder, Encoder, Json}
 
 import scala.collection.immutable.Seq

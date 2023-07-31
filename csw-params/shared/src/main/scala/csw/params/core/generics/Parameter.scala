@@ -13,7 +13,7 @@ import csw.params.extensions.OptionConverters.RichOption
 import io.bullet.borer.derivation.key
 
 import scala.collection.mutable
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 /**
  * Parameter represents a KeyName, KeyType, array of values and units applicable to values. Parameter sits as payload for

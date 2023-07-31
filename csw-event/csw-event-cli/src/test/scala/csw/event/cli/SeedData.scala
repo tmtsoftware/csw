@@ -15,7 +15,7 @@ import csw.event.client.internal.commons.EventServiceConnection
 import csw.location.api.models.TcpRegistration
 import csw.location.server.http.HTTPLocationService
 import csw.params.core.formats.JsonSupport
-import csw.params.events._
+import csw.params.events.*
 import org.scalatest.BeforeAndAfterEach
 import play.api.libs.json.Json
 import redis.embedded.{RedisSentinel, RedisServer}

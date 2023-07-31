@@ -8,9 +8,9 @@ import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
 import csw.alarm.client.internal.services.{MetadataServiceModule, SeverityServiceModule, StatusServiceModule}
 import csw.alarm.models.AcknowledgementStatus.Acknowledged
 import csw.alarm.models.ActivationStatus.Active
-import csw.alarm.models.AlarmSeverity._
+import csw.alarm.models.AlarmSeverity.*
 import csw.alarm.models.Key.AlarmKey
-import csw.alarm.models._
+import csw.alarm.models.*
 import csw.prefix.models.Prefix
 import csw.prefix.models.Subsystem.AOESW
 

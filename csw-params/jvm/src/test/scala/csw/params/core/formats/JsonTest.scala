@@ -5,13 +5,13 @@
 
 package csw.params.core.formats
 
-import csw.params.commands._
-import csw.params.core.generics.KeyType._
-import csw.params.core.generics._
+import csw.params.commands.*
+import csw.params.core.generics.KeyType.*
+import csw.params.core.generics.*
 import csw.params.core.models.Coords.EqFrame.FK5
 import csw.params.core.models.Coords.SolarSystemObject.Venus
 import csw.params.core.models.Units.{NoUnits, degree, encoder, meter}
-import csw.params.core.models._
+import csw.params.core.models.*
 import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.params.events.{EventName, ObserveEvent, SystemEvent}
 import csw.prefix.models.{Prefix, Subsystem}

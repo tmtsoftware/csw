@@ -9,7 +9,7 @@ import org.apache.pekko.Done
 import org.apache.pekko.actor.typed
 import org.apache.pekko.actor.typed.ActorSystem
 import org.apache.pekko.actor.typed.scaladsl.Behaviors
-import com.typesafe.config._
+import com.typesafe.config.*
 import csw.alarm.models.AlarmSeverity.Okay
 import csw.alarm.models.Key.{AlarmKey, ComponentKey, SubsystemKey}
 import csw.alarm.models.{AlarmHealth, AlarmMetadata, AlarmStatus, FullAlarmSeverity}

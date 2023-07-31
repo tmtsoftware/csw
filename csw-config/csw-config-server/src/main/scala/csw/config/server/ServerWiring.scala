@@ -8,7 +8,7 @@ package csw.config.server
 import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.aas.http.SecurityDirectives
-import csw.config.server.files._
+import csw.config.server.files.*
 import csw.config.server.http.{ConfigHandlers, ConfigServiceRoute, HttpService}
 import csw.config.server.svn.{SvnConfigServiceFactory, SvnRepo}
 import csw.location.api.scaladsl.LocationService

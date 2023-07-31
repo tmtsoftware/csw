@@ -7,15 +7,15 @@ package csw.params.core.formats
 
 import java.lang.{Byte => JByte}
 
-import csw.params.commands._
+import csw.params.commands.*
 import csw.params.core.generics.{KeyType, Parameter}
-import csw.params.core.models.Coords._
-import csw.params.core.models._
+import csw.params.core.models.Coords.*
+import csw.params.core.models.*
 import csw.params.core.states.{CurrentState, StateName, StateVariable}
 import csw.params.events.{Event, EventName}
 import csw.prefix.codecs.CommonCodecs
 import csw.time.core.models.{TAITime, UTCTime}
-import io.bullet.borer._
+import io.bullet.borer.*
 import io.bullet.borer.derivation.CompactMapBasedCodecs.deriveCodec
 import io.bullet.borer.derivation.MapBasedCodecs
 import io.bullet.borer.derivation.MapBasedCodecs.deriveAllCodecs

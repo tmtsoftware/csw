@@ -17,7 +17,7 @@ import csw.alarm.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.alarm.models.ActivationStatus.{Active, Inactive}
 import csw.alarm.models.AlarmHealth
 import csw.alarm.models.AlarmHealth.{Bad, Good, Ill}
-import csw.alarm.models.AlarmSeverity._
+import csw.alarm.models.AlarmSeverity.*
 import csw.alarm.models.AutoRefreshSeverityMessage.CancelAutoRefresh
 import csw.alarm.models.FullAlarmSeverity.Disconnected
 import csw.alarm.models.Key.{AlarmKey, GlobalKey}

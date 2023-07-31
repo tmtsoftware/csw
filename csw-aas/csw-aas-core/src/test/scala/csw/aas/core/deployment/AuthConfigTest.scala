@@ -13,7 +13,7 @@ import csw.prefix.models.{Prefix, Subsystem}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 class AuthConfigTest extends AnyFunSuite with Matchers {
   test("should create KeycloakDeployment with auth disabled when authServiceLocation not passed") {

@@ -5,7 +5,7 @@
 
 package csw.framework.internal.container
 
-import org.apache.pekko.actor.typed._
+import org.apache.pekko.actor.typed.*
 import org.apache.pekko.actor.typed.scaladsl.{AbstractBehavior, ActorContext}
 import csw.alarm.client.AlarmServiceFactory
 import csw.command.client.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
@@ -14,10 +14,10 @@ import csw.command.client.messages.FromSupervisorMessage.SupervisorLifecycleStat
 import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.command.client.messages.{ComponentMessage, ContainerActorMessage, ContainerCommonMessage, ContainerIdleMessage}
-import csw.command.client.models.framework._
+import csw.command.client.models.framework.*
 import csw.event.client.EventServiceFactory
 import csw.framework.internal.supervisor.SupervisorInfoFactory
-import csw.framework.models._
+import csw.framework.models.*
 import csw.framework.scaladsl.RegistrationFactory
 import csw.location.api.models.Connection.PekkoConnection
 import csw.location.api.models.{PekkoRegistration, ComponentId, ComponentType, Metadata}

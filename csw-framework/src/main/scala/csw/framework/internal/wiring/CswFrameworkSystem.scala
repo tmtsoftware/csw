@@ -7,7 +7,7 @@ package csw.framework.internal.wiring
 
 import org.apache.pekko.actor.typed.SpawnProtocol.Spawn
 import org.apache.pekko.actor.typed.scaladsl.AskPattern.Askable
-import org.apache.pekko.actor.typed._
+import org.apache.pekko.actor.typed.*
 import org.apache.pekko.util.Timeout
 
 import scala.concurrent.Future

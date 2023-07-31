@@ -12,14 +12,14 @@ import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
 import com.typesafe.config.ConfigFactory
 import csw.alarm.api.exceptions.{InactiveAlarmException, InvalidSeverityException, KeyNotFoundException}
 import csw.alarm.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
-import csw.alarm.models.AlarmSeverity._
+import csw.alarm.models.AlarmSeverity.*
 import csw.alarm.models.FullAlarmSeverity.Disconnected
-import csw.alarm.models.Key._
-import csw.alarm.models.ShelveStatus._
-import csw.alarm.models._
+import csw.alarm.models.Key.*
+import csw.alarm.models.ShelveStatus.*
+import csw.alarm.models.*
 import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
 import csw.alarm.client.internal.helpers.{AlarmServiceTestSetup, TestDataFeeder}
-import csw.alarm.client.internal.services.SeverityTestScenarios._
+import csw.alarm.client.internal.services.SeverityTestScenarios.*
 import csw.logging.models.Level.DEBUG
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.internal.LoggingSystem

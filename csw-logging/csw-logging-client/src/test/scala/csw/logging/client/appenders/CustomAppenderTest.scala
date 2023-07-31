@@ -10,7 +10,7 @@ import java.net.InetAddress
 import org.apache.pekko.actor.typed
 import org.apache.pekko.actor.typed.SpawnProtocol
 import com.typesafe.config.ConfigFactory
-import csw.logging.api.scaladsl._
+import csw.logging.api.scaladsl.*
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.scaladsl.{LoggerFactory, LoggingSystemFactory}
 import csw.prefix.models.Prefix

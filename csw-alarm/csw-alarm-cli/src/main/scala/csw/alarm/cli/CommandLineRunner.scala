@@ -23,7 +23,7 @@ import csw.alarm.models.{AlarmSeverity, AutoRefreshSeverityMessage}
 import csw.config.client.commons.ConfigUtils
 import csw.location.api.scaladsl.LocationService
 
-import scala.async.Async.{async, await}
+import cps.*
 import scala.concurrent.Future
 
 class CommandLineRunner(

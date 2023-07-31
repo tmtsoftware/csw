@@ -7,7 +7,7 @@ package csw.command.client.internal
 
 import java.util.concurrent.TimeoutException
 
-import org.apache.pekko.actor.typed.scaladsl.AskPattern._
+import org.apache.pekko.actor.typed.scaladsl.AskPattern.*
 import org.apache.pekko.actor.typed.{ActorRef, ActorSystem}
 import org.apache.pekko.stream.scaladsl.{Keep, Sink, Source}
 import org.apache.pekko.stream.typed.scaladsl.ActorSource
@@ -21,7 +21,7 @@ import csw.command.client.messages.ComponentCommonMessage.ComponentStateSubscrip
 import csw.command.client.messages.{ComponentMessage, Query, QueryFinal}
 import csw.command.client.models.framework.PubSub.{Subscribe, SubscribeOnly}
 import csw.params.commands.CommandIssue.IdNotAvailableIssue
-import csw.params.commands.CommandResponse._
+import csw.params.commands.CommandResponse.*
 import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}

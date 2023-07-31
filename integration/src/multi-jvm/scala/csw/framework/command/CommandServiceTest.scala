@@ -32,7 +32,7 @@ import io.lettuce.core.RedisClient
 import org.scalatest.concurrent.Eventually
 import org.scalatestplus.mockito.MockitoSugar
 
-import scala.async.Async.*
+import cps.*
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, ExecutionContext, Future}
 

@@ -14,7 +14,7 @@ import csw.config.server.commons.ConfigServerLogger
 import csw.config.server.{ActorRuntime, Settings}
 import csw.logging.api.scaladsl.Logger
 
-import scala.async.Async._
+import cps.*
 import scala.concurrent.Future
 
 /**

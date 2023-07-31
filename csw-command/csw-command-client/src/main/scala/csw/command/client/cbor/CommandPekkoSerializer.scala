@@ -5,9 +5,9 @@
 
 package csw.command.client.cbor
 
-import csw.command.client.messages._
+import csw.command.client.messages.*
 import csw.command.client.messages.sequencer.CswSequencerMessage
-import csw.command.client.models.framework._
+import csw.command.client.models.framework.*
 import csw.commons.CborPekkoSerializer
 import csw.params.commands.CommandResponse
 import csw.params.core.states.StateVariable

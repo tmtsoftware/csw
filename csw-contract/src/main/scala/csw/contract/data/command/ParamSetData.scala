@@ -7,13 +7,13 @@ package csw.contract.data.command
 
 import java.time.Instant
 
-import csw.params.core.generics.KeyType._
+import csw.params.core.generics.KeyType.*
 import csw.params.core.generics.Parameter
 import csw.params.core.models.Coords.EqFrame.FK5
 import csw.params.core.models.Coords.SolarSystemObject.Venus
-import csw.params.core.models.Coords._
+import csw.params.core.models.Coords.*
 import csw.params.core.models.Units.NoUnits
-import csw.params.core.models._
+import csw.params.core.models.*
 import csw.time.core.models.{TAITime, UTCTime}
 
 object ParamSetData {

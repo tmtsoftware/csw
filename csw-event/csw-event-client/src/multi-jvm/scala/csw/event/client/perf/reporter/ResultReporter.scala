@@ -6,7 +6,7 @@
 package csw.event.client.perf.reporter
 
 import org.apache.pekko.actor.typed.ActorSystem
-import csw.event.client.perf.utils.EventUtils._
+import csw.event.client.perf.utils.EventUtils.*
 import org.HdrHistogram.Histogram
 
 class ResultReporter(test: String, actorSystem: ActorSystem[_]) {

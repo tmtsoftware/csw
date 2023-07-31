@@ -13,7 +13,7 @@ import csw.prefix.models.{Prefix, Subsystem}
 import org.scalatest.BeforeAndAfterEach
 
 import scala.collection.immutable.Set
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 class LocationServiceTestMultiJvmNode1 extends LocationServiceTest(0, "cluster")
 

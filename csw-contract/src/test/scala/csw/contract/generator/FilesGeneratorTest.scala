@@ -14,7 +14,7 @@ import csw.location.api.messages.LocationRequest.{Register, Unregister}
 import csw.location.api.messages.LocationStreamRequest.Track
 import csw.location.api.messages.{LocationRequest, LocationStreamRequest}
 import csw.location.api.models.Connection.{PekkoConnection, HttpConnection}
-import csw.location.api.models._
+import csw.location.api.models.*
 import csw.prefix.models.Prefix
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.funsuite.AnyFunSuite

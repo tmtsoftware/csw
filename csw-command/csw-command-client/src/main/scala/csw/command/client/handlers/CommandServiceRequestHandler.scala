@@ -5,12 +5,12 @@
 
 package csw.command.client.handlers
 
-import org.apache.pekko.http.scaladsl.server.Directives._
+import org.apache.pekko.http.scaladsl.server.Directives.*
 import org.apache.pekko.http.scaladsl.server.Route
 import csw.aas.http.SecurityDirectives
-import csw.command.api.codecs.CommandServiceCodecs._
+import csw.command.api.codecs.CommandServiceCodecs.*
 import csw.command.api.messages.CommandServiceRequest
-import csw.command.api.messages.CommandServiceRequest._
+import csw.command.api.messages.CommandServiceRequest.*
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.auth.{CommandPolicy, CommandRoles}
 import csw.params.commands.ControlCommand

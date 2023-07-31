@@ -9,7 +9,7 @@ import csw.location.api.models.{ComponentType, Connection}
 import csw.prefix.models.Prefix
 
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 /**
  * The information needed to create a component. This class is created after de-serializing the config file for the component.

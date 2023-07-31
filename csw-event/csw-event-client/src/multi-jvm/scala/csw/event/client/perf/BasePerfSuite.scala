@@ -15,7 +15,7 @@ import org.apache.pekko.remote.testkit.{MultiNodeConfig, MultiNodeSpec, MultiNod
 import org.apache.pekko.testkit.ImplicitSender
 import csw.event.api.scaladsl.{EventPublisher, EventSubscriber}
 import csw.event.client.perf.commons.PerfSubscriber
-import csw.event.client.perf.reporter._
+import csw.event.client.perf.reporter.*
 import csw.event.client.perf.utils.EventUtils.nanosToSeconds
 import csw.event.client.perf.utils.{EventUtils, SystemMonitoringSupport}
 import csw.event.client.perf.wiring.{TestConfigs, TestWiring}

@@ -11,7 +11,7 @@ import org.apache.pekko.http.scaladsl.model.{ContentTypeRange, ContentTypes, Htt
 import org.apache.pekko.http.scaladsl.unmarshalling.{FromEntityUnmarshaller, Unmarshaller}
 import org.apache.pekko.util.ByteString
 import csw.config.api.ConfigData
-import io.bullet.borer.compat.pekko._
+import io.bullet.borer.compat.pekko.*
 import io.bullet.borer.{Decoder, Encoder, Json}
 
 import scala.collection.immutable.Seq

@@ -7,9 +7,9 @@ package csw.logging.client.components
 
 import org.apache.pekko.actor.typed.Behavior
 import org.apache.pekko.actor.typed.scaladsl.Behaviors
-import csw.logging.api.scaladsl._
-import csw.logging.client.components.IRIS._
-import csw.logging.client.components.IRISLogMessages._
+import csw.logging.api.scaladsl.*
+import csw.logging.client.components.IRIS.*
+import csw.logging.client.components.IRISLogMessages.*
 import csw.logging.client.scaladsl.{GenericLoggerFactory, LoggerFactory}
 import csw.prefix.models.Prefix
 import csw.prefix.models.Subsystem.CSW

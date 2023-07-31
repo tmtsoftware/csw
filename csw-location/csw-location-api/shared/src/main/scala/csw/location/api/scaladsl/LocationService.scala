@@ -7,7 +7,7 @@ package csw.location.api.scaladsl
 
 import org.apache.pekko.Done
 import org.apache.pekko.stream.scaladsl.Source
-import csw.location.api.models._
+import csw.location.api.models.*
 import msocket.api.Subscription
 
 import scala.concurrent.Future

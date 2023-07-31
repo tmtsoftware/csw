@@ -8,15 +8,14 @@ package csw.config.api
 import java.io.InputStream
 import java.nio.file.Path
 import java.util.concurrent.CompletableFuture
-
 import org.apache.pekko.actor.typed.ActorSystem
 import org.apache.pekko.stream.scaladsl.{FileIO, Keep, Source, StreamConverters}
 import org.apache.pekko.util.ByteString
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.config.api.commons.Constants
 
-import scala.compat.java8.FutureConverters._
 import scala.concurrent.Future
+import scala.jdk.FutureConverters.*
 
 /**
  * This class represents the contents of the files being managed.
@@ -55,7 +54,7 @@ class ConfigData private (val source: Source[ByteString, Any], val length: Long)
    * @return a CompletableFuture that completes with string representation of file data
    */
   private[config] def toJStringF(implicit system: ActorSystem[_]): CompletableFuture[String] =
-    toStringF.toJava.toCompletableFuture
+    toStringF.asJava.toCompletableFuture
 
   /**
    * Returns a future of Config object if the data is in valid parseable HOCON format. Else, throws ConfigException.
@@ -65,7 +64,7 @@ class ConfigData private (val source: Source[ByteString, Any], val length: Long)
    * @return a CompletableFuture that completes with `Config` model representing the file data
    */
   private[config] def toJConfigObject(implicit system: ActorSystem[_]): CompletableFuture[Config] =
-    toConfigObject.toJava.toCompletableFuture
+    toConfigObject.asJava.toCompletableFuture
 
   /**
    * Writes config data to a provided file path and returns future file

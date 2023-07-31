@@ -17,7 +17,7 @@ import csw.params.core.generics.{Key, Parameter}
 import csw.params.core.models.Units.pascal
 import csw.params.core.models.{ArrayData, ObsId}
 import csw.prefix.models.Prefix
-import org.openjdk.jmh.annotations._
+import org.openjdk.jmh.annotations.*
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble

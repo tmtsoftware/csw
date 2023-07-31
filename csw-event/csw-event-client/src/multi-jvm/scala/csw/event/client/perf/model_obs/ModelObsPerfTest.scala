@@ -7,12 +7,12 @@ package csw.event.client.perf.model_obs
 
 import org.apache.pekko.actor.testkit.typed.scaladsl
 import org.apache.pekko.actor.typed.ActorSystem
-import org.apache.pekko.actor.typed.scaladsl.adapter._
+import org.apache.pekko.actor.typed.scaladsl.adapter.*
 import org.apache.pekko.remote.testkit.MultiNodeConfig
 import com.typesafe.config.ConfigFactory
 import csw.event.client.perf.BasePerfSuite
 import csw.event.client.perf.commons.{EventsSetting, PerfPublisher, PerfSubscriber}
-import csw.event.client.perf.reporter._
+import csw.event.client.perf.reporter.*
 
 import scala.concurrent.Await
 

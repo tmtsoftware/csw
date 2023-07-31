@@ -8,7 +8,7 @@ package example.event
 import org.apache.pekko.Done
 import org.apache.pekko.actor.Cancellable
 import org.apache.pekko.stream.scaladsl.{Keep, Source}
-import csw.params.events._
+import csw.params.events.*
 import csw.command.client.models.framework.ComponentInfo
 import csw.params.core.models.{Id, ObsId}
 import csw.event.api.exceptions.PublishFailure

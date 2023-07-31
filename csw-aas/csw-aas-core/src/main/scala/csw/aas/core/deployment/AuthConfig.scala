@@ -6,8 +6,8 @@
 package csw.aas.core.deployment
 import java.io.{ByteArrayInputStream, InputStream}
 
-import com.typesafe.config._
-import csw.aas.core.deployment.AuthConfig._
+import com.typesafe.config.*
+import csw.aas.core.deployment.AuthConfig.*
 import csw.location.api.models.HttpLocation
 import org.keycloak.adapters.{KeycloakDeployment, KeycloakDeploymentBuilder}
 

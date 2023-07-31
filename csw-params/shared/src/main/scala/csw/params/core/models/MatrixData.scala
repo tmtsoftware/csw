@@ -9,7 +9,7 @@ import java.util
 
 import scala.annotation.{nowarn, varargs}
 import scala.collection.mutable
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.language.implicitConversions
 import scala.reflect.ClassTag
 

@@ -8,7 +8,7 @@ package csw.params.core.models
 import java.util
 
 import scala.annotation.varargs
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.language.implicitConversions
 
 /**

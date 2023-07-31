@@ -29,7 +29,7 @@ import csw.logging.api.scaladsl.Logger
 import msocket.api.Subscription
 import msocket.jvm.SourceExtension.RichSource
 
-import scala.async.Async.*
+import cps.*
 import scala.concurrent.Future
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 

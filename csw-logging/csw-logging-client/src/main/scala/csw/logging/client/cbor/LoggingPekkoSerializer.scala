@@ -6,7 +6,7 @@
 package csw.logging.client.cbor
 
 import csw.commons.CborPekkoSerializer
-import csw.logging.models.codecs.LoggingCodecs._
+import csw.logging.models.codecs.LoggingCodecs.*
 import csw.logging.models.codecs.LoggingSerializable
 import csw.logging.models.{Level, LogMetadata}
 

@@ -11,7 +11,7 @@ import csw.framework.internal.configparser.ConfigParser
 import csw.framework.internal.supervisor.SupervisorBehaviorFactory
 import csw.framework.models.CswContext
 
-import scala.async.Async.{async, await}
+import cps.*
 import scala.concurrent.Future
 
 /**

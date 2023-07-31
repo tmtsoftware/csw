@@ -14,7 +14,7 @@ import csw.logging.client.utils.FileUtils
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 import play.api.libs.json.{JsObject, Json}
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
 import org.scalatest.funsuite.AnyFunSuite

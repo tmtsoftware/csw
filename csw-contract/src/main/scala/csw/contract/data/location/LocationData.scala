@@ -9,11 +9,11 @@ import java.net.URI
 import java.util.concurrent.TimeUnit
 
 import org.apache.pekko.Done
-import csw.location.api.exceptions._
-import csw.location.api.messages.LocationRequest._
+import csw.location.api.exceptions.*
+import csw.location.api.messages.LocationRequest.*
 import csw.location.api.messages.LocationStreamRequest.Track
 import csw.location.api.models.Connection.{PekkoConnection, HttpConnection, TcpConnection}
-import csw.location.api.models._
+import csw.location.api.models.*
 import csw.prefix.models.{Prefix, Subsystem}
 
 import scala.concurrent.duration.FiniteDuration

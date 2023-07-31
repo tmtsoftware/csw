@@ -19,7 +19,7 @@ import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
 import csw.prefix.models.Prefix
 
-import scala.async.Async._
+import cps.*
 import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.util.control.NonFatal
 

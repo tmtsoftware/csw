@@ -12,14 +12,14 @@ import java.time.Instant
 import csw.config.api.ConfigData
 import csw.config.api.exceptions.{FileAlreadyExists, FileNotFound}
 import csw.config.api.scaladsl.ConfigService
-import csw.config.models._
+import csw.config.models.*
 import csw.config.server.commons.ConfigServerLogger
 import csw.config.server.files.AnnexFileService
 import csw.config.server.{ActorRuntime, Settings}
 import csw.logging.api.scaladsl.Logger
 import org.tmatesoft.svn.core.wc.SVNRevision
 
-import scala.async.Async._
+import cps.*
 import scala.concurrent.Future
 
 class SvnConfigService(settings: Settings, actorRuntime: ActorRuntime, svnRepo: SvnRepo, annexFileService: AnnexFileService)

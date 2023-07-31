@@ -11,12 +11,12 @@ import org.apache.pekko.http.scaladsl.common.ToNameReceptacleEnhancements._strin
 import org.apache.pekko.http.scaladsl.server.PathMatcher._segmentStringToPathMatcher
 import org.apache.pekko.http.scaladsl.server.PathMatchers.LongNumber
 import org.apache.pekko.http.scaladsl.server.RouteConcatenation._enhanceRouteWithConcatenation
-import org.apache.pekko.http.scaladsl.server._
+import org.apache.pekko.http.scaladsl.server.*
 import org.apache.pekko.http.scaladsl.server.directives.ParameterDirectives.parameter
 import org.apache.pekko.http.scaladsl.server.directives.PathDirectives.path
 import org.apache.pekko.http.scaladsl.server.directives.RouteDirectives.complete
 import com.typesafe.config.Config
-import csw.aas.http.AuthorizationPolicy._
+import csw.aas.http.AuthorizationPolicy.*
 import csw.aas.http.SecurityDirectives
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 

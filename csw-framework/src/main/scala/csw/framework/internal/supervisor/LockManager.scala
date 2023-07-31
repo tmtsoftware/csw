@@ -8,7 +8,7 @@ package csw.framework.internal.supervisor
 import org.apache.pekko.actor.typed.ActorRef
 import csw.command.client.messages.CommandMessage
 import csw.command.client.models.framework.LockingResponse
-import csw.command.client.models.framework.LockingResponse._
+import csw.command.client.models.framework.LockingResponse.*
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
 import csw.prefix.models.Subsystem

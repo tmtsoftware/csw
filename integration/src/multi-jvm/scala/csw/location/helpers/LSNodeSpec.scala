@@ -5,7 +5,7 @@
 
 package csw.location.helpers
 
-import org.apache.pekko.actor.typed.scaladsl.adapter._
+import org.apache.pekko.actor.typed.scaladsl.adapter.*
 import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import org.apache.pekko.remote.testkit.{MultiNodeSpec, MultiNodeSpecCallbacks}
 import org.apache.pekko.testkit.ImplicitSender

@@ -6,7 +6,7 @@
 package csw.logging.client.internal
 
 import csw.logging.client.internal.LogActorMessages.LogPekko
-import csw.logging.client.internal.LoggingState._
+import csw.logging.client.internal.LoggingState.*
 import csw.logging.client.internal.TimeActorMessages.{TimeEnd, TimeStart}
 import csw.logging.models.RequestId
 

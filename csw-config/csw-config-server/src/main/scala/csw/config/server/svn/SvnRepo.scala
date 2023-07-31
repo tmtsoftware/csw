@@ -16,7 +16,7 @@ import csw.config.server.Settings
 import csw.config.server.commons.ConfigServerLogger
 import csw.config.server.commons.SVNDirEntryExt.RichSvnDirEntry
 import csw.logging.api.scaladsl.Logger
-import org.tmatesoft.svn.core._
+import org.tmatesoft.svn.core.*
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager
 import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory
 import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator
