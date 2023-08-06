@@ -18,12 +18,12 @@ import scala.concurrent.duration.{DurationLong, FiniteDuration}
 import scala.util.Try
 
 private[aas] class InstalledAppAuthAdapterImpl(
-    authConfig: AuthConfig,
-    val keycloakInstalled: KeycloakInstalled,
-    tokenVerifier: TokenVerifier,
-    maybeStore: Option[AuthStore] = None
-)(implicit executionContext: ExecutionContext)
-    extends InstalledAppAuthAdapter {
+                                                authConfig: AuthConfig,
+                                                val keycloakInstalled: KeycloakInstalled,
+                                                tokenVerifier: TokenVerifier,
+                                                maybeStore: Option[AuthStore] = None
+                                              )(implicit executionContext: ExecutionContext)
+  extends InstalledAppAuthAdapter {
 
   import authConfig.disabled
 
@@ -50,16 +50,16 @@ private[aas] class InstalledAppAuthAdapterImpl(
   override def loginCommandLine(): Boolean = {
     require(keycloakInstalled.getDeployment != null, "keycloak deployment is null")
     require(keycloakInstalled.getDeployment.getAuthUrl != null, "auth url is not set")
-    val bool = keycloakInstalled.loginCommandLine()
+    val bool = Try(keycloakInstalled.loginManual()).isSuccess
     if (bool) updateAuthStore()
     bool
   }
 
-  override def loginCommandLine(redirectUri: String): Boolean = {
-    val bool = keycloakInstalled.loginCommandLine(redirectUri)
-    if (bool) updateAuthStore()
-    bool
-  }
+//  override def loginCommandLine(redirectUri: String): Boolean = {
+//    val bool = keycloakInstalled.loginManual(redirectUri)
+//    if (bool) updateAuthStore()
+//    bool
+//  }
 
   override def getAccessToken(minValidity: FiniteDuration = 0.seconds): Option[AccessToken] = {
     def getNewToken: Option[AccessToken] = {

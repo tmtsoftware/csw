@@ -6,13 +6,13 @@
 package csw.config.api.models
 
 import java.nio.file.Files
-
-import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.actor.{ActorSystem, typed}
 import org.apache.pekko.actor.typed.scaladsl.adapter.ClassicActorSystemOps
 import org.apache.pekko.testkit.TestKit
 import com.typesafe.config.{Config, ConfigException}
 import csw.config.api.ConfigData
-import csw.config.api.commons.TestFutureExtension.RichFuture
+import csw.config.api.commons.TestFutureExtension.given
+import scala.language.implicitConversions
 
 import scala.jdk.CollectionConverters.*
 import org.scalatest.funsuite.AnyFunSuiteLike
@@ -20,7 +20,7 @@ import org.scalatest.matchers.should.Matchers
 
 class ConfigDataTest extends TestKit(ActorSystem("test-system")) with AnyFunSuiteLike with Matchers {
 
-  implicit val typedSystem = system.toTyped
+  implicit val typedSystem: typed.ActorSystem[Nothing] = system.toTyped
 
   val expectedStringConfigData: String =
     """

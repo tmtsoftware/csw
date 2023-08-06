@@ -4,7 +4,9 @@
  */
 
 package csw.alarm.client.internal.helpers
-import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
+import csw.alarm.client.internal.helpers.TestFutureExt.given
+import scala.language.implicitConversions
+
 import csw.alarm.client.internal.services.{MetadataServiceModule, SeverityServiceModule, StatusServiceModule}
 import csw.alarm.models.AcknowledgementStatus.Acknowledged
 import csw.alarm.models.ActivationStatus.Active

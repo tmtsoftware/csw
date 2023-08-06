@@ -10,7 +10,9 @@ import csw.commons.redis.EmbeddedRedis
 import csw.event.api.scaladsl.EventPublisher
 import csw.event.cli.args.ArgsParser
 import csw.event.cli.wiring.Wiring
-import csw.event.client.helpers.TestFutureExt.RichFuture
+import csw.event.client.helpers.TestFutureExt.given
+import scala.language.implicitConversions
+
 import csw.event.client.internal.commons.EventServiceConnection
 import csw.location.api.models.TcpRegistration
 import csw.location.server.http.HTTPLocationService

@@ -317,7 +317,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
     new TromboneHcd().startLogging(logMsgMap, "alternative")
     Thread.sleep(100)
 
-    logBuffer.foreach { log => log.getString(LoggingKeys.CATEGORY) shouldBe true }
+    logBuffer.foreach { log => log.getString(LoggingKeys.CATEGORY) shouldBe "true" }
   }
 
   test("should able to log exception at ERROR level with complete stacktrace | DEOPSCSW-158, DEOPSCSW-325") {

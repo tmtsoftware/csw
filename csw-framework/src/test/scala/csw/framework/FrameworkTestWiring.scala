@@ -7,7 +7,9 @@ package csw.framework
 import org.apache.pekko.Done
 import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.commons.redis.EmbeddedRedis
-import csw.event.client.helpers.TestFutureExt.RichFuture
+import csw.event.client.helpers.TestFutureExt.given
+import scala.language.implicitConversions
+
 import csw.location.api.models
 import csw.location.api.models.Connection.TcpConnection
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}

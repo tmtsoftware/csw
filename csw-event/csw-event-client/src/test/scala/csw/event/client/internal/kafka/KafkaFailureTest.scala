@@ -8,7 +8,9 @@ package csw.event.client.internal.kafka
 import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
 import org.apache.pekko.stream.scaladsl.Source
 import csw.event.api.exceptions.PublishFailure
-import csw.event.client.helpers.TestFutureExt.RichFuture
+import csw.event.client.helpers.TestFutureExt.given
+import scala.language.implicitConversions
+
 import csw.event.client.helpers.Utils
 import csw.params.events.Event
 import csw.time.core.models.UTCTime
@@ -52,7 +54,7 @@ class KafkaFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
     val failedEvent = Utils.makeEvent(1)
     val eventStream = Source.single(failedEvent)
 
-    kafkaTestProps.publisher.publish(eventStream, onError = testProbe.ref ! _)
+    kafkaTestProps.publisher.publish(eventStream, onError = (x: PublishFailure) => testProbe.ref ! x)
 
     val failure = testProbe.expectMessageType[PublishFailure]
 
@@ -65,7 +67,7 @@ class KafkaFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
     val testProbe   = TestProbe[PublishFailure]()(kafkaTestProps.actorSystem)
     val failedEvent = Utils.makeEvent(1)
 
-    val cancellable = kafkaTestProps.publisher.publish(Some(failedEvent), 20.millis, onError = testProbe.ref ! _)
+    val cancellable = kafkaTestProps.publisher.publish(Some(failedEvent), 20.millis, onError = (x: PublishFailure) => testProbe.ref ! x)
 
     val failure = testProbe.expectMessageType[PublishFailure]
 
@@ -82,7 +84,7 @@ class KafkaFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
     val failedEvent = Utils.makeEvent(1)
 
     val cancellable =
-      kafkaTestProps.publisher.publishAsync(Future.successful(Some(failedEvent)), 20.millis, onError = testProbe.ref ! _)
+      kafkaTestProps.publisher.publishAsync(Future.successful(Some(failedEvent)), 20.millis, onError = (x: PublishFailure) => testProbe.ref ! x)
 
     val failure = testProbe.expectMessageType[PublishFailure]
 
@@ -135,7 +137,7 @@ class KafkaFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
   test("should not invoke onError on opting to not publish event with eventGenerator | DEOPSCSW-398, DEOPSCSW-516") {
     val testProbe = TestProbe[PublishFailure]()(kafkaTestProps.actorSystem)
 
-    val cancellable = kafkaTestProps.publisher.publish(None, 20.millis, onError = testProbe.ref ! _)
+    val cancellable = kafkaTestProps.publisher.publish(None, 20.millis, onError = (x: PublishFailure) => testProbe.ref ! x)
     testProbe.expectNoMessage()
 
     val startTime = UTCTime(UTCTime.now().value.plusMillis(200))
@@ -150,11 +152,11 @@ class KafkaFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
 
     def eventGenerator(): Future[Option[Event]] = Future.successful(None)
 
-    val cancellable1 = kafkaTestProps.publisher.publishAsync(eventGenerator(), 20.millis, onError = testProbe.ref ! _)
+    val cancellable1 = kafkaTestProps.publisher.publishAsync(eventGenerator(), 20.millis, onError = (x: PublishFailure) => testProbe.ref ! x)
     testProbe.expectNoMessage()
 
     val startTime    = UTCTime(UTCTime.now().value.plusMillis(200))
-    val cancellable2 = kafkaTestProps.publisher.publishAsync(eventGenerator(), startTime, 20.millis, onError = testProbe.ref ! _)
+    val cancellable2 = kafkaTestProps.publisher.publishAsync(eventGenerator(), startTime, 20.millis, onError = (x: PublishFailure) => testProbe.ref ! x)
     testProbe.expectNoMessage(500.millis)
     cancellable1.cancel()
     cancellable2.cancel()

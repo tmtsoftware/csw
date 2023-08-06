@@ -4,7 +4,9 @@
  */
 
 package csw.framework.integration
-import csw.event.client.helpers.TestFutureExt.RichFuture
+import csw.event.client.helpers.TestFutureExt.given
+import scala.language.implicitConversions
+
 import csw.framework.FrameworkTestWiring
 import csw.location.server.internal.ServerWiring
 import org.scalatest.*

@@ -12,7 +12,9 @@ import csw.commons.redis.EmbeddedRedis
 import csw.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
 import csw.event.api.scaladsl.*
 import csw.event.client.EventServiceFactory
-import csw.event.client.helpers.TestFutureExt.RichFuture
+import csw.event.client.helpers.TestFutureExt.given
+import scala.language.implicitConversions
+
 import csw.event.client.internal.commons.javawrappers.JEventService
 import csw.event.client.internal.wiring.BaseProperties
 import csw.event.client.internal.wiring.BaseProperties.createInfra
@@ -53,14 +55,14 @@ class RedisTestProps(
 
   val eventService: EventService       = eventServiceFactory.make(locationService)
   val jEventService: IEventService     = new JEventService(eventService)
-  lazy val publisher: EventPublisher   = eventService.defaultPublisher
-  lazy val subscriber: EventSubscriber = eventService.defaultSubscriber
+  val publisher: EventPublisher   = eventService.defaultPublisher
+  val subscriber: EventSubscriber = eventService.defaultSubscriber
 
   override def toString: String = name
 
-  override lazy val jPublisher: IEventPublisher = jEventService.defaultPublisher
+  override val jPublisher: IEventPublisher = jEventService.defaultPublisher
 
-  override lazy val jSubscriber: IEventSubscriber = jEventService.defaultSubscriber
+  override val jSubscriber: IEventSubscriber = jEventService.defaultSubscriber
 
   override def publishGarbage(channel: String, message: String): Future[Done] =
     asyncConnection.flatMap(c => c.publish(channel, message).asScala.map(_ => Done))

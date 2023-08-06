@@ -11,7 +11,9 @@ import com.typesafe.config.ConfigFactory
 import csw.alarm.api.exceptions.KeyNotFoundException
 import csw.alarm.cli.args.Options
 import csw.alarm.cli.utils.IterableExtensions.RichStringIterable
-import csw.alarm.cli.utils.TestFutureExt.RichFuture
+import csw.alarm.cli.utils.TestFutureExt.given
+import scala.language.implicitConversions
+
 import csw.alarm.commons.Separators.KeySeparator
 import csw.alarm.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.alarm.models.ActivationStatus.{Active, Inactive}

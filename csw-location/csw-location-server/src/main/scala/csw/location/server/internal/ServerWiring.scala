@@ -23,8 +23,8 @@ private[csw] class ServerWiring(enableAuth: Boolean) extends LocationServiceCode
   lazy val config: Config                                           = ConfigFactory.load()
   lazy val settings                                                 = new Settings(config)
   lazy val clusterSettings: ClusterSettings                         = ClusterAwareSettings.onPort(settings.clusterPort)
-  implicit lazy val actorSystem: ActorSystem[SpawnProtocol.Command] = clusterSettings.system
-  lazy val actorRuntime                                             = new ActorRuntime(actorSystem)
+  implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = clusterSettings.system
+  val actorRuntime                                             = new ActorRuntime(actorSystem)
   import actorSystem.executionContext
   lazy val locationService: LocationService = LocationServiceFactory.make(clusterSettings)
 

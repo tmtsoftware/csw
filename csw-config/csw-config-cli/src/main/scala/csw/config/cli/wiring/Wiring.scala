@@ -26,8 +26,8 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
 private[csw] class Wiring {
   lazy val config: Config = ConfigFactory.load()
   lazy val settings       = new Settings(config)
-  lazy val actorSystem    = ActorSystem(SpawnProtocol(), "config-cli", config)
-  lazy val actorRuntime   = new ActorRuntime(actorSystem)
+  val actorSystem    = ActorSystem(SpawnProtocol(), "config-cli", config)
+  val actorRuntime   = new ActorRuntime(actorSystem)
   import actorRuntime._
 
   lazy val locationService: LocationService           = HttpLocationServiceFactory.makeLocalClient(actorSystem)

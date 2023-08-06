@@ -9,7 +9,9 @@ import com.typesafe.config.{Config, ConfigFactory}
 import csw.alarm.api.exceptions.KeyNotFoundException
 import csw.alarm.api.internal.MetadataKey
 import csw.alarm.client.internal.helpers.AlarmServiceTestSetup
-import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
+import csw.alarm.client.internal.helpers.TestFutureExt.given
+import scala.language.implicitConversions
+
 import csw.alarm.models.ActivationStatus.{Active, Inactive}
 import csw.alarm.models.AlarmHealth.Bad
 import csw.alarm.models.AlarmSeverity.*

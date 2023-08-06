@@ -14,7 +14,9 @@ import csw.alarm.api.scaladsl.AlarmAdminService
 import csw.alarm.client.AlarmServiceFactory
 import csw.alarm.client.internal.commons.Settings
 import csw.alarm.client.internal.commons.serviceresolver.AlarmServiceHostPortResolver
-import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
+import csw.alarm.client.internal.helpers.TestFutureExt.given
+import scala.language.implicitConversions
+
 import csw.alarm.client.internal.redis.RedisConnectionsFactory
 import csw.alarm.models.{AlarmMetadata, FullAlarmSeverity}
 import csw.commons.redis.EmbeddedRedis

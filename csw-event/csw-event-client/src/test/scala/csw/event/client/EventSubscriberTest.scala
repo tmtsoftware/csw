@@ -10,7 +10,9 @@ import org.apache.pekko.actor.typed.ActorSystem
 import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import org.apache.pekko.stream.scaladsl.{Keep, Sink}
 import csw.event.api.scaladsl.SubscriptionModes
-import csw.event.client.helpers.TestFutureExt.RichFuture
+import csw.event.client.helpers.TestFutureExt.given
+import scala.language.implicitConversions
+
 import csw.event.client.helpers.Utils.*
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.event.client.internal.kafka.KafkaTestProps
@@ -39,8 +41,8 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
 
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 10.millis)
 
-  var redisTestProps: RedisTestProps = _
-  var kafkaTestProps: KafkaTestProps = _
+  var redisTestProps: BaseProperties = _
+  var kafkaTestProps: BaseProperties = _
 
   @BeforeSuite
   def beforeAll(): Unit = {
@@ -57,14 +59,14 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   }
 
   @DataProvider(name = "event-service-provider")
-  def pubSubProvider: Array[Array[_ <: BaseProperties]] =
+  def pubSubProvider: Array[Array[BaseProperties]] =
     Array(
       Array(redisTestProps),
       Array(kafkaTestProps)
     )
 
   @DataProvider(name = "redis-provider")
-  def redisPubSubProvider: Array[Array[RedisTestProps]] = Array(Array(redisTestProps))
+  def redisPubSubProvider: Array[Array[BaseProperties]] = Array(Array(redisTestProps))
 
   val events: immutable.Seq[Event]                  = for (i <- 1 to 3500) yield makeEvent(i)
   def events(name: EventName): immutable.Seq[Event] = for (i <- 1 to 3500) yield makeEventForKeyName(name, i)

@@ -107,7 +107,7 @@ object MiniCRM {
           // Used only for tests
           replyTo ! s"responseList: $responseList, waiterList: $waiterList"
           Behaviors.same
-        case _ =>
+        case null =>
           Behaviors.same
       }
     }

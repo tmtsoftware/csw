@@ -78,7 +78,7 @@ class CswCluster private (clusterSettings: ClusterSettings) {
 
     val confirmationActorF: ActorRef[Any] = actorSystem.spawn(ClusterConfirmationActor.behavior(), "ClusterConfirmationActor")
     implicit val timeout: Timeout         = Timeout(5.seconds)
-    def statusF: Future[Option[Done]]     = confirmationActorF ? HasJoinedCluster
+    def statusF: Future[Option[Done]]     = confirmationActorF ? HasJoinedCluster.apply
     def status: Option[Done]              = Await.result(statusF, 5.seconds)
     val success                           = BlockingUtils.poll(status.isDefined, 20.seconds)
     if (!success) {

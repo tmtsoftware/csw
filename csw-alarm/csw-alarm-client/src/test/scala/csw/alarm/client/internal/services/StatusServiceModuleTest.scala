@@ -13,7 +13,9 @@ import csw.alarm.api.exceptions.KeyNotFoundException
 import csw.alarm.api.internal.SeverityKey
 import csw.alarm.client.internal.extensions.TimeExtensions
 import csw.alarm.client.internal.helpers.AlarmServiceTestSetup
-import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
+import csw.alarm.client.internal.helpers.TestFutureExt.given
+import scala.language.implicitConversions
+
 import csw.alarm.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.alarm.models.AlarmSeverity.*
 import csw.alarm.models.FullAlarmSeverity.Disconnected

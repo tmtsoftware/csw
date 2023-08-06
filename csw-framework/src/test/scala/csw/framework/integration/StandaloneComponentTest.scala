@@ -19,7 +19,9 @@ import csw.common.FrameworkAssertions.*
 import csw.common.components.framework.SampleComponentHandlers
 import csw.common.components.framework.SampleComponentState.*
 import csw.common.utils.TestAppender
-import csw.event.client.helpers.TestFutureExt.RichFuture
+import csw.event.client.helpers.TestFutureExt.given
+import scala.language.implicitConversions
+
 import csw.framework.internal.component.ComponentBehavior
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.location.api.models.ComponentType.HCD

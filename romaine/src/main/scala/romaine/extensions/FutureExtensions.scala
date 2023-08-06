@@ -12,7 +12,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
 object FutureExtensions {
-  implicit class RichFuture(response: Future[String]) {
+  class RichFuture(response: Future[String]) {
     def failWith(reason: => String)(implicit ec: ExecutionContext): Future[Done] =
       response
         .map {
@@ -23,4 +23,7 @@ object FutureExtensions {
           throw RedisOperationFailed(reason, ex)
         }
   }
+
+  given futureConversion: Conversion[Future[String], RichFuture] with
+    def apply(x: Future[String]): RichFuture = RichFuture(x)
 }

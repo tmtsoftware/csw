@@ -6,7 +6,9 @@
 package csw.integtration.apps
 
 import org.apache.pekko.actor.typed.scaladsl.Behaviors
-import csw.integtration.common.TestFutureExtension.RichFuture
+import csw.integtration.common.TestFutureExtension.given
+import scala.language.implicitConversions
+
 import csw.location.api.PekkoRegistrationFactory
 import csw.location.api.models.ComponentId
 import csw.location.api.models.ComponentType.Assembly

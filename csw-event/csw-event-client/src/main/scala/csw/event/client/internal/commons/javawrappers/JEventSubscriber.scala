@@ -33,7 +33,7 @@ class JEventSubscriber(eventSubscriber: EventSubscriber) extends IEventSubscribe
       .subscribe(eventKeys.asScala.toSet)
       .asJava
       .mapMaterializedValue {
-        eventSubscription: EventSubscription =>
+        (eventSubscription: EventSubscription) =>
           new IEventSubscription {
             override def unsubscribe(): CompletableFuture[Done] = eventSubscription.unsubscribe().asJava.toCompletableFuture
 

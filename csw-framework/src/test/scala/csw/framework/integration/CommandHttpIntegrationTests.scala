@@ -18,7 +18,9 @@ import csw.command.client.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.command.client.models.framework.*
 import csw.common.FrameworkAssertions.*
 import csw.common.components.command.CommandComponentState.*
-import csw.event.client.helpers.TestFutureExt.RichFuture
+import csw.event.client.helpers.TestFutureExt.given
+import scala.language.implicitConversions
+
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.location.api.models
 import csw.location.api.models.ComponentType.{Assembly, HCD}

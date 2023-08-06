@@ -46,12 +46,12 @@ final class ConfigTestKit private (
     case (Some(_config), _) =>
       new ServerWiring {
         override lazy val config: Config                                  = _config
-        override lazy val actorSystem: ActorSystem[SpawnProtocol.Command] = system
+        override val actorSystem: ActorSystem[SpawnProtocol.Command] = system
         override lazy val securityDirectives: SecurityDirectives          = _securityDirectives
       }
     case (_, serverPort) =>
       new ServerWiring {
-        override lazy val actorSystem: ActorSystem[SpawnProtocol.Command] = system
+        override val actorSystem: ActorSystem[SpawnProtocol.Command] = system
         override lazy val securityDirectives: SecurityDirectives          = _securityDirectives
         override lazy val settings: Settings = new Settings(config) {
           override val `service-port`: Int = serverPort.getOrElse(super.`service-port`)

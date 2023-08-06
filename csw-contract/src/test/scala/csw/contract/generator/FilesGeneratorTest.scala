@@ -6,8 +6,7 @@
 package csw.contract.generator
 import java.io.File
 import java.net.URI
-import java.nio.file.{Files, Paths}
-
+import java.nio.file.{Files, Path, Paths}
 import csw.contract.ResourceFetcher
 import csw.location.api.codec.LocationServiceCodecs
 import csw.location.api.messages.LocationRequest.{Register, Unregister}
@@ -20,15 +19,18 @@ import org.scalatest.BeforeAndAfterAll
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 
-import scala.reflect.io.Directory
+import java.util.Comparator
 
 class FilesGeneratorTest extends AnyFunSuite with Matchers with BeforeAndAfterAll with LocationServiceCodecs {
 
   override def afterAll(): Unit = {
-    val dir = new Directory(new File("csw-contract/src/test/testOutput"))
-    if (dir.exists) {
-      dir.deleteRecursively()
-    }
+    val path = Paths.get("csw-contract/src/test/testOutput")
+    if (path.toFile.exists())
+      Files
+        .walk(path)
+        .sorted(Comparator.reverseOrder())
+        .map(_.toFile)
+        .forEach(_.delete)
   }
 
   test("should generate samples for given services") {

@@ -9,7 +9,8 @@ import org.apache.pekko.Done
 import io.lettuce.core.api.async.RedisAsyncCommands
 import romaine.RedisResult
 import romaine.exceptions.RedisServerNotAvailable
-import romaine.extensions.FutureExtensions.RichFuture
+import romaine.extensions.FutureExtensions.given
+import scala.language.implicitConversions
 
 import scala.jdk.CollectionConverters.*
 import scala.jdk.FutureConverters.*

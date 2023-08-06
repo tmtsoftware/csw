@@ -12,7 +12,9 @@ import org.apache.pekko.http.scaladsl.model.Uri.Path
 import org.apache.pekko.http.scaladsl.model.{HttpRequest, StatusCodes, Uri}
 import com.typesafe.config.ConfigFactory
 import csw.aas.core.commons.AASConnection
-import csw.config.server.commons.TestFutureExtension.RichFuture
+import csw.config.server.commons.TestFutureExtension.given
+import scala.language.implicitConversions
+
 import csw.config.server.commons.{ConfigServiceConnection, TestFileUtils}
 import csw.location.api.models
 import csw.location.api.scaladsl.LocationService

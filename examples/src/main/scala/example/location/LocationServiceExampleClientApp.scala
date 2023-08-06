@@ -319,8 +319,8 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
     val sinfActorRef = typedSystem.spawn(LocationServiceExampleClient.sinkBehavior, "")
     locationService
       .track(exampleConnection)
-      .map(TrackingEventAdapter)
-      .to(ActorSink.actorRef[ExampleMessages](sinfActorRef, AllDone(exampleConnection), CustomException))
+      .map(TrackingEventAdapter.apply)
+      .to(ActorSink.actorRef[ExampleMessages](sinfActorRef, AllDone(exampleConnection), CustomException.apply))
       .run()
     // track returns a Killswitch, that can be used to turn off notifications arbitarily
     // in this case track a connection for 5 seconds, after that schedule switching off the stream

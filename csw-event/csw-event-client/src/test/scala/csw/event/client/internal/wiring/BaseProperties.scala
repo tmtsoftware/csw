@@ -12,7 +12,9 @@ import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import org.apache.pekko.stream.Attributes
 import csw.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
 import csw.event.api.scaladsl.{EventPublisher, EventService, EventSubscriber}
-import csw.event.client.helpers.TestFutureExt.RichFuture
+import csw.event.client.helpers.TestFutureExt.given
+import scala.language.implicitConversions
+
 import csw.event.client.internal.commons.serviceresolver.EventServiceLocationResolver
 import csw.event.client.internal.commons.{EventServiceConnection, EventStreamSupervisionStrategy}
 import csw.location.api.models

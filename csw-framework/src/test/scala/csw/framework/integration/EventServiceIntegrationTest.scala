@@ -13,7 +13,9 @@ import csw.command.client.CommandServiceFactory
 import csw.command.client.models.framework.ContainerLifecycleState
 import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.common.components.framework.SampleComponentState.*
-import csw.event.client.helpers.TestFutureExt.RichFuture
+import csw.event.client.helpers.TestFutureExt.given
+import scala.language.implicitConversions
+
 import csw.event.client.internal.commons.EventServiceConnection
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.location.api

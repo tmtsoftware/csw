@@ -22,10 +22,10 @@ class RedisSubscribeApi[K, V](redisReactiveCommands: RedisPubSubReactiveCommands
       .fromPublisher(redisReactiveCommands.observeChannels(overflowStrategy))
       .map(x => RedisResult(x.getChannel, x.getMessage))
   def unsubscribe(keys: List[K]): Future[Done] = redisReactiveCommands.unsubscribe(keys: _*).toFuture.asScala.map(_ => Done)
-  def close(): Future[Unit] =
-    Future {
-      blocking {
-        redisReactiveCommands.getStatefulConnection.close()
-      }
-    }
+//  def close(): Future[Unit] =
+//    Future {
+//      blocking {
+//        redisReactiveCommands.getStatefulConnection.close()
+//      }
+//    }
 }

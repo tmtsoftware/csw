@@ -7,7 +7,9 @@ package csw.alarm.cli
 
 import com.typesafe.config.ConfigFactory
 import csw.alarm.cli.args.ArgsParser
-import csw.alarm.cli.utils.TestFutureExt.RichFuture
+import csw.alarm.cli.utils.TestFutureExt.given
+import scala.language.implicitConversions
+
 import csw.alarm.cli.wiring.Wiring
 import csw.alarm.client.internal.commons.AlarmServiceConnection
 import csw.commons.redis.EmbeddedRedis

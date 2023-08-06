@@ -72,6 +72,6 @@ trait HttpParameter extends TokenMaskSupport with Directives with HttpCodecs {
     case entity if entity.contentLengthOption.isDefined =>
       provide(ConfigData.from(entity.dataBytes, entity.contentLengthOption.get))
     case _ =>
-      reject(UnsupportedRequestEncodingRejection(HttpEncoding("All encodings with contentLength value")))
+      reject(UnsupportedRequestEncodingRejection(HttpEncoding.custom("All encodings with contentLength value")))
   }
 }

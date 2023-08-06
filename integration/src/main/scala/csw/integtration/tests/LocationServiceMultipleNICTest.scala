@@ -5,7 +5,9 @@
 
 package csw.integtration.tests
 
-import csw.integtration.common.TestFutureExtension.RichFuture
+import csw.integtration.common.TestFutureExtension.given
+import scala.language.implicitConversions
+
 import csw.location.api.models.Connection.PekkoConnection
 import csw.location.api.models.{PekkoLocation, ComponentId, ComponentType}
 import csw.location.client.scaladsl.HttpLocationServiceFactory

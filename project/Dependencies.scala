@@ -29,13 +29,13 @@ object Dependencies {
       PekkoHttp.`pekko-http`,
 //      PekkoHttp.`pekko-http-spray-json`,
       MSocket.`msocket-http`,
-      Libs.`scalatest`.value          % Test,
-      Libs.`junit4-interface`         % Test,
-      Libs.`mockito`                  % Test,
+      Libs.`scalatest`.value            % Test,
+      Libs.`junit4-interface`           % Test,
+      Libs.`mockito`                    % Test,
       Pekko.`pekko-actor-testkit-typed` % Test,
-      Libs.`jboss-logging`            % Test,
-      Libs.`embedded-keycloak`        % Test,
-      Libs.netty                      % Test,
+      Libs.`jboss-logging`              % Test,
+      Libs.`embedded-keycloak`          % Test,
+      Libs.netty                        % Test,
       Pekko.`pekko-stream-testkit`      % Test,
       PekkoHttp.`pekko-http-testkit`    % Test
     )
@@ -82,7 +82,7 @@ object Dependencies {
       Pekko.`pekko-stream`,
       Pekko.`pekko-stream-typed`,
       PekkoHttp.`pekko-http`,
-      Libs.`scalatest`.value     % Test,
+      Libs.`scalatest`.value       % Test,
       Pekko.`pekko-stream-testkit` % Test
     )
   )
@@ -100,7 +100,7 @@ object Dependencies {
       PekkoHttp.`pekko-http-cors`,
       Libs.svnkit,
       Libs.`scopt`,
-      Libs.`scalatest`.value       % Test,
+      Libs.`scalatest`.value         % Test,
       PekkoHttp.`pekko-http-testkit` % Test,
       Pekko.`pekko-stream-testkit`   % Test
     )
@@ -195,13 +195,12 @@ object Dependencies {
       // temp: Added to resolve snapshot version conflict before pekko-http release available
       PekkoHttp.`pekko-http`,
       PekkoHttp.`pekko-http-core`,
-
       Libs.`scopt`,
       Pekko.`pekko-actor-testkit-typed` % Test,
       Pekko.`pekko-stream-testkit`      % Test,
-      Libs.`scalatest`.value          % Test,
-      Libs.`junit4-interface`         % Test,
-      Libs.`mockito`                  % Test
+      Libs.`scalatest`.value            % Test,
+      Libs.`junit4-interface`           % Test,
+      Libs.`mockito`                    % Test
     )
   )
 
@@ -220,9 +219,9 @@ object Dependencies {
       Libs.`caffeine`,
       Pekko.`pekko-actor-testkit-typed` % Test,
       Pekko.`pekko-stream-testkit`      % Test,
-      Libs.`scalatest`.value          % Test,
-      Libs.`junit4-interface`         % Test,
-      Libs.`mockito`                  % Test
+      Libs.`scalatest`.value            % Test,
+      Libs.`junit4-interface`           % Test,
+      Libs.`mockito`                    % Test
     )
   )
 
@@ -238,7 +237,7 @@ object Dependencies {
       Pekko.`pekko-actor`,
       Pekko.`pekko-stream`,
       Pekko.`pekko-stream-typed`,
-      Pekko.`pekko-actor-typed`,
+      Pekko.`pekko-actor-typed`
     )
   )
 
@@ -254,15 +253,15 @@ object Dependencies {
       Libs.`pekko-connectors-kafka`,
       Libs.`lettuce`,
       Libs.`reactor-core`,
-      Libs.`HdrHistogram`             % Test,
+      Libs.`HdrHistogram`               % Test,
       Pekko.`pekko-multi-node-testkit`  % Test,
       Pekko.`pekko-actor-testkit-typed` % Test,
-      Libs.`scalatest`.value          % Test,
-      Libs.`junit4-interface`         % Test,
-      Libs.`mockito`                  % Test,
-      Libs.`embedded-redis`           % Test,
-      Libs.`embedded-kafka`           % Test,
-      Libs.`testng-6-7`               % Test
+      Libs.`scalatest`.value            % Test,
+      Libs.`junit4-interface`           % Test,
+      Libs.`mockito`                    % Test,
+      Libs.`embedded-redis`             % Test,
+      Libs.`embedded-kafka`             % Test,
+      Libs.`testng-6-7`                 % Test
     )
   )
 
@@ -364,8 +363,8 @@ object Dependencies {
   val TimeScheduler = Def.setting(
     Seq(
       Pekko.`pekko-actor`,
-      Libs.`scalatest`.value          % Test,
-      Libs.HdrHistogram               % Test,
+      Libs.`scalatest`.value            % Test,
+      Libs.HdrHistogram                 % Test,
       Pekko.`pekko-actor-testkit-typed` % Test
     )
   )
@@ -382,7 +381,7 @@ object Dependencies {
       Jooq.`jooq-codegen`,
       Libs.`scalatest`.value  % Test,
       Libs.`junit4-interface` % Test,
-      Pekko.`pekko-actor`       % Test,
+      Pekko.`pekko-actor`     % Test,
       Libs.`io.zonky.test`    % Test
     )
   )
@@ -421,19 +420,20 @@ object Dependencies {
       Libs.`config`,
       PekkoHttp.`pekko-http`,
       Libs.`play-json`,
-      Libs.`scalatest`.value          % Test,
+      Libs.`scalatest`.value            % Test,
       Pekko.`pekko-actor-testkit-typed` % Test,
       PekkoHttp.`pekko-http-testkit`    % Test,
-      Libs.`mockito`                  % Test
+      Libs.`mockito`                    % Test
     )
   )
 
   val Commons = Def.setting(
     Seq(
-      Pekko.`pekko-actor`              % Provided,
-      Pekko.`pekko-actor-typed`        % Provided,
-      PekkoHttp.`pekko-http`           % Provided,
-      Borer.`borer-compat-pekko`      % Provided,
+      Pekko.`pekko-actor`            % Provided,
+      Pekko.`pekko-stream`           % Provided,
+      Pekko.`pekko-actor-typed`      % Provided,
+      PekkoHttp.`pekko-http`         % Provided,
+      Borer.`borer-compat-pekko`     % Provided,
       Borer.`borer-derivation`.value % Provided,
       Libs.`scalatest`.value         % Test,
       Libs.`embedded-redis`          % Test
@@ -478,7 +478,6 @@ object Dependencies {
 
       // temp: Added to resolve snapshot version conflict before pekko-http release available
       PekkoHttp.`pekko-http-core`,
-
       Pekko.`pekko-actor-testkit-typed`,
       Libs.`scalatest`.value  % Test,
       Libs.`junit4-interface` % Test

@@ -17,7 +17,9 @@ import csw.alarm.models.FullAlarmSeverity.Disconnected
 import csw.alarm.models.Key.*
 import csw.alarm.models.ShelveStatus.*
 import csw.alarm.models.*
-import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
+import csw.alarm.client.internal.helpers.TestFutureExt.given
+import scala.language.implicitConversions
+
 import csw.alarm.client.internal.helpers.{AlarmServiceTestSetup, TestDataFeeder}
 import csw.alarm.client.internal.services.SeverityTestScenarios.*
 import csw.logging.models.Level.DEBUG

@@ -7,7 +7,9 @@ package csw.location.server.http
 
 import org.apache.pekko.Done
 import org.apache.pekko.actor.CoordinatedShutdown
-import csw.location.server.commons.TestFutureExtension.RichFuture
+import csw.location.server.commons.TestFutureExtension.given
+import scala.language.implicitConversions
+
 import csw.location.server.internal.ServerWiring
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.funsuite.AnyFunSuiteLike
@@ -49,7 +51,7 @@ private[csw] trait HTTPLocationService
 
 }
 
-private[csw] class JHTTPLocationService extends HTTPLocationService
+class JHTTPLocationService extends HTTPLocationService
 
 private[csw] class HTTPLocationServiceOnPorts(clusterPort: Int, val httpPort: Int, auth: Boolean = false)
     extends HTTPLocationService {

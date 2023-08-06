@@ -21,7 +21,9 @@ import csw.location.api.{PekkoRegistrationFactory, CswVersionJvm, models}
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.server.commons.ClusterAwareSettings
-import csw.location.server.commons.TestFutureExtension.RichFuture
+import csw.location.server.commons.TestFutureExtension.given
+import scala.language.implicitConversions
+
 import csw.location.server.internal.LocationServiceFactory
 import csw.location.server.scaladsl.TestRegistrationExt.RichRegistration
 import csw.logging.client.commons.PekkoTypedExtension.UserActorFactory

@@ -19,8 +19,9 @@ import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
 import csw.time.core.models.UTCTime
+import org.apache.pekko.actor.typed.ActorSystem
 
-import scala.concurrent.duration.DurationLong
+import scala.concurrent.duration.*
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -31,7 +32,7 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
   private val cancelCmdId = KeyType.StringKey.make("cancelCmdId")
 
   import ComponentStateForCommand._
-  private implicit val actorSystem          = ctx.system
+  private implicit val actorSystem: ActorSystem[Nothing] = ctx.system
   private implicit val ec: ExecutionContext = ctx.executionContext
 
   override def initialize(): Unit = {}

@@ -54,8 +54,8 @@ class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
     val worker: ActorRef[WorkerActorMsg] = ctx.spawnAnonymous(WorkerActor.behavior(hcdConfig))
 
     // initialise some state by using the worker actor created above
-    current = Await.result(worker ? InitialState, timeout.duration)
-    stats = Await.result(worker ? GetStatistics, timeout.duration)
+    current = Await.result(worker ? InitialState.apply, timeout.duration)
+    stats = Await.result(worker ? GetStatistics.apply, timeout.duration)
   }
   // #initialize-handler
 

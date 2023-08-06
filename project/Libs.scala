@@ -14,8 +14,8 @@ object Libs {
   val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.4.7"
 
   val `sourcecode`        = "com.lihaoyi"                              %% "sourcecode"        % "0.3.0"
-  val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "933b2a9" // Apache 2.0
-  val `pekko-management`  = "org.apache.pekko"                         %% "pekko-management"  % "0.0.0+761-0187bd97-SNAPSHOT"
+  val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "590c5e7" // Apache 2.0
+  val `pekko-management`  = "org.apache.pekko"                         %% "pekko-management"  % "1.0.0-RC1"
   val `svnkit`        = "org.tmatesoft.svnkit" % "svnkit"        % "1.10.11"    // TMate Open Source License
   val `commons-codec` = "commons-codec"        % "commons-codec" % "1.15"       // Apache 2.0š
   val `gson`          = "com.google.code.gson" % "gson"          % "2.10.1"     // Apache 2.0
@@ -30,7 +30,7 @@ object Libs {
   val `lettuce`          = "io.lettuce"            % "lettuce-core"     % "6.2.1.RELEASE"
   val `reactor-core`     = "io.projectreactor"     % "reactor-core"     % "3.4.24"
   val `reactive-streams` = "org.reactivestreams"   % "reactive-streams" % "1.0.4"
-  val `pekko-connectors-kafka` = "org.apache.pekko"        %% "pekko-connectors-kafka" % "1.0.0-RC1"
+  val `pekko-connectors-kafka` = "org.apache.pekko"        %% "pekko-connectors-kafka" % "1.0.0"
   val `embedded-kafka`         = "io.github.embeddedkafka" %% "embedded-kafka"         % "3.5.0"
   val `embedded-redis`         = "com.github.kstyrc"        % "embedded-redis"         % "0.6"
   val `scala-compiler`         = "org.scala-lang"           % "scala-compiler"         % ScalaVersion
@@ -58,9 +58,10 @@ object Libs {
 }
 
 object Borer {
-  val Version = "1.11.0"
-  val Org     = "io.bullet"
-//  val Org = "com.github.tmtsoftware.borer"
+//  val Version = "1.11.0"
+  val Version = "687c9de"
+//  val Org     = "io.bullet"
+  val Org = "com.github.tmtsoftware.borer"
 
   val `borer-core`         = dep(Org %%% "borer-core" % Version)
   val `borer-derivation`   = dep(Org %%% "borer-derivation" % Version)
@@ -97,7 +98,7 @@ object Pekko {
 }
 
 object PekkoHttp {
-  val Version = "1.0.0-RC2"
+  val Version = "1.0.0"
   val Org     = "org.apache.pekko"
 
   val `pekko-http`            = Org %% "pekko-http"            % Version
@@ -127,7 +128,7 @@ object Jooq {
 
 object MSocket {
 //  val Version = "0.6.0"
-  val Version = "9cbdc25"
+  val Version = "49741dd"
 
   val `msocket-api`      = dep("com.github.tmtsoftware.msocket" %%% "msocket-api" % Version)
   val `msocket-security` = "com.github.tmtsoftware.msocket" %% "msocket-security" % Version

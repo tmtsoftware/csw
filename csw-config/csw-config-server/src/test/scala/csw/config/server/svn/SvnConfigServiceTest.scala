@@ -10,7 +10,8 @@ import java.nio.file.Paths
 import csw.config.api.ConfigData
 import csw.config.api.scaladsl.ConfigService
 import csw.config.server.{ConfigServiceTest, ServerWiring}
-import csw.config.server.commons.TestFutureExtension.RichFuture
+import csw.config.server.commons.TestFutureExtension.given
+import scala.language.implicitConversions
 
 class SvnConfigServiceTest extends ConfigServiceTest {
 

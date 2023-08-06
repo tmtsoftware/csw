@@ -9,7 +9,9 @@ import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
 import com.typesafe.config.ConfigFactory
 import csw.alarm.api.exceptions.{InactiveAlarmException, KeyNotFoundException}
 import csw.alarm.client.internal.helpers.AlarmServiceTestSetup
-import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
+import csw.alarm.client.internal.helpers.TestFutureExt.given
+import scala.language.implicitConversions
+
 import csw.alarm.models.AlarmHealth
 import csw.alarm.models.AlarmHealth.{Bad, Good, Ill}
 import csw.alarm.models.AlarmSeverity.*

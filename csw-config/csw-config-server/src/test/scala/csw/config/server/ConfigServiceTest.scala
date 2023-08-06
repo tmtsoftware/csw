@@ -17,7 +17,9 @@ import csw.config.api.exceptions.{FileAlreadyExists, FileNotFound}
 import csw.config.api.scaladsl.ConfigService
 import csw.config.models.{ConfigFileInfo, ConfigFileRevision, ConfigId, FileType}
 import csw.config.server.commons.TestFileUtils
-import csw.config.server.commons.TestFutureExtension.RichFuture
+import csw.config.server.commons.TestFutureExtension.given
+import scala.language.implicitConversions
+
 import csw.config.server.files.Sha1
 import io.netty.util.internal.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
