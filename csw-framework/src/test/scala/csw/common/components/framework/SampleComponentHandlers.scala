@@ -98,7 +98,7 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
         currentStatePublisher.publish(
           CurrentState(somePrefix, StateName("testStateName"), controlCommand.paramSet + choiceKey.set(observeConfigChoice))
         )
-      case _ =>
+      case null =>
     }
   }
 
