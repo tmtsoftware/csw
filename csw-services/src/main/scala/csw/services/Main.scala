@@ -17,9 +17,9 @@ import csw.services.internal.Wiring
 import scala.util.control.NonFatal
 
 object Main extends CommandsEntryPoint {
-  def appName: String    = getClass.getSimpleName.dropRight(1) // remove $ from class name
-  def appVersion: String = BuildInfo.version
-  override def progName: String   = BuildInfo.name
+  def appName: String           = getClass.getSimpleName.dropRight(1) // remove $ from class name
+  def appVersion: String        = BuildInfo.version
+  override def progName: String = BuildInfo.name
 
   println(s"starting $progName-$appVersion")
 

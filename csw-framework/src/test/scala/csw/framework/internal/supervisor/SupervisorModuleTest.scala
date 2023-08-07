@@ -61,25 +61,24 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     "onInitialized and onRun hooks of comp handlers should be invoked when supervisor creates comp | DEOPSCSW-166, DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-165, DEOPSCSW-176"
   ) {
 
-    forAll(testData) {
-      (info: ComponentInfo) =>
-        {
-          val mocks = frameworkTestMocks()
-          import mocks._
-          val containerIdleMessageProbe = TestProbe[ContainerIdleMessage]()
-          val supervisorRef             = createSupervisorAndStartTLA(info, mocks, containerIdleMessageProbe.ref)
+    forAll(testData) { (info: ComponentInfo) =>
+      {
+        val mocks = frameworkTestMocks()
+        import mocks._
+        val containerIdleMessageProbe = TestProbe[ContainerIdleMessage]()
+        val supervisorRef             = createSupervisorAndStartTLA(info, mocks, containerIdleMessageProbe.ref)
 
-          supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
-          supervisorRef ! LifecycleStateSubscription(Subscribe(lifecycleStateProbe.ref))
+        supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
+        supervisorRef ! LifecycleStateSubscription(Subscribe(lifecycleStateProbe.ref))
 
-          compStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
+        compStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
 
-          lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
-          containerIdleMessageProbe.expectMessage(
-            SupervisorLifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)
-          )
-          verify(locationService).register(pekkoRegistration)
-        }
+        lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
+        containerIdleMessageProbe.expectMessage(
+          SupervisorLifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)
+        )
+        verify(locationService).register(pekkoRegistration)
+      }
     }
   }
 
@@ -186,74 +185,73 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   test(
     "onOneway hook should be invoked and command validation should be successful on receiving Observe config | DEOPSCSW-198, DEOPSCSW-200, DEOPSCSW-306, DEOPSCSW-204, DEOPSCSW-293, DEOPSCSW-166, DEOPSCSW-213, DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-203, DEOPSCSW-165, DEOPSCSW-176"
   ) {
-    forAll(testData) {
-      (info: ComponentInfo) =>
-        {
-          val mocks = frameworkTestMocks()
-          import mocks._
-          val supervisorRef                                 = createSupervisorAndStartTLA(info, mocks)
-          val onewayResposeProbe: TestProbe[OnewayResponse] = TestProbe[OnewayResponse]()
+    forAll(testData) { (info: ComponentInfo) =>
+      {
+        val mocks = frameworkTestMocks()
+        import mocks._
+        val supervisorRef                                 = createSupervisorAndStartTLA(info, mocks)
+        val onewayResposeProbe: TestProbe[OnewayResponse] = TestProbe[OnewayResponse]()
 
-          supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
-          supervisorRef ! LifecycleStateSubscription(Subscribe(lifecycleStateProbe.ref))
+        supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
+        supervisorRef ! LifecycleStateSubscription(Subscribe(lifecycleStateProbe.ref))
 
-          compStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
-          lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
+        compStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
+        lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
-          val obsId: ObsId          = ObsId("2020A-001-123")
-          val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(22)
-          val setup: Setup          = Setup(prefix, CommandName("move.success"), Some(obsId), Set(param))
+        val obsId: ObsId          = ObsId("2020A-001-123")
+        val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(22)
+        val setup: Setup          = Setup(prefix, CommandName("move.success"), Some(obsId), Set(param))
 
-          supervisorRef ! Oneway(setup, onewayResposeProbe.ref)
+        supervisorRef ! Oneway(setup, onewayResposeProbe.ref)
 
-          // verify that validateOneway handler is invoked
-          val onewaySetupValidationCurrentState = compStateProbe.expectMessageType[CurrentState]
-          val onewaySetupValidationDemandState =
-            DemandState(prefix, StateName("testStateName"), Set(choiceKey.set(commandValidationChoice)))
-          DemandMatcher(onewaySetupValidationDemandState, timeout = 5.seconds)
-            .check(onewaySetupValidationCurrentState) shouldBe true
-          onewayResposeProbe.expectMessageType[Accepted] // (setup.runId))
+        // verify that validateOneway handler is invoked
+        val onewaySetupValidationCurrentState = compStateProbe.expectMessageType[CurrentState]
+        val onewaySetupValidationDemandState =
+          DemandState(prefix, StateName("testStateName"), Set(choiceKey.set(commandValidationChoice)))
+        DemandMatcher(onewaySetupValidationDemandState, timeout = 5.seconds)
+          .check(onewaySetupValidationCurrentState) shouldBe true
+        onewayResposeProbe.expectMessageType[Accepted] // (setup.runId))
 
-          // verify that onOneway handler is invoked and that data is transferred
-          val onewaySetupCommandCurrentState = compStateProbe.expectMessageType[CurrentState]
-          val onewaySetupCommandDemandState =
-            DemandState(prefix, StateName("testStateName"), Set(choiceKey.set(oneWayCommandChoice)))
-          DemandMatcher(onewaySetupCommandDemandState, timeout = 5.seconds)
-            .check(onewaySetupCommandCurrentState) shouldBe true
+        // verify that onOneway handler is invoked and that data is transferred
+        val onewaySetupCommandCurrentState = compStateProbe.expectMessageType[CurrentState]
+        val onewaySetupCommandDemandState =
+          DemandState(prefix, StateName("testStateName"), Set(choiceKey.set(oneWayCommandChoice)))
+        DemandMatcher(onewaySetupCommandDemandState, timeout = 5.seconds)
+          .check(onewaySetupCommandCurrentState) shouldBe true
 
-          // verify that OneWay command is received by handler
-          val onewaySetupConfigCurrentState = compStateProbe.expectMessageType[CurrentState]
-          val onewaySetupConfigDemandState =
-            DemandState(prefix, StateName("testStateName"), Set(choiceKey.set(setupConfigChoice), param))
-          DemandMatcher(onewaySetupConfigDemandState, timeout = 5.seconds)
-            .check(onewaySetupConfigCurrentState) shouldBe true
+        // verify that OneWay command is received by handler
+        val onewaySetupConfigCurrentState = compStateProbe.expectMessageType[CurrentState]
+        val onewaySetupConfigDemandState =
+          DemandState(prefix, StateName("testStateName"), Set(choiceKey.set(setupConfigChoice), param))
+        DemandMatcher(onewaySetupConfigDemandState, timeout = 5.seconds)
+          .check(onewaySetupConfigCurrentState) shouldBe true
 
-          val observe: Observe = Observe(prefix, CommandName("move.success"), Some(obsId), Set(param))
+        val observe: Observe = Observe(prefix, CommandName("move.success"), Some(obsId), Set(param))
 
-          supervisorRef ! Oneway(observe, onewayResposeProbe.ref)
+        supervisorRef ! Oneway(observe, onewayResposeProbe.ref)
 
-          // verify that validateOneway handler is invoked
-          val oneWayObserveValidationCurrentState = compStateProbe.expectMessageType[CurrentState]
-          val oneWayObserveValidationDemandState =
-            DemandState(prefix, StateName("testStateName"), Set(choiceKey.set(commandValidationChoice)))
-          DemandMatcher(oneWayObserveValidationDemandState, timeout = 5.seconds)
-            .check(oneWayObserveValidationCurrentState) shouldBe true
-          onewayResposeProbe.expectMessageType[Accepted] // (observe.runId))
+        // verify that validateOneway handler is invoked
+        val oneWayObserveValidationCurrentState = compStateProbe.expectMessageType[CurrentState]
+        val oneWayObserveValidationDemandState =
+          DemandState(prefix, StateName("testStateName"), Set(choiceKey.set(commandValidationChoice)))
+        DemandMatcher(oneWayObserveValidationDemandState, timeout = 5.seconds)
+          .check(oneWayObserveValidationCurrentState) shouldBe true
+        onewayResposeProbe.expectMessageType[Accepted] // (observe.runId))
 
-          // verify that onObserve handler is invoked and parameter is successfully transferred
-          val oneWayObserveCommandCurrentState = compStateProbe.expectMessageType[CurrentState]
-          val oneWayObserveCommandDemandState =
-            DemandState(prefix, StateName("testStateName"), Set(choiceKey.set(oneWayCommandChoice)))
-          DemandMatcher(oneWayObserveCommandDemandState, timeout = 5.seconds)
-            .check(oneWayObserveCommandCurrentState) shouldBe true
+        // verify that onObserve handler is invoked and parameter is successfully transferred
+        val oneWayObserveCommandCurrentState = compStateProbe.expectMessageType[CurrentState]
+        val oneWayObserveCommandDemandState =
+          DemandState(prefix, StateName("testStateName"), Set(choiceKey.set(oneWayCommandChoice)))
+        DemandMatcher(oneWayObserveCommandDemandState, timeout = 5.seconds)
+          .check(oneWayObserveCommandCurrentState) shouldBe true
 
-          // verify that OneWay command is received by handler
-          val oneWayObserveConfigCurrentState = compStateProbe.expectMessageType[CurrentState]
-          val oneWayObserveConfigDemandState =
-            DemandState(prefix, StateName("testStateName"), Set(choiceKey.set(observeConfigChoice), param))
-          DemandMatcher(oneWayObserveConfigDemandState, timeout = 5.seconds)
-            .check(oneWayObserveConfigCurrentState) shouldBe true
-        }
+        // verify that OneWay command is received by handler
+        val oneWayObserveConfigCurrentState = compStateProbe.expectMessageType[CurrentState]
+        val oneWayObserveConfigDemandState =
+          DemandState(prefix, StateName("testStateName"), Set(choiceKey.set(observeConfigChoice), param))
+        DemandMatcher(oneWayObserveConfigDemandState, timeout = 5.seconds)
+          .check(oneWayObserveConfigCurrentState) shouldBe true
+      }
     }
   }
 
@@ -262,159 +260,154 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   test(
     "component handler should be able to validate a Setup or Observe command as failure during validation | DEOPSCSW-206, DEOPSCSW-166, DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-165, DEOPSCSW-176, DEOPSCSW-214"
   ) {
-    forAll(testData) {
-      (info: ComponentInfo) =>
-        {
-          val mocks                                          = frameworkTestMocks()
-          val submitResponseProbe: TestProbe[SubmitResponse] = TestProbe[SubmitResponse]()
-          val onewayResponseProbe: TestProbe[OnewayResponse] = TestProbe[OnewayResponse]()
-          import mocks._
-          val supervisorRef = createSupervisorAndStartTLA(hcdInfo, mocks)
+    forAll(testData) { (info: ComponentInfo) =>
+      {
+        val mocks                                          = frameworkTestMocks()
+        val submitResponseProbe: TestProbe[SubmitResponse] = TestProbe[SubmitResponse]()
+        val onewayResponseProbe: TestProbe[OnewayResponse] = TestProbe[OnewayResponse]()
+        import mocks._
+        val supervisorRef = createSupervisorAndStartTLA(hcdInfo, mocks)
 
-          supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
-          supervisorRef ! LifecycleStateSubscription(Subscribe(lifecycleStateProbe.ref))
+        supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
+        supervisorRef ! LifecycleStateSubscription(Subscribe(lifecycleStateProbe.ref))
 
-          compStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
-          lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
+        compStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
+        lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
-          val obsId: ObsId          = ObsId("2020A-001-123")
-          val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(22)
-          // setup to receive Success in validation result
-          val setup: Setup = Setup(prefix, CommandName("move.failure"), Some(obsId), Set(param))
+        val obsId: ObsId          = ObsId("2020A-001-123")
+        val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(22)
+        // setup to receive Success in validation result
+        val setup: Setup = Setup(prefix, CommandName("move.failure"), Some(obsId), Set(param))
 
-          supervisorRef ! Submit(setup, submitResponseProbe.ref)
-          submitResponseProbe.expectMessageType[Invalid]
+        supervisorRef ! Submit(setup, submitResponseProbe.ref)
+        submitResponseProbe.expectMessageType[Invalid]
 
-          supervisorRef ! Oneway(setup, onewayResponseProbe.ref)
-          onewayResponseProbe.expectMessageType[Invalid]
-        }
+        supervisorRef ! Oneway(setup, onewayResponseProbe.ref)
+        onewayResponseProbe.expectMessageType[Invalid]
+      }
     }
   }
 
   test(
     "onGoOffline and goOnline hooks of comp handlers should be invoked when supervisor receives Lifecycle messages | DEOPSCSW-166, DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-165, DEOPSCSW-176"
   ) {
-    forAll(testData) {
-      (info: ComponentInfo) =>
-        {
-          val mocks = frameworkTestMocks()
-          import mocks._
-          val supervisorRef = createSupervisorAndStartTLA(info, mocks)
+    forAll(testData) { (info: ComponentInfo) =>
+      {
+        val mocks = frameworkTestMocks()
+        import mocks._
+        val supervisorRef = createSupervisorAndStartTLA(info, mocks)
 
-          supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
-          supervisorRef ! LifecycleStateSubscription(Subscribe(lifecycleStateProbe.ref))
+        supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
+        supervisorRef ! LifecycleStateSubscription(Subscribe(lifecycleStateProbe.ref))
 
-          compStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
-          lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
+        compStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
+        lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
-          supervisorRef ! Lifecycle(GoOffline)
+        supervisorRef ! Lifecycle(GoOffline)
 
-          val offlineCurrentState = compStateProbe.expectMessageType[CurrentState]
-          val offlineDemandState  = DemandState(prefix, StateName("testStateName"), Set(choiceKey.set(offlineChoice)))
-          DemandMatcher(offlineDemandState, timeout = 5.seconds).check(offlineCurrentState) shouldBe true
+        val offlineCurrentState = compStateProbe.expectMessageType[CurrentState]
+        val offlineDemandState  = DemandState(prefix, StateName("testStateName"), Set(choiceKey.set(offlineChoice)))
+        DemandMatcher(offlineDemandState, timeout = 5.seconds).check(offlineCurrentState) shouldBe true
 
-          supervisorRef ! Lifecycle(GoOnline)
+        supervisorRef ! Lifecycle(GoOnline)
 
-          val onlineCurrentState = compStateProbe.expectMessageType[CurrentState]
-          val onlineDemandState  = DemandState(prefix, StateName("testStateName"), Set(choiceKey.set(onlineChoice)))
-          DemandMatcher(onlineDemandState, timeout = 5.seconds).check(onlineCurrentState) shouldBe true
-        }
+        val onlineCurrentState = compStateProbe.expectMessageType[CurrentState]
+        val onlineDemandState  = DemandState(prefix, StateName("testStateName"), Set(choiceKey.set(onlineChoice)))
+        DemandMatcher(onlineDemandState, timeout = 5.seconds).check(onlineCurrentState) shouldBe true
+      }
     }
   }
 
   test(
     "should invoke onShutdown hook when supervisor restarts component using Restart external message | DEOPSCSW-166, DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-165, DEOPSCSW-176"
   ) {
-    forAll(testData) {
-      (info: ComponentInfo) =>
-        {
-          val mocks = frameworkTestMocks()
-          import mocks._
-          val containerIdleMessageProbe = TestProbe[ContainerIdleMessage]()
-          val supervisorRef             = createSupervisorAndStartTLA(info, mocks, containerIdleMessageProbe.ref)
+    forAll(testData) { (info: ComponentInfo) =>
+      {
+        val mocks = frameworkTestMocks()
+        import mocks._
+        val containerIdleMessageProbe = TestProbe[ContainerIdleMessage]()
+        val supervisorRef             = createSupervisorAndStartTLA(info, mocks, containerIdleMessageProbe.ref)
 
-          supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
-          supervisorRef ! LifecycleStateSubscription(Subscribe(lifecycleStateProbe.ref))
+        supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
+        supervisorRef ! LifecycleStateSubscription(Subscribe(lifecycleStateProbe.ref))
 
-          compStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
+        compStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
+        lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
+        containerIdleMessageProbe.expectMessage(
+          SupervisorLifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)
+        )
+
+        supervisorRef ! Restart
+
+        compStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))
+        compStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
+
+        lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Restart))
+
+        Eventually.eventually(
           lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
-          containerIdleMessageProbe.expectMessage(
-            SupervisorLifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)
-          )
+        )
+        containerIdleMessageProbe.expectMessage(
+          SupervisorLifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)
+        )
 
-          supervisorRef ! Restart
-
-          compStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))
-          compStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
-
-          lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Restart))
-
-          Eventually.eventually(
-            lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
-          )
-          containerIdleMessageProbe.expectMessage(
-            SupervisorLifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)
-          )
-
-          verify(locationService, times(1)).unregister(any[Connection])
-          verify(locationService, times(2)).register(pekkoRegistration)
-          // this includes pekko and http registrations before restart and after restart
-          verify(locationService, times(4)).register(any[Registration])
-        }
+        verify(locationService, times(1)).unregister(any[Connection])
+        verify(locationService, times(2)).register(pekkoRegistration)
+        // this includes pekko and http registrations before restart and after restart
+        verify(locationService, times(4)).register(any[Registration])
+      }
     }
   }
 
   test(
     "running component should not ignore GoOnline lifecycle message when it is already online | DEOPSCSW-166, DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-165, DEOPSCSW-176, CSW-102"
   ) {
-    forAll(testData) {
-      (info: ComponentInfo) =>
-        {
-          val mocks = frameworkTestMocks()
-          import mocks._
-          val supervisorRef = createSupervisorAndStartTLA(info, mocks)
+    forAll(testData) { (info: ComponentInfo) =>
+      {
+        val mocks = frameworkTestMocks()
+        import mocks._
+        val supervisorRef = createSupervisorAndStartTLA(info, mocks)
 
-          supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
-          supervisorRef ! LifecycleStateSubscription(Subscribe(lifecycleStateProbe.ref))
+        supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
+        supervisorRef ! LifecycleStateSubscription(Subscribe(lifecycleStateProbe.ref))
 
-          compStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
-          lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
+        compStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
+        lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
-          supervisorRef ! Lifecycle(GoOnline)
-          compStateProbe.expectMessageType[CurrentState]
-          lifecycleStateProbe.expectNoMessage(1.seconds)
-        }
+        supervisorRef ! Lifecycle(GoOnline)
+        compStateProbe.expectMessageType[CurrentState]
+        lifecycleStateProbe.expectNoMessage(1.seconds)
+      }
     }
   }
 
   test(
     "running component should not ignore GoOffline lifecycle message when it is already offline | DEOPSCSW-166, DEOPSCSW-163, DEOPSCSW-177, DEOPSCSW-165, DEOPSCSW-176, CSW-102"
   ) {
-    forAll(testData) {
-      (info: ComponentInfo) =>
-        {
-          val mocks = frameworkTestMocks()
-          import mocks._
-          val supervisorRef = createSupervisorAndStartTLA(info, mocks)
+    forAll(testData) { (info: ComponentInfo) =>
+      {
+        val mocks = frameworkTestMocks()
+        import mocks._
+        val supervisorRef = createSupervisorAndStartTLA(info, mocks)
 
-          supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
-          supervisorRef ! LifecycleStateSubscription(Subscribe(lifecycleStateProbe.ref))
+        supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
+        supervisorRef ! LifecycleStateSubscription(Subscribe(lifecycleStateProbe.ref))
 
-          compStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
-          lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
+        compStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
+        lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
-          supervisorRef ! Lifecycle(GoOffline)
-          compStateProbe.expectMessageType[CurrentState]
-          lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.RunningOffline))
+        supervisorRef ! Lifecycle(GoOffline)
+        compStateProbe.expectMessageType[CurrentState]
+        lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.RunningOffline))
 
-          supervisorRef ! Lifecycle(GoOffline)
-          compStateProbe.expectMessageType[CurrentState]
-          lifecycleStateProbe.expectNoMessage()
+        supervisorRef ! Lifecycle(GoOffline)
+        compStateProbe.expectMessageType[CurrentState]
+        lifecycleStateProbe.expectNoMessage()
 
-          supervisorRef ! Lifecycle(GoOnline)
-          compStateProbe.expectMessageType[CurrentState]
-          lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
-        }
+        supervisorRef ! Lifecycle(GoOnline)
+        compStateProbe.expectMessageType[CurrentState]
+        lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
+      }
     }
   }
 
@@ -430,23 +423,22 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
       jHcdInfoWithInitializeTimeout
     )
 
-    forAll(testData) {
-      (info: ComponentInfo) =>
-        {
-          val mocks = frameworkTestMocks()
-          import mocks._
-          val componentStateProbe: TestProbe[CurrentState] = TestProbe[CurrentState]()
+    forAll(testData) { (info: ComponentInfo) =>
+      {
+        val mocks = frameworkTestMocks()
+        import mocks._
+        val componentStateProbe: TestProbe[CurrentState] = TestProbe[CurrentState]()
 
-          val supervisorRef = createSupervisorAndStartTLA(info, mocks)
-          supervisorRef ! ComponentStateSubscription(Subscribe(componentStateProbe.ref))
-          supervisorRef ! LifecycleStateSubscription(Subscribe(lifecycleStateProbe.ref))
+        val supervisorRef = createSupervisorAndStartTLA(info, mocks)
+        supervisorRef ! ComponentStateSubscription(Subscribe(componentStateProbe.ref))
+        supervisorRef ! LifecycleStateSubscription(Subscribe(lifecycleStateProbe.ref))
 
-          componentStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
+        componentStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
 
-          supervisorRef ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref)
-          supervisorLifecycleStateProbe.expectMessage(SupervisorLifecycleState.Running)
-          verify(locationService).register(pekkoRegistration)
-        }
+        supervisorRef ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref)
+        supervisorLifecycleStateProbe.expectMessage(SupervisorLifecycleState.Running)
+        verify(locationService).register(pekkoRegistration)
+      }
     }
   }
 }

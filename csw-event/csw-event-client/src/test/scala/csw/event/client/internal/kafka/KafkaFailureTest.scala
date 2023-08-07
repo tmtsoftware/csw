@@ -67,7 +67,8 @@ class KafkaFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
     val testProbe   = TestProbe[PublishFailure]()(kafkaTestProps.actorSystem)
     val failedEvent = Utils.makeEvent(1)
 
-    val cancellable = kafkaTestProps.publisher.publish(Some(failedEvent), 20.millis, onError = (x: PublishFailure) => testProbe.ref ! x)
+    val cancellable =
+      kafkaTestProps.publisher.publish(Some(failedEvent), 20.millis, onError = (x: PublishFailure) => testProbe.ref ! x)
 
     val failure = testProbe.expectMessageType[PublishFailure]
 
@@ -84,7 +85,11 @@ class KafkaFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
     val failedEvent = Utils.makeEvent(1)
 
     val cancellable =
-      kafkaTestProps.publisher.publishAsync(Future.successful(Some(failedEvent)), 20.millis, onError = (x: PublishFailure) => testProbe.ref ! x)
+      kafkaTestProps.publisher.publishAsync(
+        Future.successful(Some(failedEvent)),
+        20.millis,
+        onError = (x: PublishFailure) => testProbe.ref ! x
+      )
 
     val failure = testProbe.expectMessageType[PublishFailure]
 
@@ -152,11 +157,17 @@ class KafkaFailureTest extends AnyFunSuite with Matchers with MockitoSugar with 
 
     def eventGenerator(): Future[Option[Event]] = Future.successful(None)
 
-    val cancellable1 = kafkaTestProps.publisher.publishAsync(eventGenerator(), 20.millis, onError = (x: PublishFailure) => testProbe.ref ! x)
+    val cancellable1 =
+      kafkaTestProps.publisher.publishAsync(eventGenerator(), 20.millis, onError = (x: PublishFailure) => testProbe.ref ! x)
     testProbe.expectNoMessage()
 
-    val startTime    = UTCTime(UTCTime.now().value.plusMillis(200))
-    val cancellable2 = kafkaTestProps.publisher.publishAsync(eventGenerator(), startTime, 20.millis, onError = (x: PublishFailure) => testProbe.ref ! x)
+    val startTime = UTCTime(UTCTime.now().value.plusMillis(200))
+    val cancellable2 = kafkaTestProps.publisher.publishAsync(
+      eventGenerator(),
+      startTime,
+      20.millis,
+      onError = (x: PublishFailure) => testProbe.ref ! x
+    )
     testProbe.expectNoMessage(500.millis)
     cancellable1.cancel()
     cancellable2.cancel()

@@ -33,7 +33,7 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
 
   import ComponentStateForCommand._
   private implicit val actorSystem: ActorSystem[Nothing] = ctx.system
-  private implicit val ec: ExecutionContext = ctx.executionContext
+  private implicit val ec: ExecutionContext              = ctx.executionContext
 
   override def initialize(): Unit = {}
 

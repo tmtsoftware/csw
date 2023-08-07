@@ -20,9 +20,9 @@ import msocket.jvm.metrics.LabelExtractor
 
 // $COVERAGE-OFF$
 private[csw] class ServerWiring(enableAuth: Boolean) extends LocationServiceCodecs {
-  lazy val config: Config                                           = ConfigFactory.load()
-  lazy val settings                                                 = new Settings(config)
-  lazy val clusterSettings: ClusterSettings                         = ClusterAwareSettings.onPort(settings.clusterPort)
+  lazy val config: Config                                      = ConfigFactory.load()
+  lazy val settings                                            = new Settings(config)
+  lazy val clusterSettings: ClusterSettings                    = ClusterAwareSettings.onPort(settings.clusterPort)
   implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = clusterSettings.system
   val actorRuntime                                             = new ActorRuntime(actorSystem)
   import actorSystem.executionContext

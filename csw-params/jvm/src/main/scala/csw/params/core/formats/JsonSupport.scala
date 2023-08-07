@@ -101,24 +101,24 @@ trait JsonSupport {
   // --- The defs below were added to support calls from Java ---
   // --- (since Scala 3, calling the borer inline/macro code from Java doesn't work) ---
 
-  def writeProperMotion(pm: ProperMotion): JsValue = JsonSupport.writes(pm)
+  def writeProperMotion(pm: ProperMotion): JsValue  = JsonSupport.writes(pm)
   def readProperMotion(json: JsValue): ProperMotion = reads[ProperMotion](json)
 
-  def writeEqFrame(pm: EqFrame): JsValue = JsonSupport.writes(pm)
+  def writeEqFrame(pm: EqFrame): JsValue  = JsonSupport.writes(pm)
   def readEqFrame(json: JsValue): EqFrame = reads[EqFrame](json)
 
-  def writeAltAzCoord(pm: AltAzCoord): JsValue = JsonSupport.writes(pm)
+  def writeAltAzCoord(pm: AltAzCoord): JsValue  = JsonSupport.writes(pm)
   def readAltAzCoord(json: JsValue): AltAzCoord = reads[AltAzCoord](json)
 
-  def writeSolarSystemCoord(pm: SolarSystemCoord): JsValue = JsonSupport.writes(pm)
+  def writeSolarSystemCoord(pm: SolarSystemCoord): JsValue  = JsonSupport.writes(pm)
   def readSolarSystemCoord(json: JsValue): SolarSystemCoord = reads[SolarSystemCoord](json)
 
-  def writeMinorPlanetCoord(pm: MinorPlanetCoord): JsValue = JsonSupport.writes(pm)
+  def writeMinorPlanetCoord(pm: MinorPlanetCoord): JsValue  = JsonSupport.writes(pm)
   def readMinorPlanetCoord(json: JsValue): MinorPlanetCoord = reads[MinorPlanetCoord](json)
 
-  def writeCometCoord(pm: CometCoord): JsValue = JsonSupport.writes(pm)
+  def writeCometCoord(pm: CometCoord): JsValue  = JsonSupport.writes(pm)
   def readCometCoord(json: JsValue): CometCoord = reads[CometCoord](json)
 
-  def writeEqCoord(pm: EqCoord): JsValue = JsonSupport.writes(pm)
+  def writeEqCoord(pm: EqCoord): JsValue  = JsonSupport.writes(pm)
   def readEqCoord(json: JsValue): EqCoord = reads[EqCoord](json)
 }

@@ -39,15 +39,15 @@ class RedisAsyncApi[K, V](redisAsyncCommands: Future[RedisAsyncCommands[K, V]])(
 
   def mget(keys: List[K]): Future[List[RedisResult[K, Option[V]]]] =
     redisAsyncCommands.flatMap(
-      _.mget(keys *).asScala
+      _.mget(keys*).asScala
         .map(_.asScala.map(kv => RedisResult(kv.getKey, kv.optional().toScala)).toList)
     )
 
   def keys(key: K): Future[List[K]] = redisAsyncCommands.flatMap(_.keys(key).asScala.map(_.asScala.toList))
 
-  def exists(keys: K*): Future[Boolean] = redisAsyncCommands.flatMap(_.exists(keys *).asScala.map(_ == keys.size))
+  def exists(keys: K*): Future[Boolean] = redisAsyncCommands.flatMap(_.exists(keys*).asScala.map(_ == keys.size))
 
-  def del(keys: List[K]): Future[Long] = redisAsyncCommands.flatMap(_.del(keys *).asScala.map(_.toLong))
+  def del(keys: List[K]): Future[Long] = redisAsyncCommands.flatMap(_.del(keys*).asScala.map(_.toLong))
 
   def pdel(pattern: K): Future[Long] =
     keys(pattern).flatMap(matchedKeys => if (matchedKeys.nonEmpty) del(matchedKeys) else Future.successful(0))

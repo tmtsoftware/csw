@@ -124,7 +124,7 @@ private[framework] object ComponentBehavior {
           case Lifecycle(message)       => onLifecycle(message)
           case x: CommandMessage        => onRunningCompCommandMessage(x)
           case x: DiagnosticDataMessage => onRunningCompDiagnosticDataMessage(x)
-          case null                      => log.error(s"Component TLA cannot handle null message")
+          case null                     => log.error(s"Component TLA cannot handle null message")
         }
 
       /*

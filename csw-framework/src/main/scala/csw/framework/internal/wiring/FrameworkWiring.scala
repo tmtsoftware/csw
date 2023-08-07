@@ -28,12 +28,12 @@ import scala.concurrent.{ExecutionContext, Future}
 class FrameworkWiring {
   val actorSystem: ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol(), "framework-system")
   val actorRuntime: ActorRuntime                      = new ActorRuntime(actorSystem)
-  lazy val locationService: LocationService                = HttpLocationServiceFactory.makeLocalClient(actorSystem)
-  lazy val registrationFactory                             = new RegistrationFactory
-  lazy val configClientService: ConfigClientService        = ConfigClientFactory.clientApi(actorSystem, locationService)
-  lazy val configUtils: ConfigUtils                        = new ConfigUtils(configClientService)(actorSystem)
-  lazy val eventServiceFactory: EventServiceFactory        = new EventServiceFactory(RedisStore(redisClient))
-  lazy val alarmServiceFactory: AlarmServiceFactory        = new AlarmServiceFactory(redisClient)
+  lazy val locationService: LocationService           = HttpLocationServiceFactory.makeLocalClient(actorSystem)
+  lazy val registrationFactory                        = new RegistrationFactory
+  lazy val configClientService: ConfigClientService   = ConfigClientFactory.clientApi(actorSystem, locationService)
+  lazy val configUtils: ConfigUtils                   = new ConfigUtils(configClientService)(actorSystem)
+  lazy val eventServiceFactory: EventServiceFactory   = new EventServiceFactory(RedisStore(redisClient))
+  lazy val alarmServiceFactory: AlarmServiceFactory   = new AlarmServiceFactory(redisClient)
 
   lazy val redisClient: RedisClient = {
     val client = RedisClient.create()
@@ -70,7 +70,7 @@ object FrameworkWiring {
   def make(_actorSystem: ActorSystem[SpawnProtocol.Command], _redisClient: RedisClient): FrameworkWiring =
     new FrameworkWiring {
       override val actorSystem: ActorSystem[SpawnProtocol.Command] = _actorSystem
-      override lazy val redisClient: RedisClient                        = shutdownRedisOnTermination(_redisClient)
+      override lazy val redisClient: RedisClient                   = shutdownRedisOnTermination(_redisClient)
     }
 
   /**
@@ -83,7 +83,7 @@ object FrameworkWiring {
   def make(_actorSystem: ActorSystem[SpawnProtocol.Command], _locationService: LocationService): FrameworkWiring =
     new FrameworkWiring {
       override val actorSystem: ActorSystem[SpawnProtocol.Command] = _actorSystem
-      override lazy val locationService: LocationService                = _locationService
+      override lazy val locationService: LocationService           = _locationService
     }
 
   def make(
@@ -93,7 +93,7 @@ object FrameworkWiring {
   ): FrameworkWiring =
     new FrameworkWiring {
       override val actorSystem: ActorSystem[SpawnProtocol.Command] = _actorSystem
-      override lazy val locationService: LocationService                = _locationService
-      override lazy val redisClient: RedisClient                        = shutdownRedisOnTermination(_redisClient)
+      override lazy val locationService: LocationService           = _locationService
+      override lazy val redisClient: RedisClient                   = shutdownRedisOnTermination(_redisClient)
     }
 }

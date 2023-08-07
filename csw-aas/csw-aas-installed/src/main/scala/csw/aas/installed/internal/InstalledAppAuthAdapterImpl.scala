@@ -18,12 +18,12 @@ import scala.concurrent.duration.{DurationLong, FiniteDuration}
 import scala.util.Try
 
 private[aas] class InstalledAppAuthAdapterImpl(
-                                                authConfig: AuthConfig,
-                                                val keycloakInstalled: KeycloakInstalled,
-                                                tokenVerifier: TokenVerifier,
-                                                maybeStore: Option[AuthStore] = None
-                                              )(implicit executionContext: ExecutionContext)
-  extends InstalledAppAuthAdapter {
+    authConfig: AuthConfig,
+    val keycloakInstalled: KeycloakInstalled,
+    tokenVerifier: TokenVerifier,
+    maybeStore: Option[AuthStore] = None
+)(implicit executionContext: ExecutionContext)
+    extends InstalledAppAuthAdapter {
 
   import authConfig.disabled
 

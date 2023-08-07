@@ -14,13 +14,13 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
 
 private[alarm] class Wiring {
   implicit lazy val actorSystem: ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), "alarm-cli")
-  val actorRuntime                                             = new ActorRuntime(actorSystem)
+  val actorRuntime                                                  = new ActorRuntime(actorSystem)
   lazy val locationService: LocationService                         = HttpLocationServiceFactory.makeLocalClient
   lazy val configClientService: ConfigClientService                 = ConfigClientFactory.clientApi(actorSystem, locationService)
   lazy val configUtils                                              = new ConfigUtils(configClientService)
   lazy val printLine: Any => Unit                                   = println
   val commandLineRunner = new CommandLineRunner(actorRuntime, locationService, configUtils, printLine)
-  lazy val cliApp            = new CliApp(commandLineRunner)
+  lazy val cliApp       = new CliApp(commandLineRunner)
 }
 
 object Wiring {
