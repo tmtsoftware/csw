@@ -99,4 +99,4 @@ due to Scala3 complaints.
 * When initializing Array[Double], you now have to actually use doubles (1.0, 2.0) and not ints (1, 2)
 * Commented out one CBOR test for Java, since it is not likely to be used from Java.
 * Replaced use of App class in some cases with Scala main() as recommended for Scala 3
-* Removed (probably unnessary) call to `redisReactiveCommands.getStatefulConnection.close()`, since it was deprecated
+* Removed (probably unnecessary) call to `redisReactiveCommands.getStatefulConnection.close()`, since it was deprecated
