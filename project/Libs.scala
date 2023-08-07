@@ -15,7 +15,7 @@ object Libs {
 
   val `sourcecode`        = "com.lihaoyi"                              %% "sourcecode"        % "0.3.0"
   val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "590c5e7" // Apache 2.0
-  val `pekko-management`  = "org.apache.pekko"                         %% "pekko-management"  % "1.0.0-RC1"
+  val `pekko-management`  = "org.apache.pekko"                         %% "pekko-management"  % "1.0.0-RC2"
   val `svnkit`        = "org.tmatesoft.svnkit" % "svnkit"        % "1.10.11"    // TMate Open Source License
   val `commons-codec` = "commons-codec"        % "commons-codec" % "1.15"       // Apache 2.0š
   val `gson`          = "com.google.code.gson" % "gson"          % "2.10.1"     // Apache 2.0
@@ -58,10 +58,10 @@ object Libs {
 }
 
 object Borer {
-//  val Version = "1.11.0"
-  val Version = "687c9de"
-//  val Org     = "io.bullet"
-  val Org = "com.github.tmtsoftware.borer"
+  val Version = "1.11.0"
+//  val Version = "961eeed"
+  val Org     = "io.bullet"
+//  val Org = "com.github.tmtsoftware.borer"
 
   val `borer-core`         = dep(Org %%% "borer-core" % Version)
   val `borer-derivation`   = dep(Org %%% "borer-derivation" % Version)

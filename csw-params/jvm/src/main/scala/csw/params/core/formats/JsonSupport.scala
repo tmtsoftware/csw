@@ -6,12 +6,14 @@
 package csw.params.core.formats
 
 import java.nio.charset.StandardCharsets
-
 import csw.params.commands.*
+import csw.params.core.generics.Parameter
+import csw.params.core.models.Coords.{AltAzCoord, CometCoord, EqCoord, EqFrame, MinorPlanetCoord, SolarSystemCoord}
+import csw.params.core.models.ProperMotion
 import csw.params.core.states.StateVariable
 import csw.params.events.*
 import io.bullet.borer.{Decoder, Encoder, Json}
-import play.api.libs.json.{Json => PJson, _}
+import play.api.libs.json.{Json as PJson, *}
 
 object JsonSupport extends JsonSupport
 
@@ -95,4 +97,28 @@ trait JsonSupport {
    * @return an instance of Result, or an exception if the JSON is not valid for that type
    */
   def readResult(json: JsValue): Result = reads[Result](json)
+
+  // --- The defs below were added to support calls from Java ---
+  // --- (since Scala 3, calling the borer inline/macro code from Java doesn't work) ---
+
+  def writeProperMotion(pm: ProperMotion): JsValue = JsonSupport.writes(pm)
+  def readProperMotion(json: JsValue): ProperMotion = reads[ProperMotion](json)
+
+  def writeEqFrame(pm: EqFrame): JsValue = JsonSupport.writes(pm)
+  def readEqFrame(json: JsValue): EqFrame = reads[EqFrame](json)
+
+  def writeAltAzCoord(pm: AltAzCoord): JsValue = JsonSupport.writes(pm)
+  def readAltAzCoord(json: JsValue): AltAzCoord = reads[AltAzCoord](json)
+
+  def writeSolarSystemCoord(pm: SolarSystemCoord): JsValue = JsonSupport.writes(pm)
+  def readSolarSystemCoord(json: JsValue): SolarSystemCoord = reads[SolarSystemCoord](json)
+
+  def writeMinorPlanetCoord(pm: MinorPlanetCoord): JsValue = JsonSupport.writes(pm)
+  def readMinorPlanetCoord(json: JsValue): MinorPlanetCoord = reads[MinorPlanetCoord](json)
+
+  def writeCometCoord(pm: CometCoord): JsValue = JsonSupport.writes(pm)
+  def readCometCoord(json: JsValue): CometCoord = reads[CometCoord](json)
+
+  def writeEqCoord(pm: EqCoord): JsValue = JsonSupport.writes(pm)
+  def readEqCoord(json: JsValue): EqCoord = reads[EqCoord](json)
 }
