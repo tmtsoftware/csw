@@ -23,7 +23,7 @@
 | etc...                       | etc...                 |
 
 * Replaced `akka` with `pekko` everywhere (preserve case)
-* Renamed files: *akka* to *pekko* and *Akka* to *Pekko*
+* Renamed files: `*akka*` to `*pekko*` and `*Akka*` to `*Pekko*`
 * Replaced `import pekko.` with `import org.apache.pekko.`
 * Replaced remaining "pekko.: in source and conf files with org.apache.pekko (Care needed config files, since class refs use `org.apache.pekko`, but settings use just `pekko`)
 * Replaced dependencies on any libraries that depend on akka
