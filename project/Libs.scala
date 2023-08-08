@@ -21,15 +21,15 @@ object Libs {
   val `gson`          = "com.google.code.gson" % "gson"          % "2.10.1"     // Apache 2.0
   val `play-json`     = "com.typesafe.play"   %% "play-json"     % "2.10.0-RC9" // Apache 2.0
 
-  val `enumeratum`                = dep("com.beachape" %%% "enumeratum" % "1.7.3") // MIT License
+  val `enumeratum`                = dep("com.beachape" %%% "enumeratum" % "1.7.3")  // MIT License
   val `scala-java-time`           = dep("io.github.cquiroz" %%% "scala-java-time" % "2.5.0")
   val `scalajs-java-securerandom` = dep("org.scala-js" %%% "scalajs-java-securerandom" % "1.0.0")
-  val `scalatest`                 = dep("org.scalatest" %%% "scalatest" % "3.2.16")                   // Apache License 2.0
+  val `scalatest`                 = dep("org.scalatest" %%% "scalatest" % "3.2.16") // Apache License 2.0
 
-  val `jwt-core`         = "com.github.jwt-scala" %% "jwt-core"         % "9.1.2"
-  val `lettuce`          = "io.lettuce"            % "lettuce-core"     % "6.2.1.RELEASE"
-  val `reactor-core`     = "io.projectreactor"     % "reactor-core"     % "3.4.24"
-  val `reactive-streams` = "org.reactivestreams"   % "reactive-streams" % "1.0.4"
+  val `jwt-core`               = "com.github.jwt-scala"    %% "jwt-core"               % "9.1.2"
+  val `lettuce`                = "io.lettuce"               % "lettuce-core"           % "6.2.1.RELEASE"
+  val `reactor-core`           = "io.projectreactor"        % "reactor-core"           % "3.4.24"
+  val `reactive-streams`       = "org.reactivestreams"      % "reactive-streams"       % "1.0.4"
   val `pekko-connectors-kafka` = "org.apache.pekko"        %% "pekko-connectors-kafka" % "1.0.0"
   val `embedded-kafka`         = "io.github.embeddedkafka" %% "embedded-kafka"         % "3.5.0"
   val `embedded-redis`         = "com.github.kstyrc"        % "embedded-redis"         % "0.6"
@@ -60,7 +60,7 @@ object Libs {
 object Borer {
   val Version = "1.11.0"
 //  val Version = "961eeed"
-  val Org     = "io.bullet"
+  val Org = "io.bullet"
 //  val Org = "com.github.tmtsoftware.borer"
 
   val `borer-core`         = dep(Org %%% "borer-core" % Version)
@@ -112,10 +112,11 @@ object PekkoHttp {
 object Keycloak {
   val Version = "22.0.1"
 
-  val `keycloak-adapter-core` = "org.keycloak" % "keycloak-adapter-core"      % Version
-  val `keycloak-core`         = "org.keycloak" % "keycloak-core"              % Version
-  val `keycloak-installed`    = "org.keycloak" % "keycloak-installed-adapter" % Version
-  val `keycloak-test-helper`  = "org.keycloak" % "keycloak-test-helper"       % Version
+  val `keycloak-adapter-core`    = "org.keycloak" % "keycloak-adapter-core"      % Version
+  val `keycloak-core`            = "org.keycloak" % "keycloak-core"              % Version
+  val `keycloak-installed`       = "org.keycloak" % "keycloak-installed-adapter" % Version
+  val `keycloak-test-helper`     = "org.keycloak" % "keycloak-test-helper"       % Version
+  val `keycloak-policy-enforcer` = "org.keycloak" % "keycloak-policy-enforcer"   % Version
 }
 
 object Jooq {

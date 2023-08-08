@@ -390,6 +390,7 @@ object Dependencies {
     Seq(
       Libs.`config`,
       Keycloak.`keycloak-installed`,
+      Keycloak.`keycloak-policy-enforcer`,
       Libs.`os-lib`,
       // (legacy dependencies) required*
       Libs.`scalatest`.value % Test,

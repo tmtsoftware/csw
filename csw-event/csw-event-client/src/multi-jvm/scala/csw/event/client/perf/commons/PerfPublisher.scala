@@ -16,7 +16,7 @@ import csw.prefix.models.Prefix
 
 import cps.compat.FutureAsync.*
 import scala.concurrent.Future
-import scala.concurrent.duration.DurationLong
+import scala.concurrent.duration.*
 
 class PerfPublisher(
     prefix: Prefix,

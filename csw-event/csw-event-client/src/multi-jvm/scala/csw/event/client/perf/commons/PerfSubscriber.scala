@@ -7,7 +7,6 @@ package csw.event.client.perf.commons
 
 import java.time.Instant
 import java.util.concurrent.TimeUnit.SECONDS
-
 import org.apache.pekko.Done
 import org.apache.pekko.stream.UniqueKillSwitch
 import org.apache.pekko.stream.scaladsl.{Keep, Source}
@@ -19,6 +18,7 @@ import csw.event.client.perf.wiring.{TestConfigs, TestWiring}
 import csw.params.events.{Event, EventKey, EventName, SystemEvent}
 import csw.prefix.models.Prefix
 import org.HdrHistogram.Histogram
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 
 import scala.concurrent.Future
 
@@ -37,7 +37,7 @@ class PerfSubscriber(
   import testConfigs._
   import testWiring._
 
-  implicit val system = actorSystem
+  implicit val system: ActorSystem[SpawnProtocol.Command] = actorSystem
 
   private val subscriber: EventSubscriber =
     if (testConfigs.shareConnection) sharedSubscriber else testWiring.subscriber
