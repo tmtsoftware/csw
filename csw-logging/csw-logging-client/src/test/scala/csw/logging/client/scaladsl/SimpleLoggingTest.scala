@@ -63,7 +63,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
       log.getString(LoggingKeys.PREFIX) shouldBe "CSW.tromboneHcd"
       log.getString(LoggingKeys.FILE) shouldBe "TromboneHcd.scala"
       log(LoggingKeys.LINE).as[Int] shouldBe logMsgLineNumber
-      log.getString(LoggingKeys.CLASS) shouldBe "csw.logging.client.components.TromboneHcd"
+      log.getString(LoggingKeys.CLASS) shouldBe "csw.logging.client.components.TromboneHcd#startLogging"
       logMsgLineNumber += 1
     }
   }
@@ -89,7 +89,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
       log.getString(LoggingKeys.SUBSYSTEM) shouldBe "CSW"
       log.getString(LoggingKeys.FILE) shouldBe "InnerSourceComponent.scala"
       log(LoggingKeys.LINE).as[Int] shouldBe logMsgLineNumber
-      log.getString(LoggingKeys.CLASS) shouldBe "csw.logging.client.components.InnerSourceComponent$InnerSource"
+      log.getString(LoggingKeys.CLASS) shouldBe "csw.logging.client.components.InnerSourceComponent#InnerSource#startLogging"
       logMsgLineNumber += 1
     }
   }
@@ -116,7 +116,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
       log.getString(LoggingKeys.SUBSYSTEM) shouldBe "CSW"
       log.getString(LoggingKeys.FILE) shouldBe "SingletonComponent.scala"
       log(LoggingKeys.LINE).as[Int] shouldBe logMsgLineNumber
-      log.getString(LoggingKeys.CLASS) shouldBe "csw.logging.client.components.SingletonComponent"
+      log.getString(LoggingKeys.CLASS) shouldBe "csw.logging.client.components.SingletonComponent.startLogging"
       logMsgLineNumber += 1
     }
   }
@@ -147,7 +147,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
       log.getString(LoggingKeys.SUBSYSTEM) shouldBe "CSW"
       log.getString("file") shouldBe "SingletonComponent.scala"
       log("line").as[Int] shouldBe logMsgLineNumber
-      log.getString("class") shouldBe "csw.logging.client.components.SingletonComponent"
+      log.getString("class") shouldBe "csw.logging.client.components.SingletonComponent.startLogging"
       //  This verifies that the user keys are present and the value is correct
       //  Also make sure all user messages and values are present
       userMsgMap.foreach { m =>
@@ -351,7 +351,7 @@ class SimpleLoggingTest extends LoggingTestSuite with Eventually {
       log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "tromboneHcd"
       log.getString(LoggingKeys.SUBSYSTEM) shouldBe "CSW"
       log.getString(LoggingKeys.SEVERITY) shouldBe ERROR.name
-      log.getString(LoggingKeys.CLASS) shouldBe tromboneHcdClassName
+      log.getString(LoggingKeys.CLASS) should startWith(tromboneHcdClassName)
       log.getString(LoggingKeys.MESSAGE) shouldBe computationResultMsg
       // DEOPSCSW-325: Include exception stack trace in stdout log message for exceptions
       log.contains(LoggingKeys.PLAINSTACK) shouldBe true

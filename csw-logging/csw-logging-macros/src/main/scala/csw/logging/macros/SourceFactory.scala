@@ -17,5 +17,11 @@ object SourceFactory {
   def from(cls: Class[_]): SourceFactory = from(() => SourceLocation("", "", cls.getName, -1))
 
   private inline def getSourceLocation: SourceFactory =
-    () => SourceLocation(sourcecode.FileName(), sourcecode.Pkg(), sourcecode.Enclosing(), sourcecode.Line())
+    () =>
+      SourceLocation(
+        sourcecode.FileName(),
+        sourcecode.Pkg(),
+        sourcecode.Enclosing(),
+        sourcecode.Line()
+      )
 }

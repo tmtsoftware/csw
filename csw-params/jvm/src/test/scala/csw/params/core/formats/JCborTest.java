@@ -88,9 +88,9 @@ public class JCborTest {
     }
 
     // Not needed for Java
-//    @Test
-//    public void shouldAbleToConvertToAndFromParameterAndEvent__DEOPSCSW_495__CSW_147() {
-//        // ===== Test Parameter SERDE =====
+    @Test
+    public void shouldAbleToConvertToAndFromParameterAndEvent__DEOPSCSW_495__CSW_147() {
+        // ===== Test Parameter SERDE =====
 //        byte[] byteArray = Cbor.encode(param, ParamCodecs$.MODULE$.paramEncExistential()).toByteArray();
 //        Parameter<?> parameterFromBytes = Cbor.decode(byteArray, JInput.FromByteArrayProvider()).to(ParamCodecs$.MODULE$.paramDecExistential()).value();
 //
@@ -104,5 +104,5 @@ public class JCborTest {
 //        byte[] bytes = EventCbor$.MODULE$.encode(originalEvent);
 //        Event eventFromBytes = EventCbor$.MODULE$.decode(bytes);
 //        Assert.assertEquals(originalEvent, eventFromBytes);
-//    }
+    }
 }

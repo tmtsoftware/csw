@@ -131,7 +131,8 @@ private[logging] object LogActorOperations {
     jsonObject = (log.sourceLocation.packageName, log.sourceLocation.className) match {
       case ("", "") => jsonObject
       case ("", c)  => jsonObject ++ Json.obj(LoggingKeys.CLASS -> c)
-      case (p, c)   => jsonObject ++ Json.obj(LoggingKeys.CLASS -> s"$p.$c")
+//      case (p, c)   => jsonObject ++ Json.obj(LoggingKeys.CLASS -> s"$p.$c")
+      case (p, c) => jsonObject ++ Json.obj(LoggingKeys.CLASS -> s"$c")
     }
 
     if (log.actorName.isDefined) jsonObject = jsonObject ++ Json.obj(LoggingKeys.ACTOR -> log.actorName.get)
