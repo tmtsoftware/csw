@@ -252,7 +252,8 @@ private[config] class ConfigClient(
             response.entity.discardBytes()
             logger.error(EmptyResponse.getMessage, ex = EmptyResponse)
             throw EmptyResponse
-          case StatusCodes.NotFound => Future.successful(Option.empty[ConfigData])
+//          case StatusCodes.NotFound => Future.successful(Option.empty[ConfigData])
+          case _ => Future.successful(Option.empty[ConfigData])
         }
       )
     }
