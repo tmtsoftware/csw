@@ -81,7 +81,8 @@ import scala.language.implicitConversions
 ```
 
 * Added some Scala methods to support JSON serialization from Java, since the CBOR library uses inline macros, which can't be accessed directly from Java
-* Removed `lazy` from some `actorSystem` and other definitions in various `Wiring` classes, since in Scala 3 you can't import lazy vals (i.e.: import Wiring.*)
+* Removed `lazy` or added `final` to some `actorSystem` and other definitions in various `Wiring` classes, since in Scala 3 you can't import non-final lazy vals (i.e.: import Wiring.*)
+* Replaced some inherited lazy vals with defs due to new Scala 3 restrictions.
 * Replaced code like this:
 ```
 sealed trait Command { self: ParameterSetType[_] => 
@@ -100,3 +101,6 @@ due to Scala3 complaints.
 * Commented out one CBOR test for Java, since it is not likely to be used from Java.
 * Replaced use of App class in some cases with Scala main() as recommended for Scala 3
 * Removed (probably unnecessary) call to `redisReactiveCommands.getStatefulConnection.close()`, since it was deprecated
+
+* Commented out tests using `embedded-kafka` due to unknown errors (The Kafka based Event Service is not currently being used).
+* 
