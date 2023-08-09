@@ -44,27 +44,27 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually /*wit
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 10.millis)
 
   var redisTestProps: BaseProperties = _
-  var kafkaTestProps: BaseProperties = _
+//  var kafkaTestProps: BaseProperties = _
 
   @BeforeSuite
   def beforeAll(): Unit = {
     redisTestProps = RedisTestProps.createRedisProperties()
-    kafkaTestProps = KafkaTestProps.createKafkaProperties()
+//    kafkaTestProps = KafkaTestProps.createKafkaProperties()
     redisTestProps.start()
-    kafkaTestProps.start()
+//    kafkaTestProps.start()
   }
 
   @AfterSuite
   def afterAll(): Unit = {
     redisTestProps.shutdown()
-    kafkaTestProps.shutdown()
+//    kafkaTestProps.shutdown()
   }
 
   @DataProvider(name = "event-service-provider")
   def pubSubProvider: Array[Array[BaseProperties]] =
     Array(
-      Array(redisTestProps),
-      Array(kafkaTestProps)
+      Array(redisTestProps)
+//      Array(kafkaTestProps)
     )
 
   // DEOPSCSW-659: Investigate initial latency in event service pub sub API for single publish

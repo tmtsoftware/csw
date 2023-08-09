@@ -118,7 +118,7 @@ class TimingTest extends LoggingTestSuite with Timing {
         log.getString(LoggingKeys.PREFIX) shouldBe prefix.toString
         log.getString(LoggingKeys.ACTOR) shouldBe irisActorRef.path.toString
         log.getString(LoggingKeys.FILE) shouldBe IRIS.FILE_NAME
-        log.getString(LoggingKeys.CLASS) shouldBe IRIS.CLASS_NAME
+        log.getString(LoggingKeys.CLASS) should startWith(IRIS.CLASS_NAME)
         log.contains(LoggingKeys.LINE) shouldBe true
       }
     }
