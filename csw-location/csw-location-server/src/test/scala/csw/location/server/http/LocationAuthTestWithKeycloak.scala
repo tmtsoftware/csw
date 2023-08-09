@@ -107,7 +107,7 @@ class LocationAuthTestWithKeycloak
       )
     )
     val embeddedKeycloak = new EmbeddedKeycloak(keycloakData, Settings(port = port, printProcessLogs = false))
-    Await.result(embeddedKeycloak.startServer(), 1.minute)
+    Await.result(embeddedKeycloak.startServer(), 5.minutes)
   }
 
   private def getToken(userName: String, password: String): () => Some[String] = { () =>
