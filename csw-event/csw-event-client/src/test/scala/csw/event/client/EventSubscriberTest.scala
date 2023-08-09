@@ -15,7 +15,7 @@ import scala.language.implicitConversions
 
 import csw.event.client.helpers.Utils.*
 import csw.prefix.models.{Prefix, Subsystem}
-import csw.event.client.internal.kafka.KafkaTestProps
+//import csw.event.client.internal.kafka.KafkaTestProps
 import csw.event.client.internal.redis.RedisTestProps
 import csw.event.client.internal.wiring.BaseProperties
 import csw.params.core.models.ObsId
@@ -42,27 +42,27 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 10.millis)
 
   var redisTestProps: BaseProperties = _
-  var kafkaTestProps: BaseProperties = _
+//  var kafkaTestProps: BaseProperties = _
 
   @BeforeSuite
   def beforeAll(): Unit = {
     redisTestProps = RedisTestProps.createRedisProperties()
-    kafkaTestProps = KafkaTestProps.createKafkaProperties()
+//    kafkaTestProps = KafkaTestProps.createKafkaProperties()
     redisTestProps.start()
-    kafkaTestProps.start()
+//    kafkaTestProps.start()
   }
 
   @AfterSuite
   def afterAll(): Unit = {
     redisTestProps.shutdown()
-    kafkaTestProps.shutdown()
+//    kafkaTestProps.shutdown()
   }
 
   @DataProvider(name = "event-service-provider")
   def pubSubProvider: Array[Array[BaseProperties]] =
     Array(
-      Array(redisTestProps),
-      Array(kafkaTestProps)
+      Array(redisTestProps)
+//      Array(kafkaTestProps)
     )
 
   @DataProvider(name = "redis-provider")

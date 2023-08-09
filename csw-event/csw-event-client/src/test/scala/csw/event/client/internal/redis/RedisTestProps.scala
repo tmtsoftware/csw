@@ -53,10 +53,10 @@ class RedisTestProps(
 
   private val eventServiceFactory = new EventServiceFactory(RedisStore(redisClient))
 
-  val eventService: EventService   = eventServiceFactory.make(locationService)
-  val jEventService: IEventService = new JEventService(eventService)
-  override lazy val publisher: EventPublisher    = eventService.defaultPublisher
-  override lazy val subscriber: EventSubscriber  = eventService.defaultSubscriber
+  val eventService: EventService                = eventServiceFactory.make(locationService)
+  val jEventService: IEventService              = new JEventService(eventService)
+  override lazy val publisher: EventPublisher   = eventService.defaultPublisher
+  override lazy val subscriber: EventSubscriber = eventService.defaultSubscriber
 
   override def toString: String = name
 

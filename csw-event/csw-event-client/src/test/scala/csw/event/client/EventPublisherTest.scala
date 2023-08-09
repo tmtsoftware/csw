@@ -13,14 +13,14 @@ import scala.language.implicitConversions
 
 import csw.event.client.helpers.Utils.{makeDistinctEvent, makeEvent, makeEventWithPrefix}
 import csw.event.client.internal.redis.{InitializationEvent, RedisTestProps}
-import csw.event.client.internal.kafka.KafkaTestProps
+//import csw.event.client.internal.kafka.KafkaTestProps
 import csw.event.client.internal.wiring.*
 import csw.params.core.generics.KeyType.ByteKey
 import csw.params.core.generics.{Key, Parameter}
 import csw.params.events.{Event, EventKey, EventName, SystemEvent}
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.time.core.models.UTCTime
-import io.github.embeddedkafka.EmbeddedKafka
+//import io.github.embeddedkafka.EmbeddedKafka
 import org.scalatest.concurrent.Eventually
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.testng.TestNGSuite
