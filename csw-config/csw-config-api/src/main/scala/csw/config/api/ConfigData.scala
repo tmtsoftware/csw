@@ -8,21 +8,20 @@ package csw.config.api
 import java.io.InputStream
 import java.nio.file.Path
 import java.util.concurrent.CompletableFuture
-
-import akka.actor.typed.ActorSystem
-import akka.stream.scaladsl.{FileIO, Keep, Source, StreamConverters}
-import akka.util.ByteString
+import org.apache.pekko.actor.typed.ActorSystem
+import org.apache.pekko.stream.scaladsl.{FileIO, Keep, Source, StreamConverters}
+import org.apache.pekko.util.ByteString
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.config.api.commons.Constants
 
-import scala.compat.java8.FutureConverters._
 import scala.concurrent.Future
+import scala.jdk.FutureConverters.*
 
 /**
  * This class represents the contents of the files being managed.
- * It wraps an Akka streams of ByteString.
+ * It wraps an Pekko streams of ByteString.
  *
- * @param source an akka source that materializes to stream of bytes
+ * @param source an pekko source that materializes to stream of bytes
  * @param length the length representing number of bytes
  */
 class ConfigData private (val source: Source[ByteString, Any], val length: Long) {
@@ -30,7 +29,7 @@ class ConfigData private (val source: Source[ByteString, Any], val length: Long)
   /**
    * Returns a future string by reading the source
    *
-   * @param system an akka system required to start the stream of file data that will form a string out of bytes
+   * @param system an pekko system required to start the stream of file data that will form a string out of bytes
    * @return a future that completes with string representation of file data
    */
   def toStringF(implicit system: ActorSystem[_]): Future[String] =
@@ -39,7 +38,7 @@ class ConfigData private (val source: Source[ByteString, Any], val length: Long)
   /**
    * Returns a future of Config object if the data is in valid parseable HOCON format. Else, throws ConfigException.
    *
-   * @param system an akka system required to start the stream of file data that will form a string out of bytes
+   * @param system an pekko system required to start the stream of file data that will form a string out of bytes
    *            and parse it to `Config` model
    * @return a future that completes with `Config` model representing the file data
    */
@@ -55,23 +54,23 @@ class ConfigData private (val source: Source[ByteString, Any], val length: Long)
    * @return a CompletableFuture that completes with string representation of file data
    */
   private[config] def toJStringF(implicit system: ActorSystem[_]): CompletableFuture[String] =
-    toStringF.toJava.toCompletableFuture
+    toStringF.asJava.toCompletableFuture
 
   /**
    * Returns a future of Config object if the data is in valid parseable HOCON format. Else, throws ConfigException.
    *
-   * @param system an akka system required to start the stream of file data that will form a string out of bytes
+   * @param system an pekko system required to start the stream of file data that will form a string out of bytes
    *               and parse it to `Config` model
    * @return a CompletableFuture that completes with `Config` model representing the file data
    */
   private[config] def toJConfigObject(implicit system: ActorSystem[_]): CompletableFuture[Config] =
-    toConfigObject.toJava.toCompletableFuture
+    toConfigObject.asJava.toCompletableFuture
 
   /**
    * Writes config data to a provided file path and returns future file
    *
    * @param path the path to which the file data from config service is dumped on local machine
-   * @param system an akka system required to start the stream of file data and dump it onto the provided `path`
+   * @param system an pekko system required to start the stream of file data and dump it onto the provided `path`
    * @return a future of path that represents the file path on local machine
    */
   def toPath(path: Path)(implicit system: ActorSystem[_]): Future[Path] = {
@@ -85,7 +84,7 @@ class ConfigData private (val source: Source[ByteString, Any], val length: Long)
   /**
    * Returns an inputStream which emits the bytes read from source of file data
    *
-   * @param system an akka system required to start the stream of file data and convert it to InputStream
+   * @param system an pekko system required to start the stream of file data and convert it to InputStream
    * @return an inputStream which emits the bytes read from source of file data
    */
   private[config] def toInputStream(implicit system: ActorSystem[_]): InputStream =
@@ -122,10 +121,10 @@ object ConfigData {
   def fromBytes(bytes: Array[Byte]): ConfigData = ConfigData.from(Source.single(ByteString(bytes)), bytes.length)
 
   /**
-   * An internally used method to create that take an akka source and length of data and creates a ConfigData instance
+   * An internally used method to create that take an pekko source and length of data and creates a ConfigData instance
    * out of it
    *
-   * @param dataBytes an akka source that materializes to stream of bytes
+   * @param dataBytes an pekko source that materializes to stream of bytes
    * @param length the length representing number of bytes
    * @return the ConfigData instance created out of provided dataBytes and length
    */

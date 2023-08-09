@@ -7,17 +7,17 @@ package csw.location.models
 
 import java.net.URI
 
-import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.location.api
-import csw.location.api.AkkaRegistrationFactory
-import csw.location.api.exceptions.LocalAkkaActorRegistrationNotAllowed
+import csw.location.api.PekkoRegistrationFactory
+import csw.location.api.exceptions.LocalPekkoActorRegistrationNotAllowed
 import csw.location.api.extensions.ActorExtension.RichActor
-import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.location.api.models._
+import csw.location.api.models.Connection.{PekkoConnection, HttpConnection, TcpConnection}
+import csw.location.api.models.*
 import csw.location.client.ActorSystemFactory
-import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
+import csw.logging.client.commons.PekkoTypedExtension.UserActorFactory
 import csw.network.utils.Networks
 import csw.prefix.models.{Prefix, Subsystem}
 import org.scalatest.funsuite.AnyFunSuite
@@ -31,35 +31,35 @@ class RegistrationTest extends AnyFunSuite with Matchers with BeforeAndAfterAll 
 
   implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol(), "my-actor-1")
 
-  test("should able to create the AkkaRegistration which should internally create AkkaLocation without metadata | CSW-108") {
+  test("should able to create the PekkoRegistration which should internally create PekkoLocation without metadata | CSW-108") {
     val hostname = Networks().hostname
 
-    val akkaConnection = AkkaConnection(api.models.ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD))
+    val pekkoConnection = PekkoConnection(api.models.ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD))
     val actorRef: ActorRef[_] = actorSystem.spawn(
       Behaviors.empty,
       "my-actor-3"
     )
 
-    val akkaRegistration     = AkkaRegistrationFactory.make(akkaConnection, actorRef)
-    val expectedAkkaLocation = AkkaLocation(akkaConnection, actorRef.toURI, Metadata.empty)
+    val pekkoRegistration     = PekkoRegistrationFactory.make(pekkoConnection, actorRef)
+    val expectedPekkoLocation = PekkoLocation(pekkoConnection, actorRef.toURI, Metadata.empty)
 
-    akkaRegistration.location(hostname) shouldBe expectedAkkaLocation
+    pekkoRegistration.location(hostname) shouldBe expectedPekkoLocation
   }
 
-  test("should able to create the AkkaRegistration with metadata which should internally create AkkaLocation | CSW-108") {
+  test("should able to create the PekkoRegistration with metadata which should internally create PekkoLocation | CSW-108") {
     val hostname = Networks().hostname
 
-    val akkaConnection = AkkaConnection(api.models.ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD))
+    val pekkoConnection = PekkoConnection(api.models.ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD))
     val actorRef: ActorRef[_] = actorSystem.spawn(
       Behaviors.empty,
       "my-actor-4"
     )
 
-    val metadata             = Metadata(Map("key1" -> "value"))
-    val akkaRegistration     = AkkaRegistrationFactory.make(akkaConnection, actorRef, metadata)
-    val expectedAkkaLocation = AkkaLocation(akkaConnection, actorRef.toURI, metadata)
+    val metadata              = Metadata(Map("key1" -> "value"))
+    val pekkoRegistration     = PekkoRegistrationFactory.make(pekkoConnection, actorRef, metadata)
+    val expectedPekkoLocation = PekkoLocation(pekkoConnection, actorRef.toURI, metadata)
 
-    akkaRegistration.location(hostname) shouldBe expectedAkkaLocation
+    pekkoRegistration.location(hostname) shouldBe expectedPekkoLocation
   }
 
   test("should able to create the HttpRegistration which should internally create HttpLocation without metadata | CSW-108") {
@@ -117,17 +117,17 @@ class RegistrationTest extends AnyFunSuite with Matchers with BeforeAndAfterAll 
     tcpRegistration.location(hostname) shouldBe expectedTcpLocation
   }
 
-  test("should not allow AkkaRegistration using local ActorRef") {
+  test("should not allow PekkoRegistration using local ActorRef") {
     val config: Config = ConfigFactory.parseString("""
-        akka.actor.provider = local
+        pekko.actor.provider = local
       """)
 
     implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), "local-actor-system", config)
     val actorRef                                                 = actorSystem.spawn(Behaviors.empty, "my-actor-2")
-    val akkaConnection = AkkaConnection(api.models.ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD))
+    val pekkoConnection = PekkoConnection(api.models.ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD))
 
-    intercept[LocalAkkaActorRegistrationNotAllowed] {
-      AkkaRegistrationFactory.make(akkaConnection, actorRef)
+    intercept[LocalPekkoActorRegistrationNotAllowed] {
+      PekkoRegistrationFactory.make(pekkoConnection, actorRef)
     }
     actorSystem.terminate()
     Await.result(actorSystem.whenTerminated, 10.seconds)

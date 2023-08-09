@@ -5,7 +5,7 @@
 
 package csw.alarm.client.internal.helpers
 import csw.alarm.models.ActivationStatus.{Active, Inactive}
-import csw.alarm.models.AlarmSeverity._
+import csw.alarm.models.AlarmSeverity.*
 import csw.alarm.models.AlarmType.Absolute
 import csw.alarm.models.Key.AlarmKey
 import csw.alarm.models.{AlarmMetadata, AlarmType}

@@ -5,12 +5,12 @@
 
 package example.testkit;
 
-import akka.actor.typed.ActorSystem;
-import akka.actor.typed.SpawnProtocol;
+import org.apache.pekko.actor.typed.ActorSystem;
+import org.apache.pekko.actor.typed.SpawnProtocol;
 import com.typesafe.config.ConfigFactory;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.api.javadsl.JComponentType;
-import csw.location.api.models.AkkaLocation;
+import csw.location.api.models.PekkoLocation;
 import csw.location.api.models.ComponentId;
 import csw.location.api.models.Connection.*;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
@@ -60,11 +60,11 @@ public class JTestKitsExample {
 
         //#spawn-using-testkit
 
-        AkkaConnection connection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.CSW, "sample"), JComponentType.Assembly));
-        Optional<AkkaLocation> akkaLocation = locationService.resolve(connection, Duration.ofSeconds(5)).get();
+        PekkoConnection connection = new PekkoConnection(new ComponentId(Prefix.apply(JSubsystem.CSW, "sample"), JComponentType.Assembly));
+        Optional<PekkoLocation> pekkoLocation = locationService.resolve(connection, Duration.ofSeconds(5)).get();
 
-        Assert.assertTrue(akkaLocation.isPresent());
-        Assert.assertEquals(connection, akkaLocation.orElseThrow().connection());
+        Assert.assertTrue(pekkoLocation.isPresent());
+        Assert.assertEquals(connection, pekkoLocation.orElseThrow().connection());
     }
 
 }

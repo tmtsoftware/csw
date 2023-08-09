@@ -5,14 +5,16 @@
 
 package csw.config.server
 
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.Behaviors
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.Uri.Path
-import akka.http.scaladsl.model.{HttpRequest, StatusCodes, Uri}
+import org.apache.pekko.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.http.scaladsl.Http
+import org.apache.pekko.http.scaladsl.model.Uri.Path
+import org.apache.pekko.http.scaladsl.model.{HttpRequest, StatusCodes, Uri}
 import com.typesafe.config.ConfigFactory
 import csw.aas.core.commons.AASConnection
-import csw.config.server.commons.TestFutureExtension.RichFuture
+import csw.config.server.commons.TestFutureExtension.given
+import scala.language.implicitConversions
+
 import csw.config.server.commons.{ConfigServiceConnection, TestFileUtils}
 import csw.location.api.models
 import csw.location.api.scaladsl.LocationService
@@ -20,7 +22,7 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.server.http.HTTPLocationService
 import org.tmatesoft.svn.core.SVNException
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 // DEOPSCSW-130: Command line App for HTTP server
 class MainTest extends HTTPLocationService {

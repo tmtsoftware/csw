@@ -5,14 +5,14 @@
 
 package example.command
 
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.util.Timeout
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.command.api.{DemandMatcher, StateMatcher}
 import csw.command.client.CommandServiceFactory
 import csw.location.api.models
-import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.models.{AkkaLocation, ComponentType}
+import csw.location.api.models.Connection.PekkoConnection
+import csw.location.api.models.{PekkoLocation, ComponentType}
 import csw.location.api.scaladsl.LocationService
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
@@ -31,7 +31,7 @@ import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 
-import scala.async.Async.*
+import cps.compat.FutureAsync.*
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, ExecutionContext, Future}
 
@@ -62,7 +62,7 @@ class CommandServiceExample
     spawnStandalone(sampleHcdConf)
     val sampleHcdLocF =
       locationService.resolve(
-        AkkaConnection(models.ComponentId(Prefix(Subsystem.CSW, "samplehcd"), ComponentType.HCD)),
+        PekkoConnection(models.ComponentId(Prefix(Subsystem.CSW, "samplehcd"), ComponentType.HCD)),
         15.seconds
       )
     // wait for sampleHcd to be up & running before spawning assembly, as it requires sample hcd to be running.
@@ -73,17 +73,17 @@ class CommandServiceExample
     // #resolve-hcd-and-create-commandservice
     val assemblyLocF =
       locationService.resolve(
-        AkkaConnection(models.ComponentId(Prefix(Subsystem.WFOS, "Assembly"), ComponentType.Assembly)),
+        PekkoConnection(models.ComponentId(Prefix(Subsystem.WFOS, "Assembly"), ComponentType.Assembly)),
         15.seconds
       )
-    val assemblyLocation: AkkaLocation = Await.result(assemblyLocF, 10.seconds).get
-    val assemblyCmdService             = CommandServiceFactory.make(assemblyLocation)
+    val assemblyLocation: PekkoLocation = Await.result(assemblyLocF, 10.seconds).get
+    val assemblyCmdService              = CommandServiceFactory.make(assemblyLocation)
     // #resolve-hcd-and-create-commandservice
     // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
     val hcdLocF =
-      locationService.resolve(AkkaConnection(models.ComponentId(Prefix(Subsystem.WFOS, "HCD"), ComponentType.HCD)), 15.seconds)
-    val hcdLocation: AkkaLocation = Await.result(hcdLocF, 15.seconds).get
-    val hcdCmdService             = CommandServiceFactory.make(hcdLocation)
+      locationService.resolve(PekkoConnection(models.ComponentId(Prefix(Subsystem.WFOS, "HCD"), ComponentType.HCD)), 15.seconds)
+    val hcdLocation: PekkoLocation = Await.result(hcdLocF, 15.seconds).get
+    val hcdCmdService              = CommandServiceFactory.make(hcdLocation)
 
     // #invalidCmd
     val invalidSetup    = Setup(prefix, invalidCmd, obsId)

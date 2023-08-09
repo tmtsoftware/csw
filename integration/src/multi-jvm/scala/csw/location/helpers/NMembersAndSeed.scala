@@ -5,11 +5,11 @@
 
 package csw.location.helpers
 
-import akka.actor
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.remote.testconductor.RoleName
-import akka.remote.testkit.MultiNodeConfig
+import org.apache.pekko.actor
+import org.apache.pekko.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.remote.testconductor.RoleName
+import org.apache.pekko.remote.testkit.MultiNodeConfig
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.location.server.commons.{ClusterAwareSettings, ClusterSettings}
 import io.netty.util.internal.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
@@ -29,7 +29,7 @@ class NMembersAndSeed(n: Int) extends MultiNodeConfig {
     addRole(s"member-$x")(settings.joinLocal(3552))
   }
 
-  commonConfig(ConfigFactory.parseString("akka.loggers = [csw.logging.compat.AkkaLogger]"))
+  commonConfig(ConfigFactory.parseString("pekko.loggers = [csw.logging.compat.PekkoLogger]"))
 
   private def addRole(name: String)(settings: ClusterSettings): RoleName = {
     val node = role(name)

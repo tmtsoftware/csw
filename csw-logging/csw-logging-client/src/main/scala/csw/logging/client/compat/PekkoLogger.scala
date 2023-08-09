@@ -5,18 +5,18 @@
 
 package csw.logging.client.compat
 
-import akka.actor.Actor
-import akka.event.Logging._
-import csw.logging.client.internal.LogActorMessages.LogAkka
+import org.apache.pekko.actor.Actor
+import org.apache.pekko.event.Logging.*
+import csw.logging.client.internal.LogActorMessages.LogPekko
 import csw.logging.client.internal.MessageHandler
 import csw.logging.models.Level
 
 /**
- * This actor is wired up as akka logger in `logging.conf`. The instance of this actor is created via reflection. When log
- * statement from akka code is executed, a message is sent to this actor. Then this actor will simply process the received message
+ * This actor is wired up as pekko logger in `logging.conf`. The instance of this actor is created via reflection. When log
+ * statement from pekko code is executed, a message is sent to this actor. Then this actor will simply process the received message
  * and forward it to underlying logging code.
  */
-private[logging] class AkkaLogger extends Actor {
+private[logging] class PekkoLogger extends Actor {
   import Level._
 
   def receive: Receive = {
@@ -32,5 +32,5 @@ private[logging] class AkkaLogger extends Actor {
   }
 
   private def log(level: Level, source: String, clazz: Class[_], msg: Any, time: Long, cause: Option[Throwable] = None): Unit =
-    MessageHandler.sendAkkaMsg(LogAkka(time, level, source, clazz, msg, cause))
+    MessageHandler.sendPekkoMsg(LogPekko(time, level, source, clazz, msg, cause))
 }

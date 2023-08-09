@@ -5,41 +5,42 @@
 
 package csw.services
 
-import akka.actor.CoordinatedShutdown
+import org.apache.pekko.actor.CoordinatedShutdown
+import caseapp.Command
 import caseapp.core.RemainingArgs
-import caseapp.core.app.CommandApp
+import caseapp.core.app.CommandsEntryPoint
 import csw.logging.client.scaladsl.LoggingSystemFactory
-import csw.services.cli.Command
-import csw.services.cli.Command.Start
+import csw.services.cli.Commands
+import csw.services.cli.Commands.StartOptions
 import csw.services.internal.Wiring
 
 import scala.util.control.NonFatal
 
-object Main extends CommandApp[Command] {
-  override def appName: String    = getClass.getSimpleName.dropRight(1) // remove $ from class name
-  override def appVersion: String = BuildInfo.version
-  override def progName: String   = BuildInfo.name
+object Main extends CommandsEntryPoint {
+  def appName: String           = getClass.getSimpleName.dropRight(1) // remove $ from class name
+  def appVersion: String        = BuildInfo.version
+  override def progName: String = BuildInfo.name
+
   println(s"starting $progName-$appVersion")
 
-  override def run(command: Command, remainingArgs: RemainingArgs): Unit =
-    command match {
-      case s: Start => run(s)
-    }
-
-  def run(start: Start): Unit = {
-    val wiring = new Wiring(start)
-    import wiring._
-    try {
-      environment.setup()
-      LoggingSystemFactory.start(appName, appVersion, settings.hostName, actorSystem)
-      serviceList.foreach(_.start)
-      CoordinatedShutdown(actorSystem).addJvmShutdownHook(shutdown())
-    }
-    catch {
-      case NonFatal(e) =>
-        e.printStackTrace()
-        shutdown()
-        exit(1)
+  val StartCommand: Command[StartOptions] = new Command[StartOptions] {
+    def run(options: StartOptions, args: RemainingArgs): Unit = {
+      val wiring = new Wiring(options)
+      import wiring._
+      try {
+        environment.setup()
+        LoggingSystemFactory.start(appName, appVersion, settings.hostName, actorSystem)
+        serviceList.foreach(_.start)
+        CoordinatedShutdown(actorSystem).addJvmShutdownHook(shutdown())
+      }
+      catch {
+        case NonFatal(e) =>
+          e.printStackTrace()
+          shutdown()
+          exit(1)
+      }
     }
   }
+
+  override def commands: Seq[Command[_]] = List(StartCommand)
 }

@@ -12,7 +12,9 @@ import csw.config.api.scaladsl.{ConfigClientService, ConfigService}
 import csw.config.client.ConfigClientBaseSuite
 import csw.config.server.ServerWiring
 import csw.config.server.commons.TestFileUtils
-import csw.config.server.commons.TestFutureExtension.RichFuture
+import csw.config.server.commons.TestFutureExtension.given
+import scala.language.implicitConversions
+
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 
 // DEOPSCSW-138: Split Config API into Admin API and Client API

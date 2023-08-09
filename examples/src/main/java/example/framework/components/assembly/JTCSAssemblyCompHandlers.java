@@ -5,7 +5,7 @@
 
 package example.framework.components.assembly;
 
-import akka.actor.typed.javadsl.ActorContext;
+import org.apache.pekko.actor.typed.javadsl.ActorContext;
 import csw.command.client.CommandResponseManager;
 import csw.command.client.messages.TopLevelActorMessage;
 import csw.framework.javadsl.JDefaultComponentHandlers;

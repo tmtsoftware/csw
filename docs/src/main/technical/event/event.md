@@ -79,10 +79,10 @@ Romaine provides additional rich APIs over the existing functionality offered by
 * **Async API:** Provides asynchronous API (`romaine.async.RedisAsyncApi`) for various redis commands like `get`, `set`, `publish` etc.  
 
 * **Reactive API:** Provides API for Subscription and Pattern-Subscription (`romaine.reactive.RedisSubscriptionApi`).
-On subscription, it returns an [Akka Stream](https://doc.akka.io/docs/akka/current/stream/index.html) of Events which on execution materializes to `RedisSubscription` instance which gives handle to unsubscribe to events.
+On subscription, it returns an [Pekko Stream](https://doc.pekko.io/docs/pekko/current/stream/index.html) of Events which on execution materializes to `RedisSubscription` instance which gives handle to unsubscribe to events.
 
 * **Keyspace API:** Provides APIs to watch [Keyspace Notifications](https://redis.io/docs/manual/keyspace-notifications/) (`romaine.keyspace.RedisKeySpaceApi`).
-This is a rich API built on Akka Streams which provides not just the change events that happen on keys (for eg: Update, Removal etc.) but also the old and new values corresponding to those keys.  
+This is a rich API built on Pekko Streams which provides not just the change events that happen on keys (for eg: Update, Removal etc.) but also the old and new values corresponding to those keys.  
 
 Event Service uses `Async API` for publishing and setting the latest event, and `Reactive API` for subscribing to events and patterns.
 `Keyspace API` is used in Alarm Service.
@@ -102,7 +102,7 @@ If due to any other reasons, the publishing of events fail, the publish APIs wou
 
 ## Event Subscription
 
-A subscription to one or more event keys returns an [Akka Stream](https://doc.akka.io/docs/akka/current/stream/index.html) of events. 
+A subscription to one or more event keys returns an [Pekko Stream](https://doc.pekko.io/docs/pekko/current/stream/index.html) of events. 
 Subscriptions to concrete event keys as well as to glob-style patterns is supported.
 With pattern or glob-style subscriptions, the subscriber receives all the events with event-keys that match the provided pattern. 
 In both cases, the subscriber gets a handle to an instance of @scaladoc[EventSubscription](csw.event.api.scaladsl.EventSubscription) that can be used to unsubscribe.  

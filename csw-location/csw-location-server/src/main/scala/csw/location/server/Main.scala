@@ -5,9 +5,9 @@
 
 package csw.location.server
 
-import akka.Done
-import akka.actor.CoordinatedShutdown
-import akka.http.scaladsl.Http.ServerBinding
+import org.apache.pekko.Done
+import org.apache.pekko.actor.CoordinatedShutdown
+import org.apache.pekko.http.scaladsl.Http.ServerBinding
 import csw.location.server.cli.{ArgsParser, Options}
 import csw.location.server.commons.ClusterAwareSettings
 import csw.location.server.internal.ServerWiring
@@ -18,7 +18,7 @@ import scala.util.control.NonFatal
 
 /**
  * responsible for starting following:
- *  1. location service on provided port (this is required to bootstrap akka cluster, initially cluster will have single seed node)
+ *  1. location service on provided port (this is required to bootstrap pekko cluster, initially cluster will have single seed node)
  *  2. http server which exposes http end point to change/get the log level of components dynamically
  */
 // $COVERAGE-OFF$

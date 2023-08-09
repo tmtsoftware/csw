@@ -5,17 +5,17 @@
 
 package csw.command.api.client
 
-import akka.actor.typed.ActorSystem
-import akka.stream.scaladsl.Source
-import akka.util.Timeout
+import org.apache.pekko.actor.typed.ActorSystem
+import org.apache.pekko.stream.scaladsl.Source
+import org.apache.pekko.util.Timeout
 import csw.command.api.StateMatcher
 import csw.command.api.codecs.CommandServiceCodecs
-import csw.command.api.messages.CommandServiceRequest._
-import csw.command.api.messages.CommandServiceStreamRequest._
+import csw.command.api.messages.CommandServiceRequest.*
+import csw.command.api.messages.CommandServiceStreamRequest.*
 import csw.command.api.messages.{CommandServiceRequest, CommandServiceStreamRequest}
 import csw.command.api.scaladsl.CommandService
 import csw.command.api.utils.CommandServiceExtension
-import csw.params.commands.CommandResponse._
+import csw.params.commands.CommandResponse.*
 import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}

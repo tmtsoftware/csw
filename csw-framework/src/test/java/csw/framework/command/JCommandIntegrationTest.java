@@ -5,17 +5,17 @@
 
 package csw.framework.command;
 
-import akka.actor.testkit.typed.javadsl.TestInbox;
-import akka.actor.testkit.typed.javadsl.TestProbe;
-import akka.actor.typed.ActorSystem;
-import akka.actor.typed.SpawnProtocol;
-import akka.util.Timeout;
+import org.apache.pekko.actor.testkit.typed.javadsl.TestInbox;
+import org.apache.pekko.actor.testkit.typed.javadsl.TestProbe;
+import org.apache.pekko.actor.typed.ActorSystem;
+import org.apache.pekko.actor.typed.SpawnProtocol;
+import org.apache.pekko.util.Timeout;
 import com.typesafe.config.ConfigFactory;
 import csw.command.api.DemandMatcher;
 import csw.command.api.StateMatcher;
 import csw.command.api.javadsl.ICommandService;
 import csw.command.client.CommandServiceFactory;
-import csw.command.client.extensions.AkkaLocationExt;
+import csw.command.client.extensions.PekkoLocationExt;
 import csw.command.client.messages.SupervisorLockMessage;
 import csw.command.client.models.framework.LockingResponse;
 import csw.common.components.framework.SampleComponentState;
@@ -23,9 +23,9 @@ import csw.framework.internal.wiring.FrameworkWiring;
 import csw.framework.internal.wiring.Standalone;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.api.javadsl.JComponentType;
-import csw.location.api.models.AkkaLocation;
+import csw.location.api.models.PekkoLocation;
 import csw.location.api.models.ComponentId;
-import csw.location.api.models.Connection.AkkaConnection;
+import csw.location.api.models.Connection.PekkoConnection;
 import csw.location.client.ActorSystemFactory;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
 import csw.location.server.http.JHTTPLocationService;
@@ -72,7 +72,7 @@ import static csw.common.components.command.ComponentStateForCommand.*;
 // DEOPSCSW-228: Assist Components with command completion
 // DEOPSCSW-234: CCS accessibility to all CSW component builders
 // DEOPSCSW-317: Use state values of HCD to determine command completion
-// DEOPSCSW-321: AkkaLocation provides wrapper for ActorRef[ComponentMessage]
+// DEOPSCSW-321: PekkoLocation provides wrapper for ActorRef[ComponentMessage]
 @SuppressWarnings("unchecked")
 public class JCommandIntegrationTest {
     private static final ActorSystem<SpawnProtocol.Command> hcdActorSystem = ActorSystemFactory.remote(SpawnProtocol.create(), "test");
@@ -80,7 +80,7 @@ public class JCommandIntegrationTest {
     private static JHTTPLocationService jHttpLocationService;
     private static ILocationService locationService;
     private static ICommandService hcdCmdService;
-    private static AkkaLocation hcdLocation;
+    private static PekkoLocation hcdLocation;
     private final Timeout timeout = new Timeout(6, TimeUnit.SECONDS);
 
     @BeforeClass
@@ -100,13 +100,13 @@ public class JCommandIntegrationTest {
         jHttpLocationService.afterAll();
     }
 
-    private static AkkaLocation getLocation() throws Exception {
+    private static PekkoLocation getLocation() throws Exception {
         FrameworkWiring wiring = FrameworkWiring.make(hcdActorSystem, (RedisClient) null);
         Await.result(Standalone.spawn(ConfigFactory.load("aps_hcd_java.conf"), wiring), new FiniteDuration(5, TimeUnit.SECONDS));
 
-        AkkaConnection akkaConnection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.IRIS, "test_component_running_long_command_java"), JComponentType.HCD));
-        CompletableFuture<Optional<AkkaLocation>> eventualLocation = locationService.resolve(akkaConnection, java.time.Duration.ofSeconds(5));
-        Optional<AkkaLocation> maybeLocation = eventualLocation.get();
+        PekkoConnection pekkoConnection = new PekkoConnection(new ComponentId(Prefix.apply(JSubsystem.IRIS, "test_component_running_long_command_java"), JComponentType.HCD));
+        CompletableFuture<Optional<PekkoLocation>> eventualLocation = locationService.resolve(pekkoConnection, java.time.Duration.ofSeconds(5));
+        Optional<PekkoLocation> maybeLocation = eventualLocation.get();
         Assert.assertTrue(maybeLocation.isPresent());
 
         return maybeLocation.orElseThrow();
@@ -388,7 +388,7 @@ public class JCommandIntegrationTest {
         FiniteDuration duration = new FiniteDuration(5, TimeUnit.SECONDS);
 
         // Lock component
-        AkkaLocationExt.RichAkkaLocation(hcdLocation).componentRef(hcdActorSystem).tell(new SupervisorLockMessage.Lock(prefix(), probe.ref(), duration));
+        PekkoLocationExt.RichPekkoLocation(hcdLocation).componentRef(hcdActorSystem).tell(new SupervisorLockMessage.Lock(prefix(), probe.ref(), duration));
         probe.expectMessage(LockingResponse.lockAcquired());
 
         Key<Integer> intKey2 = JKeyType.IntKey().make("encoder", JUnits.encoder);
@@ -402,7 +402,7 @@ public class JCommandIntegrationTest {
         Assert.assertTrue(actualLockedCmdResponse instanceof CommandResponse.Locked);
 
         // Unlock component
-        AkkaLocationExt.RichAkkaLocation(hcdLocation).componentRef(hcdActorSystem).tell(new SupervisorLockMessage.Unlock(prefix(), probe.ref()));
+        PekkoLocationExt.RichPekkoLocation(hcdLocation).componentRef(hcdActorSystem).tell(new SupervisorLockMessage.Unlock(prefix(), probe.ref()));
         probe.expectMessage(LockingResponse.lockReleased());
 
         CompletableFuture<CommandResponse.SubmitResponse> cmdAfterUnlockResCompletableFuture = hcdCmdService.submit(imdSetupCommand);

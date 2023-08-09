@@ -12,7 +12,7 @@ interfaces to perform authentication through AAS. Sequencers, Assemblies and HCD
 authenticated environment, but do not concern themselves directly with authorization and authentication.
 
  - @ref:[Core concepts & terms](aas/core-concepts-and-terms.md)
- - @ref:[Akka HTTP Adapter - csw-aas-http](aas/csw-aas-http.md)
+ - @ref:[Pekko HTTP Adapter - csw-aas-http](aas/csw-aas-http.md)
  - @ref:[Installed Auth Adapter - csw-aas-installed](aas/csw-aas-installed.md)
  - @extref[Javascript Adapter - ESW-TS](esw_ts:aas/auth-components.html)
 

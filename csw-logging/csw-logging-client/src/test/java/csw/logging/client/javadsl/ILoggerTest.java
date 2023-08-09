@@ -5,17 +5,17 @@
 
 package csw.logging.client.javadsl;
 
-import akka.actor.typed.ActorRef;
-import akka.actor.typed.ActorSystem;
-import akka.actor.typed.Props;
-import akka.actor.typed.SpawnProtocol;
+import org.apache.pekko.actor.typed.ActorRef;
+import org.apache.pekko.actor.typed.ActorSystem;
+import org.apache.pekko.actor.typed.Props;
+import org.apache.pekko.actor.typed.SpawnProtocol;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import csw.logging.models.Level;
 import csw.logging.models.Level$;
 import csw.logging.client.appenders.LogAppenderBuilder;
-import csw.logging.client.commons.AkkaTypedExtension;
+import csw.logging.client.commons.PekkoTypedExtension;
 import csw.logging.client.commons.LoggingKeys$;
 import csw.logging.client.components.iris.JIrisSupervisorActor;
 import csw.logging.client.components.iris.JIrisTLA;
@@ -64,7 +64,7 @@ public class ILoggerTest {
     private static List<JsonObject> irisLogBuffer = new ArrayList<>();
     private static List<JsonObject> tromboneHcdLogBuffer = new ArrayList<>();
 
-    private static final AkkaTypedExtension.UserActorFactory userActorFactory = AkkaTypedExtension.UserActorFactory(actorSystem);
+    private static final PekkoTypedExtension.UserActorFactory userActorFactory = PekkoTypedExtension.UserActorFactory(actorSystem);
 
     private static final ActorRef<String> irisSupervisorActor = userActorFactory.<String>spawn(JIrisSupervisorActor.behavior, "csw.JIRISActor", Props.empty());
     private static final ActorRef<String> tromboneSupervisorActor = userActorFactory.<String>spawn(JTromboneHCDSupervisorActor.behavior(new JLoggerFactory(Prefix.apply("csw.jTromboneHcdActor"))), "csw.JTromboneActor", Props.empty());

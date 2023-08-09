@@ -7,9 +7,9 @@ package csw.testkit
 
 import java.util.Optional
 
-import akka.actor.typed
-import akka.actor.typed.scaladsl.Behaviors
-import akka.util.Timeout
+import org.apache.pekko.actor.typed
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.event.client.internal.commons.EventServiceConnection
 import csw.location.api.scaladsl.RegistrationResult

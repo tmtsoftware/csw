@@ -5,10 +5,10 @@
 
 package csw.testkit
 
-import akka.Done
-import akka.actor.typed
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.util.Timeout
+import org.apache.pekko.Done
+import org.apache.pekko.actor.typed
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.alarm.api.scaladsl.AlarmAdminService
 import csw.alarm.client.AlarmServiceFactory

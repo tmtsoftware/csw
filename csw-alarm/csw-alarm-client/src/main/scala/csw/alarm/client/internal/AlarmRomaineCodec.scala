@@ -5,8 +5,8 @@
 
 package csw.alarm.client.internal
 
-import csw.alarm.api.internal._
-import csw.alarm.models._
+import csw.alarm.api.internal.*
+import csw.alarm.models.*
 import csw.time.core.models.UTCTime
 import io.bullet.borer.{Codec, Json}
 import romaine.codec.RomaineCodec

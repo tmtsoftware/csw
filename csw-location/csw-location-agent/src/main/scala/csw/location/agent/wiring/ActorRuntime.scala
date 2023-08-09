@@ -5,9 +5,9 @@
 
 package csw.location.agent.wiring
 
-import akka.Done
-import akka.actor.CoordinatedShutdown
-import akka.actor.typed.{ActorSystem, Scheduler, SpawnProtocol}
+import org.apache.pekko.Done
+import org.apache.pekko.actor.CoordinatedShutdown
+import org.apache.pekko.actor.typed.{ActorSystem, Scheduler, SpawnProtocol}
 import csw.location.agent.BuildInfo
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.scaladsl.LoggingSystemFactory

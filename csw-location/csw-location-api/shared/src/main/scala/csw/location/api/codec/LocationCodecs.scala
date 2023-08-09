@@ -7,7 +7,7 @@ package csw.location.api.codec
 
 import java.net.URI
 
-import csw.location.api.models._
+import csw.location.api.models.*
 import csw.prefix.codecs.CommonCodecs
 import io.bullet.borer.Codec
 import io.bullet.borer.derivation.CompactMapBasedCodecs.deriveCodec

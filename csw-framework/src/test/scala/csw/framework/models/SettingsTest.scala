@@ -5,8 +5,10 @@
 
 package csw.framework.models
 
-import akka.actor.typed.SpawnProtocol
-import csw.event.client.helpers.TestFutureExt.RichFuture
+import org.apache.pekko.actor.typed.SpawnProtocol
+import csw.event.client.helpers.TestFutureExt.given
+import scala.language.implicitConversions
+
 import csw.location.client.ActorSystemFactory
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers

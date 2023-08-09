@@ -5,11 +5,11 @@
 
 package csw.framework.internal.supervisor
 
-import akka.Done
-import akka.actor.typed.*
-import akka.actor.typed.scaladsl.*
-import akka.http.scaladsl.Http.ServerBinding
-import akka.http.scaladsl.server.Route
+import org.apache.pekko.Done
+import org.apache.pekko.actor.typed.*
+import org.apache.pekko.actor.typed.scaladsl.*
+import org.apache.pekko.http.scaladsl.Http.ServerBinding
+import org.apache.pekko.http.scaladsl.server.Route
 import csw.command.client.MiniCRM.MiniCRMMessage
 import csw.command.client.messages.*
 import csw.command.client.messages.ComponentCommonMessage.{
@@ -39,8 +39,8 @@ import csw.framework.internal.pubsub.PubSubBehavior
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.{ComponentHandlersFactory, RegistrationFactory}
 import csw.location.api.models
-import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
-import csw.location.api.models.{AkkaRegistration, ComponentId, Metadata}
+import csw.location.api.models.Connection.{PekkoConnection, HttpConnection}
+import csw.location.api.models.{PekkoRegistration, ComponentId, Metadata}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.LogAdminUtil
 import csw.params.commands.CommandResponse.Locked
@@ -63,7 +63,7 @@ private[framework] object SupervisorBehavior {
 /**
  * The Behavior of a Supervisor of a component actor, represented as a mutable behavior
  *
- * @param ctx                      the [[akka.actor.typed.scaladsl.ActorContext]] under which the actor instance of this behavior is created
+ * @param ctx                      the [[pekko.actor.typed.scaladsl.ActorContext]] under which the actor instance of this behavior is created
  * @param timerScheduler           provides support for scheduled `self` messages in an actor
  * @param maybeContainerRef        the container ref of the container under which this supervisor is started if
  *                                 it's not running in standalone mode
@@ -83,16 +83,16 @@ private[framework] final class SupervisorBehavior(
   import cswCtx.*
   import ctx.executionContext
 
-  private val log: Logger                        = loggerFactory.getLogger(ctx)
-  private val prefix: Prefix                     = componentInfo.prefix
-  private val componentActorName: String         = s"$prefix-$ComponentActorNameSuffix"
-  private val akkaConnection: AkkaConnection     = AkkaConnection(ComponentId(prefix, componentInfo.componentType))
-  private val httpConnection: HttpConnection     = HttpConnection(models.ComponentId(prefix, componentInfo.componentType))
-  private val locationMetadata: Metadata         = Metadata().withPid(ProcessHandle.current().pid())
-  private val akkaRegistration: AkkaRegistration = registrationFactory.akkaTyped(akkaConnection, ctx.self, locationMetadata)
-  private val route: Route                       = CommandServiceRoutesFactory.createRoutes(ctx.self)(ctx.system)
-  private val httpService                        = new HttpService(locationService, route, log, httpConnection)(ctx.system)
-  private val isStandalone: Boolean              = maybeContainerRef.isEmpty
+  private val log: Logger                          = loggerFactory.getLogger(ctx)
+  private val prefix: Prefix                       = componentInfo.prefix
+  private val componentActorName: String           = s"$prefix-$ComponentActorNameSuffix"
+  private val pekkoConnection: PekkoConnection     = PekkoConnection(ComponentId(prefix, componentInfo.componentType))
+  private val httpConnection: HttpConnection       = HttpConnection(models.ComponentId(prefix, componentInfo.componentType))
+  private val locationMetadata: Metadata           = Metadata().withPid(ProcessHandle.current().pid())
+  private val pekkoRegistration: PekkoRegistration = registrationFactory.pekkoTyped(pekkoConnection, ctx.self, locationMetadata)
+  private val route: Route                         = CommandServiceRoutesFactory.createRoutes(ctx.self)(ctx.system)
+  private val httpService                          = new HttpService(locationService, route, log, httpConnection)(ctx.system)
+  private val isStandalone: Boolean                = maybeContainerRef.isEmpty
 
   private[framework] val initializeTimeout: FiniteDuration                        = componentInfo.initializeTimeout
   private[framework] val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] = makePubSubLifecycle()
@@ -156,7 +156,7 @@ private[framework] final class SupervisorBehavior(
   }
 
   private def unregisterAndStopEmbeddedServer(): Future[Done] = {
-    val unregistrationResult = locationService.unregister(akkaConnection)
+    val unregistrationResult = locationService.unregister(pekkoConnection)
     val embeddedServerTerminationResult =
       embeddedServer.map(_.terminate(20.seconds).map(_ => Done)).getOrElse(Future.successful(Done))
 
@@ -202,7 +202,7 @@ private[framework] final class SupervisorBehavior(
     // Honour DoNotRegister received in componentInfo
     if (componentInfo.locationServiceUsage == DoNotRegister) ctx.self ! RegistrationNotRequired(componentRef)
     else
-      (locationService.register(akkaRegistration) zip httpService.bindAndRegister()).onComplete {
+      (locationService.register(pekkoRegistration) zip httpService.bindAndRegister()).onComplete {
         case Success((_, (binding, _))) => embeddedServer = Some(binding); ctx.self ! RegistrationSuccess(componentRef)
         case Failure(throwable)         => ctx.self ! RegistrationFailed(throwable)
       }
@@ -319,7 +319,7 @@ private[framework] final class SupervisorBehavior(
     log.error(s"Unexpected message :[$message] received by supervisor in lifecycle state :[$lifecycleState]")
 
   /**
-   * Defines processing for a [[akka.actor.typed.Signal]] received by the actor instance
+   * Defines processing for a [[pekko.actor.typed.Signal]] received by the actor instance
    *
    * @return the existing behavior
    */

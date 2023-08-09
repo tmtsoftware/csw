@@ -5,8 +5,8 @@
 
 package csw.event.client.perf
 
-import akka.actor.typed.scaladsl.adapter._
-import akka.actor.{ActorSystem, typed}
+import org.apache.pekko.actor.typed.scaladsl.adapter.*
+import org.apache.pekko.actor.{ActorSystem, typed}
 import csw.event.client.EventServiceFactory
 import csw.event.client.helpers.Utils
 import csw.location.api.scaladsl.LocationService

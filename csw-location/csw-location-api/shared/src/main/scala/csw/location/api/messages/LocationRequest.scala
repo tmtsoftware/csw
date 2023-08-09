@@ -5,7 +5,7 @@
 
 package csw.location.api.messages
 
-import csw.location.api.models._
+import csw.location.api.models.*
 
 import scala.concurrent.duration.FiniteDuration
 

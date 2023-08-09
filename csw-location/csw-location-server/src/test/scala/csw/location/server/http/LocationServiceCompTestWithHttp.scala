@@ -5,9 +5,11 @@
 
 package csw.location.server.http
 
-import akka.Done
-import akka.actor.CoordinatedShutdown
-import csw.location.server.commons.TestFutureExtension.RichFuture
+import org.apache.pekko.Done
+import org.apache.pekko.actor.CoordinatedShutdown
+import csw.location.server.commons.TestFutureExtension.given
+import scala.language.implicitConversions
+
 import csw.location.server.internal.ServerWiring
 import csw.location.server.scaladsl.LocationServiceCompTest
 

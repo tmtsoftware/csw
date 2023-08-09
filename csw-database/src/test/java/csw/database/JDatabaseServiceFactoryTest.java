@@ -5,7 +5,7 @@
 
 package csw.database;
 
-import akka.actor.typed.SpawnProtocol;
+import org.apache.pekko.actor.typed.SpawnProtocol;
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
 import csw.database.commons.DBTestHelper;
 import csw.database.commons.DatabaseServiceConnection;
@@ -38,7 +38,7 @@ public class JDatabaseServiceFactoryTest {
 
     private static final Integer port = 5432;
     private static JHTTPLocationService jHttpLocationService;
-    private static akka.actor.typed.ActorSystem<SpawnProtocol.Command> typedSystem;
+    private static org.apache.pekko.actor.typed.ActorSystem<SpawnProtocol.Command> typedSystem;
     private static EmbeddedPostgres postgres;
     private static DatabaseServiceFactory dbFactory;
     private static ILocationService locationService;
@@ -48,7 +48,7 @@ public class JDatabaseServiceFactoryTest {
 
     @BeforeClass
     public static void setup() throws ExecutionException, InterruptedException, TimeoutException {
-        typedSystem = akka.actor.typed.ActorSystem.apply(SpawnProtocol.create(), "test");
+        typedSystem = org.apache.pekko.actor.typed.ActorSystem.apply(SpawnProtocol.create(), "test");
 
         dbFactory = DBTestHelper.dbServiceFactory(typedSystem);
         postgres = DBTestHelper.postgres(port); // 0 is random port

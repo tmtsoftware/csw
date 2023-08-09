@@ -8,7 +8,7 @@ package csw.aas.installed.scaladsl
 import java.io.File
 
 import org.scalatest.matchers
-import matchers.should.Matchers.convertToAnyShouldWrapper
+import matchers.should.Matchers.*
 import org.scalatest.BeforeAndAfterEach
 import os.Path
 import org.scalatest.funsuite.AnyFunSuite

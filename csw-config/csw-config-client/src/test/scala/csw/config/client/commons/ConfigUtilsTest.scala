@@ -6,8 +6,8 @@
 package csw.config.client.commons
 import java.io.File
 import java.nio.file.{Files, Paths}
-import akka.actor.typed
-import akka.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.actor.typed
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.config.api.ConfigData
 import csw.config.api.exceptions.{LocalFileNotFound, UnableToParseOptions}

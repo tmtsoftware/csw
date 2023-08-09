@@ -19,7 +19,7 @@ import org.tmt.embedded_keycloak.utils.BearerToken
 import org.tmt.embedded_keycloak.{EmbeddedKeycloak, KeycloakData, Settings}
 
 import scala.concurrent.Await
-import scala.concurrent.ExecutionContext.Implicits._
+import scala.concurrent.ExecutionContext.Implicits.*
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
 class AuthIntegrationTestMultiJvmNode1 extends AuthIntegrationTest
@@ -27,7 +27,7 @@ class AuthIntegrationTestMultiJvmNode2 extends AuthIntegrationTest
 class AuthIntegrationTestMultiJvmNode3 extends AuthIntegrationTest
 
 //DEOPSCSW-571: Setup sample gateway for piping all requests from single source
-//DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
+//DEOPSCSW-579: Prevent unauthorized access based on pekko http route rules
 class AuthIntegrationTest
     extends LSNodeSpec(config = new MultiNodeTestConfig, mode = "http")
     with BeforeAndAfterEach

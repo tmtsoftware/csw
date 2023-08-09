@@ -5,8 +5,8 @@
 
 package csw.testkit.database
 
-import akka.actor.typed
-import akka.util.Timeout
+import org.apache.pekko.actor.typed
+import org.apache.pekko.util.Timeout
 import csw.commons.ResourceReader
 import csw.database.commons.DatabaseServiceConnection
 import csw.location.api.models.TcpRegistration

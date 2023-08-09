@@ -5,7 +5,7 @@
 
 package csw.config.client.scaladsl
 
-import akka.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.ActorSystem
 import csw.config.api.TokenFactory
 import csw.config.api.scaladsl.{ConfigClientService, ConfigService}
 import csw.config.client.internal.{ActorRuntime, ConfigClient, ConfigServiceResolver}

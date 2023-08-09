@@ -5,9 +5,9 @@
 
 package csw.config.server.files
 
-import java.nio.file._
+import java.nio.file.*
 
-import akka.dispatch.MessageDispatcher
+import org.apache.pekko.dispatch.MessageDispatcher
 
 import scala.concurrent.Future
 

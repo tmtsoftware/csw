@@ -12,7 +12,7 @@ import scala.collection.immutable.IndexedSeq
 /**
  * Represents a type of connection offered by the Component
  *
- * @param entryName A name of the connection type e.g. akka, http or tcp
+ * @param entryName A name of the connection type e.g. pekko, http or tcp
  */
 sealed abstract class ConnectionType private[location] (override val entryName: String) extends EnumEntry {
 
@@ -40,8 +40,8 @@ object ConnectionType extends Enum[ConnectionType] {
   case object TcpType extends ConnectionType("tcp")
 
   /**
-   * Represents an Akka type of connection
+   * Represents an Pekko type of connection
    */
-  case object AkkaType extends ConnectionType("akka")
+  case object PekkoType extends ConnectionType("pekko")
 
 }

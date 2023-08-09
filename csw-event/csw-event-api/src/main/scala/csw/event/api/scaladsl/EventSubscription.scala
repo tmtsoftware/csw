@@ -5,7 +5,7 @@
 
 package csw.event.api.scaladsl
 
-import akka.Done
+import org.apache.pekko.Done
 
 import scala.concurrent.Future
 

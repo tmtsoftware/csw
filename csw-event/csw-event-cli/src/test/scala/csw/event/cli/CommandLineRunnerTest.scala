@@ -5,19 +5,21 @@
 
 package csw.event.cli
 
-import akka.stream.scaladsl.Sink
+import org.apache.pekko.stream.scaladsl.Sink
 import csw.commons.ResourceReader
 import csw.event.cli.IterableExtensions.RichStringIterable
-import csw.event.client.helpers.TestFutureExt.RichFuture
+import csw.event.client.helpers.TestFutureExt.given
+import scala.language.implicitConversions
+
 import csw.params.core.formats.JsonSupport
 import csw.params.core.generics.KeyType.{IntKey, StringKey}
 import csw.params.core.models.Id
 import csw.params.core.models.Units.meter
-import csw.params.events._
+import csw.params.events.*
 import csw.prefix.codecs.CommonCodecs
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.SpanSugar.convertDoubleToGrainOfTime
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import scala.collection.{immutable, mutable}
 

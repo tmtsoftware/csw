@@ -5,20 +5,20 @@
 
 package csw.location.agent
 
-import akka.Done
-import akka.actor.CoordinatedShutdown
+import org.apache.pekko.Done
+import org.apache.pekko.actor.CoordinatedShutdown
 import csw.location.agent.commons.LocationAgentLogger
 import csw.location.agent.models.Command
 import csw.location.agent.wiring.Wiring
 import csw.location.api.models
 import csw.location.api.models.Connection.{HttpConnection, TcpConnection}
-import csw.location.api.models._
+import csw.location.api.models.*
 import csw.location.api.scaladsl.RegistrationResult
 import csw.logging.api.scaladsl.Logger
 import csw.prefix.models.Prefix
 
 import scala.collection.immutable.Seq
-import scala.compat.java8.FutureConverters.CompletionStageOps
+import scala.jdk.FutureConverters.*
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.concurrent.{Await, Future}
 import scala.util.control.NonFatal
@@ -46,7 +46,7 @@ class LocationAgent(
       log.info(s"Executing specified command: ${command.commandText}")
       val process = Runtime.getRuntime.exec(command.commandText)
       // shutdown location agent on termination of external program started using provided command
-      process.onExit().toScala.onComplete(_ => shutdown())
+      process.onExit().asScala.onComplete(_ => shutdown())
 
       // delay the registration of component after executing the command
       Thread.sleep(command.delay)

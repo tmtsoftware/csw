@@ -6,10 +6,10 @@
 package csw.config.server.http
 
 import java.time.Instant
-import akka.http.scaladsl.model.*
-import akka.http.scaladsl.model.headers.Authorization
-import akka.http.scaladsl.server.Route
-import akka.http.scaladsl.testkit.ScalatestRouteTest
+import org.apache.pekko.http.scaladsl.model.*
+import org.apache.pekko.http.scaladsl.model.headers.Authorization
+import org.apache.pekko.http.scaladsl.server.Route
+import org.apache.pekko.http.scaladsl.testkit.ScalatestRouteTest
 import csw.commons.http.ErrorResponse
 import csw.config.api.ConfigData
 import csw.config.api.commons.Constants
@@ -29,7 +29,7 @@ import org.scalatestplus.mockito.MockitoSugar
 // DEOPSCSW-80: HTTP based access for configuration file
 // DEOPSCSW-576: Auth token for Configuration service
 // DEOPSCSW-69: Use authorization token to get identity of user creating/updating a configuration file
-// DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
+// DEOPSCSW-579: Prevent unauthorized access based on pekko http route rules
 // DEOPSCSW-626: Get route of config server with path for empty config file
 class ConfigServiceRouteTest
     extends AnyFunSuite

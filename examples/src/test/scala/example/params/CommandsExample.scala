@@ -10,7 +10,7 @@ import csw.params.core.formats.JsonSupport
 import csw.params.core.generics.KeyType.{ByteKey, DoubleMatrixKey}
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.Units.degree
-import csw.params.core.models._
+import csw.params.core.models.*
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.time.core.models.UTCTime
 
@@ -60,8 +60,8 @@ class CommandsExample extends AnyFunSpec with Matchers {
       val k3: Key[Int]    = KeyType.IntKey.make("filter")
       val k4: Key[Float]  = KeyType.FloatKey.make("correction")
 
-      //Source of the command is given by the prefix
-      //Source should be full name of the component sending the command.
+      // Source of the command is given by the prefix
+      // Source should be full name of the component sending the command.
       val source: Prefix = Prefix("wfos.red.detector")
 
       // parameters
@@ -120,8 +120,8 @@ class CommandsExample extends AnyFunSpec with Matchers {
       val k3: Key[Int]     = KeyType.IntKey.make("filter")
       val k4: Key[UTCTime] = KeyType.UTCTimeKey.make("creation-time")
 
-      //Source of the command is given by the prefix
-      //Source should be full name of the component sending the command.
+      // Source of the command is given by the prefix
+      // Source should be full name of the component sending the command.
       val source: Prefix = Prefix("wfos.red.detector")
 
       // parameters
@@ -173,8 +173,8 @@ class CommandsExample extends AnyFunSpec with Matchers {
       val i1: Parameter[Boolean] = k1.set(true, false, true, false)
       val i2: Parameter[Int]     = k2.set(1, 2, 3, 4)
 
-      //Source of the command is given by the prefix
-      //Source should be full name of the component sending the command.
+      // Source of the command is given by the prefix
+      // Source should be full name of the component sending the command.
       val source: Prefix = Prefix("wfos.red.detector")
 
       // create wait, add sequentially using add
@@ -225,8 +225,8 @@ class CommandsExample extends AnyFunSpec with Matchers {
         Array(7.2, 8.2, 9.2)
       )
 
-      //Source of the command is given by the prefix
-      //Source should be full name of the component sending the command.
+      // Source of the command is given by the prefix
+      // Source should be full name of the component sending the command.
       val source: Prefix = Prefix("wfos.red.detector")
 
       // parameter
@@ -271,8 +271,8 @@ class CommandsExample extends AnyFunSpec with Matchers {
       val filterKey: Key[Int]  = KeyType.IntKey.make("filter")
       val miscKey: Key[Int]    = KeyType.IntKey.make("misc.")
 
-      //Source of the command is given by the prefix
-      //Source should be full name of the component sending the command.
+      // Source of the command is given by the prefix
+      // Source should be full name of the component sending the command.
       val source: Prefix = Prefix("wfos.red.detector")
 
       // params

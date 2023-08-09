@@ -8,16 +8,16 @@ package csw.benchmark.params
 import java.nio.file.{Files, Paths}
 import java.util.concurrent.TimeUnit
 
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.Behaviors
-import akka.serialization.{Serialization, SerializationExtension}
+import org.apache.pekko.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.serialization.{Serialization, SerializationExtension}
 import csw.params.commands.{CommandName, Observe}
 import csw.params.core.generics.KeyType.ByteArrayKey
 import csw.params.core.generics.{Key, Parameter}
 import csw.params.core.models.Units.pascal
 import csw.params.core.models.{ArrayData, ObsId}
 import csw.prefix.models.Prefix
-import org.openjdk.jmh.annotations._
+import org.openjdk.jmh.annotations.*
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble

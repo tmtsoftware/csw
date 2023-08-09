@@ -5,9 +5,9 @@
 
 package csw.command.client.handlers
 
-import csw.command.api.codecs.CommandServiceCodecs._
+import csw.command.api.codecs.CommandServiceCodecs.*
 import csw.command.api.messages.CommandServiceStreamRequest
-import csw.command.api.messages.CommandServiceStreamRequest._
+import csw.command.api.messages.CommandServiceStreamRequest.*
 import csw.command.api.scaladsl.CommandService
 import msocket.jvm.stream.{StreamRequestHandler, StreamResponse}
 

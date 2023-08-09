@@ -5,16 +5,18 @@
 
 package csw.integtration.apps
 
-import akka.actor.typed.scaladsl.Behaviors
-import csw.integtration.common.TestFutureExtension.RichFuture
-import csw.location.api.AkkaRegistrationFactory
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
+import csw.integtration.common.TestFutureExtension.given
+import scala.language.implicitConversions
+
+import csw.location.api.PekkoRegistrationFactory
 import csw.location.api.models.ComponentId
 import csw.location.api.models.ComponentType.Assembly
-import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.Connection.PekkoConnection
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.server.commons.ClusterAwareSettings
 import csw.location.server.internal.ServerWiring
-import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
+import csw.logging.client.commons.PekkoTypedExtension.UserActorFactory
 import csw.prefix.models.Prefix
 import csw.prefix.models.Subsystem.NFIRAOS
 
@@ -28,9 +30,9 @@ object AssemblyApp extends App {
 
   private val assemblyActorRef = actorSystem.spawn(behavior, "assembly")
   private val componentId      = ComponentId(Prefix(NFIRAOS, "assembly"), Assembly)
-  private val connection       = AkkaConnection(componentId)
+  private val connection       = PekkoConnection(componentId)
 
-  private val registration       = AkkaRegistrationFactory.make(connection, assemblyActorRef)
+  private val registration       = PekkoRegistrationFactory.make(connection, assemblyActorRef)
   private val locationService    = HttpLocationServiceFactory.makeLocalClient
   private val registrationResult = locationService.register(registration).await
 

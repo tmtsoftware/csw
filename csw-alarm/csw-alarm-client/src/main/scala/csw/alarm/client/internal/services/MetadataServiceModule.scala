@@ -5,7 +5,7 @@
 
 package csw.alarm.client.internal.services
 
-import akka.Done
+import org.apache.pekko.Done
 import com.typesafe.config.Config
 import csw.alarm.api.exceptions.KeyNotFoundException
 import csw.alarm.api.internal.{AlarmMetadataSet, MetadataKey, MetadataService, StatusService}
@@ -17,7 +17,7 @@ import csw.alarm.models.Key.{AlarmKey, GlobalKey}
 import csw.alarm.models.{AlarmMetadata, AlarmStatus, Key}
 import romaine.RedisResult
 
-import scala.async.Async.{async, await}
+import cps.compat.FutureAsync.*
 import scala.concurrent.Future
 
 private[client] trait MetadataServiceModule extends MetadataService {

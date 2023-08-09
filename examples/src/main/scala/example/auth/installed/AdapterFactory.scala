@@ -7,7 +7,7 @@ package example.auth.installed
 
 import java.nio.file.Paths
 
-import akka.actor.typed
+import org.apache.pekko.actor.typed
 import csw.aas.installed.InstalledAppAuthAdapterFactory
 import csw.aas.installed.api.InstalledAppAuthAdapter
 import csw.aas.installed.scaladsl.FileAuthStore

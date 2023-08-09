@@ -5,11 +5,11 @@
 
 package org.tmt.csw.sample;
 
-import akka.actor.Cancellable;
-import akka.actor.typed.javadsl.ActorContext;
-import akka.stream.ThrottleMode;
-import akka.stream.javadsl.Sink;
-import akka.stream.javadsl.Source;
+import org.apache.pekko.actor.Cancellable;
+import org.apache.pekko.actor.typed.javadsl.ActorContext;
+import org.apache.pekko.stream.ThrottleMode;
+import org.apache.pekko.stream.javadsl.Sink;
+import org.apache.pekko.stream.javadsl.Source;
 import csw.command.client.CommandResponseManager;
 import csw.command.client.messages.TopLevelActorMessage;
 import csw.event.api.javadsl.IEventService;

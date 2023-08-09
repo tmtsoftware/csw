@@ -10,7 +10,7 @@ import csw.prefix.models.{Prefix, Subsystem}
 /**
  * A trait to be mixed in that provides a parameter set and prefix info
  */
-trait ParameterSetKeyData { self: ParameterSetType[_] =>
+trait ParameterSetKeyData extends ParameterSetType[ParameterSetKeyData] {
 
   /**
    * Returns an object providing the subsystem and prefix for the parameter set

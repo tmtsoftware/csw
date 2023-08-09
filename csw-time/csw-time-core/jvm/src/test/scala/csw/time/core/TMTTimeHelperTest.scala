@@ -5,7 +5,7 @@
 
 package csw.time.core
 
-import java.time._
+import java.time.*
 
 import csw.time.core.models.{TAITime, UTCTime}
 import org.scalatest.funsuite.AnyFunSuite

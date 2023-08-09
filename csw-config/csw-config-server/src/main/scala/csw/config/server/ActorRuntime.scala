@@ -7,16 +7,16 @@ package csw.config.server
 
 import java.util.concurrent.CompletableFuture
 
-import akka.actor.CoordinatedShutdown
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.dispatch.MessageDispatcher
-import akka.{Done, actor}
+import org.apache.pekko.actor.CoordinatedShutdown
+import org.apache.pekko.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.dispatch.MessageDispatcher
+import org.apache.pekko.{Done, actor}
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.network.utils.Networks
 
-import scala.compat.java8.FutureConverters.FutureOps
+import scala.jdk.FutureConverters.*
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
 /**
@@ -39,5 +39,5 @@ private[config] class ActorRuntime(_typedSystem: ActorSystem[SpawnProtocol.Comma
     typedSystem.whenTerminated
   }
 
-  def jShutdown(): CompletableFuture[Done] = shutdown().toJava.toCompletableFuture
+  def jShutdown(): CompletableFuture[Done] = shutdown().asJava.toCompletableFuture
 }

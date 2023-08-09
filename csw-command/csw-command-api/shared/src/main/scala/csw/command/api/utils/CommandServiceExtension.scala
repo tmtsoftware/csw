@@ -5,16 +5,16 @@
 
 package csw.command.api.utils
 
-import akka.actor.typed.ActorSystem
-import akka.util.Timeout
+import org.apache.pekko.actor.typed.ActorSystem
+import org.apache.pekko.util.Timeout
 import csw.command.api.StateMatcher
 import csw.command.api.scaladsl.CommandService
-import csw.params.commands.CommandResponse._
+import csw.params.commands.CommandResponse.*
 import csw.params.commands.ControlCommand
 import csw.params.core.states.CurrentState
-import msocket.portable.PortableAkka
+import msocket.portable.PortablePekko
 
-import scala.async.Async._
+import cps.compat.FutureAsync.*
 import scala.concurrent.{Future, Promise, TimeoutException}
 import scala.util.{Failure, Success}
 
@@ -51,7 +51,7 @@ class CommandServiceExtension(commandService: CommandService)(implicit val actor
       }
     }
 
-    PortableAkka.setTimeout(stateMatcher.timeout.duration) {
+    PortablePekko.setTimeout(stateMatcher.timeout.duration) {
       p.tryFailure(new TimeoutException(s"matching could not be done within ${stateMatcher.timeout.duration}"))
     }
 

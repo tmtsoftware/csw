@@ -5,11 +5,11 @@
 
 package csw.logging.client.appenders
 
-import java.io._
+import java.io.*
 import java.time.temporal.ChronoUnit
 import java.time.{LocalDateTime, ZoneId, ZoneOffset, ZonedDateTime}
 
-import akka.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.ActorSystem
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.{Category, Constants, LoggingKeys, TMTDateTimeFormatter}
 import csw.logging.client.exceptions.BaseLogPathNotDefined

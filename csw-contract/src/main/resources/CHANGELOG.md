@@ -7,11 +7,11 @@
     old: {
            "_type" : "Register",
            "registration" : {
-             "_type" : "AkkaRegistration",
+             "_type" : "PekkoRegistration",
              "connection" : {
                "prefix" : "TCS.filter.wheel",
                "componentType" : "HCD",
-               "connectionType" : "akka"
+               "connectionType" : "pekko"
              },
              "actorRefURI" : "some_path"
            }
@@ -19,11 +19,11 @@
     new: {
            "_type" : "Register",
            "registration" : {
-             "_type" : "AkkaRegistration",
+             "_type" : "PekkoRegistration",
              "connection" : {
                "prefix" : "TCS.filter.wheel",
                "componentType" : "HCD",
-               "connectionType" : "akka"
+               "connectionType" : "pekko"
              },
              "actorRefURI" : "some_path",
              "metadata" : {

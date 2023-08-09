@@ -9,7 +9,7 @@ import csw.params.core.models.Units
 import scala.annotation.varargs
 import scala.collection.mutable
 import scala.reflect.ClassTag
-import scala.runtime.ScalaRunTime._
+import scala.runtime.ScalaRunTime.*
 
 /**
  * A generic Key class. Never meant to be instantiated directly. [[csw.params.core.generics.KeyType]] exposes

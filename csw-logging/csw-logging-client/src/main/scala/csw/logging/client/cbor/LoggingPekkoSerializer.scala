@@ -5,12 +5,12 @@
 
 package csw.logging.client.cbor
 
-import csw.commons.CborAkkaSerializer
-import csw.logging.models.codecs.LoggingCodecs._
+import csw.commons.CborPekkoSerializer
+import csw.logging.models.codecs.LoggingCodecs.*
 import csw.logging.models.codecs.LoggingSerializable
 import csw.logging.models.{Level, LogMetadata}
 
-class LoggingAkkaSerializer extends CborAkkaSerializer[LoggingSerializable] {
+class LoggingPekkoSerializer extends CborPekkoSerializer[LoggingSerializable] {
   override def identifier: Int = 19925
 
   register[LogMetadata]

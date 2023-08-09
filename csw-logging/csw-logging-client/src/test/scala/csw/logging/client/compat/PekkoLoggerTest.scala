@@ -5,7 +5,7 @@
 
 package csw.logging.client.compat
 
-import akka.actor.{Actor, ActorLogging, ActorSystem, Props}
+import org.apache.pekko.actor.{Actor, ActorLogging, ActorSystem, Props}
 import csw.logging.models.Level.INFO
 import csw.logging.client.commons.LoggingKeys
 import csw.logging.client.internal.JsonExtensions.RichJsObject
@@ -25,9 +25,9 @@ class MyActor extends Actor with ActorLogging {
   }
 }
 // CSW-78: PrefixRedesign for logging
-class AkkaLoggerTest extends LoggingTestSuite with AnyFunSuiteLike with Matchers {
+class PekkoLoggerTest extends LoggingTestSuite with AnyFunSuiteLike with Matchers {
 
-  test("logging framework should capture akka log messages and log it") {
+  test("logging framework should capture pekko log messages and log it") {
     val actorRef  = ActorSystem("test1").actorOf(Props(new MyActor()), "my-actor")
     val className = classOf[MyActor].getName
 
@@ -50,7 +50,7 @@ class AkkaLoggerTest extends LoggingTestSuite with AnyFunSuiteLike with Matchers
       log.getString(LoggingKeys.MESSAGE) shouldBe currentLogLevel
       log.getString(LoggingKeys.ACTOR) shouldBe actorRef.path.toString
       log.getString(LoggingKeys.CLASS) shouldBe className
-      log.getString(LoggingKeys.KIND) shouldBe "akka"
+      log.getString(LoggingKeys.KIND) shouldBe "pekko"
     }
 
   }

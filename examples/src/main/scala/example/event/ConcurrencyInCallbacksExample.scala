@@ -5,16 +5,16 @@
 
 package example.event
 
-import akka.actor.Cancellable
-import akka.actor.typed.scaladsl.AskPattern._
-import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
-import akka.util.Timeout
+import org.apache.pekko.actor.Cancellable
+import org.apache.pekko.actor.typed.scaladsl.AskPattern.*
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.actor.typed.{ActorRef, ActorSystem, Behavior}
+import org.apache.pekko.util.Timeout
 import csw.event.api.scaladsl.EventPublisher
 import csw.params.core.generics.{Key, KeyType}
 import csw.params.events.{EventName, SystemEvent}
 import csw.prefix.models.Prefix
-import example.event.TemperatureMessage._
+import example.event.TemperatureMessage.*
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationDouble
@@ -48,7 +48,7 @@ class ConcurrencyInCallbacksExample(publisher: EventPublisher)(implicit actorSys
 
             // This is the CORRECT way to publish the mutable state by sending a message to the Actor in which the mutable state is kept (which in this case, is self)
             // The Async API of Publisher is called since the eventGenerator callback returns a Future[Event]
-            cancellable = publisher.publishAsync((ctx.self ? GetTemperature).map(makeEvent), 50.millis)
+            cancellable = publisher.publishAsync((ctx.self ? GetTemperature.apply).map(makeEvent), 50.millis)
 
           case CancelPublishingTemperature => cancellable.cancel()
           case TemperatureRise(rise)       => currentTemperature = Temperature(currentTemperature.degrees + rise)

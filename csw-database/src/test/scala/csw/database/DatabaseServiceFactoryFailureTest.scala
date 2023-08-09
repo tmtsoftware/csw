@@ -5,7 +5,7 @@
 
 package csw.database
 
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.database.commons.DBTestHelper
 import csw.database.exceptions.DatabaseException
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres

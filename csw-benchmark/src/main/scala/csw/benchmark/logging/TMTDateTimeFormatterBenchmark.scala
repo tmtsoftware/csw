@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit
 
 import csw.logging.client.commons.{LoggingKeys, TMTDateTimeFormatter}
 import csw.logging.client.internal.JsonExtensions.RichJsObject
-import org.openjdk.jmh.annotations._
+import org.openjdk.jmh.annotations.*
 import play.api.libs.json.{JsObject, Json}
 
 /**

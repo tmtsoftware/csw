@@ -5,17 +5,17 @@
 
 package example.event;
 
-import akka.actor.typed.ActorRef;
-import akka.actor.typed.ActorSystem;
-import akka.actor.typed.Behavior;
-import akka.actor.typed.javadsl.ActorContext;
-import akka.stream.javadsl.Sink;
+import org.apache.pekko.actor.typed.ActorRef;
+import org.apache.pekko.actor.typed.ActorSystem;
+import org.apache.pekko.actor.typed.Behavior;
+import org.apache.pekko.actor.typed.javadsl.ActorContext;
+import org.apache.pekko.stream.javadsl.Sink;
 import csw.command.client.messages.TopLevelActorMessage;
 import csw.event.api.javadsl.IEventSubscriber;
 import csw.event.api.javadsl.IEventSubscription;
 import csw.event.api.scaladsl.SubscriptionModes;
 import csw.event.client.internal.commons.javawrappers.JEventService;
-import csw.location.api.models.AkkaLocation;
+import csw.location.api.models.PekkoLocation;
 import csw.params.events.Event;
 import csw.params.events.EventKey;
 import csw.params.events.EventName;
@@ -28,10 +28,10 @@ import java.util.concurrent.CompletableFuture;
 public class JEventSubscribeExamples {
 
     private final JEventService eventService;
-    private final AkkaLocation hcdLocation;
+    private final PekkoLocation hcdLocation;
     private final ActorSystem<Void> system;
 
-    public JEventSubscribeExamples(JEventService eventService, AkkaLocation hcdLocation, ActorSystem<Void> system) {
+    public JEventSubscribeExamples(JEventService eventService, PekkoLocation hcdLocation, ActorSystem<Void> system) {
         this.eventService = eventService;
         this.hcdLocation = hcdLocation;
         this.system = system;

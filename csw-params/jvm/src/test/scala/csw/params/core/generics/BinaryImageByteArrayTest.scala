@@ -10,7 +10,7 @@ import java.nio.file.Files
 import csw.commons.ResourceReader
 import csw.params.core.generics.KeyType.ByteArrayKey
 import csw.params.core.models.Units.encoder
-import csw.params.core.models._
+import csw.params.core.models.*
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 

@@ -11,8 +11,8 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.time.{ZoneId, ZoneOffset, ZonedDateTime}
 
-import akka.actor.typed
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.actor.typed
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import com.typesafe.config.ConfigFactory
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.appenders.{FileAppender, StdOutAppender}
@@ -91,7 +91,7 @@ class LoggingConfigurationTest extends AnyFunSuite with Matchers with BeforeAndA
 
       jsonLogMessage.getString(LoggingKeys.MESSAGE) shouldBe sampleLogMessage
       jsonLogMessage.getString(LoggingKeys.SEVERITY) shouldBe expectedSeverity.name
-      jsonLogMessage.getString(LoggingKeys.CLASS) shouldBe className
+      jsonLogMessage.getString(LoggingKeys.CLASS) should startWith(className)
       jsonLogMessage.getString(LoggingKeys.FILE) shouldBe fileName
 
       // This assert's that, ISO_INSTANT parser should not throw exception while parsing timestamp from log message

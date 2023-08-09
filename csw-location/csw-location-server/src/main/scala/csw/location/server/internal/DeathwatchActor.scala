@@ -5,18 +5,18 @@
 
 package csw.location.server.internal
 
-import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{ActorRef, ActorSystem, Behavior, Terminated}
-import akka.cluster.ddata.typed.scaladsl.Replicator
-import akka.cluster.ddata.typed.scaladsl.Replicator.{Changed, SubscribeResponse}
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.actor.typed.{ActorRef, ActorSystem, Behavior, Terminated}
+import org.apache.pekko.cluster.ddata.typed.scaladsl.Replicator
+import org.apache.pekko.cluster.ddata.typed.scaladsl.Replicator.{Changed, SubscribeResponse}
 import csw.location.api.extensions.URIExtension.RichURI
 import csw.location.api.models.Connection.HttpConnection
-import csw.location.api.models.{AkkaLocation, Location}
+import csw.location.api.models.{PekkoLocation, Location}
 import csw.location.api.scaladsl.LocationService
 import csw.location.server.commons.{CswCluster, LocationServiceLogger}
 import csw.location.server.internal.Registry.AllServices
 import csw.logging.api.scaladsl.Logger
-import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
+import csw.logging.client.commons.PekkoTypedExtension.UserActorFactory
 
 /**
  * DeathWatchActor tracks the health of all components registered with LocationService.
@@ -30,7 +30,7 @@ private[location] class DeathwatchActor(locationService: LocationService)(implic
    * Deathwatch behavior processes `DeathwatchActor.Msg` type events sent by replicator for newly registered Locations.
    * Terminated signal will be received upon termination of an actor that was being watched.
    *
-   * @see [[akka.actor.Terminated]]
+   * @see [[pekko.actor.Terminated]]
    */
   private[location] def behavior(watchedLocations: Set[Location]): Behavior[Msg] =
     Behaviors.receive[Msg] { (context, changeMsg) =>
@@ -43,7 +43,7 @@ private[location] class DeathwatchActor(locationService: LocationService)(implic
 
       // Ignore HttpLocation or TcpLocation (Do not watch)
       unwatchedLocations.foreach {
-        case AkkaLocation(_, actorRefURI, _) =>
+        case PekkoLocation(_, actorRefURI, _) =>
           log.debug(s"Started watching actor: ${actorRefURI.toString}")
           context.watch(actorRefURI.toActorRef)
         case _ => // ignore http and tcp location
@@ -58,14 +58,14 @@ private[location] class DeathwatchActor(locationService: LocationService)(implic
       ctx.unwatch(deadActorRef)
       // Unregister the dead location and remove it from the list of watched locations
       val maybeLocation = watchedLocations.find {
-        case AkkaLocation(_, actorRefUri, _) => deadActorRef == actorRefUri.toActorRef
-        case _                               => false
+        case PekkoLocation(_, actorRefUri, _) => deadActorRef == actorRefUri.toActorRef
+        case _                                => false
       }
       maybeLocation match {
         case Some(location) =>
           // if deadActorRef is mapped to a location, unregister it and remove it from watched locations
           locationService.unregister(location.connection)
-          // unregister the http connection for an akka connection if present else do nothing, locationService.unregister is idempotent
+          // unregister the http connection for an pekko connection if present else do nothing, locationService.unregister is idempotent
           val httpConnection = HttpConnection(location.connection.componentId)
           locationService.unregister(httpConnection)
           behavior(watchedLocations - location)

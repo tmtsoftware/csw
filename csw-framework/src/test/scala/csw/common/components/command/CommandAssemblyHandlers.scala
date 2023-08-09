@@ -5,28 +5,28 @@
 
 package csw.common.components.command
 
-import akka.actor.typed.scaladsl.ActorContext
-import akka.util.Timeout
+import org.apache.pekko.actor.typed.scaladsl.ActorContext
+import org.apache.pekko.util.Timeout
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.CommandResponseManager.{OverallFailure, OverallSuccess}
 import csw.command.client.CommandServiceFactory
 import csw.command.client.messages.TopLevelActorMessage
-import csw.common.components.command.CommandComponentState._
+import csw.common.components.command.CommandComponentState.*
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.ComponentType.HCD
-import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.Connection.PekkoConnection
 import csw.location.api.models.{ComponentId, TrackingEvent}
 import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandIssue.OtherIssue
-import csw.params.commands.CommandResponse._
-import csw.params.commands._
+import csw.params.commands.CommandResponse.*
+import csw.params.commands.*
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.time.core.models.UTCTime
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.concurrent.{Await, ExecutionContext}
 import scala.util.{Failure, Success}
 
@@ -39,7 +39,7 @@ class CommandAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   private implicit val ec: ExecutionContext = ctx.executionContext
   private implicit val timeout: Timeout     = 15.seconds
 
-  private val filterHCDConnection = AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "FilterHCD"), HCD))
+  private val filterHCDConnection = PekkoConnection(ComponentId(Prefix(Subsystem.WFOS, "FilterHCD"), HCD))
   // val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient(ctx.system, clientMat)
 
   private val filterHCDLocation    = Await.result(locationService.resolve(filterHCDConnection, 5.seconds), 5.seconds)

@@ -8,7 +8,7 @@ package example.teskit
 import com.typesafe.config.ConfigFactory
 import csw.location.api.models.ComponentId
 import csw.location.api.models.ComponentType.{Assembly, HCD}
-import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.Connection.PekkoConnection
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.testkit.FrameworkTestKit
 import csw.testkit.scaladsl.CSWService.{ConfigServer, EventServer}
@@ -52,7 +52,7 @@ class TestKitsExample extends AnyFunSuiteLike with BeforeAndAfterAll with Matche
 
     // #spawn-using-testkit
 
-    val connection       = AkkaConnection(ComponentId(Prefix(Subsystem.CSW, "sample"), Assembly))
+    val connection       = PekkoConnection(ComponentId(Prefix(Subsystem.CSW, "sample"), Assembly))
     val assemblyLocation = Await.result(locationService.resolve(connection, 5.seconds), 10.seconds)
     assemblyLocation.value.connection shouldBe connection
   }
@@ -63,7 +63,7 @@ class TestKitsExample extends AnyFunSuiteLike with BeforeAndAfterAll with Matche
     frameworkTestKit.spawnAssembly(Prefix("TCS.sampleAssembly"), (ctx, cswCtx) => new SampleHandlers(ctx, cswCtx))
     // #spawn-assembly
 
-    val assemblyConnection = AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "sampleAssembly"), Assembly))
+    val assemblyConnection = PekkoConnection(ComponentId(Prefix(Subsystem.TCS, "sampleAssembly"), Assembly))
     val assemblyLocation   = Await.result(locationService.resolve(assemblyConnection, 5.seconds), 10.seconds)
     assemblyLocation.value.connection shouldBe assemblyConnection
 
@@ -71,7 +71,7 @@ class TestKitsExample extends AnyFunSuiteLike with BeforeAndAfterAll with Matche
     frameworkTestKit.spawnHCD(Prefix("TCS.sampleHcd"), (ctx, cswCtx) => new SampleHcdHandlers(ctx, cswCtx))
     // #spawn-hcd
 
-    val hcdConnection = AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "sampleHcd"), HCD))
+    val hcdConnection = PekkoConnection(ComponentId(Prefix(Subsystem.TCS, "sampleHcd"), HCD))
     val hcdLocation   = Await.result(locationService.resolve(hcdConnection, 5.seconds), 10.seconds)
     hcdLocation.value.connection shouldBe hcdConnection
   }

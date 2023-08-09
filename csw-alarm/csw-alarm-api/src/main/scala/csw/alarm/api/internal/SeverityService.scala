@@ -4,8 +4,8 @@
  */
 
 package csw.alarm.api.internal
-import akka.actor.typed.ActorRef
-import akka.stream.scaladsl.Source
+import org.apache.pekko.actor.typed.ActorRef
+import org.apache.pekko.stream.scaladsl.Source
 import csw.alarm.models.Key.AlarmKey
 import csw.alarm.models.{FullAlarmSeverity, Key}
 import csw.alarm.api.scaladsl.{AlarmService, AlarmSubscription}

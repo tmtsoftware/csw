@@ -5,11 +5,11 @@
 
 package csw.event.client.perf.ocs.gateway.client
 
-import akka.actor.typed.{ActorSystem, Scheduler, SpawnProtocol}
-import akka.http.scaladsl.model.Uri
-import akka.http.scaladsl.model.Uri.Path
-import akka.stream.scaladsl.{Keep, Source}
-import akka.stream.{KillSwitches, UniqueKillSwitch}
+import org.apache.pekko.actor.typed.{ActorSystem, Scheduler, SpawnProtocol}
+import org.apache.pekko.http.scaladsl.model.Uri
+import org.apache.pekko.http.scaladsl.model.Uri.Path
+import org.apache.pekko.stream.scaladsl.{Keep, Source}
+import org.apache.pekko.stream.{KillSwitches, UniqueKillSwitch}
 import csw.location.api.models.ComponentType.Service
 import csw.location.api.models.Connection.HttpConnection
 import csw.location.api.models.{ComponentId, ComponentType}

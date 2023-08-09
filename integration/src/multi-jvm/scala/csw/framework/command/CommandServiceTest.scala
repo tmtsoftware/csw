@@ -5,20 +5,20 @@
 
 package csw.framework.command
 
-import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.util.Timeout
+import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
+import org.apache.pekko.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.command.api.{DemandMatcher, StateMatcher}
 import csw.command.client.CommandServiceFactory
-import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.client.extensions.PekkoLocationExt.RichPekkoLocation
 import csw.command.client.messages.CommandMessage.Submit
 import csw.command.client.models.framework.LockingResponse
 import csw.command.client.models.framework.LockingResponse.LockAcquired
 import csw.common.utils.LockCommandFactory
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.location.api.models
-import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
+import csw.location.api.models.Connection.PekkoConnection
+import csw.location.api.models.{PekkoLocation, ComponentId, ComponentType}
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandIssue.IdNotAvailableIssue
@@ -32,7 +32,7 @@ import io.lettuce.core.RedisClient
 import org.scalatest.concurrent.Eventually
 import org.scalatestplus.mockito.MockitoSugar
 
-import scala.async.Async.*
+import cps.compat.FutureAsync.*
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, ExecutionContext, Future}
 
@@ -82,7 +82,7 @@ class CommandServiceTestMultiJvm3 extends CommandServiceTest(0)
 // DEOPSCSW-228: Assist Components with command completion
 // DEOPSCSW-234: CCS accessibility to all CSW component builders
 // DEOPSCSW-313: Support short running actions by providing immediate response
-// DEOPSCSW-321: AkkaLocation provides wrapper for ActorRef[ComponentMessage]
+// DEOPSCSW-321: PekkoLocation provides wrapper for ActorRef[ComponentMessage]
 // DEOPSCSW-623: Make query wait till Started
 // CSW-82: ComponentInfo should take prefix
 class CommandServiceTest(ignore: Int)
@@ -109,7 +109,7 @@ class CommandServiceTest(ignore: Int)
 
       // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
       val assemblyLocF = locationService.resolve(
-        AkkaConnection(ComponentId(Prefix(Subsystem.WFOS, "Assembly"), ComponentType.Assembly)),
+        PekkoConnection(ComponentId(Prefix(Subsystem.WFOS, "Assembly"), ComponentType.Assembly)),
         5.seconds
       )
       val maybeLocation = Await.result(assemblyLocF, 10.seconds)
@@ -144,15 +144,15 @@ class CommandServiceTest(ignore: Int)
       // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
       val assemblyLocF =
         locationService.resolve(
-          AkkaConnection(models.ComponentId(Prefix(Subsystem.WFOS, "Assembly"), ComponentType.Assembly)),
+          PekkoConnection(models.ComponentId(Prefix(Subsystem.WFOS, "Assembly"), ComponentType.Assembly)),
           5.seconds
         )
-      val assemblyLocation: AkkaLocation = Await.result(assemblyLocF, 10.seconds).get
+      val assemblyLocation: PekkoLocation = Await.result(assemblyLocF, 10.seconds).get
       val assemblyCmdService             = CommandServiceFactory.make(assemblyLocation)
       // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
       val hcdLocF =
-        locationService.resolve(AkkaConnection(models.ComponentId(Prefix(Subsystem.WFOS, "HCD"), ComponentType.HCD)), 5.seconds)
-      val hcdLocation: AkkaLocation = Await.result(hcdLocF, 10.seconds).get
+        locationService.resolve(PekkoConnection(models.ComponentId(Prefix(Subsystem.WFOS, "HCD"), ComponentType.HCD)), 5.seconds)
+      val hcdLocation: PekkoLocation = Await.result(hcdLocF, 10.seconds).get
       val hcdCmdService             = CommandServiceFactory.make(hcdLocation)
 
       val invalidSetup    = Setup(prefix, invalidCmd, obsId)

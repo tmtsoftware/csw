@@ -5,16 +5,16 @@
 
 package csw.framework.command
 
-import akka.actor.testkit.typed.TestKitSettings
-import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.Scheduler
-import akka.util.Timeout
+import org.apache.pekko.actor.testkit.typed.TestKitSettings
+import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
+import org.apache.pekko.actor.typed.Scheduler
+import org.apache.pekko.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
 import csw.common.components.command.ComponentStateForCommand.*
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
-import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
+import csw.location.api.models.Connection.PekkoConnection
+import csw.location.api.models.{PekkoLocation, ComponentId, ComponentType}
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandIssue.OtherIssue
@@ -62,10 +62,10 @@ class LongRunningCommandTest(ignore: Int)
       // resolve assembly running in jvm-2 and send setup command expecting immediate command completion response
       val assemblyLocF =
         locationService.resolve(
-          AkkaConnection(ComponentId(Prefix(Subsystem.IRIS, "Test_Component_Running_Long_Command"), ComponentType.Assembly)),
+          PekkoConnection(ComponentId(Prefix(Subsystem.IRIS, "Test_Component_Running_Long_Command"), ComponentType.Assembly)),
           5.seconds
         )
-      val assemblyLocation: AkkaLocation = Await.result(assemblyLocF, 10.seconds).get
+      val assemblyLocation: PekkoLocation = Await.result(assemblyLocF, 10.seconds).get
       val assemblyCommandService         = CommandServiceFactory.make(assemblyLocation)
 
       val assemblyLongSetup = Setup(prefix, longRunning, Some(obsId))

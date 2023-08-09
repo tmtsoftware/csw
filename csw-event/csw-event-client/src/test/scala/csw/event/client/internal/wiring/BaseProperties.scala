@@ -7,29 +7,31 @@ package csw.event.client.internal.wiring
 
 import java.net.URI
 
-import akka.Done
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.stream.Attributes
+import org.apache.pekko.Done
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.stream.Attributes
 import csw.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
 import csw.event.api.scaladsl.{EventPublisher, EventService, EventSubscriber}
-import csw.event.client.helpers.TestFutureExt.RichFuture
+import csw.event.client.helpers.TestFutureExt.given
+import scala.language.implicitConversions
+
 import csw.event.client.internal.commons.serviceresolver.EventServiceLocationResolver
 import csw.event.client.internal.commons.{EventServiceConnection, EventStreamSupervisionStrategy}
 import csw.location.api.models
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 
-import scala.async.Async._
+import cps.compat.FutureAsync.*
 import scala.concurrent.{ExecutionContext, Future}
 
 trait BaseProperties {
   val eventPattern: String
-  val publisher: EventPublisher
-  val subscriber: EventSubscriber
+  def publisher: EventPublisher
+  def subscriber: EventSubscriber
   val eventService: EventService
   val jEventService: IEventService
-  val jPublisher: IEventPublisher
-  val jSubscriber: IEventSubscriber
+  def jPublisher: IEventPublisher
+  def jSubscriber: IEventSubscriber
   def publishGarbage(channel: String, message: String): Future[Done]
   def start(): Unit
   def shutdown(): Unit

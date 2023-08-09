@@ -7,7 +7,7 @@ package csw.location.api.javadsl
 
 import java.util.concurrent.CompletableFuture
 
-import akka.Done
+import org.apache.pekko.Done
 import csw.location.api.models.Location
 
 /**

@@ -5,7 +5,7 @@
 
 package csw.command.client.handlers
 
-import akka.http.scaladsl.testkit.ScalatestRouteTest
+import org.apache.pekko.http.scaladsl.testkit.ScalatestRouteTest
 import csw.aas.http.SecurityDirectives
 import csw.command.api.codecs.CommandServiceCodecs
 import csw.command.api.messages.CommandServiceRequest

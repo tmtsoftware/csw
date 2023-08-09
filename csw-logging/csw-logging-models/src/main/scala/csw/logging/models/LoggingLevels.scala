@@ -6,7 +6,7 @@
 package csw.logging.models
 
 import csw.logging.models.codecs.LoggingSerializable
-import enumeratum._
+import enumeratum.*
 
 import scala.collection.immutable.IndexedSeq
 

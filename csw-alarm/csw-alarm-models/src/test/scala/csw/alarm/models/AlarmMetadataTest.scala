@@ -5,7 +5,7 @@
 
 package csw.alarm.models
 import csw.alarm.models.ActivationStatus.{Active, Inactive}
-import csw.alarm.models.AlarmSeverity._
+import csw.alarm.models.AlarmSeverity.*
 import csw.alarm.models.Key.AlarmKey
 import csw.prefix.models.Prefix
 import csw.prefix.models.Subsystem.NFIRAOS

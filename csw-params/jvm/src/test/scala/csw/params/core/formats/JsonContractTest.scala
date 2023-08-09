@@ -11,9 +11,9 @@ import csw.params.core.generics.KeyType.LongMatrixKey
 import csw.params.core.models.Coords.{SolarSystemCoord, Tag}
 import csw.params.core.models.Coords.SolarSystemObject.{Jupiter, Venus}
 import csw.params.core.models.Units.{NoUnits, encoder, meter}
-import csw.params.core.models._
+import csw.params.core.models.*
 import csw.params.core.states.{CurrentState, DemandState, StateName}
-import csw.params.events._
+import csw.params.events.*
 import csw.params.testdata.ParamSetData
 import csw.prefix.models.Prefix
 import csw.time.core.models.UTCTime

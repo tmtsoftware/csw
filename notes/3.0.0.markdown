@@ -9,7 +9,7 @@ See [CHANGELOG.md](CHANGELOG.md) for details of all releases.
 - Changed behaviour of `->` method of Parameter Key class.
 - Used Realm-roles instead of Client-roles in Location server and Config server.
 - Added `metadata` field in `Location` and `Registration` model to associate additional information with `Registration`.
-- Removed `RegistrationFactory`. Use `AkkaRegistrationFactory` from Scala and `JAkkaRegistrationFactory` from Java.
+- Removed `RegistrationFactory`. Use `PekkoRegistrationFactory` from Scala and `JPekkoRegistrationFactory` from Java.
 - `initialize` and `onShutdown` handlers of ComponentHandler are blocking now.
 - Used Coursier for installation of CSW apps instead of downloading apps.zip from release page.
 - Restricted use of `[`, `]` or `/` characters in Parameter Key name.
@@ -20,8 +20,8 @@ See [CHANGELOG.md](CHANGELOG.md) for details of all releases.
 - Scala version upgrade to 2.13.3
 - SBT version upgrade to 1.4.2
 - Borer version upgrade to 1.6.2
-- Akka version upgrade 2.6.10
-- Akka-http version upgrade 10.2.1
+- Pekko version upgrade 2.6.10
+- Pekko-http version upgrade 10.2.1
 - Keycloak version upgrade 11.0.2
 - Lettuce version upgrade 6.0.1.RELEASE
 

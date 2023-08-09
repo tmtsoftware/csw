@@ -5,10 +5,10 @@
 
 package csw.framework.internal.supervisor
 
-import akka.actor.testkit.typed.Effect.Spawned
-import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestInbox, TestProbe}
-import akka.actor.typed.scaladsl.{Behaviors, TimerScheduler}
-import akka.actor.typed.{ActorRef, Terminated}
+import org.apache.pekko.actor.testkit.typed.Effect.Spawned
+import org.apache.pekko.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestInbox, TestProbe}
+import org.apache.pekko.actor.typed.scaladsl.{Behaviors, TimerScheduler}
+import org.apache.pekko.actor.typed.{ActorRef, Terminated}
 import csw.command.client.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.command.client.messages.FromComponentLifecycleMessage.Running
 import csw.command.client.messages.RunningMessage.Lifecycle
@@ -93,7 +93,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
     verify(timerScheduler).isTimerActive(SupervisorBehavior.InitializeTimerKey)
     verify(timerScheduler).cancel(SupervisorBehavior.InitializeTimerKey)
-    verify(locationService).register(akkaRegistration)
+    verify(locationService).register(pekkoRegistration)
 
     supervisorBehaviorKit.run(GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref))
     supervisorLifecycleStateProbe.expectMessage(SupervisorLifecycleState.Running)
@@ -110,7 +110,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
     supervisorBehaviorKit.run(Running(childRef))
 
-    verify(locationService, never).register(akkaRegistration)
+    verify(locationService, never).register(pekkoRegistration)
     verify(timerScheduler).cancel(SupervisorBehavior.InitializeTimerKey)
     supervisorBehaviorKit.run(RegistrationNotRequired(childRef))
 

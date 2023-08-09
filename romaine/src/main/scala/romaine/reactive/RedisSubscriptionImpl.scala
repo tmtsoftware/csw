@@ -4,11 +4,11 @@
  */
 
 package romaine.reactive
-import akka.Done
-import akka.stream.KillSwitch
+import org.apache.pekko.Done
+import org.apache.pekko.stream.KillSwitch
 import romaine.reactive.subscribe.RedisReactiveApi
 
-import scala.async.Async.{async, await}
+import cps.compat.FutureAsync.*
 import scala.concurrent.{ExecutionContext, Future}
 
 private class RedisSubscriptionImpl[K](
@@ -31,7 +31,7 @@ private class RedisSubscriptionImpl[K](
     async {
       await(connectedF)
       await(redisReactiveApi.flatMap(_.unsubscribe(keys))) // unsubscribe is no-op
-      await(redisReactiveApi.flatMap(_.close()))
+//      await(redisReactiveApi.flatMap(_.close()))
       killSwitch.shutdown()
       await(terminationSignal) // await on terminationSignal when unsubscribe is called by user
     }

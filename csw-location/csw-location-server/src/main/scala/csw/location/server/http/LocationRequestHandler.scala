@@ -5,13 +5,13 @@
 
 package csw.location.server.http
 
-import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.Route
+import org.apache.pekko.http.scaladsl.server.Directives.*
+import org.apache.pekko.http.scaladsl.server.Route
 import csw.aas.http.AuthorizationPolicy.RealmRolePolicy
 import csw.aas.http.SecurityDirectives
-import csw.location.api.codec.LocationServiceCodecs._
+import csw.location.api.codec.LocationServiceCodecs.*
 import csw.location.api.messages.LocationRequest
-import csw.location.api.messages.LocationRequest._
+import csw.location.api.messages.LocationRequest.*
 import csw.location.api.scaladsl.LocationService
 import msocket.http.post.{HttpPostHandler, ServerHttpCodecs}
 

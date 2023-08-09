@@ -10,7 +10,7 @@ import java.io.File
 import csw.params.events.EventKey
 import scopt.{OptionDef, OptionParser}
 
-import scala.concurrent.duration.DurationDouble
+import scala.concurrent.duration.*
 
 trait Arguments { self: OptionParser[Options] =>
 

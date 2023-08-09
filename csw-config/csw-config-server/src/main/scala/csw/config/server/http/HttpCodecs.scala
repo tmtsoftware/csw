@@ -5,13 +5,13 @@
 
 package csw.config.server.http
 
-import akka.http.scaladsl.marshalling.{Marshaller, ToEntityMarshaller}
-import akka.http.scaladsl.model.MediaTypes.`application/json`
-import akka.http.scaladsl.model.{ContentTypeRange, ContentTypes, HttpEntity, MediaType}
-import akka.http.scaladsl.unmarshalling.{FromEntityUnmarshaller, Unmarshaller}
-import akka.util.ByteString
+import org.apache.pekko.http.scaladsl.marshalling.{Marshaller, ToEntityMarshaller}
+import org.apache.pekko.http.scaladsl.model.MediaTypes.`application/json`
+import org.apache.pekko.http.scaladsl.model.{ContentTypeRange, ContentTypes, HttpEntity, MediaType}
+import org.apache.pekko.http.scaladsl.unmarshalling.{FromEntityUnmarshaller, Unmarshaller}
+import org.apache.pekko.util.ByteString
 import csw.config.api.ConfigData
-import io.bullet.borer.compat.akka._
+import io.bullet.borer.compat.pekko.*
 import io.bullet.borer.{Decoder, Encoder, Json}
 
 import scala.collection.immutable.Seq

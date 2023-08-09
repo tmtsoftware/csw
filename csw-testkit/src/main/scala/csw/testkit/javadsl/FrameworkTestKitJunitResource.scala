@@ -7,18 +7,18 @@ package csw.testkit.javadsl
 
 import java.util.Collections
 
-import akka.actor.typed
-import akka.actor.typed.{ActorRef, SpawnProtocol}
+import org.apache.pekko.actor.typed
+import org.apache.pekko.actor.typed.{ActorRef, SpawnProtocol}
 import com.typesafe.config.Config
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.event.api.javadsl.IEventService
 import csw.location.api.javadsl.ILocationService
 import csw.location.client.extensions.LocationServiceExt
-import csw.testkit._
+import csw.testkit.*
 import csw.testkit.scaladsl.CSWService
 import org.junit.rules.ExternalResource
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 /**
  * A Junit external resource for the [[FrameworkTestKit]], making it possible to have Junit manage the lifecycle of the testkit.

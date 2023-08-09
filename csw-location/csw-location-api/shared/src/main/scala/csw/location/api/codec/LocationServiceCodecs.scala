@@ -5,7 +5,7 @@
 
 package csw.location.api.codec
 
-import csw.location.api.exceptions._
+import csw.location.api.exceptions.*
 import csw.location.api.messages.{LocationRequest, LocationStreamRequest}
 import io.bullet.borer.Codec
 import io.bullet.borer.derivation.MapBasedCodecs.deriveAllCodecs

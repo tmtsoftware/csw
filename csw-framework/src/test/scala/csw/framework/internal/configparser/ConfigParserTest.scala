@@ -17,7 +17,7 @@ import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.duration.DurationInt
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 // DEOPSCSW-167: Creation and Deployment of Standalone Components
 // DEOPSCSW-170: Starting component using a file format
@@ -32,7 +32,7 @@ class ConfigParserTest extends AnyFunSuite with Matchers {
     Assembly,
     "csw.pkgDemo.assembly1.Assembly1",
     DoNotRegister,
-    Set(Connection.from("TCS.HCD2A-HCD-akka"), Connection.from("tcs.HCD2C-HCD-akka")),
+    Set(Connection.from("TCS.HCD2A-HCD-pekko"), Connection.from("tcs.HCD2C-HCD-pekko")),
     5.seconds
   )
   private val hcd2AInfo = ComponentInfo(Prefix("TCS.HCD2A"), HCD, "csw.pkgDemo.hcd2.Hcd2", RegisterOnly, Set.empty)

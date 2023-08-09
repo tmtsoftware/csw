@@ -6,7 +6,7 @@
 package csw.benchmark.event
 
 import csw.params.core.generics.{KeyType, Parameter}
-import csw.params.core.models._
+import csw.params.core.models.*
 import csw.params.events.{EventName, SystemEvent}
 import csw.prefix.models.Prefix
 import csw.time.core.models.TAITime

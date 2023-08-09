@@ -5,8 +5,8 @@
 
 package csw.location.server.internal
 
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.http.scaladsl.server.Route
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.http.scaladsl.server.Route
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.aas.http.SecurityDirectives
 import csw.location.api.codec.LocationServiceCodecs
@@ -20,11 +20,11 @@ import msocket.jvm.metrics.LabelExtractor
 
 // $COVERAGE-OFF$
 private[csw] class ServerWiring(enableAuth: Boolean) extends LocationServiceCodecs {
-  lazy val config: Config                                           = ConfigFactory.load()
-  lazy val settings                                                 = new Settings(config)
-  lazy val clusterSettings: ClusterSettings                         = ClusterAwareSettings.onPort(settings.clusterPort)
-  implicit lazy val actorSystem: ActorSystem[SpawnProtocol.Command] = clusterSettings.system
-  lazy val actorRuntime                                             = new ActorRuntime(actorSystem)
+  lazy val config: Config                                      = ConfigFactory.load()
+  lazy val settings                                            = new Settings(config)
+  lazy val clusterSettings: ClusterSettings                    = ClusterAwareSettings.onPort(settings.clusterPort)
+  implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = clusterSettings.system
+  val actorRuntime                                             = new ActorRuntime(actorSystem)
   import actorSystem.executionContext
   lazy val locationService: LocationService = LocationServiceFactory.make(clusterSettings)
 

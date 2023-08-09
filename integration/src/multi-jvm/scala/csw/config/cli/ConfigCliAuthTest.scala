@@ -8,8 +8,8 @@ package csw.config.cli
 import java.io.ByteArrayInputStream
 import java.nio.file.Paths
 
-import akka.actor.typed.scaladsl.adapter._
-import akka.remote.testconductor.RoleName
+import org.apache.pekko.actor.typed.scaladsl.adapter.*
+import org.apache.pekko.remote.testconductor.RoleName
 import com.typesafe.config.ConfigFactory
 import csw.aas.core.deployment.AuthServiceLocation
 import csw.commons.ResourceReader
@@ -21,7 +21,7 @@ import csw.config.server.{ServerWiring, Settings}
 import csw.location.helpers.{LSNodeSpec, NMembersAndSeed}
 import csw.location.server.http.MultiNodeHTTPLocationService
 import org.scalatest.funsuite.AnyFunSuiteLike
-import org.tmt.embedded_keycloak.KeycloakData._
+import org.tmt.embedded_keycloak.KeycloakData.*
 import org.tmt.embedded_keycloak.{EmbeddedKeycloak, KeycloakData, Settings => KeycloakSettings}
 
 import scala.concurrent.Await

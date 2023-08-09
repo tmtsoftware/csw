@@ -5,10 +5,10 @@
 
 package csw.alarm.client.internal.auto_refresh
 
-import akka.Done
-import akka.actor.testkit.typed.scaladsl.{ActorTestKit, ManualTime, TestProbe}
-import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
+import org.apache.pekko.Done
+import org.apache.pekko.actor.testkit.typed.scaladsl.{ActorTestKit, ManualTime, TestProbe}
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
 import com.typesafe.config.ConfigFactory
 import csw.alarm.models.AlarmSeverity.Major
 import csw.alarm.models.AutoRefreshSeverityMessage

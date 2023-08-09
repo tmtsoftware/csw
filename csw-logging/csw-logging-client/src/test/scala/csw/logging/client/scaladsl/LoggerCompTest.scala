@@ -5,15 +5,15 @@
 
 package csw.logging.client.scaladsl
 
-import akka.actor.typed.ActorRef
-import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
+import org.apache.pekko.actor.typed.ActorRef
+import csw.logging.client.commons.PekkoTypedExtension.UserActorFactory
 import csw.logging.client.commons.LoggingKeys
-import csw.logging.client.components.IRISLogMessages._
-import csw.logging.client.components._
+import csw.logging.client.components.IRISLogMessages.*
+import csw.logging.client.components.*
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.utils.LoggingTestSuite
 import csw.logging.models.Level
-import csw.logging.models.Level._
+import csw.logging.models.Level.*
 import csw.prefix.models.Prefix
 import csw.prefix.models.Subsystem.CSW
 import play.api.libs.json.JsObject

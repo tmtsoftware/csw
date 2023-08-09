@@ -8,7 +8,7 @@ package csw.contract.data.config
 import csw.config.models.FileType
 import csw.config.models.codecs.ConfigCodecs
 import csw.contract.ResourceFetcher
-import csw.contract.generator._
+import csw.contract.generator.*
 
 object ConfigContract extends ConfigData with ConfigCodecs {
   private val models: ModelSet = ModelSet.models(

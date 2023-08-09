@@ -5,7 +5,7 @@
 
 package example.logging.client.componentlogger;
 
-import akka.actor.typed.javadsl.ActorContext;
+import org.apache.pekko.actor.typed.javadsl.ActorContext;
 import csw.command.client.messages.ComponentMessage;
 import csw.logging.api.javadsl.ILogger;
 import csw.logging.client.javadsl.JLoggerFactory;
@@ -22,11 +22,11 @@ public class JSampleClass {
 //#component-logger-class
 
 //#component-logger-actor
-class JSampleActor extends akka.actor.AbstractActor {
+class JSampleActor extends org.apache.pekko.actor.AbstractActor {
 
     public JSampleActor(JLoggerFactory loggerFactory) {
 
-        //context() is available from akka.actor.AbstractActor
+        //context() is available from pekko.actor.AbstractActor
         ILogger log = loggerFactory.getLogger(context(), getClass());
     }
 

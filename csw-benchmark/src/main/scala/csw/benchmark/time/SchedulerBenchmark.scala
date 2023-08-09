@@ -8,8 +8,8 @@ package csw.benchmark.time
 import java.time.Duration
 import java.util.concurrent.{CountDownLatch, TimeUnit}
 
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import csw.time.scheduler.TimeServiceSchedulerFactory
 import csw.time.scheduler.api.TimeServiceScheduler
 import org.openjdk.jmh.annotations.{OperationsPerInvocation, _}

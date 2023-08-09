@@ -7,9 +7,9 @@ package csw.location.api.serializer
 
 import csw.location.api.codec.{LocationCodecs, LocationSerializable}
 import csw.location.api.models.{Connection, Location, Registration, TrackingEvent}
-import csw.commons.CborAkkaSerializer
+import csw.commons.CborPekkoSerializer
 
-class LocationAkkaSerializer extends CborAkkaSerializer[LocationSerializable] with LocationCodecs {
+class LocationPekkoSerializer extends CborPekkoSerializer[LocationSerializable] with LocationCodecs {
 
   override val identifier: Int = 19924
 

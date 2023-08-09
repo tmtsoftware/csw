@@ -2,7 +2,7 @@ Location Service
 ================
 
 The Location Service helps accomplish service discovery i.e. automatic detection of components and services in the TMT computer network.
-It uses CRDT (Conflict Free Replicated Data) on the akka cluster as the service registry.
+It uses CRDT (Conflict Free Replicated Data) on the pekko cluster as the service registry.
 
 Using location service, a component or service can:
 * Register its location information.

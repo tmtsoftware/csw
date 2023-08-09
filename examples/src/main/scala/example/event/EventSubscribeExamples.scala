@@ -5,19 +5,19 @@
 
 package example.event
 
-import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
-import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
-import akka.stream.scaladsl.Sink
+import org.apache.pekko.actor.typed.scaladsl.{ActorContext, Behaviors}
+import org.apache.pekko.actor.typed.{ActorRef, ActorSystem, Behavior}
+import org.apache.pekko.stream.scaladsl.Sink
 import csw.command.client.messages.TopLevelActorMessage
 import csw.event.api.scaladsl.{EventService, EventSubscription, SubscriptionModes}
-import csw.location.api.models.AkkaLocation
+import csw.location.api.models.PekkoLocation
 import csw.params.events.{Event, EventKey, EventName}
 import csw.prefix.models.Subsystem
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble
 
-class EventSubscribeExamples(eventService: EventService, hcd: AkkaLocation)(implicit system: ActorSystem[_]) {
+class EventSubscribeExamples(eventService: EventService, hcd: PekkoLocation)(implicit system: ActorSystem[_]) {
 
   def callback(): EventSubscription =
     // #with-callback

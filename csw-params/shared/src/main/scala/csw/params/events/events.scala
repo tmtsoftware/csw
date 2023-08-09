@@ -15,14 +15,14 @@ import csw.time.core.models.UTCTime
 /**
  * Common trait representing events in TMT like [[csw.params.events.SystemEvent]] and [[csw.params.events.ObserveEvent]]
  */
-sealed trait Event { self: ParameterSetType[_] =>
+sealed trait Event extends ParameterSetType[Event] {
 
   /**
    * A helper to give access of public members of ParameterSetType
    *
    * @return a handle to ParameterSetType extended by concrete implementation of this class
    */
-  def paramType: ParameterSetType[_] = self
+  def paramType: ParameterSetType[_] = this
 
   /**
    * unique Id for event
@@ -70,7 +70,7 @@ sealed trait Event { self: ParameterSetType[_] =>
    * @return the string representation of command
    */
   override def toString: String =
-    s"$typeName(eventId=$eventId, source=$source, eventName=$eventName, eventTime=$eventTime, paramSet=$paramSet)"
+    s"${this.typeName}(eventId=$eventId, source=$source, eventName=$eventName, eventTime=$eventTime, paramSet=$paramSet)"
 
   def isInvalid: Boolean = eventTime == Event.invalidEventTime
 }

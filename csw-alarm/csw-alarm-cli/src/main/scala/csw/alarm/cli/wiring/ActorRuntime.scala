@@ -5,9 +5,9 @@
 
 package csw.alarm.cli.wiring
 
-import akka.Done
-import akka.actor.CoordinatedShutdown
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.Done
+import org.apache.pekko.actor.CoordinatedShutdown
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.alarm.cli.BuildInfo
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.scaladsl.LoggingSystemFactory

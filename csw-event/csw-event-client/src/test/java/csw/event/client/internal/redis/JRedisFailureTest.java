@@ -5,9 +5,9 @@
 
 package csw.event.client.internal.redis;
 
-import akka.NotUsed;
-import akka.actor.testkit.typed.javadsl.TestProbe;
-import akka.stream.javadsl.Source;
+import org.apache.pekko.NotUsed;
+import org.apache.pekko.actor.testkit.typed.javadsl.TestProbe;
+import org.apache.pekko.stream.javadsl.Source;
 import csw.event.api.exceptions.PublishFailure;
 import csw.event.api.javadsl.IEventPublisher;
 import csw.event.client.helpers.Utils;

@@ -5,16 +5,16 @@
 
 package csw.logging.client.commons
 
-import akka.actor.typed.Scheduler
-import akka.actor.typed.SpawnProtocol.Spawn
-import akka.actor.typed._
-import akka.actor.typed.scaladsl.AskPattern._
-import akka.util.Timeout
+import org.apache.pekko.actor.typed.Scheduler
+import org.apache.pekko.actor.typed.SpawnProtocol.Spawn
+import org.apache.pekko.actor.typed.*
+import org.apache.pekko.actor.typed.scaladsl.AskPattern.*
+import org.apache.pekko.util.Timeout
 
 import scala.concurrent.Await
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
-object AkkaTypedExtension {
+object PekkoTypedExtension {
   implicit class UserActorFactory(system: ActorSystem[SpawnProtocol.Command]) {
     private val defaultDuration: FiniteDuration = 5.seconds
     private implicit val timeout: Timeout       = Timeout(defaultDuration)

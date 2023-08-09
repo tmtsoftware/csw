@@ -11,7 +11,7 @@ import csw.prefix.models.Prefix
 import csw.serializable.CommandSerializable
 
 import scala.annotation.varargs
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 /**
  * Base trait for state variables

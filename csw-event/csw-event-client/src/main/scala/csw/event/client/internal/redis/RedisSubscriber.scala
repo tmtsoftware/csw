@@ -5,13 +5,13 @@
 
 package csw.event.client.internal.redis
 
-import akka.actor.typed.{ActorRef, ActorSystem}
-import akka.stream.scaladsl.{Keep, Source}
-import akka.{Done, NotUsed}
+import org.apache.pekko.actor.typed.{ActorRef, ActorSystem}
+import org.apache.pekko.stream.scaladsl.{Keep, Source}
+import org.apache.pekko.{Done, NotUsed}
 import csw.event.api.exceptions.EventServerNotAvailable
 import csw.event.api.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
 import csw.event.client.internal.commons.{EventServiceLogger, EventSubscriberUtil}
-import csw.params.events._
+import csw.params.events.*
 import csw.prefix.models.Subsystem
 import io.lettuce.core.{RedisClient, RedisURI}
 import reactor.core.publisher.FluxSink.OverflowStrategy
@@ -21,7 +21,7 @@ import romaine.codec.RomaineCodec
 import romaine.exceptions.RedisServerNotAvailable
 import romaine.reactive.{RedisSubscription, RedisSubscriptionApi}
 
-import scala.async.Async._
+import cps.compat.FutureAsync.*
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 

@@ -10,13 +10,13 @@ import java.nio.file.Path
 import java.time.Instant
 import java.util.regex.Pattern
 
-import akka.dispatch.MessageDispatcher
+import org.apache.pekko.dispatch.MessageDispatcher
 import csw.config.models.FileType
 import csw.config.server.Settings
 import csw.config.server.commons.ConfigServerLogger
 import csw.config.server.commons.SVNDirEntryExt.RichSvnDirEntry
 import csw.logging.api.scaladsl.Logger
-import org.tmatesoft.svn.core._
+import org.tmatesoft.svn.core.*
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager
 import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory
 import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator

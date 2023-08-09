@@ -5,10 +5,12 @@
 
 package csw.location.server.http
 
-import akka.http.scaladsl.Http
+import org.apache.pekko.http.scaladsl.Http
 import csw.location.helpers.LSNodeSpec
 import csw.location.server.commons.ClusterSettings
-import csw.location.server.commons.TestFutureExtension.RichFuture
+import csw.location.server.commons.TestFutureExtension.given
+import scala.language.implicitConversions
+
 import csw.location.server.internal.ServerWiring
 import org.scalatest.BeforeAndAfterAll
 

@@ -7,7 +7,7 @@ are the important changes from 1.0.0:
 * Prefix has Subsystem in constructor
 * Log statements have subsystem and prefix along with componentName
 * AlarmKey and ComponentKey is constructed from prefix instead of string
-* TcpLocation and HttpLocation has prefix along with AkkaLocation
+* TcpLocation and HttpLocation has prefix along with PekkoLocation
 * ComponentType is displayed to snake_case from lowercase
 * Subsystem is displayed in uppercase instead of lowercase
 * ArrayData and MatrixData does not require classtag for creation

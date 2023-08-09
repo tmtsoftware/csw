@@ -5,18 +5,18 @@
 
 package example.auth
 
-import akka.actor.typed
-import akka.actor.typed.SpawnProtocol
-import akka.http.scaladsl.common.ToNameReceptacleEnhancements._string2NR
-import akka.http.scaladsl.server.PathMatcher._segmentStringToPathMatcher
-import akka.http.scaladsl.server.PathMatchers.LongNumber
-import akka.http.scaladsl.server.RouteConcatenation._enhanceRouteWithConcatenation
-import akka.http.scaladsl.server._
-import akka.http.scaladsl.server.directives.ParameterDirectives.parameter
-import akka.http.scaladsl.server.directives.PathDirectives.path
-import akka.http.scaladsl.server.directives.RouteDirectives.complete
+import org.apache.pekko.actor.typed
+import org.apache.pekko.actor.typed.SpawnProtocol
+import org.apache.pekko.http.scaladsl.common.ToNameReceptacleEnhancements._string2NR
+import org.apache.pekko.http.scaladsl.server.PathMatcher._segmentStringToPathMatcher
+import org.apache.pekko.http.scaladsl.server.PathMatchers.LongNumber
+import org.apache.pekko.http.scaladsl.server.RouteConcatenation._enhanceRouteWithConcatenation
+import org.apache.pekko.http.scaladsl.server.*
+import org.apache.pekko.http.scaladsl.server.directives.ParameterDirectives.parameter
+import org.apache.pekko.http.scaladsl.server.directives.PathDirectives.path
+import org.apache.pekko.http.scaladsl.server.directives.RouteDirectives.complete
 import com.typesafe.config.Config
-import csw.aas.http.AuthorizationPolicy._
+import csw.aas.http.AuthorizationPolicy.*
 import csw.aas.http.SecurityDirectives
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 

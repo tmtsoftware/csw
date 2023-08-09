@@ -12,7 +12,7 @@ import csw.aas.http.Roles
 import csw.params.commands.CommandName
 import csw.prefix.models.{Prefix, Subsystem}
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 // maps to key from command roles config file
 case class CommandKey private (key: String) {
@@ -55,7 +55,7 @@ object CommandRoles {
 
   def from(config: Config): CommandRoles = {
     val entrySet = config.entrySet().asScala.toSet
-    val cmdRoles = entrySet.map { entry: util.Map.Entry[String, ConfigValue] =>
+    val cmdRoles = entrySet.map { (entry: util.Map.Entry[String, ConfigValue]) =>
       val cmdKey = entry.getKey
       val roles  = config.getStringList(cmdKey).asScala.toSet
       CommandKey(cmdKey) -> Roles(roles)

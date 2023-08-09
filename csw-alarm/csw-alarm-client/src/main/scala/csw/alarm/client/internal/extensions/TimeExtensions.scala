@@ -5,7 +5,7 @@
 
 package csw.alarm.client.internal.extensions
 
-import java.time._
+import java.time.*
 import java.time.format.{DateTimeFormatter, DateTimeFormatterBuilder}
 
 private[alarm] object TimeExtensions {

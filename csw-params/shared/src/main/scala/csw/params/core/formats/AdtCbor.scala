@@ -6,7 +6,7 @@
 package csw.params.core.formats
 
 import csw.params.commands.{CommandIssue, SequenceCommand}
-import csw.params.core.formats.ParamCodecs._
+import csw.params.core.formats.ParamCodecs.*
 import csw.params.events.Event
 import io.bullet.borer.{Cbor, Decoder, Encoder}
 

@@ -24,7 +24,7 @@ object LogAdminUtil {
   def getLogMetadata(prefix: Prefix): LogMetadata =
     LogMetadata(
       LoggingState.logLevel,
-      LoggingState.akkaLogLevel,
+      LoggingState.pekkoLogLevel,
       LoggingState.slf4jLogLevel,
       LoggingState.componentsLoggingState
         .getOrDefault(prefix, ComponentLoggingState(LoggingState.defaultLogLevel))

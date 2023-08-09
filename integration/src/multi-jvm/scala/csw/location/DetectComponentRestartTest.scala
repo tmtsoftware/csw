@@ -5,22 +5,22 @@
 
 package csw.location
 
-import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.scaladsl.adapter._
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.testkit.TestProbe
-import csw.location.api.AkkaRegistrationFactory
-import csw.location.api.models.Connection.AkkaConnection
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.actor.typed.scaladsl.adapter.*
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.testkit.TestProbe
+import csw.location.api.PekkoRegistrationFactory
+import csw.location.api.models.Connection.PekkoConnection
 import csw.location.api.models.{ComponentId, ComponentType, LocationRemoved, LocationUpdated}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.server.commons.ClusterSettings
 import csw.location.server.internal.{LocationServiceFactory, ServerWiring}
-import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
+import csw.logging.client.commons.PekkoTypedExtension.UserActorFactory
 import csw.prefix.models.{Prefix, Subsystem}
 import io.netty.util.internal.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 
 import scala.concurrent.Await
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.util.Try
 
 class DetectComponentRestartTestMultiJvmNode1 extends DetectComponentRestartTest(0, "cluster")
@@ -30,17 +30,17 @@ class DetectComponentRestartTestMultiJvmNode3 extends DetectComponentRestartTest
 class DetectComponentRestartTest(ignore: Int, mode: String)
     extends helpers.LSNodeSpec(config = new helpers.TwoMembersAndSeed, mode) {
 
-  import AkkaRegistrationFactory._
+  import PekkoRegistrationFactory._
   import config._
 
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(Slf4JLoggerFactory.INSTANCE)
   test(s"${testPrefixWithSuite} should detect re-registering of new location for a connection that has crashed/gone away | DEOPSCSW-429") {
 
-    val akkaConnection = AkkaConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "TromboneHcd"), ComponentType.HCD))
+    val pekkoConnection = PekkoConnection(ComponentId(Prefix(Subsystem.NFIRAOS, "TromboneHcd"), ComponentType.HCD))
 
     runOn(member1) {
-      locationService.register(make(akkaConnection, typedSystem.spawn(Behaviors.empty, "empty"))).await
+      locationService.register(make(pekkoConnection, typedSystem.spawn(Behaviors.empty, "empty"))).await
 
       enterBarrier("location-registered")
       enterBarrier("location-updated")
@@ -69,14 +69,14 @@ class DetectComponentRestartTest(ignore: Int, mode: String)
 
       Thread.sleep(20000)
 
-      freshLocationService.register(make(akkaConnection, newTypedSystem.spawn(Behaviors.empty, "empty"))).await
+      freshLocationService.register(make(pekkoConnection, newTypedSystem.spawn(Behaviors.empty, "empty"))).await
       enterBarrier("member-re-registered")
     }
 
     runOn(seed, member2) {
       enterBarrier("location-registered")
       val testProbe  = TestProbe()
-      val killSwitch = locationService.subscribe(akkaConnection, testProbe.testActor ! _)
+      val killSwitch = locationService.subscribe(pekkoConnection, testProbe.testActor ! _)
 
       testProbe.expectMsgType[LocationUpdated]
       enterBarrier("location-updated")

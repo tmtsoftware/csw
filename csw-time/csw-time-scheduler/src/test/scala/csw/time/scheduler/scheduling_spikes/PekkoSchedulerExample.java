@@ -5,8 +5,8 @@
 
 package csw.time.scheduler.scheduling_spikes;
 
-import akka.actor.typed.ActorSystem;
-import akka.actor.typed.javadsl.Behaviors;
+import org.apache.pekko.actor.typed.ActorSystem;
+import org.apache.pekko.actor.typed.javadsl.Behaviors;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import csw.time.clock.natives.TimeLibrary;
@@ -15,11 +15,11 @@ import csw.time.clock.natives.models.TimeSpec;
 import java.time.Duration;
 import java.util.ArrayList;
 
-public class AkkaSchedulerExample {
+public class PekkoSchedulerExample {
 
     public static void main(String[] args) {
-        Config config = ConfigFactory.parseString("akka.scheduler.tick-duration=1ms").withFallback(ConfigFactory.load());
-        ActorSystem system = ActorSystem.create(Behaviors.empty(), "AkkaSchedulerExample", config);
+        Config config = ConfigFactory.parseString("pekko.scheduler.tick-duration=1ms").withFallback(ConfigFactory.load());
+        ActorSystem system = ActorSystem.create(Behaviors.empty(), "PekkoSchedulerExample", config);
 
         system.scheduler().scheduleAtFixedRate(Duration.ofMillis(0), Duration.ofMillis(1), new MyTask1(), system.executionContext());
     }

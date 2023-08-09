@@ -8,25 +8,25 @@ package csw.config.client.internal
 import java.nio.{file => jnio}
 import java.time.Instant
 
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.Uri.{Path, Query}
-import akka.http.scaladsl.model._
-import akka.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
-import akka.http.scaladsl.unmarshalling.Unmarshal
+import org.apache.pekko.http.scaladsl.Http
+import org.apache.pekko.http.scaladsl.model.Uri.{Path, Query}
+import org.apache.pekko.http.scaladsl.model.*
+import org.apache.pekko.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
+import org.apache.pekko.http.scaladsl.unmarshalling.Unmarshal
 import csw.commons.http.ErrorResponse
 import csw.commons.http.codecs.ErrorCodecs
 import csw.config.api.commons.{BinaryUtils, TokenMaskSupport}
-import csw.config.api.exceptions._
+import csw.config.api.exceptions.*
 import csw.config.api.internal.ConfigStreamExts.RichSource
 import csw.config.api.scaladsl.ConfigService
 import csw.config.api.{ConfigData, TokenFactory}
 import csw.config.client.HttpCodecs
 import csw.config.client.commons.ConfigClientLogger
-import csw.config.models._
+import csw.config.models.*
 import csw.config.models.codecs.ConfigCodecs
 import csw.logging.api.scaladsl.Logger
 
-import scala.async.Async._
+import cps.compat.FutureAsync.*
 import scala.concurrent.Future
 
 /**
@@ -252,7 +252,7 @@ private[config] class ConfigClient(
             response.entity.discardBytes()
             logger.error(EmptyResponse.getMessage, ex = EmptyResponse)
             throw EmptyResponse
-          case StatusCodes.NotFound => Future.successful(None)
+          case StatusCodes.NotFound => Future.successful(Option.empty[ConfigData])
         }
       )
     }

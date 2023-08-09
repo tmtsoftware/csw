@@ -7,7 +7,7 @@ package csw.location.api.models
 
 import csw.location.api.codec.LocationSerializable
 import csw.location.api.models
-import csw.location.api.models.ConnectionType.{AkkaType, HttpType, TcpType}
+import csw.location.api.models.ConnectionType.{PekkoType, HttpType, TcpType}
 import csw.prefix.models.Prefix
 
 /**
@@ -50,7 +50,7 @@ sealed abstract class Connection(val connectionType: ConnectionType) extends Loc
 /**
  * TypedConnection captures the type of Location that concrete connection will resolve to
  *
- * @param connectionType represents the type of connection e.g akka, http, tcp
+ * @param connectionType represents the type of connection e.g pekko, http, tcp
  * @tparam T represents the type of Location
  */
 abstract sealed class TypedConnection[+T <: Location](connectionType: ConnectionType) extends Connection(connectionType)
@@ -60,7 +60,7 @@ object Connection {
   /**
    * Create a Connection from provided String input
    *
-   * @param input is the string representation of connection e.g. TromboneAssembly-assembly-akka
+   * @param input is the string representation of connection e.g. TromboneAssembly-assembly-pekko
    * @return a Connection model created from string
    */
   def from(input: String): Connection =
@@ -84,15 +84,15 @@ object Connection {
 
   private def from(componentId: ComponentId, connectionType: ConnectionType): Connection =
     connectionType match {
-      case AkkaType => AkkaConnection(componentId)
-      case TcpType  => TcpConnection(componentId)
-      case HttpType => HttpConnection(componentId)
+      case PekkoType => PekkoConnection(componentId)
+      case TcpType   => TcpConnection(componentId)
+      case HttpType  => HttpConnection(componentId)
     }
 
   /**
-   * Represents a connection offered by remote Actors e.g. nfiraos.TromboneAssembly-assembly-akka or nfiraos.TromboneHcd-hcd-akka
+   * Represents a connection offered by remote Actors e.g. nfiraos.TromboneAssembly-assembly-pekko or nfiraos.TromboneHcd-hcd-pekko
    */
-  case class AkkaConnection(componentId: ComponentId) extends TypedConnection[AkkaLocation](AkkaType)
+  case class PekkoConnection(componentId: ComponentId) extends TypedConnection[PekkoLocation](PekkoType)
 
   /**
    * Represents a http connection provided by the component e.g. csw.ConfigServer-service-http

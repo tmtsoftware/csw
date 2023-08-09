@@ -5,24 +5,24 @@
 
 package org.tmt.csw.sample
 
-import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
-import akka.util.Timeout
+import org.apache.pekko.actor.typed.scaladsl.{ActorContext, Behaviors}
+import org.apache.pekko.util.Timeout
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.CommandServiceFactory
 import csw.command.client.messages.TopLevelActorMessage
 import csw.event.api.scaladsl.EventSubscription
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.location.api.models.{AkkaLocation, LocationRemoved, LocationUpdated, TrackingEvent}
-import csw.params.commands.CommandResponse._
+import csw.location.api.models.{PekkoLocation, LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.params.commands.CommandResponse.*
 import csw.params.commands.{CommandName, CommandResponse, ControlCommand, Setup}
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.{Id, ObsId, Units}
-import csw.params.events._
+import csw.params.events.*
 import csw.prefix.models.Prefix
 import csw.time.core.models.UTCTime
 
-import scala.async.Async._
+import cps.compat.FutureAsync.*
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
 /**
@@ -50,7 +50,7 @@ class SampleHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext
           case command: SendCommand =>
             log.trace(s"WorkerActor received SendCommand message.")
             handle(command.hcd)
-          case _ => log.error("Unsupported message type")
+          case null => log.error("Unsupported message type")
         }
         Behaviors.same
       }),
@@ -146,7 +146,7 @@ class SampleHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext
     log.debug(s"onLocationTrackingEvent called: $trackingEvent")
     trackingEvent match {
       case LocationUpdated(location) =>
-        val hcd = CommandServiceFactory.make(location.asInstanceOf[AkkaLocation])(ctx.system)
+        val hcd = CommandServiceFactory.make(location.asInstanceOf[PekkoLocation])(ctx.system)
         commandSender ! SendCommand(hcd)
       case LocationRemoved(_) => log.info("HCD no longer available")
     }

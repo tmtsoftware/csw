@@ -17,7 +17,7 @@ package csw.logging
  *    - Asynchronous thread safe logging
  *    - Structured logging
  *    - Supports overriding default logging properties per component viz
- *    - Intercepting logs from akka/slf4j
+ *    - Intercepting logs from pekko/slf4j
  *    - Supports JSON logging
  *
  * === LogActor ===
@@ -25,7 +25,7 @@ package csw.logging
  * `LogActor` is the heart of logging library. It receives messages from following classes:
  *
  *  - Slf4jAppender: Intercepts Slf4j logs and forwards it to LogActor via MessageHandler
- *  - AkkaLogger: Intercepts Akka logs and forwards it to LogActor via MessageHandler.
+ *  - PekkoLogger: Intercepts Pekko logs and forwards it to LogActor via MessageHandler.
  *  - LoggerImpl: Provides csw logging API for component writer to log messages which gets forwarded to LogActor via MessageHandler
  *
  * === Logging Appenders ===

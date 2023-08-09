@@ -5,8 +5,8 @@
 
 package csw.framework.internal.component
 
-import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
-import akka.actor.typed.Behavior
+import org.apache.pekko.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
+import org.apache.pekko.actor.typed.Behavior
 import csw.command.client.messages.DiagnosticDataMessage.DiagnosticMode
 import csw.command.client.messages.FromComponentLifecycleMessage.Running
 import csw.command.client.messages.TopLevelActorIdleMessage.Initialize

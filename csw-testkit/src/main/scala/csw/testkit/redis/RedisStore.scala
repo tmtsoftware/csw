@@ -6,9 +6,9 @@
 package csw.testkit.redis
 import java.util.Optional
 
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.{ActorSystem, typed}
-import akka.util.Timeout
+import org.apache.pekko.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import org.apache.pekko.actor.{ActorSystem, typed}
+import org.apache.pekko.util.Timeout
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.api.models.Connection.TcpConnection

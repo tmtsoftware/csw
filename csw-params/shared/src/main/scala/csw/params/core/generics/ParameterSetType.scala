@@ -10,14 +10,14 @@ import csw.params.extensions.OptionConverters.RichOption
 
 import java.util.NoSuchElementException
 import scala.annotation.varargs
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 /**
  * The base trait for various parameter set types (commands or events)
  *
  * @tparam T the subclass of ParameterSetType
  */
-abstract class ParameterSetType[T <: ParameterSetType[T]] { self: T =>
+abstract class ParameterSetType[+T <: ParameterSetType[T]] { self: T =>
 
   /**
    * A name identifying the type of parameter set, such as "setup", "observe".

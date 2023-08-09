@@ -9,7 +9,7 @@ import csw.aas.core.commons.AASConnection
 import csw.location.api.models.{HttpLocation, HttpRegistration, NetworkType}
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 
-import scala.async.Async.{async, _}
+import cps.compat.FutureAsync.*
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.concurrent.{ExecutionContext, Future}
 

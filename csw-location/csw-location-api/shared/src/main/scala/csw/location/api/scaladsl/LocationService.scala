@@ -5,9 +5,9 @@
 
 package csw.location.api.scaladsl
 
-import akka.Done
-import akka.stream.scaladsl.Source
-import csw.location.api.models._
+import org.apache.pekko.Done
+import org.apache.pekko.stream.scaladsl.Source
+import csw.location.api.models.*
 import msocket.api.Subscription
 
 import scala.concurrent.Future

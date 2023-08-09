@@ -12,8 +12,8 @@ import csw.command.client.models.framework.{ComponentInfo, LocationServiceUsage}
 import csw.location.api.models.{ComponentType, Connection}
 import csw.prefix.models.Prefix
 
-import scala.compat.java8.DurationConverters.DurationOps
-import scala.jdk.CollectionConverters._
+import scala.jdk.DurationConverters.*
+import scala.jdk.CollectionConverters.*
 
 /**
  * Helper instance for Java to create [[csw.command.client.models.framework.ComponentInfo]]

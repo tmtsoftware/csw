@@ -4,7 +4,7 @@
  */
 
 package csw.alarm.api.internal
-import akka.actor.typed.ActorRef
+import org.apache.pekko.actor.typed.ActorRef
 import csw.alarm.models.{AlarmHealth, Key}
 import csw.alarm.api.scaladsl.AlarmSubscription
 

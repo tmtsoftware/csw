@@ -5,8 +5,8 @@
 
 package csw.database
 
-import akka.actor.typed
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.actor.typed
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.database.DatabaseServiceFactory.{ReadPasswordHolder, ReadUsernameHolder}
 import csw.database.commons.{DBTestHelper, DatabaseServiceConnection}
 import csw.database.scaladsl.JooqExtentions.{RichQuery, RichResultQuery}

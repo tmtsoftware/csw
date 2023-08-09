@@ -7,7 +7,7 @@ package csw.time.scheduler.api
 
 import java.time.Duration
 
-import akka.actor.ActorRef
+import org.apache.pekko.actor.ActorRef
 import csw.time.core.models.TMTTime
 
 /**

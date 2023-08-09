@@ -5,8 +5,8 @@
 
 package csw.framework.deploy.containercmd
 
-import akka.Done
-import akka.actor.typed.ActorRef
+import org.apache.pekko.Done
+import org.apache.pekko.actor.typed.ActorRef
 import com.typesafe.config.Config
 import csw.framework.deploy.containercmd.cli.{ArgsParser, Options}
 import csw.framework.exceptions.UnableToParseOptions
@@ -17,7 +17,7 @@ import csw.logging.client.scaladsl.LoggerFactory
 import csw.prefix.models.{Prefix, Subsystem}
 
 import java.nio.file.Path
-import scala.async.Async.{async, await}
+import cps.compat.FutureAsync.*
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, Future}
 import scala.util.control.NonFatal
@@ -47,7 +47,7 @@ private[framework] class ContainerCmd(
 ) {
   private val log: Logger = new LoggerFactory(Prefix(subsystem, name)).getLogger
 
-  private lazy val wiring: FrameworkWiring = new FrameworkWiring
+  final private lazy val wiring: FrameworkWiring = new FrameworkWiring
   import wiring.actorRuntime.*
 
   def start(args: Array[String]): ActorRef[_] =

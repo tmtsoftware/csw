@@ -5,14 +5,14 @@
 
 package csw.logging.client.javadsl;
 
-import akka.actor.typed.ActorRef;
-import akka.actor.typed.ActorSystem;
-import akka.actor.typed.SpawnProtocol;
+import org.apache.pekko.actor.typed.ActorRef;
+import org.apache.pekko.actor.typed.ActorSystem;
+import org.apache.pekko.actor.typed.SpawnProtocol;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import csw.logging.client.appenders.LogAppenderBuilder;
-import csw.logging.client.commons.AkkaTypedExtension;
+import csw.logging.client.commons.PekkoTypedExtension;
 import csw.logging.client.commons.LoggingKeys$;
 import csw.logging.client.components.trombone.JTromboneHCDSupervisorActor;
 import csw.logging.client.internal.LoggingSystem;
@@ -71,9 +71,9 @@ public class ILoggerActorTest {
     @Test
     public void testDefaultLogConfigurationForActor_DEOPSCSW_316() {
 
-        AkkaTypedExtension.UserActorFactory userActorFactory = AkkaTypedExtension.UserActorFactory(actorSystem);
+        PekkoTypedExtension.UserActorFactory userActorFactory = PekkoTypedExtension.UserActorFactory(actorSystem);
 
-        ActorRef<String> tromboneActor = userActorFactory.<String>spawn(JTromboneHCDSupervisorActor.behavior(new JLoggerFactory(Prefix.apply("csw.jTromboneHcdActor"))), "csw.JTromboneActor", akka.actor.typed.Props.empty());
+        ActorRef<String> tromboneActor = userActorFactory.<String>spawn(JTromboneHCDSupervisorActor.behavior(new JLoggerFactory(Prefix.apply("csw.jTromboneHcdActor"))), "csw.JTromboneActor", org.apache.pekko.actor.typed.Props.empty());
 
         String actorPath = tromboneActor.path().toString();
         String className = JTromboneHCDSupervisorActor.class.getName();

@@ -5,8 +5,8 @@
 
 package csw.config.client.internal
 
-import akka.Done
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.Done
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
@@ -18,8 +18,8 @@ private[csw] class ActorRuntime(_typedSystem: ActorSystem[_] = ActorSystem(Spawn
   implicit val ec: ExecutionContextExecutor = actorSystem.executionContext
 
   /**
-   * The shutdown method helps self node to gracefully quit the akka cluster. It is used by `csw-config-cli`
-   * to shutdown the the app gracefully. `csw-config-cli` becomes the part of akka cluster on booting up and
+   * The shutdown method helps self node to gracefully quit the pekko cluster. It is used by `csw-config-cli`
+   * to shutdown the the app gracefully. `csw-config-cli` becomes the part of pekko cluster on booting up and
    * resolves the config server, using location service, to provide cli features around admin api of config service.
    *
    * @return a future that completes when shutdown is successful

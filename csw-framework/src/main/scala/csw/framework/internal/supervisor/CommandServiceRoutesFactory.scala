@@ -5,8 +5,8 @@
 
 package csw.framework.internal.supervisor
 
-import akka.actor.typed.{ActorRef, ActorSystem}
-import akka.http.scaladsl.server.Route
+import org.apache.pekko.actor.typed.{ActorRef, ActorSystem}
+import org.apache.pekko.http.scaladsl.server.Route
 import csw.aas.http.SecurityDirectives
 import csw.command.api.codecs.CommandServiceCodecs
 import csw.command.client.CommandServiceFactory

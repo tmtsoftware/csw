@@ -5,7 +5,7 @@
 
 package csw.database.commons
 
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.commons.ResourceReader
 import csw.database.DatabaseServiceFactory
 import csw.database.DatabaseServiceFactory.{ReadPasswordHolder, ReadUsernameHolder}

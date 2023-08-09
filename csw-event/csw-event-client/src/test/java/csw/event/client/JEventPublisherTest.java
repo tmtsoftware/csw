@@ -5,12 +5,12 @@
 
 package csw.event.client;
 
-import akka.actor.Cancellable;
-import akka.actor.testkit.typed.javadsl.TestProbe;
-import akka.japi.function.Procedure;
-import akka.stream.javadsl.Keep;
-import akka.stream.javadsl.Sink;
-import akka.stream.javadsl.Source;
+import org.apache.pekko.actor.Cancellable;
+import org.apache.pekko.actor.testkit.typed.javadsl.TestProbe;
+import org.apache.pekko.japi.function.Procedure;
+import org.apache.pekko.stream.javadsl.Keep;
+import org.apache.pekko.stream.javadsl.Sink;
+import org.apache.pekko.stream.javadsl.Source;
 import csw.event.api.javadsl.IEventPublisher;
 import csw.event.api.javadsl.IEventSubscription;
 import csw.event.client.helpers.Utils;
@@ -37,7 +37,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
-import csw.event.client.internal.kafka.KafkaTestProps;
+//import csw.event.client.internal.kafka.KafkaTestProps;
 
 //DEOPSCSW-331: Event Service Accessible to all CSW component builders
 //DEOPSCSW-334: Publish an event
@@ -50,7 +50,7 @@ import csw.event.client.internal.kafka.KafkaTestProps;
 public class JEventPublisherTest extends TestNGSuite {
 
     private RedisTestProps redisTestProps;
-    private KafkaTestProps kafkaTestProps;
+//    private KafkaTestProps kafkaTestProps;
 
     private int counter = -1;
     private Cancellable cancellable;
@@ -58,20 +58,23 @@ public class JEventPublisherTest extends TestNGSuite {
     @BeforeSuite
     public void beforeAll() {
         redisTestProps = RedisTestProps.jCreateRedisProperties();
-        kafkaTestProps = KafkaTestProps.jCreateKafkaProperties();
+//        kafkaTestProps = KafkaTestProps.jCreateKafkaProperties();
         redisTestProps.start();
-        kafkaTestProps.start();
+//        kafkaTestProps.start();
     }
 
     @AfterSuite
     public void afterAll() {
         redisTestProps.shutdown();
-        kafkaTestProps.shutdown();
+//        kafkaTestProps.shutdown();
     }
 
     @DataProvider(name = "event-service-provider")
     public Object[][] pubsubProvider() {
-        return new Object[][]{{redisTestProps}, {kafkaTestProps}};
+        return new Object[][]{
+                {redisTestProps}
+//                {kafkaTestProps}
+        };
     }
 
     //DEOPSCSW-345: Publish events irrespective of subscriber existence

@@ -4,8 +4,8 @@
  */
 
 package csw.config.api.commons
-import akka.http.scaladsl.model.HttpRequest
-import akka.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
+import org.apache.pekko.http.scaladsl.model.HttpRequest
+import org.apache.pekko.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
 import csw.logging.api.scaladsl.Logger
 
 trait TokenMaskSupport {

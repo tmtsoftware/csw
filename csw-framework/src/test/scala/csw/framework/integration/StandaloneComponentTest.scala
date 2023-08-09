@@ -5,25 +5,27 @@
 
 package csw.framework.integration
 
-import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.stream.scaladsl.Keep
-import akka.stream.testkit.scaladsl.TestSink
+import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
+import org.apache.pekko.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.stream.scaladsl.Keep
+import org.apache.pekko.stream.testkit.scaladsl.TestSink
 import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
-import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.client.extensions.PekkoLocationExt.RichPekkoLocation
 import csw.command.client.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.command.client.models.framework.SupervisorLifecycleState
-import csw.common.FrameworkAssertions._
+import csw.common.FrameworkAssertions.*
 import csw.common.components.framework.SampleComponentHandlers
-import csw.common.components.framework.SampleComponentState._
+import csw.common.components.framework.SampleComponentState.*
 import csw.common.utils.TestAppender
-import csw.event.client.helpers.TestFutureExt.RichFuture
+import csw.event.client.helpers.TestFutureExt.given
+import scala.language.implicitConversions
+
 import csw.framework.internal.component.ComponentBehavior
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.location.api.models.ComponentType.HCD
-import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.Connection.PekkoConnection
 import csw.location.api.models.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.location.client.ActorSystemFactory
 import csw.logging.client.internal.LoggingSystem
@@ -39,7 +41,7 @@ import scala.concurrent.duration.DurationLong
 
 // DEOPSCSW-167: Creation and Deployment of Standalone Components
 // DEOPSCSW-177: Hooks for lifecycle management
-// DEOPSCSW-216: Locate and connect components to send AKKA commands
+// DEOPSCSW-216: Locate and connect components to send PEKKO commands
 // CSW-82: ComponentInfo should take prefix
 // CSW-86: Subsystem should be case-insensitive
 class StandaloneComponentTest extends FrameworkIntegrationSuite {
@@ -75,23 +77,23 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
 
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]("supervisor-lifecycle-state-probe")
     val supervisorStateProbe          = TestProbe[CurrentState]("supervisor-state-probe")
-    val akkaConnection                = AkkaConnection(ComponentId(Prefix(Subsystem.IRIS, "IFS_Detector"), HCD))
+    val pekkoConnection               = PekkoConnection(ComponentId(Prefix(Subsystem.IRIS, "IFS_Detector"), HCD))
 
     // verify component gets registered with location service
-    val maybeLocation = seedLocationService.resolve(akkaConnection, 5.seconds).await
+    val maybeLocation = seedLocationService.resolve(pekkoConnection, 5.seconds).await
 
     maybeLocation.isDefined shouldBe true
-    val resolvedAkkaLocation = maybeLocation.get
-    resolvedAkkaLocation.connection shouldBe akkaConnection
+    val resolvedPekkoLocation = maybeLocation.get
+    resolvedPekkoLocation.connection shouldBe pekkoConnection
 
-    val supervisorRef = resolvedAkkaLocation.componentRef
+    val supervisorRef = resolvedPekkoLocation.componentRef
     assertThatSupervisorIsRunning(supervisorRef, supervisorLifecycleStateProbe, 5.seconds)
 
-    val supervisorCommandService = CommandServiceFactory.make(resolvedAkkaLocation)
+    val supervisorCommandService = CommandServiceFactory.make(resolvedPekkoLocation)
 
-    val (_, akkaProbe) =
-      seedLocationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent](seedActorSystem.toClassic))(Keep.both).run()
-    akkaProbe.requestNext() shouldBe a[LocationUpdated]
+    val (_, pekkoProbe) =
+      seedLocationService.track(pekkoConnection).toMat(TestSink.probe[TrackingEvent](seedActorSystem.toClassic))(Keep.both).run()
+    pekkoProbe.requestNext() shouldBe a[LocationUpdated]
 
     // on shutdown, component unregisters from location service
     supervisorCommandService.subscribeCurrentState(supervisorStateProbe.ref ! _)
@@ -103,7 +105,7 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
 
     // this proves that postStop signal of supervisor gets invoked
     // as supervisor gets unregistered in postStop signal
-    akkaProbe.requestNext(10.seconds) shouldBe LocationRemoved(akkaConnection)
+    pekkoProbe.requestNext(10.seconds) shouldBe LocationRemoved(pekkoConnection)
 
     // this proves that on shutdown message, supervisor's actor system gets terminated
     // if it does not get terminated in 5 seconds, future will fail which in turn fail this test

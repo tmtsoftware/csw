@@ -18,7 +18,7 @@ import com.typesafe.config.{Config, ConfigFactory, ConfigRenderOptions}
 import csw.alarm.api.internal.ValidationResult
 import csw.alarm.api.internal.ValidationResult.{Failure, Success}
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 /**
  * Uses json-schema to validate the Config File

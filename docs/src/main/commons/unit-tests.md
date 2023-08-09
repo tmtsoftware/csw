@@ -113,7 +113,7 @@ Java
 Next, we'll add a test for command handling in the HCD.  The HCD supports a "sleep" command, which sleeps
 some amount of seconds as specified in the command payload, and then returns a `CommandResponse.Completed`.
 We will specify a sleep of 5 seconds, and then check that we get the expected response. Note that the
-obtaining a `CommandService` reference in Java requires an Akka Typed Actor System, so our code will create one
+obtaining a `CommandService` reference in Java requires an Pekko Typed Actor System, so our code will create one
 using the Actor System provided by the Test Kit. In Scala, `import frameworkTestkit._` brings in implicit Actor System in scope,
 hence you do not need to create one in your test.
 

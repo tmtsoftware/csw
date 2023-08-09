@@ -5,15 +5,15 @@
 
 package csw.command.client.cbor
 
-import csw.command.client.messages._
+import csw.command.client.messages.*
 import csw.command.client.messages.sequencer.CswSequencerMessage
-import csw.command.client.models.framework._
-import csw.commons.CborAkkaSerializer
+import csw.command.client.models.framework.*
+import csw.commons.CborPekkoSerializer
 import csw.params.commands.CommandResponse
 import csw.params.core.states.StateVariable
 import csw.serializable.CommandSerializable
 
-class CommandAkkaSerializer extends CborAkkaSerializer[CommandSerializable] with MessageCodecs {
+class CommandPekkoSerializer extends CborPekkoSerializer[CommandSerializable] with MessageCodecs {
 
   override def identifier: Int = 19923
 

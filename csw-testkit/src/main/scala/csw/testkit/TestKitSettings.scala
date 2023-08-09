@@ -5,11 +5,11 @@
 
 package csw.testkit
 
-import akka.actor.typed.ActorSystem
-import akka.util.Timeout
+import org.apache.pekko.actor.typed.ActorSystem
+import org.apache.pekko.util.Timeout
 import com.typesafe.config.Config
 
-import scala.compat.java8.DurationConverters.DurationOps
+import scala.jdk.DurationConverters.*
 
 object TestKitSettings {
 
@@ -31,7 +31,7 @@ object TestKitSettings {
 
   /**
    * Reads configuration settings from given `Config` that
-   * must have the same layout as the `akka.actor.testkit.typed` section.
+   * must have the same layout as the `pekko.actor.testkit.typed` section.
    */
   def create(config: Config): TestKitSettings = apply(config)
 }

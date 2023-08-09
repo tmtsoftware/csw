@@ -6,7 +6,7 @@
 package csw.contract.generator
 
 import csw.prefix.codecs.CommonCodecs
-import enumeratum._
+import enumeratum.*
 import io.bullet.borer.{Codec, Decoder, Encoder, Writer}
 
 import scala.reflect.ClassTag

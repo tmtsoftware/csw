@@ -5,11 +5,11 @@
 
 package csw.logging.client.javadsl
 
-import akka.actor
-import akka.actor.typed.javadsl.ActorContext
-import akka.actor.typed.scaladsl.adapter.TypedActorRefOps
-import akka.actor.{ActorPath, ActorRef, typed}
-import akka.serialization.Serialization
+import org.apache.pekko.actor
+import org.apache.pekko.actor.typed.javadsl.ActorContext
+import org.apache.pekko.actor.typed.scaladsl.adapter.TypedActorRefOps
+import org.apache.pekko.actor.{ActorPath, ActorRef, typed}
+import org.apache.pekko.serialization.Serialization
 import csw.logging.api.javadsl.ILogger
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.internal.{JLoggerImpl, LoggerImpl}

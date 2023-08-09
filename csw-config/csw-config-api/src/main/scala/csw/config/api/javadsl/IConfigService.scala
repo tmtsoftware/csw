@@ -13,7 +13,7 @@ import java.{util => ju}
 
 import csw.config.api.ConfigData
 import csw.config.api.scaladsl.ConfigService
-import csw.config.models._
+import csw.config.models.*
 
 /**
  * Defines an interface to be used by admin users for storing and retrieving configuration information

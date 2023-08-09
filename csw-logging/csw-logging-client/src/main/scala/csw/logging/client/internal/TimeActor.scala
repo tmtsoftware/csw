@@ -5,8 +5,8 @@
 
 package csw.logging.client.internal
 
-import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{Behavior, PostStop}
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.actor.typed.{Behavior, PostStop}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.LoggingKeys
 import csw.logging.client.internal.JsonExtensions.{AnyToJson, RichJsObject}

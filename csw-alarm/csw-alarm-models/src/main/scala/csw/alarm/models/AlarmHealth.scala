@@ -5,7 +5,7 @@
 
 package csw.alarm.models
 
-import csw.alarm.models.AlarmSeverity._
+import csw.alarm.models.AlarmSeverity.*
 import csw.alarm.models.FullAlarmSeverity.Disconnected
 import enumeratum.EnumEntry.Lowercase
 import enumeratum.{Enum, EnumEntry}

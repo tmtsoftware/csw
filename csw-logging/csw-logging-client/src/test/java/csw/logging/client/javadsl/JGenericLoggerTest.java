@@ -5,9 +5,9 @@
 
 package csw.logging.client.javadsl;
 
-import akka.actor.typed.ActorRef;
-import akka.actor.typed.ActorSystem;
-import akka.actor.typed.SpawnProtocol;
+import org.apache.pekko.actor.typed.ActorRef;
+import org.apache.pekko.actor.typed.ActorSystem;
+import org.apache.pekko.actor.typed.SpawnProtocol;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -15,7 +15,7 @@ import csw.logging.api.javadsl.ILogger;
 import csw.logging.models.Level;
 import csw.logging.models.Level$;
 import csw.logging.client.appenders.LogAppenderBuilder;
-import csw.logging.client.commons.AkkaTypedExtension;
+import csw.logging.client.commons.PekkoTypedExtension;
 import csw.logging.client.commons.LoggingKeys$;
 import csw.logging.client.internal.LoggingSystem;
 import csw.logging.client.utils.JGenericActor;
@@ -97,9 +97,9 @@ public class JGenericLoggerTest {
     @Test
     public void testGenericLoggerActorWithoutComponentName_DEOPSCSW_316() {
 
-        AkkaTypedExtension.UserActorFactory userActorFactory = AkkaTypedExtension.UserActorFactory(actorSystem);
+        PekkoTypedExtension.UserActorFactory userActorFactory = PekkoTypedExtension.UserActorFactory(actorSystem);
 
-        ActorRef<String> utilActor = userActorFactory.<String>spawn(JGenericActor.behavior, "JActorUtil", akka.actor.typed.Props.empty());
+        ActorRef<String> utilActor = userActorFactory.<String>spawn(JGenericActor.behavior, "JActorUtil", org.apache.pekko.actor.typed.Props.empty());
 
         String actorPath = utilActor.path().toString();
         String className = JGenericActor.class.getName();

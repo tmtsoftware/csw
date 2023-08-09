@@ -5,8 +5,8 @@
 
 package csw.common.components.command
 
-import akka.actor.typed.scaladsl.ActorContext
-import akka.util.Timeout
+import org.apache.pekko.actor.typed.scaladsl.ActorContext
+import org.apache.pekko.util.Timeout
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.CommandResponseManager.{OverallFailure, OverallSuccess}
 import csw.command.client.CommandServiceFactory
@@ -14,15 +14,15 @@ import csw.command.client.messages.TopLevelActorMessage
 import csw.common.components.command.ComponentStateForCommand.{longRunningCmdCompleted, _}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.location.api.models.{AkkaLocation, TrackingEvent}
+import csw.location.api.models.{PekkoLocation, TrackingEvent}
 import csw.params.commands.CommandIssue.UnsupportedCommandIssue
-import csw.params.commands.CommandResponse._
+import csw.params.commands.CommandResponse.*
 import csw.params.commands.{CommandIssue, ControlCommand, Setup}
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
 import csw.time.core.models.UTCTime
 
-import scala.async.Async._
+import cps.compat.FutureAsync.*
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -40,9 +40,9 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
   override def initialize(): Unit = {
     componentInfo.connections.headOption match {
       case Some(hcd) =>
-        cswCtx.locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
-          case Some(akkaLocation) => hcdComponent = CommandServiceFactory.make(akkaLocation)(ctx.system)
-          case None               => throw new RuntimeException("Could not resolve hcd location, Initialization failure.")
+        cswCtx.locationService.resolve(hcd.of[PekkoLocation], 5.seconds).map {
+          case Some(pekkoLocation) => hcdComponent = CommandServiceFactory.make(pekkoLocation)(ctx.system)
+          case None                => throw new RuntimeException("Could not resolve hcd location, Initialization failure.")
         }
       case None => ()
     }

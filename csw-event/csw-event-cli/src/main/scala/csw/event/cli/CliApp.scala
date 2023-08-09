@@ -5,7 +5,7 @@
 
 package csw.event.cli
 
-import akka.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.ActorSystem
 import csw.event.cli.args.Options
 
 import scala.concurrent.duration.Duration

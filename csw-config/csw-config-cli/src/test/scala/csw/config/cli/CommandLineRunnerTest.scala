@@ -7,12 +7,14 @@ package csw.config.cli
 
 import java.nio.file.{Files, Paths}
 import java.time.Instant
-import akka.actor.typed
-import akka.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.actor.typed
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import csw.aas.installed.api.InstalledAppAuthAdapter
 import csw.config.cli.args.{ArgsParser, Options}
 import csw.config.cli.wiring.Wiring
-import csw.config.commons.TestFutureExtension.RichFuture
+import csw.config.commons.TestFutureExtension.given
+import scala.language.implicitConversions
+
 import csw.config.commons.{ArgsUtil, TestFileUtils}
 import csw.config.models.ConfigId
 import csw.config.server.ServerWiring

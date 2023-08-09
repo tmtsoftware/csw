@@ -5,32 +5,32 @@
 
 package csw.location
 
-import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.SpawnProtocol
-import akka.actor.typed.scaladsl.Behaviors
-import akka.stream.scaladsl.{Keep, Sink}
-import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
-import csw.location.api.models._
-import csw.location.api.{AkkaRegistrationFactory, models}
+import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
+import org.apache.pekko.actor.typed.SpawnProtocol
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.stream.scaladsl.{Keep, Sink}
+import csw.location.api.models.Connection.{PekkoConnection, HttpConnection}
+import csw.location.api.models.*
+import csw.location.api.{PekkoRegistrationFactory, models}
 import csw.location.client.ActorSystemFactory
-import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
+import csw.logging.client.commons.PekkoTypedExtension.UserActorFactory
 import csw.prefix.models.{Prefix, Subsystem}
 import org.scalatest.OptionValues
 import org.scalatest.concurrent.Eventually
 
 import scala.concurrent.Await
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
-class DetectAkkaComponentCrashTestMultiJvmNode1 extends DetectAkkaComponentCrashTest(0, "cluster")
+class DetectPekkoComponentCrashTestMultiJvmNode1 extends DetectPekkoComponentCrashTest(0, "cluster")
 
-class DetectAkkaComponentCrashTestMultiJvmNode2 extends DetectAkkaComponentCrashTest(0, "cluster")
+class DetectPekkoComponentCrashTestMultiJvmNode2 extends DetectPekkoComponentCrashTest(0, "cluster")
 
-class DetectAkkaComponentCrashTestMultiJvmNode3 extends DetectAkkaComponentCrashTest(0, "cluster")
+class DetectPekkoComponentCrashTestMultiJvmNode3 extends DetectPekkoComponentCrashTest(0, "cluster")
 
 /**
  * This test exercises below steps :
- * 1. Registering akka connection on member1 node
- * 2. seed(master) and member2 is tracking a akka connection which is registered on slave (member1)
+ * 1. Registering pekko connection on member1 node
+ * 2. seed(master) and member2 is tracking a pekko connection which is registered on slave (member1)
  * 3. Exiting member1 using testConductor.exit(member1, 1) (tell the remote node to shut itself down using System.exit with the given
  * exitValue 1. The node will also be removed from cluster)
  * 4. Once remote member1 is exited, we are asserting that master (seed) and member2 should receive LocationRemoved event within 5 seconds
@@ -38,7 +38,7 @@ class DetectAkkaComponentCrashTestMultiJvmNode3 extends DetectAkkaComponentCrash
  *
 **/
 // CSW-81: Graceful removal of component
-class DetectAkkaComponentCrashTest(ignore: Int, mode: String)
+class DetectPekkoComponentCrashTest(ignore: Int, mode: String)
     extends helpers.LSNodeSpec(config = new helpers.TwoMembersAndSeed, mode)
     with Eventually
     with OptionValues {
@@ -51,10 +51,10 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String)
   // DEOPSCSW-35: CRDT detects comp/service crash
   // DEOPSCSW-36: Track a crashed service/comp
   test(
-    s"${testPrefixWithSuite} akka component running on one node should detect if other component running on another node crashes | DEOPSCSW-15, DEOPSCSW-35, DEOPSCSW-36, DEOPSCSW-429"
+    s"${testPrefixWithSuite} pekko component running on one node should detect if other component running on another node crashes | DEOPSCSW-15, DEOPSCSW-35, DEOPSCSW-36, DEOPSCSW-429"
   ) {
 
-    val akkaConnection = AkkaConnection(ComponentId(Prefix(Subsystem.Container, "Container1"), ComponentType.Container))
+    val pekkoConnection = PekkoConnection(ComponentId(Prefix(Subsystem.Container, "Container1"), ComponentType.Container))
     val httpConnection = HttpConnection(ComponentId(Prefix(Subsystem.Container, "Container1"), ComponentType.Container))
 
     runOn(seed) {
@@ -62,7 +62,7 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String)
       val probe = TestProbe[TrackingEvent]("test-probe")
 
       val switch = locationService
-        .track(akkaConnection)
+        .track(pekkoConnection)
         .toMat(Sink.foreach(probe.ref.tell(_)))(Keep.left)
         .run()
       enterBarrier("Registration")
@@ -102,10 +102,10 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String)
       val system   = ActorSystemFactory.remote(SpawnProtocol(), "test")
       val actorRef = system.spawn(Behaviors.empty, "trombone-hcd-1")
 
-      import AkkaRegistrationFactory._
+      import PekkoRegistrationFactory._
 
       locationService
-        .register(make(akkaConnection, actorRef, Metadata(Map("key1" -> "value1"))))
+        .register(make(pekkoConnection, actorRef, Metadata(Map("key1" -> "value1"))))
         .await
       val port = 1234
       locationService.register(HttpRegistration(httpConnection, port, "")).await
@@ -126,7 +126,7 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String)
 
       enterBarrier("Registration")
       val switch = locationService
-        .track(akkaConnection)
+        .track(pekkoConnection)
         .toMat(Sink.foreach(probe.ref.tell(_)))(Keep.left)
         .run()
       Thread.sleep(2000)

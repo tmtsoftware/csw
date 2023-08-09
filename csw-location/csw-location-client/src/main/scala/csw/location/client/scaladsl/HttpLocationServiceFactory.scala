@@ -5,7 +5,7 @@
 
 package csw.location.client.scaladsl
 
-import akka.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.ActorSystem
 import csw.location.api.CswVersionJvm
 import csw.location.api.client.LocationServiceClient
 import csw.location.api.codec.LocationServiceCodecs

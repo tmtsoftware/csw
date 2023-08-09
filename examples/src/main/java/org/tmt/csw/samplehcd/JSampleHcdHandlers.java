@@ -5,10 +5,10 @@
 
 package org.tmt.csw.samplehcd;
 
-import akka.actor.Cancellable;
-import akka.actor.typed.ActorRef;
-import akka.actor.typed.javadsl.ActorContext;
-import akka.actor.typed.javadsl.Behaviors;
+import org.apache.pekko.actor.Cancellable;
+import org.apache.pekko.actor.typed.ActorRef;
+import org.apache.pekko.actor.typed.javadsl.ActorContext;
+import org.apache.pekko.actor.typed.javadsl.Behaviors;
 import csw.command.client.messages.TopLevelActorMessage;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;

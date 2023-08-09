@@ -12,7 +12,7 @@ import java.net.URI
  *
  * @param actorRefURI the reference of the Actor that is expected to be remote but instead it is local
  */
-case class LocalAkkaActorRegistrationNotAllowed(actorRefURI: URI)
+case class LocalPekkoActorRegistrationNotAllowed(actorRefURI: URI)
     extends RuntimeException(s"Registration of only remote actors is allowed. Instead local actor $actorRefURI received.")
 
 /**

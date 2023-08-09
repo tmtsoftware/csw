@@ -10,7 +10,7 @@ import java.net.URI
 import csw.alarm.client.internal.commons.AlarmServiceConnection
 import csw.location.api.scaladsl.LocationService
 
-import scala.async.Async._
+import cps.compat.FutureAsync.*
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{ExecutionContext, Future}
 

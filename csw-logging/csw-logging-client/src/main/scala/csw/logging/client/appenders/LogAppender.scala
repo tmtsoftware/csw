@@ -5,7 +5,7 @@
 
 package csw.logging.client.appenders
 
-import akka.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.ActorSystem
 import play.api.libs.json.JsObject
 
 import scala.concurrent.Future

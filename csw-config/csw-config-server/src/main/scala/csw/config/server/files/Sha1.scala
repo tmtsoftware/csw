@@ -8,9 +8,9 @@ package csw.config.server.files
 import java.nio.file.Path
 import java.security.MessageDigest
 
-import akka.actor.typed.ActorSystem
-import akka.stream.scaladsl.{FileIO, Flow, Keep, Sink, Source}
-import akka.util.ByteString
+import org.apache.pekko.actor.typed.ActorSystem
+import org.apache.pekko.stream.scaladsl.{FileIO, Flow, Keep, Sink, Source}
+import org.apache.pekko.util.ByteString
 import csw.config.api.ConfigData
 
 import scala.concurrent.Future

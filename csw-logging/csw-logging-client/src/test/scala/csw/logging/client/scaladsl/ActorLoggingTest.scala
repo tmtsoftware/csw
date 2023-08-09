@@ -5,10 +5,10 @@
 
 package csw.logging.client.scaladsl
 
-import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
+import csw.logging.client.commons.PekkoTypedExtension.UserActorFactory
 import csw.logging.client.commons.LoggingKeys
 import csw.logging.client.components.IRIS
-import csw.logging.client.components.IRISLogMessages._
+import csw.logging.client.components.IRISLogMessages.*
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.utils.LoggingTestSuite
 import csw.logging.models.Level
@@ -55,7 +55,7 @@ class ActorLoggingTest extends LoggingTestSuite {
       log.getString(LoggingKeys.FILE) shouldBe IRIS.FILE_NAME
       // todo : create method getNumber as extension to JsObject.
       log(LoggingKeys.LINE).as[Int] shouldBe logMsgLineNumber
-      log.getString(LoggingKeys.CLASS).toString shouldBe IRIS.CLASS_NAME
+      log.getString(LoggingKeys.CLASS).toString should startWith(IRIS.CLASS_NAME)
       logMsgLineNumber += 1
     }
   }

@@ -5,11 +5,11 @@
 
 package example.time;
 
-import akka.actor.ActorRef;
-import akka.actor.typed.ActorSystem;
-import akka.actor.typed.Behavior;
-import akka.actor.typed.javadsl.Adapter;
-import akka.actor.typed.scaladsl.ActorContext;
+import org.apache.pekko.actor.ActorRef;
+import org.apache.pekko.actor.typed.ActorSystem;
+import org.apache.pekko.actor.typed.Behavior;
+import org.apache.pekko.actor.typed.javadsl.Adapter;
+import org.apache.pekko.actor.typed.scaladsl.ActorContext;
 import csw.time.core.models.UTCTime;
 import csw.time.scheduler.TimeServiceSchedulerFactory;
 import csw.time.scheduler.api.Cancellable;

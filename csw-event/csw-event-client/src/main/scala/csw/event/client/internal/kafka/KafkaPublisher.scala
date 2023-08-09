@@ -5,11 +5,11 @@
 
 package csw.event.client.internal.kafka
 
-import akka.Done
-import akka.actor.Cancellable
-import akka.actor.typed.ActorSystem
-import akka.kafka.ProducerSettings
-import akka.stream.scaladsl.Source
+import org.apache.pekko.Done
+import org.apache.pekko.actor.Cancellable
+import org.apache.pekko.actor.typed.ActorSystem
+import org.apache.pekko.kafka.ProducerSettings
+import org.apache.pekko.stream.scaladsl.Source
 import csw.event.api.exceptions.PublishFailure
 import csw.event.api.scaladsl.EventPublisher
 import csw.event.client.internal.commons.{EventConverter, EventPublisherUtil}
@@ -25,7 +25,7 @@ import scala.util.control.NonFatal
  * An implementation of [[csw.event.api.scaladsl.EventPublisher]] API which uses Apache Kafka as the provider for publishing
  * and subscribing events.
  *
- * @param producerSettings future of settings for akka-streams-kafka API for Apache Kafka producer
+ * @param producerSettings future of settings for pekko-streams-kafka API for Apache Kafka producer
  */
 // $COVERAGE-OFF$
 private[event] class KafkaPublisher(producerSettings: Future[ProducerSettings[String, Array[Byte]]])(implicit

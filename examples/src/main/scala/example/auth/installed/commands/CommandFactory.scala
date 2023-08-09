@@ -5,7 +5,7 @@
 
 package example.auth.installed.commands
 
-import akka.actor.typed
+import org.apache.pekko.actor.typed
 import csw.aas.installed.api.InstalledAppAuthAdapter
 
 // #command-factory

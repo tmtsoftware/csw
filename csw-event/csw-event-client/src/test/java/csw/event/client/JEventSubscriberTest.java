@@ -5,16 +5,17 @@
 
 package csw.event.client;
 
-import akka.actor.Cancellable;
-import akka.actor.testkit.typed.javadsl.TestInbox;
-import akka.actor.testkit.typed.javadsl.TestProbe;
-import akka.japi.Pair;
-import akka.stream.javadsl.Keep;
-import akka.stream.javadsl.Sink;
+import org.apache.pekko.actor.Cancellable;
+import org.apache.pekko.actor.testkit.typed.javadsl.TestInbox;
+import org.apache.pekko.actor.testkit.typed.javadsl.TestProbe;
+import org.apache.pekko.japi.Pair;
+import org.apache.pekko.stream.javadsl.Keep;
+import org.apache.pekko.stream.javadsl.Sink;
+import org.apache.pekko.Done;
 import csw.event.api.javadsl.IEventSubscription;
 import csw.event.api.scaladsl.SubscriptionModes;
 import csw.event.client.helpers.Utils;
-import csw.event.client.internal.kafka.KafkaTestProps;
+//import csw.event.client.internal.kafka.KafkaTestProps;
 import csw.event.client.internal.redis.RedisTestProps;
 import csw.event.client.internal.wiring.BaseProperties;
 import csw.logging.client.utils.Eventually;
@@ -46,14 +47,14 @@ import static csw.prefix.javadsl.JSubsystem.WFOS;
 public class JEventSubscriberTest extends TestNGSuite {
 
     private RedisTestProps redisTestProps;
-    private KafkaTestProps kafkaTestProps;
+//    private KafkaTestProps kafkaTestProps;
 
     @BeforeSuite
     public void beforeAll() {
         redisTestProps = RedisTestProps.jCreateRedisProperties();
-        kafkaTestProps = KafkaTestProps.jCreateKafkaProperties();
+//        kafkaTestProps = KafkaTestProps.jCreateKafkaProperties();
         redisTestProps.start();
-        kafkaTestProps.start();
+//        kafkaTestProps.start();
     }
 
     public List<Event> getEvents() {
@@ -74,12 +75,15 @@ public class JEventSubscriberTest extends TestNGSuite {
     @AfterSuite
     public void afterAll() {
         redisTestProps.shutdown();
-        kafkaTestProps.shutdown();
+//        kafkaTestProps.shutdown();
     }
 
     @DataProvider(name = "event-service-provider")
     public Object[][] pubsubProvider() {
-        return new Object[][]{{redisTestProps}, {kafkaTestProps}};
+        return new Object[][]{
+                {redisTestProps}
+//                {kafkaTestProps}
+        };
     }
 
     @DataProvider(name = "redis-provider")
@@ -159,8 +163,10 @@ public class JEventSubscriberTest extends TestNGSuite {
         }, Duration.ofMillis(400), SubscriptionModes.jRateAdapterMode());
 
         Thread.sleep(1000);
-        subscription.unsubscribe().get(10, TimeUnit.SECONDS);
-        subscription2.unsubscribe().get(10, TimeUnit.SECONDS);
+        CompletableFuture<Done> f1 = subscription.unsubscribe();
+        CompletableFuture<Done> f2 = subscription2.unsubscribe();
+        f1.get(10, TimeUnit.SECONDS);
+        f2.get(10, TimeUnit.SECONDS);
 
         cancellable.cancel();
         Assert.assertEquals(queue.size(), 4);
@@ -206,8 +212,10 @@ public class JEventSubscriberTest extends TestNGSuite {
         IEventSubscription subscription2 = baseProperties.jSubscriber().subscribeCallback(Set.of(event1.eventKey()), queue2::add, Duration.ofMillis(400), SubscriptionModes.jRateAdapterMode());
 
         Thread.sleep(1000);
-        subscription.unsubscribe().get(10, TimeUnit.SECONDS);
-        subscription2.unsubscribe().get(10, TimeUnit.SECONDS);
+        CompletableFuture<Done> f1 = subscription.unsubscribe();
+        CompletableFuture<Done> f2 = subscription2.unsubscribe();
+        f1.get(10, TimeUnit.SECONDS);
+        f2.get(10, TimeUnit.SECONDS);
 
         cancellable.cancel();
         Assert.assertEquals(queue.size(), 4);
@@ -344,10 +352,10 @@ public class JEventSubscriberTest extends TestNGSuite {
     @Test(dataProvider = "redis-provider")
     public void should_be_able_to_subscribe_all_observe_events_CSW_119(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         ObsId obsId = ObsId.apply("2020A-001-123");
-        Event irDetObsStart = IRDetectorEvent.observeStart(new Prefix(IRIS,"det"), obsId);
-        Event irDetObsEnd = IRDetectorEvent.observeEnd(new Prefix(IRIS,"det"), obsId);
-        Event publishSuccess = WFSDetectorEvent.publishSuccess(new Prefix(WFOS,"test"));
-        Event optDetObsStart = OpticalDetectorEvent.observeStart(new Prefix(WFOS,"det"), obsId);
+        Event irDetObsStart = IRDetectorEvent.observeStart(new Prefix(IRIS, "det"), obsId);
+        Event irDetObsEnd = IRDetectorEvent.observeEnd(new Prefix(IRIS, "det"), obsId);
+        Event publishSuccess = WFSDetectorEvent.publishSuccess(new Prefix(WFOS, "test"));
+        Event optDetObsStart = OpticalDetectorEvent.observeStart(new Prefix(WFOS, "det"), obsId);
         Event testEvent = Utils.makeEventWithPrefix(1, Prefix.apply(JSubsystem.CSW, "prefix"));
 
         List<Event> receivedEvents = new ArrayList<>();

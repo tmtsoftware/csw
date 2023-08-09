@@ -5,7 +5,7 @@
 
 package csw.location.client.javadsl
 
-import akka.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.ActorSystem
 import csw.location.api.javadsl.ILocationService
 import csw.location.client.extensions.LocationServiceExt.RichLocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory

@@ -13,7 +13,7 @@ import csw.logging.client.scaladsl.GenericLoggerFactory
 import javax.management.openmbean.CompositeData
 import javax.management.{Notification, NotificationEmitter, NotificationListener}
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 /**
  * When enabled by the gc configuration option, Garbage collection events are logged to the 'gc' log following the same structure as the other logs.

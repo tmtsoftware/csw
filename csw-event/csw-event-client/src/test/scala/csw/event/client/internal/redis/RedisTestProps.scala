@@ -5,14 +5,16 @@
 
 package csw.event.client.internal.redis
 
-import akka.Done
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.Done
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import com.typesafe.config.ConfigFactory
 import csw.commons.redis.EmbeddedRedis
 import csw.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
-import csw.event.api.scaladsl._
+import csw.event.api.scaladsl.*
 import csw.event.client.EventServiceFactory
-import csw.event.client.helpers.TestFutureExt.RichFuture
+import csw.event.client.helpers.TestFutureExt.given
+import scala.language.implicitConversions
+
 import csw.event.client.internal.commons.javawrappers.JEventService
 import csw.event.client.internal.wiring.BaseProperties
 import csw.event.client.internal.wiring.BaseProperties.createInfra
@@ -25,7 +27,7 @@ import io.lettuce.core.codec.StringCodec
 import io.lettuce.core.{ClientOptions, RedisClient, RedisURI}
 import redis.embedded.{RedisSentinel, RedisServer}
 
-import scala.compat.java8.FutureConverters.CompletionStageOps
+import scala.jdk.FutureConverters.*
 import scala.concurrent.Future
 
 class RedisTestProps(
@@ -42,7 +44,7 @@ class RedisTestProps(
   private lazy val masterId = ConfigFactory.load().getString("csw-event.redis.masterId")
   private lazy val redisURI = RedisURI.Builder.sentinel("localhost", sentinelPort, masterId).build()
   private lazy val asyncConnection: Future[RedisAsyncCommands[String, String]] =
-    redisClient.connectAsync(new StringCodec(), redisURI).toScala.map(_.async())
+    redisClient.connectAsync(new StringCodec(), redisURI).asScala.map(_.async())
 
   var redisSentinel: RedisSentinel = _
   var redisServer: RedisServer     = _
@@ -51,10 +53,10 @@ class RedisTestProps(
 
   private val eventServiceFactory = new EventServiceFactory(RedisStore(redisClient))
 
-  val eventService: EventService       = eventServiceFactory.make(locationService)
-  val jEventService: IEventService     = new JEventService(eventService)
-  lazy val publisher: EventPublisher   = eventService.defaultPublisher
-  lazy val subscriber: EventSubscriber = eventService.defaultSubscriber
+  val eventService: EventService                = eventServiceFactory.make(locationService)
+  val jEventService: IEventService              = new JEventService(eventService)
+  override lazy val publisher: EventPublisher   = eventService.defaultPublisher
+  override lazy val subscriber: EventSubscriber = eventService.defaultSubscriber
 
   override def toString: String = name
 
@@ -63,7 +65,7 @@ class RedisTestProps(
   override lazy val jSubscriber: IEventSubscriber = jEventService.defaultSubscriber
 
   override def publishGarbage(channel: String, message: String): Future[Done] =
-    asyncConnection.flatMap(c => c.publish(channel, message).toScala.map(_ => Done))
+    asyncConnection.flatMap(c => c.publish(channel, message).asScala.map(_ => Done))
 
   override def start(): Unit = {
     val redis = startSentinel(sentinelPort, serverPort, masterId)

@@ -10,9 +10,9 @@ Normally one instance of the _Location Server_ will run on each host that is run
 
 Main building blocks of location service are captured below, we will go through each one of them in following sections:
 
-- [Akka Cluster](https://doc.akka.io/docs/akka/current/index-cluster.html)
-- [Conflict Free Replicated Data Types (CRDTs)](https://doc.akka.io/docs/akka/current/typed/distributed-data.html): Shares location information within the network.
-- [Akka HTTP](https://doc.akka.io/docs/akka-http/current/)
+- [Pekko Cluster](https://doc.pekko.io/docs/pekko/current/index-cluster.html)
+- [Conflict Free Replicated Data Types (CRDTs)](https://doc.pekko.io/docs/pekko/current/typed/distributed-data.html): Shares location information within the network.
+- [Pekko HTTP](https://doc.pekko.io/docs/pekko-http/current/)
 - DeathWatch Actor
 
 ![Location Service](../../images/locationservice/location-service.png)
@@ -31,28 +31,28 @@ Let's discuss different components of `Location Server` in following sections:
 
 ### Cluster Member
 
-Location Service JVM (precisely Actor System) takes part in [Akka Cluster](https://doc.akka.io/docs/akka/current/index-cluster.html).
-By default, this actor system binds to port `3552`. Initially when there is no member in Akka cluster, node joins itself.
+Location Service JVM (precisely Actor System) takes part in [Pekko Cluster](https://doc.pekko.io/docs/pekko/current/index-cluster.html).
+By default, this actor system binds to port `3552`. Initially when there is no member in Pekko cluster, node joins itself.
 Such a node is referred as seed node (introducer) and the location of this node needs to be known so that other nodes can join to this known address and form a larger cluster.
 After the joining process is complete, seed nodes are not special and they participate in the cluster in exactly the same way as other nodes.
 
-Akka Cluster provides cluster [membership](https://doc.akka.io/docs/akka/current/typed/cluster-membership.html) service using [gossip](https://doc.akka.io/docs/akka/current/typed/cluster-concepts.html#gossip)
-protocols and an automatic [failure detector](https://doc.akka.io/docs/akka/current/typed/cluster-concepts.html#failure-detector).
+Pekko Cluster provides cluster [membership](https://doc.pekko.io/docs/pekko/current/typed/cluster-membership.html) service using [gossip](https://doc.pekko.io/docs/pekko/current/typed/cluster-concepts.html#gossip)
+protocols and an automatic [failure detector](https://doc.pekko.io/docs/pekko/current/typed/cluster-concepts.html#failure-detector).
 
 Death watch uses the cluster failure detector for nodes in the cluster, i.e. it detects network failures and JVM crashes, in addition to graceful termination of watched actor.
 Death watch generates the `Terminated` message to the watching actor when the unreachable cluster node has been downed and removed. Hence we have kept `auto-down-unreachable-after = 10s` so that in case of failure, interested parties get the death watch notification for the location in around 10s.
 
 ### Distributed Data (Replicator)
 
-We use Akka Distributed Data to share CSW component locations between nodes in an Akka Cluster. These locations are accessed with an actor called as `replicator` providing a key-value store like API.
+We use Pekko Distributed Data to share CSW component locations between nodes in an Pekko Cluster. These locations are accessed with an actor called as `replicator` providing a key-value store like API.
 We store the following data in this key-value store (distributed data):
 
 - `AllServices`:
-  This uses [LWWMap](https://doc.akka.io/docs/akka/current/distributed-data.html?language=scala) CRDT from `Connection` to `Location`. `Connection` and `Location` can be one of `Akka`, `Tcp` or `HTTP` type.
+  This uses [LWWMap](https://doc.pekko.io/docs/pekko/current/distributed-data.html?language=scala) CRDT from `Connection` to `Location`. `Connection` and `Location` can be one of `Pekko`, `Tcp` or `HTTP` type.
   At any point in time, the value of this map represents all the locations registered with `Location Service` in a TMT environment.
 
 - `Service`:
-  This uses [LWWRegister](https://doc.akka.io/docs/akka/current/distributed-data.html?language=scala) which holds location of CSW component against unique connection name.
+  This uses [LWWRegister](https://doc.pekko.io/docs/pekko/current/distributed-data.html?language=scala) which holds location of CSW component against unique connection name.
 
 #### Consistency Guarantees
 
@@ -73,7 +73,7 @@ Death watch actor registers interest in change notifications for `AllServices` k
 Death watch actor then starts watching all the new locations. When it receives `Terminated` signal for any of the watched location precisely for actor ref, then it unregister that particular connection from Location Service.
 
 @@@ note
-Death watch actor only supports Akka locations and filters out `tcp` and `http` locations.
+Death watch actor only supports Pekko locations and filters out `tcp` and `http` locations.
 @@@
 
 ### HTTP Server

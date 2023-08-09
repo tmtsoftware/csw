@@ -8,12 +8,14 @@ package csw.location
 import csw.location.api.models
 import csw.location.api.models.Connection.{HttpConnection, TcpConnection}
 import csw.location.api.models.{ComponentId, ComponentType, HttpRegistration, TcpRegistration}
-import csw.location.server.commons.TestFutureExtension.RichFuture
+import csw.location.server.commons.TestFutureExtension.given
+import scala.language.implicitConversions
+
 import csw.prefix.models.{Prefix, Subsystem}
 import org.scalatest.BeforeAndAfterEach
 
 import scala.collection.immutable.Set
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 class LocationServiceTestMultiJvmNode1 extends LocationServiceTest(0, "cluster")
 

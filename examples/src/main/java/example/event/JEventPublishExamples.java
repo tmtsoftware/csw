@@ -5,10 +5,10 @@
 
 package example.event;
 
-import akka.Done;
-import akka.actor.Cancellable;
-import akka.stream.javadsl.Keep;
-import akka.stream.javadsl.Source;
+import org.apache.pekko.Done;
+import org.apache.pekko.actor.Cancellable;
+import org.apache.pekko.stream.javadsl.Keep;
+import org.apache.pekko.stream.javadsl.Source;
 import csw.params.events.Event;
 import csw.params.events.EventName;
 import csw.params.events.SystemEvent;

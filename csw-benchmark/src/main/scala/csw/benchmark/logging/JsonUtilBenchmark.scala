@@ -11,10 +11,10 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.gson.Gson
 import csw.logging.client.commons.LoggingKeys
 import csw.logging.client.internal.JsonExtensions.RichJsObject
-import org.openjdk.jmh.annotations._
+import org.openjdk.jmh.annotations.*
 import play.api.libs.json.{JsObject, Json}
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 /**
  * Tests Json utility performance.
