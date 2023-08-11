@@ -72,7 +72,7 @@ jobs:
         run: |
           sbtn clean
           sbtn scalafmtCheck
-          sbtn scalastyle
+#          sbtn scalastyle # Not scala 3 ready
           sbtn makeSite
 
       - name: Multi-Jvm Tests
