@@ -31,6 +31,7 @@ jobs:
 
       - name: Tests
         run: |
+          sbt clean
           sbt -DenableFatalWarnings=true -Dpekko.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true csw-time/Test/test
           sbt -DenableFatalWarnings=true -Dpekko.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true -DdisableTimeTests Test/test
 
