@@ -44,11 +44,6 @@ object Common {
       "-feature",
       "-unchecked",
       "-deprecation",
-//      "-source:3.0-migration",
-      "-source:3.0",
-//      "-rewrite",
-//      "-explain",
-//      "-explain-types"
     ),
     javacOptions ++= Seq(
       "-Xlint:unchecked"
