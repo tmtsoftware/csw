@@ -390,7 +390,7 @@ object Dependencies {
     Seq(
       Libs.`config`,
       Keycloak.`keycloak-installed`,
-      Keycloak.`keycloak-policy-enforcer`,
+//      Keycloak.`keycloak-policy-enforcer`, // Needed for keycloak-22.0.1!
       Libs.`os-lib`,
       // (legacy dependencies) required*
       Libs.`scalatest`.value % Test,
@@ -410,6 +410,7 @@ object Dependencies {
       Libs.`dotty-cps-async`.value,
       // (legacy dependencies) required*
       Libs.`jboss-logging`,
+//      Libs.httpclient5,
       Libs.httpclient,
       Libs.`scalatest`.value % Test,
       Libs.`mockito`         % Test

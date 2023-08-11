@@ -46,7 +46,8 @@ object Libs {
   val `postgresql`    = "org.postgresql"                    % "postgresql"        % "42.6.0"
   val `hikaricp`      = "com.zaxxer"                        % "HikariCP"          % "5.0.1" // Apache License 2.0
   val `io.zonky.test` = "io.zonky.test"                     % "embedded-postgres" % "2.0.4"
-  val httpclient      = "org.apache.httpcomponents.client5" % "httpclient5"       % "5.2.1"
+  val httpclient          = "org.apache.httpcomponents"     % "httpclient"        % "4.5.13"
+//  val httpclient5      = "org.apache.httpcomponents.client5" % "httpclient5"       % "5.2.1"
   val `jboss-logging` = "org.jboss.logging"                 % "jboss-logging"     % "3.4.3.Final"
   val `config`        = "com.typesafe"                      % "config"            % "1.4.2"
   val `os-lib`        = "com.lihaoyi"                      %% "os-lib"            % "0.9.1"
@@ -110,7 +111,8 @@ object PekkoHttp {
 }
 
 object Keycloak {
-  val Version = "22.0.1"
+//  val Version = "22.0.1"
+  val Version = "16.1.0"
 
   val `keycloak-adapter-core`    = "org.keycloak" % "keycloak-adapter-core"      % Version
   val `keycloak-core`            = "org.keycloak" % "keycloak-core"              % Version
