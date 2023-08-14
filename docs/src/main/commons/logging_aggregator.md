@@ -1,7 +1,7 @@
 # Logging Aggregator
 
 The logging aggregator provides aggregation of logs generated from TMT applications written in Scala, Java, Python, C, C++, modules like System logs,
-Redis logs, Postgres logs, ElasticSearch logs, Keycloak logs using the widely used Elastic [ELK stack](https://www.elastic.co/what-is/elk-stack) ([Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html),
+Redis logs, Postgres logs, ElasticSearch logs, Keycloak logs using the widely used [Elastic (ELK) stack](https://www.elastic.co/elastic-stack/) ([Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html),
 [Logstash](https://www.elastic.co/guide/en/logstash/current/index.html), [Kibana](https://www.elastic.co/guide/en/kibana/current/index.html)),
 and the [Filebeat](https://www.elastic.co/guide/en/beats/filebeat/current/index.html) utility.
 
