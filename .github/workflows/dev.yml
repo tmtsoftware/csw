@@ -32,8 +32,8 @@ jobs:
       - name: Tests
         run: |
           sbt clean
-          sbt -DenableFatalWarnings=true -Dpekko.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true csw-time/Test/test
-          sbt -DenableFatalWarnings=true -Dpekko.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true -DdisableTimeTests Test/test
+          sbt -DenableFatalWarnings=true -Dpekko.actor.serialize-messages=on -DenableCoverage=false -DgenerateStoryReport=false csw-time/Test/test
+          sbt -DenableFatalWarnings=true -Dpekko.actor.serialize-messages=on -DenableCoverage=false -DgenerateStoryReport=false -DdisableTimeTests Test/test
 
 
   multi-jvm-tests:
@@ -55,7 +55,7 @@ jobs:
           sbtn makeSite
 
       - name: Multi-Jvm Tests
-        run: sbt -DenableFatalWarnings=true -DgenerateStoryReport=true integration/MultiJvm/test
+        run: sbt -DenableFatalWarnings=true -DgenerateStoryReport=false integration/MultiJvm/test
 
   slack-success:
     needs: [ unit-tests, multi-jvm-tests ]
