@@ -8,6 +8,11 @@ object Coverage extends AutoPlugin {
 
   override def projectSettings: Seq[Setting[_]] =
     Seq(
+      coverageExcludedPackages := "csw.event.client.internal.kafka",
+      coverageExcludedPackages := "csw.command.client.messages",
+      coverageExcludedPackages := "csw.framework.deploy.containercmd",
+      coverageExcludedPackages := "csw.framework.exceptions",
+      coverageExcludedPackages := "example.*",
       coverageEnabled          := true,
       coverageMinimumStmtTotal := 80,
       coverageFailOnMinimum    := true,

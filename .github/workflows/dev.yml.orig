@@ -35,6 +35,27 @@ jobs:
           sbt -DenableFatalWarnings=true -Dpekko.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true csw-time/Test/test
           sbt -DenableFatalWarnings=true -Dpekko.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true -DdisableTimeTests Test/test
 
+      - name: Coverage Report
+        run: |
+          sbt -DenableCoverage=true coverageReport
+          sbtn coverageAggregate
+
+      - name: Generate RTM
+        if: always()
+        run: |
+          cs launch --channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/apps.json rtm:0.3.0 -- target/RTM/testStoryMapping.txt tools/RTM/cswStoryToRequirementMap.csv target/RTM/testRequirementsMapping.txt
+
+      - name: Upload RTM
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: RTM
+          path: target/RTM
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Coverage Report
+          path: target/scala-2.13/scoverage-report
 
   multi-jvm-tests:
     runs-on: ubuntu-latest
@@ -56,6 +77,18 @@ jobs:
 
       - name: Multi-Jvm Tests
         run: sbt -DenableFatalWarnings=true -DgenerateStoryReport=true integration/MultiJvm/test
+
+      - name: Generate RTM
+        if: always()
+        run: |
+          cs launch --channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/apps.json rtm:0.3.0 -- target/RTM/testStoryMapping.txt tools/RTM/cswStoryToRequirementMap.csv target/RTM/testRequirementsMapping.txt
+
+      - name: Upload RTM
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: RTM-multi-jvm
+          path: target/RTM
 
   slack-success:
     needs: [ unit-tests, multi-jvm-tests ]

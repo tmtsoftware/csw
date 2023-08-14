@@ -15,7 +15,7 @@ object Libs {
 
   val `sourcecode`        = "com.lihaoyi"                              %% "sourcecode"        % "0.3.0"
   val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "590c5e7" // Apache 2.0
-  val `pekko-management`  = "org.apache.pekko"                         %% "pekko-management"  % "1.0.0-RC2"
+  val `pekko-management`  = "org.apache.pekko"                         %% "pekko-management"  % "1.0.0"
   val `svnkit`        = "org.tmatesoft.svnkit" % "svnkit"        % "1.10.11"    // TMate Open Source License
   val `commons-codec` = "commons-codec"        % "commons-codec" % "1.15"       // Apache 2.0š
   val `gson`          = "com.google.code.gson" % "gson"          % "2.10.1"     // Apache 2.0
@@ -54,7 +54,6 @@ object Libs {
   val `caffeine`      = "com.github.ben-manes.caffeine"     % "caffeine"          % "3.1.7"
   val netty           = "io.netty"                          % "netty-all"         % "4.1.95.Final"
   val `case-app`      = "com.github.alexarchambault"       %% "case-app"          % "2.1.0-M25"
-//  val `tmt-test-reporter` = "com.github.tmtsoftware.rtm"       %% "rtm"               % "c6a49ee"
   val `tmt-test-reporter` = "com.github.tmtsoftware.rtm" %% "rtm" % "f922171"
 }
 

@@ -30,7 +30,7 @@
 * For `msocket`, for now using jitpack with unreleased branch `allan/migrate-akka-to-pekko-scala3`
 * For `embedded-keycloak`, for now using jitpack with unreleased branch `migrate-to-pekko-scala3`
 * For `rtm` (TMT Test reporters) now using `scala3` branch via jitpack
-* Updated keycloak API usage to match newer version
+* Updated keycloak API usage to match newer version (Note: TODO: Still using older version)
 * Needed to add explicit dependency on `pekko-stream` when using `pekko-http`
 
 ## Changes made to upgrade from Scala-2.13.8 to Scala-3.3.0

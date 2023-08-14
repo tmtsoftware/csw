@@ -27,7 +27,6 @@ object Dependencies {
       Pekko.`cluster-sharding`, // akka-management-cluster-http uses lower version, to avoid conflict, this needs to be overridden
       Libs.`pekko-management`,
       PekkoHttp.`pekko-http`,
-//      PekkoHttp.`pekko-http-spray-json`,
       MSocket.`msocket-http`,
       Libs.`scalatest`.value            % Test,
       Libs.`junit4-interface`           % Test,

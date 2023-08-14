@@ -32,7 +32,7 @@ object Common {
     scalaVersion                                    := Libs.ScalaVersion,
     homepage                                        := Some(url("https://github.com/tmtsoftware/csw")),
     resolvers += "Apache Pekko Staging".at("https://repository.apache.org/content/groups/staging"),
-    resolvers += "Apache Pekko Snapshots".at("https://repository.apache.org/content/groups/snapshots"),
+//    resolvers += "Apache Pekko Snapshots".at("https://repository.apache.org/content/groups/snapshots"),
     resolvers += "jitpack" at "https://jitpack.io",
     scmInfo := Some(
       ScmInfo(url("https://github.com/tmtsoftware/csw"), "git@github.com:tmtsoftware/csw.git")
