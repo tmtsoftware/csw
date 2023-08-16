@@ -30,7 +30,7 @@ private[location] class DeathwatchActor(locationService: LocationService)(implic
    * Deathwatch behavior processes `DeathwatchActor.Msg` type events sent by replicator for newly registered Locations.
    * Terminated signal will be received upon termination of an actor that was being watched.
    *
-   * @see [[pekko.actor.Terminated]]
+   * @see [[org.apache.pekko.actor.Terminated]]
    */
   private[location] def behavior(watchedLocations: Set[Location]): Behavior[Msg] =
     Behaviors.receive[Msg] { (context, changeMsg) =>

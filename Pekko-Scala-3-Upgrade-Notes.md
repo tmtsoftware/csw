@@ -26,10 +26,11 @@
 * Renamed files: `*akka*` to `*pekko*` and `*Akka*` to `*Pekko*`
 * Replaced `import pekko.` with `import org.apache.pekko.`
 * Replaced remaining "pekko.: in source and conf files with org.apache.pekko (Care needed config files, since class refs use `org.apache.pekko`, but settings use just `pekko`)
-* Replaced dependencies on any libraries that depend on akka
+* Replaced dependencies on any TMT libraries that depend on akka
 * For `msocket`, for now using jitpack with unreleased branch `allan/migrate-akka-to-pekko-scala3`
 * For `embedded-keycloak`, for now using jitpack with unreleased branch `migrate-to-pekko-scala3`
 * For `rtm` (TMT Test reporters) now using `scala3` branch via jitpack
+* For `csw-docs` (generate documentation) no using branch "Allan/scala3", updated dependencies, replaced akka with org.apache.pekko
 * Updated keycloak API usage to match newer version (Note: TODO: Still using older version)
 * Needed to add explicit dependency on `pekko-stream` when using `pekko-http`
 

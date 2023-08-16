@@ -30,7 +30,7 @@ trait IEventSubscriber {
    * and the stream is stopped after logging appropriately. In all other cases of exception, the stream resumes to receive remaining elements.
    *
    * @param eventKeys a set of [[csw.params.events.EventKey]] to subscribe to
-   * @return a [[pekko.stream.javadsl.Source]] of [[csw.params.events.Event]]. The materialized value of the source provides an
+   * @return a [[org.apache.pekko.stream.javadsl.Source]] of [[csw.params.events.Event]]. The materialized value of the source provides an
    *         [[csw.event.api.javadsl.IEventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
    */
   def subscribe(eventKeys: util.Set[EventKey]): Source[Event, IEventSubscription]
@@ -47,7 +47,7 @@ trait IEventSubscriber {
    * @param every the duration which determines the frequency with which events are received
    * @param mode an appropriate [[csw.event.api.scaladsl.SubscriptionMode]] to control the behavior of rate of events w.r.t. the given frequency.
    *             Refer the API documentation for SubscriptionMode for more details
-   * @return a [[pekko.stream.javadsl.Source]] of [[csw.params.events.Event]]. The materialized value of the source provides an
+   * @return a [[org.apache.pekko.stream.javadsl.Source]] of [[csw.params.events.Event]]. The materialized value of the source provides an
    *         [[csw.event.api.javadsl.IEventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
    */
   def subscribe(eventKeys: util.Set[EventKey], every: Duration, mode: SubscriptionMode): Source[Event, IEventSubscription]
@@ -184,7 +184,7 @@ trait IEventSubscriber {
    *                  - h*llo subscribes to hllo and heeeello
    *                  - h[ae]llo subscribes to hello and hallo, but not hillo
    *                  Use \ to escape special characters if you want to match them verbatim.
-   * @return a [[pekko.stream.javadsl.Source]] of [[csw.params.events.Event]]. The materialized value of the source provides an [[csw.event.api.javadsl.IEventSubscription]]
+   * @return a [[org.apache.pekko.stream.javadsl.Source]] of [[csw.params.events.Event]]. The materialized value of the source provides an [[csw.event.api.javadsl.IEventSubscription]]
    *         which can be used to unsubscribe from all the Event Keys which were subscribed to
    */
   def pSubscribe(subsystem: Subsystem, pattern: String): Source[Event, IEventSubscription]
@@ -221,7 +221,7 @@ trait IEventSubscriber {
    * and the subscription is stopped after logging appropriately. [[csw.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine this
    * state. In all other cases of exception, the subscription resumes to receive remaining elements.
    *
-   * @return a [[pekko.stream.scaladsl.Source]] of [[csw.params.events.Event]]. The materialized value of the source provides
+   * @return a [[org.apache.pekko.stream.scaladsl.Source]] of [[csw.params.events.Event]]. The materialized value of the source provides
    *         an [[csw.event.api.scaladsl.EventSubscription]] which can be used to unsubscribe from observe events subscription
    */
   def subscribeObserveEvents(): Source[Event, IEventSubscription]

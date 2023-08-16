@@ -27,10 +27,10 @@ trait EventSubscriber {
    * and the stream is stopped after logging appropriately. In all other cases of exception, as per the default behavior, the stream will stop.
    * To avoid that, user should provide a resuming materializer while running the stream.
    *
-   * @note All the other APIs of [[csw.event.api.scaladsl.EventSubscriber]] that do not return a [[pekko.stream.scaladsl.Source]],
+   * @note All the other APIs of [[csw.event.api.scaladsl.EventSubscriber]] that do not return a [[org.apache.pekko.stream.scaladsl.Source]],
    *       internally use the resuming materializer which will ignore the failed event and resume receiving further events.
    * @param eventKeys a set of [[csw.params.events.EventKey]] to subscribe to
-   * @return a [[pekko.stream.scaladsl.Source]] of [[csw.params.events.Event]]. The materialized value of the source provides
+   * @return a [[org.apache.pekko.stream.scaladsl.Source]] of [[csw.params.events.Event]]. The materialized value of the source provides
    *         an [[csw.event.api.scaladsl.EventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
    */
   def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription]
@@ -44,13 +44,13 @@ trait EventSubscriber {
    * and the stream is stopped after logging appropriately. In all other cases of exception, as per the default behavior, the stream will stop.
    * To avoid that, user should provide a resuming materializer while running the stream.
    *
-   * @note All the other APIs of [[csw.event.api.scaladsl.EventSubscriber]] that do not return a [[pekko.stream.scaladsl.Source]],
+   * @note All the other APIs of [[csw.event.api.scaladsl.EventSubscriber]] that do not return a [[org.apache.pekko.stream.scaladsl.Source]],
    *       internally use the resuming materializer which will ignore the failed event and resume receiving further events.
    * @param eventKeys a set of [[csw.params.events.EventKey]] to subscribe to
    * @param every the duration which determines the frequency with which events are received
    * @param mode an appropriate [[csw.event.api.scaladsl.SubscriptionMode]] to control the behavior of rate of events w.r.t. the given frequency.
    *             Refer the API documentation for SubscriptionMode for more details
-   * @return a [[pekko.stream.scaladsl.Source]] of [[csw.params.events.Event]]. The materialized value of the source provides an
+   * @return a [[org.apache.pekko.stream.scaladsl.Source]] of [[csw.params.events.Event]]. The materialized value of the source provides an
    *         [[csw.event.api.scaladsl.EventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
    */
   def subscribe(eventKeys: Set[EventKey], every: FiniteDuration, mode: SubscriptionMode): Source[Event, EventSubscription]
@@ -186,7 +186,7 @@ trait EventSubscriber {
    *                  - h*llo subscribes to hllo and heeeello
    *                  - h[ae]llo subscribes to hello and hallo, but not hillo
    *                  Use \ to escape special characters if you want to match them verbatim.
-   * @return a [[pekko.stream.scaladsl.Source]] of [[csw.params.events.Event]]. The materialized value of the source provides
+   * @return a [[org.apache.pekko.stream.scaladsl.Source]] of [[csw.params.events.Event]]. The materialized value of the source provides
    *         an [[csw.event.api.scaladsl.EventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
    */
   def pSubscribe(subsystem: Subsystem, pattern: String): Source[Event, EventSubscription]
@@ -225,7 +225,7 @@ trait EventSubscriber {
    * and the subscription is stopped after logging appropriately. [[csw.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine this
    * state. In all other cases of exception, the subscription resumes to receive remaining elements.
    *
-   * @return a [[pekko.stream.scaladsl.Source]] of [[csw.params.events.Event]]. The materialized value of the source provides
+   * @return a [[org.apache.pekko.stream.scaladsl.Source]] of [[csw.params.events.Event]]. The materialized value of the source provides
    *         an [[csw.event.api.scaladsl.EventSubscription]] which can be used to unsubscribe from observe events subscription
    */
   def subscribeObserveEvents(): Source[Event, EventSubscription]

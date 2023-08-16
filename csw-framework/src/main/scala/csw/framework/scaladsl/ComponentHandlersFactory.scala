@@ -22,14 +22,14 @@ private[framework] abstract class ComponentHandlersFactory {
   /**
    * Implement this method for providing the component handlers to be used by component actor
    *
-   * @param ctx the [[pekko.actor.typed.scaladsl.ActorContext]] under which the actor instance of this behavior is created
+   * @param ctx the [[org.apache.pekko.actor.typed.scaladsl.ActorContext]] under which the actor instance of this behavior is created
    * @param cswCtx provides access to csw services e.g. location, event, alarm, etc
    * @return componentHandlers to be used by this component
    */
   def handlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext): ComponentHandlers
 
   /**
-   * Creates the [[pekko.actor.typed.Behavior]] of the component
+   * Creates the [[org.apache.pekko.actor.typed.Behavior]] of the component
    *
    * @param supervisor the actor reference of the supervisor actor which created this component for this component
    * @param cswCtx provides access to csw services e.g. location, event, alarm, etc

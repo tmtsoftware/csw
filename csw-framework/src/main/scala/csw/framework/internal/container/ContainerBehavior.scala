@@ -31,7 +31,7 @@ import scala.util.{Failure, Success}
 /**
  * The Behavior of a Container of one or more components, represented as a mutable behavior.
  *
- * @param ctx                   the [[pekko.actor.typed.scaladsl.ActorContext]] under which the actor instance of this behavior is created
+ * @param ctx                   the [[org.apache.pekko.actor.typed.scaladsl.ActorContext]] under which the actor instance of this behavior is created
  * @param containerInfo         container related information as described in the configuration file
  * @param supervisorInfoFactory the factory for creating the Supervisors for components described in ContainerInfo
  * @param registrationFactory   the factory for creating a typed [[PekkoRegistration]] from
@@ -91,7 +91,7 @@ private[framework] final class ContainerBehavior(
   }
 
   /**
-   * Defines processing for a [[pekko.actor.typed.Signal]] received by the actor instance
+   * Defines processing for a [[org.apache.pekko.actor.typed.Signal]] received by the actor instance
    *
    * @return the existing behavior
    */

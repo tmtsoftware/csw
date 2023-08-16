@@ -16,7 +16,7 @@ import scala.annotation.varargs
 import scala.jdk.CollectionConverters.*
 
 /**
- * ClusterSettings manages [[com.typesafe.config.Config]] values required by an [[pekko.actor.typed.ActorSystem]] to boot. It configures mainly
+ * ClusterSettings manages [[com.typesafe.config.Config]] values required by an [[org.apache.pekko.actor.typed.ActorSystem]] to boot. It configures mainly
  * four parameters of an `ActorSystem`, namely :
  *
  *  - name (Name is defaulted to a constant value so that ActorSystem joins the cluster while booting)

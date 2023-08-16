@@ -63,7 +63,7 @@ private[framework] object SupervisorBehavior {
 /**
  * The Behavior of a Supervisor of a component actor, represented as a mutable behavior
  *
- * @param ctx                      the [[pekko.actor.typed.scaladsl.ActorContext]] under which the actor instance of this behavior is created
+ * @param ctx                      the [[org.apache.pekko.actor.typed.scaladsl.ActorContext]] under which the actor instance of this behavior is created
  * @param timerScheduler           provides support for scheduled `self` messages in an actor
  * @param maybeContainerRef        the container ref of the container under which this supervisor is started if
  *                                 it's not running in standalone mode
@@ -319,7 +319,7 @@ private[framework] final class SupervisorBehavior(
     log.error(s"Unexpected message :[$message] received by supervisor in lifecycle state :[$lifecycleState]")
 
   /**
-   * Defines processing for a [[pekko.actor.typed.Signal]] received by the actor instance
+   * Defines processing for a [[org.apache.pekko.actor.typed.Signal]] received by the actor instance
    *
    * @return the existing behavior
    */

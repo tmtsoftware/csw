@@ -12,7 +12,7 @@ import csw.framework.models.CswContext
 import csw.framework.scaladsl.{ComponentHandlersFactory, ComponentHandlers, RegistrationFactory}
 
 /**
- * The factory for creating [[pekko.actor.typed.scaladsl.AbstractBehavior]] of the supervisor of a component
+ * The factory for creating [[org.apache.pekko.actor.typed.scaladsl.AbstractBehavior]] of the supervisor of a component
  */
 private[csw] object SupervisorBehaviorFactory {
 

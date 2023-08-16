@@ -17,7 +17,7 @@ import csw.location.api.scaladsl.LocationService
 import csw.logging.client.scaladsl.LoggerFactory
 
 /**
- * Factory for creating [[pekko.actor.typed.scaladsl.AbstractBehavior]] of a container component
+ * Factory for creating [[org.apache.pekko.actor.typed.scaladsl.AbstractBehavior]] of a container component
  */
 private[framework] object ContainerBehaviorFactory {
   def behavior(

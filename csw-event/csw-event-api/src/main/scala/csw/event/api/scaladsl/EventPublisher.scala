@@ -42,7 +42,7 @@ trait EventPublisher {
    * In all other cases of exception, the stream receives a [[csw.event.api.exceptions.PublishFailure]] exception
    * which wraps the underlying exception. The stream resumes to publish remaining elements in case of this exception.
    *
-   * @param source a [[pekko.stream.scaladsl.Source]] of events to be published.
+   * @param source a [[org.apache.pekko.stream.scaladsl.Source]] of events to be published.
    *               Any resource cleanup or exception handling of the provided source is to be managed by the source provider
    * @tparam Mat represents the type of materialized value as defined in the source to be obtained on running the stream
    * @return the materialized value obtained on running the stream
@@ -59,7 +59,7 @@ trait EventPublisher {
    * The provided callback is executed on the failed element and the stream resumes to publish remaining elements.
    *
    * @note Callbacks like `onError` are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
-   * @param source  a [[pekko.stream.scaladsl.Source]] of events to be published.
+   * @param source  a [[org.apache.pekko.stream.scaladsl.Source]] of events to be published.
    *                Any resource cleanup or exception handling of the provided source is to be managed by the source provider
    * @param onError a callback to execute for each event for which publishing failed
    * @tparam Mat represents the type of materialized value as defined in the source to be obtained on running the stream

@@ -29,7 +29,7 @@ object AlarmRefreshActorFactory {
    * @param alarmService instance of alarm service or custom implementation of [[csw.alarm.api.scaladsl.AlarmService]], you can use lambda expression here
    * @param refreshInterval interval after which alarm will be refreshed
    * @param actorSystem actorSystem used for creating actor
-   * @return [[pekko.actor.typed.ActorRef]] which accepts [[csw.alarm.models.AutoRefreshSeverityMessage]]
+   * @return [[org.apache.pekko.actor.typed.ActorRef]] which accepts [[csw.alarm.models.AutoRefreshSeverityMessage]]
    */
   def make(
       alarmService: AlarmService,
@@ -46,7 +46,7 @@ object AlarmRefreshActorFactory {
    * @param alarmService instance of alarm service or custom implementation of [[csw.alarm.api.scaladsl.AlarmService]], you can use lambda expression here
    * @param refreshInterval interval after which alarm will be refreshed
    * @param actorSystem actorSystem used for creating actor
-   * @return [[pekko.actor.typed.ActorRef]] which accepts [[csw.alarm.models.AutoRefreshSeverityMessage]]
+   * @return [[org.apache.pekko.actor.typed.ActorRef]] which accepts [[csw.alarm.models.AutoRefreshSeverityMessage]]
    */
   def jMake(
       alarmService: IAlarmService,
@@ -61,7 +61,7 @@ object AlarmRefreshActorFactory {
    * @param setSeverity function responsible for setting severity of alarm
    * @param refreshInterval interval after which alarm will be refreshed
    * @param actorSystem actorSystem used for creating actor
-   * @return [[pekko.actor.typed.ActorRef]] which accepts [[csw.alarm.models.AutoRefreshSeverityMessage]]
+   * @return [[org.apache.pekko.actor.typed.ActorRef]] which accepts [[csw.alarm.models.AutoRefreshSeverityMessage]]
    */
   def jMake(
       setSeverity: BiFunction[AlarmKey, AlarmSeverity, CompletableFuture[Done]],

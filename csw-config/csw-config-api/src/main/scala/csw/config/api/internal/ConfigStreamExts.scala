@@ -19,7 +19,7 @@ private[config] object ConfigStreamExts {
   /**
    * RichSource adds extra features on pekko streams
    *
-   * @see [[pekko.stream.scaladsl.Source]]
+   * @see [[org.apache.pekko.stream.scaladsl.Source]]
    * @tparam Out the type of values that will flow through this stream
    * @tparam Mat when the stream starts flowing, the handle to the Mat will be available
    */

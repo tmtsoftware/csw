@@ -18,7 +18,7 @@ import csw.time.core.models.UTCTime
 /**
  * Base class for component handlers which will be used by the component actor
  *
- * @param ctx the [[pekko.actor.typed.scaladsl.ActorContext]] under which the actor instance of the component, which use these handlers, is created
+ * @param ctx the [[org.apache.pekko.actor.typed.scaladsl.ActorContext]] under which the actor instance of the component, which use these handlers, is created
  * @param cswCtx provides access to csw services e.g. location, event, alarm, etc
  */
 abstract class ComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext) {
