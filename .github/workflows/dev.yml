@@ -49,10 +49,10 @@ jobs:
 
       - name: Docs Check
         run: |
-          sbtn clean
-          sbtn scalafmtCheck
-          : # sbtn scalastyle # Not scala 3 ready
-          sbtn makeSite
+          sbt clean
+          sbt scalafmtCheck
+          : # sbt scalastyle # Not scala 3 ready
+          sbt makeSite
 
       - name: Multi-Jvm Tests
         run: sbt -DenableFatalWarnings=true -DgenerateStoryReport=false integration/MultiJvm/test
