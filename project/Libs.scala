@@ -3,7 +3,8 @@ import sbt.Def.{setting => dep}
 import sbt._
 
 object Libs {
-  val ScalaVersion = "3.3.1-RC5"
+//  val ScalaVersion = "3.3.1-RC5"
+  val ScalaVersion = "3.3.0"
 
   val `dotty-cps-async` = dep("com.github.rssh" %%% "dotty-cps-async" % "0.9.17")
 
