@@ -6,7 +6,7 @@ object Libs {
 //  val ScalaVersion = "3.3.1-RC5"
   val ScalaVersion = "3.3.0"
 
-  val `dotty-cps-async` = dep("com.github.rssh" %%% "dotty-cps-async" % "0.9.17")
+  val `dotty-cps-async` = dep("com.github.rssh" %%% "dotty-cps-async" % "0.9.18")
 
   val `scopt`   = "com.github.scopt"  %% "scopt"       % "4.1.0" // MIT License
   val `mockito` = "org.scalatestplus" %% "mockito-3-4" % "3.2.10.0"
@@ -27,9 +27,9 @@ object Libs {
   val `scalajs-java-securerandom` = dep("org.scala-js" %%% "scalajs-java-securerandom" % "1.0.0")
   val `scalatest`                 = dep("org.scalatest" %%% "scalatest" % "3.2.16") // Apache License 2.0
 
-  val `jwt-core`               = "com.github.jwt-scala"    %% "jwt-core"               % "9.1.2"
-  val `lettuce`                = "io.lettuce"               % "lettuce-core"           % "6.2.1.RELEASE"
-  val `reactor-core`           = "io.projectreactor"        % "reactor-core"           % "3.4.24"
+  val `jwt-core`               = "com.github.jwt-scala"    %% "jwt-core"               % "9.4.3"
+  val `lettuce`                = "io.lettuce"               % "lettuce-core"           % "6.2.6.RELEASE"
+  val `reactor-core`           = "io.projectreactor"        % "reactor-core"           % "3.5.9"
   val `reactive-streams`       = "org.reactivestreams"      % "reactive-streams"       % "1.0.4"
   val `pekko-connectors-kafka` = "org.apache.pekko"        %% "pekko-connectors-kafka" % "1.0.0"
   val `embedded-kafka`         = "io.github.embeddedkafka" %% "embedded-kafka"         % "3.5.1"
@@ -43,19 +43,19 @@ object Libs {
   val `scala-csv`             = "com.github.tototoshi" %% "scala-csv"             % "1.3.10"
   val `json-schema-validator` = "com.github.fge"        % "json-schema-validator" % "2.2.14" // LGPL/ASL
 
-  val `jna`           = "net.java.dev.jna"                  % "jna"               % "5.13.0"
-  val `postgresql`    = "org.postgresql"                    % "postgresql"        % "42.6.0"
-  val `hikaricp`      = "com.zaxxer"                        % "HikariCP"          % "5.0.1" // Apache License 2.0
-  val `io.zonky.test` = "io.zonky.test"                     % "embedded-postgres" % "2.0.4"
-  val httpclient          = "org.apache.httpcomponents"     % "httpclient"        % "4.5.13"
-//  val httpclient5      = "org.apache.httpcomponents.client5" % "httpclient5"       % "5.2.1"
-  val `jboss-logging` = "org.jboss.logging"                 % "jboss-logging"     % "3.4.3.Final"
-  val `config`        = "com.typesafe"                      % "config"            % "1.4.2"
-  val `os-lib`        = "com.lihaoyi"                      %% "os-lib"            % "0.9.1"
-  val `caffeine`      = "com.github.ben-manes.caffeine"     % "caffeine"          % "3.1.7"
-  val netty           = "io.netty"                          % "netty-all"         % "4.1.95.Final"
-  val `case-app`      = "com.github.alexarchambault"       %% "case-app"          % "2.1.0-M25"
-  val `tmt-test-reporter` = "com.github.tmtsoftware.rtm" %% "rtm" % "f922171"
+  val `jna`           = "net.java.dev.jna"          % "jna"               % "5.13.0"
+  val `postgresql`    = "org.postgresql"            % "postgresql"        % "42.6.0"
+  val `hikaricp`      = "com.zaxxer"                % "HikariCP"          % "5.0.1" // Apache License 2.0
+  val `io.zonky.test` = "io.zonky.test"             % "embedded-postgres" % "2.0.4"
+  val httpclient      = "org.apache.httpcomponents" % "httpclient"        % "4.5.14"
+//  val httpclient          = "org.apache.httpcomponents.client5" % "httpclient5"   % "5.2.1"
+  val `jboss-logging`     = "org.jboss.logging"             % "jboss-logging" % "3.5.3.Final"
+  val `config`            = "com.typesafe"                  % "config"        % "1.4.2"
+  val `os-lib`            = "com.lihaoyi"                  %% "os-lib"        % "0.9.1"
+  val `caffeine`          = "com.github.ben-manes.caffeine" % "caffeine"      % "3.1.7"
+  val netty               = "io.netty"                      % "netty-all"     % "4.1.95.Final"
+  val `case-app`          = "com.github.alexarchambault"   %% "case-app"      % "2.1.0-M25"
+  val `tmt-test-reporter` = "com.github.tmtsoftware.rtm"   %% "rtm"           % "f922171"
 }
 
 object Borer {
@@ -122,7 +122,7 @@ object Keycloak {
 }
 
 object Jooq {
-  val Version = "3.18.5"
+  val Version = "3.18.6"
 
   val `jooq`         = "org.jooq" % "jooq"         % Version
   val `jooq-meta`    = "org.jooq" % "jooq-meta"    % Version
