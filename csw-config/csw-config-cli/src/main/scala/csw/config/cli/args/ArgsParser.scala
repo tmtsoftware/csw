@@ -22,11 +22,7 @@ class ArgsParser(name: String) {
     // login operation
     cmd("login") action { (_, c) =>
       c.copy(op = "login")
-    } text "login to access admin API's" children (
-      opt[Unit]("consoleLogin") action { (_, c) =>
-        c.copy(console = true)
-      } text "optional:: add this option to login from command line instead of browser"
-    )
+    } text "login to access admin API's"
 
     // logout operation
     cmd("logout") action { (_, c) =>

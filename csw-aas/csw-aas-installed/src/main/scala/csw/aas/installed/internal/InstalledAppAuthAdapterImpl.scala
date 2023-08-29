@@ -47,19 +47,19 @@ private[aas] class InstalledAppAuthAdapterImpl(
     updateAuthStore()
   }
 
-  override def loginCommandLine(): Boolean = {
-    require(keycloakInstalled.getDeployment != null, "keycloak deployment is null")
-    require(keycloakInstalled.getDeployment.getAuthUrl != null, "auth url is not set")
-    val bool = keycloakInstalled.loginCommandLine()
-    if (bool) updateAuthStore()
-    bool
-  }
+//  override def loginCommandLine(): Boolean = {
+//    require(keycloakInstalled.getDeployment != null, "keycloak deployment is null")
+//    require(keycloakInstalled.getDeployment.getAuthUrl != null, "auth url is not set")
+//    val bool = keycloakInstalled.loginCommandLine()
+//    if (bool) updateAuthStore()
+//    bool
+//  }
 
-  override def loginCommandLine(redirectUri: String): Boolean = {
-    val bool = keycloakInstalled.loginCommandLine(redirectUri)
-    if (bool) updateAuthStore()
-    bool
-  }
+//  override def loginCommandLine(redirectUri: String): Boolean = {
+//    val bool = keycloakInstalled.loginCommandLine(redirectUri)
+//    if (bool) updateAuthStore()
+//    bool
+//  }
 
   override def getAccessToken(minValidity: FiniteDuration = 0.seconds): Option[AccessToken] = {
     def getNewToken: Option[AccessToken] = {

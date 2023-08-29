@@ -15,7 +15,7 @@ object Libs {
   val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.4.7"
 
   val `sourcecode`        = "com.lihaoyi"                              %% "sourcecode"        % "0.3.0"
-  val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "590c5e7" // Apache 2.0
+  val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "b339ef1" // Apache 2.0
   val `pekko-management`  = "org.apache.pekko"                         %% "pekko-management"  % "1.0.0"
   val `svnkit`        = "org.tmatesoft.svnkit" % "svnkit"        % "1.10.11"    // TMate Open Source License
   val `commons-codec` = "commons-codec"        % "commons-codec" % "1.15"       // Apache 2.0š
@@ -47,8 +47,8 @@ object Libs {
   val `postgresql`    = "org.postgresql"            % "postgresql"        % "42.6.0"
   val `hikaricp`      = "com.zaxxer"                % "HikariCP"          % "5.0.1" // Apache License 2.0
   val `io.zonky.test` = "io.zonky.test"             % "embedded-postgres" % "2.0.4"
-  val httpclient      = "org.apache.httpcomponents" % "httpclient"        % "4.5.14"
-//  val httpclient          = "org.apache.httpcomponents.client5" % "httpclient5"   % "5.2.1"
+//  val httpclient      = "org.apache.httpcomponents" % "httpclient"        % "4.5.14"
+  val httpclient5          = "org.apache.httpcomponents.client5" % "httpclient5"   % "5.2.1"
   val `jboss-logging`     = "org.jboss.logging"             % "jboss-logging" % "3.5.3.Final"
   val `config`            = "com.typesafe"                  % "config"        % "1.4.2"
   val `os-lib`            = "com.lihaoyi"                  %% "os-lib"        % "0.9.1"
@@ -111,8 +111,8 @@ object PekkoHttp {
 }
 
 object Keycloak {
-//  val Version = "22.0.1"
-  val Version = "16.1.0"
+  val Version = "22.0.1"
+//  val Version = "16.1.0"
 
   val `keycloak-adapter-core`    = "org.keycloak" % "keycloak-adapter-core"      % Version
   val `keycloak-core`            = "org.keycloak" % "keycloak-core"              % Version

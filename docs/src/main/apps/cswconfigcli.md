@@ -55,7 +55,7 @@ These credentials will not be available in actual production environment.
 
 ### Examples of login api
 
-1.  The command below opens up default browser on your machine and asks you to provide username and password. 
+The command below opens up default browser on your machine and asks you to provide username and password. 
 Once you provide valid credentials, AAS will respond with an access token, refresh token etc. which get stored on the local filesystem.
 So next time when you use any of the above admin protected commands, this access token gets retrieved from local filesystem and is implicitly passed in a request sent to 
 the Config Server.
@@ -64,12 +64,6 @@ the Config Server.
     csw-config-cli login
     ``` 
 
-2.  Instead of opening the default browser on your machine, this will prompt for username and password on the console. (You do not need to leave console in this case.)
-
-    ```bash
-    csw-config-cli login --consoleLogin
-    ``` 
-    
 ## logout
 Use this command to logout if you are already logged in or you want to re-login with different credentials.
 

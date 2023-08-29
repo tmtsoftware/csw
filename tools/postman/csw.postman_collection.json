@@ -1401,7 +1401,7 @@
               "raw": "[\n  {\n    \"resource_id\": \"e1718e9c-285d-4661-9c89-829c7dc62b87\",\n    \"resource_scopes\": [\n      \"read\"\n    ]\n  }\n]"
             },
             "url": {
-              "raw": "http://{{hostname}}:{{keycloak_port}}/auth/realms/TMT/authz/protection/permission",
+              "raw": "http://{{hostname}}:{{keycloak_port}}/admin/realms/TMT/authz/protection/permission",
               "protocol": "http",
               "host": [
                 "{{hostname}}"
@@ -1449,7 +1449,7 @@
               ]
             },
             "url": {
-              "raw": "http://{{hostname}}:{{keycloak_port}}/auth/realms/TMT/protocol/openid-connect/token",
+              "raw": "http://{{hostname}}:{{keycloak_port}}/admin/realms/TMT/protocol/openid-connect/token",
               "protocol": "http",
               "host": [
                 "{{hostname}}"
@@ -1526,7 +1526,7 @@
               ]
             },
             "url": {
-              "raw": "http://{{hostname}}:{{keycloak_port}}/auth/realms/TMT/protocol/openid-connect/token",
+              "raw": "http://{{hostname}}:{{keycloak_port}}/admin/realms/TMT/protocol/openid-connect/token",
               "protocol": "http",
               "host": [
                 "{{hostname}}"

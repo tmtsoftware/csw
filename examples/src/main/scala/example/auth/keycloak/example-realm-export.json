@@ -464,7 +464,7 @@
       "id": "b3be9eaf-cda3-4460-bb5c-134a2db58ecd",
       "clientId": "account",
       "name": "${client_account}",
-      "baseUrl": "/auth/realms/example/account",
+      "baseUrl": "/admin/realms/example/account",
       "surrogateAuthRequired": false,
       "enabled": true,
       "clientAuthenticatorType": "client-secret",
@@ -474,7 +474,7 @@
         "view-profile"
       ],
       "redirectUris": [
-        "/auth/realms/example/account/*"
+        "/admin/realms/example/account/*"
       ],
       "webOrigins": [],
       "notBefore": 0,

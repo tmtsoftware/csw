@@ -36,6 +36,5 @@ case class Options(
     latest: Boolean = false,
     pattern: Option[String] = None,
     normal: Boolean = false,
-    locationHost: String = "localhost",
-    console: Boolean = false
+    locationHost: String = "localhost"
 )

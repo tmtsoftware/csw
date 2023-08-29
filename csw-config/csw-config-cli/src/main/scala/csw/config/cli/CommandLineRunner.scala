@@ -28,8 +28,7 @@ class CommandLineRunner(
   import actorRuntime._
 
   def login(options: Options): Unit = {
-    if (options.console) nativeAuthAdapter.loginCommandLine()
-    else nativeAuthAdapter.login()
+    nativeAuthAdapter.login()
     printLine(s"SUCCESS : Logged in successfully")
   }
 

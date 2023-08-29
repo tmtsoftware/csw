@@ -47,7 +47,7 @@ class MainTest extends AnyFunSuiteLike with Matchers with ScalaFutures {
 
     val (binding, wiring) = Main.start(startLogging = false, options = options)
     // AAS location is registered here to make sure, it does not give AASResolution Failed error
-    wiring.locationService.register(HttpRegistration(AASConnection.value, SocketUtils.getFreePort, "auth")).futureValue
+    wiring.locationService.register(HttpRegistration(AASConnection.value, SocketUtils.getFreePort, "")).futureValue
 
     // assert location server running at hostname
     binding.localAddress.getAddress.getHostAddress shouldBe hostname

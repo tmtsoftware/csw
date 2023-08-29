@@ -37,7 +37,7 @@ class MainTest extends HTTPLocationService {
     super.beforeAll()
     testFileUtils.deleteServerFiles()
     // register AAS with location service
-    locationService.register(models.HttpRegistration(AASConnection.value, AASPort, "auth"))
+    locationService.register(models.HttpRegistration(AASConnection.value, AASPort, ""))
   }
 
   override def afterEach(): Unit = testFileUtils.deleteServerFiles()

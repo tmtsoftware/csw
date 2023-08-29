@@ -35,7 +35,7 @@ private[csw] class AuthServiceLocation(locationService: LocationService) {
     }
 
   private[csw] def register(authServicePort: Int): Future[RegistrationResult] = {
-    val authServicePath    = "auth"
+    val authServicePath    = ""
     val httpRegistration   = HttpRegistration(AASConnection.value, authServicePort, authServicePath, NetworkType.Outside)
     val registrationResult = locationService.register(httpRegistration)
     registrationResult

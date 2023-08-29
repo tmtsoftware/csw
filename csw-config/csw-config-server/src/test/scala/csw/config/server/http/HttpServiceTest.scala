@@ -31,7 +31,7 @@ class HttpServiceTest extends HTTPLocationService {
 
   override def beforeAll(): Unit = {
     super.beforeAll()
-    testLocationService.register(models.HttpRegistration(AASConnection.value, AASPort, "auth")).futureValue
+    testLocationService.register(models.HttpRegistration(AASConnection.value, AASPort, "")).futureValue
   }
 
   override def afterAll(): Unit = {

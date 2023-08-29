@@ -46,7 +46,7 @@ class LocationAuthTestWithKeycloak
   override def beforeAll(): Unit = {
     super.beforeAll()
     keycloakStopHandle = startKeycloak(aasPort)
-    locationWiring.get.locationService.register(HttpRegistration(AASConnection.value, aasPort, "auth")).futureValue
+    locationWiring.get.locationService.register(HttpRegistration(AASConnection.value, aasPort, "")).futureValue
   }
 
   private implicit def actorSystem: ActorSystem[SpawnProtocol.Command] = locationWiring.get.actorSystem
