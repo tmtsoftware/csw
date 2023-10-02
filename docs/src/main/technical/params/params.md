@@ -33,7 +33,7 @@ ADTs (Abstract Data Types) with Cbor. This is needed due to the way ADTs are enc
 Having this abstraction ensures all the types in an ADT (Base types plus concrete types) are encoded in a similar manner.
 In Borer, encoding of base-types carries the type information which differs than the way concrete-types are 
 encoded (without type information).
-The problem is described in detail in the issue [here](https://github.com/sirthias/borer/issues/17).
+The problem is described in detail in the issue [here](https://github.com/sirthias/borer/issues/21).
 Going via `AdtCbor` ensures the Adt types(base as well concrete) are all encoded as **Base-type** containing
 type information.
 So if you are writing new types which are ADTs, make sure you add your own helper next to 

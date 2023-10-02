@@ -3,8 +3,7 @@ import sbt.Def.{setting => dep}
 import sbt._
 
 object Libs {
-//  val ScalaVersion = "3.3.1-RC5"
-  val ScalaVersion = "3.3.0"
+  val ScalaVersion = "3.3.1"
 
   val `dotty-cps-async` = dep("com.github.rssh" %%% "dotty-cps-async" % "0.9.18")
 
@@ -14,22 +13,22 @@ object Libs {
   // Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
   val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.4.7"
 
-  val `sourcecode`        = "com.lihaoyi"                              %% "sourcecode"        % "0.3.0"
-  val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "b339ef1" // Apache 2.0
+  val `sourcecode`        = "com.lihaoyi"                              %% "sourcecode"        % "0.3.1"
+  val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "7916ac2" // Apache 2.0
   val `pekko-management`  = "org.apache.pekko"                         %% "pekko-management"  % "1.0.0"
   val `svnkit`        = "org.tmatesoft.svnkit" % "svnkit"        % "1.10.11"    // TMate Open Source License
   val `commons-codec` = "commons-codec"        % "commons-codec" % "1.15"       // Apache 2.0š
   val `gson`          = "com.google.code.gson" % "gson"          % "2.10.1"     // Apache 2.0
-  val `play-json`     = "com.typesafe.play"   %% "play-json"     % "2.10.0-RC9" // Apache 2.0
+  val `play-json`     = "com.typesafe.play"   %% "play-json"     % "2.10.1" // Apache 2.0
 
   val `enumeratum`                = dep("com.beachape" %%% "enumeratum" % "1.7.3")  // MIT License
   val `scala-java-time`           = dep("io.github.cquiroz" %%% "scala-java-time" % "2.5.0")
   val `scalajs-java-securerandom` = dep("org.scala-js" %%% "scalajs-java-securerandom" % "1.0.0")
-  val `scalatest`                 = dep("org.scalatest" %%% "scalatest" % "3.2.16") // Apache License 2.0
+  val `scalatest`                 = dep("org.scalatest" %%% "scalatest" % "3.2.17") // Apache License 2.0
 
   val `jwt-core`               = "com.github.jwt-scala"    %% "jwt-core"               % "9.4.3"
   val `lettuce`                = "io.lettuce"               % "lettuce-core"           % "6.2.6.RELEASE"
-  val `reactor-core`           = "io.projectreactor"        % "reactor-core"           % "3.5.9"
+  val `reactor-core`           = "io.projectreactor"        % "reactor-core"           % "3.5.10"
   val `reactive-streams`       = "org.reactivestreams"      % "reactive-streams"       % "1.0.4"
   val `pekko-connectors-kafka` = "org.apache.pekko"        %% "pekko-connectors-kafka" % "1.0.0"
   val `embedded-kafka`         = "io.github.embeddedkafka" %% "embedded-kafka"         % "3.5.1"
@@ -47,13 +46,12 @@ object Libs {
   val `postgresql`    = "org.postgresql"            % "postgresql"        % "42.6.0"
   val `hikaricp`      = "com.zaxxer"                % "HikariCP"          % "5.0.1" // Apache License 2.0
   val `io.zonky.test` = "io.zonky.test"             % "embedded-postgres" % "2.0.4"
-//  val httpclient      = "org.apache.httpcomponents" % "httpclient"        % "4.5.14"
   val httpclient5          = "org.apache.httpcomponents.client5" % "httpclient5"   % "5.2.1"
   val `jboss-logging`     = "org.jboss.logging"             % "jboss-logging" % "3.5.3.Final"
   val `config`            = "com.typesafe"                  % "config"        % "1.4.2"
   val `os-lib`            = "com.lihaoyi"                  %% "os-lib"        % "0.9.1"
   val `caffeine`          = "com.github.ben-manes.caffeine" % "caffeine"      % "3.1.7"
-  val netty               = "io.netty"                      % "netty-all"     % "4.1.95.Final"
+  val netty               = "io.netty"                      % "netty-all"     % "4.1.99.Final"
   val `case-app`          = "com.github.alexarchambault"   %% "case-app"      % "2.1.0-M25"
   val `tmt-test-reporter` = "com.github.tmtsoftware.rtm"   %% "rtm"           % "f922171"
 }
@@ -111,8 +109,7 @@ object PekkoHttp {
 }
 
 object Keycloak {
-  val Version = "22.0.1"
-//  val Version = "16.1.0"
+  val Version = "22.0.3"
 
   val `keycloak-adapter-core`    = "org.keycloak" % "keycloak-adapter-core"      % Version
   val `keycloak-core`            = "org.keycloak" % "keycloak-core"              % Version

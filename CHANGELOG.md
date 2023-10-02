@@ -59,7 +59,7 @@ This is a release candidate 1 for version 5.0.0 of the TMT Common Software.
 See [here](https://tmtsoftware.github.io/csw/5.0.0-RC1/) for a detailed documentation of this version of the CSW software.
 
 ### Changes
-- Upgrade the project to jdk 17 (Update the INSTALL.md)
+- Upgrade the project to jdk 21 (Update the INSTALL.md)
 - Added missing standard units
 - [Breaking] ComponentInfo now takes componentHandlerClassName instead of behaviorFactoryClassName.
   Follow migration guide(https://tmtsoftware.github.io/csw/migration_guide/migration_guide_4.0.0_to_5.0.0/migration-guide-4.0.0-to-5.0.0.html)

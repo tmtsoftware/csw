@@ -60,7 +60,7 @@ There are total three APIs provided by the Time Service:
 
 ### TMTTime API
 
-TMTTime represents an instantaneous point in time with nanosecond precision. It is a wrapper around [Instant](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html) and provides additional information 
+TMTTime represents an instantaneous point in time with nanosecond precision. It is a wrapper around [Instant](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/Instant.html) and provides additional information 
 about the timescale of the instant. 
 
 TMTTime supports two timescales:

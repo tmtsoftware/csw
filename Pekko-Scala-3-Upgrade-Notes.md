@@ -102,6 +102,5 @@ due to Scala3 complaints.
 * Commented out one CBOR test for Java, since it is not likely to be used from Java.
 * Replaced use of App class in some cases with Scala main() as recommended for Scala 3
 * Removed (probably unnecessary) call to `redisReactiveCommands.getStatefulConnection.close()`, since it was deprecated
-
 * Commented out tests using `embedded-kafka` due to unknown errors (The Kafka based Event Service is not currently being used).
-* 
+* Temporarily removed coverage test from GitHub action in .github/dev.yml (due to differences in Scala3 and commented out Kafka code)

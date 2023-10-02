@@ -7,7 +7,7 @@ We’ll use the [sbt](https://www.scala-sbt.org/1.x/docs/index.html) build tool 
 ## Installation
 Supported Operating Systems are: CentOS and MacOS
  
-1.  Make sure you have coursier installed and set up along with Java Eclipse Temurin 17 and sbt.
+1.  Make sure you have coursier installed and set up along with Java Eclipse Temurin 21 and sbt.
     Please refer to @ref:[coursier installation](../apps/csinstallation.md) for more details.
 2. Install IntelliJ 
 	- [MAC](https://www.jetbrains.com/idea/download/)
@@ -41,7 +41,7 @@ You will then see a dialog asking how to import the project.
 
 ![intellijImport](../images/gettingstarted/intellijImport.png)
 
-On the next dialog, click the Project JDK dropdown and select Java 17.
+On the next dialog, click the Project JDK dropdown and select Java 21.
 
 ![intellijJava](../images/gettingstarted/intellijJava.png)
 
