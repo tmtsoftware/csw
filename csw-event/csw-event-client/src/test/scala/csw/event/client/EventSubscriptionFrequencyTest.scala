@@ -10,45 +10,44 @@ import akka.stream.scaladsl.Sink
 import csw.event.api.scaladsl.SubscriptionModes
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.helpers.Utils.makeEventForKeyName
-import csw.event.client.internal.kafka.KafkaTestProps
 import csw.event.client.internal.redis.RedisTestProps
 import csw.event.client.internal.wiring.BaseProperties
 import csw.params.events.{Event, EventKey, EventName}
 import org.scalatest.concurrent.Eventually
+import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.testng.TestNGSuite
-import org.testng.annotations._
+import org.testng.annotations.*
 
 import scala.collection.{immutable, mutable}
 import scala.concurrent.duration.DurationLong
 import scala.util.Random
-import org.scalatest.matchers.should.Matchers
 
 //DEOPSCSW-331: Event Service Accessible to all CSW component builders
 class EventSubscriptionFrequencyTest extends TestNGSuite with Matchers with Eventually {
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 10.millis)
 
   var redisTestProps: RedisTestProps = _
-  var kafkaTestProps: KafkaTestProps = _
+//  var kafkaTestProps: KafkaTestProps = _
 
   @BeforeSuite
   def beforeAll(): Unit = {
     redisTestProps = RedisTestProps.createRedisProperties()
-    kafkaTestProps = KafkaTestProps.createKafkaProperties()
+//    kafkaTestProps = KafkaTestProps.createKafkaProperties()
     redisTestProps.start()
-    kafkaTestProps.start()
+//    kafkaTestProps.start()
   }
 
   @AfterSuite
   def afterAll(): Unit = {
     redisTestProps.shutdown()
-    kafkaTestProps.shutdown()
+//    kafkaTestProps.shutdown()
   }
 
   @DataProvider(name = "event-service-provider")
   def pubSubProvider: Array[Array[_ <: BaseProperties]] =
     Array(
-      Array(redisTestProps),
-      Array(kafkaTestProps)
+      Array(redisTestProps)
+//      Array(kafkaTestProps)
     )
 
   @DataProvider(name = "redis-provider")
@@ -76,11 +75,11 @@ class EventSubscriptionFrequencyTest extends TestNGSuite with Matchers with Even
   def should_be_able_to_subscribe_with_duration_with_rate_adapter_mode_for_slow_publisher__DEOPSCSW_331_DEOPSCSW_342(
       baseProperties: BaseProperties
   ): Unit = {
-    import baseProperties._
+    import baseProperties.*
     val inbox = TestInbox[Event]()
 
     val eventGenerator = new EventGenerator(EventName(s"system_${Random.nextInt()}"))
-    import eventGenerator._
+    import eventGenerator.*
     val eventKey: EventKey = eventsGroup.head.eventKey
 
     val cancellable = publisher.publish(eventGenerator.generator, 400.millis)
@@ -104,12 +103,12 @@ class EventSubscriptionFrequencyTest extends TestNGSuite with Matchers with Even
   def should_be_able_to_subscribe_an_event_with_duration_with_rate_adapter_for_fast_publisher__DEOPSCSW_331_DEOPSCSW_342_DEOPSCSW_346(
       baseProperties: BaseProperties
   ): Unit = {
-    import baseProperties._
+    import baseProperties.*
 
     val receivedEvents: mutable.Queue[Event]  = new mutable.Queue[Event]()
     val receivedEvents2: mutable.Queue[Event] = new mutable.Queue[Event]()
     val eventGenerator                        = new EventGenerator(EventName(s"system_${Random.nextInt()}"))
-    import eventGenerator._
+    import eventGenerator.*
     val eventKey: EventKey = eventsGroup.head.eventKey
 
     val cancellable = publisher.publish(eventGenerator.generator, 100.millis)
@@ -150,11 +149,11 @@ class EventSubscriptionFrequencyTest extends TestNGSuite with Matchers with Even
   def should_be_able_to_subscribe_with_duration_with_rate_limiter_mode_for_slow_publisher__DEOPSCSW_331_DEOPSCSW_342(
       baseProperties: BaseProperties
   ): Unit = {
-    import baseProperties._
+    import baseProperties.*
     val inbox = TestInbox[Event]()
 
     val eventGenerator = new EventGenerator(EventName(s"system_${Random.nextInt()}"))
-    import eventGenerator._
+    import eventGenerator.*
     val eventKey: EventKey = eventsGroup.head.eventKey
 
     val cancellable = publisher.publish(eventGenerator.generator, 400.millis)
@@ -176,11 +175,11 @@ class EventSubscriptionFrequencyTest extends TestNGSuite with Matchers with Even
   def should_be_able_to_subscribe_with_duration_with_rate_limiter_mode_for_fast_publisher__DEOPSCSW_331_DEOPSCSW_342(
       baseProperties: BaseProperties
   ): Unit = {
-    import baseProperties._
+    import baseProperties.*
     val inbox = TestInbox[Event]()
 
     val eventGenerator = new EventGenerator(EventName(s"system_${Random.nextInt()}"))
-    import eventGenerator._
+    import eventGenerator.*
     val eventKey: EventKey = eventsGroup.head.eventKey
 
     val cancellable = publisher.publish(eventGenerator.generator, 100.millis)

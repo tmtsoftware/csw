@@ -31,7 +31,7 @@ private class RedisSubscriptionImpl[K](
     async {
       await(connectedF)
       await(redisReactiveApi.flatMap(_.unsubscribe(keys))) // unsubscribe is no-op
-      await(redisReactiveApi.flatMap(_.close()))
+//      await(redisReactiveApi.flatMap(_.close()))
       killSwitch.shutdown()
       await(terminationSignal) // await on terminationSignal when unsubscribe is called by user
     }

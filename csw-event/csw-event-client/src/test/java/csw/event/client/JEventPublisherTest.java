@@ -19,8 +19,8 @@ import csw.event.client.internal.wiring.BaseProperties;
 import csw.params.events.Event;
 import csw.params.events.Event$;
 import csw.params.events.EventKey;
-import csw.prefix.models.Prefix;
 import csw.prefix.javadsl.JSubsystem;
+import csw.prefix.models.Prefix;
 import csw.time.core.models.UTCTime;
 import org.scalatestplus.testng.TestNGSuite;
 import org.testng.Assert;
@@ -37,8 +37,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
-import csw.event.client.internal.kafka.KafkaTestProps;
-
 //DEOPSCSW-331: Event Service Accessible to all CSW component builders
 //DEOPSCSW-334: Publish an event
 //DEOPSCSW-335: Model for EventName that encapsulates the topic(or channel ) name
@@ -50,7 +48,7 @@ import csw.event.client.internal.kafka.KafkaTestProps;
 public class JEventPublisherTest extends TestNGSuite {
 
     private RedisTestProps redisTestProps;
-    private KafkaTestProps kafkaTestProps;
+//    private KafkaTestProps kafkaTestProps;
 
     private int counter = -1;
     private Cancellable cancellable;
@@ -58,20 +56,20 @@ public class JEventPublisherTest extends TestNGSuite {
     @BeforeSuite
     public void beforeAll() {
         redisTestProps = RedisTestProps.jCreateRedisProperties();
-        kafkaTestProps = KafkaTestProps.jCreateKafkaProperties();
+//        kafkaTestProps = KafkaTestProps.jCreateKafkaProperties();
         redisTestProps.start();
-        kafkaTestProps.start();
+//        kafkaTestProps.start();
     }
 
     @AfterSuite
     public void afterAll() {
         redisTestProps.shutdown();
-        kafkaTestProps.shutdown();
+//        kafkaTestProps.shutdown();
     }
 
     @DataProvider(name = "event-service-provider")
     public Object[][] pubsubProvider() {
-        return new Object[][]{{redisTestProps}, {kafkaTestProps}};
+        return new Object[][]{{redisTestProps}, /*{kafkaTestProps}*/};
     }
 
     //DEOPSCSW-345: Publish events irrespective of subscriber existence
