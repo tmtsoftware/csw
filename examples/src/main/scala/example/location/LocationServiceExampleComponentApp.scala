@@ -27,7 +27,7 @@ import scala.concurrent.{Await, ExecutionContextExecutor, Future}
 /**
  * An example that shows how to register a component actor with the location service.
  */
-object LocationServiceExampleComponentApp extends App {
+object LocationServiceExampleComponentApp {
   implicit val system: typed.ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol(), "example-system")
   implicit val ec: ExecutionContextExecutor                     = system.executionContext
   private val locationService                                   = HttpLocationServiceFactory.makeLocalClient
@@ -37,7 +37,9 @@ object LocationServiceExampleComponentApp extends App {
   LoggingSystemFactory.start("LocationServiceExampleComponent", "0.1", host, system)
   // #create-logging-system
 
-  system.spawn(LocationServiceExampleComponent.behaviour(locationService), LocationServiceExampleComponent.connection.name)
+  def main(args: Array[String]): Unit = {
+    system.spawn(LocationServiceExampleComponent.behaviour(locationService), LocationServiceExampleComponent.connection.name)
+  }
 }
 
 object LocationServiceExampleComponent {

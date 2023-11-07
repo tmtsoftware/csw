@@ -20,8 +20,7 @@ import csw.logging.client.commons.PekkoTypedExtension.UserActorFactory
 import csw.prefix.models.Prefix
 import csw.prefix.models.Subsystem.NFIRAOS
 
-object AssemblyApp extends App {
-
+object AssemblyApp {
   private val locationWiring = ServerWiring.make(ClusterAwareSettings.onPort(3553).withInterface("eth1"), enableAuth = false)
   locationWiring.actorRuntime.startLogging("Assembly", locationWiring.clusterSettings.hostname)
   locationWiring.locationHttpService.start().await
@@ -41,4 +40,6 @@ object AssemblyApp extends App {
       registrationResult.unregister()
       Behaviors.same
     }
+
+  def main(args: Array[String]): Unit = {}
 }

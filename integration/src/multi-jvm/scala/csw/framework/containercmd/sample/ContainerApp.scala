@@ -18,22 +18,24 @@ import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
 
-object ContainerApp extends App {
-  private val wiring                                      = new FrameworkWiring()
-  implicit val system: ActorSystem[SpawnProtocol.Command] = wiring.actorSystem
-  implicit val testkit: TestKitSettings                   = TestKitSettings(system)
-  private val config: Config                              = ConfigFactory.load("laser_container.conf")
-  private val ref: ActorRef[ContainerMessage] =
-    Await.result(Container.spawn(config, wiring), 5.seconds)
+object ContainerApp {
+  def main(args: Array[String]): Unit = {
+    val wiring                                              = new FrameworkWiring()
+    implicit val system: ActorSystem[SpawnProtocol.Command] = wiring.actorSystem
+    implicit val testkit: TestKitSettings                   = TestKitSettings(system)
+    val config: Config                                      = ConfigFactory.load("laser_container.conf")
+    val ref: ActorRef[ContainerMessage] =
+      Await.result(Container.spawn(config, wiring), 5.seconds)
 
-  Thread.sleep(2000)
+    Thread.sleep(2000)
 
-  ref ! Restart
+    ref ! Restart
 
-  Thread.sleep(2000)
+    Thread.sleep(2000)
 
-  private val containerLifecycleStateProbe: TestProbe[ContainerLifecycleState] = TestProbe[ContainerLifecycleState]()
-  ref ! GetContainerLifecycleState(containerLifecycleStateProbe.ref)
+    val containerLifecycleStateProbe: TestProbe[ContainerLifecycleState] = TestProbe[ContainerLifecycleState]()
+    ref ! GetContainerLifecycleState(containerLifecycleStateProbe.ref)
 
-  containerLifecycleStateProbe.expectMessage(ContainerLifecycleState.Running)
+    containerLifecycleStateProbe.expectMessage(ContainerLifecycleState.Running)
+  }
 }

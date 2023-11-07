@@ -39,29 +39,30 @@ import scala.concurrent.{Await, Future}
 /**
  * An example location service client application.
  */
-object LocationServiceExampleClientApp extends App {
+object LocationServiceExampleClientApp {
+  def main(args: Array[String]): Unit = {
+    // http location service client expect that location server is running on local machine
+    // here we are starting location http server so that httpLocationClient uses can be illustrated
+    val wiring = new LocationServerWiring().wiring
+    Await.result(wiring.locationHttpService.start(), 5.seconds)
+    val untypedSystem = ActorSystem("untyped-system")
+    // #create-actor-system
+    val typedSystem: typed.ActorSystem[SpawnProtocol.Command] =
+      ActorSystemFactory.remote(SpawnProtocol(), "csw-examples-locationServiceClient")
+    // #create-actor-system
 
-  // http location service client expect that location server is running on local machine
-  // here we are starting location http server so that httpLocationClient uses can be illustrated
-  private val wiring = new LocationServerWiring().wiring
-  Await.result(wiring.locationHttpService.start(), 5.seconds)
-  val untypedSystem = ActorSystem("untyped-system")
-  // #create-actor-system
-  val typedSystem: typed.ActorSystem[SpawnProtocol.Command] =
-    ActorSystemFactory.remote(SpawnProtocol(), "csw-examples-locationServiceClient")
-  // #create-actor-system
+    // #create-location-service
+    val locationService = HttpLocationServiceFactory.makeLocalClient(typedSystem)
+    // #create-location-service
 
-  // #create-location-service
-  private val locationService = HttpLocationServiceFactory.makeLocalClient(typedSystem)
-  // #create-location-service
+    // #create-logging-system
+    val host = InetAddress.getLocalHost.getHostName
+    // Only call this once per application
+    val loggingSystem: LoggingSystem = LoggingSystemFactory.start("LocationServiceExampleClient", "0.1", host, typedSystem)
+    // #create-logging-system
 
-  // #create-logging-system
-  private val host = InetAddress.getLocalHost.getHostName
-  // Only call this once per application
-  val loggingSystem: LoggingSystem = LoggingSystemFactory.start("LocationServiceExampleClient", "0.1", host, typedSystem)
-  // #create-logging-system
-
-  untypedSystem.actorOf(LocationServiceExampleClient.props(locationService, loggingSystem)(typedSystem))
+    untypedSystem.actorOf(LocationServiceExampleClient.props(locationService, loggingSystem)(typedSystem))
+  }
 }
 
 sealed trait ExampleMessages
