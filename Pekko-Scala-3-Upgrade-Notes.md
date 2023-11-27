@@ -6,7 +6,7 @@
 
 * Replaced akka dependencies with pekko dependencies:
 - Used these sbt resolvers:
-```java
+```
     resolvers += "Apache Pekko Staging".at("https://repository.apache.org/content/groups/staging"),
     resolvers += "jitpack" at "https://jitpack.io",
 ```
