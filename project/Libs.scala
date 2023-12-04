@@ -11,10 +11,10 @@ object Libs {
   val `mockito` = "org.scalatestplus" %% "mockito-3-4" % "3.2.10.0"
 
   // Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
-  val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.4.12"
+  val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.4.14"
 
   val `sourcecode`        = "com.lihaoyi"                              %% "sourcecode"        % "0.3.0"
-  val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "6a111cd" // Apache 2.0
+  val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "ca8b866" // Apache 2.0
   val `pekko-management`  = "org.apache.pekko"                         %% "pekko-management"  % "1.0.0"
   val `svnkit`        = "org.tmatesoft.svnkit" % "svnkit"        % "1.10.11"    // TMate Open Source License
   val `commons-codec` = "commons-codec"        % "commons-codec" % "1.15"       // Apache 2.0š
@@ -47,7 +47,7 @@ object Libs {
   val `hikaricp`      = "com.zaxxer"                % "HikariCP"          % "5.1.0" // Apache License 2.0
   val `io.zonky.test` = "io.zonky.test"             % "embedded-postgres" % "2.0.5"
 //  val httpclient      = "org.apache.httpcomponents" % "httpclient"        % "4.5.14"
-  val httpclient5          = "org.apache.httpcomponents.client5" % "httpclient5"   % "5.2.2"
+  val httpclient5          = "org.apache.httpcomponents.client5" % "httpclient5"   % "5.3"
   val `jboss-logging`     = "org.jboss.logging"             % "jboss-logging" % "3.5.3.Final"
   val `config`            = "com.typesafe"                  % "config"        % "1.4.3"
   val `os-lib`            = "com.lihaoyi"                  %% "os-lib"        % "0.9.2"
@@ -76,7 +76,7 @@ object Jackson {
 }
 
 object Pekko {
-  val Version = "1.0.1" // all pekko is Apache License 2.0
+  val Version = "1.0.2" // all pekko is Apache License 2.0
   val Org     = "org.apache.pekko"
 
   val `pekko-stream`              = Org %% "pekko-stream"              % Version
@@ -109,7 +109,7 @@ object PekkoHttp {
 }
 
 object Keycloak {
-  val Version = "23.0.0"
+  val Version = "23.0.1"
 
   val `keycloak-adapter-core`    = "org.keycloak" % "keycloak-adapter-core"      % Version
   val `keycloak-core`            = "org.keycloak" % "keycloak-core"              % Version
@@ -127,7 +127,7 @@ object Jooq {
 }
 
 object MSocket {
-  val Version = "e205834"
+  val Version = "98e0993"
 
   val `msocket-api`      = dep("com.github.tmtsoftware.msocket" %%% "msocket-api" % Version)
   val `msocket-security` = "com.github.tmtsoftware.msocket" %% "msocket-security" % Version
