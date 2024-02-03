@@ -60,19 +60,36 @@ class RedisKeySpaceApi[K: RomaineCodec, V: RomaineCodec](
   ): Source[RedisResult[K, RedisValueChange[Option[V]]], RedisSubscription] = {
     val initialValuesF: Future[Map[K, Option[V]]] = redisAsyncApi.mget(keys).map(_.map(x => x.key -> x.value).toMap)
 
+    // XXX statefulMapConcat is Deprecated
+//    val sourceF = initialValuesF.map(initialValues => {
+//      watchKeyspaceValue(keys, overflowStrategy)
+//        .statefulMapConcat(() => {
+//          var digest = initialValues
+//          redisResult => {
+//            val change = RedisResult(
+//              redisResult.key,
+//              RedisValueChange(digest.get(redisResult.key).flatten, redisResult.value)
+//            )
+//            digest += redisResult.key -> redisResult.value
+//            List(change)
+//          }
+//        })
+//    })
+
     val sourceF = initialValuesF.map(initialValues => {
       watchKeyspaceValue(keys, overflowStrategy)
-        .statefulMapConcat(() => {
-          var digest = initialValues
-          redisResult => {
+        .statefulMap(() => initialValues)(
+          (digest, redisResult) => {
             val change = RedisResult(
               redisResult.key,
               RedisValueChange(digest.get(redisResult.key).flatten, redisResult.value)
             )
-            digest += redisResult.key -> redisResult.value
-            List(change)
-          }
-        })
+            val state = digest + (redisResult.key -> redisResult.value)
+            (state, List(change))
+          },
+          state => None
+        )
+        .mapConcat(identity)
     })
 
     Source
