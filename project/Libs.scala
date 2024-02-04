@@ -14,7 +14,7 @@ object Libs {
   val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.4.14"
 
   val `sourcecode`        = "com.lihaoyi"                              %% "sourcecode"        % "0.3.1"
-  val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "8b6676c" // Apache 2.0
+  val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "283ab9a" // Apache 2.0
   val `pekko-management`  = "org.apache.pekko"                         %% "pekko-management"  % "1.0.0"
   val `svnkit`        = "org.tmatesoft.svnkit" % "svnkit"        % "1.10.11"    // TMate Open Source License
   val `commons-codec` = "commons-codec"        % "commons-codec" % "1.15"       // Apache 2.0š
@@ -108,7 +108,7 @@ object PekkoHttp {
 }
 
 object Keycloak {
-  val Version = "23.0.5"
+  val Version = "23.0.6"
 
   val `keycloak-adapter-core`    = "org.keycloak" % "keycloak-adapter-core"      % Version
   val `keycloak-core`            = "org.keycloak" % "keycloak-core"              % Version
