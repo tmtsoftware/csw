@@ -85,6 +85,9 @@ class ConfigCliAuthTest(ignore: Int)
               ApplicationUser(
                 adminUser,
                 adminPassword,
+                firstName = adminUser,
+                lastName = adminUser,
+                email = s"$adminUser@tmt.org",
                 realmRoles = Set(configAdmin)
               )
             ),

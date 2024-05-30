@@ -99,9 +99,17 @@ class AuthIntegrationTest
           realms = Set(
             Realm(
               "TMT",
-              clients = Set(
-                Client("tmt-frontend-app", "public", passwordGrantEnabled = true, authorizationEnabled = false)),
-              users = Set(ApplicationUser("john", "secret", realmRoles = Set("admin"))),
+              clients = Set(Client("tmt-frontend-app", "public", passwordGrantEnabled = true, authorizationEnabled = false)),
+              users = Set(
+                ApplicationUser(
+                  "john",
+                  "secret",
+                  firstName = "john",
+                  lastName = "secret",
+                  email = "john@tmt.org",
+                  realmRoles = Set("admin")
+                )
+              ),
               realmRoles = Set("admin")
             )
           )
@@ -173,7 +181,15 @@ class AuthIntegrationTest
               clients = Set(
                 Client("tmt-frontend-app", "public", passwordGrantEnabled = true, authorizationEnabled = false)
               ),
-              users = Set(ApplicationUser("john", "secret")),
+              users = Set(
+                ApplicationUser(
+                  "john",
+                  "secret",
+                  firstName = "john",
+                  lastName = "secret",
+                  email = "john@tmt.org"
+                )
+              ),
               realmRoles = Set("admin")
             )
           )
