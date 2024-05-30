@@ -27,7 +27,7 @@ import org.scalatest.matchers.should.Matchers
 
 case class CommandMsg(
     command: Command,
-    ackTo: ActorRef[java.util.Set[Parameter[_]]],
+    ackTo: ActorRef[java.util.Set[Parameter[?]]],
     replyTo: ActorRef[SystemEvent],
     obsIdAck: ActorRef[Optional[ObsId]]
 )
@@ -43,7 +43,7 @@ class InterOperabilityTest extends AnyFunSuite with Matchers with BeforeAndAfter
   private val intParam     = intKey.set(22, 33)
   private val stringParam  = stringKey.set("First", "Second")
 
-  private implicit val system: ActorSystem[_] = ActorSystem(Behaviors.empty, "test")
+  private implicit val system: ActorSystem[?] = ActorSystem(Behaviors.empty, "test")
   implicit val testKit: TestKitSettings       = TestKitSettings(system)
 
   private val scalaSetup = Setup(Prefix(prefixStr), CommandName(prefixStr), Some(obsId)).add(intParam).add(stringParam)
@@ -60,13 +60,13 @@ class InterOperabilityTest extends AnyFunSuite with Matchers with BeforeAndAfter
   // 2. onMessage, Java actor extracts paramSet from Setup command and replies back to scala actor
   // 3. also, java actor creates StatusEvent and forward it to scala actor
   test("should able to send commands/events from scala code to java and vice a versa | DEOPSCSW-184") {
-    val ackProbe     = TestProbe[java.util.Set[Parameter[_]]]()
+    val ackProbe     = TestProbe[java.util.Set[Parameter[?]]]()
     val replyToProbe = TestProbe[SystemEvent]()
     val obsIdProbe   = TestProbe[Optional[ObsId]]()
 
     jCommandHandlerActor ! CommandMsg(scalaSetup, ackProbe.ref, replyToProbe.ref, obsIdProbe.ref)
 
-    val set = ackProbe.expectMessageType[java.util.Set[Parameter[_]]]
+    val set = ackProbe.expectMessageType[java.util.Set[Parameter[?]]]
     set.asScala.toSet shouldBe Set(intParam, stringParam)
 
     val eventFromJava = replyToProbe.expectMessageType[SystemEvent]

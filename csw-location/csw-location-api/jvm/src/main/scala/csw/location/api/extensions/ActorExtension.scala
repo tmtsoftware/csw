@@ -12,7 +12,7 @@ import org.apache.pekko.actor.typed.scaladsl.adapter.TypedActorRefOps
 import org.apache.pekko.serialization.Serialization
 
 object ActorExtension {
-  implicit class RichActor(actorRef: ActorRef[_]) {
+  implicit class RichActor(actorRef: ActorRef[?]) {
     def toURI: URI = new URI(Serialization.serializedActorPath(actorRef.toClassic))
   }
 }

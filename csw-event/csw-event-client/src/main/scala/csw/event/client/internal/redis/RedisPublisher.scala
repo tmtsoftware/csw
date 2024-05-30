@@ -32,7 +32,7 @@ import scala.util.control.NonFatal
  * @param actorSystem provides Materializer, executionContext, etc
  */
 private[event] class RedisPublisher(redisURI: Future[RedisURI], redisClient: RedisClient)(implicit
-    actorSystem: ActorSystem[_]
+    actorSystem: ActorSystem[?]
 ) extends EventPublisher {
 
   import actorSystem.executionContext

@@ -27,7 +27,7 @@ class RegistrationFactory {
    */
   def pekkoTyped(
       pekkoConnection: PekkoConnection,
-      actorRef: ActorRef[_],
+      actorRef: ActorRef[?],
       metadata: Metadata = Metadata.empty
   ): PekkoRegistration =
     PekkoRegistrationFactory.make(pekkoConnection, actorRef, metadata)

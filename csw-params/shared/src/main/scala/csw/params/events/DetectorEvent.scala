@@ -160,7 +160,7 @@ private[events] class DetectorEvent(detectorExpStateName: EventName) {
       errorMessage: String,
       operationalState: OperationalState
   ): ObserveEvent = {
-    val params: Set[Parameter[_]] = Set(
+    val params: Set[Parameter[?]] = Set(
       ParamFactories.exposureIdParam(exposureId),
       ParamFactories.operationalStateParam(operationalState),
       ParamFactories.errorMessageParam(errorMessage),

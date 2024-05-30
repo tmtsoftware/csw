@@ -11,7 +11,7 @@ import csw.event.cli.args.Options
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
-class CliApp(commandLineRunner: CommandLineRunner)(implicit val system: ActorSystem[_]) {
+class CliApp(commandLineRunner: CommandLineRunner)(implicit val system: ActorSystem[?]) {
 
   def start(options: Options): Any = {
     options.cmd match {

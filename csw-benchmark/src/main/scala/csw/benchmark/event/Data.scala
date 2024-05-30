@@ -24,7 +24,7 @@ object Data {
   private val arrayDataKey  = KeyType.IntArrayKey.make("intarrays")
   private val matrixDataKey = KeyType.IntMatrixKey.make("intmatrices")
 
-  private val paramSet: Set[Parameter[_]] = Set(
+  private val paramSet: Set[Parameter[?]] = Set(
     byteKey.set(100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100),
     intKey.set(100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100),
     doubleKey.set(100.342, 100.342, 100.342, 100.342, 100.342, 100.342, 100.342, 100.342, 100.342, 100.342, 100.342, 100.342,

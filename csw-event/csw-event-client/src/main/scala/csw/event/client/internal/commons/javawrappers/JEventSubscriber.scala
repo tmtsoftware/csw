@@ -46,12 +46,12 @@ class JEventSubscriber(eventSubscriber: EventSubscriber) extends IEventSubscribe
       .mapMaterializedValue(_.asJava)
       .asJava
 
-  def subscribeAsync(eventKeys: util.Set[EventKey], callback: Event => CompletableFuture[_]): IEventSubscription =
+  def subscribeAsync(eventKeys: util.Set[EventKey], callback: Event => CompletableFuture[?]): IEventSubscription =
     eventSubscriber.subscribeAsync(eventKeys.asScala.toSet, e => callback(e).asScala).asJava
 
   def subscribeAsync(
       eventKeys: util.Set[EventKey],
-      callback: Event => CompletableFuture[_],
+      callback: Event => CompletableFuture[?],
       every: Duration,
       mode: SubscriptionMode
   ): IEventSubscription =

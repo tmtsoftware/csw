@@ -25,7 +25,7 @@ object StdOutAppender extends LogAppenderBuilder {
    * @param stdHeaders the headers that are fixes for this service
    * @return the stdout appender
    */
-  def apply(system: ActorSystem[_], stdHeaders: JsObject): StdOutAppender =
+  def apply(system: ActorSystem[?], stdHeaders: JsObject): StdOutAppender =
     new StdOutAppender(system, stdHeaders, println)
 }
 
@@ -36,18 +36,18 @@ object StdOutAppender extends LogAppenderBuilder {
  * @param system typed Actor System
  * @param stdHeaders the headers that are fixes for this service
  */
-class StdOutAppender(system: ActorSystem[_], stdHeaders: JsObject, logPrinter: Any => Unit) extends LogAppender {
-  private[this] val config        = system.settings.config.getConfig("csw-logging.appender-config.stdout")
-  private[this] val fullHeaders   = config.getBoolean("fullHeaders")
-  private[this] val summary       = config.getBoolean("summary")
-  private[this] val pretty        = config.getBoolean("pretty")
-  private[this] val logLevelLimit = Level(config.getString("logLevelLimit"))
-  private[csw] val color          = config.getBoolean("color")
-  private[csw] val oneLine        = config.getBoolean("oneLine")
+class StdOutAppender(system: ActorSystem[?], stdHeaders: JsObject, logPrinter: Any => Unit) extends LogAppender {
+  private val config        = system.settings.config.getConfig("csw-logging.appender-config.stdout")
+  private val fullHeaders   = config.getBoolean("fullHeaders")
+  private val summary       = config.getBoolean("summary")
+  private val pretty        = config.getBoolean("pretty")
+  private val logLevelLimit = Level(config.getString("logLevelLimit"))
+  private[csw] val color    = config.getBoolean("color")
+  private[csw] val oneLine  = config.getBoolean("oneLine")
 
-  private[this] var categories = Map.empty[String, Int]
-  private[this] var levels     = Map.empty[String, Int]
-  private[this] var kinds      = Map.empty[String, Int]
+  private var categories = Map.empty[String, Int]
+  private var levels     = Map.empty[String, Int]
+  private var kinds      = Map.empty[String, Int]
 
   /**
    * Writes a log message to stdout

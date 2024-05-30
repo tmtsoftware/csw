@@ -24,7 +24,7 @@ import scala.concurrent.Future
  */
 // $COVERAGE-OFF$
 private[event] class KafkaEventService(eventServiceResolver: EventServiceResolver)(implicit
-    actorSystem: ActorSystem[_]
+    actorSystem: ActorSystem[?]
 ) extends EventService {
 
   import actorSystem.executionContext

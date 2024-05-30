@@ -31,6 +31,6 @@ private[logging] class PekkoLogger extends Actor {
     case event @ Debug(logSource, logClass, message)   => log(DEBUG, logSource, logClass, message, event.timestamp)
   }
 
-  private def log(level: Level, source: String, clazz: Class[_], msg: Any, time: Long, cause: Option[Throwable] = None): Unit =
+  private def log(level: Level, source: String, clazz: Class[?], msg: Any, time: Long, cause: Option[Throwable] = None): Unit =
     MessageHandler.sendPekkoMsg(LogPekko(time, level, source, clazz, msg, cause))
 }

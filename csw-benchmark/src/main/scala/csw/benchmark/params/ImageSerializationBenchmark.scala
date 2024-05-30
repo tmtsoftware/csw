@@ -37,16 +37,16 @@ import scala.concurrent.duration.DurationDouble
 // DEOPSCSW-187: Efficient serialization to/from binary
 @State(Scope.Benchmark)
 class ImageSerializationBenchmark {
-  private var img_32k_Path: Path                 = _
-  private var img_32k_Bytes: Array[Byte]         = _
-  private var img_128k_Path: Path                = _
-  private var img_128k_Bytes: Array[Byte]        = _
-  private var img_512k_Path: Path                = _
-  private var img_512k_Bytes: Array[Byte]        = _
-  private final var system: ActorSystem[_]       = _
-  private final var serialization: Serialization = _
-  private final var prefixStr: String            = _
-  private final var obsId: ObsId                 = _
+  private var img_32k_Path: Path                 = scala.compiletime.uninitialized
+  private var img_32k_Bytes: Array[Byte]         = scala.compiletime.uninitialized
+  private var img_128k_Path: Path                = scala.compiletime.uninitialized
+  private var img_128k_Bytes: Array[Byte]        = scala.compiletime.uninitialized
+  private var img_512k_Path: Path                = scala.compiletime.uninitialized
+  private var img_512k_Bytes: Array[Byte]        = scala.compiletime.uninitialized
+  private final var system: ActorSystem[?]       = scala.compiletime.uninitialized
+  private final var serialization: Serialization = scala.compiletime.uninitialized
+  private final var prefixStr: String            = scala.compiletime.uninitialized
+  private final var obsId: ObsId                 = scala.compiletime.uninitialized
 
   @Setup(Level.Trial)
   def setup() = {
@@ -79,7 +79,7 @@ class ImageSerializationBenchmark {
     val imageKey: Key[ArrayData[Byte]] = ByteArrayKey.make("imageKey")
 
     val binaryImgData: ArrayData[Byte]    = ArrayData.fromArray(img_32k_Bytes)
-    val param: Parameter[ArrayData[Byte]] = imageKey -> binaryImgData withUnits pascal
+    val param: Parameter[ArrayData[Byte]] = imageKey -> binaryImgData `withUnits` pascal
 
     val observe           = Observe(Prefix("csw.originationPrefix"), CommandName(prefixStr), Some(obsId)).add(param)
     val observeSerializer = serialization.findSerializerFor(observe)
@@ -94,7 +94,7 @@ class ImageSerializationBenchmark {
     val imageKey: Key[ArrayData[Byte]] = ByteArrayKey.make("imageKey")
 
     val binaryImgData: ArrayData[Byte]    = ArrayData.fromArray(img_128k_Bytes)
-    val param: Parameter[ArrayData[Byte]] = imageKey -> binaryImgData withUnits pascal
+    val param: Parameter[ArrayData[Byte]] = imageKey -> binaryImgData `withUnits` pascal
 
     val observe           = Observe(Prefix("csw.originationPrefix"), CommandName(prefixStr), Some(obsId)).add(param)
     val observeSerializer = serialization.findSerializerFor(observe)
@@ -109,7 +109,7 @@ class ImageSerializationBenchmark {
     val imageKey: Key[ArrayData[Byte]] = ByteArrayKey.make("imageKey")
 
     val binaryImgData: ArrayData[Byte]    = ArrayData.fromArray(img_512k_Bytes)
-    val param: Parameter[ArrayData[Byte]] = imageKey -> binaryImgData withUnits pascal
+    val param: Parameter[ArrayData[Byte]] = imageKey -> binaryImgData `withUnits` pascal
 
     val observe           = Observe(Prefix("csw.originationPrefix"), CommandName(prefixStr), Some(obsId)).add(param)
     val observeSerializer = serialization.findSerializerFor(observe)

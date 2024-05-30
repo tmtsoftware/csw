@@ -17,7 +17,7 @@ import scala.reflect.ClassTag
 object PekkoLocationExt {
   implicit class RichPekkoLocation(val pekkoLocation: PekkoLocation) {
 
-    private def typedRef[T: ClassTag](implicit actorSystem: ActorSystem[_]): ActorRef[T] = {
+    private def typedRef[T: ClassTag](implicit actorSystem: ActorSystem[?]): ActorRef[T] = {
       val typeManifest    = scala.reflect.classTag[T].runtimeClass.getSimpleName
       val messageManifest = pekkoLocation.connection.componentId.componentType.messageManifest
 
@@ -34,21 +34,21 @@ object PekkoLocationExt {
      *
      * @return a typed ActorRef that understands only ComponentMessage
      */
-    def componentRef(implicit actorSystem: ActorSystem[_]): ActorRef[ComponentMessage] = typedRef[ComponentMessage]
+    def componentRef(implicit actorSystem: ActorSystem[?]): ActorRef[ComponentMessage] = typedRef[ComponentMessage]
 
     /**
      * If the component type is Container, use this to get the correct ActorRef
      *
      * @return a typed ActorRef that understands only ContainerMessage
      */
-    def containerRef(implicit actorSystem: ActorSystem[_]): ActorRef[ContainerMessage] = typedRef[ContainerMessage]
+    def containerRef(implicit actorSystem: ActorSystem[?]): ActorRef[ContainerMessage] = typedRef[ContainerMessage]
 
     /**
      * If the component type is Sequencer, use this to get the correct ActorRef
      *
      * @return a typed ActorRef that understands only SequencerMsg
      */
-    def sequencerRef(implicit actorSystem: ActorSystem[_]): ActorRef[SequencerMsg] = typedRef[SequencerMsg]
+    def sequencerRef(implicit actorSystem: ActorSystem[?]): ActorRef[SequencerMsg] = typedRef[SequencerMsg]
 
   }
 }

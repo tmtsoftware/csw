@@ -22,7 +22,7 @@ import org.scalatest.matchers.should.Matchers
 
 class LoggingSystemTest extends AnyFunSuite with Matchers with BeforeAndAfterAll {
   // This will load default configuration in application.conf file if provided
-  private var loggingSystem: LoggingSystem = _
+  private var loggingSystem: LoggingSystem = scala.compiletime.uninitialized
   private val config                       = ConfigFactory.load().getConfig("csw-logging")
 
   override protected def beforeAll(): Unit = loggingSystem = LoggingSystemFactory.start()

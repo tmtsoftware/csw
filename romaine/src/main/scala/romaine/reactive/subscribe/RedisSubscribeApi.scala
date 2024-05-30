@@ -16,12 +16,12 @@ import scala.concurrent.{blocking, ExecutionContext, Future}
 
 class RedisSubscribeApi[K, V](redisReactiveCommands: RedisPubSubReactiveCommands[K, V])(implicit ec: ExecutionContext)
     extends RedisReactiveApi[K, V] {
-  def subscribe(keys: List[K]): Future[Done] = redisReactiveCommands.subscribe(keys: _*).toFuture.asScala.map(_ => Done)
+  def subscribe(keys: List[K]): Future[Done] = redisReactiveCommands.subscribe(keys*).toFuture.asScala.map(_ => Done)
   def observe(overflowStrategy: OverflowStrategy): Source[RedisResult[K, V], NotUsed] =
     Source
       .fromPublisher(redisReactiveCommands.observeChannels(overflowStrategy))
       .map(x => RedisResult(x.getChannel, x.getMessage))
-  def unsubscribe(keys: List[K]): Future[Done] = redisReactiveCommands.unsubscribe(keys: _*).toFuture.asScala.map(_ => Done)
+  def unsubscribe(keys: List[K]): Future[Done] = redisReactiveCommands.unsubscribe(keys*).toFuture.asScala.map(_ => Done)
 //  def close(): Future[Unit] =
 //    Future {
 //      blocking {

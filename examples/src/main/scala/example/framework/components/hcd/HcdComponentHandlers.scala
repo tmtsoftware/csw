@@ -41,8 +41,8 @@ class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
   implicit val ec: ExecutionContext = ctx.executionContext
   implicit val timeout: Timeout     = 5.seconds
   implicit val scheduler: Scheduler = ctx.system.scheduler
-  var current: Int                  = _
-  var stats: Int                    = _
+  var current: Int                  = scala.compiletime.uninitialized
+  var stats: Int                    = scala.compiletime.uninitialized
 
   // #initialize-handler
   override def initialize(): Unit = {

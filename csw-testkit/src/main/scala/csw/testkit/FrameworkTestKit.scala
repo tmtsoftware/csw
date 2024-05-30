@@ -71,7 +71,7 @@ final class FrameworkTestKit private (
 
   lazy val timeout: Timeout = locationTestKit.timeout
 
-  private var locationTestkitWithAuth: LocationTestKit = _
+  private var locationTestkitWithAuth: LocationTestKit = scala.compiletime.uninitialized
 
   private var configStarted           = false
   private var eventStarted            = false

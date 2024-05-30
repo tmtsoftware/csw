@@ -26,7 +26,7 @@ class EventOnelineTransformer(options: Options) {
     else List(onelines)
   }
 
-  private def traverse(params: Set[Parameter[_]], paths: List[String]): List[Oneline] =
+  private def traverse(params: Set[Parameter[?]], paths: List[String]): List[Oneline] =
     params.toList.flatMap { param =>
       val currentPath = param.keyName
 

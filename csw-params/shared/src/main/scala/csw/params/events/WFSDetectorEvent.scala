@@ -57,7 +57,7 @@ object WFSDetectorEvent {
       operationalState: OperationalState,
       errorMessage: String
   ): ObserveEvent = {
-    val params: Set[Parameter[_]] = Set(
+    val params: Set[Parameter[?]] = Set(
       ParamFactories.exposureIdParam(exposureId),
       ParamFactories.operationalStateParam(operationalState),
       ParamFactories.errorMessageParam(errorMessage),

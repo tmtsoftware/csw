@@ -43,7 +43,7 @@ class AlarmServiceFactory(redisClient: RedisClient = RedisClient.create()) {
    * @param system an actor system required for underlying actors
    * @return an instance of [[csw.alarm.api.scaladsl.AlarmAdminService]]
    */
-  def makeAdminApi(locationService: LocationService)(implicit system: ActorSystem[_]): AlarmAdminService = {
+  def makeAdminApi(locationService: LocationService)(implicit system: ActorSystem[?]): AlarmAdminService = {
     implicit val ec: ExecutionContext = system.executionContext
     alarmService(new AlarmServiceLocationResolver(locationService))
   }
@@ -56,7 +56,7 @@ class AlarmServiceFactory(redisClient: RedisClient = RedisClient.create()) {
    * @param system an actor system required for underlying actors
    * @return an instance of [[csw.alarm.api.scaladsl.AlarmAdminService]]
    */
-  def makeAdminApi(host: String, port: Int)(implicit system: ActorSystem[_]): AlarmAdminService = {
+  def makeAdminApi(host: String, port: Int)(implicit system: ActorSystem[?]): AlarmAdminService = {
     implicit val ec: ExecutionContext = system.executionContext
     alarmService(new AlarmServiceHostPortResolver(host, port))
   }
@@ -68,7 +68,7 @@ class AlarmServiceFactory(redisClient: RedisClient = RedisClient.create()) {
    * @param system an actor system required for underlying actors
    * @return an instance of [[csw.alarm.api.scaladsl.AlarmService]]
    */
-  def makeClientApi(locationService: LocationService)(implicit system: ActorSystem[_]): AlarmService =
+  def makeClientApi(locationService: LocationService)(implicit system: ActorSystem[?]): AlarmService =
     makeAdminApi(locationService)
 
   /**
@@ -79,7 +79,7 @@ class AlarmServiceFactory(redisClient: RedisClient = RedisClient.create()) {
    * @param system an actor system required for underlying actors
    * @return an instance of [[csw.alarm.api.scaladsl.AlarmService]]
    */
-  def makeClientApi(host: String, port: Int)(implicit system: ActorSystem[_]): AlarmService = makeAdminApi(host, port)
+  def makeClientApi(host: String, port: Int)(implicit system: ActorSystem[?]): AlarmService = makeAdminApi(host, port)
 
   /**
    * Creates [[csw.alarm.api.javadsl.IAlarmService]] instance for non admin users using [[csw.location.api.javadsl.ILocationService]]
@@ -88,7 +88,7 @@ class AlarmServiceFactory(redisClient: RedisClient = RedisClient.create()) {
    * @param system an actor system required for underlying actors
    * @return an instance of [[csw.alarm.api.javadsl.IAlarmService]]
    */
-  def jMakeClientApi(locationService: ILocationService, system: ActorSystem[_]): IAlarmService =
+  def jMakeClientApi(locationService: ILocationService, system: ActorSystem[?]): IAlarmService =
     new JAlarmServiceImpl(makeAdminApi(locationService.asScala)(system))
 
   /**
@@ -99,20 +99,20 @@ class AlarmServiceFactory(redisClient: RedisClient = RedisClient.create()) {
    * @param system an actor system required for underlying actors
    * @return an instance of [[csw.alarm.api.javadsl.IAlarmService]]
    */
-  def jMakeClientApi(host: String, port: Int, system: ActorSystem[_]): IAlarmService =
+  def jMakeClientApi(host: String, port: Int, system: ActorSystem[?]): IAlarmService =
     new JAlarmServiceImpl(makeAdminApi(host, port)(system))
 
   /**
    * ********** INTERNAL ***********
    */
-  private def alarmService(alarmServiceResolver: AlarmServiceResolver)(implicit system: ActorSystem[_], ec: ExecutionContext) = {
+  private def alarmService(alarmServiceResolver: AlarmServiceResolver)(implicit system: ActorSystem[?], ec: ExecutionContext) = {
     val settings = new Settings(ConfigFactory.load())
     val redisConnectionsFactory =
       new RedisConnectionsFactory(alarmServiceResolver, settings.masterId, new RomaineFactory(redisClient))
     new AlarmServiceImpl(redisConnectionsFactory, settings)
   }
 
-  private[alarm] def makeAlarmImpl(locationService: LocationService)(implicit system: ActorSystem[_]) = {
+  private[alarm] def makeAlarmImpl(locationService: LocationService)(implicit system: ActorSystem[?]) = {
     implicit val ec: ExecutionContext = system.executionContext
     alarmService(new AlarmServiceLocationResolver(locationService))
   }

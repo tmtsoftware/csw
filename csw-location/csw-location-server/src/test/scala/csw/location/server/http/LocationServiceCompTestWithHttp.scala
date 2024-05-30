@@ -17,7 +17,7 @@ import scala.concurrent.duration.DurationInt
 
 // DEOPSCSW-429: [SPIKE] Provide HTTP server and client for location service
 class LocationServiceCompTestWithHttp extends LocationServiceCompTest("http") {
-  private var wiring: ServerWiring = _
+  private var wiring: ServerWiring = scala.compiletime.uninitialized
 
   override protected def beforeAll(): Unit = {
     wiring = new ServerWiring(false)

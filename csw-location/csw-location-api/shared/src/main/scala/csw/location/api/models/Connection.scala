@@ -16,7 +16,7 @@ import csw.prefix.models.Prefix
  * @param connectionType represents a type of connection offered by the Component
  */
 sealed abstract class Connection(val connectionType: ConnectionType) extends LocationSerializable {
-  self: TypedConnection[_] =>
+  self: TypedConnection[?] =>
 
   /**
    * The component that is providing this connection

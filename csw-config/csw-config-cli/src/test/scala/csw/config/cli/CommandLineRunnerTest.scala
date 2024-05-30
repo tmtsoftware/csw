@@ -30,7 +30,7 @@ import org.scalatest.matchers.should.Matchers
 // DEOPSCSW-576: Auth token for Configuration service
 class CommandLineRunnerTest extends HTTPLocationService with Matchers with BeforeAndAfterEach with MockedAuthentication {
 
-  private val clientSystem: typed.ActorSystem[_]         = typed.ActorSystem(Behaviors.empty, "config-cli")
+  private val clientSystem: typed.ActorSystem[?]         = typed.ActorSystem(Behaviors.empty, "config-cli")
   private val locationService                            = HttpLocationServiceFactory.makeLocalClient(clientSystem)
   private val nativeAuthAdapter: InstalledAppAuthAdapter = mock[InstalledAppAuthAdapter]
   private val clientWiring                               = Wiring.noPrinting(locationService, factory, nativeAuthAdapter)

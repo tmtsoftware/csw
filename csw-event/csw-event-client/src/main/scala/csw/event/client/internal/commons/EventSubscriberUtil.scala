@@ -21,7 +21,7 @@ import scala.concurrent.duration.FiniteDuration
 /**
  * Utility class to provided common functionalities to different implementations of EventSubscriber
  */
-class EventSubscriberUtil(implicit actorSystem: ActorSystem[_]) {
+class EventSubscriberUtil(implicit actorSystem: ActorSystem[?]) {
 
   def subscriptionModeStage(
       every: FiniteDuration,
@@ -32,7 +32,7 @@ class EventSubscriberUtil(implicit actorSystem: ActorSystem[_]) {
       case RateLimiterMode => new RateLimiterStage[Event](every)
     }
 
-  def subscribeAsync(eventSource: Source[Event, EventSubscription], callback: Event => Future[_]): EventSubscription =
+  def subscribeAsync(eventSource: Source[Event, EventSubscription], callback: Event => Future[?]): EventSubscription =
     eventSource.mapAsync(1)(x => callback(x)).withAttributes(attributes).to(Sink.ignore).run()
 
   def subscribeCallback(eventSource: Source[Event, EventSubscription], callback: Event => Unit): EventSubscription =

@@ -33,10 +33,10 @@ trait SeedData extends HTTPLocationService with Matchers with BeforeAndAfterEach
 
   val argsParser                        = new ArgsParser("csw-event-cli")
   val logBuffer: mutable.Buffer[String] = mutable.Buffer.empty[String]
-  var redisSentinel: RedisSentinel      = _
-  var redisServer: RedisServer          = _
-  var event1: SystemEvent               = _
-  var event2: ObserveEvent              = _
+  var redisSentinel: RedisSentinel      = scala.compiletime.uninitialized
+  var redisServer: RedisServer          = scala.compiletime.uninitialized
+  var event1: SystemEvent               = scala.compiletime.uninitialized
+  var event2: ObserveEvent              = scala.compiletime.uninitialized
 
   private def printLine(msg: Any): Unit = logBuffer += msg.toString
 

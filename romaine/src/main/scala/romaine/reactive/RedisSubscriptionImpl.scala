@@ -16,7 +16,7 @@ private class RedisSubscriptionImpl[K](
     connectedF: Future[Done],
     killSwitch: KillSwitch,
     terminationSignal: Future[Done],
-    redisReactiveApi: Future[RedisReactiveApi[K, _]]
+    redisReactiveApi: Future[RedisReactiveApi[K, ?]]
 )(implicit executionContext: ExecutionContext)
     extends RedisSubscription {
 

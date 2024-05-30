@@ -21,7 +21,7 @@ class SchedulerExamples(ctx: ActorContext[UTCTime]) {
 
   // #create-scheduler
   // create time service scheduler using the factory method
-  implicit val actorSystem: typed.ActorSystem[_]         = ctx.system
+  implicit val actorSystem: typed.ActorSystem[?]         = ctx.system
   implicit val scheduler: Scheduler                      = actorSystem.scheduler
   implicit val executionContext: ExecutionContext        = actorSystem.executionContext
   private val timeServiceScheduler: TimeServiceScheduler = new TimeServiceSchedulerFactory().make()

@@ -12,7 +12,7 @@ import org.apache.pekko.actor.typed.{ActorRef, ActorSystem}
 import scala.language.reflectiveCalls
 import scala.reflect.Selectable.reflectiveSelectable
 
-abstract class AskProxyTestKit[Msg, Impl](implicit actorSystem: ActorSystem[_]) {
+abstract class AskProxyTestKit[Msg, Impl](implicit actorSystem: ActorSystem[?]) {
   protected def make(actorRef: ActorRef[Msg]): Impl
 
   def withBehavior(pf: PartialFunction[Msg, Unit]): Assertable = {

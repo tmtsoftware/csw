@@ -28,7 +28,7 @@ class LocationServiceImplTest extends AnyFunSuite with Matchers with MockitoSuga
   test("should select public hostname when network type is public | CSW-97") {
     val registration = HttpRegistration(connection = httpConnection, port = port, path = "", NetworkType.Outside)
 
-    when(mockCswCluster.publicHostname) thenReturn ("some-public-ip")
+    when(mockCswCluster.publicHostname) `thenReturn` ("some-public-ip")
 
     val locationService = new LocationServiceImpl(mockCswCluster)
     locationService.getLocation(registration).uri.getHost shouldBe "some-public-ip"
@@ -37,7 +37,7 @@ class LocationServiceImplTest extends AnyFunSuite with Matchers with MockitoSuga
   test("should select private hostname when no network type provided | CSW-97") {
     val registration = HttpRegistration(connection = httpConnection, port = port, path = "")
 
-    when(mockCswCluster.hostname) thenReturn ("some-private-ip")
+    when(mockCswCluster.hostname) `thenReturn` ("some-private-ip")
 
     val locationService = new LocationServiceImpl(mockCswCluster)
     locationService.getLocation(registration).uri.getHost shouldBe "some-private-ip"
@@ -50,8 +50,8 @@ class LocationServiceImplTest extends AnyFunSuite with Matchers with MockitoSuga
     val pekkoRegistration: PekkoRegistration =
       PekkoRegistrationFactory.make(pekkoConnection, actorRef)
 
-    when(mockCswCluster.hostname) thenReturn ("some-private-ip")
-    when(mockCswCluster.publicHostname) thenReturn ("some-public-ip")
+    when(mockCswCluster.hostname) `thenReturn` ("some-private-ip")
+    when(mockCswCluster.publicHostname) `thenReturn` ("some-public-ip")
 
     val locationService = new LocationServiceImpl(mockCswCluster)
     locationService.getLocation(pekkoRegistration).uri shouldBe actorRef.toURI

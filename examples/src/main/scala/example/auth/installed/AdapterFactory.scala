@@ -18,7 +18,7 @@ import scala.concurrent.ExecutionContextExecutor
 
 // #adapter-factory
 object AdapterFactory {
-  def makeAdapter(implicit actorSystem: typed.ActorSystem[_]): InstalledAppAuthAdapter = {
+  def makeAdapter(implicit actorSystem: typed.ActorSystem[?]): InstalledAppAuthAdapter = {
     implicit val ec: ExecutionContextExecutor = actorSystem.executionContext
     val locationService: LocationService      = HttpLocationServiceFactory.makeLocalClient(actorSystem)
     val authStore                             = new FileAuthStore(Paths.get("/tmp/demo-cli/auth"))

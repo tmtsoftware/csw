@@ -15,7 +15,7 @@ import scala.concurrent.duration.DurationLong
 import scala.concurrent.{Await, ExecutionContext, ExecutionContextExecutor, Future}
 
 // #read-command
-class ReadCommand(implicit val actorSystem: typed.ActorSystem[_]) extends AppCommand {
+class ReadCommand(implicit val actorSystem: typed.ActorSystem[?]) extends AppCommand {
   implicit val ec: ExecutionContextExecutor = actorSystem.executionContext
   override def run(): Unit = {
     val url = "http://localhost:7000/data"
@@ -29,7 +29,7 @@ class ReadCommand(implicit val actorSystem: typed.ActorSystem[_]) extends AppCom
 // #read-command
 
 object ReadCommand {
-  def convertToString(entity: ResponseEntity)(implicit actorSystem: typed.ActorSystem[_]): Future[String] = {
+  def convertToString(entity: ResponseEntity)(implicit actorSystem: typed.ActorSystem[?]): Future[String] = {
     implicit val ec: ExecutionContext = actorSystem.executionContext
     Unmarshaller.stringUnmarshaller(entity)
   }

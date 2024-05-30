@@ -51,18 +51,18 @@ import scala.concurrent.{ExecutionContext, Future}
 class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
   val supervisorLifecycleStateProbe: TestProbe[SupervisorLifecycleState] = TestProbe[SupervisorLifecycleState]()
-  var supervisorRef: ActorRef[ComponentMessage]                          = _
-  var initializeAnswer: Answer[Unit]                                     = _
-  var submitAnswer: Answer[Future[Unit]]                                 = _
-  var shutdownAnswer: Answer[Unit]                                       = _
-  var runAnswer: Answer[Future[Unit]]                                    = _
+  var supervisorRef: ActorRef[ComponentMessage]                          = scala.compiletime.uninitialized
+  var initializeAnswer: Answer[Unit]                                     = scala.compiletime.uninitialized
+  var submitAnswer: Answer[Future[Unit]]                                 = scala.compiletime.uninitialized
+  var shutdownAnswer: Answer[Unit]                                       = scala.compiletime.uninitialized
+  var runAnswer: Answer[Future[Unit]]                                    = scala.compiletime.uninitialized
 
   implicit val ec: ExecutionContext = typedSystem.executionContext
 
   // all log messages will be captured in log buffer
   private val logBuffer                    = mutable.Buffer.empty[JsObject]
   private val testAppender                 = new TestAppender(x => logBuffer += Json.parse(x.toString).as[JsObject])
-  private var loggingSystem: LoggingSystem = _
+  private var loggingSystem: LoggingSystem = scala.compiletime.uninitialized
 
   override protected def beforeAll(): Unit = {
     loggingSystem = new LoggingSystem("sup-failure", "1.0", "localhost", typedSystem)

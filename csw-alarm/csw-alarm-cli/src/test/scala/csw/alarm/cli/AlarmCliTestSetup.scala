@@ -31,8 +31,8 @@ trait AlarmCliTestSetup extends HTTPLocationService with EmbeddedRedis with Even
   val argsParser                        = new ArgsParser(BuildInfo.name)
   val logBuffer: mutable.Buffer[String] = mutable.Buffer.empty[String]
 
-  var redisSentinel: RedisSentinel = _
-  var redisServer: RedisServer     = _
+  var redisSentinel: RedisSentinel = scala.compiletime.uninitialized
+  var redisServer: RedisServer     = scala.compiletime.uninitialized
 
   private def printLine(msg: Any): Unit = logBuffer += msg.toString
 

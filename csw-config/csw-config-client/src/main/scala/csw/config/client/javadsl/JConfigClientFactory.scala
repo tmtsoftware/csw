@@ -26,7 +26,7 @@ object JConfigClientFactory {
    * @return an instance of IConfigService
    */
   def adminApi(
-      actorSystem: ActorSystem[_],
+      actorSystem: ActorSystem[?],
       locationService: ILocationService,
       tokenFactory: TokenFactory
   ): IConfigService = make(actorSystem, locationService, Some(tokenFactory))
@@ -38,11 +38,11 @@ object JConfigClientFactory {
    * @param locationService location service instance which will be used to resolve the location of config server
    * @return an instance of IConfigClientService
    */
-  def clientApi(actorSystem: ActorSystem[_], locationService: ILocationService): IConfigClientService =
+  def clientApi(actorSystem: ActorSystem[?], locationService: ILocationService): IConfigClientService =
     make(actorSystem, locationService)
 
   private def make(
-      actorSystem: ActorSystem[_],
+      actorSystem: ActorSystem[?],
       locationService: ILocationService,
       tokenFactory: Option[TokenFactory] = None
   ): IConfigService = {

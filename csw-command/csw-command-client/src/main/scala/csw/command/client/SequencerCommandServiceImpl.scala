@@ -27,7 +27,7 @@ import scala.concurrent.Future
  * @param actorSystem required for sending sequence commands or querying the sequencer
  */
 class SequencerCommandServiceImpl(sequencerLocation: PekkoLocation)(implicit
-    actorSystem: ActorSystem[_]
+    actorSystem: ActorSystem[?]
 ) extends SequencerCommandService {
   import actorSystem.executionContext
 

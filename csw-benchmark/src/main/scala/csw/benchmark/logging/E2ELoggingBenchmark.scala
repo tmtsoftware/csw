@@ -34,10 +34,10 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-279: Test logging performance
 @State(Scope.Benchmark)
 class E2ELoggingBenchmark {
-  var actorSystem: typed.ActorSystem[SpawnProtocol.Command] = _
-  var log: Logger                                           = _
-  var fileAppender: FileAppender                            = _
-  var person: Person                                        = _
+  var actorSystem: typed.ActorSystem[SpawnProtocol.Command] = scala.compiletime.uninitialized
+  var log: Logger                                           = scala.compiletime.uninitialized
+  var fileAppender: FileAppender                            = scala.compiletime.uninitialized
+  var person: Person                                        = scala.compiletime.uninitialized
 
   @Setup(Level.Trial)
   def setup(): Unit = {

@@ -40,42 +40,42 @@ import scala.jdk.CollectionConverters.*
  */
 class LoggingSystem private[csw] (name: String, version: String, host: String, val system: ActorSystem[SpawnProtocol.Command]) {
 
-  private[this] val loggingConfig = system.settings.config.getConfig("csw-logging")
+  private val loggingConfig = system.settings.config.getConfig("csw-logging")
 
-  private[this] val defaultAppenderBuilders: List[LogAppenderBuilder] =
+  private val defaultAppenderBuilders: List[LogAppenderBuilder] =
     loggingConfig.getStringList("appenders").asScala.toList.map(getAppenderInstance)
 
   @volatile var appenderBuilders: List[LogAppenderBuilder] = defaultAppenderBuilders
 
-  private[this] val levels = loggingConfig.getString("logLevel")
-  private[this] val defaultLevel: Level =
+  private val levels = loggingConfig.getString("logLevel")
+  private val defaultLevel: Level =
     if (Level.hasLevel(levels)) Level(levels)
     else throw new Exception(s"Bad value $levels for csw-logging.logLevel")
 
   LoggingState.logLevel = defaultLevel
 
-  private[this] val pekkoLogLevelS = loggingConfig.getString("pekkoLogLevel")
-  private[this] val defaultPekkoLogLevel: Level =
+  private val pekkoLogLevelS = loggingConfig.getString("pekkoLogLevel")
+  private val defaultPekkoLogLevel: Level =
     if (Level.hasLevel(pekkoLogLevelS)) Level(pekkoLogLevelS)
     else throw new Exception(s"Bad value $pekkoLogLevelS for csw-logging.pekkoLogLevel")
 
   LoggingState.pekkoLogLevel = defaultPekkoLogLevel
 
-  private[this] val slf4jLogLevelS = loggingConfig.getString("slf4jLogLevel")
-  private[this] val defaultSlf4jLogLevel: Level =
+  private val slf4jLogLevelS = loggingConfig.getString("slf4jLogLevel")
+  private val defaultSlf4jLogLevel: Level =
     if (Level.hasLevel(slf4jLogLevelS)) Level(slf4jLogLevelS)
     else throw new Exception(s"Bad value $slf4jLogLevelS for csw-logging.slf4jLogLevel")
 
   LoggingState.slf4jLogLevel = defaultSlf4jLogLevel
 
-  private[this] val gc   = loggingConfig.getBoolean("gc")
-  private[this] val time = loggingConfig.getBoolean("time")
+  private val gc   = loggingConfig.getBoolean("gc")
+  private val time = loggingConfig.getBoolean("time")
 
-  private[this] implicit val ec: ExecutionContext = system.executionContext
-  private[this] val done                          = Promise[Unit]()
-  private[this] val timeActorDonePromise          = Promise[Unit]()
+  private implicit val ec: ExecutionContext = system.executionContext
+  private val done                          = Promise[Unit]()
+  private val timeActorDonePromise          = Promise[Unit]()
 
-  private[this] val initialComponentsLoggingState = ComponentLoggingStateManager.from(loggingConfig)
+  private val initialComponentsLoggingState = ComponentLoggingStateManager.from(loggingConfig)
 
   LoggingState.componentsLoggingState.putAll(initialComponentsLoggingState)
 
@@ -89,11 +89,11 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
   LoggingState.doTime = false
   LoggingState.timeActorOption = None
 
-  @volatile private[this] var appenders = appenderBuilders.map {
+  @volatile private var appenders = appenderBuilders.map {
     _.apply(system, standardHeaders)
   }
 
-  private[this] val logActor = system.spawn(
+  private val logActor = system.spawn(
     LogActor.behavior(done, appenders, defaultLevel, defaultSlf4jLogLevel, defaultPekkoLogLevel),
     name = "LoggingActor",
     MailboxSelector.fromConfig("logging-dispatcher")

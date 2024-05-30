@@ -116,7 +116,7 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
     }
   }
 
-  private def updateEventParams(event: Event, paramSet: Set[Parameter[_]]) =
+  private def updateEventParams(event: Event, paramSet: Set[Parameter[?]]) =
     event match {
       case event: SystemEvent  => event.madd(paramSet)
       case event: ObserveEvent => event.madd(paramSet)

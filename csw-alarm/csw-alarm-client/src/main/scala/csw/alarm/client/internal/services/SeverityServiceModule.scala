@@ -27,11 +27,11 @@ import cps.compat.FutureAsync.*
 import scala.concurrent.Future
 
 private[client] trait SeverityServiceModule extends SeverityService {
-  self: MetadataService with StatusService =>
+  self: MetadataService & StatusService =>
 
   val redisConnectionsFactory: RedisConnectionsFactory
   def settings: Settings
-  implicit val actorSystem: typed.ActorSystem[_]
+  implicit val actorSystem: typed.ActorSystem[?]
   import redisConnectionsFactory._
 
   private val log = AlarmServiceLogger.getLogger

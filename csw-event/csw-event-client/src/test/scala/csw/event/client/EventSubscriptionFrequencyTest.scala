@@ -29,7 +29,7 @@ import org.scalatest.matchers.should.Matchers
 class EventSubscriptionFrequencyTest extends TestNGSuite with Matchers with Eventually {
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 10.millis)
 
-  var redisTestProps: BaseProperties = _
+  var redisTestProps: BaseProperties = scala.compiletime.uninitialized
 //  var kafkaTestProps: BaseProperties = _
 
   @BeforeSuite

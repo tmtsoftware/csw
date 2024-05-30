@@ -33,9 +33,9 @@ class DatabaseServiceFactoryTest extends AnyFunSuite with Matchers with BeforeAn
   private val dbName: String                    = "postgres"
   private val port: Int                         = 5432
   private val locationService: LocationService  = HttpLocationServiceFactory.makeLocalClient
-  private var postgres: EmbeddedPostgres        = _
-  private var dbFactory: DatabaseServiceFactory = _
-  private var testDsl: DSLContext               = _
+  private var postgres: EmbeddedPostgres        = scala.compiletime.uninitialized
+  private var dbFactory: DatabaseServiceFactory = scala.compiletime.uninitialized
+  private var testDsl: DSLContext               = scala.compiletime.uninitialized
 
   override implicit val patienceConfig: PatienceConfig = PatienceConfig(5.seconds)
 

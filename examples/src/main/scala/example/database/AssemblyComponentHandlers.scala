@@ -26,7 +26,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
   import cswCtx._
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
 
-  private var dsl: DSLContext = _
+  private var dsl: DSLContext = scala.compiletime.uninitialized
   override def initialize(): Unit = {
     // #dbFactory-access
     val dbFactory = new DatabaseServiceFactory(ctx.system)

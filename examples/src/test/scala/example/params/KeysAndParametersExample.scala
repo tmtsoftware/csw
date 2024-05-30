@@ -40,7 +40,7 @@ class KeysAndParametersExample extends AnyFunSpec with Matchers {
       // associating units
       val weekDays: Array[String]            = Array("Sunday", "Monday", "Tuesday")
       val paramWithUnits1: Parameter[String] = k3.setAll(weekDays)
-      val paramWithUnits2: Parameter[String] = k3.setAll(weekDays) withUnits Units.day
+      val paramWithUnits2: Parameter[String] = k3.setAll(weekDays) `withUnits` Units.day
 
       // default unit is NoUnits
       assert(booleanParam.units === Units.NoUnits)
@@ -74,7 +74,7 @@ class KeysAndParametersExample extends AnyFunSpec with Matchers {
 
       // Store some values using helper class ArrayData
       val p1: Parameter[ArrayData[Double]] = filterKey.set(ArrayData(arr1), ArrayData(arr2))
-      val p2: Parameter[ArrayData[Double]] = filterKey -> ArrayData(arr1 ++ arr2) withUnits Units.liter
+      val p2: Parameter[ArrayData[Double]] = filterKey -> ArrayData(arr1 ++ arr2) `withUnits` Units.liter
 
       // add units to existing parameters
       val p1AsCount = p1.withUnits(Units.count)
@@ -105,7 +105,7 @@ class KeysAndParametersExample extends AnyFunSpec with Matchers {
 
       // Store some values using helper class MatrixData
       val p1: Parameter[MatrixData[Byte]] = encoderKey.set(MatrixData.fromArrays(m1))
-      val p2: Parameter[MatrixData[Byte]] = encoderKey.set(m1, m2) withUnits Units.liter
+      val p2: Parameter[MatrixData[Byte]] = encoderKey.set(m1, m2) `withUnits` Units.liter
 
       // add units to existing parameters
       val p1AsLiter = p1.withUnits(Units.liter)
@@ -217,7 +217,7 @@ class KeysAndParametersExample extends AnyFunSpec with Matchers {
       // default units via set
       val paramWithUnits1: Parameter[String] = k3.setAll(weekDays)
       // associating units via withUnits
-      val paramWithUnits2: Parameter[String] = k3.setAll(weekDays) withUnits Units.day
+      val paramWithUnits2: Parameter[String] = k3.setAll(weekDays) `withUnits` Units.day
       // change existing unit
       val paramWithUnits3: Parameter[Short] = paramOfShorts.withUnits(Units.meter)
       // #units

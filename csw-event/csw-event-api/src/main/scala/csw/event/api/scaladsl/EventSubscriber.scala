@@ -72,7 +72,7 @@ trait EventSubscriber {
    * @param callback a function to execute asynchronously on each received event
    * @return an [[csw.event.api.scaladsl.EventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
    */
-  def subscribeAsync(eventKeys: Set[EventKey], callback: Event => Future[_]): EventSubscription
+  def subscribeAsync(eventKeys: Set[EventKey], callback: Event => Future[?]): EventSubscription
 
   /**
    * Overload for above `subscribeAsync` for receiving event at a `every` frequency according to the specified `mode`. The latest events available for the given
@@ -91,7 +91,7 @@ trait EventSubscriber {
    */
   def subscribeAsync(
       eventKeys: Set[EventKey],
-      callback: Event => Future[_],
+      callback: Event => Future[?],
       every: FiniteDuration,
       mode: SubscriptionMode
   ): EventSubscription

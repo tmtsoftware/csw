@@ -27,7 +27,7 @@ class BinaryImageByteArrayTest extends AnyFunSpec with Matchers {
       val imgBytes = Files.readAllBytes(imgPath)
 
       val binaryImgData: ArrayData[Byte]          = ArrayData.fromArray(imgBytes)
-      val binaryParam: Parameter[ArrayData[Byte]] = imageKey -> binaryImgData withUnits encoder
+      val binaryParam: Parameter[ArrayData[Byte]] = imageKey -> binaryImgData `withUnits` encoder
 
       binaryParam.head shouldBe binaryImgData
       binaryParam.value(0) shouldBe binaryImgData

@@ -83,7 +83,7 @@ class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar 
 
     private val registrationFactory: RegistrationFactory = mock[RegistrationFactory]
 
-    when(registrationFactory.pekkoTyped(any[PekkoConnection], any[ActorRef[_]], any[Metadata]))
+    when(registrationFactory.pekkoTyped(any[PekkoConnection], any[ActorRef[?]], any[Metadata]))
       .thenReturn(pekkoRegistration)
 
     private val eventualRegistrationResult: Future[RegistrationResult] =

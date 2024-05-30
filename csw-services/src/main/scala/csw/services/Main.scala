@@ -42,5 +42,5 @@ object Main extends CommandsEntryPoint {
     }
   }
 
-  override def commands: Seq[Command[_]] = List(StartCommand)
+  override def commands: Seq[Command[?]] = List(StartCommand)
 }

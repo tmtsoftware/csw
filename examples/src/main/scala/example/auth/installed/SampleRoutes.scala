@@ -22,7 +22,7 @@ import spray.json._
 
 import scala.concurrent.ExecutionContext
 
-class SampleRoutes(securityDirectives: SecurityDirectives)(implicit actorSystem: ActorSystem[_]) {
+class SampleRoutes(securityDirectives: SecurityDirectives)(implicit actorSystem: ActorSystem[?]) {
 
   import actorSystem.executionContext
   import securityDirectives._
@@ -48,7 +48,7 @@ class SampleRoutes(securityDirectives: SecurityDirectives)(implicit actorSystem:
 
 object SampleServer {
   def main(args: Array[String]): Unit = {
-    implicit val actorSystem: ActorSystem[_] = ActorSystem(Behaviors.empty, "test")
+    implicit val actorSystem: ActorSystem[?] = ActorSystem(Behaviors.empty, "test")
     implicit val ec: ExecutionContext        = actorSystem.executionContext
 
     val config: Config = ConfigFactory.parseString("""

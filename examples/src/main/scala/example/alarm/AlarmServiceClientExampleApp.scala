@@ -24,7 +24,7 @@ import scala.util.{Failure, Success}
 
 object AlarmServiceClientExampleApp {
 
-  implicit val actorSystem: ActorSystem[_] = typed.ActorSystem(Behaviors.empty, "")
+  implicit val actorSystem: ActorSystem[?] = typed.ActorSystem(Behaviors.empty, "")
   implicit val ec: ExecutionContext        = actorSystem.executionContext
   private val locationService              = HttpLocationServiceFactory.makeLocalClient
 

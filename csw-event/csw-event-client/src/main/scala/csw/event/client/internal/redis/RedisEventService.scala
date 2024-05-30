@@ -22,7 +22,7 @@ import scala.concurrent.Future
  * @param actorSystem provides Materializer, ExecutionContext, etc.
  */
 private[event] class RedisEventService(eventServiceResolver: EventServiceResolver, masterId: String, redisClient: RedisClient)(
-    implicit val actorSystem: ActorSystem[_]
+    implicit val actorSystem: ActorSystem[?]
 ) extends EventService {
 
   import actorSystem.executionContext

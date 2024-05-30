@@ -37,8 +37,8 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
 
   private val log: Logger                                          = loggerFactory.getLogger(ctx)
   private var runningHcds: Map[Connection, Option[CommandService]] = Map.empty
-  var diagnosticsPublisher: ActorRef[DiagnosticPublisherMessages]  = _
-  var commandHandler: ActorRef[CommandHandlerMsgs]                 = _
+  var diagnosticsPublisher: ActorRef[DiagnosticPublisherMessages]  = scala.compiletime.uninitialized
+  var commandHandler: ActorRef[CommandHandlerMsgs]                 = scala.compiletime.uninitialized
   val timeout: FiniteDuration                                      = 5.seconds
 
   // #initialize-handler

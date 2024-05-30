@@ -25,7 +25,7 @@ class LocationServiceClient(
     httpTransport: Transport[LocationRequest],
     websocketTransport: Transport[LocationStreamRequest],
     cswVersion: CswVersion
-)(implicit actorSystem: ActorSystem[_])
+)(implicit actorSystem: ActorSystem[?])
     extends LocationService
     with LocationServiceCodecs
     with BasicCodecs {

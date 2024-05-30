@@ -14,7 +14,7 @@ object SourceFactory {
 
   def from(f: () => SourceLocation): SourceFactory = () => f()
 
-  def from(cls: Class[_]): SourceFactory = from(() => SourceLocation("", "", cls.getName, -1))
+  def from(cls: Class[?]): SourceFactory = from(() => SourceLocation("", "", cls.getName, -1))
 
   private inline def getSourceLocation: SourceFactory =
     () =>

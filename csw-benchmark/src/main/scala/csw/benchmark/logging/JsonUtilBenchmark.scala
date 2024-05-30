@@ -47,8 +47,8 @@ class JsonUtilBenchmark {
 
   val expectedLogMsgJson1: JsObject = Json.parse(logMsgString1).as[JsObject]
 
-  var gson: Gson                        = _
-  var jacksonObjectMapper: ObjectMapper = _
+  var gson: Gson                        = scala.compiletime.uninitialized
+  var jacksonObjectMapper: ObjectMapper = scala.compiletime.uninitialized
 
   @Setup(Level.Trial)
   def setup() = {

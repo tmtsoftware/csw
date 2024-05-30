@@ -19,8 +19,8 @@ class SequencerObserveEventTest extends AnyFunSpec with Matchers {
     val obsId                         = "2020A-001-123"
     val exposureId                    = ExposureId("2020A-001-123-TCS-DET-SCI0-0001")
     val prefix                        = Prefix(ESW, "filter.wheel")
-    val obsIdParam: Parameter[_]      = ObserveEventKeys.obsId.set(obsId)
-    val exposureIdParam: Parameter[_] = ObserveEventKeys.exposureId.set(exposureId.toString)
+    val obsIdParam: Parameter[?]      = ObserveEventKeys.obsId.set(obsId)
+    val exposureIdParam: Parameter[?] = ObserveEventKeys.exposureId.set(exposureId.toString)
     val sequencerObserveEvent         = SequencerObserveEvent(prefix)
     val filename                      = "some/nested/folder/file123.conf"
 

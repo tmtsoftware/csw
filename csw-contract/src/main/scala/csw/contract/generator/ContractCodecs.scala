@@ -11,9 +11,9 @@ import io.bullet.borer.derivation.CompactMapBasedCodecs.deriveEncoder
 object ContractCodecs extends ContractCodecs
 trait ContractCodecs {
   implicit lazy val endpointEncoder: Encoder[Endpoint]      = deriveEncoder
-  implicit lazy val modelTypeEncoder: Encoder[ModelType[_]] = Encoder((w, v) => v.write(w))
+  implicit lazy val modelTypeEncoder: Encoder[ModelType[?]] = Encoder((w, v) => v.write(w))
 
-  implicit lazy val modelSetEncoder: Encoder[ModelSet] = Encoder[Map[String, ModelType[_]]]
+  implicit lazy val modelSetEncoder: Encoder[ModelSet] = Encoder[Map[String, ModelType[?]]]
     .contramap(_.modelTypes.map(x => x.name -> x).toMap)
 
   implicit lazy val readmeEncoder: Encoder[Readme]     = deriveEncoder

@@ -39,7 +39,7 @@ object OpticalDetectorEvent extends DetectorEvent(ObserveEventNames.OpticalDetec
       exposureTime: Long,
       remainingExposureTime: Long
   ): ObserveEvent = {
-    val params: Set[Parameter[_]] = Set(
+    val params: Set[Parameter[?]] = Set(
       ParamFactories.exposureIdParam(exposureId),
       ParamFactories.exposureTimeParam(exposureTime),
       ParamFactories.remainingExposureTimeParam(remainingExposureTime),

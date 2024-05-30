@@ -24,15 +24,15 @@ class ArgsParser(name: String) {
       .children(
         cmd("get")
           .action((_, args) => args.copy(subCmd = "get"))
-          .children(optionalAlarmKey: _*)
+          .children(optionalAlarmKey*)
           .text("get severity of a subsystem/component/alarm"),
         cmd("set")
           .action((_, args) => args.copy(subCmd = "set"))
-          .children(requiredAlarmKey :+ severity :+ refresh: _*)
+          .children(requiredAlarmKey :+ severity :+ refresh*)
           .text("set severity of an alarm"),
         cmd("subscribe")
           .action((_, args) => args.copy(subCmd = "subscribe"))
-          .children(optionalAlarmKey: _*)
+          .children(optionalAlarmKey*)
           .text("subscribe to severity of a subsystem/component/alarm")
       )
 
@@ -41,53 +41,53 @@ class ArgsParser(name: String) {
       .children(
         cmd("get")
           .action((_, args) => args.copy(subCmd = "get"))
-          .children(optionalAlarmKey: _*)
+          .children(optionalAlarmKey*)
           .text("get health of a subsystem/component/alarm"),
         cmd("subscribe")
           .action((_, args) => args.copy(subCmd = "subscribe"))
-          .children(optionalAlarmKey: _*)
+          .children(optionalAlarmKey*)
           .text("subscribe to health of a subsystem/component/alarm")
       )
 
     cmd("acknowledge")
       .action((_, args) => args.copy(cmd = "acknowledge"))
       .text("acknowledge an alarm")
-      .children(requiredAlarmKey: _*)
+      .children(requiredAlarmKey*)
 
     cmd("unacknowledge")
       .action((_, args) => args.copy(cmd = "unacknowledge"))
       .text("unacknowledge an alarm")
-      .children(requiredAlarmKey: _*)
+      .children(requiredAlarmKey*)
 
     cmd("activate")
       .action((_, args) => args.copy(cmd = "activate"))
       .text("activate an alarm")
-      .children(requiredAlarmKey: _*)
+      .children(requiredAlarmKey*)
 
     cmd("deactivate")
       .action((_, args) => args.copy(cmd = "deactivate"))
       .text("deactivate an alarm")
-      .children(requiredAlarmKey: _*)
+      .children(requiredAlarmKey*)
 
     cmd("shelve")
       .action((_, args) => args.copy(cmd = "shelve"))
       .text("shelve an alarm")
-      .children(requiredAlarmKey: _*)
+      .children(requiredAlarmKey*)
 
     cmd("unshelve")
       .action((_, args) => args.copy(cmd = "unshelve"))
       .text("unshelve an alarm")
-      .children(requiredAlarmKey: _*)
+      .children(requiredAlarmKey*)
 
     cmd("reset")
       .action((_, args) => args.copy(cmd = "reset"))
       .text("reset latched severity of an alarm")
-      .children(requiredAlarmKey: _*)
+      .children(requiredAlarmKey*)
 
     cmd("list")
       .action((_, args) => args.copy(cmd = "list"))
       .text("list alarms")
-      .children(optionalAlarmKey :+ metadata :+ status: _*)
+      .children(optionalAlarmKey :+ metadata :+ status*)
 
     opt[String]("locationHost") action { (x, c) =>
       c.copy(locationHost = x)

@@ -17,7 +17,7 @@ import io.lettuce.core.{ClientOptions, RedisClient}
 
 class EventServiceCreationExamples {
 
-  private implicit val actorSystem: typed.ActorSystem[_] =
+  private implicit val actorSystem: typed.ActorSystem[?] =
     ActorSystemFactory.remote(SpawnProtocol(), "event-creation-examples")
   private val locationService = HttpLocationServiceFactory.makeLocalClient
 

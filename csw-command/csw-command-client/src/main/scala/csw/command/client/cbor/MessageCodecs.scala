@@ -17,7 +17,7 @@ import io.bullet.borer.derivation.MapBasedCodecs.deriveAllCodecs
 import io.bullet.borer.{Codec, Decoder, Encoder}
 
 trait MessageCodecs extends MessageCodecsBase {
-  implicit def pubSubCodec[T: Encoder: Decoder, PS[_] <: PubSub[_]]: Codec[PS[T]] = pubSubCodecValue[T].asInstanceOf[Codec[PS[T]]]
+  implicit def pubSubCodec[T: Encoder: Decoder, PS[_] <: PubSub[?]]: Codec[PS[T]] = pubSubCodecValue[T].asInstanceOf[Codec[PS[T]]]
   implicit lazy val messageRemoteMsgCodec: Codec[RemoteMsg]                       = deriveAllCodecs
 }
 

@@ -24,8 +24,8 @@ class SchedulerBenchmark {
   final private val Offset                  = 20L
   final private val OperationsPerInvocation = 1
 
-  private val actorSystem: ActorSystem[_]                = ActorSystem(Behaviors.empty, "test")
-  private var timeServiceScheduler: TimeServiceScheduler = _
+  private val actorSystem: ActorSystem[?]                = ActorSystem(Behaviors.empty, "test")
+  private var timeServiceScheduler: TimeServiceScheduler = scala.compiletime.uninitialized
 
   @Setup
   def setup(): Unit = {

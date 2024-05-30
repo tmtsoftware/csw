@@ -27,7 +27,7 @@ import scala.concurrent.Future
 class CommandServiceClient(
     httpTransport: Transport[CommandServiceRequest],
     websocketTransport: Transport[CommandServiceStreamRequest]
-)(implicit actorSystem: ActorSystem[_])
+)(implicit actorSystem: ActorSystem[?])
     extends CommandService
     with CommandServiceCodecs {
 

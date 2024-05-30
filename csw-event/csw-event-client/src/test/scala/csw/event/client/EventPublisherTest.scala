@@ -43,7 +43,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually /*wit
 
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 10.millis)
 
-  var redisTestProps: BaseProperties = _
+  var redisTestProps: BaseProperties = scala.compiletime.uninitialized
 //  var kafkaTestProps: BaseProperties = _
 
   @BeforeSuite
@@ -104,7 +104,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually /*wit
 
   // DEOPSCSW-345: Publish events irrespective of subscriber existence
   // DEOPSCSW-516: Optionally Publish - API Change
-  var cancellable: Cancellable = _
+  var cancellable: Cancellable = scala.compiletime.uninitialized
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_publish_an_event_with_duration__DEOPSCSW_331_DEOPSCSW_334_DEOPSCSW_335_DEOPSCSW_337_DEOPSCSW_349_DEOPSCSW_395_DEOPSCSW_515_DEOPSCSW_516_DEOPSCSW_345(
       baseProperties: BaseProperties
@@ -328,7 +328,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually /*wit
 
     val payloadKey: Key[Byte]       = ByteKey.make("payloadKey")
     val payload: Array[Byte]        = ("0" * 1024 * 2).getBytes("utf-8")
-    val paramSet: Set[Parameter[_]] = Set(payloadKey.setAll(payload))
+    val paramSet: Set[Parameter[?]] = Set(payloadKey.setAll(payload))
     val event1                      = SystemEvent(Prefix("csw.abc"), EventName("system_1"), paramSet)
 
     val eventKey: EventKey = event1.eventKey

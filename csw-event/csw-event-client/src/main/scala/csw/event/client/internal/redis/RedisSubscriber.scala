@@ -34,7 +34,7 @@ import scala.concurrent.duration.FiniteDuration
  * @param actorSystem to be used for performing asynchronous operations
  */
 private[event] class RedisSubscriber(redisURI: Future[RedisURI], redisClient: RedisClient)(implicit
-    actorSystem: ActorSystem[_]
+    actorSystem: ActorSystem[?]
 ) extends EventSubscriber {
 
   import EventRomaineCodecs._
@@ -67,12 +67,12 @@ private[event] class RedisSubscriber(redisURI: Future[RedisURI], redisClient: Re
       mode: SubscriptionMode
   ): Source[Event, EventSubscription] = subscribe(eventKeys).via(eventSubscriberUtil.subscriptionModeStage(every, mode))
 
-  override def subscribeAsync(eventKeys: Set[EventKey], callback: Event => Future[_]): EventSubscription =
+  override def subscribeAsync(eventKeys: Set[EventKey], callback: Event => Future[?]): EventSubscription =
     eventSubscriberUtil.subscribeAsync(subscribe(eventKeys), callback)
 
   override def subscribeAsync(
       eventKeys: Set[EventKey],
-      callback: Event => Future[_],
+      callback: Event => Future[?],
       every: FiniteDuration,
       mode: SubscriptionMode
   ): EventSubscription = eventSubscriberUtil.subscribeAsync(subscribe(eventKeys, every, mode), callback)

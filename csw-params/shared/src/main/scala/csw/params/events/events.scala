@@ -22,7 +22,7 @@ sealed trait Event extends ParameterSetType[Event] {
    *
    * @return a handle to ParameterSetType extended by concrete implementation of this class
    */
-  def paramType: ParameterSetType[_] = this
+  def paramType: ParameterSetType[?] = this
 
   /**
    * unique Id for event
@@ -47,7 +47,7 @@ sealed trait Event extends ParameterSetType[Event] {
   /**
    * An optional initial set of parameters (keys with values)
    */
-  val paramSet: Set[Parameter[_]]
+  val paramSet: Set[Parameter[?]]
 
   /**
    * A name identifying the type of parameter set, such as "SystemEvent", "ObserveEvent".
@@ -106,7 +106,7 @@ case class SystemEvent private[csw] (
     source: Prefix,
     eventName: EventName,
     eventTime: UTCTime,
-    paramSet: Set[Parameter[_]]
+    paramSet: Set[Parameter[?]]
 ) extends ParameterSetType[SystemEvent]
     with Event {
 
@@ -121,7 +121,7 @@ case class SystemEvent private[csw] (
    * @param data set of parameters
    * @return a new instance of SystemEvent with new eventId, eventTime and provided data
    */
-  override protected def create(data: Set[Parameter[_]]): SystemEvent =
+  override protected def create(data: Set[Parameter[?]]): SystemEvent =
     copy(eventId = Id(), eventTime = UTCTime.now(), paramSet = data)
 }
 
@@ -145,7 +145,7 @@ object SystemEvent {
    * @param paramSet an initial set of parameters (keys with values)
    * @return a new instance of SystemEvent with auto-generated eventId and eventTime
    */
-  def apply(source: Prefix, eventName: EventName, paramSet: Set[Parameter[_]]): SystemEvent =
+  def apply(source: Prefix, eventName: EventName, paramSet: Set[Parameter[?]]): SystemEvent =
     apply(source, eventName).madd(paramSet)
 }
 
@@ -157,7 +157,7 @@ case class ObserveEvent private[csw] (
     source: Prefix,
     eventName: EventName,
     eventTime: UTCTime,
-    paramSet: Set[Parameter[_]]
+    paramSet: Set[Parameter[?]]
 ) extends ParameterSetType[ObserveEvent]
     with Event {
 
@@ -167,7 +167,7 @@ case class ObserveEvent private[csw] (
    * @param data set of parameters
    * @return a new instance of ObserveEvent with new eventId, eventTime and provided data
    */
-  override protected def create(data: Set[Parameter[_]]): ObserveEvent =
+  override protected def create(data: Set[Parameter[?]]): ObserveEvent =
     copy(eventId = Id(), eventTime = UTCTime.now(), paramSet = data)
 }
 
@@ -191,6 +191,6 @@ private[csw] object ObserveEvent {
    * @param paramSet an initial set of parameters (keys with values)
    * @return a new instance of ObserveEvent with auto-generated eventId and eventTime
    */
-  def apply(source: Prefix, eventName: EventName, paramSet: Set[Parameter[_]]): ObserveEvent =
+  def apply(source: Prefix, eventName: EventName, paramSet: Set[Parameter[?]]): ObserveEvent =
     apply(source, eventName).madd(paramSet)
 }

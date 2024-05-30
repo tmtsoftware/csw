@@ -79,7 +79,7 @@ final class FrameworkTestKitJunitResource(val frameworkTestKit: FrameworkTestKit
   def spawnStandalone(config: Config): ActorRef[ComponentMessage] = frameworkTestKit.spawnStandalone(config)
 
   /** Start FrameworkTestKit */
-  override def before(): Unit = frameworkTestKit.start(services.asScala.toList: _*)
+  override def before(): Unit = frameworkTestKit.start(services.asScala.toList*)
 
   /** Shuts down the FrameworkTestKit */
   override def after(): Unit = frameworkTestKit.shutdown()

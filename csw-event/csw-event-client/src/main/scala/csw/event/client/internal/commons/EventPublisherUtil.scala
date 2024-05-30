@@ -20,7 +20,7 @@ import scala.util.control.NonFatal
 /**
  * Utility class to provided common functionalities to different implementations of EventPublisher
  */
-private[event] class EventPublisherUtil(implicit actorSystem: ActorSystem[_]) {
+private[event] class EventPublisherUtil(implicit actorSystem: ActorSystem[?]) {
 
   private val logger = EventServiceLogger.getLogger
 

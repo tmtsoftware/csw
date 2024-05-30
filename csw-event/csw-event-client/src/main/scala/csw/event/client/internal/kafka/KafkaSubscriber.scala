@@ -33,7 +33,7 @@ import scala.util.control.NonFatal
  */
 // $COVERAGE-OFF$
 private[event] class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[String, Array[Byte]]])(implicit
-    actorSystem: ActorSystem[_]
+    actorSystem: ActorSystem[?]
 ) extends EventSubscriber {
 
   import actorSystem.executionContext
@@ -72,12 +72,12 @@ private[event] class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[S
   ): Source[Event, EventSubscription] =
     subscribe(eventKeys).via(eventSubscriberUtil.subscriptionModeStage(every, mode))
 
-  override def subscribeAsync(eventKeys: Set[EventKey], callback: Event => Future[_]): EventSubscription =
+  override def subscribeAsync(eventKeys: Set[EventKey], callback: Event => Future[?]): EventSubscription =
     eventSubscriberUtil.subscribeAsync(subscribe(eventKeys), callback)
 
   override def subscribeAsync(
       eventKeys: Set[EventKey],
-      callback: Event => Future[_],
+      callback: Event => Future[?],
       every: FiniteDuration,
       mode: SubscriptionMode
   ): EventSubscription =

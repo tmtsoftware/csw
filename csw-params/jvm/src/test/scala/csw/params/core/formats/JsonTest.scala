@@ -178,7 +178,7 @@ class JsonTest extends AnyFunSpec {
       val items = sc1.paramSet
 
       val js3 = JsonSupport.writes(items)
-      val in1 = JsonSupport.reads[Set[Parameter[_]]](js3)
+      val in1 = JsonSupport.reads[Set[Parameter[?]]](js3)
       assert(in1 == items)
     }
   }

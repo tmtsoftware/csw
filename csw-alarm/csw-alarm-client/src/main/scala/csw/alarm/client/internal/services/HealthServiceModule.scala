@@ -21,7 +21,7 @@ private[client] trait HealthServiceModule extends HealthService {
   self: SeverityService =>
 
   val redisConnectionsFactory: RedisConnectionsFactory
-  implicit val actorSystem: typed.ActorSystem[_]
+  implicit val actorSystem: typed.ActorSystem[?]
   import redisConnectionsFactory._
 
   private val log = AlarmServiceLogger.getLogger

@@ -25,8 +25,9 @@ object Dependencies {
       Libs.`scopt`,
       Libs.`enumeratum`.value,
       Pekko.`cluster-sharding`, // akka-management-cluster-http uses lower version, to avoid conflict, this needs to be overridden
-      Libs.`pekko-management`,
+      Pekko.`pekko-management`,
       PekkoHttp.`pekko-http`,
+      PekkoHttp.`pekko-http-spray-json`,
       MSocket.`msocket-http`,
       Libs.`scalatest`.value            % Test,
       Libs.`junit4-interface`           % Test,
@@ -340,7 +341,7 @@ object Dependencies {
       Pekko.`pekko-stream-typed`,
       Pekko.`pekko-actor-typed`,
       PekkoHttp.`pekko-http`,
-//      Libs.`scala-reflect`,
+      PekkoHttp.`pekko-http-spray-json`,
       Keycloak.`keycloak-adapter-core`,
       // TODO: make this as provided deps
       Libs.`scalatest`.value,

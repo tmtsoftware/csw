@@ -48,11 +48,11 @@ class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol.Command]) ex
   val registrationResult: RegistrationResult     = mock[RegistrationResult]
   val registrationFactory: RegistrationFactory   = mock[RegistrationFactory]
 
-  when(registrationFactory.pekkoTyped(any[PekkoConnection], any[ActorRef[_]], any[Metadata])).thenReturn(pekkoRegistration)
+  when(registrationFactory.pekkoTyped(any[PekkoConnection], any[ActorRef[?]], any[Metadata])).thenReturn(pekkoRegistration)
   when(locationService.register(pekkoRegistration)).thenReturn(Future.successful(registrationResult))
   when(locationService.register(any[HttpRegistration])).thenReturn(Future.successful(registrationResult))
   when(locationService.unregister(any[PekkoConnection])).thenReturn(Future.successful(Done))
-  when(eventServiceFactory.make(any[LocationService])(any[ActorSystem[_]])).thenReturn(eventService)
+  when(eventServiceFactory.make(any[LocationService])(any[ActorSystem[?]])).thenReturn(eventService)
   ///////////////////////////////////////////////
 
   val lifecycleStateProbe: TestProbe[LifecycleStateChanged] = TestProbe[LifecycleStateChanged]()
@@ -64,7 +64,7 @@ class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol.Command]) ex
 
   when(loggerFactory.getLogger).thenReturn(logger)
   when(loggerFactory.getLogger(any[actor.ActorContext])).thenReturn(logger)
-  when(loggerFactory.getLogger(any[ActorContext[_]])).thenReturn(logger)
+  when(loggerFactory.getLogger(any[ActorContext[?]])).thenReturn(logger)
 
   ///////////////////////////////////////////////
   val pubSubComponentActor: ActorRef[PubSub[CurrentState]] =

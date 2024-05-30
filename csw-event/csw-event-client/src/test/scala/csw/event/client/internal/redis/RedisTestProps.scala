@@ -46,8 +46,8 @@ class RedisTestProps(
   private lazy val asyncConnection: Future[RedisAsyncCommands[String, String]] =
     redisClient.connectAsync(new StringCodec(), redisURI).asScala.map(_.async())
 
-  var redisSentinel: RedisSentinel = _
-  var redisServer: RedisServer     = _
+  var redisSentinel: RedisSentinel = scala.compiletime.uninitialized
+  var redisServer: RedisServer     = scala.compiletime.uninitialized
 
   override val eventPattern: String = "*"
 

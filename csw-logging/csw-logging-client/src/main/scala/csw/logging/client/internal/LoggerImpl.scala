@@ -21,7 +21,7 @@ import csw.prefix.models.Prefix
 private[csw] class LoggerImpl(maybePrefix: Option[Prefix], actorName: Option[String]) extends Logger {
 
   // default log level will be applied if component specific log level is not provided in logging configuration inside component-log-levels block
-  private[this] def componentLoggingState: ComponentLoggingState =
+  private def componentLoggingState: ComponentLoggingState =
     maybePrefix match {
       case Some(prefix) => componentsLoggingState.getOrDefault(prefix, ComponentLoggingState(defaultLogLevel))
       case None         => ComponentLoggingState(defaultLogLevel)

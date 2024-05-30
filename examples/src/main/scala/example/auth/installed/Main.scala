@@ -18,7 +18,7 @@ object Main {
 
     LocationServerStatus.requireUpLocally()
 
-    implicit val actorSystem: ActorSystem[_] = ActorSystem(Behaviors.empty, "example-system")
+    implicit val actorSystem: ActorSystem[?] = ActorSystem(Behaviors.empty, "example-system")
 
     val adapter: InstalledAppAuthAdapter = AdapterFactory.makeAdapter
 

@@ -35,7 +35,7 @@ class RegistrationTest extends AnyFunSuite with Matchers with BeforeAndAfterAll 
     val hostname = Networks().hostname
 
     val pekkoConnection = PekkoConnection(api.models.ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD))
-    val actorRef: ActorRef[_] = actorSystem.spawn(
+    val actorRef: ActorRef[?] = actorSystem.spawn(
       Behaviors.empty,
       "my-actor-3"
     )
@@ -50,7 +50,7 @@ class RegistrationTest extends AnyFunSuite with Matchers with BeforeAndAfterAll 
     val hostname = Networks().hostname
 
     val pekkoConnection = PekkoConnection(api.models.ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD))
-    val actorRef: ActorRef[_] = actorSystem.spawn(
+    val actorRef: ActorRef[?] = actorSystem.spawn(
       Behaviors.empty,
       "my-actor-4"
     )

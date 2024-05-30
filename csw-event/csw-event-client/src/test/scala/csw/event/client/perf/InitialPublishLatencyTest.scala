@@ -18,7 +18,7 @@ import org.scalatest.funsuite.AnyFunSuite
 class InitialPublishLatencyTest extends AnyFunSuite with BeforeAndAfterAll {
 
   private implicit val system: ActorSystem               = ActorSystem()
-  private implicit val typedSystem: typed.ActorSystem[_] = system.toTyped
+  private implicit val typedSystem: typed.ActorSystem[?] = system.toTyped
   private val ls: LocationService                        = HttpLocationServiceFactory.makeLocalClient
   private val eventServiceFactory                        = new EventServiceFactory().make(ls)
   import eventServiceFactory._

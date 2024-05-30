@@ -33,8 +33,8 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-279: Test logging performance
 @State(Scope.Benchmark)
 class FileAppenderBenchmark {
-  var actorSystem: typed.ActorSystem[SpawnProtocol.Command] = _
-  var fileAppender: FileAppender                            = _
+  var actorSystem: typed.ActorSystem[SpawnProtocol.Command] = scala.compiletime.uninitialized
+  var fileAppender: FileAppender                            = scala.compiletime.uninitialized
 
   @Setup(Level.Trial)
   def setup(): Unit = {

@@ -87,7 +87,7 @@ private[hostconfig] class HostConfig(name: String, subsystem: Subsystem, startLo
   def executeScript(containerScript: String, args: String*): Process = {
     val cmd = containerScript +: args
     log.info(s"Executing command : ${cmd.mkString(" ")}")
-    new ProcessBuilder(cmd: _*).start()
+    new ProcessBuilder(cmd*).start()
   }
 
   private def shutdown(): Done = Await.result(wiring.actorRuntime.shutdown(), timeout)

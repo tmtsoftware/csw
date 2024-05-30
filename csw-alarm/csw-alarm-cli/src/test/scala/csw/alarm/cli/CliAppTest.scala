@@ -232,7 +232,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
     val cmd = Options("list")
 
     cliApp.execute(cmd)
-    logBuffer.toList shouldEqualContentsOf "list/all_alarms.txt"
+    logBuffer.toList `shouldEqualContentsOf` "list/all_alarms.txt"
   }
 
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
@@ -241,7 +241,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
     val cmd = Options("list", maybeSubsystem = Some(NFIRAOS))
 
     cliApp.execute(cmd)
-    logBuffer.toList shouldEqualContentsOf "list/subsystem_alarms.txt"
+    logBuffer.toList `shouldEqualContentsOf` "list/subsystem_alarms.txt"
   }
 
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
@@ -254,7 +254,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
     )
 
     cliApp.execute(cmd)
-    logBuffer.toList shouldEqualContentsOf "list/component_alarms.txt"
+    logBuffer.toList `shouldEqualContentsOf` "list/component_alarms.txt"
   }
 
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
@@ -268,7 +268,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
     )
 
     cliApp.execute(cmd)
-    logBuffer.toList shouldEqualContentsOf "list/with_name_alarms.txt"
+    logBuffer.toList `shouldEqualContentsOf` "list/with_name_alarms.txt"
   }
 
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
@@ -283,7 +283,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
     )
 
     cliApp.execute(cmd)
-    logBuffer.toList shouldEqualContentsOf "metadata.txt"
+    logBuffer.toList `shouldEqualContentsOf` "metadata.txt"
   }
 
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
@@ -300,7 +300,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
 
     cliApp.execute(cmd)
     // alarm time changes on every run hence filter out time before assertion
-    logBuffer.toList shouldEqualContentsOf "status.txt"
+    logBuffer.toList `shouldEqualContentsOf` "status.txt"
 
   }
 

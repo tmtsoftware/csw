@@ -17,7 +17,7 @@ import csw.prefix.models.Prefix
 import csw.prefix.models.Subsystem.AOESW
 
 trait TestDataFeeder {
-  self: SeverityServiceModule with MetadataServiceModule with StatusServiceModule =>
+  self: SeverityServiceModule & MetadataServiceModule & StatusServiceModule =>
 
   def feedTestData(testCase: SetSeverityTestCase): Unit =
     feedTestData(

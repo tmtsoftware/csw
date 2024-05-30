@@ -86,12 +86,12 @@ class MatrixKeyType[S: ClassTag: ArrayEnc: ArrayDec] extends SimpleKeyType[Matri
 /**
  * KeyTypes defined for consumption in Scala code
  */
-object KeyType extends Enum[KeyType[_]] {
+object KeyType extends Enum[KeyType[?]] {
 
   /**
    * values return a Seq of all KeyTypes provided by `csw-messages`
    */
-  override def values: IndexedSeq[KeyType[_]] = findValues
+  override def values: IndexedSeq[KeyType[?]] = findValues
 
   sealed class SKT[S: ClassTag: ArrayEnc: ArrayDec]                 extends SimpleKeyType[S] with KeyType[S]
   sealed class SKTWU[S: ClassTag: ArrayEnc: ArrayDec](value: Units) extends SimpleKeyTypeWithUnits[S](value) with KeyType[S]
@@ -106,7 +106,7 @@ object KeyType extends Enum[KeyType[_]] {
       new GChoiceKey(name, this, units, Choices(restChoices.toSet + firstChoice))
 
     def make(name: String, firstChoice: Choice, restChoices: Choice*): GChoiceKey =
-      make(name, NoUnits, firstChoice, restChoices: _*)
+      make(name, NoUnits, firstChoice, restChoices*)
   }
 
   case object StringKey  extends SKT[String]

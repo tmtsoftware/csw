@@ -17,13 +17,13 @@ import csw.logging.client.scaladsl.LoggerFactory
 import csw.prefix.models.Prefix
 
 abstract class JBaseLoggerFactory private[logging] (maybePrefix: Option[Prefix]) {
-  def getLogger[T](ctx: ActorContext[T], klass: Class[_]): ILogger = new JLoggerImpl(logger(Some(actorPath(ctx.getSelf))), klass)
-  def getLogger(ctx: actor.ActorContext, klass: Class[_]): ILogger = new JLoggerImpl(logger(Some(actorPath(ctx.self))), klass)
-  def getLogger(klass: Class[_]): ILogger                          = new JLoggerImpl(logger(None), klass)
+  def getLogger[T](ctx: ActorContext[T], klass: Class[?]): ILogger = new JLoggerImpl(logger(Some(actorPath(ctx.getSelf))), klass)
+  def getLogger(ctx: actor.ActorContext, klass: Class[?]): ILogger = new JLoggerImpl(logger(Some(actorPath(ctx.self))), klass)
+  def getLogger(klass: Class[?]): ILogger                          = new JLoggerImpl(logger(None), klass)
 
   private def logger(maybeActorRef: Option[String]): Logger = new LoggerImpl(maybePrefix, maybeActorRef)
   private def actorPath(actorRef: ActorRef): String = ActorPath.fromString(Serialization.serializedActorPath(actorRef)).toString
-  private def actorPath(actorRef: typed.ActorRef[_]): String = actorPath(actorRef.toClassic)
+  private def actorPath(actorRef: typed.ActorRef[?]): String = actorPath(actorRef.toClassic)
 }
 
 /**

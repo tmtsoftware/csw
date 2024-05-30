@@ -19,7 +19,7 @@ import example.event.TemperatureMessage.*
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationDouble
 
-class ConcurrencyInCallbacksExample(publisher: EventPublisher)(implicit actorSystem: ActorSystem[_]) {
+class ConcurrencyInCallbacksExample(publisher: EventPublisher)(implicit actorSystem: ActorSystem[?]) {
 
   def behavior(): Behavior[TemperatureMessage] =
     Behaviors.setup { ctx =>

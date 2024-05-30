@@ -17,7 +17,7 @@ import csw.prefix.models.Subsystem
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble
 
-class EventSubscribeExamples(eventService: EventService, hcd: PekkoLocation)(implicit system: ActorSystem[_]) {
+class EventSubscribeExamples(eventService: EventService, hcd: PekkoLocation)(implicit system: ActorSystem[?]) {
 
   def callback(): EventSubscription =
     // #with-callback

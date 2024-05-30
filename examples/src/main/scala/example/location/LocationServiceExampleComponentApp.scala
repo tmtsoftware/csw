@@ -50,7 +50,7 @@ object LocationServiceExampleComponent {
   val connection = PekkoConnection(componentId)
 
   // Message sent from client once location has been resolved
-  case class ClientMessage(replyTo: typed.ActorRef[_])
+  case class ClientMessage(replyTo: typed.ActorRef[?])
 
   def behaviour(locationService: LocationService)(implicit ec: ExecutionContextExecutor): Behaviors.Receive[ClientMessage] =
     Behaviors.receive[ClientMessage]((ctx, msg) => {

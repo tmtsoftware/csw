@@ -22,7 +22,7 @@ trait LogAppenderBuilder {
    * @param standardHeaders the headers that are fixes for this service
    * @return an appender
    */
-  def apply(system: ActorSystem[_], standardHeaders: JsObject): LogAppender
+  def apply(system: ActorSystem[?], standardHeaders: JsObject): LogAppender
 }
 
 /**

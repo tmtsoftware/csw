@@ -23,7 +23,7 @@ import csw.logging.client.commons.PekkoTypedExtension.UserActorFactory
  *
  * @param locationService is used to unregister Actors that are no more alive
  */
-private[location] class DeathwatchActor(locationService: LocationService)(implicit actorSystem: ActorSystem[_]) {
+private[location] class DeathwatchActor(locationService: LocationService)(implicit actorSystem: ActorSystem[?]) {
   import DeathwatchActor.Msg
 
   /**

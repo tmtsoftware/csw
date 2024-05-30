@@ -38,8 +38,8 @@ class EventServiceIntegrationTest extends FrameworkIntegrationSuite with Eventua
   import testWiring._
 
   private val masterId: String        = ConfigFactory.load().getString("csw-event.redis.masterId")
-  private var sentinel: RedisSentinel = _
-  private var server: RedisServer     = _
+  private var sentinel: RedisSentinel = scala.compiletime.uninitialized
+  private var server: RedisServer     = scala.compiletime.uninitialized
 
   private val filterAssemblyConnection = PekkoConnection(api.models.ComponentId(Prefix(Subsystem.TCS, "Filter"), Assembly))
   private val disperserHcdConnection   = PekkoConnection(api.models.ComponentId(Prefix(Subsystem.TCS, "Disperser"), HCD))

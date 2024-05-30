@@ -29,7 +29,7 @@ import scala.util.control.NonFatal
  */
 // $COVERAGE-OFF$
 private[event] class KafkaPublisher(producerSettings: Future[ProducerSettings[String, Array[Byte]]])(implicit
-    actorSystem: ActorSystem[_]
+    actorSystem: ActorSystem[?]
 ) extends EventPublisher {
 
   import actorSystem.executionContext

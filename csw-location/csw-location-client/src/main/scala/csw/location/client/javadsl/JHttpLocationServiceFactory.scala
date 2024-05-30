@@ -19,7 +19,7 @@ object JHttpLocationServiceFactory {
    * Use this factory method to create http location client when location server is running locally.
    * HTTP Location server runs on port 7654.
    */
-  def makeLocalClient(actorSystem: ActorSystem[_]): ILocationService =
+  def makeLocalClient(actorSystem: ActorSystem[?]): ILocationService =
     HttpLocationServiceFactory.makeLocalClient(actorSystem).asJava(actorSystem.executionContext)
 
 }

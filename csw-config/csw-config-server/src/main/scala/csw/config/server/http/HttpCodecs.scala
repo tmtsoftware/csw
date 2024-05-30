@@ -24,13 +24,13 @@ trait HttpCodecs {
 
   implicit def unmarshaller[A: Decoder]: FromEntityUnmarshaller[A] = {
     Unmarshaller.byteStringUnmarshaller
-      .forContentTypes(unmarshallerContentTypes: _*)
+      .forContentTypes(unmarshallerContentTypes*)
       .map(Json.decode(_).to[A].value)
   }
 
   implicit def marshaller[A: Encoder]: ToEntityMarshaller[A] = {
     Marshaller
-      .oneOf(mediaTypes: _*)(Marshaller.byteStringMarshaller(_))
+      .oneOf(mediaTypes*)(Marshaller.byteStringMarshaller(_))
       .compose(Json.encode(_).to[ByteString].result)
   }
 

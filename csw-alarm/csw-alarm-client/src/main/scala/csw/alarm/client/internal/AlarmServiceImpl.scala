@@ -17,7 +17,7 @@ private[alarm] class AlarmServiceImpl(
     override val redisConnectionsFactory: RedisConnectionsFactory,
     override val settings: Settings
 )(implicit
-    override val actorSystem: typed.ActorSystem[_],
+    override val actorSystem: typed.ActorSystem[?],
     val ec: ExecutionContext
 ) extends AlarmAdminService
     with MetadataServiceModule

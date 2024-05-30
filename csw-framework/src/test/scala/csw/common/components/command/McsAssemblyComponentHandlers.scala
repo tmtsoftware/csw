@@ -32,7 +32,7 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
 
   private implicit val timeout: Timeout     = 10.seconds
   private implicit val ec: ExecutionContext = ctx.executionContext
-  private var hcdComponent: CommandService  = _
+  private var hcdComponent: CommandService  = scala.compiletime.uninitialized
   private val assemblyPrefix                = prefix
 
   import cswCtx._

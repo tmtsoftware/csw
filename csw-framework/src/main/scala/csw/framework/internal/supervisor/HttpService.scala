@@ -30,7 +30,7 @@ class HttpService(
     route: Route,
     log: Logger,
     httpConnection: HttpConnection
-)(implicit actorSystem: ActorSystem[_]) {
+)(implicit actorSystem: ActorSystem[?]) {
 
   import actorSystem.executionContext
 

@@ -12,10 +12,10 @@ import csw.params.core.generics.Parameter
 
 object ParameterArgParser {
 
-  def parse(cmdLineParamsArg: String): Set[Parameter[_]] =
+  def parse(cmdLineParamsArg: String): Set[Parameter[?]] =
     extractParams(cmdLineParamsArg)
       .map(keyValue)
-      .map((createParam _).tupled)
+      .map((createParam).tupled)
       .toSet
 
   private def extractParams(paramsStr: String) = paramsStr.split(PARAMS_SEP)
@@ -38,7 +38,7 @@ object ParameterArgParser {
     }
   }
 
-  private def createParam(keyArg: KeyArg, values: Array[String]): Parameter[_] = {
+  private def createParam(keyArg: KeyArg, values: Array[String]): Parameter[?] = {
     import keyArg._
     keyType match {
       case 'i' => IntKey.make(keyName, units).setAll(values.map(_.toInt))

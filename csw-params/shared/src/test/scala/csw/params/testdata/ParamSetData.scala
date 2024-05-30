@@ -65,7 +65,7 @@ object ParamSetData {
   private val altAzCoord       = AltAzCoord(Tag("BASE"), 301.degree, 42.5.degree)
   private val p27 = CoordKey.make("CoordKey").set(eqCoord, solarSystemCoord, minorPlanetCoord, cometCoord, altAzCoord)
 
-  val paramSet: Set[Parameter[_]] =
+  val paramSet: Set[Parameter[?]] =
     Set(
       p1,
       p2,

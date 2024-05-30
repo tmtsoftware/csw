@@ -13,8 +13,8 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 /**
  * A convenient class wrapping actor system and providing handles for execution context and clean up of actor system
  */
-private[csw] class ActorRuntime(_typedSystem: ActorSystem[_] = ActorSystem(SpawnProtocol(), "config-client-system")) {
-  implicit val actorSystem: ActorSystem[_]  = _typedSystem
+private[csw] class ActorRuntime(_typedSystem: ActorSystem[?] = ActorSystem(SpawnProtocol(), "config-client-system")) {
+  implicit val actorSystem: ActorSystem[?]  = _typedSystem
   implicit val ec: ExecutionContextExecutor = actorSystem.executionContext
 
   /**

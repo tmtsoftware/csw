@@ -40,7 +40,7 @@ private[csw] object LogActorMessages {
 
   case class SetSlf4jLevel(level: Level) extends LogActorMessages
 
-  case class LogPekko(time: Long, level: Level, source: String, clazz: Class[_], msg: Any, cause: Option[Throwable])
+  case class LogPekko(time: Long, level: Level, source: String, clazz: Class[?], msg: Any, cause: Option[Throwable])
       extends LogActorMessages
 
   case class SetPekkoLevel(level: Level) extends LogActorMessages

@@ -35,8 +35,8 @@ class AlarmServiceIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
 
   private val masterId: String        = ConfigFactory.load().getString("csw-alarm.redis.masterId")
-  private var sentinel: RedisSentinel = _
-  private var server: RedisServer     = _
+  private var sentinel: RedisSentinel = scala.compiletime.uninitialized
+  private var server: RedisServer     = scala.compiletime.uninitialized
 
   private val wiring: FrameworkWiring = FrameworkWiring.make(seedActorSystem)
   private val adminAlarmService       = wiring.alarmServiceFactory.makeAdminApi(wiring.locationService)

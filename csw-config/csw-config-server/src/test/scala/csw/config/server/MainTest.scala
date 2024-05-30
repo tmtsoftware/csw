@@ -26,7 +26,7 @@ import scala.concurrent.duration.*
 
 // DEOPSCSW-130: Command line App for HTTP server
 class MainTest extends HTTPLocationService {
-  implicit val actorSystem: ActorSystem[_] = ActorSystem(Behaviors.empty, "config-server")
+  implicit val actorSystem: ActorSystem[?] = ActorSystem(Behaviors.empty, "config-server")
 
   private val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient
 

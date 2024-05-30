@@ -35,7 +35,7 @@ object ContainerCmd {
    * alone without any container
    * @return                  Actor ref of the container or supervisor of the component started without container
    */
-  def start(name: String, subsystem: Subsystem, args: Array[String], defaultConfig: Option[Config] = None): ActorRef[_] =
+  def start(name: String, subsystem: Subsystem, args: Array[String], defaultConfig: Option[Config] = None): ActorRef[?] =
     new ContainerCmd(name, subsystem, true, defaultConfig).start(args)
 }
 
@@ -50,7 +50,7 @@ private[framework] class ContainerCmd(
   final private lazy val wiring: FrameworkWiring = new FrameworkWiring
   import wiring.actorRuntime.*
 
-  def start(args: Array[String]): ActorRef[_] =
+  def start(args: Array[String]): ActorRef[?] =
     new ArgsParser(name).parse(args.toList) match {
       case None => throw UnableToParseOptions
       case Some(Options(isLocal, inputFilePath)) =>
@@ -78,7 +78,7 @@ private[framework] class ContainerCmd(
       isLocal: Boolean,
       inputFilePath: Option[Path],
       defaultConfig: Option[Config]
-  ): Future[ActorRef[_]] =
+  ): Future[ActorRef[?]] =
     async {
       val config          = await(wiring.configUtils.getConfig(isLocal, inputFilePath, defaultConfig))
       val isContainerConf = config.hasPath("components")
@@ -87,7 +87,7 @@ private[framework] class ContainerCmd(
       actorRef
     }
 
-  private def createComponent(isContainerConf: Boolean, wiring: FrameworkWiring, config: Config): Future[ActorRef[_]] =
+  private def createComponent(isContainerConf: Boolean, wiring: FrameworkWiring, config: Config): Future[ActorRef[?]] =
     if (isContainerConf) Container.spawn(config, wiring)
     else Standalone.spawn(config, wiring)
 

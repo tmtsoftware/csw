@@ -23,21 +23,21 @@ object ModelType extends CommonCodecs {
   def apply[T <: EnumEntry: Enum: ClassTag](`enum`: Enum[T]): ModelType[T] = new ModelType(`enum`.values.toList)
 }
 
-class ModelSet private (val modelTypes: List[ModelType[_]])
+class ModelSet private (val modelTypes: List[ModelType[?]])
 
 object ModelSet {
-  def models(modelTypes: ModelType[_]*): ModelSet = new ModelSet(modelTypes.toList)
+  def models(modelTypes: ModelType[?]*): ModelSet = new ModelSet(modelTypes.toList)
 }
 
 class RequestSet[T: Encoder: Decoder] {
-  private var requests: List[ModelType[_]] = Nil
+  private var requests: List[ModelType[?]] = Nil
 
   protected def requestType[R <: T: ClassTag](models: R*): Unit = {
     implicit val codec: Codec[R] = Codec.of[T].asInstanceOf[Codec[R]]
     requests ::= ModelType(models.toList)
   }
 
-  def modelSet: ModelSet = ModelSet.models(requests.reverse: _*)
+  def modelSet: ModelSet = ModelSet.models(requests.reverse*)
 }
 
 case class Endpoint(requestType: String, responseType: String, errorTypes: List[String] = Nil, description: Option[String] = None)
@@ -45,7 +45,7 @@ case class Endpoint(requestType: String, responseType: String, errorTypes: List[
 abstract case class Contract private (endpoints: List[Endpoint], requests: ModelSet)
 
 object Contract {
-  def apply(endpoints: List[Endpoint], requestSet: RequestSet[_]): Contract = new Contract(endpoints, requestSet.modelSet) {}
+  def apply(endpoints: List[Endpoint], requestSet: RequestSet[?]): Contract = new Contract(endpoints, requestSet.modelSet) {}
   def empty: Contract                                                       = new Contract(Nil, ModelSet.models()) {}
 }
 

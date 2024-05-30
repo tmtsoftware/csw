@@ -39,7 +39,7 @@ private[csw] object DatabaseServiceFactory {
  *                    2) schedule the task of database connection
  * @param values used for testing purposes, to manually set the values for credentials instead of reading from env vars
  */
-class DatabaseServiceFactory private[csw] (actorSystem: ActorSystem[_], values: Map[String, String]) {
+class DatabaseServiceFactory private[csw] (actorSystem: ActorSystem[?], values: Map[String, String]) {
 
   /**
    * Creates the DatabaseServiceFactory. It is not injected in `CswContext` like other csw services.
@@ -50,7 +50,7 @@ class DatabaseServiceFactory private[csw] (actorSystem: ActorSystem[_], values: 
    *                    2) schedule the task of database connection
    * @return DatabaseServiceFactory
    */
-  def this(actorSystem: ActorSystem[_]) = this(actorSystem, Map.empty)
+  def this(actorSystem: ActorSystem[?]) = this(actorSystem, Map.empty)
 
   private val log: Logger    = DatabaseLogger.getLogger
   private val config: Config = actorSystem.settings.config

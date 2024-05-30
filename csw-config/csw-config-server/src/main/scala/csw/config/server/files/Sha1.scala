@@ -20,7 +20,7 @@ import scala.concurrent.Future
  */
 object Sha1 {
 
-  private def fromSource(source: Source[ByteString, Any])(implicit system: ActorSystem[_]): Future[String] =
+  private def fromSource(source: Source[ByteString, Any])(implicit system: ActorSystem[?]): Future[String] =
     source.runWith(sink)
 
   /**
@@ -31,7 +31,7 @@ object Sha1 {
    *            of it
    * @return a future that completes with calculated sha value of the data
    */
-  def fromConfigData(configData: ConfigData)(implicit system: ActorSystem[_]): Future[String] =
+  def fromConfigData(configData: ConfigData)(implicit system: ActorSystem[?]): Future[String] =
     fromSource(configData.source)
 
   /**
@@ -44,7 +44,7 @@ object Sha1 {
    *            of it
    * @return a future that completes with calculated sha value of the data
    */
-  def fromPath(path: Path)(implicit system: ActorSystem[_]): Future[String] =
+  def fromPath(path: Path)(implicit system: ActorSystem[?]): Future[String] =
     fromSource(FileIO.fromPath(path))
 
   /**

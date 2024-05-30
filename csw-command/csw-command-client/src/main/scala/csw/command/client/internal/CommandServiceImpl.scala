@@ -30,7 +30,7 @@ import msocket.api.Subscription
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 
-private[command] class CommandServiceImpl(component: ActorRef[ComponentMessage])(implicit val actorSystem: ActorSystem[_])
+private[command] class CommandServiceImpl(component: ActorRef[ComponentMessage])(implicit val actorSystem: ActorSystem[?])
     extends CommandService {
 
   private implicit val ec: ExecutionContext = actorSystem.executionContext

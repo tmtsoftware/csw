@@ -11,7 +11,7 @@ import csw.aas.installed.api.InstalledAppAuthAdapter
 // #command-factory
 object CommandFactory {
   def makeCommand(adapter: InstalledAppAuthAdapter, args: Array[String])(implicit
-      actorSystem: typed.ActorSystem[_]
+      actorSystem: typed.ActorSystem[?]
   ): Option[AppCommand] = {
 
     // ============ NOTE ============

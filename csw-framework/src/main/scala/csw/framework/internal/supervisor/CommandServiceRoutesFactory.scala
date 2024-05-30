@@ -21,7 +21,7 @@ object CommandServiceRoutesFactory {
 
   import CommandServiceCodecs._
 
-  def createRoutes(component: ActorRef[ComponentMessage])(implicit actorSystem: ActorSystem[_]): Route = {
+  def createRoutes(component: ActorRef[ComponentMessage])(implicit actorSystem: ActorSystem[?]): Route = {
     import actorSystem.executionContext
     val commandService     = CommandServiceFactory.make(component)
     val securityDirectives = SecurityDirectives.authDisabled(actorSystem.settings.config)(actorSystem.executionContext)

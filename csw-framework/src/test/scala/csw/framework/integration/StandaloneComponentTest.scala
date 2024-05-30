@@ -49,7 +49,7 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
   // all log messages will be captured in log buffer
   private val logBuffer                    = mutable.Buffer.empty[JsObject]
   private val testAppender                 = new TestAppender(x => logBuffer += Json.parse(x.toString).as[JsObject])
-  private var loggingSystem: LoggingSystem = _
+  private var loggingSystem: LoggingSystem = scala.compiletime.uninitialized
   // using standaloneActorSystem to start component instead of seedActorSystem,
   // to assert shutdown of the component(which will also shutdown standaloneActorSystem)
   private val standaloneComponentActorSystem: ActorSystem[SpawnProtocol.Command] =

@@ -24,7 +24,7 @@ trait CommandData {
 
   val values = 100
 
-  val paramSet: Set[Parameter[_]] = ParamSetData.paramSet
+  val paramSet: Set[Parameter[?]] = ParamSetData.paramSet
 
   val prefix                     = new Prefix(Subsystem.CSW, "ncc.trombone")
   val id: Id                     = Id()

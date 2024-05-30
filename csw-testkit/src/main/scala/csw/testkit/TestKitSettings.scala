@@ -16,7 +16,7 @@ object TestKitSettings {
   /**
    * Reads configuration settings from `csw.testkit` section.
    */
-  def apply(system: ActorSystem[_]): TestKitSettings = apply(system.settings.config)
+  def apply(system: ActorSystem[?]): TestKitSettings = apply(system.settings.config)
 
   /**
    * Reads configuration settings from given `Config` that
@@ -27,7 +27,7 @@ object TestKitSettings {
   /**
    * Java API: Reads configuration settings from ``csw.testkit`` section.
    */
-  def create(system: ActorSystem[_]): TestKitSettings = apply(system)
+  def create(system: ActorSystem[?]): TestKitSettings = apply(system)
 
   /**
    * Reads configuration settings from given `Config` that

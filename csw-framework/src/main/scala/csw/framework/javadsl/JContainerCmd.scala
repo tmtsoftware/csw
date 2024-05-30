@@ -28,7 +28,7 @@ object JContainerCmd {
    * alone without any container
    * @return actor ref of the container or supervisor of the component started without container
    */
-  def start(name: String, subsystem: Subsystem, args: Array[String], defaultConfig: Optional[Config]): ActorRef[_] =
+  def start(name: String, subsystem: Subsystem, args: Array[String], defaultConfig: Optional[Config]): ActorRef[?] =
     ContainerCmd.start(name, subsystem, args, defaultConfig.toScala)
 }
 // $COVERAGE-ON$

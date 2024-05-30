@@ -21,7 +21,7 @@ import scala.concurrent.ExecutionContext
 
 private[testkit] trait RedisStore extends EmbeddedRedis {
 
-  implicit def system: typed.ActorSystem[_]
+  implicit def system: typed.ActorSystem[?]
   implicit def timeout: Timeout
   protected def masterId: String
   protected def connection: TcpConnection

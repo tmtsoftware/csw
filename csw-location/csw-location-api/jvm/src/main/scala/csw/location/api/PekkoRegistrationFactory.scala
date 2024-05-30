@@ -30,7 +30,7 @@ class PekkoRegistrationFactory {
    * @return PekkoRegistration instance. A [[csw.location.api.exceptions.LocalPekkoActorRegistrationNotAllowed]]
    *        is thrown if the actorRefURI provided is not a remote actorRef uri
    */
-  def make(connection: PekkoConnection, actorRef: ActorRef[_], metadata: Metadata): PekkoRegistration = {
+  def make(connection: PekkoConnection, actorRef: ActorRef[?], metadata: Metadata): PekkoRegistration = {
     val actorRefURI = actorRef.toURI
     if (actorRefURI.getPort == -1) {
       val log: Logger            = LocationServiceLogger.getLogger
@@ -49,7 +49,7 @@ class PekkoRegistrationFactory {
    * @return PekkoRegistration instance. A [[csw.location.api.exceptions.LocalPekkoActorRegistrationNotAllowed]]
    *        is thrown if the actorRefURI provided is not a remote actorRef uri
    */
-  def make(connection: PekkoConnection, actorRef: ActorRef[_]): PekkoRegistration =
+  def make(connection: PekkoConnection, actorRef: ActorRef[?]): PekkoRegistration =
     make(connection, actorRef, Metadata.empty)
 
 }

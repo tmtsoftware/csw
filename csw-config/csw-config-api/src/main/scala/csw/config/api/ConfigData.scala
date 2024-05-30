@@ -32,7 +32,7 @@ class ConfigData private (val source: Source[ByteString, Any], val length: Long)
    * @param system an pekko system required to start the stream of file data that will form a string out of bytes
    * @return a future that completes with string representation of file data
    */
-  def toStringF(implicit system: ActorSystem[_]): Future[String] =
+  def toStringF(implicit system: ActorSystem[?]): Future[String] =
     source.runFold("")((str, bs) => str + bs.utf8String)
 
   /**
@@ -42,7 +42,7 @@ class ConfigData private (val source: Source[ByteString, Any], val length: Long)
    *            and parse it to `Config` model
    * @return a future that completes with `Config` model representing the file data
    */
-  def toConfigObject(implicit system: ActorSystem[_]): Future[Config] = {
+  def toConfigObject(implicit system: ActorSystem[?]): Future[Config] = {
     import system.executionContext
     toStringF.map { s => ConfigFactory.parseString(s) }
   }
@@ -53,7 +53,7 @@ class ConfigData private (val source: Source[ByteString, Any], val length: Long)
    * @param system required to start the stream of file data that will form a string out of bytes
    * @return a CompletableFuture that completes with string representation of file data
    */
-  private[config] def toJStringF(implicit system: ActorSystem[_]): CompletableFuture[String] =
+  private[config] def toJStringF(implicit system: ActorSystem[?]): CompletableFuture[String] =
     toStringF.asJava.toCompletableFuture
 
   /**
@@ -63,7 +63,7 @@ class ConfigData private (val source: Source[ByteString, Any], val length: Long)
    *               and parse it to `Config` model
    * @return a CompletableFuture that completes with `Config` model representing the file data
    */
-  private[config] def toJConfigObject(implicit system: ActorSystem[_]): CompletableFuture[Config] =
+  private[config] def toJConfigObject(implicit system: ActorSystem[?]): CompletableFuture[Config] =
     toConfigObject.asJava.toCompletableFuture
 
   /**
@@ -73,7 +73,7 @@ class ConfigData private (val source: Source[ByteString, Any], val length: Long)
    * @param system an pekko system required to start the stream of file data and dump it onto the provided `path`
    * @return a future of path that represents the file path on local machine
    */
-  def toPath(path: Path)(implicit system: ActorSystem[_]): Future[Path] = {
+  def toPath(path: Path)(implicit system: ActorSystem[?]): Future[Path] = {
     import system.executionContext
     source
       .toMat(FileIO.toPath(path))(Keep.right)
@@ -87,7 +87,7 @@ class ConfigData private (val source: Source[ByteString, Any], val length: Long)
    * @param system an pekko system required to start the stream of file data and convert it to InputStream
    * @return an inputStream which emits the bytes read from source of file data
    */
-  private[config] def toInputStream(implicit system: ActorSystem[_]): InputStream =
+  private[config] def toInputStream(implicit system: ActorSystem[?]): InputStream =
     source.runWith(StreamConverters.asInputStream())
 }
 

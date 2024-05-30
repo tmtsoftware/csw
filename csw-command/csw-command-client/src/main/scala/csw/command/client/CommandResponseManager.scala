@@ -24,7 +24,7 @@ import scala.jdk.FutureConverters.*
  * @param actorSystem actor system for allowing sending messages in API
  */
 class CommandResponseManager(val commandResponseManagerActor: ActorRef[MiniCRM.CRMMessage])(implicit
-    val actorSystem: ActorSystem[_]
+    val actorSystem: ActorSystem[?]
 ) {
 
   /**
@@ -60,7 +60,7 @@ class CommandResponseManager(val commandResponseManagerActor: ActorRef[MiniCRM.C
    */
   def queryFinalAll(commands: java.util.List[CompletableFuture[SubmitResponse]]): CompletableFuture[OverallResponse] = {
     val args = commands.asScala.toList.map(_.asScala)
-    queryFinalAll(args: _*).asJava.toCompletableFuture
+    queryFinalAll(args*).asJava.toCompletableFuture
   }
 
   // Returns true if all the commands in the response set have returned without Error

@@ -97,12 +97,12 @@ trait ParamCodecsBase extends CommonCodecs {
   implicit def paramCodec[T: ArrayEnc: ArrayDec]: Codec[Parameter[T]] =
     Codec.bimap[Map[String, ParamCore[T]], Parameter[T]](ParamCore.fromParam, ParamCore.toParam)
 
-  implicit lazy val paramEncExistential: Encoder[Parameter[_]] = { (w: Writer, value: Parameter[_]) =>
+  implicit lazy val paramEncExistential: Encoder[Parameter[?]] = { (w: Writer, value: Parameter[?]) =>
     val encoder: Encoder[Parameter[Any]] = value.keyType.paramEncoder.asInstanceOf[Encoder[Parameter[Any]]]
     encoder.write(w, value.asInstanceOf[Parameter[Any]])
   }
 
-  implicit lazy val paramDecExistential: Decoder[Parameter[_]] = { (r: Reader) =>
+  implicit lazy val paramDecExistential: Decoder[Parameter[?]] = { (r: Reader) =>
     r.tryReadMapHeader(1) || r.tryReadMapStart() || r.tryReadArrayHeader(1) || r.tryReadArrayStart()
     val keyTypeName = r.readString()
     val keyType     = KeyType.withNameInsensitive(keyTypeName)

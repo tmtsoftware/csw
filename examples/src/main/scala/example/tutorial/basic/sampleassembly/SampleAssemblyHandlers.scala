@@ -51,7 +51,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
   private val log                           = loggerFactory.getLogger
   private val prefix: Prefix                = cswCtx.componentInfo.prefix
   private val hcdConnection                 = PekkoConnection(ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
-  private var hcdLocation: PekkoLocation    = _
+  private var hcdLocation: PekkoLocation    = scala.compiletime.uninitialized
   private var hcdCS: Option[CommandService] = None
 
   // #initialize

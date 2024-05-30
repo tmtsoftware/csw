@@ -18,6 +18,6 @@ class TestAppender(callback: Any => Unit) extends LogAppenderBuilder {
    * @param stdHeaders the headers that are fixes for this service.
    * @return the stdout appender.
    */
-  def apply(system: ActorSystem[_], stdHeaders: JsObject): StdOutAppender =
+  def apply(system: ActorSystem[?], stdHeaders: JsObject): StdOutAppender =
     new StdOutAppender(system, stdHeaders, callback)
 }

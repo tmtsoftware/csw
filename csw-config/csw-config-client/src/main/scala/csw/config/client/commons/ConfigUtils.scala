@@ -15,7 +15,7 @@ import csw.config.api.scaladsl.ConfigClientService
 import cps.compat.FutureAsync.*
 import scala.concurrent.Future
 
-class ConfigUtils(configClientService: ConfigClientService)(implicit system: ActorSystem[_]) {
+class ConfigUtils(configClientService: ConfigClientService)(implicit system: ActorSystem[?]) {
 
   import system.executionContext
 

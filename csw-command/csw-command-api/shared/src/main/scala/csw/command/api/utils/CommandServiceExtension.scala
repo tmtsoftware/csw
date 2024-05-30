@@ -18,7 +18,7 @@ import cps.compat.FutureAsync.*
 import scala.concurrent.{Future, Promise, TimeoutException}
 import scala.util.{Failure, Success}
 
-class CommandServiceExtension(commandService: CommandService)(implicit val actorSystem: ActorSystem[_]) {
+class CommandServiceExtension(commandService: CommandService)(implicit val actorSystem: ActorSystem[?]) {
   import actorSystem.executionContext
 
   def submitAndWait(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse] = {
