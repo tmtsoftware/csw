@@ -123,6 +123,12 @@ case class SystemEvent private[csw] (
    */
   override protected def create(data: Set[Parameter[?]]): SystemEvent =
     copy(eventId = Id(), eventTime = UTCTime.now(), paramSet = data)
+
+  /**
+   * Returns a new SystemEvent with the same values and the given time and a new id
+   */
+  def withEventTime(eventTime: UTCTime): SystemEvent =
+    copy(eventId = Id(), eventTime = eventTime)
 }
 
 object SystemEvent {
