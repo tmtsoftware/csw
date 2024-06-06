@@ -127,13 +127,13 @@ class JsonContractTest extends AnyFunSpec with Matchers {
       val arrayDataParam = arrayDataKey.set(ArrayData.fromArray(a1), ArrayData.fromArrays[Byte](10, 20, 30, 40, 50))
 
       val systemEvent       = SystemEvent(eventId, prefix, eventName, eventTime, Set(arrayDataParam))
-      val systemEvent2      = SystemEvent(prefix, eventName, Set(arrayDataParam)).withEventTime(eventTime).copy(eventId = eventId)
+//      val systemEvent2      = SystemEvent(prefix, eventName, Set(arrayDataParam)).withEventTime(eventTime).copy(eventId = eventId)
       val systemEventToJson = JsonSupport.writeEvent(systemEvent)
-      val systemEventToJson2 = JsonSupport.writeEvent(systemEvent2)
+//      val systemEventToJson2 = JsonSupport.writeEvent(systemEvent2)
 
       val expectedSystemEventJson = Json.parse(Source.fromResource("json/system_event.json").mkString)
       systemEventToJson shouldEqual expectedSystemEventJson
-      systemEventToJson2 shouldEqual expectedSystemEventJson
+//      systemEventToJson2 shouldEqual expectedSystemEventJson
     }
   }
 

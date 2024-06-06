@@ -124,11 +124,15 @@ case class SystemEvent private[csw] (
   override protected def create(data: Set[Parameter[?]]): SystemEvent =
     copy(eventId = Id(), eventTime = UTCTime.now(), paramSet = data)
 
-  /**
-   * Returns a new SystemEvent with the same values and the given time and a new id
-   */
-  def withEventTime(eventTime: UTCTime): SystemEvent =
-    copy(eventId = Id(), eventTime = eventTime)
+  // TODO FIXME: Find a way to set the eventTime. The method below works, but the time is reset again in create() above
+  // if you make any other changes, such as adding parameters. The reason for resetting the eventTime in create() was to
+  // make event reuse safer, since the caller might otherwise forget to set a new id and eventTime.
+
+//  /**
+//   * Returns a new SystemEvent with the same values and the given time and a new id
+//   */
+//  def withEventTime(eventTime: UTCTime): SystemEvent =
+//    copy(eventId = Id(), eventTime = eventTime)
 }
 
 object SystemEvent {
