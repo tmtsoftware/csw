@@ -3,7 +3,8 @@ import sbt.Def.{setting => dep}
 import sbt._
 
 object Libs {
-  val ScalaVersion = "3.4.2"
+  //  val ScalaVersion: String  = "3.4.2"
+  val ScalaVersion: String  = "3.3.3" // Needs to match esw ammonite scala version
 
   val `dotty-cps-async` = dep("com.github.rssh" %%% "dotty-cps-async" % "0.9.21")
 
@@ -14,7 +15,7 @@ object Libs {
   val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.5.6"
 
   val `sourcecode`        = "com.lihaoyi"                              %% "sourcecode"        % "0.4.2"
-  val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "3c23339" // Apache 2.0
+  val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "2572711" // Apache 2.0
   val `svnkit`        = "org.tmatesoft.svnkit" % "svnkit"        % "1.10.11" // TMate Open Source License
   val `commons-codec` = "commons-codec"        % "commons-codec" % "1.15"    // Apache 2.0š
   val `gson`          = "com.google.code.gson" % "gson"          % "2.11.0"  // Apache 2.0
@@ -52,7 +53,7 @@ object Libs {
   val `caffeine`          = "com.github.ben-manes.caffeine"     % "caffeine"          % "3.1.8"
   val netty               = "io.netty"                          % "netty-all"         % "4.1.110.Final"
   val `case-app`          = "com.github.alexarchambault"       %% "case-app"          % "2.1.0-M26"
-  val `tmt-test-reporter` = "com.github.tmtsoftware.rtm"       %% "rtm"               % "1981053"
+  val `tmt-test-reporter` = "com.github.tmtsoftware.rtm"       %% "rtm"               % "b7997a9"
 }
 
 object Borer {
@@ -126,7 +127,7 @@ object Jooq {
 }
 
 object MSocket {
-  val Version = "033f412"
+  val Version = "06b7251"
 
   val `msocket-api`      = dep("com.github.tmtsoftware.msocket" %%% "msocket-api" % Version)
   val `msocket-security` = "com.github.tmtsoftware.msocket" %% "msocket-security" % Version
