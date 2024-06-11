@@ -19,7 +19,7 @@ object Libs {
   val `svnkit`        = "org.tmatesoft.svnkit" % "svnkit"        % "1.10.11" // TMate Open Source License
   val `commons-codec` = "commons-codec"        % "commons-codec" % "1.15"    // Apache 2.0š
   val `gson`          = "com.google.code.gson" % "gson"          % "2.11.0"  // Apache 2.0
-  val `play-json`     = "com.typesafe.play"   %% "play-json"     % "2.10.5"  // Apache 2.0
+  val `play-json`     = "org.playframework"   %% "play-json"     % "3.0.3"  // Apache 2.0
 
   val `enumeratum`                = dep("com.beachape" %%% "enumeratum" % "1.7.3")  // MIT License
   val `scala-java-time`           = dep("io.github.cquiroz" %%% "scala-java-time" % "2.5.0")
