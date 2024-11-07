@@ -27,10 +27,12 @@ class CommandServiceRequestHandler(
 
   override def handle(request: CommandServiceRequest): Route =
     request match {
-      case Validate(controlCommand) => sPost(controlCommand)(complete(commandService.validate(controlCommand)))
-      case Submit(controlCommand)   => sPost(controlCommand)(complete(commandService.submit(controlCommand)))
-      case Oneway(controlCommand)   => sPost(controlCommand)(complete(commandService.oneway(controlCommand)))
-      case Query(runId)             => complete(commandService.query(runId))
+      case Validate(controlCommand)               => sPost(controlCommand)(complete(commandService.validate(controlCommand)))
+      case Submit(controlCommand)                 => sPost(controlCommand)(complete(commandService.submit(controlCommand)))
+      case Oneway(controlCommand)                 => sPost(controlCommand)(complete(commandService.oneway(controlCommand)))
+      case Query(runId)                           => complete(commandService.query(runId))
+      case ExecuteDiagnosticMode(startTime, hint) => complete(commandService.executeDiagnosticMode(startTime, hint))
+      case ExecuteOperationsMode()                => complete(commandService.executeOperationsMode())
     }
 
   private def sPost(controlCommand: ControlCommand)(route: => Route) =

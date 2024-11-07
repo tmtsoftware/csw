@@ -6,7 +6,6 @@
 package csw.command.client.internal
 
 import java.util.concurrent.TimeoutException
-
 import org.apache.pekko.actor.typed.scaladsl.AskPattern.*
 import org.apache.pekko.actor.typed.{ActorRef, ActorSystem}
 import org.apache.pekko.stream.scaladsl.{Keep, Sink, Source}
@@ -18,6 +17,7 @@ import csw.command.api.scaladsl.CommandService
 import csw.command.api.utils.CommandServiceExtension
 import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
 import csw.command.client.messages.ComponentCommonMessage.ComponentStateSubscription
+import csw.command.client.messages.DiagnosticDataMessage.*
 import csw.command.client.messages.{ComponentMessage, Query, QueryFinal}
 import csw.command.client.models.framework.PubSub.{Subscribe, SubscribeOnly}
 import csw.params.commands.CommandIssue.IdNotAvailableIssue
@@ -25,6 +25,7 @@ import csw.params.commands.CommandResponse.*
 import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
+import csw.time.core.models.UTCTime
 import msocket.api.Subscription
 
 import scala.concurrent.duration.DurationInt
@@ -108,4 +109,12 @@ private[command] class CommandServiceImpl(component: ActorRef[ComponentMessage])
   override def subscribeCurrentState(names: Set[StateName], callback: CurrentState => Unit): Subscription =
     subscribeCurrentState(names).map(callback).toMat(Sink.ignore)(Keep.left).run()
 
+  override def executeDiagnosticMode(startTime: UTCTime, hint: String): Unit =
+    component ! DiagnosticMode(startTime, hint)
+
+  /**
+   * On receiving a operations mode command, the current diagnostic data mode is halted.
+   */
+  override def executeOperationsMode(): Unit =
+    component ! OperationsMode
 }
