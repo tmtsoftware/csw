@@ -33,6 +33,8 @@ class CommandServiceRequestHandler(
       case Query(runId)                           => complete(commandService.query(runId))
       case ExecuteDiagnosticMode(startTime, hint) => complete(commandService.executeDiagnosticMode(startTime, hint))
       case ExecuteOperationsMode()                => complete(commandService.executeOperationsMode())
+      case GoOnline()                             => complete(commandService.onGoOnline())
+      case GoOffline()                            => complete(commandService.onGoOffline())
     }
 
   private def sPost(controlCommand: ControlCommand)(route: => Route) =

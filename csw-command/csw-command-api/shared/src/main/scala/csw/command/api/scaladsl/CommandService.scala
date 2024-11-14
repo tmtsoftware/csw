@@ -130,8 +130,9 @@ trait CommandService {
   /**
    * On receiving a diagnostic data command, the component goes into a diagnostic data mode based on hint at the specified startTime.
    * Validation of supported hints need to be handled by the component writer.
+   *
    * @param startTime represents the time at which the diagnostic mode actions will take effect
-   * @param hint represents supported diagnostic data mode for a component
+   * @param hint      represents supported diagnostic data mode for a component
    */
   def executeDiagnosticMode(startTime: UTCTime, hint: String): Unit
 
@@ -140,4 +141,13 @@ trait CommandService {
    */
   def executeOperationsMode(): Unit
 
+  /**
+   * A component can be notified to run in online mode again in case it was put to run in offline mode.
+   */
+  def onGoOnline(): Unit
+
+  /**
+   * A component can be notified to run in offline mode.
+   */
+  def onGoOffline(): Unit
 }

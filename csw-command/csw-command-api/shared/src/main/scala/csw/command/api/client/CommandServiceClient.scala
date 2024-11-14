@@ -71,6 +71,12 @@ class CommandServiceClient(
   override def executeDiagnosticMode(startTime: UTCTime, hint: String): Unit =
     httpTransport.requestResponse[Unit](ExecuteDiagnosticMode(startTime, hint))
 
-  def executeOperationsMode(): Unit =
+  override def executeOperationsMode(): Unit =
     httpTransport.requestResponse[Unit](ExecuteOperationsMode())
+
+  override def onGoOnline(): Unit =
+    httpTransport.requestResponse[Unit](GoOnline())
+
+  override def onGoOffline(): Unit =
+    httpTransport.requestResponse[Unit](GoOffline())
 }

@@ -18,4 +18,6 @@ object CommandServiceRequest {
   case class Query(runId: Id)                                        extends CommandServiceRequest
   case class ExecuteDiagnosticMode(startTime: UTCTime, hint: String) extends CommandServiceRequest
   case class ExecuteOperationsMode()                                 extends CommandServiceRequest
+  case class GoOnline()                                              extends CommandServiceRequest
+  case class GoOffline()                                             extends CommandServiceRequest
 }

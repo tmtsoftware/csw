@@ -18,8 +18,10 @@ import csw.command.api.utils.CommandServiceExtension
 import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
 import csw.command.client.messages.ComponentCommonMessage.ComponentStateSubscription
 import csw.command.client.messages.DiagnosticDataMessage.*
+import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.{ComponentMessage, Query, QueryFinal}
 import csw.command.client.models.framework.PubSub.{Subscribe, SubscribeOnly}
+import csw.command.client.models.framework.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.params.commands.CommandIssue.IdNotAvailableIssue
 import csw.params.commands.CommandResponse.*
 import csw.params.commands.ControlCommand
@@ -117,4 +119,10 @@ private[command] class CommandServiceImpl(component: ActorRef[ComponentMessage])
    */
   override def executeOperationsMode(): Unit =
     component ! OperationsMode
+
+  override def onGoOnline(): Unit =
+    component ! Lifecycle(GoOnline)
+
+  override def onGoOffline(): Unit =
+    component ! Lifecycle(GoOffline)
 }
