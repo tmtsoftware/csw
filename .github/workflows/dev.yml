@@ -17,8 +17,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: coursier/setup-action@v1
+      - uses: actions/checkout@v4
+      - uses: coursier/setup-action@v1.2.0-M2
         with:
           jvm: temurin:1.17
           apps: sbt
@@ -32,16 +32,16 @@ jobs:
       - name: Tests
         run: |
           sbt clean
-          sbt -DenableFatalWarnings=true -Dpekko.actor.serialize-messages=on -DenableCoverage=false -DgenerateStoryReport=false csw-time/Test/test
-          sbt -DenableFatalWarnings=true -Dpekko.actor.serialize-messages=on -DenableCoverage=false -DgenerateStoryReport=false -DdisableTimeTests Test/test
+          sbt -Dsbt.log.noformat=true -DenableFatalWarnings=true -Dpekko.actor.serialize-messages=on -DenableCoverage=false -DgenerateStoryReport=false csw-time/Test/test
+          sbt -Dsbt.log.noformat=true -DenableFatalWarnings=true -Dpekko.actor.serialize-messages=on -DenableCoverage=false -DgenerateStoryReport=false -DdisableTimeTests Test/test
 
 
   multi-jvm-tests:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: coursier/setup-action@v1
+      - uses: actions/checkout@v4
+      - uses: coursier/setup-action@v1.2.0-M2
         with:
           jvm: temurin:1.17
           apps: sbt
@@ -55,7 +55,7 @@ jobs:
           sbt makeSite
 
       - name: Multi-Jvm Tests
-        run: sbt -DenableFatalWarnings=true -DgenerateStoryReport=false integration/MultiJvm/test
+        run: sbt -Dsbt.log.noformat=true -DenableFatalWarnings=true -DgenerateStoryReport=false integration/MultiJvm/test
 
   slack-success:
     needs: [ unit-tests, multi-jvm-tests ]
