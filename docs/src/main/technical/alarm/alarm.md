@@ -15,7 +15,7 @@ in order to receive events affecting the Redis data set in some way.
 
 ![Alarm Dependencies](alarm-layers.png)
 
-We have created a layer i.e. "Romaine" which converts redis events into an [akka stream](https://doc.akka.io/docs/akka/current/stream/index.html).
+We have created a layer i.e. "Romaine" which converts redis events into an [akka stream](https://doc.akka.io/libraries/akka-core/current/stream/index.html).
 Romaine internally uses a java redis library called [Lettuce](https://lettuce.io/).
 
 ## Severities

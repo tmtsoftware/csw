@@ -22,7 +22,7 @@ Configuration service is divided into following modules:
 
 1. **Client**
     1. Config client is a convenient lightweight wrapper for accessing the CSW Configuration HTTP Server.
-    1. It is build using Akka Http's [request level](https://doc.akka.io/docs/akka-http/current/client-side/request-level.html) client API.
+    1. It is build using Akka Http's [request level](https://doc.akka.io/libraries/akka-http/current/client-side/request-level.html) client API.
 
 1. **CLI**
     1. It is a command line application which internally uses Config Client and hides HTTP interaction with Config server.

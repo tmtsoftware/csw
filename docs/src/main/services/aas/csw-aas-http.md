@@ -201,7 +201,7 @@ val policy = policy1 | (policy2 & (policy3 | policy4)) | policy5
 
 Since security directives extend from `akka.http.scaladsl.server.Directive`, they give you all the
 benefits of a usual directive. These benefits include being able to label and [compose higher level
-directives](https://doc.akka.io/docs/akka-http/current/routing-dsl/directives/custom-directives.html#custom-directives).
+directives](https://doc.akka.io/libraries/akka-http/current/routing-dsl/directives/custom-directives.html#custom-directives).
 
 With the help of directive labeling you could write a route like below:
 

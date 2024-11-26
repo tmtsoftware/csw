@@ -235,7 +235,7 @@ periodically. The schedulers can be used to handle tasks at 1KHz
 frequency or 1 task every millisecond. However, jitters and JVM garbage
 collection can degrade the performance of the schedulers at such a high
 frequency. Internally, the scheduler APIs makes use of ‘[Akka Scheduler
-Library](https://doc.akka.io/docs/akka/current/scheduler.html)’. The
+Library](https://doc.akka.io/libraries/akka-http/current/)’. The
 results published in [here](https://id.atlassian.com/login?continue=https%3A%2F%2Ftmt-project.atlassian.net%2Flogin%3FredirectCount%3D1%26dest-url%3D%252Fwiki%252Fspaces%252FDEOPSCSW%252Fpages%252F298680332%252FComparative%252Bstudy%252Bof%252Bscheduler%252Boptions%252Bfor%252B1KHz%252B1ms%252Bscheduling%252Brate%26application%3Dconfluence&application=confluence)
 compares some of the options and makes strong recommendation to use the
 Akka Schedulers. The snippets in the API documentation defines the schedule APIs in the

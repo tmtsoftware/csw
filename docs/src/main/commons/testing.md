@@ -169,9 +169,9 @@ Unit testing simple Scala/Java classes or objects is straightforward. You can mo
 
 The following links provide guides for testing applications using different modules of Akka:
 
-- [Akka Untyped Actors](https://doc.akka.io/docs/akka/current/testing.html)
-- [Akka Typed Actors](https://doc.akka.io/docs/akka/current/typed/testing.html)
-- [Akka Streams](https://doc.akka.io/docs/akka/current/stream/stream-testkit.html?language=scala)
+- [Akka Untyped Actors](https://doc.akka.io/libraries/akka-core/current/testing.html)
+- [Akka Typed Actors](https://doc.akka.io/libraries/akka-core/current/typed/testing.html)
+- [Akka Streams](https://doc.akka.io/libraries/akka-core/current/stream/stream-testkit.html?language=scala)
 
 ## Multi-JVM Tests
 
@@ -179,11 +179,11 @@ Testing asynchronous distributed systems requires special tooling/framework supp
 Sbt has a plugin called [sbt-multi-jvm](https://github.com/sbt/sbt-multi-jvm) which helps to test systems across multiple JVMs or machines.
 This is especially useful for integration testing where multiple systems communicate with each other.
 
-You can find more details on multi-JVM tests [here](https://doc.akka.io/docs/akka/current/multi-jvm-testing.html).
+You can find more details on multi-JVM tests [here](https://doc.akka.io/libraries/akka-core/current/multi-jvm-testing.html).
 
 You can also refer to some examples in [CSW](https://github.com/tmtsoftware/csw) for writing your own multi-JVM tests. For example: [CommandServiceTest.scala]($github.base_url$/integration/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala)  
 
-In case you want to run your multi-JVM tests across machines, refer to this multi-node testing guide [here](https://doc.akka.io/docs/akka/current/multi-node-testing.html).
+In case you want to run your multi-JVM tests across machines, refer to this multi-node testing guide [here](https://doc.akka.io/libraries/akka-core/current/multi-node-testing.html).
 
 ## Mockito
 

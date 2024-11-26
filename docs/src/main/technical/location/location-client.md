@@ -2,7 +2,7 @@
 
 The [csw-location-client]($github.dir.base_url$/csw-location/csw-location-client) project provides a convenient lightweight wrapper for accessing the CSW Location HTTP Server.
 
-Location service client is build using Akka Http's [request level](https://doc.akka.io/docs/akka-http/current/client-side/request-level.html) client API.
+Location service client is build using Akka Http's [request level](https://doc.akka.io/libraries/akka-http/current/client-side/request-level.html) client API.
 
 @@@ note
 Lifecycle of all the components registered using location service client is tied up with the actor system used to create client.

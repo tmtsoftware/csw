@@ -14,9 +14,9 @@ For information on _using_ the Location Service, see these sections:
 
 Core implementation of location service uses
 
-- [Akka Cluster](https://doc.akka.io/docs/akka/current/index-cluster.html)
-- [Conflict Free Replicated Data Types (CRDTs)](https://doc.akka.io/docs/akka/current/typed/distributed-data.html)
-- [Akka Http](https://doc.akka.io/docs/akka-http/current/).
+- [Akka Cluster](https://doc.akka.io/libraries/akka-core/current/index-cluster.html)
+- [Conflict Free Replicated Data Types (CRDTs)](https://doc.akka.io/libraries/akka-core/current/typed/distributed-data.html)
+- [Akka Http](https://doc.akka.io/libraries/akka-http/current/).
 
 You can find more details on how CSW is using this in @ref:[csw-location-server](./location-server.md).
 

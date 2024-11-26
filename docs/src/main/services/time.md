@@ -16,7 +16,7 @@ with PTP capable Network Interface Cards (NIC).
 In order to read the time with high precision, the Time Service relies on making native calls to the Linux kernel libraries, 
 since Java 8 supports only millisecond precision. [Java Native Access (JNA)](https://github.com/java-native-access/jna) 
 is used internally in Time Service to make native calls that return the required precision.
-The implementation of Time Service Scheduler is based on the [Akka Scheduler](https://doc.akka.io/docs/akka/current/scheduler.html),
+The implementation of Time Service Scheduler is based on the [Akka Scheduler](https://doc.akka.io/libraries/akka-core/current/scheduler.html),
 which is designed for high-throughput tasks rather than long-term, cron-like scheduling of tasks.
 
 <!-- introduction to the service -->

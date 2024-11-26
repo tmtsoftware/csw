@@ -11,7 +11,7 @@ The common software framework is a library that provides set of APIs used for:
 - receiving responses from components
 - deploying component in container or standalone mode 
 
-The CSW framework is implemented using [Akka typed actors](https://doc.akka.io/docs/akka/current/typed/index.html).
+The CSW framework is implemented using [Akka typed actors](https://doc.akka.io/libraries/akka-core/current/typed/index.htmls).
 
 @@@ note {title="IMPORTANT!!!"}
 
@@ -68,7 +68,7 @@ An explanation of the `Idle` state can be found @ref[here](../../commons/create-
 
 If there is any exception thrown while executing `initialize` handler then the exception is bubbled up to Supervisor, and it restarts Top Level
 Actor which in turn calls `initialize` handler again hoping the error fixes on restart. For this, Supervisor uses a restart strategy with maximum of 3
-restarts possible that must be finished within 5 seconds. To know more about the Akka supervision failure strategy please refer to the [Akka Fault Tolerance](https://doc.akka.io/docs/akka/current/typed/fault-tolerance.html)
+restarts possible that must be finished within 5 seconds. To know more about the Akka supervision failure strategy please refer to the [Akka Fault Tolerance](https://doc.akka.io/libraries/akka-core/current/typed/fault-tolerance.html)
 document. The Supervisor code base wiring restart strategy can be found [here]($github.base_url$/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehavior.scala#L309). 
 
 @@@
@@ -104,7 +104,7 @@ components in the container.
 ### ActorSystem for the Component
 
 While creating a component a new ActorSystem is spawned, which means if there are more than one components running in single JVM process there will
-be more than one ActorSystem created in the single JVM. Having different ActorSystems in an application is not recommended by [akka](https://doc.akka.io/docs/akka/current/general/actor-systems.html)
+be more than one ActorSystem created in the single JVM. Having different ActorSystems in an application is not recommended by [akka](https://doc.akka.io/libraries/akka-core/current/general/actor-systems.html)
 but it is still kept multiple per JVM so that any delay in executing in one component does not affect the execution of other components running in the same
 JVM. The code base for creating an ActorSystem for each component is written in [SupervisorInfoFactory]($github.base_url$/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorInfoFactory.scala#L35).
 
