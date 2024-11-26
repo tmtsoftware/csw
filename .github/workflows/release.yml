@@ -11,7 +11,7 @@ jobs:
     env:
       ESW_TS_VERSION: "0.4.1"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: coursier/setup-action@v1.2.0-M2
         with:
           jvm: temurin:1.17
@@ -52,7 +52,7 @@ jobs:
           sbt -DenableCoverage=true coverageReport
           sbtn coverageAggregate
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: Coverage Report
           path: target/scala-2.13/scoverage-report
@@ -71,7 +71,7 @@ jobs:
 
       - name: Upload RTM
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: RTM
           path: target/RTM
