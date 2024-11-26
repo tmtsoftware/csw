@@ -18,7 +18,7 @@ pipeline {
 
         stage('Paradox Validate Links') {
             steps {
-                sh "sbt docs/paradoxValidateLinks"
+                sh "sbt -Dsbt.log.noformat=true docs/paradoxValidateLinks"
             }
         }
     }

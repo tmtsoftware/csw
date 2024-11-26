@@ -31,12 +31,12 @@ jobs:
 
       - name: Tests
         run: |
-          sbt -DenableFatalWarnings=true -Dakka.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true 'csw-time/test:test'
-          sbt -DenableFatalWarnings=true -Dakka.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true -DdisableTimeTests 'test:test'
+          sbt -Dsbt.log.noformat=true -DenableFatalWarnings=true -Dakka.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true 'csw-time/test:test'
+          sbt -Dsbt.log.noformat=true -DenableFatalWarnings=true -Dakka.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true -DdisableTimeTests 'test:test'
 
       - name: Coverage Report
         run: |
-          sbt -DenableCoverage=true coverageReport
+          sbt -Dsbt.log.noformat=true -DenableCoverage=true coverageReport
           sbtn coverageAggregate
 
       - name: Generate RTM
@@ -75,7 +75,7 @@ jobs:
           sbtn makeSite
 
       - name: Multi-Jvm Tests
-        run: sbt -DenableFatalWarnings=true -DgenerateStoryReport=true 'integration/multi-jvm:test'
+        run: sbt -Dsbt.log.noformat=true -DenableFatalWarnings=true -DgenerateStoryReport=true 'integration/multi-jvm:test'
 
       - name: Generate RTM
         if: always()
