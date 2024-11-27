@@ -141,8 +141,7 @@ In case of TMT most of the synchronization components will be based on
 Linux operating system. For understanding the internal working of Linux
 clock one can refer to [this short
 description](http://btorpey.github.io/blog/2014/02/18/clock-sources-in-linux/#fnref:1)
-or follow ‘Chapter 6’ of [the detailed
-document](https://doc.lagout.org/operating%20system%20/linux/Understanding%20Linux%20Kernel.pdf).
+or follow ‘Chapter 6’ of [the detailed document](https://doc.lagout.org/operating%20system%20/linux/Understanding%20Linux%20Kernel.pdf).
 The block diagram of an ordinary clock is shown in the following figure.
 
 ![block diagram](block-diagram-ordinary-clock.png)

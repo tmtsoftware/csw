@@ -236,4 +236,4 @@ You can explicitly pass the hostname and port of the Redis server while running 
 $ redis-cli -h redis.tmt.org -p 6379
 ```
 
-A detailed list of operations you can perform with `redis-cli` can be found [here](https://redis.io/docs/manual/cli/)
+A detailed list of operations you can perform with `redis-cli` can be found [here](https://redis.io/docs/latest/develop/tools/cli/)

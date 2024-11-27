@@ -11,7 +11,7 @@ The common software framework is a library that provides set of APIs used for:
 - receiving responses from components
 - deploying component in container or standalone mode 
 
-The CSW framework is implemented using [Akka typed actors](https://doc.akka.io/libraries/akka-core/current/typed/index.htmls).
+The CSW framework is implemented using [Akka typed actors](https://doc.akka.io/libraries/akka-core/2.5/typed-actors.html).
 
 @@@ note {title="IMPORTANT!!!"}
 

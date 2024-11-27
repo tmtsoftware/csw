@@ -11,7 +11,7 @@ It provides following libraries (aka adapters). For information on _using_ these
 - @ref:[Installed Auth Adapter - csw-aas-installed](../../services/aas/csw-aas-installed.md) - enables security for CLI applications 
 - @extref[Javascript Adapter - ESW-TS](esw_ts:aas/auth-components.html) - enables security for Javascript React applications
 
-These adapters are written on top of [client adapters](https://www.keycloak.org/docs/18.0/securing_apps/#client-adapters) provided by Keycloak.
+These adapters are written on top of [client adapters](https://www.keycloak.org/securing-apps/javascript-adapter) provided by Keycloak.
 
 ![AAS Adapters](aas-adapters.png) 
 

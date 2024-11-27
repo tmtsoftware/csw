@@ -315,6 +315,6 @@ To know more about setting up docker and starting Elastic, please refer to @ref:
 @@@ note
 
 By default, Elasticsearch will run in a read-only mode if the disk it is using is more than 90% full.  This can be configured.
-See the [Elasticsearch reference documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/disk-allocator.html)
+See the [Elasticsearch reference documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-cluster.html#disk-based-shard-allocation)
 
 @@@

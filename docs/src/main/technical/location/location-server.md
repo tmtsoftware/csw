@@ -36,7 +36,7 @@ By default, this actor system binds to port `3552`. Initially when there is no m
 Such a node is referred as seed node (introducer) and the location of this node needs to be known so that other nodes can join to this known address and form a larger cluster.
 After the joining process is complete, seed nodes are not special and they participate in the cluster in exactly the same way as other nodes.
 
-Akka Cluster provides cluster [membership](https://doc.akka.io/libraries/akksa-core/current/typed/cluster-membership.html) service using [gossip](https://doc.akka.io/docs/akka/current/typed/cluster-concepts.html#gossip)
+Akka Cluster provides cluster [membership](https://doc.akka.io/libraries/akka-core/current/typed/cluster-membership.html) service using [gossip](https://doc.akka.io/libraries/akka-core/current/typed/cluster-concepts.html#gossip)
 protocols and an automatic [failure detector](https://doc.akka.io/libraries/akka-core/current/typed/cluster-concepts.html#failure-detector).
 
 Death watch uses the cluster failure detector for nodes in the cluster, i.e. it detects network failures and JVM crashes, in addition to graceful termination of watched actor.

@@ -64,8 +64,8 @@ When to use which API is documented in
 @ref[this section](../../services/event.md#accessing-event-service) of the Event Service programming documentation.
 
  
-Event Service uses [Redis' PubSub](https://redis.io/docs/manual/pubsub/) for publishing and subscribing to events.
-And to support the feature of `getting` the latest event on a subscription, the [set operation](https://redis.io/commands/set/) of Redis DB is used.
+Event Service uses [Redis' PubSub](https://redis.io/docs/latest/develop/interact/pubsub/) for publishing and subscribing to events.
+And to support the feature of `getting` the latest event on a subscription, the [set operation](https://redis.io/docs/latest/commands/set/) of Redis DB is used.
 
 ## Romaine
 
@@ -73,7 +73,7 @@ At a lower level, we have created a library called "Romaine" to communicate more
 
 ![Event Dependencies](event-layers.png)
 
-Romaine is a Scala library built over the Java Redis client library called [Lettuce](https://lettuce.io/).
+Romaine is a Scala library built over the Java Redis client library called [Lettuce](https://redis.github.io/lettuce/).
 Romaine provides additional rich APIs over the existing functionality offered by Lettuce including these additional APIs useful to CSW:
 
 * **Async API:** Provides asynchronous API (`romaine.async.RedisAsyncApi`) for various redis commands like `get`, `set`, `publish` etc.  
@@ -81,7 +81,7 @@ Romaine provides additional rich APIs over the existing functionality offered by
 * **Reactive API:** Provides API for Subscription and Pattern-Subscription (`romaine.reactive.RedisSubscriptionApi`).
 On subscription, it returns an [Akka Stream](https://doc.akka.io/libraries/akka-core/current/stream/index.html) of Events which on execution materializes to `RedisSubscription` instance which gives handle to unsubscribe to events.
 
-* **Keyspace API:** Provides APIs to watch [Keyspace Notifications](https://redis.io/docs/manual/keyspace-notifications/) (`romaine.keyspace.RedisKeySpaceApi`).
+* **Keyspace API:** Provides APIs to watch [Keyspace Notifications](https://redis.io/docs/latest/develop/use/keyspace-notifications/) (`romaine.keyspace.RedisKeySpaceApi`).
 This is a rich API built on Akka Streams which provides not just the change events that happen on keys (for eg: Update, Removal etc.) but also the old and new values corresponding to those keys.  
 
 Event Service uses `Async API` for publishing and setting the latest event, and `Reactive API` for subscribing to events and patterns.
@@ -117,7 +117,7 @@ In case, when the underlying event implementation is not available, the Subscrib
 ## Architecture
 
 In order to allow components to discover Event Service, it is necessary to register it with the Location Service including the underlying product, 
-which here refers to the Redis instance (particularly [Redis Sentinel](https://redis.io/docs/manual/sentinel/)).
+which here refers to the Redis instance (particularly [Redis Sentinel](https://redis.io/docs/latest/operate/oss_and_stack/management/sentinel/)).
 
 For high availability of Event Service, we use the Redis Sentinel along with master and slave instances of Redis. Master and slave are configured in "replication" mode.
 
