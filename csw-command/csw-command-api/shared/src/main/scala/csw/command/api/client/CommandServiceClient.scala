@@ -62,8 +62,9 @@ class CommandServiceClient(
   override def subscribeCurrentState(names: Set[StateName]): Source[CurrentState, Subscription] =
     websocketTransport.requestStream[CurrentState](SubscribeCurrentState(names))
 
-  override def subscribeCurrentState(callback: CurrentState => Unit): Subscription =
+  override def subscribeCurrentState(callback: CurrentState => Unit): Subscription = {
     websocketTransport.requestStream[CurrentState](SubscribeCurrentState(), Observer.create(callback))
+  }
 
   override def subscribeCurrentState(names: Set[StateName], callback: CurrentState => Unit): Subscription =
     websocketTransport.requestStream[CurrentState](SubscribeCurrentState(names), Observer.create(callback))
