@@ -410,6 +410,7 @@ object Dependencies {
       Libs.`dotty-cps-async`.value,
       // (legacy dependencies) required*
       Libs.`jboss-logging`,
+      Libs.`commons-logging`,
       Libs.httpclient5,
 //      Libs.httpclient,
       Libs.`scalatest`.value % Test,

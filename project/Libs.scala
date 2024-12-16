@@ -4,7 +4,7 @@ import sbt._
 
 object Libs {
   //  val ScalaVersion: String  = "3.4.2"
-  val ScalaVersion: String  = "3.6.2" // Needs to match esw ammonite scala version?
+  val ScalaVersion: String = "3.6.2" // Needs to match esw ammonite scala version?
 
   val `dotty-cps-async` = dep("com.github.rssh" %%% "dotty-cps-async" % "0.9.22")
 
@@ -19,7 +19,7 @@ object Libs {
   val `svnkit`        = "org.tmatesoft.svnkit" % "svnkit"        % "1.10.11" // TMate Open Source License
   val `commons-codec` = "commons-codec"        % "commons-codec" % "1.15"    // Apache 2.0š
   val `gson`          = "com.google.code.gson" % "gson"          % "2.11.0"  // Apache 2.0
-  val `play-json`     = "org.playframework"   %% "play-json"     % "3.0.4"  // Apache 2.0
+  val `play-json`     = "org.playframework"   %% "play-json"     % "3.0.4"   // Apache 2.0
 
   val `enumeratum`                = dep("com.beachape" %%% "enumeratum" % "1.7.5")  // MIT License
   val `scala-java-time`           = dep("io.github.cquiroz" %%% "scala-java-time" % "2.6.0")
@@ -48,6 +48,7 @@ object Libs {
   val `io.zonky.test`     = "io.zonky.test"                     % "embedded-postgres" % "2.1.0"
   val httpclient5         = "org.apache.httpcomponents.client5" % "httpclient5"       % "5.4.1"
   val `jboss-logging`     = "org.jboss.logging"                 % "jboss-logging"     % "3.6.1.Final"
+  val `commons-logging`   = "commons-logging"                   % "commons-logging"   % "1.3.4"
   val `config`            = "com.typesafe"                      % "config"            % "1.4.3"
   val `os-lib`            = "com.lihaoyi"                      %% "os-lib"            % "0.11.3"
   val `caffeine`          = "com.github.ben-manes.caffeine"     % "caffeine"          % "3.1.8"
