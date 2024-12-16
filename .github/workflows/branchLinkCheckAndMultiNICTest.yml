@@ -16,6 +16,7 @@ jobs:
       - uses: coursier/setup-action@v1.2.0-M2
         with:
           jvm: temurin:1.17
+          apps: sbt sbtn
       - uses: coursier/cache-action@v6
       - run: sudo chmod 666 /var/run/docker.sock
 
