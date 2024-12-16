@@ -6,7 +6,7 @@ object Libs {
   //  val ScalaVersion: String  = "3.4.2"
   val ScalaVersion: String = "3.6.2" // Needs to match esw ammonite scala version?
 
-  val `dotty-cps-async` = dep("com.github.rssh" %%% "dotty-cps-async" % "0.9.22")
+  val `dotty-cps-async` = dep("com.github.rssh" %%% "dotty-cps-async" % "0.9.23")
 
   val `scopt`   = "com.github.scopt"  %% "scopt"       % "4.1.0" // MIT License
   val `mockito` = "org.scalatestplus" %% "mockito-3-4" % "3.2.10.0"
