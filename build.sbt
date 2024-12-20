@@ -447,6 +447,7 @@ lazy val `csw-alarm-client` = project
     `csw-alarm-api`,
     `csw-location-api`.jvm,
     `csw-logging-client`,
+    `csw-prefix`.jvm,
     `romaine`,
     `csw-logging-client`  % "test->test",
     `csw-commons`         % "test->test",

@@ -15,7 +15,7 @@ object Libs {
   val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.5.12"
 
   val `sourcecode`        = "com.lihaoyi"                              %% "sourcecode"        % "0.4.2"
-  val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "2572711" // Apache 2.0
+  val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "6b52e4e" // Apache 2.0
   val `svnkit`        = "org.tmatesoft.svnkit" % "svnkit"        % "1.10.11" // TMate Open Source License
   val `commons-codec` = "commons-codec"        % "commons-codec" % "1.15"    // Apache 2.0š
   val `gson`          = "com.google.code.gson" % "gson"          % "2.11.0"  // Apache 2.0
@@ -110,7 +110,11 @@ object PekkoHttp {
 }
 
 object Keycloak {
-  val Version = "25.0.3"
+  // XXX TODO FIXME: Recent versions of Keycloak have removed the adapter libs.
+  // The code using the adapters would need to be completely rewritten.
+//  val Version = "26.0.7"
+//  val Version = "25.0.3"
+  val Version = "24.0.4"
 
   val `keycloak-adapter-core`    = "org.keycloak" % "keycloak-adapter-core"      % Version
   val `keycloak-core`            = "org.keycloak" % "keycloak-core"              % Version
@@ -128,7 +132,7 @@ object Jooq {
 }
 
 object MSocket {
-  val Version = "b55e81b"
+  val Version = "f35e6ea"
 
   val `msocket-api`      = dep("com.github.tmtsoftware.msocket" %%% "msocket-api" % Version)
   val `msocket-security` = "com.github.tmtsoftware.msocket" %% "msocket-security" % Version
