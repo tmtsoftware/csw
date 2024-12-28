@@ -18,10 +18,10 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh "cs java --jvm temurin:1.17.0 -version"
-                sh "eval \$(cs java --jvm temurin:1.17.0 --env) && sbt -Dsbt.log.noformat=true clean"
-                sh "eval \$(cs java --jvm temurin:1.17.0 --env) && sbt -Dsbt.log.noformat=true scalafmtCheck"
-                sh "eval \$(cs java --jvm temurin:1.17.0 --env) && sbt -Dsbt.log.noformat=true -DenableFatalWarnings=true ';set every Seq(scalafmtOnCompile := false); scalastyle; test:compile; multi-jvm:compile;'"
+                sh "cs java --jvm temurin:1.21.0 -version"
+                sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.log.noformat=true clean"
+                sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.log.noformat=true scalafmtCheck"
+                sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.log.noformat=true -DenableFatalWarnings=true ';set every Seq(scalafmtOnCompile := false); scalastyle; test:compile; multi-jvm:compile;'"
             }
         }
 
@@ -29,15 +29,15 @@ pipeline {
         stage('Unit and Component Tests') {
             steps {
                 // Run all tests except csw-time tests
-                sh "eval \$(cs java --jvm temurin:1.17.0 --env) && sbt -Dsbt.log.noformat=true -DenableFatalWarnings=true -Dpekko.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true -DdisableTimeTests 'test:test'"
+                sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.log.noformat=true -DenableFatalWarnings=true -Dpekko.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true -DdisableTimeTests 'test:test'"
 
                 // Run csw-time module tests
-                sh "eval \$(cs java --jvm temurin:1.17.0 --env) && sbt -Dsbt.log.noformat=true -DenableFatalWarnings=true -Dpekko.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true 'csw-time/test:test'"
+                sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.log.noformat=true -DenableFatalWarnings=true -Dpekko.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true 'csw-time/test:test'"
             }
             post {
                 always {
-                    sh "eval \$(cs java --jvm temurin:1.17.0 --env) && sbt -Dsbt.log.noformat=true -DenableCoverage=true coverageReport"
-                    sh "eval \$(cs java --jvm temurin:1.17.0 --env) && sbt -Dsbt.log.noformat=true coverageAggregate"
+                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.log.noformat=true -DenableCoverage=true coverageReport"
+                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.log.noformat=true coverageAggregate"
                     junit '**/target/test-reports/*.xml'
                     publishHTML(target: [
                             allowMissing         : true,
@@ -54,19 +54,19 @@ pipeline {
         // These tests cover the scenario of multiple components in multiple containers on same machine.
         stage('Multi-Jvm Test') {
             steps {
-                sh "eval \$(cs java --jvm temurin:1.17.0 --env) && sbt -Dsbt.log.noformat=true -DenableFatalWarnings=true -DgenerateStoryReport=true 'integration/multi-jvm:test'"
+                sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.log.noformat=true -DenableFatalWarnings=true -DgenerateStoryReport=true 'integration/multi-jvm:test'"
             }
         }
 
         stage('Package') {
             steps {
-                sh "eval \$(cs java --jvm temurin:1.17.0 --env) && ./integration/scripts/bootstrap_standalone_jars.sh"
+                sh "eval \$(cs java --jvm temurin:1.21.0 --env) && ./integration/scripts/bootstrap_standalone_jars.sh"
             }
         }
 
         stage('Multi-NICs Docker') {
             steps {
-                sh "eval \$(cs java --jvm temurin:1.17.0 --env) && ./integration/scripts/multiple_nic_test.sh"
+                sh "eval \$(cs java --jvm temurin:1.21.0 --env) && ./integration/scripts/multiple_nic_test.sh"
             }
         }
 
