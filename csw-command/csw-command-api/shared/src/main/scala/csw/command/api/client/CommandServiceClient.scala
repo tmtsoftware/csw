@@ -19,8 +19,10 @@ import csw.params.commands.CommandResponse.*
 import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
+import csw.time.core.models.UTCTime
 import msocket.api.{Subscription, Transport}
 import msocket.portable.Observer
+import org.apache.pekko.Done
 
 import scala.concurrent.Future
 
@@ -60,9 +62,22 @@ class CommandServiceClient(
   override def subscribeCurrentState(names: Set[StateName]): Source[CurrentState, Subscription] =
     websocketTransport.requestStream[CurrentState](SubscribeCurrentState(names))
 
-  override def subscribeCurrentState(callback: CurrentState => Unit): Subscription =
+  override def subscribeCurrentState(callback: CurrentState => Unit): Subscription = {
     websocketTransport.requestStream[CurrentState](SubscribeCurrentState(), Observer.create(callback))
+  }
 
   override def subscribeCurrentState(names: Set[StateName], callback: CurrentState => Unit): Subscription =
     websocketTransport.requestStream[CurrentState](SubscribeCurrentState(names), Observer.create(callback))
+
+  override def executeDiagnosticMode(startTime: UTCTime, hint: String): Unit =
+    httpTransport.requestResponse[Unit](ExecuteDiagnosticMode(startTime, hint))
+
+  override def executeOperationsMode(): Unit =
+    httpTransport.requestResponse[Unit](ExecuteOperationsMode())
+
+  override def onGoOnline(): Unit =
+    httpTransport.requestResponse[Unit](GoOnline())
+
+  override def onGoOffline(): Unit =
+    httpTransport.requestResponse[Unit](GoOffline())
 }

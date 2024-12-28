@@ -298,7 +298,7 @@ object ExposureId {
    * @return A stand-alone ExposureId
    */
   def apply(subsystem: Subsystem, det: String, typLevel: TYPLevel, exposureNumber: ExposureNumber): ExposureId =
-    StandaloneExposureId(UTCTime.now(), subsystem: Subsystem, det: String, typLevel: TYPLevel, exposureNumber: ExposureNumber)
+    StandaloneExposureId(UTCTime.now(), subsystem, det, typLevel, exposureNumber)
 
   /**
    * This creates an ExposureId with an ObsId.
@@ -310,5 +310,5 @@ object ExposureId {
    * @return A standalone ExposureId
    */
   def apply(obsId: ObsId, subsystem: Subsystem, det: String, typLevel: TYPLevel, exposureNumber: ExposureNumber): ExposureId =
-    ExposureIdWithObsId(Some(obsId), subsystem: Subsystem, det: String, typLevel: TYPLevel, exposureNumber: ExposureNumber)
+    ExposureIdWithObsId(Some(obsId), subsystem, det, typLevel, exposureNumber)
 }

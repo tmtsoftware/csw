@@ -12,6 +12,7 @@ import csw.params.commands.CommandResponse.*
 import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
+import csw.time.core.models.UTCTime
 import msocket.api.Subscription
 
 import scala.concurrent.Future
@@ -43,7 +44,7 @@ trait CommandService {
    * final [[csw.params.commands.CommandResponse.SubmitResponse]] as a Future
    *
    * @param controlCommand the [[csw.params.commands.ControlCommand]] payload
-   * @param timeout max-time to wait for a final response
+   * @param timeout        max-time to wait for a final response
    * @return a SubmitResponse as a Future value
    */
   def submitAndWait(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse]
@@ -53,7 +54,7 @@ trait CommandService {
    * of validation (Accepted, Invalid) or a final Response. In case of response as `Accepted`, final CommandResponse can be obtained by using `subscribe` API.
    *
    * @param submitCommands the set of [[csw.params.commands.ControlCommand]] payloads
-   * @param timeout max-time to wait for a final response
+   * @param timeout        max-time to wait for a final response
    * @return a future list of SubmitResponse, one for each command
    */
   def submitAllAndWait(submitCommands: List[ControlCommand])(implicit timeout: Timeout): Future[List[SubmitResponse]]
@@ -75,7 +76,7 @@ trait CommandService {
    * provided as a future. In case of a failure or unmatched state, `Error` CommandResponse is provided as a Future.
    *
    * @param controlCommand the [[csw.params.commands.ControlCommand]] payload
-   * @param stateMatcher the StateMatcher implementation for matching received state against a demand state
+   * @param stateMatcher   the StateMatcher implementation for matching received state against a demand state
    * @return a MatchingResponse as a Future value
    */
   def onewayAndMatch(controlCommand: ControlCommand, stateMatcher: StateMatcher): Future[MatchingResponse]
@@ -93,7 +94,7 @@ trait CommandService {
    * Query for the final result of a long running command which was sent as Submit to get a [[csw.params.commands.CommandResponse.SubmitResponse]] as a Future
    *
    * @param commandRunId the runId of the command for which response is required
-   * @param timeout max-time to wait for a final response
+   * @param timeout      max-time to wait for a final response
    * @return a SubmitResponse as a Future value
    */
   def queryFinal(commandRunId: Id)(implicit timeout: Timeout): Future[SubmitResponse]
@@ -120,9 +121,33 @@ trait CommandService {
    * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.PekkoLocation]] of the component
    *
    * @note Callbacks are not thread-safe on the JVM. If you are doing side effects/mutations inside the callback, you should ensure that it is done in a thread-safe way inside an actor.
-   * @param names subscribe to only those states which have any of the provided value for name
+   * @param names    subscribe to only those states which have any of the provided value for name
    * @param callback the action to be applied on the CurrentState element received as a result of subscription
    * @return a Subscription to stop the subscription
    */
   def subscribeCurrentState(names: Set[StateName], callback: CurrentState => Unit): Subscription
+
+  /**
+   * On receiving a diagnostic data command, the component goes into a diagnostic data mode based on hint at the specified startTime.
+   * Validation of supported hints need to be handled by the component writer.
+   *
+   * @param startTime represents the time at which the diagnostic mode actions will take effect
+   * @param hint      represents supported diagnostic data mode for a component
+   */
+  def executeDiagnosticMode(startTime: UTCTime, hint: String): Unit
+
+  /**
+   * On receiving a operations mode command, the current diagnostic data mode is halted.
+   */
+  def executeOperationsMode(): Unit
+
+  /**
+   * A component can be notified to run in online mode again in case it was put to run in offline mode.
+   */
+  def onGoOnline(): Unit
+
+  /**
+   * A component can be notified to run in offline mode.
+   */
+  def onGoOffline(): Unit
 }
