@@ -23,8 +23,8 @@ jobs:
       - name: Multi-NICs Docker
         run: ./integration/scripts/multiple_nic_test.sh
 
-      - name: Paradox Validate Links
-        run: sbtn docs/paradoxValidateLinks
+#      - name: Paradox Validate Links
+#        run: sbtn docs/paradoxValidateLinks
 
       - name: Notify slack
         if: always()

@@ -3,7 +3,7 @@
 In TMT, we have adopted coursier to set up scala/java environment on development/production machines and install java based
 applications provided by CSW and ESW.
 
-## Install and Setup, Coursier and Jdk 17
+## Install and Setup, Coursier and Jdk 21
 
 1. Refer to the steps mentioned @link:[here](https://get-coursier.io/docs/cli-installation) { open=new } for downloading and installing coursier launcher
 
@@ -11,18 +11,18 @@ applications provided by CSW and ESW.
 
 ```bash
 ./cs setup
-cs java --jvm temurin:1.17
+cs java --jvm temurin:1.21
 ```
 
 The above command does the following things:
 
    1. It adds coursier bin directory where coursier installs applications to PATH environment variable. So that, all the applications installed via coursier are available in PATH and can be executed from any directory.
-   1. It installs Java Eclipse Temurin JDK 17.
+   1. It installs Java Eclipse Temurin JDK 21.
 
 
-Once jvm installed - include the output of command `cs java --jvm temurin:1.17 --env` in your respective shell profiles
-- In Fish: add `eval (cs java --jvm temurin:1.17 --env)` into fish.config
-- In Zsh: add `eval $(cs java --jvm temurin:1.17 --env)` into .zshrc
+Once jvm installed - include the output of command `cs java --jvm temurin:1.21 --env` in your respective shell profiles
+- In Fish: add `eval (cs java --jvm temurin:1.21 --env)` into fish.config
+- In Zsh: add `eval $(cs java --jvm temurin:1.21 --env)` into .zshrc
 
 Above config will set the required environment variable(e.g., JAVA_HOME) into your shell.
 
