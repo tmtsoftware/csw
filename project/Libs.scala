@@ -32,7 +32,7 @@ object Libs {
   val `reactive-streams`       = "org.reactivestreams"      % "reactive-streams"       % "1.0.4"
   val `pekko-connectors-kafka` = "org.apache.pekko"        %% "pekko-connectors-kafka" % "1.1.0"
   val `embedded-kafka`         = "io.github.embeddedkafka" %% "embedded-kafka"         % "3.7.0"
-  val `embedded-redis`         = "com.github.kstyrc"        % "embedded-redis"         % "0.6"
+  val `embedded-redis`         = "com.github.codemonstur"   % "embedded-redis"         % "1.4.3"
   val `scala-compiler`         = "org.scala-lang"           % "scala-compiler"         % ScalaVersion
   val `HdrHistogram`           = "org.hdrhistogram"         % "HdrHistogram"           % "2.2.2"
   val `testng`                 = "org.testng"               % "testng"                 % "7.8.0"
