@@ -40,8 +40,8 @@ class PubSubBehaviorTest extends AnyFunSuite with Matchers with BeforeAndAfterAl
 
   private val lifecycleProbe1    = TestProbe[LifecycleStateChanged]()
   private val lifecycleProbe2    = TestProbe[LifecycleStateChanged]()
-  private val currentStateProbe1 = TestInbox[CurrentState]()
-  private val currentStateProbe2 = TestInbox[CurrentState]()
+  private val currentStateProbe1 = TestInbox[CurrentState]("probe1")
+  private val currentStateProbe2 = TestInbox[CurrentState]("probe2")
 
   val currentState1 = CurrentState(prefix, StateName("testStateName1"))
   val currentState2 = CurrentState(prefix, StateName("testStateName2"))
