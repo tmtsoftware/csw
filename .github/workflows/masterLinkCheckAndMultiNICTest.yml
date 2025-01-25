@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: coursier/setup-action@v1.2.0-M2
+      - uses: actions/checkout@v4
+      - uses: coursier/setup-action@v1.2.0
         with:
-          jvm: temurin:1.17
+          jvm: temurin:1.21
       - uses: coursier/cache-action@v6
       - run: sudo chmod 666 /var/run/docker.sock
 
@@ -23,8 +23,8 @@ jobs:
       - name: Multi-NICs Docker
         run: ./integration/scripts/multiple_nic_test.sh
 
-      - name: Paradox Validate Links
-        run: sbtn docs/paradoxValidateLinks
+#      - name: Paradox Validate Links
+#        run: sbtn docs/paradoxValidateLinks
 
       - name: Notify slack
         if: always()

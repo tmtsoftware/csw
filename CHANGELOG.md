@@ -15,9 +15,10 @@ All notable changes to this project will be documented in this file.
 
 ### Changes
 - Upgraded all dependencies to latest versions
-- Upgraded to Scala-3.3.0
+- Upgraded to Scala-3, JDK-21
 - Replaced use of akka libraries with org.apache.pekko
 - Added some supporting methods for Java for JSON serialization of the coordinate classes in csw.params.core.formats.JsonSupport
+- Replaced embedded-redis lib with a different version that supports recent MacOS versions (for testing)
 
 ## [CSW v5.0.1] - 2023-04-12
 This is the final release version v5.0.1 of the TMT Common Software for project stakeholders.

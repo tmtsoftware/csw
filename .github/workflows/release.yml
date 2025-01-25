@@ -11,10 +11,10 @@ jobs:
     env:
       ESW_TS_VERSION: "0.4.1"
     steps:
-      - uses: actions/checkout@v2
-      - uses: coursier/setup-action@v1.2.0-M2
+      - uses: actions/checkout@v4
+      - uses: coursier/setup-action@v1.2.0
         with:
-          jvm: temurin:1.17
+          jvm: temurin:1.21
           apps: sbt sbtn
       - uses: coursier/cache-action@v6
 
@@ -44,15 +44,15 @@ jobs:
 
       - name: Unit and Component Tests
         run: |
-          sbt -DenableFatalWarnings=true -Dpekko.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true 'csw-time/test:test'
-          sbt -DenableFatalWarnings=true -Dpekko.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true -DdisableTimeTests 'test:test'
+          sbt -Dsbt.log.noformat=true -DenableFatalWarnings=true -Dpekko.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true 'csw-time/test:test'
+          sbt -Dsbt.log.noformat=true -DenableFatalWarnings=true -Dpekko.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true -DdisableTimeTests 'test:test'
 
       - name: Coverage Report
         run: |
-          sbt -DenableCoverage=true coverageReport
+          sbt -Dsbt.log.noformat=true -DenableCoverage=true coverageReport
           sbtn coverageAggregate
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: Coverage Report
           path: target/scala-2.13/scoverage-report
@@ -62,7 +62,7 @@ jobs:
         run: find . -type d -regex ".*js/target.*" | xargs rm -rf
 
       - name: Multi-Jvm Tests
-        run: sbt -DgenerateStoryReport=true integration/multi-jvm:test
+        run: sbt -Dsbt.log.noformat=true -DgenerateStoryReport=true integration/multi-jvm:test
 
       - name: Generate RTM
         if: always()
@@ -71,7 +71,7 @@ jobs:
 
       - name: Upload RTM
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: RTM
           path: target/RTM
@@ -80,7 +80,7 @@ jobs:
         run: sbtn makeSite
 
       - name: Github Release
-        run: sbt githubRelease
+        run: sbt -Dsbt.log.noformat=true githubRelease
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
 
@@ -90,7 +90,7 @@ jobs:
           chmod +x /tmp/.git-askpass
           git config --global user.email "actions@github.com"
           git config --global user.name "Github Action"
-          sbt clean ghpagesPushSite
+          sbt -Dsbt.log.noformat=true clean ghpagesPushSite
         env:
           RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
           GIT_ASKPASS: /tmp/.git-askpass

@@ -356,7 +356,7 @@ class CommandServiceTest(ignore: Int)
       val commandResponse = Await.result(matchResponseF, timeout.duration)
       commandResponse shouldBe a[Completed]
 
-      val onewayMatchF: Future[SubmitResponse with MatchingResponse] = async {
+      val onewayMatchF: Future[SubmitResponse & MatchingResponse] = async {
         await(assemblyCmdService.onewayAndMatch(setupWithMatcher, demandMatcher)) match {
           case i: Invalid =>
             // Command was not accepted
