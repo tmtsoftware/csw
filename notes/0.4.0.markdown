@@ -5,7 +5,7 @@ This is release v0.4.0 of the TMT Common Software.
 See [CHANGELOG.md](../CHANGELOG.md) for details of all releases.
 
 ### Changed from FDR
-- Updated Location Service implementation is now based on [Pekko Cluster](https://doc.pekko.io/docs/pekko/2.5/cluster-usage.html) and [Distributed Data](https://doc.pekko.io/docs/pekko/2.5/distributed-data.html) for higher performance and proper operation in all required scenarios
+- Updated Location Service implementation is now based on [Pekko Cluster](https://pekko.apache.org/docs/pekko/2.5/cluster-usage.html) and [Distributed Data](https://pekko.apache.org/docs/pekko/2.5/distributed-data.html) for higher performance and proper operation in all required scenarios
 - New Command Service APIs - FDR version was based on Pekko messages
 - Significant updates to Configuration Service implementation with some API changes
 - New Logging APIs

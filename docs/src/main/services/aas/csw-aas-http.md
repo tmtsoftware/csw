@@ -201,7 +201,7 @@ val policy = policy1 | (policy2 & (policy3 | policy4)) | policy5
 
 Since security directives extend from `pekko.http.scaladsl.server.Directive`, they give you all the
 benefits of a usual directive. These benefits include being able to label and [compose higher level
-directives](https://doc.pekko.io/docs/pekko-http/current/routing-dsl/directives/custom-directives.html#custom-directives).
+directives](https://pekko.apache.org/docs/pekko-http/current/routing-dsl/directives/custom-directives.html#custom-directives).
 
 With the help of directive labeling you could write a route like below:
 

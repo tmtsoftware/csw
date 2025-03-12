@@ -169,9 +169,9 @@ Unit testing simple Scala/Java classes or objects is straightforward. You can mo
 
 The following links provide guides for testing applications using different modules of Pekko:
 
-- [Pekko Untyped Actors](https://doc.pekko.io/docs/pekko/current/testing.html)
-- [Pekko Typed Actors](https://doc.pekko.io/docs/pekko/current/typed/testing.html)
-- [Pekko Streams](https://doc.pekko.io/docs/pekko/current/stream/stream-testkit.html?language=scala)
+- [Pekko Untyped Actors](https://pekko.apache.org/docs/pekko/current/testing.html)
+- [Pekko Typed Actors](https://pekko.apache.org/docs/pekko/current/typed/testing.html)
+- [Pekko Streams](https://pekko.apache.org/docs/pekko/current/stream/stream-testkit.html?language=scala)
 
 ## Multi-JVM Tests
 
@@ -179,11 +179,11 @@ Testing asynchronous distributed systems requires special tooling/framework supp
 Sbt has a plugin called [sbt-multi-jvm](https://github.com/sbt/sbt-multi-jvm) which helps to test systems across multiple JVMs or machines.
 This is especially useful for integration testing where multiple systems communicate with each other.
 
-You can find more details on multi-JVM tests [here](https://doc.pekko.io/docs/pekko/current/multi-jvm-testing.html).
+You can find more details on multi-JVM tests [here](https://pekko.apache.org/docs/pekko/current/multi-jvm-testing.html).
 
 You can also refer to some examples in [CSW](https://github.com/tmtsoftware/csw) for writing your own multi-JVM tests. For example: [CommandServiceTest.scala]($github.base_url$/integration/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala)  
 
-In case you want to run your multi-JVM tests across machines, refer to this multi-node testing guide [here](https://doc.pekko.io/docs/pekko/current/multi-node-testing.html).
+In case you want to run your multi-JVM tests across machines, refer to this multi-node testing guide [here](https://pekko.apache.org/docs/pekko/current/multi-node-testing.html).
 
 ## Mockito
 

@@ -22,7 +22,7 @@ Configuration service is divided into following modules:
 
 1. **Client**
     1. Config client is a convenient lightweight wrapper for accessing the CSW Configuration HTTP Server.
-    1. It is build using Pekko Http's [request level](https://doc.pekko.io/docs/pekko-http/current/client-side/request-level.html) client API.
+    1. It is build using Pekko Http's [request level](https://pekko.apache.org/docs/pekko-http/current/client-side/request-level.html) client API.
 
 1. **CLI**
     1. It is a command line application which internally uses Config Client and hides HTTP interaction with Config server.

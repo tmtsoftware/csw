@@ -39,7 +39,7 @@ In order to install applications provided by CSW and ESW, TMT channel needs to b
 For developer machine setup, add `apps.json` channel,
 
 ```bash
-cs channel --add https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/apps.json
+cs channel --add https://raw.githubusercontent.com/tmtsoftware/osw-apps/branch-6.0.x/apps.json
 ```
 
 For production machine setup, add `apps.prod.json` channel,

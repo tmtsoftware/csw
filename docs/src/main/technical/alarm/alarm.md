@@ -10,13 +10,13 @@ The Alarm Service also provides mechanisms to monitor the health of all componen
 ## Technology
 
 Alarm Service uses [Redis](https://redis.io/) for persistence. Redis provides 
-[Keyspace Notifications](https://redis.io/docs/manual/keyspace-notifications/) which allows clients to subscribe to Pub/Sub channels 
+[Keyspace Notifications](https://redis.io/docs/latest/develop/use/keyspace-notifications/) which allows clients to subscribe to Pub/Sub channels 
 in order to receive events affecting the Redis data set in some way.
 
 ![Alarm Dependencies](alarm-layers.png)
 
-We have created a layer i.e. "Romaine" which converts redis events into an [pekko stream](https://doc.pekko.io/docs/pekko/current/stream/index.html).
-Romaine internally uses a java redis library called [Lettuce](https://lettuce.io/).
+We have created a layer i.e. "Romaine" which converts redis events into an [pekko stream](https://pekko.apache.org/docs/pekko/current/stream/index.html).
+Romaine internally uses a java redis library called [Lettuce](https://redis.github.io/lettuce/).
 
 ## Severities
 

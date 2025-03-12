@@ -18,8 +18,7 @@ pipeline {
 
         stage('Paradox Validate Links') {
             steps {
- // TODO FIXME: paradoxValidateLinks does not follow redirects
- //               sh "sbt -Dsbt.log.noformat=true docs/paradoxValidateLinks"
+                sh "sbt -Dsbt.log.noformat=true docs/paradoxValidateLinks"
             }
         }
     }

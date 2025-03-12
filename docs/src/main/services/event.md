@@ -98,7 +98,7 @@ Callbacks like `eventGenerator` are not thread-safe on the JVM. If you are doing
 In order to publish a continuous stream of events, this stream-based API can also be used. 
 If an infinite stream is provided, shutdown of the stream needs to be taken care by the users.
 (Note that streams discussed here are an Pekko feature that is supported in event publisher and subscriber APIs. 
-See [Pekko stream documentation.](https://doc.pekko.io/docs/pekko/current/stream/index.html?language=scala))
+See [Pekko stream documentation.](https://pekko.apache.org/docs/pekko/current/stream/index.html?language=scala))
 
 Scala
 :   @@snip [EventPublishExamples.scala](../../../../examples/src/main/scala/example/event/EventPublishExamples.scala) { #with-source }
@@ -165,7 +165,7 @@ Java
 ### Receive Event Stream
 
 This API takes a set of Event keys to subscribe to and returns a 
-Source of events (see [Pekko stream documentation](https://doc.pekko.io/docs/pekko/current/stream/index.html?language=scala)). 
+Source of events (see [Pekko stream documentation](https://pekko.apache.org/docs/pekko/current/stream/index.html?language=scala)). 
 This API gives more control to the user to customize the behavior of an event stream.
 
 Scala

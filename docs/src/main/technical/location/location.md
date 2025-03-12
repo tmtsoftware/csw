@@ -14,9 +14,9 @@ For information on _using_ the Location Service, see these sections:
 
 Core implementation of location service uses
 
-- [Pekko Cluster](https://doc.pekko.io/docs/pekko/current/index-cluster.html)
-- [Conflict Free Replicated Data Types (CRDTs)](https://doc.pekko.io/docs/pekko/current/typed/distributed-data.html)
-- [Pekko Http](https://doc.pekko.io/docs/pekko-http/current/).
+- [Pekko Cluster](https://pekko.apache.org/docs/pekko/current/index-cluster.html)
+- [Conflict Free Replicated Data Types (CRDTs)](https://pekko.apache.org/docs/pekko/current/typed/distributed-data.html)
+- [Pekko Http](https://pekko.apache.org/docs/pekko-http/current/).
 
 You can find more details on how CSW is using this in @ref:[csw-location-server](./location-server.md).
 

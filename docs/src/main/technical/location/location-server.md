@@ -10,9 +10,9 @@ Normally one instance of the _Location Server_ will run on each host that is run
 
 Main building blocks of location service are captured below, we will go through each one of them in following sections:
 
-- [Pekko Cluster](https://doc.pekko.io/docs/pekko/current/index-cluster.html)
-- [Conflict Free Replicated Data Types (CRDTs)](https://doc.pekko.io/docs/pekko/current/typed/distributed-data.html): Shares location information within the network.
-- [Pekko HTTP](https://doc.pekko.io/docs/pekko-http/current/)
+- [Pekko Cluster](https://pekko.apache.org/docs/pekko/current/index-cluster.html)
+- [Conflict Free Replicated Data Types (CRDTs)](https://pekko.apache.org/docs/pekko/current/typed/distributed-data.html): Shares location information within the network.
+- [Pekko HTTP](https://pekko.apache.org/docs/pekko-http/current/)
 - DeathWatch Actor
 
 ![Location Service](../../images/locationservice/location-service.png)
@@ -31,13 +31,13 @@ Let's discuss different components of `Location Server` in following sections:
 
 ### Cluster Member
 
-Location Service JVM (precisely Actor System) takes part in [Pekko Cluster](https://doc.pekko.io/docs/pekko/current/index-cluster.html).
+Location Service JVM (precisely Actor System) takes part in [Pekko Cluster](https://pekko.apache.org/docs/pekko/current/index-cluster.html).
 By default, this actor system binds to port `3552`. Initially when there is no member in Pekko cluster, node joins itself.
 Such a node is referred as seed node (introducer) and the location of this node needs to be known so that other nodes can join to this known address and form a larger cluster.
 After the joining process is complete, seed nodes are not special and they participate in the cluster in exactly the same way as other nodes.
 
-Pekko Cluster provides cluster [membership](https://doc.pekko.io/docs/pekko/current/typed/cluster-membership.html) service using [gossip](https://doc.pekko.io/docs/pekko/current/typed/cluster-concepts.html#gossip)
-protocols and an automatic [failure detector](https://doc.pekko.io/docs/pekko/current/typed/cluster-concepts.html#failure-detector).
+Pekko Cluster provides cluster [membership](https://pekko.apache.org/docs/pekko/current/typed/cluster-membership.html) service using [gossip](https://pekko.apache.org/docs/pekko/current/typed/cluster-concepts.html#gossip)
+protocols and an automatic [failure detector](https://pekko.apache.org/docs/pekko/current/typed/cluster-concepts.html#failure-detector).
 
 Death watch uses the cluster failure detector for nodes in the cluster, i.e. it detects network failures and JVM crashes, in addition to graceful termination of watched actor.
 Death watch generates the `Terminated` message to the watching actor when the unreachable cluster node has been downed and removed. Hence we have kept `auto-down-unreachable-after = 10s` so that in case of failure, interested parties get the death watch notification for the location in around 10s.
@@ -48,11 +48,11 @@ We use Pekko Distributed Data to share CSW component locations between nodes in 
 We store the following data in this key-value store (distributed data):
 
 - `AllServices`:
-  This uses [LWWMap](https://doc.pekko.io/docs/pekko/current/distributed-data.html?language=scala) CRDT from `Connection` to `Location`. `Connection` and `Location` can be one of `Pekko`, `Tcp` or `HTTP` type.
+  This uses [LWWMap](https://pekko.apache.org/docs/pekko/current/distributed-data.html?language=scala) CRDT from `Connection` to `Location`. `Connection` and `Location` can be one of `Pekko`, `Tcp` or `HTTP` type.
   At any point in time, the value of this map represents all the locations registered with `Location Service` in a TMT environment.
 
 - `Service`:
-  This uses [LWWRegister](https://doc.pekko.io/docs/pekko/current/distributed-data.html?language=scala) which holds location of CSW component against unique connection name.
+  This uses [LWWRegister](https://pekko.apache.org/docs/pekko/current/distributed-data.html?language=scala) which holds location of CSW component against unique connection name.
 
 #### Consistency Guarantees
 
