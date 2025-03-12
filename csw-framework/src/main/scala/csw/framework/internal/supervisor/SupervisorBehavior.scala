@@ -115,7 +115,7 @@ private[framework] final class SupervisorBehavior(
     log.debug(s"Supervisor in lifecycle state :[$lifecycleState] received message :[$msg]")
     (lifecycleState, msg) match {
       case (SupervisorLifecycleState.Lock, LockAboutToTimeout(replyTo)) => replyTo ! LockExpiringShortly
-      case (SupervisorLifecycleState.Lock, LockTimedout(replyTo)) => replyTo ! LockExpired; onLockTimeout()
+      case (SupervisorLifecycleState.Lock, LockTimedout(replyTo))       => replyTo ! LockExpired; onLockTimeout()
       // SupervisorLockMessage has Submit/Oneway as well along with Lock to allow commands from locking source
       case (SupervisorLifecycleState.Lock, message: SupervisorLockMessage)                     => onRunning(message)
       case (SupervisorLifecycleState.Lock, message)                                            => ignore(message)
