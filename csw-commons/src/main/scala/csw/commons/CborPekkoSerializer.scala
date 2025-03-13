@@ -5,14 +5,14 @@
 
 package csw.commons
 
-import akka.serialization.Serializer
+import org.apache.pekko.serialization.Serializer
 import io.bullet.borer.{Cbor, Codec, Decoder, Encoder}
 
 import scala.reflect.ClassTag
 
-abstract class CborAkkaSerializer[Ser] extends Serializer {
+abstract class CborPekkoSerializer[Ser] extends Serializer {
 
-  private var registrations: List[(Class[_], Codec[_])] = Nil
+  private var registrations: List[(Class[?], Codec[?])] = Nil
 
   protected def register[T <: Ser: Encoder: Decoder: ClassTag]: Unit = {
     registrations ::= scala.reflect.classTag[T].runtimeClass -> Codec.of[T]
@@ -23,16 +23,16 @@ abstract class CborAkkaSerializer[Ser] extends Serializer {
   override def toBinary(o: AnyRef): Array[Byte] = {
     val codec   = getCodec(o.getClass, "encoding")
     val encoder = codec.encoder.asInstanceOf[Encoder[AnyRef]]
-    Cbor.encode(o)(encoder).toByteArray
+    Cbor.encode(o)(using encoder).toByteArray
   }
 
-  override def fromBinary(bytes: Array[Byte], manifest: Option[Class[_]]): AnyRef = {
+  override def fromBinary(bytes: Array[Byte], manifest: Option[Class[?]]): AnyRef = {
     val codec   = getCodec(manifest.get, "decoding")
     val decoder = codec.decoder.asInstanceOf[Decoder[AnyRef]]
-    Cbor.decode(bytes).to[AnyRef](decoder).value
+    Cbor.decode(bytes).to[AnyRef](using decoder).value
   }
 
-  private def getCodec(classValue: Class[_], action: String): Codec[_] = {
+  private def getCodec(classValue: Class[?], action: String): Codec[?] = {
     registrations
       .collectFirst {
         case (clazz, codec) if clazz.isAssignableFrom(classValue) => codec

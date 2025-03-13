@@ -5,10 +5,10 @@
 
 package csw.framework.internal.supervisor
 
-import akka.actor.testkit.typed.TestKitSettings
-import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.scaladsl.adapter.*
-import akka.actor.{ActorSystem, typed}
+import org.apache.pekko.actor.testkit.typed.TestKitSettings
+import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
+import org.apache.pekko.actor.typed.scaladsl.adapter.*
+import org.apache.pekko.actor.{ActorSystem, typed}
 import csw.command.client.messages.CommandMessage.Submit
 import csw.command.client.models.framework.LockingResponse
 import csw.command.client.models.framework.LockingResponse.*

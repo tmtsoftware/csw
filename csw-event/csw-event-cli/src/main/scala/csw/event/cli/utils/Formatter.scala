@@ -45,7 +45,7 @@ case class OnelineFormatter(options: Options) {
   }
 }
 
-case class Oneline(path: String, param: Parameter[_]) {
+case class Oneline(path: String, param: Parameter[?]) {
   private val onelineSeparator = " = "
 
   private def values = {

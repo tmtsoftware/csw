@@ -6,31 +6,34 @@
 package csw.command.client.internal
 
 import java.util.concurrent.TimeoutException
-
-import akka.actor.typed.scaladsl.AskPattern._
-import akka.actor.typed.{ActorRef, ActorSystem}
-import akka.stream.scaladsl.{Keep, Sink, Source}
-import akka.stream.typed.scaladsl.ActorSource
-import akka.stream.{KillSwitches, OverflowStrategy}
-import akka.util.Timeout
+import org.apache.pekko.actor.typed.scaladsl.AskPattern.*
+import org.apache.pekko.actor.typed.{ActorRef, ActorSystem}
+import org.apache.pekko.stream.scaladsl.{Keep, Sink, Source}
+import org.apache.pekko.stream.typed.scaladsl.ActorSource
+import org.apache.pekko.stream.{KillSwitches, OverflowStrategy}
+import org.apache.pekko.util.Timeout
 import csw.command.api.StateMatcher
 import csw.command.api.scaladsl.CommandService
 import csw.command.api.utils.CommandServiceExtension
 import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
 import csw.command.client.messages.ComponentCommonMessage.ComponentStateSubscription
+import csw.command.client.messages.DiagnosticDataMessage.*
+import csw.command.client.messages.RunningMessage.Lifecycle
 import csw.command.client.messages.{ComponentMessage, Query, QueryFinal}
 import csw.command.client.models.framework.PubSub.{Subscribe, SubscribeOnly}
+import csw.command.client.models.framework.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.params.commands.CommandIssue.IdNotAvailableIssue
-import csw.params.commands.CommandResponse._
+import csw.params.commands.CommandResponse.*
 import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
+import csw.time.core.models.UTCTime
 import msocket.api.Subscription
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 
-private[command] class CommandServiceImpl(component: ActorRef[ComponentMessage])(implicit val actorSystem: ActorSystem[_])
+private[command] class CommandServiceImpl(component: ActorRef[ComponentMessage])(implicit val actorSystem: ActorSystem[?])
     extends CommandService {
 
   private implicit val ec: ExecutionContext = actorSystem.executionContext
@@ -71,7 +74,7 @@ private[command] class CommandServiceImpl(component: ActorRef[ComponentMessage])
     component ? (QueryFinal(commandRunId, _))
 
   /**
-   * Subscribe to the current state of a component corresponding to the [[AkkaLocation]] of the component
+   * Subscribe to the current state of a component corresponding to the [[PekkoLocation]] of the component
    *
    * @param names subscribe to states which have any of the provided value for name.
    *              If no states are provided, subscription in made to all the states.
@@ -108,4 +111,18 @@ private[command] class CommandServiceImpl(component: ActorRef[ComponentMessage])
   override def subscribeCurrentState(names: Set[StateName], callback: CurrentState => Unit): Subscription =
     subscribeCurrentState(names).map(callback).toMat(Sink.ignore)(Keep.left).run()
 
+  override def executeDiagnosticMode(startTime: UTCTime, hint: String): Unit =
+    component ! DiagnosticMode(startTime, hint)
+
+  /**
+   * On receiving a operations mode command, the current diagnostic data mode is halted.
+   */
+  override def executeOperationsMode(): Unit =
+    component ! OperationsMode
+
+  override def onGoOnline(): Unit =
+    component ! Lifecycle(GoOnline)
+
+  override def onGoOffline(): Unit =
+    component ! Lifecycle(GoOffline)
 }

@@ -5,14 +5,14 @@
 
 package csw.framework.internal.supervisor
 
-import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
-import akka.actor.typed.{ActorRef, Behavior}
+import org.apache.pekko.actor.typed.scaladsl.{ActorContext, Behaviors}
+import org.apache.pekko.actor.typed.{ActorRef, Behavior}
 import csw.command.client.messages.{ComponentMessage, ContainerIdleMessage, SupervisorMessage, TopLevelActorMessage}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.{ComponentHandlersFactory, ComponentHandlers, RegistrationFactory}
 
 /**
- * The factory for creating [[akka.actor.typed.scaladsl.AbstractBehavior]] of the supervisor of a component
+ * The factory for creating [[org.apache.pekko.actor.typed.scaladsl.AbstractBehavior]] of the supervisor of a component
  */
 private[csw] object SupervisorBehaviorFactory {
 

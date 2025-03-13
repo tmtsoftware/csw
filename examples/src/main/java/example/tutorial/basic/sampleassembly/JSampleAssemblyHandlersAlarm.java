@@ -5,10 +5,10 @@
 
 package example.tutorial.basic.sampleassembly;
 
-import akka.actor.typed.ActorRef;
-import akka.actor.typed.javadsl.ActorContext;
-import akka.actor.typed.javadsl.Behaviors;
-import akka.util.Timeout;
+import org.apache.pekko.actor.typed.ActorRef;
+import org.apache.pekko.actor.typed.javadsl.ActorContext;
+import org.apache.pekko.actor.typed.javadsl.Behaviors;
+import org.apache.pekko.util.Timeout;
 import csw.alarm.api.javadsl.JAlarmSeverity;
 import csw.alarm.models.AlarmSeverity;
 import csw.alarm.models.Key.AlarmKey;

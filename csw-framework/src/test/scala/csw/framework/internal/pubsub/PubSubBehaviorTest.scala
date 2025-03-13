@@ -5,11 +5,11 @@
 
 package csw.framework.internal.pubsub
 
-import akka.actor.testkit.typed.TestKitSettings
-import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestInbox, TestProbe}
-import akka.actor.typed.SpawnProtocol
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.{ActorSystem, typed}
+import org.apache.pekko.actor.testkit.typed.TestKitSettings
+import org.apache.pekko.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestInbox, TestProbe}
+import org.apache.pekko.actor.typed.SpawnProtocol
+import org.apache.pekko.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import org.apache.pekko.actor.{ActorSystem, typed}
 import csw.command.client.messages.ComponentMessage
 import csw.command.client.models.framework.PubSub.{Publish, Subscribe, SubscribeOnly, Unsubscribe}
 import csw.command.client.models.framework.{LifecycleStateChanged, PubSub, SupervisorLifecycleState}

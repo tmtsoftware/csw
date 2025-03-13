@@ -6,8 +6,8 @@
 package csw.database.scaladsl
 import org.jooq.{Queries, Query, Record, ResultQuery}
 
-import scala.jdk.CollectionConverters._
-import scala.compat.java8.FutureConverters.CompletionStageOps
+import scala.jdk.CollectionConverters.*
+import scala.jdk.FutureConverters.*
 import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag
 
@@ -36,7 +36,7 @@ object JooqExtentions {
       val klass = classTag.runtimeClass.asInstanceOf[Class[R]]
       resultQuery
         .fetchAsync()
-        .toScala
+        .asScala
         .map(_.asScala.map(_.into(klass)).toList)
     }
   }
@@ -55,7 +55,7 @@ object JooqExtentions {
      *         indicates that the command was processed successfully and is an update count giving the number of rows in the
      *         database that were affected by the command's execution.
      */
-    def executeAsyncScala(): Future[Integer] = query.executeAsync().toScala
+    def executeAsyncScala(): Future[Integer] = query.executeAsync().asScala
   }
 
   /**

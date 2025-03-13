@@ -5,10 +5,10 @@
 
 package example.auth.installed.commands
 
-import akka.actor.typed
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.*
-import akka.http.scaladsl.model.StatusCodes.*
+import org.apache.pekko.actor.typed
+import org.apache.pekko.http.scaladsl.Http
+import org.apache.pekko.http.scaladsl.model.*
+import org.apache.pekko.http.scaladsl.model.StatusCodes.*
 import csw.aas.installed.api.InstalledAppAuthAdapter
 
 // #write-command

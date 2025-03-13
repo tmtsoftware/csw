@@ -5,15 +5,15 @@
 
 package csw.framework.command
 
-import akka.actor.typed.scaladsl.adapter.*
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.util.Timeout
+import org.apache.pekko.actor.typed.scaladsl.adapter.*
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
 import csw.common.components.command.ComponentStateForCommand.{acceptedCmd, cancelCmd, prefix}
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.location.api.models.{ComponentId, ComponentType}
-import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.Connection.PekkoConnection
 import csw.location.helpers.{LSNodeSpec, OneMemberAndSeed}
 import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandResponse.*
@@ -62,7 +62,7 @@ class CancellableCommandTest(ignore: Int)
       // resolve the assembly running on seed
       val assemblyLocF =
         locationService.resolve(
-          AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "Monitor_Assembly"), ComponentType.Assembly)),
+          PekkoConnection(ComponentId(Prefix(Subsystem.TCS, "Monitor_Assembly"), ComponentType.Assembly)),
           5.seconds
         )
       val assemblyLoc = Await.result(assemblyLocF, 10.seconds).get

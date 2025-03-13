@@ -5,18 +5,18 @@
 
 package csw.framework.internal.supervisor
 
-import akka.actor.CoordinatedShutdown
-import akka.actor.typed.ActorSystem
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.Http.ServerBinding
-import akka.http.scaladsl.server.Route
+import org.apache.pekko.actor.CoordinatedShutdown
+import org.apache.pekko.actor.typed.ActorSystem
+import org.apache.pekko.http.scaladsl.Http
+import org.apache.pekko.http.scaladsl.Http.ServerBinding
+import org.apache.pekko.http.scaladsl.server.Route
 import csw.location.api.models.Connection.HttpConnection
 import csw.location.api.models.HttpRegistration
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.logging.api.scaladsl.Logger
 import csw.network.utils.Networks
 
-import scala.async.Async._
+import cps.compat.FutureAsync.*
 import scala.concurrent.Future
 
 /**
@@ -30,7 +30,7 @@ class HttpService(
     route: Route,
     log: Logger,
     httpConnection: HttpConnection
-)(implicit actorSystem: ActorSystem[_]) {
+)(implicit actorSystem: ActorSystem[?]) {
 
   import actorSystem.executionContext
 

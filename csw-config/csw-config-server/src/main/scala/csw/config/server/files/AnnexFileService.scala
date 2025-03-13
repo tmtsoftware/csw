@@ -7,14 +7,14 @@ package csw.config.server.files
 
 import java.nio.file.{Path, Paths}
 
-import akka.stream.Materializer.matFromSystem
-import akka.stream.scaladsl.{FileIO, Keep}
+import org.apache.pekko.stream.Materializer.matFromSystem
+import org.apache.pekko.stream.scaladsl.{FileIO, Keep}
 import csw.config.api.ConfigData
 import csw.config.server.commons.ConfigServerLogger
 import csw.config.server.{ActorRuntime, Settings}
 import csw.logging.api.scaladsl.Logger
 
-import scala.async.Async._
+import cps.compat.FutureAsync.*
 import scala.concurrent.Future
 
 /**

@@ -5,14 +5,14 @@
 
 package org.tmt.csw.samplehcd
 
-import akka.actor.Cancellable
-import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
+import org.apache.pekko.actor.Cancellable
+import org.apache.pekko.actor.typed.scaladsl.{ActorContext, Behaviors}
 import csw.command.client.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.TrackingEvent
-import csw.params.commands.CommandResponse._
-import csw.params.commands._
+import csw.params.commands.CommandResponse.*
+import csw.params.commands.*
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.Id
 import csw.params.events.{EventName, SystemEvent}
@@ -49,7 +49,7 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
             timeServiceScheduler.scheduleOnce(when) {
               commandResponseManager.updateCommand(CommandResponse.Completed(sleep.runId))
             }
-          case _ => log.error("Unsupported message type")
+          case null => log.error("Unsupported message type")
         }
         Behaviors.same
       }),

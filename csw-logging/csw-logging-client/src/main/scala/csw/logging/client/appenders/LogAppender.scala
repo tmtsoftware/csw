@@ -5,7 +5,7 @@
 
 package csw.logging.client.appenders
 
-import akka.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.ActorSystem
 import play.api.libs.json.JsObject
 
 import scala.concurrent.Future
@@ -22,7 +22,7 @@ trait LogAppenderBuilder {
    * @param standardHeaders the headers that are fixes for this service
    * @return an appender
    */
-  def apply(system: ActorSystem[_], standardHeaders: JsObject): LogAppender
+  def apply(system: ActorSystem[?], standardHeaders: JsObject): LogAppender
 }
 
 /**

@@ -5,10 +5,10 @@
 
 package csw.event.client.internal.redis
 
-import akka.Done
-import akka.actor.Cancellable
-import akka.actor.typed.ActorSystem
-import akka.stream.scaladsl.Source
+import org.apache.pekko.Done
+import org.apache.pekko.actor.Cancellable
+import org.apache.pekko.actor.typed.ActorSystem
+import org.apache.pekko.stream.scaladsl.Source
 import csw.event.api.exceptions.PublishFailure
 import csw.event.api.scaladsl.EventPublisher
 import csw.event.client.internal.commons.EventPublisherUtil
@@ -18,7 +18,7 @@ import io.lettuce.core.{RedisClient, RedisURI}
 import romaine.RomaineFactory
 import romaine.async.RedisAsyncApi
 
-import scala.async.Async._
+import cps.compat.FutureAsync.*
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 import scala.concurrent.{Await, Future}
 import scala.util.control.NonFatal
@@ -32,7 +32,7 @@ import scala.util.control.NonFatal
  * @param actorSystem provides Materializer, executionContext, etc
  */
 private[event] class RedisPublisher(redisURI: Future[RedisURI], redisClient: RedisClient)(implicit
-    actorSystem: ActorSystem[_]
+    actorSystem: ActorSystem[?]
 ) extends EventPublisher {
 
   import actorSystem.executionContext

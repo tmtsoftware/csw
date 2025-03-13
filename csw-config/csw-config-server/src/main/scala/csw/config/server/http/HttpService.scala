@@ -5,10 +5,10 @@
 
 package csw.config.server.http
 
-import akka.Done
-import akka.actor.CoordinatedShutdown
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.Http.ServerBinding
+import org.apache.pekko.Done
+import org.apache.pekko.actor.CoordinatedShutdown
+import org.apache.pekko.http.scaladsl.Http
+import org.apache.pekko.http.scaladsl.Http.ServerBinding
 import csw.config.server.commons.{ConfigServerLogger, ConfigServiceConnection}
 import csw.config.server.{ActorRuntime, Settings}
 import csw.location.api.models.{HttpRegistration, NetworkType}
@@ -16,7 +16,7 @@ import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.logging.api.scaladsl.Logger
 import csw.network.utils.Networks
 
-import scala.async.Async._
+import cps.compat.FutureAsync.*
 import scala.concurrent.Future
 import scala.util.control.NonFatal
 

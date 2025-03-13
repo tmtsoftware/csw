@@ -5,8 +5,8 @@
 
 package csw.config.server.http
 
-import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.{Directives, ExceptionHandler}
+import org.apache.pekko.http.scaladsl.model.StatusCodes
+import org.apache.pekko.http.scaladsl.server.{Directives, ExceptionHandler}
 import csw.commons.http.{JsonRejectionHandler, JsonSupport}
 import csw.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidInput}
 import csw.config.server.commons.ConfigServerLogger

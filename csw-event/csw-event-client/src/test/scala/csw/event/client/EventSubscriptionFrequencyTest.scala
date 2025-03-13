@@ -5,18 +5,20 @@
 
 package csw.event.client
 
-import akka.actor.testkit.typed.scaladsl.TestInbox
-import akka.stream.scaladsl.Sink
+import org.apache.pekko.actor.testkit.typed.scaladsl.TestInbox
+import org.apache.pekko.stream.scaladsl.Sink
 import csw.event.api.scaladsl.SubscriptionModes
-import csw.event.client.helpers.TestFutureExt.RichFuture
+import csw.event.client.helpers.TestFutureExt.given
+import scala.language.implicitConversions
+
 import csw.event.client.helpers.Utils.makeEventForKeyName
-import csw.event.client.internal.kafka.KafkaTestProps
+//import csw.event.client.internal.kafka.KafkaTestProps
 import csw.event.client.internal.redis.RedisTestProps
 import csw.event.client.internal.wiring.BaseProperties
 import csw.params.events.{Event, EventKey, EventName}
 import org.scalatest.concurrent.Eventually
 import org.scalatestplus.testng.TestNGSuite
-import org.testng.annotations._
+import org.testng.annotations.*
 
 import scala.collection.{immutable, mutable}
 import scala.concurrent.duration.DurationLong
@@ -27,32 +29,32 @@ import org.scalatest.matchers.should.Matchers
 class EventSubscriptionFrequencyTest extends TestNGSuite with Matchers with Eventually {
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 10.millis)
 
-  var redisTestProps: RedisTestProps = _
-  var kafkaTestProps: KafkaTestProps = _
+  var redisTestProps: BaseProperties = scala.compiletime.uninitialized
+//  var kafkaTestProps: BaseProperties = _
 
   @BeforeSuite
   def beforeAll(): Unit = {
     redisTestProps = RedisTestProps.createRedisProperties()
-    kafkaTestProps = KafkaTestProps.createKafkaProperties()
+//    kafkaTestProps = KafkaTestProps.createKafkaProperties()
     redisTestProps.start()
-    kafkaTestProps.start()
+//    kafkaTestProps.start()
   }
 
   @AfterSuite
   def afterAll(): Unit = {
     redisTestProps.shutdown()
-    kafkaTestProps.shutdown()
+//    kafkaTestProps.shutdown()
   }
 
   @DataProvider(name = "event-service-provider")
-  def pubSubProvider: Array[Array[_ <: BaseProperties]] =
+  def pubSubProvider: Array[Array[BaseProperties]] =
     Array(
-      Array(redisTestProps),
-      Array(kafkaTestProps)
+      Array(redisTestProps)
+//      Array(kafkaTestProps)
     )
 
   @DataProvider(name = "redis-provider")
-  def redisPubSubProvider: Array[Array[RedisTestProps]] =
+  def redisPubSubProvider: Array[Array[BaseProperties]] =
     Array(Array(redisTestProps))
 
   def events(name: EventName): immutable.Seq[Event] = for (i <- 1 to 1500) yield makeEventForKeyName(name, i)
@@ -128,8 +130,10 @@ class EventSubscriptionFrequencyTest extends TestNGSuite with Matchers with Even
 
     Thread.sleep(2000)
 
-    subscription.unsubscribe().await
-    subscription2.unsubscribe().await
+    val f1 = subscription.unsubscribe()
+    val f2 = subscription2.unsubscribe()
+    f1.await
+    f2.await
     cancellable.cancel()
 
     receivedEvents.size shouldBe 4

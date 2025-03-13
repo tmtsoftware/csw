@@ -9,7 +9,7 @@ import java.nio.file.Path
 import java.time.Instant
 
 import csw.config.api.ConfigData
-import csw.config.models._
+import csw.config.models.*
 
 import scala.concurrent.Future
 

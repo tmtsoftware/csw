@@ -7,14 +7,14 @@ package csw.contract.data.command
 
 import java.util.concurrent.TimeUnit
 
-import akka.util.Timeout
+import org.apache.pekko.util.Timeout
 import csw.command.api.messages.CommandServiceRequest.{Oneway, Query, Submit, Validate}
 import csw.command.api.messages.CommandServiceStreamRequest.{QueryFinal, SubscribeCurrentState}
-import csw.params.commands.CommandIssue._
-import csw.params.commands.CommandResponse._
-import csw.params.commands._
+import csw.params.commands.CommandIssue.*
+import csw.params.commands.CommandResponse.*
+import csw.params.commands.*
 import csw.params.core.generics.Parameter
-import csw.params.core.models._
+import csw.params.core.models.*
 import csw.params.core.states.{CurrentState, StateName}
 import csw.prefix.models.{Prefix, Subsystem}
 
@@ -24,7 +24,7 @@ trait CommandData {
 
   val values = 100
 
-  val paramSet: Set[Parameter[_]] = ParamSetData.paramSet
+  val paramSet: Set[Parameter[?]] = ParamSetData.paramSet
 
   val prefix                     = new Prefix(Subsystem.CSW, "ncc.trombone")
   val id: Id                     = Id()

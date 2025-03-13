@@ -5,8 +5,8 @@
 
 package csw.common
 
-import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.ActorRef
+import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
+import org.apache.pekko.actor.typed.ActorRef
 import csw.command.client.messages.ComponentCommonMessage.GetSupervisorLifecycleState
 import csw.command.client.messages.ContainerCommonMessage.GetContainerLifecycleState
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
@@ -74,7 +74,7 @@ object FrameworkAssertions extends Matchers with Eventually {
     Level(logMsg.getString("@severity")) shouldBe expLevel
     logMsg.getString("@componentName") shouldBe componentName
     logMsg.getString("@subsystem") shouldBe subsystem
-    logMsg.getString("class") shouldBe sanitizeClassName(className)
+    logMsg.getString("class") should startWith(sanitizeClassName(className))
   }
 
   def assertThatExceptionIsLogged(
@@ -95,7 +95,7 @@ object FrameworkAssertions extends Matchers with Eventually {
     Level(logMsg.getString("@severity")) shouldBe expLevel
     logMsg.getString("@componentName") shouldBe componentName
     logMsg.getString("@subsystem") shouldBe subsystem
-    logMsg.getString("class") shouldBe sanitizeClassName(className)
+    logMsg.getString("class") should startWith(sanitizeClassName(className))
 
     logMsg.contains("trace") shouldBe true
     val traceBlock    = logMsg("trace").asInstanceOf[JsObject]

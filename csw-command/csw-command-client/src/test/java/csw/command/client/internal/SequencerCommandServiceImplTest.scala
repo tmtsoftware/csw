@@ -5,15 +5,15 @@
 
 package csw.command.client.internal
 
-import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
-import akka.util.Timeout
+import org.apache.pekko.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
+import org.apache.pekko.util.Timeout
 import csw.command.client.SequencerCommandServiceImpl
 import csw.command.client.messages.sequencer.SequencerMsg
 import csw.command.client.messages.sequencer.SequencerMsg.{Query, QueryFinal, SubmitSequence}
 import csw.commons.{AskProxyTestKit, RandomUtils}
 import csw.location.api.extensions.ActorExtension.RichActor
-import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType, Metadata}
+import csw.location.api.models.Connection.PekkoConnection
+import csw.location.api.models.{PekkoLocation, ComponentId, ComponentType, Metadata}
 import csw.params.commands.CommandResponse.*
 import csw.params.commands.{CommandName, Sequence, Setup}
 import csw.params.core.models.Id
@@ -39,8 +39,8 @@ class SequencerCommandServiceImplTest
 
   private val askProxyTestKit = new AskProxyTestKit[SequencerMsg, SequencerCommandServiceImpl] {
     override def make(actorRef: ActorRef[SequencerMsg]): SequencerCommandServiceImpl = {
-      val location = AkkaLocation(
-        AkkaConnection(ComponentId(Prefix(IRIS, "sequencer"), ComponentType.Sequencer)),
+      val location = PekkoLocation(
+        PekkoConnection(ComponentId(Prefix(IRIS, "sequencer"), ComponentType.Sequencer)),
         actorRef.toURI,
         Metadata.empty
       )

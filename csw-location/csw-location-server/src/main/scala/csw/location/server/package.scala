@@ -10,20 +10,20 @@ package csw.location
  *
  * The Location Service implemented in this project is based on CRDT (Conflict Free Replicated Data).
  * The Location Service helps you resolve the hostname and port number for a service which can be used for further communication.
- * In case of Akka connection, It helps you to resolve component reference with which you can send messages
+ * In case of Pekko connection, It helps you to resolve component reference with which you can send messages
  *
- * Location Service supports three types of services as follows: Akka, Tcp and HTTP based services.
+ * Location Service supports three types of services as follows: Pekko, Tcp and HTTP based services.
  *
  * Before calling LocationServiceFactory.make() to get an handle of LocationService,
  * it is recommended to have below environment variables set to System global environments or system properties:
- *  - INTERFACE_NAME (The network interface where akka cluster is formed.) Ex. INTERFACE_NAME=eth0 if not set, first inet4 interface by priority will be picked
+ *  - INTERFACE_NAME (The network interface where pekko cluster is formed.) Ex. INTERFACE_NAME=eth0 if not set, first inet4 interface by priority will be picked
  *  - CLUSTER_SEEDS (The host address and port of the seedNodes of the cluster) Ex. CLUSTER_SEEDS="192.168.121.10:3552, 192.168.121.11:3552"
  *
  * Location service make use of classes defined in `csw-messages` package, for example:
  * - [[csw.location.api.models.Location]] :
  *  When you resolve component location using [[csw.location.api.scaladsl.LocationService]], you get back this location.
  *  There are three types of Locations:
- *   - [[csw.location.api.models.AkkaLocation]]: holds hostname, port and actorRef which is ready to receive [[csw.params.commands.Command]] from outside.
+ *   - [[csw.location.api.models.PekkoLocation]]: holds hostname, port and actorRef which is ready to receive [[csw.params.commands.Command]] from outside.
  *   - [[csw.location.api.models.TcpLocation]]: holds hostname and port which can be used for further communication.
  *   - [[csw.location.api.models.HttpLocation]]: holds hostname and port which can be used for further communication.
  *
@@ -31,7 +31,7 @@ package csw.location
  *  Connection holds the identity of component which includes `component name` and [[csw.location.api.models.ComponentType]].
  *  Every component needs to register with location service using unique connection.
  *  There are three types of Connections:
- *  - [[csw.location.api.models.Connection.AkkaConnection]]
+ *  - [[csw.location.api.models.Connection.PekkoConnection]]
  *  - [[csw.location.api.models.Connection.TcpConnection]]
  *  - [[csw.location.api.models.Connection.HttpConnection]]
  *

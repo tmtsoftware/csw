@@ -5,10 +5,10 @@
 
 package csw.testkit
 
-import akka.actor.typed
-import akka.actor.typed.scaladsl.ActorContext
-import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
-import akka.util.Timeout
+import org.apache.pekko.actor.typed
+import org.apache.pekko.actor.typed.scaladsl.ActorContext
+import org.apache.pekko.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
+import org.apache.pekko.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.alarm.client.AlarmServiceFactory
 import csw.command.client.messages.{ComponentMessage, ContainerMessage, TopLevelActorMessage}
@@ -71,7 +71,7 @@ final class FrameworkTestKit private (
 
   lazy val timeout: Timeout = locationTestKit.timeout
 
-  private var locationTestkitWithAuth: LocationTestKit = _
+  private var locationTestkitWithAuth: LocationTestKit = scala.compiletime.uninitialized
 
   private var configStarted           = false
   private var eventStarted            = false

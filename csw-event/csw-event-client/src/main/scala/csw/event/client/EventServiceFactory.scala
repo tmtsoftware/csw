@@ -5,7 +5,7 @@
 
 package csw.event.client
 
-import akka.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.ActorSystem
 import csw.event.api.javadsl.IEventService
 import csw.event.api.scaladsl.EventService
 import csw.event.client.internal.commons.javawrappers.JEventService
@@ -38,7 +38,7 @@ class EventServiceFactory(store: EventStore = RedisStore()) {
    * @param system an actor system required for underlying event streams
    * @return [[csw.event.api.scaladsl.EventService]] which provides handles to [[csw.event.api.scaladsl.EventPublisher]] and [[csw.event.api.scaladsl.EventSubscriber]]
    */
-  def make(locationService: LocationService)(implicit system: ActorSystem[_]): EventService =
+  def make(locationService: LocationService)(implicit system: ActorSystem[?]): EventService =
     eventService(new EventServiceLocationResolver(locationService)(system.executionContext))
 
   /**
@@ -49,7 +49,7 @@ class EventServiceFactory(store: EventStore = RedisStore()) {
    * @param system an actor system required for underlying event streams
    * @return [[csw.event.api.scaladsl.EventService]] which provides handles to [[csw.event.api.scaladsl.EventPublisher]] and [[csw.event.api.scaladsl.EventSubscriber]]
    */
-  def make(host: String, port: Int)(implicit system: ActorSystem[_]): EventService =
+  def make(host: String, port: Int)(implicit system: ActorSystem[?]): EventService =
     eventService(new EventServiceHostPortResolver(host, port))
 
   /**
@@ -59,7 +59,7 @@ class EventServiceFactory(store: EventStore = RedisStore()) {
    * @param actorSystem an actor system required for underlying event streams
    * @return [[csw.event.api.javadsl.IEventService]] which provides handles to [[csw.event.api.javadsl.IEventPublisher]] and [[csw.event.api.javadsl.IEventSubscriber]]
    */
-  def jMake(locationService: ILocationService, actorSystem: ActorSystem[_]): IEventService = {
+  def jMake(locationService: ILocationService, actorSystem: ActorSystem[?]): IEventService = {
     val eventService = make(locationService.asScala)(actorSystem)
     new JEventService(eventService)
   }
@@ -72,12 +72,12 @@ class EventServiceFactory(store: EventStore = RedisStore()) {
    * @param system an actor system required for underlying event streams
    * @return [[csw.event.api.javadsl.IEventService]] which provides handles to [[csw.event.api.javadsl.IEventPublisher]] and [[csw.event.api.javadsl.IEventSubscriber]]
    */
-  def jMake(host: String, port: Int, system: ActorSystem[_]): IEventService = {
+  def jMake(host: String, port: Int, system: ActorSystem[?]): IEventService = {
     val eventService = make(host, port)(system)
     new JEventService(eventService)
   }
 
-  private def eventService(eventServiceResolver: EventServiceResolver)(implicit system: ActorSystem[_]) = {
+  private def eventService(eventServiceResolver: EventServiceResolver)(implicit system: ActorSystem[?]) = {
     def masterId = system.settings.config.getString("csw-event.redis.masterId")
     store match {
       case RedisStore(client) => new RedisEventService(eventServiceResolver, masterId, client)

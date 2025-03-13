@@ -11,9 +11,9 @@ import csw.params.core.generics.KeyType.LongMatrixKey
 import csw.params.core.models.Coords.{SolarSystemCoord, Tag}
 import csw.params.core.models.Coords.SolarSystemObject.{Jupiter, Venus}
 import csw.params.core.models.Units.{NoUnits, encoder, meter}
-import csw.params.core.models._
+import csw.params.core.models.*
 import csw.params.core.states.{CurrentState, DemandState, StateName}
-import csw.params.events._
+import csw.params.events.*
 import csw.params.testdata.ParamSetData
 import csw.prefix.models.Prefix
 import csw.time.core.models.UTCTime
@@ -126,11 +126,14 @@ class JsonContractTest extends AnyFunSpec with Matchers {
       val arrayDataKey   = KeyType.ByteArrayKey.make("arrayDataKey")
       val arrayDataParam = arrayDataKey.set(ArrayData.fromArray(a1), ArrayData.fromArrays[Byte](10, 20, 30, 40, 50))
 
-      val systemEvent       = SystemEvent(eventId, prefix, eventName, eventTime, Set(arrayDataParam))
+      val systemEvent = SystemEvent(eventId, prefix, eventName, eventTime, Set(arrayDataParam))
+//      val systemEvent2      = SystemEvent(prefix, eventName, Set(arrayDataParam)).withEventTime(eventTime).copy(eventId = eventId)
       val systemEventToJson = JsonSupport.writeEvent(systemEvent)
+//      val systemEventToJson2 = JsonSupport.writeEvent(systemEvent2)
 
       val expectedSystemEventJson = Json.parse(Source.fromResource("json/system_event.json").mkString)
       systemEventToJson shouldEqual expectedSystemEventJson
+//      systemEventToJson2 shouldEqual expectedSystemEventJson
     }
   }
 

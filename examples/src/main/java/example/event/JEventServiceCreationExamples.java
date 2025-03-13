@@ -5,8 +5,8 @@
 
 package example.event;
 
-import akka.actor.typed.ActorSystem;
-import akka.actor.typed.SpawnProtocol;
+import org.apache.pekko.actor.typed.ActorSystem;
+import org.apache.pekko.actor.typed.SpawnProtocol;
 import csw.event.api.javadsl.IEventService;
 import csw.event.client.EventServiceFactory;
 import csw.event.client.models.EventStores;
@@ -19,7 +19,7 @@ public class JEventServiceCreationExamples {
     private final ActorSystem<SpawnProtocol.Command> actorSystem;
     private final ILocationService locationService;
 
-    public JEventServiceCreationExamples(akka.actor.typed.ActorSystem<SpawnProtocol.Command> actorSystem, ILocationService locationService) {
+    public JEventServiceCreationExamples(org.apache.pekko.actor.typed.ActorSystem<SpawnProtocol.Command> actorSystem, ILocationService locationService) {
         this.actorSystem = actorSystem;
         this.locationService = locationService;
     }

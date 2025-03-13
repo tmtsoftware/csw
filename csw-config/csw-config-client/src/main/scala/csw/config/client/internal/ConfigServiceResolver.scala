@@ -5,11 +5,11 @@
 
 package csw.config.client.internal
 
-import akka.http.scaladsl.model.Uri
+import org.apache.pekko.http.scaladsl.model.Uri
 import csw.location.api.scaladsl.LocationService
 import csw.config.client.commons.ConfigServiceConnection
 
-import scala.async.Async._
+import cps.compat.FutureAsync.*
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble
 

@@ -9,9 +9,9 @@ import java.time.{Duration, Instant}
 
 import csw.time.clock.natives.models.TimeConstants
 import org.scalatest.matchers
-import matchers.should.Matchers._
+import matchers.should.Matchers.*
 
-import scala.concurrent.duration.DurationDouble
+import scala.concurrent.duration.*
 import org.scalatest.funsuite.AnyFunSuite
 
 // DEOPSCSW-549: Time service api

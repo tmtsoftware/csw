@@ -13,9 +13,9 @@ import csw.location.api.models.ConnectionType;
  */
 public interface JConnectionType {
     /**
-     * Used to define an Akka connection
+     * Used to define an Pekko connection
      */
-    ConnectionType AkkaType = ConnectionType.AkkaType$.MODULE$;
+    ConnectionType PekkoType = ConnectionType.PekkoType$.MODULE$;
 
     /**
      * Used to define a TCP connection

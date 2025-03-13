@@ -5,12 +5,12 @@
 
 package csw.framework.internal.container
 
-import akka.Done
-import akka.actor.testkit.typed.Effect.Watched
-import akka.actor.testkit.typed.TestKitSettings
-import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
-import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{ActorRef, ActorRefResolver, ActorSystem, SpawnProtocol}
+import org.apache.pekko.Done
+import org.apache.pekko.actor.testkit.typed.Effect.Watched
+import org.apache.pekko.actor.testkit.typed.TestKitSettings
+import org.apache.pekko.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.actor.typed.{ActorRef, ActorRefResolver, ActorSystem, SpawnProtocol}
 import csw.alarm.client.AlarmServiceFactory
 import csw.command.client.messages.ContainerCommonMessage.GetContainerLifecycleState
 import csw.command.client.messages.ContainerIdleMessage.SupervisorsCreated
@@ -25,9 +25,9 @@ import csw.framework.ComponentInfos.*
 import csw.framework.FrameworkTestMocks
 import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.scaladsl.RegistrationFactory
-import csw.location.api.AkkaRegistrationFactory
-import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.models.{AkkaRegistration, Metadata}
+import csw.location.api.PekkoRegistrationFactory
+import csw.location.api.models.Connection.PekkoConnection
+import csw.location.api.models.{PekkoRegistration, Metadata}
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.client.ActorSystemFactory
 import org.mockito.ArgumentMatchers.any
@@ -40,7 +40,7 @@ import scala.concurrent.{Future, Promise}
 import scala.util.Success
 
 //DEOPSCSW-182-Control Life Cycle of Components
-//DEOPSCSW-216-Locate and connect components to send AKKA commands
+//DEOPSCSW-216-Locate and connect components to send PEKKO commands
 class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar {
   implicit val typedSystem: ActorSystem[SpawnProtocol.Command] = ActorSystemFactory.remote(SpawnProtocol(), "test")
   implicit val settings: TestKitSettings                       = TestKitSettings(typedSystem)
@@ -49,7 +49,7 @@ class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar 
   class IdleContainer() {
     private val testActor: ActorRef[Any]       = TestProbe("test-probe").ref
     private val metadata: Metadata             = Metadata(Map("key1" -> "value1"))
-    val akkaRegistration: AkkaRegistration     = AkkaRegistrationFactory.make(mock[AkkaConnection], testActor, metadata)
+    val pekkoRegistration: PekkoRegistration   = PekkoRegistrationFactory.make(mock[PekkoConnection], testActor, metadata)
     val locationService: LocationService       = mock[LocationService]
     val eventService: EventServiceFactory      = mock[EventServiceFactory]
     val alarmService: AlarmServiceFactory      = mock[AlarmServiceFactory]
@@ -83,14 +83,14 @@ class ContainerBehaviorTest extends AnyFunSuite with Matchers with MockitoSugar 
 
     private val registrationFactory: RegistrationFactory = mock[RegistrationFactory]
 
-    when(registrationFactory.akkaTyped(any[AkkaConnection], any[ActorRef[_]], any[Metadata]))
-      .thenReturn(akkaRegistration)
+    when(registrationFactory.pekkoTyped(any[PekkoConnection], any[ActorRef[?]], any[Metadata]))
+      .thenReturn(pekkoRegistration)
 
     private val eventualRegistrationResult: Future[RegistrationResult] =
       Promise[RegistrationResult]().complete(Success(registrationResult)).future
     private val eventualDone: Future[Done] = Promise[Done]().complete(Success(Done)).future
 
-    when(locationService.register(akkaRegistration)).thenReturn(eventualRegistrationResult)
+    when(locationService.register(pekkoRegistration)).thenReturn(eventualRegistrationResult)
     when(registrationResult.unregister()).thenReturn(eventualDone)
 
     val containerBehaviorTestkit: BehaviorTestKit[ContainerActorMessage] = BehaviorTestKit(

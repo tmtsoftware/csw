@@ -4,7 +4,7 @@
  */
 
 package csw.alarm.api.internal
-import akka.Done
+import org.apache.pekko.Done
 import com.typesafe.config.Config
 import csw.alarm.models.Key.AlarmKey
 import csw.alarm.models.{AlarmMetadata, Key}

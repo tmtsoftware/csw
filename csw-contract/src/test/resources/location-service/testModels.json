@@ -1,10 +1,10 @@
 {
   "Location" : [ {
-    "_type" : "AkkaLocation",
+    "_type" : "PekkoLocation",
     "connection" : {
       "prefix" : "TCS.filter.wheel",
       "componentType" : "HCD",
-      "connectionType" : "akka"
+      "connectionType" : "pekko"
     },
     "uri" : "some_path",
     "metadata" : {
@@ -23,11 +23,11 @@
   "TrackingEvent" : [ {
     "_type" : "LocationUpdated",
     "location" : {
-      "_type" : "AkkaLocation",
+      "_type" : "PekkoLocation",
       "connection" : {
         "prefix" : "TCS.filter.wheel",
         "componentType" : "HCD",
-        "connectionType" : "akka"
+        "connectionType" : "pekko"
       },
       "uri" : "some_path",
       "metadata" : {

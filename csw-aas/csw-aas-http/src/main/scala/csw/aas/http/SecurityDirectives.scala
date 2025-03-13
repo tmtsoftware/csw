@@ -5,14 +5,14 @@
 
 package csw.aas.http
 
-import akka.http.scaladsl.model.HttpMethods._
-import akka.http.scaladsl.server._
+import org.apache.pekko.http.scaladsl.model.HttpMethods.*
+import org.apache.pekko.http.scaladsl.server.*
 import com.typesafe.config.Config
 import csw.aas.core.TokenVerifier
 import csw.aas.core.commons.AuthLogger
 import csw.aas.core.deployment.{AuthConfig, AuthServiceLocation}
 import csw.aas.core.token.TokenFactory
-import csw.aas.core.utils.ConfigExt._
+import csw.aas.core.utils.ConfigExt.*
 import csw.location.api.models.HttpLocation
 import csw.location.api.scaladsl.LocationService
 import msocket.security.AccessControllerFactory

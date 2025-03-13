@@ -5,7 +5,7 @@
 
 package csw.framework.models
 
-import enumeratum._
+import enumeratum.*
 
 import scala.collection.immutable
 

@@ -7,10 +7,10 @@ package example.time
 
 import java.time.Duration
 
-import akka.actor.typed.{Behavior, Scheduler}
-import akka.actor.typed.scaladsl.adapter.TypedActorRefOps
-import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
-import akka.actor.{ActorRef, typed}
+import org.apache.pekko.actor.typed.{Behavior, Scheduler}
+import org.apache.pekko.actor.typed.scaladsl.adapter.TypedActorRefOps
+import org.apache.pekko.actor.typed.scaladsl.{ActorContext, Behaviors}
+import org.apache.pekko.actor.{ActorRef, typed}
 import csw.time.core.models.UTCTime
 import csw.time.scheduler.TimeServiceSchedulerFactory
 import csw.time.scheduler.api.TimeServiceScheduler
@@ -21,7 +21,7 @@ class SchedulerExamples(ctx: ActorContext[UTCTime]) {
 
   // #create-scheduler
   // create time service scheduler using the factory method
-  implicit val actorSystem: typed.ActorSystem[_]         = ctx.system
+  implicit val actorSystem: typed.ActorSystem[?]         = ctx.system
   implicit val scheduler: Scheduler                      = actorSystem.scheduler
   implicit val executionContext: ExecutionContext        = actorSystem.executionContext
   private val timeServiceScheduler: TimeServiceScheduler = new TimeServiceSchedulerFactory().make()

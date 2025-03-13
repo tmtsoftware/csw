@@ -69,7 +69,7 @@
 					]
 				},
 				"url": {
-					"raw": "http://localhost:8080/auth/realms/{{realm}}/protocol/openid-connect/token",
+					"raw": "http://localhost:8080/admin/realms/{{realm}}/protocol/openid-connect/token",
 					"protocol": "http",
 					"host": [
 						"localhost"

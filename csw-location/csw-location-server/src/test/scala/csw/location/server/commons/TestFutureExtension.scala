@@ -10,10 +10,12 @@ import scala.concurrent.{Await, Future}
 
 object TestFutureExtension {
 
-  implicit class RichFuture[T](val f: Future[T]) extends AnyVal {
+  class RichFuture[T](val f: Future[T]) extends AnyVal {
     def await: T                                     = Await.result(f, 20.seconds)
     def awaitWithTimeout(timeout: FiniteDuration): T = Await.result(f, timeout)
     def done: Future[T]                              = Await.ready(f, 20.seconds)
   }
 
+  given futureConversion[T]: Conversion[Future[T], RichFuture[T]] with
+    def apply(x: Future[T]): RichFuture[T] = RichFuture(x)
 }

@@ -4,14 +4,16 @@
  */
 
 package csw.alarm.cli
-import akka.Done
-import akka.actor.CoordinatedShutdown
-import akka.actor.typed.ActorRef
-import akka.stream.scaladsl.{Keep, Sink}
+import org.apache.pekko.Done
+import org.apache.pekko.actor.CoordinatedShutdown
+import org.apache.pekko.actor.typed.ActorRef
+import org.apache.pekko.stream.scaladsl.{Keep, Sink}
 import com.typesafe.config.ConfigFactory
 import csw.alarm.api.scaladsl.AlarmSubscription
 import csw.alarm.cli.args.Options
-import csw.alarm.cli.extensions.RichFutureExt.RichFuture
+import csw.alarm.cli.extensions.RichFutureExt.given
+import scala.language.implicitConversions
+
 import csw.alarm.cli.utils.Formatter
 import csw.alarm.cli.wiring.ActorRuntime
 import csw.alarm.client.internal.AlarmServiceImpl
@@ -23,7 +25,7 @@ import csw.alarm.models.{AlarmSeverity, AutoRefreshSeverityMessage}
 import csw.config.client.commons.ConfigUtils
 import csw.location.api.scaladsl.LocationService
 
-import scala.async.Async.{async, await}
+import cps.compat.FutureAsync.*
 import scala.concurrent.Future
 
 class CommandLineRunner(

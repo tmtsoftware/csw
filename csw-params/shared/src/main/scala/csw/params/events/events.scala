@@ -15,14 +15,14 @@ import csw.time.core.models.UTCTime
 /**
  * Common trait representing events in TMT like [[csw.params.events.SystemEvent]] and [[csw.params.events.ObserveEvent]]
  */
-sealed trait Event { self: ParameterSetType[_] =>
+sealed trait Event extends ParameterSetType[Event] {
 
   /**
    * A helper to give access of public members of ParameterSetType
    *
    * @return a handle to ParameterSetType extended by concrete implementation of this class
    */
-  def paramType: ParameterSetType[_] = self
+  def paramType: ParameterSetType[?] = this
 
   /**
    * unique Id for event
@@ -47,7 +47,7 @@ sealed trait Event { self: ParameterSetType[_] =>
   /**
    * An optional initial set of parameters (keys with values)
    */
-  val paramSet: Set[Parameter[_]]
+  val paramSet: Set[Parameter[?]]
 
   /**
    * A name identifying the type of parameter set, such as "SystemEvent", "ObserveEvent".
@@ -70,7 +70,7 @@ sealed trait Event { self: ParameterSetType[_] =>
    * @return the string representation of command
    */
   override def toString: String =
-    s"$typeName(eventId=$eventId, source=$source, eventName=$eventName, eventTime=$eventTime, paramSet=$paramSet)"
+    s"${this.typeName}(eventId=$eventId, source=$source, eventName=$eventName, eventTime=$eventTime, paramSet=$paramSet)"
 
   def isInvalid: Boolean = eventTime == Event.invalidEventTime
 }
@@ -106,7 +106,7 @@ case class SystemEvent private[csw] (
     source: Prefix,
     eventName: EventName,
     eventTime: UTCTime,
-    paramSet: Set[Parameter[_]]
+    paramSet: Set[Parameter[?]]
 ) extends ParameterSetType[SystemEvent]
     with Event {
 
@@ -121,8 +121,18 @@ case class SystemEvent private[csw] (
    * @param data set of parameters
    * @return a new instance of SystemEvent with new eventId, eventTime and provided data
    */
-  override protected def create(data: Set[Parameter[_]]): SystemEvent =
+  override protected def create(data: Set[Parameter[?]]): SystemEvent =
     copy(eventId = Id(), eventTime = UTCTime.now(), paramSet = data)
+
+  // TODO FIXME: Find a way to set the eventTime. The method below works, but the time is reset again in create() above
+  // if you make any other changes, such as adding parameters. The reason for resetting the eventTime in create() was to
+  // make event reuse safer, since the caller might otherwise forget to set a new id and eventTime.
+
+//  /**
+//   * Returns a new SystemEvent with the same values and the given time and a new id
+//   */
+//  def withEventTime(eventTime: UTCTime): SystemEvent =
+//    copy(eventId = Id(), eventTime = eventTime)
 }
 
 object SystemEvent {
@@ -145,7 +155,7 @@ object SystemEvent {
    * @param paramSet an initial set of parameters (keys with values)
    * @return a new instance of SystemEvent with auto-generated eventId and eventTime
    */
-  def apply(source: Prefix, eventName: EventName, paramSet: Set[Parameter[_]]): SystemEvent =
+  def apply(source: Prefix, eventName: EventName, paramSet: Set[Parameter[?]]): SystemEvent =
     apply(source, eventName).madd(paramSet)
 }
 
@@ -157,7 +167,7 @@ case class ObserveEvent private[csw] (
     source: Prefix,
     eventName: EventName,
     eventTime: UTCTime,
-    paramSet: Set[Parameter[_]]
+    paramSet: Set[Parameter[?]]
 ) extends ParameterSetType[ObserveEvent]
     with Event {
 
@@ -167,7 +177,7 @@ case class ObserveEvent private[csw] (
    * @param data set of parameters
    * @return a new instance of ObserveEvent with new eventId, eventTime and provided data
    */
-  override protected def create(data: Set[Parameter[_]]): ObserveEvent =
+  override protected def create(data: Set[Parameter[?]]): ObserveEvent =
     copy(eventId = Id(), eventTime = UTCTime.now(), paramSet = data)
 }
 
@@ -191,6 +201,6 @@ private[csw] object ObserveEvent {
    * @param paramSet an initial set of parameters (keys with values)
    * @return a new instance of ObserveEvent with auto-generated eventId and eventTime
    */
-  def apply(source: Prefix, eventName: EventName, paramSet: Set[Parameter[_]]): ObserveEvent =
+  def apply(source: Prefix, eventName: EventName, paramSet: Set[Parameter[?]]): ObserveEvent =
     apply(source, eventName).madd(paramSet)
 }

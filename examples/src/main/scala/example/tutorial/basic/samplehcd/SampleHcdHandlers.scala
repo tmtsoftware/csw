@@ -5,24 +5,24 @@
 
 package example.tutorial.basic.samplehcd
 
-import akka.actor.Cancellable
-import akka.actor.typed.Behavior
-import akka.actor.typed.scaladsl.adapter.TypedActorRefOps
-import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
+import org.apache.pekko.actor.Cancellable
+import org.apache.pekko.actor.typed.Behavior
+import org.apache.pekko.actor.typed.scaladsl.adapter.TypedActorRefOps
+import org.apache.pekko.actor.typed.scaladsl.{ActorContext, Behaviors}
 import csw.command.client.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.TrackingEvent
 import csw.params.commands.CommandIssue.UnsupportedCommandIssue
-import csw.params.commands.CommandResponse._
-import csw.params.commands._
+import csw.params.commands.CommandResponse.*
+import csw.params.commands.*
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.Id
 import csw.params.events.{EventName, SystemEvent}
 import csw.prefix.models.Prefix
 import csw.time.core.models.UTCTime
 import example.tutorial.basic.samplehcd.SleepWorker.Sleep
-import example.tutorial.basic.shared.SampleInfo._
+import example.tutorial.basic.shared.SampleInfo.*
 
 import scala.concurrent.duration.{FiniteDuration, MILLISECONDS}
 import scala.concurrent.{ExecutionContextExecutor, Future}

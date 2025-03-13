@@ -5,7 +5,7 @@
 
 package csw.event.client.internal.commons
 
-import akka.stream.{ActorAttributes, Attributes, Supervision}
+import org.apache.pekko.stream.{ActorAttributes, Attributes, Supervision}
 import csw.event.api.exceptions.EventServerNotAvailable
 
 /**

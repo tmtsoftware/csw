@@ -10,8 +10,8 @@ import csw.params.core.generics.KeyType.DoubleMatrixKey
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.Coords.SolarSystemObject.{Jupiter, Venus}
 import csw.params.core.models.Coords.{SolarSystemCoord, Tag}
-import csw.params.core.models._
-import csw.params.events._
+import csw.params.core.models.*
+import csw.params.events.*
 import csw.prefix.models.Prefix
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers

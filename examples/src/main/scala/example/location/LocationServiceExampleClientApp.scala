@@ -7,23 +7,23 @@ package example.location
 
 import java.net.InetAddress
 
-import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{ActorRef, Behavior, SpawnProtocol}
-import akka.actor.{Actor, ActorSystem, Props, typed}
-import akka.stream.scaladsl.{Keep, Sink}
-import akka.stream.typed.scaladsl.ActorSink
-import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.actor.typed.{ActorRef, Behavior, SpawnProtocol}
+import org.apache.pekko.actor.{Actor, ActorSystem, Props, typed}
+import org.apache.pekko.stream.scaladsl.{Keep, Sink}
+import org.apache.pekko.stream.typed.scaladsl.ActorSink
+import csw.command.client.extensions.PekkoLocationExt.RichPekkoLocation
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.location.api
-import csw.location.api.AkkaRegistrationFactory
-import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
+import csw.location.api.PekkoRegistrationFactory
+import csw.location.api.models.Connection.{PekkoConnection, HttpConnection}
 import csw.location.api.models.*
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.wrapper.LocationServerWiring
 import csw.logging.api.scaladsl.*
-import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
+import csw.logging.client.commons.PekkoTypedExtension.UserActorFactory
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.scaladsl.{Keys, LoggerFactory, LoggingSystemFactory}
 import csw.prefix.models.{Prefix, Subsystem}
@@ -31,7 +31,7 @@ import example.location.ExampleMessages.{AllDone, CustomException, TrackingEvent
 import example.location.LocationServiceExampleClient.locationInfoToString
 
 import scala.annotation.nowarn
-import scala.async.Async.*
+import cps.compat.FutureAsync.*
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.*
 import scala.concurrent.{Await, Future}
@@ -39,29 +39,30 @@ import scala.concurrent.{Await, Future}
 /**
  * An example location service client application.
  */
-object LocationServiceExampleClientApp extends App {
+object LocationServiceExampleClientApp {
+  def main(args: Array[String]): Unit = {
+    // http location service client expect that location server is running on local machine
+    // here we are starting location http server so that httpLocationClient uses can be illustrated
+    val wiring = new LocationServerWiring().wiring
+    Await.result(wiring.locationHttpService.start(), 5.seconds)
+    val untypedSystem = ActorSystem("untyped-system")
+    // #create-actor-system
+    val typedSystem: typed.ActorSystem[SpawnProtocol.Command] =
+      ActorSystemFactory.remote(SpawnProtocol(), "csw-examples-locationServiceClient")
+    // #create-actor-system
 
-  // http location service client expect that location server is running on local machine
-  // here we are starting location http server so that httpLocationClient uses can be illustrated
-  private val wiring = new LocationServerWiring().wiring
-  Await.result(wiring.locationHttpService.start(), 5.seconds)
-  val untypedSystem = ActorSystem("untyped-system")
-  // #create-actor-system
-  val typedSystem: typed.ActorSystem[SpawnProtocol.Command] =
-    ActorSystemFactory.remote(SpawnProtocol(), "csw-examples-locationServiceClient")
-  // #create-actor-system
+    // #create-location-service
+    val locationService = HttpLocationServiceFactory.makeLocalClient(typedSystem)
+    // #create-location-service
 
-  // #create-location-service
-  private val locationService = HttpLocationServiceFactory.makeLocalClient(typedSystem)
-  // #create-location-service
+    // #create-logging-system
+    val host = InetAddress.getLocalHost.getHostName
+    // Only call this once per application
+    val loggingSystem: LoggingSystem = LoggingSystemFactory.start("LocationServiceExampleClient", "0.1", host, typedSystem)
+    // #create-logging-system
 
-  // #create-logging-system
-  private val host = InetAddress.getLocalHost.getHostName
-  // Only call this once per application
-  val loggingSystem: LoggingSystem = LoggingSystemFactory.start("LocationServiceExampleClient", "0.1", host, typedSystem)
-  // #create-logging-system
-
-  untypedSystem.actorOf(LocationServiceExampleClient.props(locationService, loggingSystem)(typedSystem))
+    untypedSystem.actorOf(LocationServiceExampleClient.props(locationService, loggingSystem)(typedSystem))
+  }
 }
 
 sealed trait ExampleMessages
@@ -107,7 +108,7 @@ object LocationServiceExampleClient {
  */
 class LocationServiceExampleClient(locationService: LocationService, loggingSystem: LoggingSystem)(implicit
     typedSystem: typed.ActorSystem[SpawnProtocol.Command]
-) extends akka.actor.Actor {
+) extends org.apache.pekko.actor.Actor {
 
   val log: Logger = new LoggerFactory(Prefix("csw.my-component-name")).getLogger(context)
 
@@ -154,11 +155,13 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   // ************************************************************************************************************
 
   // import scaladsl adapter to implicitly convert UnTyped ActorRefs to Typed ActorRef[Nothing]
-  import akka.actor.typed.scaladsl.adapter.*
+  import org.apache.pekko.actor.typed.scaladsl.adapter.*
 
   // dummy HCD connection
-  val hcdConnection: AkkaConnection = AkkaConnection(api.models.ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD))
-  val hcdRegistration: AkkaRegistration = AkkaRegistrationFactory.make(
+  val hcdConnection: PekkoConnection = PekkoConnection(
+    api.models.ComponentId(Prefix(Subsystem.NFIRAOS, "hcd1"), ComponentType.HCD)
+  )
+  val hcdRegistration: PekkoRegistration = PekkoRegistrationFactory.make(
     hcdConnection,
     context
       .actorOf(
@@ -185,12 +188,12 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   def behavior(): Behavior[String]    = Behaviors.setup { _ => Behaviors.receiveMessage { _ => Behaviors.same } }
   val typedActorRef: ActorRef[String] = context.system.spawn(behavior(), "typed-actor-ref")
 
-  val assemblyConnection: AkkaConnection = AkkaConnection(
+  val assemblyConnection: PekkoConnection = PekkoConnection(
     ComponentId(Prefix(Subsystem.NFIRAOS, "assembly1"), ComponentType.Assembly)
   )
 
   // Register Typed ActorRef[String] with Location Service
-  val assemblyRegistration: AkkaRegistration = AkkaRegistrationFactory.make(assemblyConnection, typedActorRef)
+  val assemblyRegistration: PekkoRegistration = PekkoRegistrationFactory.make(assemblyConnection, typedActorRef)
 
   private val assemblyRegResultF: Future[RegistrationResult] = locationService
     .register(assemblyRegistration)
@@ -224,7 +227,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   // #find
   // find connection to LocationServiceExampleComponent in location service
   // [do this before starting LocationServiceExampleComponent.  this should return Future[None]]
-  val exampleConnection: AkkaConnection = LocationServiceExampleComponent.connection
+  val exampleConnection: PekkoConnection = LocationServiceExampleComponent.connection
 
   // #log-info-map
   log.info(
@@ -237,13 +240,13 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
       // #log-info
       log.info(s"Result of the find call: $findResult")
       // #log-info
-      val akkaLocation = findResult
+      val pekkoLocation = findResult
       // #typed-ref
       // If the component type is HCD or Assembly, use this to get the correct ActorRef
-      val typedComponentRef: ActorRef[ComponentMessage] = akkaLocation.componentRef
+      val typedComponentRef: ActorRef[ComponentMessage] = pekkoLocation.componentRef
 
       // If the component type is Container, use this to get the correct ActorRef
-      val typedContainerRef: ActorRef[ContainerMessage] = akkaLocation.containerRef
+      val typedContainerRef: ActorRef[ContainerMessage] = pekkoLocation.containerRef
     // #typed-ref
     case None => // do something when nothing is found
   }
@@ -255,8 +258,8 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   // [start LocationServiceExampleComponent after this command but before timeout]
   log.info(s"Attempting to resolve $exampleConnection with a wait of $waitForResolveLimit ...")
 
-  val resolveResultF: Future[Option[AkkaLocation]] = locationService.resolve(exampleConnection, waitForResolveLimit)
-  val resolveResult: Option[AkkaLocation]          = Await.result(resolveResultF, waitForResolveLimit + timeout)
+  val resolveResultF: Future[Option[PekkoLocation]] = locationService.resolve(exampleConnection, waitForResolveLimit)
+  val resolveResult: Option[PekkoLocation]          = Await.result(resolveResultF, waitForResolveLimit + timeout)
   resolveResult match {
     case Some(result) =>
       log.info(s"Resolve result: ${locationInfoToString(result)}")
@@ -287,20 +290,20 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   // #filtering-connection
   // filter connections based on connection type
   locationService
-    .list(ConnectionType.AkkaType)
-    .map(akkaList => {
-      log.info("Registered Akka connections:")
-      akkaList.foreach(c => log.info(s"--- ${locationInfoToString(c)}"))
+    .list(ConnectionType.PekkoType)
+    .map(pekkoList => {
+      log.info("Registered Pekko connections:")
+      pekkoList.foreach(c => log.info(s"--- ${locationInfoToString(c)}"))
     })
   // #filtering-connection
 
   // #filtering-prefix
-  // filter akka locations based on prefix
+  // filter pekko locations based on prefix
   locationService
     .listByPrefix("NFIRAOS.ncc")
-    .map(akkaLocations => {
-      log.info("Registered akka locations for nfiraos.ncc")
-      akkaLocations.foreach(c => log.info(s"--- ${locationInfoToString(c)}"))
+    .map(pekkoLocations => {
+      log.info("Registered pekko locations for nfiraos.ncc")
+      pekkoLocations.foreach(c => log.info(s"--- ${locationInfoToString(c)}"))
     })
   // #filtering-prefix
 
@@ -317,8 +320,8 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
     val sinfActorRef = typedSystem.spawn(LocationServiceExampleClient.sinkBehavior, "")
     locationService
       .track(exampleConnection)
-      .map(TrackingEventAdapter)
-      .to(ActorSink.actorRef[ExampleMessages](sinfActorRef, AllDone(exampleConnection), CustomException))
+      .map(TrackingEventAdapter.apply)
+      .to(ActorSink.actorRef[ExampleMessages](sinfActorRef, AllDone(exampleConnection), CustomException.apply))
       .run()
     // track returns a Killswitch, that can be used to turn off notifications arbitarily
     // in this case track a connection for 5 seconds, after that schedule switching off the stream
@@ -375,7 +378,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   @nowarn("msg=unreachable code")
   override def receive: Receive = {
 
-    // Receive a location from the location service and if it is an akka location, send it a message
+    // Receive a location from the location service and if it is an pekko location, send it a message
     case LocationUpdated(loc) =>
       log.info(s"Location updated ${locationInfoToString(loc)}")
 

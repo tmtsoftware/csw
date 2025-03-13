@@ -92,27 +92,26 @@ public class JCoordsTest {
     @Test
     public void shouldConvertPmToFromJSON() {
         // Check proper motions
-        var pmjs = JavaJsonSupport.writes(pm, JParamCodecs.properMotionCodec().encoder());
-
-        var pmIn = JavaJsonSupport.reads(pmjs, JParamCodecs.properMotionCodec().decoder());
+        var pmjs = JavaJsonSupport.writeProperMotion(pm);
+        var pmIn = JavaJsonSupport.readProperMotion(pmjs);
         assertEquals(pmIn, pm);
     }
 
     @Test
     public void shouldConvertFrameToFromJSON() {
         var f1 = ICRS();
-        var j1 = JavaJsonSupport.writes(f1, JParamCodecs.eqFrameCodec().encoder());
-        assertEquals(JavaJsonSupport.reads(j1, JParamCodecs.eqFrameCodec().decoder()), ICRS());
+        var j1 = JavaJsonSupport.writeEqFrame(f1);
+        assertEquals(JavaJsonSupport.readEqFrame(j1), ICRS());
         var f2 = FK5();
-        var j2 = JavaJsonSupport.writes(f2, JParamCodecs.eqFrameCodec().encoder());
-        assertEquals(JavaJsonSupport.reads(j2, JParamCodecs.eqFrameCodec().decoder()), FK5());
+        var j2 = JavaJsonSupport.writeEqFrame(f2);
+        assertEquals(JavaJsonSupport.readEqFrame(j2), FK5());
     }
 
     @Test
     public void shouldJSONAnAltAz() {
         var c0 = new AltAzCoord(BASE(), degree(301), degree(42.5));
-        var js = JavaJsonSupport.writes(c0, JParamCodecs.coordCodecValue().encoder());
-        var c1 = JavaJsonSupport.reads(js, JParamCodecs.coordCodecValue().decoder());
+        var js = JavaJsonSupport.writeAltAzCoord(c0);
+        var c1 = JavaJsonSupport.readAltAzCoord(js);
         assertEquals(c0, c1);
     }
 
@@ -120,8 +119,8 @@ public class JCoordsTest {
     public void shouldJSONSolarSystemCoord() {
         var c0 = new SolarSystemCoord(BASE(), Venus());
 
-        var js = JavaJsonSupport.writes(c0, JParamCodecs.coordCodecValue().encoder());
-        var c1 = JavaJsonSupport.reads(js, JParamCodecs.coordCodecValue().decoder());
+        var js = JavaJsonSupport.writeSolarSystemCoord(c0);
+        var c1 = JavaJsonSupport.readSolarSystemCoord(js);
         assertEquals(c0, c1);
     }
 
@@ -129,8 +128,8 @@ public class JCoordsTest {
     public void shouldJSONMinorPlanetCoord() {
         var c0 = new MinorPlanetCoord(GUIDER1(), 2000.0d, degree(90), degree(2), degree(100), 1.4d, 0.234d, degree(220));
 
-        var js = JavaJsonSupport.writes(c0, JParamCodecs.coordCodecValue().encoder());
-        var c1 = JavaJsonSupport.reads(js, JParamCodecs.coordCodecValue().decoder());
+        var js = JavaJsonSupport.writeMinorPlanetCoord(c0);
+        var c1 = JavaJsonSupport.readMinorPlanetCoord(js);
         assertEquals(c0, c1);
     }
 
@@ -138,12 +137,12 @@ public class JCoordsTest {
     public void shouldJSONCometCoord() {
         var c0 = new CometCoord(BASE(), 2000.0d, degree(90), degree(2), degree(100), 1.4d, 0.234d);
 
-        var js = JavaJsonSupport.writes(c0, JParamCodecs.coordCodecValue().encoder());
-        var c1 = JavaJsonSupport.reads(js, JParamCodecs.coordCodecValue().decoder());
+        var js = JavaJsonSupport.writeCometCoord(c0);
+        var c1 = JavaJsonSupport.readCometCoord(js);
         assertEquals(c0, c1);
 
-        var js2 = JavaJsonSupport.writes(c0, JParamCodecs.coordCodecValue().encoder());
-        assertEquals(JavaJsonSupport.reads(js2, JParamCodecs.coordCodecValue().decoder()), c0);
+        var js2 = JavaJsonSupport.writeCometCoord(c0);
+        assertEquals(JavaJsonSupport.readCometCoord(js2), c0);
     }
 
     @Test
@@ -151,8 +150,8 @@ public class JCoordsTest {
         // Check EqCoordinate
         var eq = new EqCoord(180.0, 32.0, FK5(), BASE(), DEFAULT_CATNAME(), pm.pmx(), pm.pmy());
 
-        var js = JavaJsonSupport.writes(eq, JParamCodecs.coordCodecValue().encoder());
-        var eqIn = JavaJsonSupport.reads(js, JParamCodecs.coordCodecValue().decoder());
+        var js = JavaJsonSupport.writeEqCoord(eq);
+        var eqIn = JavaJsonSupport.readEqCoord(js);
         assertEquals(eqIn, eq);
     }
 

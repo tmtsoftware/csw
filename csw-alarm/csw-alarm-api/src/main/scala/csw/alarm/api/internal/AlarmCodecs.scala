@@ -5,7 +5,7 @@
 
 package csw.alarm.api.internal
 
-import csw.alarm.models._
+import csw.alarm.models.*
 import csw.prefix.codecs.CommonCodecs
 import csw.time.core.models.UTCTime
 import io.bullet.borer.Codec

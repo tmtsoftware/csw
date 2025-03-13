@@ -10,9 +10,9 @@ import java.util.Optional
 import java.util.concurrent.CompletableFuture
 import java.util.function.{Consumer, Supplier}
 
-import akka.Done
-import akka.actor.Cancellable
-import akka.stream.javadsl.Source
+import org.apache.pekko.Done
+import org.apache.pekko.actor.Cancellable
+import org.apache.pekko.stream.javadsl.Source
 import csw.event.api.exceptions.PublishFailure
 import csw.params.events.Event
 import csw.time.core.models.TMTTime
@@ -43,7 +43,7 @@ trait IEventPublisher {
    * stopped after logging appropriately. In all other cases of exception, the stream receives a [[csw.event.api.exceptions.PublishFailure]] exception
    * which wraps the underlying exception. The stream resumes to publish remaining elements in case of this exception.
    *
-   * @param source a [[akka.stream.javadsl.Source]] of events to be published
+   * @param source a [[org.apache.pekko.stream.javadsl.Source]] of events to be published
    * @tparam Mat represents the type of materialized value as defined in the source to be obtained on running the stream
    * @return the materialized value obtained on running the stream
    */
@@ -58,7 +58,7 @@ trait IEventPublisher {
    * which wraps the underlying exception and also provides the handle to the event which was failed to be published.
    * The provided callback is executed on the failed element and the stream resumes to publish remaining elements.
    *
-   * @param source a [[akka.stream.javadsl.Source]] of events to be published
+   * @param source a [[org.apache.pekko.stream.javadsl.Source]] of events to be published
    * @param onError a consumer which defines an operation for each event for which publishing failed
    * @tparam Mat represents the type of materialized value as defined in the source to be obtained on running the stream
    * @return the materialized value obtained on running the stream

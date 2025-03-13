@@ -141,7 +141,8 @@ In case of TMT most of the synchronization components will be based on
 Linux operating system. For understanding the internal working of Linux
 clock one can refer to [this short
 description](http://btorpey.github.io/blog/2014/02/18/clock-sources-in-linux/#fnref:1)
-or follow ‘Chapter 6’ of the O'Reilly book [Understanding the Linux Kernel](https://www.oreilly.com/library/view/understanding-the-linux/0596000022/).
+or follow ‘Chapter 6’ of [the detailed
+document](https://doc.lagout.org/operating%20system%20/linux/Understanding%20Linux%20Kernel.pdf).
 The block diagram of an ordinary clock is shown in the following figure.
 
 ![block diagram](block-diagram-ordinary-clock.png)
@@ -233,11 +234,11 @@ TMT time service provides scheduler for scheduling tasks once or
 periodically. The schedulers can be used to handle tasks at 1KHz
 frequency or 1 task every millisecond. However, jitters and JVM garbage
 collection can degrade the performance of the schedulers at such a high
-frequency. Internally, the scheduler APIs makes use of ‘[Akka Scheduler
-Library](https://doc.akka.io/libraries/akka-http/current/)’. The
+frequency. Internally, the scheduler APIs makes use of ‘[Pekko Scheduler
+Library](https://pekko.apache.org/docs/pekko/current/scheduler.html)’. The
 results published in [here](https://id.atlassian.com/login?continue=https%3A%2F%2Ftmt-project.atlassian.net%2Flogin%3FredirectCount%3D1%26dest-url%3D%252Fwiki%252Fspaces%252FDEOPSCSW%252Fpages%252F298680332%252FComparative%252Bstudy%252Bof%252Bscheduler%252Boptions%252Bfor%252B1KHz%252B1ms%252Bscheduling%252Brate%26application%3Dconfluence&application=confluence)
 compares some of the options and makes strong recommendation to use the
-Akka Schedulers. The snippets in the API documentation defines the schedule APIs in the
+Pekko Schedulers. The snippets in the API documentation defines the schedule APIs in the
 CSW library.
 
 One of the major challenge in designing the scheduler was to handle the

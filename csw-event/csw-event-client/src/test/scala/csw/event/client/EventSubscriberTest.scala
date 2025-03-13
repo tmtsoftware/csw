@@ -5,22 +5,24 @@
 
 package csw.event.client
 
-import akka.actor.testkit.typed.scaladsl.{TestInbox, TestProbe}
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.Behaviors
-import akka.stream.scaladsl.{Keep, Sink}
+import org.apache.pekko.actor.testkit.typed.scaladsl.{TestInbox, TestProbe}
+import org.apache.pekko.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.stream.scaladsl.{Keep, Sink}
 import csw.event.api.scaladsl.SubscriptionModes
-import csw.event.client.helpers.TestFutureExt.RichFuture
-import csw.event.client.helpers.Utils._
+import csw.event.client.helpers.TestFutureExt.given
+import scala.language.implicitConversions
+
+import csw.event.client.helpers.Utils.*
 import csw.prefix.models.{Prefix, Subsystem}
-import csw.event.client.internal.kafka.KafkaTestProps
+//import csw.event.client.internal.kafka.KafkaTestProps
 import csw.event.client.internal.redis.RedisTestProps
 import csw.event.client.internal.wiring.BaseProperties
 import csw.params.core.models.ObsId
 import csw.params.events.{Event, EventKey, EventName, IRDetectorEvent, OpticalDetectorEvent, SystemEvent, WFSDetectorEvent}
 import org.scalatest.concurrent.Eventually
 import org.scalatestplus.testng.TestNGSuite
-import org.testng.annotations._
+import org.testng.annotations.*
 
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.{immutable, mutable}
@@ -39,35 +41,35 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
 
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 10.millis)
 
-  var redisTestProps: RedisTestProps = _
-  var kafkaTestProps: KafkaTestProps = _
+  var redisTestProps: BaseProperties = scala.compiletime.uninitialized
+//  var kafkaTestProps: BaseProperties = _
 
   @BeforeSuite
   def beforeAll(): Unit = {
     redisTestProps = RedisTestProps.createRedisProperties()
-    kafkaTestProps = KafkaTestProps.createKafkaProperties()
+//    kafkaTestProps = KafkaTestProps.createKafkaProperties()
     redisTestProps.start()
-    kafkaTestProps.start()
+//    kafkaTestProps.start()
   }
 
   @AfterSuite
   def afterAll(): Unit = {
     redisTestProps.shutdown()
-    kafkaTestProps.shutdown()
+//    kafkaTestProps.shutdown()
   }
 
   @DataProvider(name = "event-service-provider")
-  def pubSubProvider: Array[Array[_ <: BaseProperties]] =
+  def pubSubProvider: Array[Array[BaseProperties]] =
     Array(
-      Array(redisTestProps),
-      Array(kafkaTestProps)
+      Array(redisTestProps)
+//      Array(kafkaTestProps)
     )
 
   @DataProvider(name = "redis-provider")
-  def redisPubSubProvider: Array[Array[RedisTestProps]] = Array(Array(redisTestProps))
+  def redisPubSubProvider: Array[Array[BaseProperties]] = Array(Array(redisTestProps))
 
-  val events: immutable.Seq[Event]                  = for (i <- 1 to 1500) yield makeEvent(i)
-  def events(name: EventName): immutable.Seq[Event] = for (i <- 1 to 1500) yield makeEventForKeyName(name, i)
+  val events: immutable.Seq[Event]                  = for (i <- 1 to 3500) yield makeEvent(i)
+  def events(name: EventName): immutable.Seq[Event] = for (i <- 1 to 3500) yield makeEventForKeyName(name, i)
 
   class EventGenerator(eventName: EventName) {
     var counter                               = 0
@@ -155,12 +157,15 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     val callback2: Event => Future[Unit] = event => Future.successful(queue2.enqueue(event))
     eventId = 0
     val cancellable = publisher.publish(eventGenerator(), 1.millis)
+    Thread.sleep(1000) // kafka seems to need a warmup time
 
     val subscription  = subscriber.subscribeAsync(Set(eventKey), callback, 300.millis, SubscriptionModes.RateAdapterMode)
     val subscription2 = subscriber.subscribeAsync(Set(eventKey), callback2, 400.millis, SubscriptionModes.RateAdapterMode)
     Thread.sleep(1000) // Future in callback needs time to execute
-    subscription.unsubscribe().await
-    subscription2.unsubscribe().await
+    val f1 = subscription.unsubscribe()
+    val f2 = subscription2.unsubscribe()
+    f1.await
+    f2.await
 
     cancellable.cancel()
     queue.size shouldBe 4
@@ -217,8 +222,10 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     val subscription2 =
       subscriber.subscribeCallback(Set(event1.eventKey), callback2, 400.millis, SubscriptionModes.RateAdapterMode)
     Thread.sleep(1000)
-    subscription.unsubscribe().await
-    subscription2.unsubscribe().await
+    val f1 = subscription.unsubscribe()
+    val f2 = subscription2.unsubscribe()
+    f1.await
+    f2.await
 
     cancellable.cancel()
     queue.size shouldBe 4

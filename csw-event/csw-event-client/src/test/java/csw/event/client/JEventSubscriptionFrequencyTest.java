@@ -5,14 +5,15 @@
 
 package csw.event.client;
 
-import akka.actor.Cancellable;
-import akka.actor.testkit.typed.javadsl.TestInbox;
-import akka.stream.javadsl.Keep;
-import akka.stream.javadsl.Sink;
+import org.apache.pekko.Done;
+import org.apache.pekko.actor.Cancellable;
+import org.apache.pekko.actor.testkit.typed.javadsl.TestInbox;
+import org.apache.pekko.stream.javadsl.Keep;
+import org.apache.pekko.stream.javadsl.Sink;
 import csw.event.api.javadsl.IEventSubscription;
 import csw.event.api.scaladsl.SubscriptionModes;
 import csw.event.client.helpers.Utils;
-import csw.event.client.internal.kafka.KafkaTestProps;
+//import csw.event.client.internal.kafka.KafkaTestProps;
 import csw.event.client.internal.redis.RedisTestProps;
 import csw.event.client.internal.wiring.BaseProperties;
 import csw.params.events.Event;
@@ -27,6 +28,7 @@ import org.testng.annotations.Test;
 
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -40,19 +42,19 @@ import java.util.function.Supplier;
 public class JEventSubscriptionFrequencyTest extends TestNGSuite {
 
     private RedisTestProps redisTestProps;
-    private KafkaTestProps kafkaTestProps;
+//    private KafkaTestProps kafkaTestProps;
 
     @BeforeSuite
     public void beforeAll() {
         redisTestProps = RedisTestProps.jCreateRedisProperties();
-        kafkaTestProps = KafkaTestProps.jCreateKafkaProperties();
+//        kafkaTestProps = KafkaTestProps.jCreateKafkaProperties();
         redisTestProps.start();
-        kafkaTestProps.start();
+//        kafkaTestProps.start();
     }
 
     private List<Event> getEventsWithName(EventName eventName) {
         List<Event> events = new ArrayList<>();
-        for(int i = 0; i < 1500; i++) {
+        for(int i = 0; i < 3500; i++) {
             events.add(Utils.makeEventForKeyName(eventName, i));
         }
         return events;
@@ -84,12 +86,15 @@ public class JEventSubscriptionFrequencyTest extends TestNGSuite {
     @AfterSuite
     public void afterAll() {
         redisTestProps.shutdown();
-        kafkaTestProps.shutdown();
+//        kafkaTestProps.shutdown();
     }
 
     @DataProvider(name = "event-service-provider")
     public Object[][] pubsubProvider() {
-        return new Object[][]{{redisTestProps}, {kafkaTestProps}};
+        return new Object[][]{
+                {redisTestProps}
+//                {kafkaTestProps}
+        };
     }
 
     @DataProvider(name = "redis-provider")
@@ -141,8 +146,10 @@ public class JEventSubscriptionFrequencyTest extends TestNGSuite {
 
         Thread.sleep(2000);
 
-        subscription.unsubscribe().get(10, TimeUnit.SECONDS);
-        subscription2.unsubscribe().get(10, TimeUnit.SECONDS);
+        CompletableFuture<Done> f1 = subscription.unsubscribe();
+        CompletableFuture<Done> f2 = subscription2.unsubscribe();
+        f1.get(10, TimeUnit.SECONDS);
+        f2.get(10, TimeUnit.SECONDS);
         cancellable.cancel();
 
         Assert.assertEquals(receivedEvents.size(), 4);

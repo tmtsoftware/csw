@@ -8,7 +8,7 @@ package csw.database
 import java.util.Properties
 import java.util.concurrent.CompletableFuture
 
-import akka.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 import csw.database.commons.{DatabaseLogger, DatabaseServiceLocationResolver}
@@ -19,9 +19,9 @@ import csw.logging.api.scaladsl.Logger
 import org.jooq.impl.DSL
 import org.jooq.{DSLContext, SQLDialect}
 
-import scala.async.Async.{async, await}
-import scala.jdk.CollectionConverters._
-import scala.compat.java8.FutureConverters.FutureOps
+import cps.compat.FutureAsync.*
+import scala.jdk.CollectionConverters.*
+import scala.jdk.FutureConverters.*
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
@@ -39,7 +39,7 @@ private[csw] object DatabaseServiceFactory {
  *                    2) schedule the task of database connection
  * @param values used for testing purposes, to manually set the values for credentials instead of reading from env vars
  */
-class DatabaseServiceFactory private[csw] (actorSystem: ActorSystem[_], values: Map[String, String]) {
+class DatabaseServiceFactory private[csw] (actorSystem: ActorSystem[?], values: Map[String, String]) {
 
   /**
    * Creates the DatabaseServiceFactory. It is not injected in `CswContext` like other csw services.
@@ -50,7 +50,7 @@ class DatabaseServiceFactory private[csw] (actorSystem: ActorSystem[_], values: 
    *                    2) schedule the task of database connection
    * @return DatabaseServiceFactory
    */
-  def this(actorSystem: ActorSystem[_]) = this(actorSystem, Map.empty)
+  def this(actorSystem: ActorSystem[?]) = this(actorSystem, Map.empty)
 
   private val log: Logger    = DatabaseLogger.getLogger
   private val config: Config = actorSystem.settings.config
@@ -121,7 +121,7 @@ class DatabaseServiceFactory private[csw] (actorSystem: ActorSystem[_], values: 
    *         scala which provides wrapper methods on Jooq's `DSLContext`.
    */
   def jMakeDsl(locationService: ILocationService, dbName: String): CompletableFuture[DSLContext] =
-    makeDsl(locationService.asScala, dbName).toJava.toCompletableFuture
+    makeDsl(locationService.asScala, dbName).asJava.toCompletableFuture
 
   /**
    * A java method to create the connection to database with credentials picked from environment variables. Names of these
@@ -143,7 +143,7 @@ class DatabaseServiceFactory private[csw] (actorSystem: ActorSystem[_], values: 
       usernameHolder: String,
       passwordHolder: String
   ): CompletableFuture[DSLContext] =
-    makeDsl(locationService.asScala, dbName, usernameHolder, passwordHolder).toJava.toCompletableFuture
+    makeDsl(locationService.asScala, dbName, usernameHolder, passwordHolder).asJava.toCompletableFuture
 
   /**
    * Creates a connection to database using the configuration read from application.conf. Refer the reference.conf/database
@@ -167,7 +167,7 @@ class DatabaseServiceFactory private[csw] (actorSystem: ActorSystem[_], values: 
    *         [[csw.database.javadsl.JooqHelper]] for java and [[csw.database.scaladsl.JooqExtentions]] for
    *         scala which provides wrapper methods on Jooq's `DSLContext`.
    */
-  def jMakeDsl(): CompletableFuture[DSLContext] = makeDsl().toJava.toCompletableFuture
+  def jMakeDsl(): CompletableFuture[DSLContext] = makeDsl().asJava.toCompletableFuture
 
   private[database] def makeDsl(port: Int): Future[DSLContext] = {
     val config = ConfigFactory.parseString(s"dataSource.portNumber = $port")

@@ -5,9 +5,9 @@
 
 package example.tutorial.basic.sampleassembly
 
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.ActorContext
-import akka.util.Timeout
+import org.apache.pekko.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.scaladsl.ActorContext
+import org.apache.pekko.util.Timeout
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.CommandResponseManager.{OverallFailure, OverallSuccess}
 import csw.command.client.CommandServiceFactory
@@ -15,19 +15,19 @@ import csw.command.client.messages.TopLevelActorMessage
 import csw.event.api.scaladsl.EventSubscription
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType, LocationRemoved, LocationUpdated, TrackingEvent}
-import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.{PekkoLocation, ComponentId, ComponentType, LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.location.api.models.Connection.PekkoConnection
 import csw.params.commands.CommandIssue.{MissingKeyIssue, ParameterValueOutOfRangeIssue, UnsupportedCommandIssue}
-import csw.params.commands.CommandResponse._
+import csw.params.commands.CommandResponse.*
 import csw.params.commands.{CommandIssue, ControlCommand, Observe, Result, Setup}
 import csw.params.core.generics.KeyType
 import csw.params.core.models.Id
-import csw.params.events._
+import csw.params.events.*
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.time.core.models.UTCTime
-import example.tutorial.basic.shared.SampleInfo._
+import example.tutorial.basic.shared.SampleInfo.*
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
 /**
@@ -50,8 +50,8 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
   private implicit val timeout: Timeout     = 10.seconds
   private val log                           = loggerFactory.getLogger
   private val prefix: Prefix                = cswCtx.componentInfo.prefix
-  private val hcdConnection                 = AkkaConnection(ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
-  private var hcdLocation: AkkaLocation     = _
+  private val hcdConnection                 = PekkoConnection(ComponentId(Prefix(Subsystem.ESW, "SampleHcd"), ComponentType.HCD))
+  private var hcdLocation: PekkoLocation    = scala.compiletime.uninitialized
   private var hcdCS: Option[CommandService] = None
 
   // #initialize
@@ -73,7 +73,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
     log.debug(s"onLocationTrackingEvent called: $trackingEvent")
     trackingEvent match {
       case LocationUpdated(location) =>
-        hcdLocation = location.asInstanceOf[AkkaLocation]
+        hcdLocation = location.asInstanceOf[PekkoLocation]
         hcdCS = Some(CommandServiceFactory.make(location))
         onSetup(Id(), Setup(prefix, shortCommand, None))
       case LocationRemoved(connection) =>

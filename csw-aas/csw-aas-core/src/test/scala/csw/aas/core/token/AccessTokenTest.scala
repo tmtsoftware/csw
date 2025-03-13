@@ -9,7 +9,7 @@ import msocket.security.models.{Access, AccessToken}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 
-//DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
+//DEOPSCSW-579: Prevent unauthorized access based on pekko http route rules
 class AccessTokenTest extends AnyFunSuite with Matchers {
 
   test("should able to check realm role for access token | DEOPSCSW-579") {

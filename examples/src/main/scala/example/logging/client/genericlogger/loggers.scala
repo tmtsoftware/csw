@@ -5,8 +5,8 @@
 
 package example.logging.client.genericlogger
 
-import akka.actor.typed.Behavior
-import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
+import org.apache.pekko.actor.typed.Behavior
+import org.apache.pekko.actor.typed.scaladsl.{ActorContext, Behaviors}
 import csw.command.client.messages.ComponentMessage
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.GenericLoggerFactory

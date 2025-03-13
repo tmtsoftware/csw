@@ -5,21 +5,21 @@
 
 package csw.config.api.internal
 
-import akka.NotUsed
-import akka.actor.typed.ActorSystem
-import akka.stream.scaladsl.{Sink, Source}
+import org.apache.pekko.NotUsed
+import org.apache.pekko.actor.typed.ActorSystem
+import org.apache.pekko.stream.scaladsl.{Sink, Source}
 
 import scala.concurrent.{Future, Promise}
 
 /**
- * Extensions on akka streams
+ * Extensions on pekko streams
  */
 private[config] object ConfigStreamExts {
 
   /**
-   * RichSource adds extra features on akka streams
+   * RichSource adds extra features on pekko streams
    *
-   * @see [[akka.stream.scaladsl.Source]]
+   * @see [[org.apache.pekko.stream.scaladsl.Source]]
    * @tparam Out the type of values that will flow through this stream
    * @tparam Mat when the stream starts flowing, the handle to the Mat will be available
    */
@@ -31,7 +31,7 @@ private[config] object ConfigStreamExts {
      *
      * @param n number of elements to be extracted as prefix
      */
-    def prefixAndStitch(n: Int)(implicit system: ActorSystem[_]): (Future[Seq[Out]], Source[Out, Future[NotUsed]]) = {
+    def prefixAndStitch(n: Int)(implicit system: ActorSystem[?]): (Future[Seq[Out]], Source[Out, Future[NotUsed]]) = {
       import system.executionContext
       val p = Promise[Seq[Out]]()
       val futureSource = source.prefixAndTail(n).runWith(Sink.head).map { case (prefix, remainingSource) =>

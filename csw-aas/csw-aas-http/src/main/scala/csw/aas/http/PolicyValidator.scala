@@ -5,13 +5,13 @@
 
 package csw.aas.http
 
-import akka.http.scaladsl.model.HttpMethod
-import akka.http.scaladsl.model.headers.{HttpChallenges, OAuth2BearerToken}
-import akka.http.scaladsl.server.AuthenticationFailedRejection.{CredentialsMissing, CredentialsRejected}
-import akka.http.scaladsl.server.Directives.{extractCredentials, extractRequestContext, method, onSuccess}
-import akka.http.scaladsl.server.directives.BasicDirectives.provide
-import akka.http.scaladsl.server.directives.RouteDirectives.reject
-import akka.http.scaladsl.server.{AuthenticationFailedRejection, AuthorizationFailedRejection, Directive1}
+import org.apache.pekko.http.scaladsl.model.HttpMethod
+import org.apache.pekko.http.scaladsl.model.headers.{HttpChallenges, OAuth2BearerToken}
+import org.apache.pekko.http.scaladsl.server.AuthenticationFailedRejection.{CredentialsMissing, CredentialsRejected}
+import org.apache.pekko.http.scaladsl.server.Directives.{extractCredentials, extractRequestContext, method, onSuccess}
+import org.apache.pekko.http.scaladsl.server.directives.BasicDirectives.provide
+import org.apache.pekko.http.scaladsl.server.directives.RouteDirectives.reject
+import org.apache.pekko.http.scaladsl.server.{AuthenticationFailedRejection, AuthorizationFailedRejection, Directive1}
 import msocket.security.api.AuthorizationPolicy
 import msocket.security.models.{AccessStatus, AccessToken}
 import msocket.security.{AccessControllerFactory, models}

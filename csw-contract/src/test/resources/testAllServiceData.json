@@ -10,11 +10,11 @@
         "Register" : [ {
           "_type" : "Register",
           "registration" : {
-            "_type" : "AkkaRegistration",
+            "_type" : "PekkoRegistration",
             "connection" : {
               "prefix" : "TCS.filter.wheel",
               "componentType" : "HCD",
-              "connectionType" : "akka"
+              "connectionType" : "pekko"
             },
             "actorRefURI" : "some_path",
             "metadata" : {
@@ -60,18 +60,18 @@
           "connection" : {
             "prefix" : "TCS.filter.wheel",
             "componentType" : "HCD",
-            "connectionType" : "akka"
+            "connectionType" : "pekko"
           }
         } ]
       }
     },
     "models" : {
       "Location" : [ {
-        "_type" : "AkkaLocation",
+        "_type" : "PekkoLocation",
         "connection" : {
           "prefix" : "TCS.filter.wheel",
           "componentType" : "HCD",
-          "connectionType" : "akka"
+          "connectionType" : "pekko"
         },
         "uri" : "some_path",
         "metadata" : {
@@ -90,11 +90,11 @@
       "TrackingEvent" : [ {
         "_type" : "LocationUpdated",
         "location" : {
-          "_type" : "AkkaLocation",
+          "_type" : "PekkoLocation",
           "connection" : {
             "prefix" : "TCS.filter.wheel",
             "componentType" : "HCD",
-            "connectionType" : "akka"
+            "connectionType" : "pekko"
           },
           "uri" : "some_path",
           "metadata" : {

@@ -8,7 +8,7 @@ package csw.aas.installed.internal
 import csw.aas.core.TokenVerificationFailure.TokenExpired
 import csw.aas.core.TokenVerifier
 import csw.aas.core.deployment.AuthConfig
-import csw.aas.installed.api._
+import csw.aas.installed.api.*
 import csw.aas.installed.utils.Conversions.RichEitherTFuture
 import msocket.security.models.AccessToken
 import org.keycloak.adapters.installed.KeycloakInstalled
@@ -47,19 +47,19 @@ private[aas] class InstalledAppAuthAdapterImpl(
     updateAuthStore()
   }
 
-  override def loginCommandLine(): Boolean = {
-    require(keycloakInstalled.getDeployment != null, "keycloak deployment is null")
-    require(keycloakInstalled.getDeployment.getAuthUrl != null, "auth url is not set")
-    val bool = keycloakInstalled.loginCommandLine()
-    if (bool) updateAuthStore()
-    bool
-  }
+//  override def loginCommandLine(): Boolean = {
+//    require(keycloakInstalled.getDeployment != null, "keycloak deployment is null")
+//    require(keycloakInstalled.getDeployment.getAuthUrl != null, "auth url is not set")
+//    val bool = keycloakInstalled.loginCommandLine()
+//    if (bool) updateAuthStore()
+//    bool
+//  }
 
-  override def loginCommandLine(redirectUri: String): Boolean = {
-    val bool = keycloakInstalled.loginCommandLine(redirectUri)
-    if (bool) updateAuthStore()
-    bool
-  }
+//  override def loginCommandLine(redirectUri: String): Boolean = {
+//    val bool = keycloakInstalled.loginCommandLine(redirectUri)
+//    if (bool) updateAuthStore()
+//    bool
+//  }
 
   override def getAccessToken(minValidity: FiniteDuration = 0.seconds): Option[AccessToken] = {
     def getNewToken: Option[AccessToken] = {

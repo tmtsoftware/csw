@@ -5,7 +5,7 @@
 
 package csw.command.client.models.framework
 
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 
 /**
  * SupervisorInfo is used by container while spawning multiple components

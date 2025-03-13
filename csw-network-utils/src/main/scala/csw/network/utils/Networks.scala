@@ -38,7 +38,7 @@ case class Networks(private val interfaceName: String, networkProvider: NetworkI
 
   // Check if the given InetAddress is not a loopback address and is a ipv4 address
   private def isIpv4(addr: InetAddress): Boolean =
-    // Don't use ipv6 addresses yet, since it seems to not be working with the current akka version
+    // Don't use ipv6 addresses yet, since it seems to not be working with the current pekko version
     !addr.isLoopbackAddress && !addr.isInstanceOf[Inet6Address]
 
   // Get a flattened seq of Index -> InetAddresses pairs

@@ -90,12 +90,12 @@ package csw
  *          {
  *            name: Instrument_Filter
  *            componentType: hcd
- *            connectionType: akka
+ *            connectionType: pekko
  *          },
  *          {
  *            name: Disperser
  *            componentType: hcd
- *            connectionType: akka
+ *            connectionType: pekko
  *          }
  *        ]
  *      },

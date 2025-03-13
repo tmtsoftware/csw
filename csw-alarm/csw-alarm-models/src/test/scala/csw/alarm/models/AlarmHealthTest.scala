@@ -5,8 +5,8 @@
 
 package csw.alarm.models
 
-import csw.alarm.models.AlarmHealth._
-import csw.alarm.models.AlarmSeverity._
+import csw.alarm.models.AlarmHealth.*
+import csw.alarm.models.AlarmSeverity.*
 import csw.alarm.models.FullAlarmSeverity.Disconnected
 
 // DEOPSCSW-458: Calculate component health based on alarm severities

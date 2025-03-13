@@ -5,9 +5,11 @@
 
 package csw.location.server.http
 
-import akka.Done
-import akka.actor.CoordinatedShutdown
-import csw.location.server.commons.TestFutureExtension.RichFuture
+import org.apache.pekko.Done
+import org.apache.pekko.actor.CoordinatedShutdown
+import csw.location.server.commons.TestFutureExtension.given
+import scala.language.implicitConversions
+
 import csw.location.server.internal.ServerWiring
 import csw.location.server.scaladsl.LocationServiceCompTest
 
@@ -15,7 +17,7 @@ import scala.concurrent.duration.DurationInt
 
 // DEOPSCSW-429: [SPIKE] Provide HTTP server and client for location service
 class LocationServiceCompTestWithHttp extends LocationServiceCompTest("http") {
-  private var wiring: ServerWiring = _
+  private var wiring: ServerWiring = scala.compiletime.uninitialized
 
   override protected def beforeAll(): Unit = {
     wiring = new ServerWiring(false)

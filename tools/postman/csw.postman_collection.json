@@ -110,7 +110,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "****************************************************\n*****************   version : 1   ******************\n****************************************************\n\n\n// This describes a container containing the HCD and is used to start the actors.\ncontainer {\n  name = \"tromboneHCD\"\n  connectionType: [akka]\n  components {\n    lgsTromboneHCD {\n      type = HCD\n      class = \"csw.examples.vslice.hcd.TromboneHCD\"\n      prefix = nfiraos.ncc.tromboneHCD\n      connectionType: [akka]\n      rate = 1 second\n    }\n  }\n}\n\n// Additional, application specific configuration for the HCD\ncsw.examples.trombone.hcd {\n  axis-config {\n    axisName = \"tromboneAxis\"\n    lowLimit = 100\n    lowUser = 200\n    highUser = 1200\n    highLimit = 1300\n    home = 300\n    startPosition = 350\n    stepDelayMS = 100  // This value can be shorter, but 150 shows well in tests\n  }\n}\n\n// This describes a container containing the HCD and is used to start the actors.\ncontainer {\n  name = \"tromboneHCD\"\n  connectionType: [akka]\n  components {\n    lgsTromboneHCD {\n      type = HCD\n      class = \"csw.examples.vslice.hcd.TromboneHCD\"\n      prefix = nfiraos.ncc.tromboneHCD\n      connectionType: [akka]\n      rate = 1 second\n    }\n  }\n}"
+                  "raw": "****************************************************\n*****************   version : 1   ******************\n****************************************************\n\n\n// This describes a container containing the HCD and is used to start the actors.\ncontainer {\n  name = \"tromboneHCD\"\n  connectionType: [pekko]\n  components {\n    lgsTromboneHCD {\n      type = HCD\n      class = \"csw.examples.vslice.hcd.TromboneHCD\"\n      prefix = nfiraos.ncc.tromboneHCD\n      connectionType: [pekko]\n      rate = 1 second\n    }\n  }\n}\n\n// Additional, application specific configuration for the HCD\ncsw.examples.trombone.hcd {\n  axis-config {\n    axisName = \"tromboneAxis\"\n    lowLimit = 100\n    lowUser = 200\n    highUser = 1200\n    highLimit = 1300\n    home = 300\n    startPosition = 350\n    stepDelayMS = 100  // This value can be shorter, but 150 shows well in tests\n  }\n}\n\n// This describes a container containing the HCD and is used to start the actors.\ncontainer {\n  name = \"tromboneHCD\"\n  connectionType: [pekko]\n  components {\n    lgsTromboneHCD {\n      type = HCD\n      class = \"csw.examples.vslice.hcd.TromboneHCD\"\n      prefix = nfiraos.ncc.tromboneHCD\n      connectionType: [pekko]\n      rate = 1 second\n    }\n  }\n}"
                 },
                 "url": {
                   "raw": "http://{{hostname}}:{{port}}/config/File%Path?comment=\"My path is invalid\"",
@@ -157,7 +157,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "****************************************************\n*****************   version : 1   ******************\n****************************************************\n\n\n// This describes a container containing the HCD and is used to start the actors.\ncontainer {\n  name = \"tromboneHCD\"\n  connectionType: [akka]\n  components {\n    lgsTromboneHCD {\n      type = HCD\n      class = \"csw.examples.vslice.hcd.TromboneHCD\"\n      prefix = nfiraos.ncc.tromboneHCD\n      connectionType: [akka]\n      rate = 1 second\n    }\n  }\n}\n\n// Additional, application specific configuration for the HCD\ncsw.examples.trombone.hcd {\n  axis-config {\n    axisName = \"tromboneAxis\"\n    lowLimit = 100\n    lowUser = 200\n    highUser = 1200\n    highLimit = 1300\n    home = 300\n    startPosition = 350\n    stepDelayMS = 100  // This value can be shorter, but 150 shows well in tests\n  }\n}\n\n// This describes a container containing the HCD and is used to start the actors.\ncontainer {\n  name = \"tromboneHCD\"\n  connectionType: [akka]\n  components {\n    lgsTromboneHCD {\n      type = HCD\n      class = \"csw.examples.vslice.hcd.TromboneHCD\"\n      prefix = nfiraos.ncc.tromboneHCD\n      connectionType: [akka]\n      rate = 1 second\n    }\n  }\n}"
+                  "raw": "****************************************************\n*****************   version : 1   ******************\n****************************************************\n\n\n// This describes a container containing the HCD and is used to start the actors.\ncontainer {\n  name = \"tromboneHCD\"\n  connectionType: [pekko]\n  components {\n    lgsTromboneHCD {\n      type = HCD\n      class = \"csw.examples.vslice.hcd.TromboneHCD\"\n      prefix = nfiraos.ncc.tromboneHCD\n      connectionType: [pekko]\n      rate = 1 second\n    }\n  }\n}\n\n// Additional, application specific configuration for the HCD\ncsw.examples.trombone.hcd {\n  axis-config {\n    axisName = \"tromboneAxis\"\n    lowLimit = 100\n    lowUser = 200\n    highUser = 1200\n    highLimit = 1300\n    home = 300\n    startPosition = 350\n    stepDelayMS = 100  // This value can be shorter, but 150 shows well in tests\n  }\n}\n\n// This describes a container containing the HCD and is used to start the actors.\ncontainer {\n  name = \"tromboneHCD\"\n  connectionType: [pekko]\n  components {\n    lgsTromboneHCD {\n      type = HCD\n      class = \"csw.examples.vslice.hcd.TromboneHCD\"\n      prefix = nfiraos.ncc.tromboneHCD\n      connectionType: [pekko]\n      rate = 1 second\n    }\n  }\n}"
                 },
                 "url": {
                   "raw": "http://{{hostname}}:{{port}}/config/{{path}}?comment=\"Sample commit message\"",
@@ -833,7 +833,7 @@
                 "level"
               ]
             },
-            "description": "Get log metatdata Api returns the current log level details for particular component. Response contains below details :\n1. LogLevel\n2. AkkaLevel\n3. Slf4jLevel\n4. ComponentLevel"
+            "description": "Get log metatdata Api returns the current log level details for particular component. Response contains below details :\n1. LogLevel\n2. PekkoLevel\n3. Slf4jLevel\n4. ComponentLevel"
           },
           "response": []
         },
@@ -908,7 +908,7 @@
               "raw": ""
             },
             "url": {
-              "raw": "http://{{hostname}}:{{adminPort}}/admin/LGSF_Container-container-akka/container/restart",
+              "raw": "http://{{hostname}}:{{adminPort}}/admin/LGSF_Container-container-pekko/container/restart",
               "protocol": "http",
               "host": [
                 "{{hostname}}"
@@ -916,7 +916,7 @@
               "port": "{{adminPort}}",
               "path": [
                 "admin",
-                "LGSF_Container-container-akka",
+                "LGSF_Container-container-pekko",
                 "container",
                 "restart"
               ]
@@ -951,7 +951,7 @@
               "raw": ""
             },
             "url": {
-              "raw": "http://{{hostname}}:{{adminPort}}/admin/LGSF_Container-container-akka/container/restart",
+              "raw": "http://{{hostname}}:{{adminPort}}/admin/LGSF_Container-container-pekko/container/restart",
               "protocol": "http",
               "host": [
                 "{{hostname}}"
@@ -959,7 +959,7 @@
               "port": "{{adminPort}}",
               "path": [
                 "admin",
-                "LGSF_Container-container-akka",
+                "LGSF_Container-container-pekko",
                 "container",
                 "restart"
               ]
@@ -994,7 +994,7 @@
               "raw": ""
             },
             "url": {
-              "raw": "http://{{hostname}}:{{adminPort}}/admin/LGSF_Container-container-akka/container/restart",
+              "raw": "http://{{hostname}}:{{adminPort}}/admin/LGSF_Container-container-pekko/container/restart",
               "protocol": "http",
               "host": [
                 "{{hostname}}"
@@ -1002,7 +1002,7 @@
               "port": "{{adminPort}}",
               "path": [
                 "admin",
-                "LGSF_Container-container-akka",
+                "LGSF_Container-container-pekko",
                 "container",
                 "restart"
               ]
@@ -1064,7 +1064,7 @@
                 "list"
               ]
             },
-            "description": "Get log metatdata Api returns the current log level details for particular component. Response contains below details :\n1. LogLevel\n2. AkkaLevel\n3. Slf4jLevel\n4. ComponentLevel"
+            "description": "Get log metatdata Api returns the current log level details for particular component. Response contains below details :\n1. LogLevel\n2. PekkoLevel\n3. Slf4jLevel\n4. ComponentLevel"
           },
           "response": []
         },
@@ -1091,7 +1091,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"$type\": \"csw.services.location.models.TcpRegistration\",\n  \"connection\": {\n    \"$type\": \"csw.messages.location.Connection.TcpConnection\",\n    \"componentId\": {\n      \"name\": \"EventServer\",\n      \"componentType\": {\n        \"$type\": \"csw.messages.location.ComponentType.Service\"\n      }\n    }\n  },\n  \"port\": 26379,\n  \"logAdminActorRef\": \"akka://test@192.168.0.103:58420/user/$a#-2084221527\"\n}"
+              "raw": "{\n  \"$type\": \"csw.services.location.models.TcpRegistration\",\n  \"connection\": {\n    \"$type\": \"csw.messages.location.Connection.TcpConnection\",\n    \"componentId\": {\n      \"name\": \"EventServer\",\n      \"componentType\": {\n        \"$type\": \"csw.messages.location.ComponentType.Service\"\n      }\n    }\n  },\n  \"port\": 26379,\n  \"logAdminActorRef\": \"pekko://test@192.168.0.103:58420/user/$a#-2084221527\"\n}"
             },
             "url": {
               "raw": "http://localhost:{{location-port}}/location/register",
@@ -1109,7 +1109,7 @@
           "response": []
         },
         {
-          "name": "register Akka",
+          "name": "register Pekko",
           "event": [
             {
               "listen": "test",
@@ -1131,7 +1131,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n\t\"AkkaRegistration\":{\n\t\t\"connection\":\"assembly2-assembly-akka\",\n\t\t\"prefix\":\"nfiraos.ncc.tromboneAssembly2\",\n\t\t\"actorRef\":\"akka://test@192.168.0.104:49592/user/$c#612197610\",\n\t\t\"logAdminActorRef\":\"akka://test@192.168.0.104:49592/user/$a#163534290\"\n\t}\n}"
+              "raw": "{\n\t\"PekkoRegistration\":{\n\t\t\"connection\":\"assembly2-assembly-pekko\",\n\t\t\"prefix\":\"nfiraos.ncc.tromboneAssembly2\",\n\t\t\"actorRef\":\"pekko://test@192.168.0.104:49592/user/$c#612197610\",\n\t\t\"logAdminActorRef\":\"pekko://test@192.168.0.104:49592/user/$a#163534290\"\n\t}\n}"
             },
             "url": {
               "raw": "http://localhost:{{location-port}}/location/register",
@@ -1227,7 +1227,7 @@
                 }
               ]
             },
-            "description": "Get log metatdata Api returns the current log level details for particular component. Response contains below details :\n1. LogLevel\n2. AkkaLevel\n3. Slf4jLevel\n4. ComponentLevel"
+            "description": "Get log metatdata Api returns the current log level details for particular component. Response contains below details :\n1. LogLevel\n2. PekkoLevel\n3. Slf4jLevel\n4. ComponentLevel"
           },
           "response": []
         },
@@ -1274,7 +1274,7 @@
                 }
               ]
             },
-            "description": "Get log metatdata Api returns the current log level details for particular component. Response contains below details :\n1. LogLevel\n2. AkkaLevel\n3. Slf4jLevel\n4. ComponentLevel"
+            "description": "Get log metatdata Api returns the current log level details for particular component. Response contains below details :\n1. LogLevel\n2. PekkoLevel\n3. Slf4jLevel\n4. ComponentLevel"
           },
           "response": []
         },
@@ -1336,7 +1336,7 @@
                 "unregisterAll"
               ]
             },
-            "description": "Get log metatdata Api returns the current log level details for particular component. Response contains below details :\n1. LogLevel\n2. AkkaLevel\n3. Slf4jLevel\n4. ComponentLevel"
+            "description": "Get log metatdata Api returns the current log level details for particular component. Response contains below details :\n1. LogLevel\n2. PekkoLevel\n3. Slf4jLevel\n4. ComponentLevel"
           },
           "response": []
         },
@@ -1373,7 +1373,7 @@
                 "sample-service-tcp"
               ]
             },
-            "description": "Get log metatdata Api returns the current log level details for particular component. Response contains below details :\n1. LogLevel\n2. AkkaLevel\n3. Slf4jLevel\n4. ComponentLevel"
+            "description": "Get log metatdata Api returns the current log level details for particular component. Response contains below details :\n1. LogLevel\n2. PekkoLevel\n3. Slf4jLevel\n4. ComponentLevel"
           },
           "response": []
         }
@@ -1401,7 +1401,7 @@
               "raw": "[\n  {\n    \"resource_id\": \"e1718e9c-285d-4661-9c89-829c7dc62b87\",\n    \"resource_scopes\": [\n      \"read\"\n    ]\n  }\n]"
             },
             "url": {
-              "raw": "http://{{hostname}}:{{keycloak_port}}/auth/realms/TMT/authz/protection/permission",
+              "raw": "http://{{hostname}}:{{keycloak_port}}/admin/realms/TMT/authz/protection/permission",
               "protocol": "http",
               "host": [
                 "{{hostname}}"
@@ -1449,7 +1449,7 @@
               ]
             },
             "url": {
-              "raw": "http://{{hostname}}:{{keycloak_port}}/auth/realms/TMT/protocol/openid-connect/token",
+              "raw": "http://{{hostname}}:{{keycloak_port}}/admin/realms/TMT/protocol/openid-connect/token",
               "protocol": "http",
               "host": [
                 "{{hostname}}"
@@ -1526,7 +1526,7 @@
               ]
             },
             "url": {
-              "raw": "http://{{hostname}}:{{keycloak_port}}/auth/realms/TMT/protocol/openid-connect/token",
+              "raw": "http://{{hostname}}:{{keycloak_port}}/admin/realms/TMT/protocol/openid-connect/token",
               "protocol": "http",
               "host": [
                 "{{hostname}}"

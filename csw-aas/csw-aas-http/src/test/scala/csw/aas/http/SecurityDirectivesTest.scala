@@ -6,9 +6,9 @@
 package csw.aas.http
 
 import java.net.URI
-import akka.http.scaladsl.model.HttpMethods.*
-import akka.http.scaladsl.server.Directives
-import akka.http.scaladsl.testkit.ScalatestRouteTest
+import org.apache.pekko.http.scaladsl.model.HttpMethods.*
+import org.apache.pekko.http.scaladsl.server.Directives
+import org.apache.pekko.http.scaladsl.testkit.ScalatestRouteTest
 import com.typesafe.config.ConfigValueFactory
 import csw.aas.core.commons.AASConnection
 import csw.location.api.models.Connection.HttpConnection
@@ -25,7 +25,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 
-//DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
+//DEOPSCSW-579: Prevent unauthorized access based on pekko http route rules
 class SecurityDirectivesTest extends AnyFunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
   test("sGet should call validate with HttpMethod GET and policy | DEOPSCSW-579") {

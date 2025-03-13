@@ -7,7 +7,6 @@ package csw.commons.redis
 
 import java.io.IOException
 import java.net.ServerSocket
-
 import redis.embedded.{RedisSentinel, RedisServer}
 
 import scala.annotation.tailrec
@@ -38,7 +37,7 @@ trait EmbeddedRedis {
   }
 
   def startRedis(port: Int = getFreePort): RedisServer = {
-    val redisServer = new RedisServer(port)
+    val redisServer = RedisServer.newRedisServer().port(port).bind("0.0.0.0").build()
     redisServer.start()
     addJvmShutdownHook(stopRedis(redisServer))
     redisServer
@@ -50,12 +49,13 @@ trait EmbeddedRedis {
       masterId: String,
       keyspace: Boolean = false
   ): (RedisSentinel, RedisServer) = {
-    val builder     = RedisServer.builder().port(serverPort)
+    val builder     = RedisServer.newRedisServer().port(serverPort).bind("0.0.0.0")
     val redisServer = if (keyspace) builder.setting("notify-keyspace-events K$x").build() else builder.build()
 
     val redisSentinel: RedisSentinel = RedisSentinel
-      .builder()
+      .newRedisSentinel()
       .port(sentinelPort)
+      .bind("0.0.0.0")
       .masterName(masterId)
       .masterPort(serverPort)
       .quorumSize(1)

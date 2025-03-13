@@ -7,8 +7,8 @@ package example.framework.components.assembly
 
 import java.nio.file.Paths
 
-import akka.actor.typed.scaladsl.ActorContext
-import akka.actor.typed.{ActorRef, ActorSystem}
+import org.apache.pekko.actor.typed.scaladsl.ActorContext
+import org.apache.pekko.actor.typed.{ActorRef, ActorSystem}
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.CommandServiceFactory
 import csw.command.client.messages.TopLevelActorMessage
@@ -16,10 +16,10 @@ import csw.config.api.ConfigData
 import csw.framework.exceptions.{FailureRestart, FailureStop}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.location.api.models._
+import csw.location.api.models.*
 import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandResponse.{Accepted, Completed, SubmitResponse, ValidateCommandResponse}
-import csw.params.commands._
+import csw.params.commands.*
 import csw.params.core.models.Id
 import csw.time.core.models.UTCTime
 
@@ -37,8 +37,8 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
 
   private val log: Logger                                          = loggerFactory.getLogger(ctx)
   private var runningHcds: Map[Connection, Option[CommandService]] = Map.empty
-  var diagnosticsPublisher: ActorRef[DiagnosticPublisherMessages]  = _
-  var commandHandler: ActorRef[CommandHandlerMsgs]                 = _
+  var diagnosticsPublisher: ActorRef[DiagnosticPublisherMessages]  = scala.compiletime.uninitialized
+  var commandHandler: ActorRef[CommandHandlerMsgs]                 = scala.compiletime.uninitialized
   val timeout: FiniteDuration                                      = 5.seconds
 
   // #initialize-handler
@@ -171,13 +171,13 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
   // #failureRestart-Exception
   case class HcdNotFoundException() extends FailureRestart("Could not resolve hcd location. Initialization failure.")
 
-  private def resolveHcd(): Future[Option[AkkaLocation]] = {
+  private def resolveHcd(): Future[Option[PekkoLocation]] = {
     val maybeConnection = componentInfo.connections.find(connection => connection.componentId.componentType == ComponentType.HCD)
     maybeConnection match {
       case Some(hcd) =>
-        cswCtx.locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
-          case loc @ Some(akkaLocation) => loc
-          case None                     =>
+        cswCtx.locationService.resolve(hcd.of[PekkoLocation], 5.seconds).map {
+          case loc @ Some(pekkoLocation) => loc
+          case None                      =>
             // Hcd connection could not be resolved for this Assembly. One option to handle this could be to automatic restart which can give enough time
             // for the Hcd to be available
             throw HcdNotFoundException()
@@ -211,9 +211,9 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
     implicit val system: ActorSystem[Nothing] = ctx.system
 
     val eventualCommandService: Future[CommandService] =
-      cswCtx.locationService.resolve(hcdConnection.of[AkkaLocation], 5.seconds).map {
-        case Some(hcdLocation: AkkaLocation) => CommandServiceFactory.make(hcdLocation)
-        case _                               => throw HcdNotFoundException()
+      cswCtx.locationService.resolve(hcdConnection.of[PekkoLocation], 5.seconds).map {
+        case Some(hcdLocation: PekkoLocation) => CommandServiceFactory.make(hcdLocation)
+        case _                                => throw HcdNotFoundException()
       }
 
     eventualCommandService.foreach { commandService => hcd = commandService }

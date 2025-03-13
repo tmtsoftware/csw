@@ -8,7 +8,7 @@ package csw.time.scheduler.scheduling_spikes;
 import java.util.ArrayList;
 import java.util.concurrent.locks.LockSupport;
 
-public class AkkaParkNanosExample {
+public class PekkoParkNanosExample {
 
     private static final ArrayList<Long> buf = new ArrayList<>();
     private static int numWarningBeeps = 901000;

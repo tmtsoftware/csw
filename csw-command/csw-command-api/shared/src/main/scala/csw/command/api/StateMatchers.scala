@@ -5,7 +5,7 @@
 
 package csw.command.api
 
-import akka.util.Timeout
+import org.apache.pekko.util.Timeout
 import csw.params.core.generics.Parameter
 import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.prefix.models.Prefix
@@ -78,7 +78,7 @@ case class DemandMatcher(demand: DemandState, withUnits: Boolean = false, timeou
    */
   def check(current: CurrentState): Boolean = {
     demand.paramSet.forall { di =>
-      val foundItem: Option[Parameter[_]] = current.find(di)
+      val foundItem: Option[Parameter[?]] = current.find(di)
       foundItem.fold(false)(if (withUnits) _ == di else _.values.sameElements(di.values))
     }
   }

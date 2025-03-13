@@ -36,9 +36,9 @@ class ClusterSettingsTest extends AnyFunSuite with Matchers with BeforeAndAfterA
     val config          = clusterSettings.config
 
     clusterSettings.clusterName shouldBe Constants.ClusterName
-    config.getString("akka.remote.artery.canonical.hostname") shouldBe Networks().hostname
-    config.getInt("akka.remote.artery.canonical.port") shouldBe 0
-    config.getList("akka.cluster.seed-nodes").size shouldBe 0
+    config.getString("pekko.remote.artery.canonical.hostname") shouldBe Networks().hostname
+    config.getInt("pekko.remote.artery.canonical.port") shouldBe 0
+    config.getList("pekko.cluster.seed-nodes").size shouldBe 0
   }
 
   test("cluster settings with custom parameters are used") {
@@ -49,7 +49,7 @@ class ClusterSettingsTest extends AnyFunSuite with Matchers with BeforeAndAfterA
     clusterSettings.interfaceName shouldBe Some("en0")
     clusterSettings.port shouldBe port
     clusterSettings.seedNodes shouldBe List("10.10.10.10", "10.10.10.11").map { hostname =>
-      s"akka://${clusterSettings.clusterName}@$hostname"
+      s"pekko://${clusterSettings.clusterName}@$hostname"
     }
   }
 
@@ -61,7 +61,7 @@ class ClusterSettingsTest extends AnyFunSuite with Matchers with BeforeAndAfterA
       ClusterSettings().onPort(port).joinLocal(portList(0), portList(1), portList(2), portList(3))
 
     clusterSettings.port shouldBe port
-    clusterSettings.seedNodes shouldBe portList.map { port => s"akka://${clusterSettings.clusterName}@$hostname:$port" }
+    clusterSettings.seedNodes shouldBe portList.map { port => s"pekko://${clusterSettings.clusterName}@$hostname:$port" }
   }
 
   test("cluster settings with custom values | CSW-97") {
@@ -78,7 +78,7 @@ class ClusterSettingsTest extends AnyFunSuite with Matchers with BeforeAndAfterA
     clusterSettings.interfaceName shouldBe Some("en0")
     clusterSettings.publicInterfaceName shouldBe Some("en1")
     clusterSettings.port shouldBe port
-    clusterSettings.seedNodes shouldBe ipList.map { hostname => s"akka://${clusterSettings.clusterName}@$hostname" }
+    clusterSettings.seedNodes shouldBe ipList.map { hostname => s"pekko://${clusterSettings.clusterName}@$hostname" }
   }
 
   test("cluster settings with system properties | CSW-97") {
@@ -97,7 +97,7 @@ class ClusterSettingsTest extends AnyFunSuite with Matchers with BeforeAndAfterA
     clusterSettings.interfaceName shouldBe Some(systemInterface)
     clusterSettings.publicInterfaceName shouldBe Some(publicInterface)
     clusterSettings.seedNodes shouldBe List("10.10.10.12", "10.10.10.13").map { hostname =>
-      s"akka://${clusterSettings.clusterName}@$hostname"
+      s"pekko://${clusterSettings.clusterName}@$hostname"
     }
   }
 }

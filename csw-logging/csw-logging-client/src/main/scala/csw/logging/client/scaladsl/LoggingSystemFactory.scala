@@ -7,19 +7,19 @@ package csw.logging.client.scaladsl
 
 import java.net.InetAddress
 
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.logging.client.appenders.{LogAppenderBuilder, StdOutAppender}
 import csw.logging.client.internal.LoggingSystem
 import play.api.libs.json.JsObject
 
-private[csw] class StdOutTestAppender(system: ActorSystem[_], stdHeaders: JsObject, logPrinter: Any => Unit)
+private[csw] class StdOutTestAppender(system: ActorSystem[?], stdHeaders: JsObject, logPrinter: Any => Unit)
     extends StdOutAppender(system, stdHeaders, logPrinter) {
   override val color   = true
   override val oneLine = true
 }
 
 private[csw] object StdOutTestAppender extends LogAppenderBuilder {
-  def apply(system: ActorSystem[_], stdHeaders: JsObject): StdOutTestAppender =
+  def apply(system: ActorSystem[?], stdHeaders: JsObject): StdOutTestAppender =
     new StdOutTestAppender(system, stdHeaders, println)
 }
 

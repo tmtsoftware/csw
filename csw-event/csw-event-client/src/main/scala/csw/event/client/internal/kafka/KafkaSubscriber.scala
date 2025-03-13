@@ -5,35 +5,35 @@
 
 package csw.event.client.internal.kafka
 
-import akka.Done
-import akka.actor.typed.{ActorRef, ActorSystem}
-import akka.kafka.{ConsumerSettings, Subscription, Subscriptions, scaladsl}
-import akka.stream.StreamDetachedException
-import akka.stream.scaladsl.{Keep, Sink, Source}
+import org.apache.pekko.Done
+import org.apache.pekko.actor.typed.{ActorRef, ActorSystem}
+import org.apache.pekko.kafka.{ConsumerSettings, Subscription, Subscriptions, scaladsl}
+import org.apache.pekko.stream.StreamDetachedException
+import org.apache.pekko.stream.scaladsl.{Keep, Sink, Source}
 import csw.event.api.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
 import csw.event.client.internal.commons.{EventConverter, EventSubscriberUtil}
 import csw.event.client.utils.Utils
-import csw.params.events._
+import csw.params.events.*
 import csw.prefix.models.Subsystem
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.common.TopicPartition
 
-import scala.async.Async.{async, await}
+import cps.compat.FutureAsync.*
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 
 /**
  * An implementation of [[csw.event.api.scaladsl.EventSubscriber]] API which uses Apache Kafka as the provider for publishing
  * and subscribing events.
  *
- * @param consumerSettings  future of settings for akka-streams-kafka API for Apache Kafka consumer
+ * @param consumerSettings  future of settings for pekko-streams-kafka API for Apache Kafka consumer
  * @param actorSystem to be used for performing asynchronous operations
  */
 // $COVERAGE-OFF$
 private[event] class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[String, Array[Byte]]])(implicit
-    actorSystem: ActorSystem[_]
+    actorSystem: ActorSystem[?]
 ) extends EventSubscriber {
 
   import actorSystem.executionContext
@@ -72,12 +72,12 @@ private[event] class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[S
   ): Source[Event, EventSubscription] =
     subscribe(eventKeys).via(eventSubscriberUtil.subscriptionModeStage(every, mode))
 
-  override def subscribeAsync(eventKeys: Set[EventKey], callback: Event => Future[_]): EventSubscription =
+  override def subscribeAsync(eventKeys: Set[EventKey], callback: Event => Future[?]): EventSubscription =
     eventSubscriberUtil.subscribeAsync(subscribe(eventKeys), callback)
 
   override def subscribeAsync(
       eventKeys: Set[EventKey],
-      callback: Event => Future[_],
+      callback: Event => Future[?],
       every: FiniteDuration,
       mode: SubscriptionMode
   ): EventSubscription =

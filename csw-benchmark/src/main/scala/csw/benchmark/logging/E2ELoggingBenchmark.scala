@@ -8,13 +8,13 @@ package csw.benchmark.logging
 import java.net.InetAddress
 import java.util.concurrent.TimeUnit
 
-import akka.actor.typed
-import akka.actor.typed.SpawnProtocol
+import org.apache.pekko.actor.typed
+import org.apache.pekko.actor.typed.SpawnProtocol
 import csw.logging.models.Level.INFO
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.appenders.FileAppender
 import csw.logging.client.internal.{LoggerImpl, LoggingSystem}
-import org.openjdk.jmh.annotations._
+import org.openjdk.jmh.annotations.*
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
@@ -34,10 +34,10 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-279: Test logging performance
 @State(Scope.Benchmark)
 class E2ELoggingBenchmark {
-  var actorSystem: typed.ActorSystem[SpawnProtocol.Command] = _
-  var log: Logger                                           = _
-  var fileAppender: FileAppender                            = _
-  var person: Person                                        = _
+  var actorSystem: typed.ActorSystem[SpawnProtocol.Command] = scala.compiletime.uninitialized
+  var log: Logger                                           = scala.compiletime.uninitialized
+  var fileAppender: FileAppender                            = scala.compiletime.uninitialized
+  var person: Person                                        = scala.compiletime.uninitialized
 
   @Setup(Level.Trial)
   def setup(): Unit = {

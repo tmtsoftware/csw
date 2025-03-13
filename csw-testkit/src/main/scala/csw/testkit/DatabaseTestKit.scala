@@ -5,9 +5,9 @@
 
 package csw.testkit
 
-import akka.actor.typed
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.util.Timeout
+import org.apache.pekko.actor.typed
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.database.DatabaseServiceFactory
 import csw.database.DatabaseServiceFactory.{ReadPasswordHolder, ReadUsernameHolder}

@@ -7,8 +7,8 @@ package csw.location.agent
 
 import java.net.URI
 
-import akka.actor.typed
-import akka.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.actor.typed
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import com.typesafe.config.ConfigFactory
 import csw.commons.ResourceReader
 import csw.location.api.models
@@ -26,7 +26,7 @@ import scala.concurrent.duration.DurationInt
 // DEOPSCSW-592: Create csw testkit for component writers
 class MainTest extends ScalaTestFrameworkTestKit with AnyFunSuiteLike with ScalaFutures {
 
-  implicit private val system: typed.ActorSystem[_] = typed.ActorSystem(Behaviors.empty, "test-system")
+  implicit private val system: typed.ActorSystem[?] = typed.ActorSystem(Behaviors.empty, "test-system")
   private val locationService                       = HttpLocationServiceFactory.makeLocalClient
 
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 100.millis)

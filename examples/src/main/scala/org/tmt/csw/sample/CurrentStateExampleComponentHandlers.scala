@@ -5,12 +5,12 @@
 
 package org.tmt.csw.sample
 
-import akka.actor.Cancellable
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.ActorContext
-import akka.stream.ThrottleMode
-import akka.stream.scaladsl.{Sink, Source}
-import akka.util.Timeout
+import org.apache.pekko.actor.Cancellable
+import org.apache.pekko.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.scaladsl.ActorContext
+import org.apache.pekko.stream.ThrottleMode
+import org.apache.pekko.stream.scaladsl.{Sink, Source}
+import org.apache.pekko.util.Timeout
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.CommandResponseManager.{OverallFailure, OverallSuccess}
 import csw.command.client.CommandServiceFactory
@@ -18,7 +18,7 @@ import csw.command.client.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.ComponentType.HCD
-import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.Connection.PekkoConnection
 import csw.location.api.models.{ComponentId, TrackingEvent}
 import csw.location.api.scaladsl.LocationService
 import csw.logging.api.scaladsl.Logger
@@ -46,7 +46,7 @@ class CurrentStateExampleComponentHandlers(ctx: ActorContext[TopLevelActorMessag
   private implicit val ec: ExecutionContext              = ctx.executionContext
   private implicit val actorSystem: ActorSystem[Nothing] = ctx.system
   private implicit val timeout: Timeout                  = 15.seconds
-  private val filterHCDConnection                        = AkkaConnection(ComponentId(Prefix(Subsystem.CSW, "samplehcd"), HCD))
+  private val filterHCDConnection                        = PekkoConnection(ComponentId(Prefix(Subsystem.CSW, "samplehcd"), HCD))
   val locationService: LocationService                   = cswCtx.locationService
 
   private val filterHCDLocation    = Await.result(locationService.resolve(filterHCDConnection, 5.seconds), 5.seconds)
@@ -72,9 +72,9 @@ class CurrentStateExampleComponentHandlers(ctx: ActorContext[TopLevelActorMessag
 
   def validateCommand(runId: Id, command: ControlCommand): ValidateCommandResponse = {
     command.commandName match {
-      case `longRunning`   => Accepted(runId)
-      case `mediumRunning` => Accepted(runId)
-      case `shortRunning`  => Accepted(runId)
+      case ComponentStateForCommand.`longRunning`  => Accepted(runId)
+      case `mediumRunning`                         => Accepted(runId)
+      case ComponentStateForCommand.`shortRunning` => Accepted(runId)
       case `immediateCmd` | `longRunningCmd` | `longRunningCmdToAsm` | `longRunningCmdToAsmComp` | `longRunningCmdToAsmInvalid` |
           `longRunningCmdToAsmCActor` | `cmdWithBigParameter` | `hcdCurrentStateCmd` | `matcherCmd` =>
         Accepted(runId)

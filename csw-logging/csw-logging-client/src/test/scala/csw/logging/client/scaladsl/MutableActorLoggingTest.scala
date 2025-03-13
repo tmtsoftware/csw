@@ -5,12 +5,12 @@
 
 package csw.logging.client.scaladsl
 
-import akka.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import csw.logging.models.Level.ERROR
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.LogCommand
-import csw.logging.client.LogCommand._
-import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
+import csw.logging.client.LogCommand.*
+import csw.logging.client.commons.PekkoTypedExtension.UserActorFactory
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.utils.LoggingTestSuite
 import csw.logging.models.Level
@@ -34,7 +34,7 @@ object TromboneMutableActor {
     }
 }
 
-// DEOPSCSW-280 SPIKE: Introduce Akkatyped in logging
+// DEOPSCSW-280 SPIKE: Introduce Pekkotyped in logging
 class MutableActorLoggingTest extends LoggingTestSuite {
 
   private val tromboneActorRef =
@@ -73,7 +73,7 @@ class MutableActorLoggingTest extends LoggingTestSuite {
       log.getString("actor") shouldBe tromboneActorRef.path.toString
       log.getString("file") shouldBe "MutableActorLoggingTest.scala"
       log.contains("line") shouldBe true
-      log.getString("class") shouldBe "csw.logging.client.scaladsl.TromboneMutableActor"
+      log.getString("class") should startWith("csw.logging.client.scaladsl.TromboneMutableActor")
     }
   }
 

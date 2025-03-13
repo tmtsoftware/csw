@@ -20,7 +20,7 @@ class HostConfigTest extends AnyFunSuite with MockitoSugar with Matchers {
   private val containerCmdAppScript = "containerCmd.sh"
   private val mockedProcesses       = List(mock[Process], mock[Process])
 
-  mockedProcesses.foreach(p => when(p.pid()).thenReturn(1))
+  mockedProcesses.foreach(p => when(p.pid()).thenReturn(1L))
 
   test(
     "should parse host configuration file and invoke container cmd app with valid arguments | DEOPSCSW-174, DEOPSCSW-314, CSW-177"

@@ -5,8 +5,8 @@
 
 package csw.aas.http
 
-import akka.http.scaladsl.server.Directives
-import akka.http.scaladsl.testkit.ScalatestRouteTest
+import org.apache.pekko.http.scaladsl.server.Directives
+import org.apache.pekko.http.scaladsl.testkit.ScalatestRouteTest
 import csw.aas.http.AuthorizationPolicy.{CustomPolicy, CustomPolicyAsync, EmptyPolicy, RealmRolePolicy}
 import msocket.security.models.AccessToken
 import org.mockito.Mockito.{verify, when}
@@ -18,7 +18,7 @@ import org.scalatestplus.mockito.MockitoSugar
 
 import scala.concurrent.Future
 
-//DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
+//DEOPSCSW-579: Prevent unauthorized access based on pekko http route rules
 class AuthorizationPolicyTest
     extends AnyFunSuite
     with MockitoSugar

@@ -5,18 +5,18 @@
 
 package example.auth.installed.commands
 
-import akka.actor.typed
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.{HttpRequest, ResponseEntity, Uri}
-import akka.http.scaladsl.unmarshalling.Unmarshaller
+import org.apache.pekko.actor.typed
+import org.apache.pekko.http.scaladsl.Http
+import org.apache.pekko.http.scaladsl.model.{HttpRequest, ResponseEntity, Uri}
+import org.apache.pekko.http.scaladsl.unmarshalling.Unmarshaller
 import example.auth.installed.commands.ReadCommand.convertToString
 
 import scala.concurrent.duration.DurationLong
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, ExecutionContextExecutor, Future}
 
 // #read-command
-class ReadCommand(implicit val actorSystem: typed.ActorSystem[_]) extends AppCommand {
-  implicit lazy val ec = actorSystem.executionContext
+class ReadCommand(implicit val actorSystem: typed.ActorSystem[?]) extends AppCommand {
+  implicit val ec: ExecutionContextExecutor = actorSystem.executionContext
   override def run(): Unit = {
     val url = "http://localhost:7000/data"
     Http()
@@ -29,7 +29,7 @@ class ReadCommand(implicit val actorSystem: typed.ActorSystem[_]) extends AppCom
 // #read-command
 
 object ReadCommand {
-  def convertToString(entity: ResponseEntity)(implicit actorSystem: typed.ActorSystem[_]): Future[String] = {
+  def convertToString(entity: ResponseEntity)(implicit actorSystem: typed.ActorSystem[?]): Future[String] = {
     implicit val ec: ExecutionContext = actorSystem.executionContext
     Unmarshaller.stringUnmarshaller(entity)
   }

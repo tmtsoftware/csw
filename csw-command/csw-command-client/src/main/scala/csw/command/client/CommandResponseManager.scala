@@ -7,15 +7,15 @@ package csw.command.client
 
 import java.util.concurrent.CompletableFuture
 
-import akka.actor.typed.{ActorRef, ActorSystem}
+import org.apache.pekko.actor.typed.{ActorRef, ActorSystem}
 import csw.command.client.CommandResponseManager.{OverallFailure, OverallResponse, OverallSuccess}
 import csw.command.client.MiniCRM.MiniCRMMessage.AddResponse
 import csw.params.commands.CommandResponse
 import csw.params.commands.CommandResponse.SubmitResponse
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.jdk.CollectionConverters._
-import scala.jdk.FutureConverters._
+import scala.jdk.CollectionConverters.*
+import scala.jdk.FutureConverters.*
 
 /**
  * Wrapper API for interacting with Command Response Manager of a component
@@ -24,7 +24,7 @@ import scala.jdk.FutureConverters._
  * @param actorSystem actor system for allowing sending messages in API
  */
 class CommandResponseManager(val commandResponseManagerActor: ActorRef[MiniCRM.CRMMessage])(implicit
-    val actorSystem: ActorSystem[_]
+    val actorSystem: ActorSystem[?]
 ) {
 
   /**
@@ -60,7 +60,7 @@ class CommandResponseManager(val commandResponseManagerActor: ActorRef[MiniCRM.C
    */
   def queryFinalAll(commands: java.util.List[CompletableFuture[SubmitResponse]]): CompletableFuture[OverallResponse] = {
     val args = commands.asScala.toList.map(_.asScala)
-    queryFinalAll(args: _*).asJava.toCompletableFuture
+    queryFinalAll(args*).asJava.toCompletableFuture
   }
 
   // Returns true if all the commands in the response set have returned without Error

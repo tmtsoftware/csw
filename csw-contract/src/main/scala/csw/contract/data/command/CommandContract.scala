@@ -24,7 +24,7 @@ object CommandContract extends CommandData with CommandServiceCodecs {
     ModelType(observe, observeWithoutObsId, setup, setupWithoutObsId),
     ModelType(commandName),
     ModelType(OperationalState),
-    ModelType[Parameter[_]](paramSet.toList),
+    ModelType[Parameter[?]](paramSet.toList),
     ModelType(KeyType),
     ModelType(Units),
     ModelType(UnitsMap.value),

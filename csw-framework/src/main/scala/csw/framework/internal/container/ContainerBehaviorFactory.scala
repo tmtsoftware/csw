@@ -5,8 +5,8 @@
 
 package csw.framework.internal.container
 
-import akka.actor.typed.{ActorRefResolver, Behavior}
-import akka.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.actor.typed.{ActorRefResolver, Behavior}
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import csw.alarm.client.AlarmServiceFactory
 import csw.command.client.messages.ContainerActorMessage
 import csw.event.client.EventServiceFactory
@@ -17,7 +17,7 @@ import csw.location.api.scaladsl.LocationService
 import csw.logging.client.scaladsl.LoggerFactory
 
 /**
- * Factory for creating [[akka.actor.typed.scaladsl.AbstractBehavior]] of a container component
+ * Factory for creating [[org.apache.pekko.actor.typed.scaladsl.AbstractBehavior]] of a container component
  */
 private[framework] object ContainerBehaviorFactory {
   def behavior(

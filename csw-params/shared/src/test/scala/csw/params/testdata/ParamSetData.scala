@@ -7,7 +7,7 @@ package csw.params.testdata
 
 import java.time.Instant
 
-import csw.params.core.generics.KeyType._
+import csw.params.core.generics.KeyType.*
 import csw.params.core.generics.Parameter
 import csw.params.core.models.Coords.EqFrame.FK5
 import csw.params.core.models.Coords.SolarSystemObject.Venus
@@ -65,7 +65,7 @@ object ParamSetData {
   private val altAzCoord       = AltAzCoord(Tag("BASE"), 301.degree, 42.5.degree)
   private val p27 = CoordKey.make("CoordKey").set(eqCoord, solarSystemCoord, minorPlanetCoord, cometCoord, altAzCoord)
 
-  val paramSet: Set[Parameter[_]] =
+  val paramSet: Set[Parameter[?]] =
     Set(
       p1,
       p2,

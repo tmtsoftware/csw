@@ -15,7 +15,7 @@ in order to receive events affecting the Redis data set in some way.
 
 ![Alarm Dependencies](alarm-layers.png)
 
-We have created a layer i.e. "Romaine" which converts redis events into an [akka stream](https://doc.akka.io/libraries/akka-core/current/stream/index.html).
+We have created a layer i.e. "Romaine" which converts redis events into an [pekko stream](https://pekko.apache.org/docs/pekko/current/stream/index.html).
 Romaine internally uses a java redis library called [Lettuce](https://redis.github.io/lettuce/).
 
 ## Severities
@@ -211,7 +211,7 @@ For, alarms which are not latchable, latched severity will always be equal to se
 Setting severity and latched severity both is done by `SetSeverity` api. As described in previous sections,
 when a component dies, it can't call `SetSeverity` and the severity key in redis, expires.
 However the "Latched Severity" is still not updated; which is a problem. To solve this problem, the future Alarm Server
-subscribes to all severity changes (using akka stream api of alarm service) and whenever it detects a key has expired,
+subscribes to all severity changes (using pekko stream api of alarm service) and whenever it detects a key has expired,
 it updates its respective "latchedSeverity" value in Redis to `disconnected`.
 
 ## Shelving Alarms

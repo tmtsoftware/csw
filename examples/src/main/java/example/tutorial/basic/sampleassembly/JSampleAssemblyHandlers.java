@@ -5,9 +5,9 @@
 
 package example.tutorial.basic.sampleassembly;
 
-import akka.actor.typed.ActorSystem;
-import akka.actor.typed.javadsl.ActorContext;
-import akka.util.Timeout;
+import org.apache.pekko.actor.typed.ActorSystem;
+import org.apache.pekko.actor.typed.javadsl.ActorContext;
+import org.apache.pekko.util.Timeout;
 import csw.command.api.javadsl.ICommandService;
 import csw.command.client.CommandServiceFactory;
 import csw.command.client.messages.TopLevelActorMessage;
@@ -59,9 +59,9 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
   private final JCswContext cswCtx;
   private final ILogger log;
   private final Prefix prefix;
-  private final Connection.AkkaConnection hcdConnection;
+  private final Connection.PekkoConnection hcdConnection;
   @SuppressWarnings("unused")
-  private AkkaLocation hcdLocation = null;
+  private PekkoLocation hcdLocation = null;
   private Optional<ICommandService> hcdCS = Optional.empty();
 //#resolve-hcd-and-create-commandservice
   JSampleAssemblyHandlers(ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
@@ -72,7 +72,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     timeout = new Timeout(10, TimeUnit.SECONDS);
     this.log = cswCtx.loggerFactory().getLogger(getClass());
     prefix = cswCtx.componentInfo().prefix();
-    hcdConnection = new Connection.AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.ESW, "JSampleHcd"), JComponentType.HCD));
+    hcdConnection = new Connection.PekkoConnection(new ComponentId(Prefix.apply(JSubsystem.ESW, "JSampleHcd"), JComponentType.HCD));
   }
 
 
@@ -100,7 +100,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     log.debug(() -> "onLocationTrackingEvent called: " + trackingEvent.toString());
     if (trackingEvent instanceof LocationUpdated) {
       Location location = ((LocationUpdated) trackingEvent).location();
-      hcdLocation = (AkkaLocation) location;
+      hcdLocation = (PekkoLocation) location;
       cswCtx.eventService().defaultPublisher().publish(new SystemEvent(prefix, new EventName("receivedHcdLocation")));
       hcdCS = Optional.of(CommandServiceFactory.jMake(location, system));
       onSetup(Id.apply(), new Setup(prefix, shortCommand, Optional.empty()));

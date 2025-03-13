@@ -5,10 +5,10 @@
 
 package csw.config.server
 
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.aas.http.SecurityDirectives
-import csw.config.server.files._
+import csw.config.server.files.*
 import csw.config.server.http.{ConfigHandlers, ConfigServiceRoute, HttpService}
 import csw.config.server.svn.{SvnConfigServiceFactory, SvnRepo}
 import csw.location.api.scaladsl.LocationService
@@ -17,12 +17,12 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
 /**
  * Server configuration
  */
-private[csw] class ServerWiring {
-  lazy val actorSystem    = ActorSystem(SpawnProtocol(), "config-server")
-  lazy val config: Config = actorSystem.settings.config
-  lazy val settings       = new Settings(config)
+class ServerWiring {
+  lazy val actorSystem: ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), "config-server")
+  lazy val config: Config                                  = actorSystem.settings.config
+  lazy val settings                                        = new Settings(config)
 
-  lazy val actorRuntime = new ActorRuntime(actorSystem, settings)
+  final lazy val actorRuntime = new ActorRuntime(actorSystem, settings)
   import actorRuntime._
 
   lazy val annexFileRepo    = new AnnexFileRepo(actorRuntime.blockingIoDispatcher)
@@ -34,9 +34,10 @@ private[csw] class ServerWiring {
   lazy val locationService: LocationService =
     HttpLocationServiceFactory.makeLocalClient(actorSystem)
 
-  lazy val configHandlers     = new ConfigHandlers
-  lazy val securityDirectives = SecurityDirectives(config, locationService)
-  lazy val configServiceRoute = new ConfigServiceRoute(configServiceFactory, actorRuntime, configHandlers, securityDirectives)
+  lazy val configHandlers                         = new ConfigHandlers
+  lazy val securityDirectives: SecurityDirectives = SecurityDirectives(config, locationService)
+  final lazy val configServiceRoute =
+    new ConfigServiceRoute(configServiceFactory, actorRuntime, configHandlers, securityDirectives)
 
   lazy val httpService: HttpService = new HttpService(locationService, configServiceRoute, settings, actorRuntime)
 }

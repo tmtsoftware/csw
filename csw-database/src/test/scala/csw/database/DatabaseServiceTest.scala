@@ -6,7 +6,7 @@
 package csw.database
 
 import java.util.concurrent.CompletionException
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.database.commons.DBTestHelper
 import csw.database.scaladsl.JooqExtentions.{RichQueries, RichQuery, RichResultQuery}
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
@@ -24,8 +24,8 @@ import org.scalatest.matchers.should.Matchers
 class DatabaseServiceTest extends AnyFunSuite with Matchers with ScalaFutures with BeforeAndAfterAll {
   private val system: ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), "test")
   private implicit val ec: ExecutionContext              = system.executionContext
-  private var postgres: EmbeddedPostgres                 = _
-  private var dsl: DSLContext                            = _
+  private var postgres: EmbeddedPostgres                 = scala.compiletime.uninitialized
+  private var dsl: DSLContext                            = scala.compiletime.uninitialized
 
   override implicit val patienceConfig: PatienceConfig = PatienceConfig(5.seconds)
 

@@ -7,9 +7,9 @@ package org.tmt.csw.sample;
 
 import csw.location.api.javadsl.ILocationService;
 import csw.location.api.javadsl.JComponentType;
-import csw.location.api.models.AkkaLocation;
+import csw.location.api.models.PekkoLocation;
 import csw.location.api.models.ComponentId;
-import csw.location.api.models.Connection.AkkaConnection;
+import csw.location.api.models.Connection.PekkoConnection;
 import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
 import csw.testkit.javadsl.FrameworkTestKitJunitResource;
@@ -41,9 +41,9 @@ public class JSampleTest {
     //#locate
     @Test
     public void testAssemblyShouldBeLocatableUsingLocationService() throws ExecutionException, InterruptedException {
-        AkkaConnection connection = new AkkaConnection(new ComponentId(Prefix.apply(JSubsystem.CSW, "sample"), JComponentType.Assembly));
+        PekkoConnection connection = new PekkoConnection(new ComponentId(Prefix.apply(JSubsystem.CSW, "sample"), JComponentType.Assembly));
         ILocationService locationService = testKit.jLocationService();
-        AkkaLocation location = locationService.resolve(connection, Duration.ofSeconds(10)).get().orElseThrow();
+        PekkoLocation location = locationService.resolve(connection, Duration.ofSeconds(10)).get().orElseThrow();
 
         Assert.assertEquals(location.connection(), connection);
     }

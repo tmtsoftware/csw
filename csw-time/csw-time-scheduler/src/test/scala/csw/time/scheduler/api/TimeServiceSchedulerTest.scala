@@ -5,12 +5,12 @@
 
 package csw.time.scheduler.api
 
-import akka.actor.testkit.typed.scaladsl
-import akka.actor.testkit.typed.scaladsl.{ManualTime, ScalaTestWithActorTestKit}
-import akka.actor.typed
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.typed.{ActorSystem, Scheduler, SpawnProtocol}
-import akka.testkit.TestProbe
+import org.apache.pekko.actor.testkit.typed.scaladsl
+import org.apache.pekko.actor.testkit.typed.scaladsl.{ManualTime, ScalaTestWithActorTestKit}
+import org.apache.pekko.actor.typed
+import org.apache.pekko.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import org.apache.pekko.actor.typed.{ActorSystem, Scheduler, SpawnProtocol}
+import org.apache.pekko.testkit.TestProbe
 import csw.time.core.models.{TAITime, UTCTime}
 import csw.time.scheduler.TimeServiceSchedulerFactory
 import org.scalatest.funsuite.AnyFunSuiteLike
@@ -128,7 +128,7 @@ class TimeServiceSchedulerTest extends ScalaTestWithActorTestKit(ManualTime.conf
       testProbe.ref ! UTCTime.now()
     }
 
-    val times = testProbe.receiveMessages(3, 1400.milli).map { t: UTCTime => t }
+    val times = testProbe.receiveMessages(3, 1400.milli).map { (t: UTCTime) => t }
 
     cancellable.cancel()
 

@@ -13,7 +13,7 @@ import csw.config.api.exceptions.FileNotFound
 import csw.config.api.scaladsl.ConfigService
 import csw.config.cli.args.Options
 import csw.config.client.internal.ActorRuntime
-import csw.config.models._
+import csw.config.models.*
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
@@ -28,8 +28,7 @@ class CommandLineRunner(
   import actorRuntime._
 
   def login(options: Options): Unit = {
-    if (options.console) nativeAuthAdapter.loginCommandLine()
-    else nativeAuthAdapter.login()
+    nativeAuthAdapter.login()
     printLine(s"SUCCESS : Logged in successfully")
   }
 

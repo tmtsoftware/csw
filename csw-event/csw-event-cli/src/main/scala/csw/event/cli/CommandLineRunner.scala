@@ -7,10 +7,10 @@ package csw.event.cli
 
 import java.io.File
 
-import akka.Done
-import akka.actor.CoordinatedShutdown
-import akka.stream.scaladsl.{Keep, Sink, Source}
-import akka.stream.{KillSwitches}
+import org.apache.pekko.Done
+import org.apache.pekko.actor.CoordinatedShutdown
+import org.apache.pekko.stream.scaladsl.{Keep, Sink, Source}
+import org.apache.pekko.stream.{KillSwitches}
 import csw.event.api.scaladsl.SubscriptionModes.RateAdapterMode
 import csw.event.api.scaladsl.{EventService, EventSubscription}
 import csw.event.cli.args.Options
@@ -20,11 +20,11 @@ import csw.event.cli.wiring.ActorRuntime
 import csw.params.core.formats.JsonSupport
 import csw.params.core.generics.Parameter
 import csw.params.core.models.Id
-import csw.params.events._
+import csw.params.events.*
 import csw.time.core.models.UTCTime
 import play.api.libs.json.Json
 
-import scala.async.Async.{async, await}
+import cps.compat.FutureAsync.*
 import scala.concurrent.Future
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.util.{Failure, Success}
@@ -116,7 +116,7 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
     }
   }
 
-  private def updateEventParams(event: Event, paramSet: Set[Parameter[_]]) =
+  private def updateEventParams(event: Event, paramSet: Set[Parameter[?]]) =
     event match {
       case event: SystemEvent  => event.madd(paramSet)
       case event: ObserveEvent => event.madd(paramSet)

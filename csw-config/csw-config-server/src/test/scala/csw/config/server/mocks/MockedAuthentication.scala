@@ -5,7 +5,7 @@
 
 package csw.config.server.mocks
 
-import akka.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
+import org.apache.pekko.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
 import csw.aas.core.deployment.AuthConfig
 import csw.aas.http.{PolicyValidator, SecurityDirectives}
 import csw.config.api.TokenFactory

@@ -7,8 +7,8 @@ package csw.logging.client.appenders
 
 import java.nio.file.Paths
 
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.SpawnProtocol
+import org.apache.pekko.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.SpawnProtocol
 import com.typesafe.config.ConfigFactory
 import csw.logging.client.commons.{Category, LoggingKeys, TMTDateTimeFormatter}
 import csw.logging.client.exceptions.BaseLogPathNotDefined

@@ -7,15 +7,17 @@ package csw.alarm.client.internal.services
 
 import java.time.{Clock, LocalDateTime}
 
-import akka.stream.scaladsl.Sink
+import org.apache.pekko.stream.scaladsl.Sink
 import com.typesafe.config.ConfigFactory
 import csw.alarm.api.exceptions.KeyNotFoundException
 import csw.alarm.api.internal.SeverityKey
 import csw.alarm.client.internal.extensions.TimeExtensions
 import csw.alarm.client.internal.helpers.AlarmServiceTestSetup
-import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
+import csw.alarm.client.internal.helpers.TestFutureExt.given
+import scala.language.implicitConversions
+
 import csw.alarm.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
-import csw.alarm.models.AlarmSeverity._
+import csw.alarm.models.AlarmSeverity.*
 import csw.alarm.models.FullAlarmSeverity.Disconnected
 import csw.alarm.models.Key.AlarmKey
 import csw.alarm.models.ShelveStatus.{Shelved, Unshelved}

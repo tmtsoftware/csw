@@ -5,7 +5,7 @@
 
 package csw.event.client.internal.redis
 
-import akka.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.ActorSystem
 import csw.event.api.scaladsl.EventService
 import csw.event.client.internal.commons.serviceresolver.EventServiceResolver
 import io.lettuce.core.{RedisClient, RedisURI}
@@ -22,7 +22,7 @@ import scala.concurrent.Future
  * @param actorSystem provides Materializer, ExecutionContext, etc.
  */
 private[event] class RedisEventService(eventServiceResolver: EventServiceResolver, masterId: String, redisClient: RedisClient)(
-    implicit val actorSystem: ActorSystem[_]
+    implicit val actorSystem: ActorSystem[?]
 ) extends EventService {
 
   import actorSystem.executionContext

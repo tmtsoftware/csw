@@ -12,14 +12,14 @@ import java.time.Instant
 import csw.config.api.ConfigData
 import csw.config.api.exceptions.{FileAlreadyExists, FileNotFound}
 import csw.config.api.scaladsl.ConfigService
-import csw.config.models._
+import csw.config.models.*
 import csw.config.server.commons.ConfigServerLogger
 import csw.config.server.files.AnnexFileService
 import csw.config.server.{ActorRuntime, Settings}
 import csw.logging.api.scaladsl.Logger
 import org.tmatesoft.svn.core.wc.SVNRevision
 
-import scala.async.Async._
+import cps.compat.FutureAsync.*
 import scala.concurrent.Future
 
 class SvnConfigService(settings: Settings, actorRuntime: ActorRuntime, svnRepo: SvnRepo, annexFileService: AnnexFileService)
@@ -166,10 +166,10 @@ class SvnConfigService(settings: Settings, actorRuntime: ActorRuntime, svnRepo: 
       await(pathStatus(path)) match {
         case PathStatus.NormalSize =>
           log.info(s"Deleting normal file at path ${path.toString}")
-          await(svnRepo.delete(path, comment))
+          await(svnRepo.delete(path, comment).map(_ => ()))
         case PathStatus.Annex =>
           log.info(s"Deleting annex file at path ${path.toString}")
-          await(svnRepo.delete(shaFilePath(path), comment))
+          await(svnRepo.delete(shaFilePath(path), comment).map(_ => ()))
         case PathStatus.Missing => throw FileNotFound(path)
       }
     }
@@ -229,11 +229,11 @@ class SvnConfigService(settings: Settings, actorRuntime: ActorRuntime, svnRepo: 
 
       if (present) {
         log.info(s"Updating active version for file with path ${path.toString}")
-        await(update(activePath, ConfigData.fromString(id.id), comment))
+        await(update(activePath, ConfigData.fromString(id.id), comment).map(_ => ()))
       }
       else {
         log.info(s"Setting active version for file with path ${path.toString}")
-        await(createFile(activePath, ConfigData.fromString(id.id), comment = comment))
+        await(createFile(activePath, ConfigData.fromString(id.id), comment = comment).map(_ => ()))
       }
     }
 

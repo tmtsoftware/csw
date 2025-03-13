@@ -5,28 +5,28 @@
 
 package csw.command.client.extensions
 
-import akka.actor.typed.{ActorRef, ActorSystem}
+import org.apache.pekko.actor.typed.{ActorRef, ActorSystem}
 import csw.command.client.messages.sequencer.SequencerMsg
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.location.api.extensions.URIExtension.RichURI
-import csw.location.api.models.AkkaLocation
+import csw.location.api.models.PekkoLocation
 
 import scala.reflect.ClassTag
 
 //TODO: Find a better way for Java Support
-object AkkaLocationExt {
-  implicit class RichAkkaLocation(val akkaLocation: AkkaLocation) {
+object PekkoLocationExt {
+  implicit class RichPekkoLocation(val pekkoLocation: PekkoLocation) {
 
-    private def typedRef[T: ClassTag](implicit actorSystem: ActorSystem[_]): ActorRef[T] = {
+    private def typedRef[T: ClassTag](implicit actorSystem: ActorSystem[?]): ActorRef[T] = {
       val typeManifest    = scala.reflect.classTag[T].runtimeClass.getSimpleName
-      val messageManifest = akkaLocation.connection.componentId.componentType.messageManifest
+      val messageManifest = pekkoLocation.connection.componentId.componentType.messageManifest
 
       require(
         typeManifest == messageManifest,
         s"actorRef for type $messageManifest can not handle messages of type $typeManifest"
       )
 
-      akkaLocation.uri.toActorRef.unsafeUpcast[T]
+      pekkoLocation.uri.toActorRef.unsafeUpcast[T]
     }
 
     /**
@@ -34,21 +34,21 @@ object AkkaLocationExt {
      *
      * @return a typed ActorRef that understands only ComponentMessage
      */
-    def componentRef(implicit actorSystem: ActorSystem[_]): ActorRef[ComponentMessage] = typedRef[ComponentMessage]
+    def componentRef(implicit actorSystem: ActorSystem[?]): ActorRef[ComponentMessage] = typedRef[ComponentMessage]
 
     /**
      * If the component type is Container, use this to get the correct ActorRef
      *
      * @return a typed ActorRef that understands only ContainerMessage
      */
-    def containerRef(implicit actorSystem: ActorSystem[_]): ActorRef[ContainerMessage] = typedRef[ContainerMessage]
+    def containerRef(implicit actorSystem: ActorSystem[?]): ActorRef[ContainerMessage] = typedRef[ContainerMessage]
 
     /**
      * If the component type is Sequencer, use this to get the correct ActorRef
      *
      * @return a typed ActorRef that understands only SequencerMsg
      */
-    def sequencerRef(implicit actorSystem: ActorSystem[_]): ActorRef[SequencerMsg] = typedRef[SequencerMsg]
+    def sequencerRef(implicit actorSystem: ActorSystem[?]): ActorRef[SequencerMsg] = typedRef[SequencerMsg]
 
   }
 }

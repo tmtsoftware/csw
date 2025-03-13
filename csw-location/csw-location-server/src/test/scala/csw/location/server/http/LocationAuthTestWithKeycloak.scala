@@ -5,7 +5,7 @@
 
 package csw.location.server.http
 
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.aas.core.commons.AASConnection
 import csw.location.api.CswVersionJvm
 import csw.location.api.codec.LocationServiceCodecs
@@ -41,12 +41,12 @@ class LocationAuthTestWithKeycloak
 
   private lazy val tokenFactoryWithAdminRole: () => Option[String]    = getToken("admin", "password1")
   private lazy val tokenFactoryWithoutAdminRole: () => Option[String] = getToken("nonAdmin", "password2")
-  private var keycloakStopHandle: StopHandle                          = _
+  private var keycloakStopHandle: StopHandle                          = scala.compiletime.uninitialized
 
   override def beforeAll(): Unit = {
     super.beforeAll()
     keycloakStopHandle = startKeycloak(aasPort)
-    locationWiring.get.locationService.register(HttpRegistration(AASConnection.value, aasPort, "auth")).futureValue
+    locationWiring.get.locationService.register(HttpRegistration(AASConnection.value, aasPort, "")).futureValue
   }
 
   private implicit def actorSystem: ActorSystem[SpawnProtocol.Command] = locationWiring.get.actorSystem
@@ -98,8 +98,21 @@ class LocationAuthTestWithKeycloak
         Realm(
           name = "TMT",
           users = Set(
-            ApplicationUser("admin", "password1", realmRoles = Set(AdminRole)),
-            ApplicationUser("nonAdmin", "password2")
+            ApplicationUser(
+              "admin",
+              "password1",
+              firstName = "admin",
+              lastName = "admin",
+              email = "admin@tmt.org",
+              realmRoles = Set(AdminRole)
+            ),
+            ApplicationUser(
+              "nonAdmin",
+              "password2",
+              firstName = "noadmin",
+              lastName = "noadmin",
+              email = "noadmin@tmt.org"
+            )
           ),
           clients = Set(locationServerClient),
           realmRoles = Set(AdminRole)
@@ -107,7 +120,7 @@ class LocationAuthTestWithKeycloak
       )
     )
     val embeddedKeycloak = new EmbeddedKeycloak(keycloakData, Settings(port = port, printProcessLogs = false))
-    Await.result(embeddedKeycloak.startServer(), 1.minute)
+    Await.result(embeddedKeycloak.startServer(), 5.minutes)
   }
 
   private def getToken(userName: String, password: String): () => Some[String] = { () =>

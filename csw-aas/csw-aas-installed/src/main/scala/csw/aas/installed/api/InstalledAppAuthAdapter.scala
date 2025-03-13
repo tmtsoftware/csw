@@ -32,22 +32,22 @@ trait InstalledAppAuthAdapter {
    */
   def loginManual(): Unit
 
-  /**
-   * User logs in by entering credentials on console. This however is not Resource Owner Credentials Password grant.
-   * This method uses www-authenticate mechanism to post user credentials to auth server. It can also work with OTP.
-   *
-   * @return login successful or not
-   */
-  def loginCommandLine(): Boolean
+//  /**
+//   * User logs in by entering credentials on console. This however is not Resource Owner Credentials Password grant.
+//   * This method uses www-authenticate mechanism to post user credentials to auth server. It can also work with OTP.
+//   *
+//   * @return login successful or not
+//   */
+//  def loginCommandLine(): Boolean
 
-  /**
-   * User logs in by entering credentials on console. This however is not Resource Owner Credentials Password grant.
-   * This method uses www-authenticate mechanism to post user credentials to auth server. It can also work with OTP.
-   *
-   * @param redirectUri callback uri where you want to receive token response from auth server
-   * @return login successful or not
-   */
-  def loginCommandLine(redirectUri: String): Boolean
+//  /**
+//   * User logs in by entering credentials on console. This however is not Resource Owner Credentials Password grant.
+//   * This method uses www-authenticate mechanism to post user credentials to auth server. It can also work with OTP.
+//   *
+//   * @param redirectUri callback uri where you want to receive token response from auth server
+//   * @return login successful or not
+//   */
+//  def loginCommandLine(redirectUri: String): Boolean
 
   /**
    * Get [[msocket.security.models.AccessToken]] converted from raw access token string fetched from [[AuthStore]]

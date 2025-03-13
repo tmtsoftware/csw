@@ -5,7 +5,7 @@
 
 package csw.location.api.scaladsl
 
-import akka.Done
+import org.apache.pekko.Done
 import csw.location.api.models.{Connection, Location}
 
 import scala.concurrent.Future

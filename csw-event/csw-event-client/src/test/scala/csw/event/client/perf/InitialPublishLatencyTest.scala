@@ -5,8 +5,8 @@
 
 package csw.event.client.perf
 
-import akka.actor.typed.scaladsl.adapter._
-import akka.actor.{ActorSystem, typed}
+import org.apache.pekko.actor.typed.scaladsl.adapter.*
+import org.apache.pekko.actor.{ActorSystem, typed}
 import csw.event.client.EventServiceFactory
 import csw.event.client.helpers.Utils
 import csw.location.api.scaladsl.LocationService
@@ -18,7 +18,7 @@ import org.scalatest.funsuite.AnyFunSuite
 class InitialPublishLatencyTest extends AnyFunSuite with BeforeAndAfterAll {
 
   private implicit val system: ActorSystem               = ActorSystem()
-  private implicit val typedSystem: typed.ActorSystem[_] = system.toTyped
+  private implicit val typedSystem: typed.ActorSystem[?] = system.toTyped
   private val ls: LocationService                        = HttpLocationServiceFactory.makeLocalClient
   private val eventServiceFactory                        = new EventServiceFactory().make(ls)
   import eventServiceFactory._

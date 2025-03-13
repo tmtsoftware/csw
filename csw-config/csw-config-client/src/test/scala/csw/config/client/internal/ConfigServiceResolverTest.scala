@@ -9,7 +9,9 @@ import java.net.URI
 import csw.config.client.ConfigClientBaseSuite
 import csw.config.client.commons.ConfigServiceConnection
 import csw.config.client.scaladsl.ConfigClientFactory
-import csw.config.server.commons.TestFutureExtension.RichFuture
+import csw.config.server.commons.TestFutureExtension.given
+import scala.language.implicitConversions
+
 import csw.location.api.models
 import csw.location.api.models.Metadata
 import csw.location.api.scaladsl.LocationService

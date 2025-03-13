@@ -19,7 +19,7 @@ case class Options(
     eventKeys: Seq[EventKey] = Seq.empty,
     eventsMap: Map[EventKey, Set[String]] = Map.empty,
     eventData: Option[File] = None,
-    params: Set[Parameter[_]] = Set.empty,
+    params: Set[Parameter[?]] = Set.empty,
     out: String = "oneline",
     printTimestamp: Boolean = false,
     printId: Boolean = false,

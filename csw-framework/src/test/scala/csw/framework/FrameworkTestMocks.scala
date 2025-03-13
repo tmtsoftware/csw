@@ -5,10 +5,10 @@
 
 package csw.framework
 
-import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.scaladsl.ActorContext
-import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
-import akka.{Done, actor}
+import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
+import org.apache.pekko.actor.typed.scaladsl.ActorContext
+import org.apache.pekko.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
+import org.apache.pekko.{Done, actor}
 import csw.alarm.api.scaladsl.AlarmService
 import csw.command.client.models.framework.{LifecycleStateChanged, PubSub}
 import csw.command.client.{CommandResponseManager, MiniCRM}
@@ -19,12 +19,12 @@ import csw.event.client.EventServiceFactory
 import csw.framework.internal.pubsub.PubSubBehavior
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.RegistrationFactory
-import csw.location.api.AkkaRegistrationFactory
-import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.models.{AkkaRegistration, HttpRegistration, Metadata}
+import csw.location.api.PekkoRegistrationFactory
+import csw.location.api.models.Connection.PekkoConnection
+import csw.location.api.models.{PekkoRegistration, HttpRegistration, Metadata}
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 import csw.logging.api.scaladsl.Logger
-import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
+import csw.logging.client.commons.PekkoTypedExtension.UserActorFactory
 import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse.SubmitResponse
 import csw.params.core.states.CurrentState
@@ -39,7 +39,7 @@ class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol.Command]) ex
 
   ///////////////////////////////////////////////
   val testActor: ActorRef[Any]                   = TestProbe("test-probe").ref
-  val akkaRegistration: AkkaRegistration         = AkkaRegistrationFactory.make(mock[AkkaConnection], testActor)
+  val pekkoRegistration: PekkoRegistration       = PekkoRegistrationFactory.make(mock[PekkoConnection], testActor)
   val locationService: LocationService           = mock[LocationService]
   val eventServiceFactory: EventServiceFactory   = mock[EventServiceFactory]
   val eventService: EventService                 = mock[EventService]
@@ -48,11 +48,11 @@ class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol.Command]) ex
   val registrationResult: RegistrationResult     = mock[RegistrationResult]
   val registrationFactory: RegistrationFactory   = mock[RegistrationFactory]
 
-  when(registrationFactory.akkaTyped(any[AkkaConnection], any[ActorRef[_]], any[Metadata])).thenReturn(akkaRegistration)
-  when(locationService.register(akkaRegistration)).thenReturn(Future.successful(registrationResult))
+  when(registrationFactory.pekkoTyped(any[PekkoConnection], any[ActorRef[?]], any[Metadata])).thenReturn(pekkoRegistration)
+  when(locationService.register(pekkoRegistration)).thenReturn(Future.successful(registrationResult))
   when(locationService.register(any[HttpRegistration])).thenReturn(Future.successful(registrationResult))
-  when(locationService.unregister(any[AkkaConnection])).thenReturn(Future.successful(Done))
-  when(eventServiceFactory.make(any[LocationService])(any[ActorSystem[_]])).thenReturn(eventService)
+  when(locationService.unregister(any[PekkoConnection])).thenReturn(Future.successful(Done))
+  when(eventServiceFactory.make(any[LocationService])(any[ActorSystem[?]])).thenReturn(eventService)
   ///////////////////////////////////////////////
 
   val lifecycleStateProbe: TestProbe[LifecycleStateChanged] = TestProbe[LifecycleStateChanged]()
@@ -64,7 +64,7 @@ class FrameworkTestMocks(implicit system: ActorSystem[SpawnProtocol.Command]) ex
 
   when(loggerFactory.getLogger).thenReturn(logger)
   when(loggerFactory.getLogger(any[actor.ActorContext])).thenReturn(logger)
-  when(loggerFactory.getLogger(any[ActorContext[_]])).thenReturn(logger)
+  when(loggerFactory.getLogger(any[ActorContext[?]])).thenReturn(logger)
 
   ///////////////////////////////////////////////
   val pubSubComponentActor: ActorRef[PubSub[CurrentState]] =

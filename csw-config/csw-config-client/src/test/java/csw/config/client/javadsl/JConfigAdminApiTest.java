@@ -5,7 +5,7 @@
 
 package csw.config.client.javadsl;
 
-import akka.actor.typed.ActorSystem;
+import org.apache.pekko.actor.typed.ActorSystem;
 import csw.config.api.ConfigData;
 import csw.config.api.exceptions.FileAlreadyExists;
 import csw.config.api.exceptions.FileNotFound;
@@ -133,9 +133,9 @@ public class JConfigAdminApiTest {
     // DEOPSCSW-46: Unique identifier for configuration file version
     @Test
     public void testEachRevisionHasUniqueId__DEOPSCSW_88_DEOPSCSW_138_DEOPSCSW_103_DEOPSCSW_46() throws ExecutionException, InterruptedException {
-        Path tromboneHcdConf = Paths.get("trombone/test/hcd/akka/hcd.conf");
-        Path tromboneAssemblyConf = Paths.get("trombone/test/assembly/akka/assembly.conf");
-        Path tromboneContainerConf = Paths.get("trombone/test/container/akka/container.conf");
+        Path tromboneHcdConf = Paths.get("trombone/test/hcd/pekko/hcd.conf");
+        Path tromboneAssemblyConf = Paths.get("trombone/test/assembly/pekko/assembly.conf");
+        Path tromboneContainerConf = Paths.get("trombone/test/container/pekko/container.conf");
         Path redisConf = Paths.get("redis/test/text/redis.conf");
 
         ConfigId configId1 = configService.create(tromboneHcdConf, ConfigData.fromString(configValue1), "creating tromboneHCD.conf").get();

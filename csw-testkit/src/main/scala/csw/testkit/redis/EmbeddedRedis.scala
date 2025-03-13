@@ -16,11 +16,12 @@ private[testkit] trait EmbeddedRedis {
       keyspaceEvent: Boolean
   ): (RedisSentinel, RedisServer) = {
     val keyspaceEventStr = if (keyspaceEvent) "notify-keyspace-events K$x" else "notify-keyspace-events \"\""
-    val redisServer      = RedisServer.builder().port(serverPort).setting(keyspaceEventStr).build()
+    val redisServer      = RedisServer.newRedisServer().port(serverPort).bind("0.0.0.0").setting(keyspaceEventStr).build()
 
     val redisSentinel: RedisSentinel = RedisSentinel
-      .builder()
+      .newRedisSentinel()
       .port(sentinelPort)
+      .bind("0.0.0.0")
       .masterName(masterId)
       .masterPort(serverPort)
       .quorumSize(1)

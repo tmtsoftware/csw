@@ -5,7 +5,7 @@
 
 package csw.params.core.formats
 
-import csw.params.core.formats.ParamCodecs._
+import csw.params.core.formats.ParamCodecs.*
 import csw.params.core.generics.{Key, Parameter}
 import csw.params.javadsl.JKeyType
 import io.bullet.borer.Cbor

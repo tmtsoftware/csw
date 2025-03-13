@@ -5,10 +5,10 @@
 
 package csw.logging.client.javadsl;
 
-import akka.actor.typed.ActorRef;
-import akka.actor.typed.ActorSystem;
-import akka.actor.typed.Props;
-import akka.actor.typed.SpawnProtocol;
+import org.apache.pekko.actor.typed.ActorRef;
+import org.apache.pekko.actor.typed.ActorSystem;
+import org.apache.pekko.actor.typed.Props;
+import org.apache.pekko.actor.typed.SpawnProtocol;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -16,7 +16,7 @@ import csw.logging.models.Level;
 import csw.logging.models.Level$;
 import csw.logging.client.LogCommand;
 import csw.logging.client.appenders.LogAppenderBuilder;
-import csw.logging.client.commons.AkkaTypedExtension;
+import csw.logging.client.commons.PekkoTypedExtension;
 import csw.logging.client.commons.LoggingKeys$;
 import csw.logging.client.components.iris.JIrisSupervisorMutableActor;
 import csw.logging.client.internal.LoggingSystem;
@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 import static csw.logging.client.utils.Eventually.eventually;
 
-// DEOPSCSW-280 SPIKE: Introduce Akkatyped in logging
+// DEOPSCSW-280 SPIKE: Introduce Pekkotyped in logging
 // CSW-78: PrefixRedesign for logging
 // CSW-86: Subsystem should be case-insensitive
 public class ILoggerMutableActorTest {
@@ -73,7 +73,7 @@ public class ILoggerMutableActorTest {
     public void testDefaultLogConfigurationForActor__DEOPSCSW_280() {
 
         ActorRef<LogCommand> irisTyped =
-                AkkaTypedExtension
+                PekkoTypedExtension
                         .UserActorFactory(actorSystem)
                         .spawn(
                                 JIrisSupervisorMutableActor.irisBeh(Prefix.apply("csw.jIRISTyped")),
@@ -105,7 +105,7 @@ public class ILoggerMutableActorTest {
         });
     }
 
-    private static void sendLogMsgToTypedActorInBulk(akka.actor.typed.ActorRef<LogCommand> actorRef) {
+    private static void sendLogMsgToTypedActorInBulk(org.apache.pekko.actor.typed.ActorRef<LogCommand> actorRef) {
         actorRef.tell(JLogCommand.LogTrace);
         actorRef.tell(JLogCommand.LogDebug);
         actorRef.tell(JLogCommand.LogInfo);

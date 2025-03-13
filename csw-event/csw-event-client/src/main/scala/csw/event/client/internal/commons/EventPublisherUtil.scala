@@ -5,11 +5,11 @@
 
 package csw.event.client.internal.commons
 
-import akka.Done
-import akka.actor.typed.ActorSystem
-import akka.actor.{Cancellable, PoisonPill}
-import akka.stream.OverflowStrategy
-import akka.stream.scaladsl.{Sink, Source}
+import org.apache.pekko.Done
+import org.apache.pekko.actor.typed.ActorSystem
+import org.apache.pekko.actor.{Cancellable, PoisonPill}
+import org.apache.pekko.stream.OverflowStrategy
+import org.apache.pekko.stream.scaladsl.{Sink, Source}
 import csw.event.api.exceptions.PublishFailure
 import csw.params.events.Event
 
@@ -20,7 +20,7 @@ import scala.util.control.NonFatal
 /**
  * Utility class to provided common functionalities to different implementations of EventPublisher
  */
-private[event] class EventPublisherUtil(implicit actorSystem: ActorSystem[_]) {
+private[event] class EventPublisherUtil(implicit actorSystem: ActorSystem[?]) {
 
   private val logger = EventServiceLogger.getLogger
 
@@ -54,7 +54,7 @@ private[event] class EventPublisherUtil(implicit actorSystem: ActorSystem[_]) {
     }
   }
 
-  // create an akka stream source out of eventGenerator function
+  // create an pekko stream source out of eventGenerator function
   def eventSource(
       eventGenerator: => Future[Option[Event]],
       parallelism: Int,

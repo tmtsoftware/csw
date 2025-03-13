@@ -7,10 +7,10 @@ package csw.logging.client.appenders
 
 import java.net.InetAddress
 
-import akka.actor.typed
-import akka.actor.typed.SpawnProtocol
+import org.apache.pekko.actor.typed
+import org.apache.pekko.actor.typed.SpawnProtocol
 import com.typesafe.config.ConfigFactory
-import csw.logging.api.scaladsl._
+import csw.logging.api.scaladsl.*
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.scaladsl.{LoggerFactory, LoggingSystemFactory}
 import csw.prefix.models.Prefix
@@ -39,21 +39,21 @@ class MyFavComponent {
 class CustomAppenderBuilderClass extends LogAppenderBuilder {
   val logBuffer: mutable.Buffer[JsObject] = mutable.Buffer.empty[JsObject]
 
-  override def apply(system: typed.ActorSystem[_], standardHeaders: JsObject): LogAppender =
+  override def apply(system: typed.ActorSystem[?], standardHeaders: JsObject): LogAppender =
     new CustomAppender(system, standardHeaders, x => logBuffer += Json.parse(x.toString).as[JsObject])
 }
 
 object CustomAppenderBuilderObject extends LogAppenderBuilder {
   val logBuffer: mutable.Buffer[JsObject] = mutable.Buffer.empty[JsObject]
 
-  override def apply(system: typed.ActorSystem[_], standardHeaders: JsObject): LogAppender =
+  override def apply(system: typed.ActorSystem[?], standardHeaders: JsObject): LogAppender =
     new CustomAppender(system, standardHeaders, x => logBuffer += Json.parse(x.toString).as[JsObject])
 }
 
-class CustomAppender(system: typed.ActorSystem[_], stdHeaders: JsObject, callback: Any => Unit) extends LogAppender {
+class CustomAppender(system: typed.ActorSystem[?], stdHeaders: JsObject, callback: Any => Unit) extends LogAppender {
 
-  private[this] val config       = system.settings.config.getConfig("csw-logging.appender-config.my-fav-appender")
-  private[this] val logIpAddress = config.getBoolean("logIpAddress")
+  private val config       = system.settings.config.getConfig("csw-logging.appender-config.my-fav-appender")
+  private val logIpAddress = config.getBoolean("logIpAddress")
 
   override def stop(): Future[Unit] = Future.successful(())
 

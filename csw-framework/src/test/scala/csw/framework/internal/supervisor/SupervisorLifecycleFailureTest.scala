@@ -5,8 +5,8 @@
 
 package csw.framework.internal.supervisor
 
-import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.ActorRef
+import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
+import org.apache.pekko.actor.typed.ActorRef
 import csw.command.client.messages.CommandMessage.Submit
 import csw.command.client.messages.ComponentCommonMessage.{
   ComponentStateSubscription,
@@ -25,7 +25,7 @@ import csw.framework.internal.component.ComponentBehavior
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
-import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
+import csw.logging.client.commons.PekkoTypedExtension.UserActorFactory
 import csw.logging.client.internal.LoggingSystem
 import csw.logging.client.scaladsl.LoggerFactory
 import csw.logging.models.Level.ERROR
@@ -51,18 +51,18 @@ import scala.concurrent.{ExecutionContext, Future}
 class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
   val supervisorLifecycleStateProbe: TestProbe[SupervisorLifecycleState] = TestProbe[SupervisorLifecycleState]()
-  var supervisorRef: ActorRef[ComponentMessage]                          = _
-  var initializeAnswer: Answer[Unit]                                     = _
-  var submitAnswer: Answer[Future[Unit]]                                 = _
-  var shutdownAnswer: Answer[Unit]                                       = _
-  var runAnswer: Answer[Future[Unit]]                                    = _
+  var supervisorRef: ActorRef[ComponentMessage]                          = scala.compiletime.uninitialized
+  var initializeAnswer: Answer[Unit]                                     = scala.compiletime.uninitialized
+  var submitAnswer: Answer[Future[Unit]]                                 = scala.compiletime.uninitialized
+  var shutdownAnswer: Answer[Unit]                                       = scala.compiletime.uninitialized
+  var runAnswer: Answer[Future[Unit]]                                    = scala.compiletime.uninitialized
 
   implicit val ec: ExecutionContext = typedSystem.executionContext
 
   // all log messages will be captured in log buffer
   private val logBuffer                    = mutable.Buffer.empty[JsObject]
   private val testAppender                 = new TestAppender(x => logBuffer += Json.parse(x.toString).as[JsObject])
-  private var loggingSystem: LoggingSystem = _
+  private var loggingSystem: LoggingSystem = scala.compiletime.uninitialized
 
   override protected def beforeAll(): Unit = {
     loggingSystem = new LoggingSystem("sup-failure", "1.0", "localhost", typedSystem)
@@ -88,13 +88,13 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     supervisorRef ! ComponentStateSubscription(PubSub.Subscribe(compStateProbe.ref))
     supervisorRef ! LifecycleStateSubscription(PubSub.Subscribe(lifecycleStateProbe.ref))
 
-    // Component fails to initialize with `FailureStop`. The default akka supervision strategy kills the TLA
+    // Component fails to initialize with `FailureStop`. The default pekko supervision strategy kills the TLA
     // and triggers the PostStop signal of TLA. The post stop signal has `onShutdown` handler of the component which is
     // mocked in the test to publish a `shutdownChoice`.
     compStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))
 
     // DEOPSCSW-180: Generic and Specific Log messages
-    // component handlers initialize block throws FailureStop exception which we expect akka logs it
+    // component handlers initialize block throws FailureStop exception which we expect pekko logs it
     Thread.sleep(100)
     assertThatExceptionIsLogged(
       logBuffer,
@@ -126,7 +126,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 
     // Supervisor registers itself only after successful initialization of TLA. In this test the TLA successfully
     // initializes after Restart message, after which Supervisor registers itself.
-    verify(locationService).register(akkaRegistration)
+    verify(locationService).register(pekkoRegistration)
 
     // On receiving Restart message the supervisor first unregisters itself. But in the case of initialization failures
     // it never registers itself and thus never unregisters as well on receiving Restart message.
@@ -147,7 +147,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     supervisorRef ! ComponentStateSubscription(PubSub.Subscribe(compStateProbe.ref))
     supervisorRef ! LifecycleStateSubscription(PubSub.Subscribe(lifecycleStateProbe.ref))
 
-    // component fails to initialize with `FailureRestart`. The akka supervision strategy specified in SupervisorBehavior
+    // component fails to initialize with `FailureRestart`. The pekko supervision strategy specified in SupervisorBehavior
     // restarts the TLA. The `initialize` handler of the component is mocked in the test to publish a `initChoice` in the second attempt.
     compStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
 
@@ -156,7 +156,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 
     Thread.sleep(100)
     // DEOPSCSW-180: Generic and Specific Log messages
-    // component handlers initialize block throws FailureRestart exception which we expect akka logs it
+    // component handlers initialize block throws FailureRestart exception which we expect pekko logs it
     assertThatExceptionIsLogged(
       logBuffer,
       "WFOS",
@@ -170,7 +170,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 
     // Supervisor registers itself only after successful initialization of TLA. In this test the TLA successfully
     // initializes after Restart message after which Supervisor registers itself
-    verify(locationService).register(akkaRegistration)
+    verify(locationService).register(pekkoRegistration)
   }
 
   // DEOPSCSW-294 : FailureRestart exception from onDomainMsg, onSetup or onObserve component handlers results into unexpected message to supervisor
@@ -204,7 +204,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     // Supervisor sends component a submit command which will fail with FailureRestart exception on calling onSubmit Handler
     supervisorRef ! Submit(setup, TestProbe[SubmitResponse]().ref)
 
-    // Component initializes again by the akka framework without termination
+    // Component initializes again by the pekko framework without termination
     compStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
 
     supervisorRef ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref)

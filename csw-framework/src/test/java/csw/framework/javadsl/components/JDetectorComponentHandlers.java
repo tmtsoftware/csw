@@ -5,8 +5,8 @@
 
 package csw.framework.javadsl.components;
 
-import akka.actor.Cancellable;
-import akka.actor.typed.javadsl.ActorContext;
+import org.apache.pekko.actor.Cancellable;
+import org.apache.pekko.actor.typed.javadsl.ActorContext;
 import csw.command.client.CommandResponseManager;
 import csw.command.client.messages.TopLevelActorMessage;
 import csw.common.components.framework.SampleComponentState;

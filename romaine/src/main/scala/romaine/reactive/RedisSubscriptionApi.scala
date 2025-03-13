@@ -5,8 +5,8 @@
 
 package romaine.reactive
 
-import akka.NotUsed
-import akka.stream.scaladsl.{Keep, Source}
+import org.apache.pekko.NotUsed
+import org.apache.pekko.stream.scaladsl.{Keep, Source}
 import io.lettuce.core.pubsub.api.reactive.RedisPubSubReactiveCommands
 import reactor.core.publisher.FluxSink.OverflowStrategy
 import romaine.RedisResult

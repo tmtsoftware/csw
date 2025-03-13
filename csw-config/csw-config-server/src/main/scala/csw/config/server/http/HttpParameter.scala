@@ -9,9 +9,9 @@ import java.nio.file.{Path, Paths}
 import java.time.Instant
 import java.util.regex.{Pattern, PatternSyntaxException}
 
-import akka.http.scaladsl.model.headers.HttpEncoding
-import akka.http.scaladsl.server._
-import akka.http.scaladsl.server.directives.{DebuggingDirectives, LoggingMagnet}
+import org.apache.pekko.http.scaladsl.model.headers.HttpEncoding
+import org.apache.pekko.http.scaladsl.server.*
+import org.apache.pekko.http.scaladsl.server.directives.{DebuggingDirectives, LoggingMagnet}
 import csw.config.api.ConfigData
 import csw.config.api.commons.TokenMaskSupport
 import csw.config.models.{ConfigId, FileType}
@@ -72,6 +72,6 @@ trait HttpParameter extends TokenMaskSupport with Directives with HttpCodecs {
     case entity if entity.contentLengthOption.isDefined =>
       provide(ConfigData.from(entity.dataBytes, entity.contentLengthOption.get))
     case _ =>
-      reject(UnsupportedRequestEncodingRejection(HttpEncoding("All encodings with contentLength value")))
+      reject(UnsupportedRequestEncodingRejection(HttpEncoding.custom("All encodings with contentLength value")))
   }
 }

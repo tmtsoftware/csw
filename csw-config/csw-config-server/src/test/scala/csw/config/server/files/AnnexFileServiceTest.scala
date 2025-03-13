@@ -10,7 +10,9 @@ import java.nio.file.Paths
 import csw.config.api.ConfigData
 import csw.config.server.ServerWiring
 import csw.config.server.commons.TestFileUtils
-import csw.config.server.commons.TestFutureExtension.RichFuture
+import csw.config.server.commons.TestFutureExtension.given
+import scala.language.implicitConversions
+
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers

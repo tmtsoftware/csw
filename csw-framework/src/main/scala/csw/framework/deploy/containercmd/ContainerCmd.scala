@@ -5,8 +5,8 @@
 
 package csw.framework.deploy.containercmd
 
-import akka.Done
-import akka.actor.typed.ActorRef
+import org.apache.pekko.Done
+import org.apache.pekko.actor.typed.ActorRef
 import com.typesafe.config.Config
 import csw.framework.deploy.containercmd.cli.{ArgsParser, Options}
 import csw.framework.exceptions.UnableToParseOptions
@@ -17,7 +17,7 @@ import csw.logging.client.scaladsl.LoggerFactory
 import csw.prefix.models.{Prefix, Subsystem}
 
 import java.nio.file.Path
-import scala.async.Async.{async, await}
+import cps.compat.FutureAsync.*
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, Future}
 import scala.util.control.NonFatal
@@ -35,7 +35,7 @@ object ContainerCmd {
    * alone without any container
    * @return                  Actor ref of the container or supervisor of the component started without container
    */
-  def start(name: String, subsystem: Subsystem, args: Array[String], defaultConfig: Option[Config] = None): ActorRef[_] =
+  def start(name: String, subsystem: Subsystem, args: Array[String], defaultConfig: Option[Config] = None): ActorRef[?] =
     new ContainerCmd(name, subsystem, true, defaultConfig).start(args)
 }
 
@@ -47,10 +47,10 @@ private[framework] class ContainerCmd(
 ) {
   private val log: Logger = new LoggerFactory(Prefix(subsystem, name)).getLogger
 
-  private lazy val wiring: FrameworkWiring = new FrameworkWiring
+  final private lazy val wiring: FrameworkWiring = new FrameworkWiring
   import wiring.actorRuntime.*
 
-  def start(args: Array[String]): ActorRef[_] =
+  def start(args: Array[String]): ActorRef[?] =
     new ArgsParser(name).parse(args.toList) match {
       case None => throw UnableToParseOptions
       case Some(Options(isLocal, inputFilePath)) =>
@@ -78,7 +78,7 @@ private[framework] class ContainerCmd(
       isLocal: Boolean,
       inputFilePath: Option[Path],
       defaultConfig: Option[Config]
-  ): Future[ActorRef[_]] =
+  ): Future[ActorRef[?]] =
     async {
       val config          = await(wiring.configUtils.getConfig(isLocal, inputFilePath, defaultConfig))
       val isContainerConf = config.hasPath("components")
@@ -87,7 +87,7 @@ private[framework] class ContainerCmd(
       actorRef
     }
 
-  private def createComponent(isContainerConf: Boolean, wiring: FrameworkWiring, config: Config): Future[ActorRef[_]] =
+  private def createComponent(isContainerConf: Boolean, wiring: FrameworkWiring, config: Config): Future[ActorRef[?]] =
     if (isContainerConf) Container.spawn(config, wiring)
     else Standalone.spawn(config, wiring)
 

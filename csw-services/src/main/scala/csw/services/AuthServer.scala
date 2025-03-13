@@ -8,7 +8,7 @@ package csw.services
 import csw.aas.core.deployment.AuthServiceLocation
 import csw.location.api.scaladsl.LocationService
 import csw.prefix.models.Subsystem
-import csw.services.internal.FutureExt._
+import csw.services.internal.FutureExt.*
 import csw.services.internal.{ManagedService, Settings}
 import org.tmt.embedded_keycloak.KeycloakData.{ApplicationUser, Client, Realm}
 import org.tmt.embedded_keycloak.impl.StopHandle
@@ -37,48 +37,72 @@ class AuthServer(locationService: LocationService, settings: Settings)(implicit 
 
   private val configUser: ApplicationUser = ApplicationUser(
     "config-user1",
-    "config-user1"
+    "config-user1",
+    firstName = "config",
+    lastName = "user1",
+    email = "config-user1@tmt.org"
   )
 
   private val eswUser1: ApplicationUser = ApplicationUser(
     "esw-user1",
     "esw-user1",
+    firstName = "esw",
+    lastName = "user1",
+    email = "esw-user1@tmt.org",
     realmRoles = Set("esw-user", configAdminRole)
   )
 
   private val oswUser1: ApplicationUser = ApplicationUser(
     username = "osw-user1",
     password = "osw-user1",
+    firstName = "osw",
+    lastName = "user1",
+    email = "osw-user1@tmt.org",
     realmRoles = oswUserRoles
   )
 
   private val irisUser1: ApplicationUser = ApplicationUser(
     "iris-user1",
     "iris-user1",
+    firstName = "iris",
+    lastName = "user1",
+    email = "iris-user1@tmt.org",
     realmRoles = Set("iris-user")
   )
 
   private val tcsUser1: ApplicationUser = ApplicationUser(
     "tcs-user1",
     "tcs-user1",
+    firstName = "tcs",
+    lastName = "user1",
+    email = "tcs-user1@tmt.org",
     realmRoles = Set("tcs-user")
   )
 
   private val wfosUser1: ApplicationUser = ApplicationUser(
     "wfos-user1",
     "wfos-user1",
+    firstName = "wfos",
+    lastName = "user1",
+    email = "wfos-user1@tmt.org",
     realmRoles = Set("wfos-user")
   )
 
   private val applicationUser: ApplicationUser = ApplicationUser(
     "dummy-user",
     "dummy-user",
+    firstName = "dummy",
+    lastName = "user",
+    email = "dummy-user@tmt.org",
     realmRoles = Set(personRole, exampleAdminRole)
   )
 
   private val configAdminUser: ApplicationUser = ApplicationUser(
     configAdminUsername,
     configAdminPassword,
+    firstName = configAdminUsername,
+    lastName = configAdminUsername,
+    email = s"$configAdminUsername@tmt.org",
     realmRoles = Set(configAdminRole)
   )
 

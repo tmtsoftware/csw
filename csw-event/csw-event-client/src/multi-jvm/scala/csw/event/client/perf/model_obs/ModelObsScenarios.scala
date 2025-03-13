@@ -7,7 +7,7 @@ package csw.event.client.perf.model_obs
 
 import csw.event.client.perf.model_obs.BaseSetting.{PubSetting, SubSetting}
 import csw.event.client.perf.wiring.TestConfigs
-import csw.prefix.models.Subsystem._
+import csw.prefix.models.Subsystem.*
 import csw.prefix.models.Prefix
 
 class ModelObsScenarios(testConfigs: TestConfigs) {

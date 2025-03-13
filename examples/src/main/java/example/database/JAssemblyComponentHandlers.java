@@ -5,7 +5,7 @@
 
 package example.database;
 
-import akka.actor.typed.javadsl.ActorContext;
+import org.apache.pekko.actor.typed.javadsl.ActorContext;
 import csw.command.client.messages.TopLevelActorMessage;
 import csw.database.DatabaseServiceFactory;
 import csw.database.javadsl.JooqHelper;

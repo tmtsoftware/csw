@@ -5,12 +5,12 @@
 
 package csw.alarm.client.internal.services
 
-import akka.Done
-import akka.actor.typed
-import akka.actor.typed.ActorRef
-import akka.stream.scaladsl.{Sink, Source}
+import org.apache.pekko.Done
+import org.apache.pekko.actor.typed
+import org.apache.pekko.actor.typed.ActorRef
+import org.apache.pekko.stream.scaladsl.{Sink, Source}
 import csw.alarm.api.exceptions.{InactiveAlarmException, InvalidSeverityException, KeyNotFoundException}
-import csw.alarm.api.internal._
+import csw.alarm.api.internal.*
 import csw.alarm.api.scaladsl.AlarmSubscription
 import csw.alarm.client.internal.commons.Settings
 import csw.alarm.client.internal.redis.RedisConnectionsFactory
@@ -23,15 +23,15 @@ import romaine.RedisResult
 import romaine.extensions.SourceExtensions.RichSource
 import romaine.reactive.RedisSubscription
 
-import scala.async.Async.{async, await}
+import cps.compat.FutureAsync.*
 import scala.concurrent.Future
 
 private[client] trait SeverityServiceModule extends SeverityService {
-  self: MetadataService with StatusService =>
+  self: MetadataService & StatusService =>
 
   val redisConnectionsFactory: RedisConnectionsFactory
   def settings: Settings
-  implicit val actorSystem: typed.ActorSystem[_]
+  implicit val actorSystem: typed.ActorSystem[?]
   import redisConnectionsFactory._
 
   private val log = AlarmServiceLogger.getLogger

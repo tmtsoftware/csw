@@ -6,7 +6,7 @@
 package csw.alarm.client.internal.commons
 import com.typesafe.config.Config
 
-import scala.compat.java8.DurationConverters.DurationOps
+import scala.jdk.DurationConverters.*
 import scala.concurrent.duration.FiniteDuration
 
 private[alarm] class Settings(config: Config) {

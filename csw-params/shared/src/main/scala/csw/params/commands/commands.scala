@@ -15,14 +15,14 @@ import csw.prefix.models.Prefix
 /**
  * Common trait representing commands in TMT like Setup, Observe and Wait
  */
-sealed trait Command { self: ParameterSetType[_] =>
+sealed trait Command extends ParameterSetType[Command] {
 
   /**
    * A helper to give access of public members of ParameterSetType
    *
    * @return a handle to ParameterSetType extended by concrete implementation of this class
    */
-  def paramType: ParameterSetType[_] = self
+  def paramType: ParameterSetType[?] = this
 
   /**
    * A name identifying the type of parameter set, such as "setup", "observe".
@@ -35,7 +35,7 @@ sealed trait Command { self: ParameterSetType[_] =>
   /**
    * An optional initial set of parameters (keys with values)
    */
-  val paramSet: Set[Parameter[_]]
+  val paramSet: Set[Parameter[?]]
 
   /**
    * Prefix representing source of the command
@@ -65,18 +65,18 @@ sealed trait Command { self: ParameterSetType[_] =>
    * @return the string representation of command
    */
   override def toString: String =
-    s"$typeName(paramSet=$paramSet, source=$source, commandName=$commandName, maybeObsId=$maybeObsId)"
+    s"${this.typeName}(paramSet=$paramSet, source=$source, commandName=$commandName, maybeObsId=$maybeObsId)"
 }
 
 /**
  * Marker trait for sequence parameter sets which is applicable to Sequencer type of components
  */
-sealed trait SequenceCommand extends Command { self: ParameterSetType[_] => }
+sealed trait SequenceCommand extends Command
 
 /**
  * Marker trait for control parameter sets which i applicable to Assembly and HCD type of components
  */
-sealed trait ControlCommand extends SequenceCommand { self: ParameterSetType[_] => }
+sealed trait ControlCommand extends SequenceCommand
 
 /**
  * A parameter set for setting telescope and instrument parameters.
@@ -85,7 +85,7 @@ case class Setup private[params] (
     source: Prefix,
     commandName: CommandName,
     maybeObsId: Option[ObsId] = None,
-    paramSet: Set[Parameter[_]]
+    paramSet: Set[Parameter[?]]
 ) extends ParameterSetType[Setup]
     with ControlCommand {
 
@@ -101,7 +101,7 @@ case class Setup private[params] (
    * @param data set of parameters
    * @return a new instance of Setup with provided data
    */
-  override protected def create(data: Set[Parameter[_]]): Setup = copy(paramSet = data)
+  override protected def create(data: Set[Parameter[?]]): Setup = copy(paramSet = data)
 }
 
 object Setup {
@@ -126,7 +126,7 @@ object Setup {
    * @param paramSet an initial set of parameters (keys with values)
    * @return a new instance of Setup
    */
-  def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]]): Setup =
+  def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId], paramSet: Set[Parameter[?]]): Setup =
     apply(source, commandName, maybeObsId).madd(paramSet)
 }
 
@@ -137,7 +137,7 @@ case class Observe private[params] (
     source: Prefix,
     commandName: CommandName,
     maybeObsId: Option[ObsId] = None,
-    paramSet: Set[Parameter[_]]
+    paramSet: Set[Parameter[?]]
 ) extends ParameterSetType[Observe]
     with ControlCommand {
 
@@ -153,7 +153,7 @@ case class Observe private[params] (
    * @param data set of parameters
    * @return a new instance of Observe with new provided data
    */
-  override protected def create(data: Set[Parameter[_]]): Observe = copy(paramSet = data)
+  override protected def create(data: Set[Parameter[?]]): Observe = copy(paramSet = data)
 }
 
 object Observe {
@@ -178,7 +178,7 @@ object Observe {
    * @param paramSet an initial set of parameters (keys with values)
    * @return a new instance of Observe
    */
-  def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]]): Observe =
+  def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId], paramSet: Set[Parameter[?]]): Observe =
     apply(source, commandName, maybeObsId).madd(paramSet)
 }
 
@@ -189,7 +189,7 @@ case class Wait private[params] (
     source: Prefix,
     commandName: CommandName,
     maybeObsId: Option[ObsId] = None,
-    paramSet: Set[Parameter[_]]
+    paramSet: Set[Parameter[?]]
 ) extends ParameterSetType[Wait]
     with SequenceCommand {
 
@@ -205,7 +205,7 @@ case class Wait private[params] (
    * @param data set of parameters
    * @return a new instance of Wait with new provided data
    */
-  override protected def create(data: Set[Parameter[_]]): Wait = copy(paramSet = data)
+  override protected def create(data: Set[Parameter[?]]): Wait = copy(paramSet = data)
 }
 
 object Wait {
@@ -230,6 +230,6 @@ object Wait {
    * @param paramSet an initial set of parameters (keys with values)
    * @return a new instance of Wait
    */
-  def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]]): Wait =
+  def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId], paramSet: Set[Parameter[?]]): Wait =
     new Wait(source, commandName, maybeObsId, Set.empty).madd(paramSet)
 }

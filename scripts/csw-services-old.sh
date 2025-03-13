@@ -256,7 +256,7 @@ function enableAllServicesForRunning() {
 }
 
 function is_AAS_running() {
-    local http_code=$(curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:${aas_port}/auth/admin/realms)
+    local http_code=$(curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:${aas_port}/admin/realms)
     if [[ ${http_code} -eq 401 ]]; then
         return 0
     else

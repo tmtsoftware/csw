@@ -5,7 +5,7 @@
 
 package csw.logging.client.utils;
 
-import akka.actor.typed.ActorRef;
+import org.apache.pekko.actor.typed.ActorRef;
 import csw.logging.api.javadsl.ILogger;
 
 import java.util.Map;

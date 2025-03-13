@@ -10,14 +10,14 @@ import csw.params.extensions.OptionConverters.RichOption
 
 import java.util.NoSuchElementException
 import scala.annotation.varargs
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 /**
  * The base trait for various parameter set types (commands or events)
  *
  * @tparam T the subclass of ParameterSetType
  */
-abstract class ParameterSetType[T <: ParameterSetType[T]] { self: T =>
+abstract class ParameterSetType[+T <: ParameterSetType[T]] { self: T =>
 
   /**
    * A name identifying the type of parameter set, such as "setup", "observe".
@@ -28,12 +28,12 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] { self: T =>
   /**
    * Holds the parameters for this parameter set
    */
-  def paramSet: Set[Parameter[_]]
+  def paramSet: Set[Parameter[?]]
 
   /**
    * A Java helper to get parameters for this parameter set
    */
-  def jParamSet: util.Set[Parameter[_]] = paramSet.asJava
+  def jParamSet: util.Set[Parameter[?]] = paramSet.asJava
 
   /**
    * The number of parameters in this parameter set
@@ -49,9 +49,9 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] { self: T =>
    * @tparam P the Parameter type
    * @return a new instance of this parameter set with the given parameter added
    */
-  def add[P <: Parameter[_]](parameter: P): T = doAdd(this, parameter)
+  def add[P <: Parameter[?]](parameter: P): T = doAdd(this, parameter)
 
-  private def doAdd[P <: Parameter[_]](c: T, parameter: P): T = create(removeByKeyname(c, parameter.keyName).paramSet + parameter)
+  private def doAdd[P <: Parameter[?]](c: T, parameter: P): T = create(removeByKeyname(c, parameter.keyName).paramSet + parameter)
 
   /**
    * Adds several parameters to the parameter set
@@ -62,8 +62,8 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] { self: T =>
    * @return a new instance of this parameter set with the given parameter added
    */
   @varargs
-  def madd[P <: Parameter[_]](parametersToAdd: P*): T                = madd(parametersToAdd.toSet)
-  def jMadd[P <: Parameter[_]](parametersToAdd: java.util.Set[P]): T = madd(parametersToAdd.asScala.toSet)
+  def madd[P <: Parameter[?]](parametersToAdd: P*): T                = madd(parametersToAdd.toSet)
+  def jMadd[P <: Parameter[?]](parametersToAdd: java.util.Set[P]): T = madd(parametersToAdd.asScala.toSet)
 
   /**
    * Adds several parameters to the parameter set
@@ -73,7 +73,7 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] { self: T =>
    * @tparam P must be a subclass of Parameter
    * @return a new instance of this parameter set with the given parameter added
    */
-  def madd[P <: Parameter[_]](parametersToAdd: Set[P]): T = parametersToAdd.foldLeft(this)((c, parameter) => doAdd(c, parameter))
+  def madd[P <: Parameter[?]](parametersToAdd: Set[P]): T = parametersToAdd.foldLeft(this)((c, parameter) => doAdd(c, parameter))
 
   /**
    * Returns an Option with the parameter for the key if found, otherwise None
@@ -179,7 +179,7 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] { self: T =>
    * @tparam P the type of the parameter to be removed
    * @return a new T, where T is a parameter set child with the parameter removed or identical if the parameter is not present
    */
-  def remove[P <: Parameter[_]](parameter: P): T = removeByParameter(this, parameter)
+  def remove[P <: Parameter[?]](parameter: P): T = removeByParameter(this, parameter)
 
   /**
    * Function removes a parameter from the parameter set c based on keyname
@@ -189,7 +189,7 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] { self: T =>
    * @tparam P the Parameter type
    * @return a new T, where T is a parameter set child with the parameter removed or identical if the parameter is not present
    */
-  private def removeByKeyname[P <: Parameter[_]](c: ParameterSetType[T], keyname: String): T = {
+  private def removeByKeyname[P <: Parameter[?]](c: ParameterSetType[T], keyname: String): T = {
     val f: Option[P] = getByKeyname(c.paramSet, keyname)
     f match {
       case Some(parameter) => create(c.paramSet - parameter)
@@ -205,7 +205,7 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] { self: T =>
    * @tparam P the Parameter type
    * @return a new T, where T is a parameter set child with the parameter removed or identical if the parameter is not presen
    */
-  private def removeByParameter[P <: Parameter[_]](c: ParameterSetType[T], parameterIn: P): T = {
+  private def removeByParameter[P <: Parameter[?]](c: ParameterSetType[T], parameterIn: P): T = {
     val f: Option[P] = getByParameter(c.paramSet, parameterIn)
     f match {
       case Some(parameter) => create(c.paramSet.-(parameter))
@@ -214,11 +214,11 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] { self: T =>
   }
 
   // Function to find a parameter by keyname
-  private def getByKeyname[P](parametersIn: Set[Parameter[_]], keyname: String): Option[P] =
+  private def getByKeyname[P](parametersIn: Set[Parameter[?]], keyname: String): Option[P] =
     parametersIn.find(_.keyName == keyname).asInstanceOf[Option[P]]
 
   // Function to find a given parameter in the parameter set
-  private def getByParameter[P](parametersIn: Set[Parameter[_]], parameter: Parameter[_]): Option[P] =
+  private def getByParameter[P](parametersIn: Set[Parameter[?]], parameter: Parameter[?]): Option[P] =
     parametersIn.find(_.equals(parameter)).asInstanceOf[Option[P]]
 
   /**
@@ -228,7 +228,7 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] { self: T =>
    * @param data a new set of Parameters after addition or deletion
    * @return a concrete implementation of type T
    */
-  protected def create(data: Set[Parameter[_]]): T
+  protected def create(data: Set[Parameter[?]]): T
 
   /**
    * A comma separated string representation of parameters
@@ -243,7 +243,7 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] { self: T =>
   /**
    * Returns true if the data contains the given key
    */
-  def contains(key: Key[_]): Boolean = paramSet.exists(_.keyName == key.keyName)
+  def contains(key: Key[?]): Boolean = paramSet.exists(_.keyName == key.keyName)
 
   /**
    * Returns a set containing the names of any of the given keys that are missing in the data
@@ -251,7 +251,7 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] { self: T =>
    * @param keys one or more keys
    * @return a Set of key names
    */
-  def missingKeys(keys: Key[_]*): Set[String] = {
+  def missingKeys(keys: Key[?]*): Set[String] = {
     val argKeySet        = keys.map(_.keyName).toSet
     val parametersKeySet = paramSet.map(_.keyName)
     argKeySet.diff(parametersKeySet)
@@ -263,7 +263,7 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] { self: T =>
    * @param keys one or more keys
    */
   @varargs
-  def jMissingKeys(keys: Key[_]*): java.util.Set[String] = missingKeys(keys: _*).asJava
+  def jMissingKeys(keys: Key[?]*): java.util.Set[String] = missingKeys(keys*).asJava
 
   /**
    * Returns a map based on this object where the keys and values are in string get

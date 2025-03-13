@@ -5,7 +5,9 @@
 
 package csw.config.client
 
-import csw.config.server.commons.TestFutureExtension.RichFuture
+import csw.config.server.commons.TestFutureExtension.given
+import scala.language.implicitConversions
+
 import csw.config.server.mocks.MockedAuthentication
 import csw.location.server.internal.ServerWiring
 import org.scalatest.*

@@ -7,8 +7,8 @@ package org.tmt.csw.sample
 
 import csw.framework.scaladsl.DefaultComponentHandlers
 import csw.location.api.models.ComponentType.Assembly
-import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.models._
+import csw.location.api.models.Connection.PekkoConnection
+import csw.location.api.models.*
 import csw.params.commands.CommandResponse.{Completed, Started}
 import csw.params.commands.{CommandResponse, ControlCommand}
 import csw.params.core.models.Id
@@ -36,10 +36,10 @@ class SampleTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) wit
   // #locate
   import scala.concurrent.duration._
   test("Assembly should be locatable using Location Service") {
-    val connection   = AkkaConnection(ComponentId(Prefix(CSW, "sample"), ComponentType.Assembly))
-    val akkaLocation = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
+    val connection    = PekkoConnection(ComponentId(Prefix(CSW, "sample"), ComponentType.Assembly))
+    val pekkoLocation = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
 
-    akkaLocation.connection shouldBe connection
+    pekkoLocation.connection shouldBe connection
   }
   // #locate
 
@@ -49,7 +49,7 @@ class SampleTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) wit
     spawnAssembly(Prefix("TCS.sampleAssembly"), (ctx, cswCtx) => new SampleHandlers(ctx, cswCtx))
     // #spawn-assembly
 
-    val assemblyConnection = AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "sampleAssembly"), Assembly))
+    val assemblyConnection = PekkoConnection(ComponentId(Prefix(Subsystem.TCS, "sampleAssembly"), Assembly))
     val assemblyLocation   = Await.result(locationService.resolve(assemblyConnection, 5.seconds), 10.seconds)
     assemblyLocation.value.connection shouldBe assemblyConnection
   }
@@ -75,7 +75,7 @@ class SampleTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) wit
     )
     // #spawn-assembly-with-default-handlers
 
-    val assemblyConnection = AkkaConnection(ComponentId(Prefix(Subsystem.TCS, "defaultAssembly"), Assembly))
+    val assemblyConnection = PekkoConnection(ComponentId(Prefix(Subsystem.TCS, "defaultAssembly"), Assembly))
     val assemblyLocation   = Await.result(locationService.resolve(assemblyConnection, 5.seconds), 10.seconds)
     assemblyLocation.value.connection shouldBe assemblyConnection
   }

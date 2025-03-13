@@ -5,16 +5,16 @@
 
 package csw.framework.integration
 
-import akka.actor.Status
-import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
-import akka.stream.Materializer.matFromSystem
-import akka.stream.scaladsl.{Keep, Sink}
-import akka.testkit
+import org.apache.pekko.actor.Status
+import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
+import org.apache.pekko.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.stream.Materializer.matFromSystem
+import org.apache.pekko.stream.scaladsl.{Keep, Sink}
+import org.apache.pekko.testkit
 import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
-import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.client.extensions.PekkoLocationExt.RichPekkoLocation
 import csw.command.client.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.command.client.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.command.client.messages.RunningMessage.Lifecycle
@@ -22,14 +22,16 @@ import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, S
 import csw.command.client.models.framework.PubSub.Subscribe
 import csw.command.client.models.framework.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.command.client.models.framework.{Components, ContainerLifecycleState, LifecycleStateChanged, SupervisorLifecycleState}
-import csw.common.FrameworkAssertions._
-import csw.common.components.framework.SampleComponentState._
-import csw.event.client.helpers.TestFutureExt.RichFuture
+import csw.common.FrameworkAssertions.*
+import csw.common.components.framework.SampleComponentState.*
+import csw.event.client.helpers.TestFutureExt.given
+import scala.language.implicitConversions
+
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.location.api.models
 import csw.location.api.models.ComponentType.{Assembly, HCD}
-import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
-import csw.location.api.models._
+import csw.location.api.models.Connection.{PekkoConnection, HttpConnection}
+import csw.location.api.models.*
 import csw.location.client.ActorSystemFactory
 import csw.params.core.states.{CurrentState, StateName}
 import csw.prefix.models.{Prefix, Subsystem}
@@ -40,24 +42,24 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-169: Creation of Multiple Components
 // DEOPSCSW-177: Hooks for lifecycle management
 // DEOPSCSW-182: Control Life Cycle of Components
-// DEOPSCSW-216: Locate and connect components to send AKKA commands
+// DEOPSCSW-216: Locate and connect components to send PEKKO commands
 // CSW-82: ComponentInfo should take prefix
 class ContainerIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring.seedLocationService
 
-  private val irisContainerConnection = AkkaConnection(
+  private val irisContainerConnection = PekkoConnection(
     ComponentId(Prefix(Subsystem.Container, "IRIS_Container"), ComponentType.Container)
   )
   private val filterAssembly: ComponentId = models.ComponentId(Prefix(Subsystem.TCS, "Filter"), Assembly)
   private val instrumentHcd: ComponentId  = models.ComponentId(Prefix(Subsystem.TCS, "Instrument_Filter"), HCD)
   private val disperserHcd: ComponentId   = models.ComponentId(Prefix(Subsystem.TCS, "Disperser"), HCD)
 
-  private val filterAssemblyAkkaConnection = AkkaConnection(filterAssembly)
-  private val filterAssemblyHttpConnection = HttpConnection(filterAssembly)
-  private val instrumentHcdAkkaConnection  = AkkaConnection(instrumentHcd)
-  private val instrumentHcdHttpConnection  = HttpConnection(instrumentHcd)
-  private val disperserHcdAkkaConnection   = AkkaConnection(disperserHcd)
-  private val disperserHcdHttpConnection   = HttpConnection(disperserHcd)
+  private val filterAssemblyPekkoConnection = PekkoConnection(filterAssembly)
+  private val filterAssemblyHttpConnection  = HttpConnection(filterAssembly)
+  private val instrumentHcdPekkoConnection  = PekkoConnection(instrumentHcd)
+  private val instrumentHcdHttpConnection   = HttpConnection(instrumentHcd)
+  private val disperserHcdPekkoConnection   = PekkoConnection(disperserHcd)
+  private val disperserHcdHttpConnection    = HttpConnection(disperserHcd)
 
   private implicit val containerActorSystem: ActorSystem[SpawnProtocol.Command] =
     ActorSystemFactory.remote(SpawnProtocol(), "container-system")
@@ -118,9 +120,9 @@ class ContainerIntegrationTest extends FrameworkIntegrationSuite {
     containerLifecycleStateProbe.expectMessage(ContainerLifecycleState.Running)
 
     // resolve all the components from container using location service
-    val filterAssemblyLocation = assertConnectionIsRegistered(filterAssemblyAkkaConnection)
-    val instrumentHcdLocation  = assertConnectionIsRegistered(instrumentHcdAkkaConnection)
-    val disperserHcdLocation   = assertConnectionIsRegistered(disperserHcdAkkaConnection)
+    val filterAssemblyLocation = assertConnectionIsRegistered(filterAssemblyPekkoConnection)
+    val instrumentHcdLocation  = assertConnectionIsRegistered(instrumentHcdPekkoConnection)
+    val disperserHcdLocation   = assertConnectionIsRegistered(disperserHcdPekkoConnection)
     assertConnectionIsRegistered(filterAssemblyHttpConnection)
     assertConnectionIsRegistered(instrumentHcdHttpConnection)
     assertConnectionIsRegistered(disperserHcdHttpConnection)
@@ -208,9 +210,9 @@ class ContainerIntegrationTest extends FrameworkIntegrationSuite {
     assertThatContainerIsRunning(resolvedContainerRef, containerLifecycleStateProbe, 2.seconds)
 
     // assert that all components are re-registered
-    assertConnectionIsRegistered(filterAssemblyAkkaConnection)
-    assertConnectionIsRegistered(instrumentHcdAkkaConnection)
-    assertConnectionIsRegistered(disperserHcdAkkaConnection)
+    assertConnectionIsRegistered(filterAssemblyPekkoConnection)
+    assertConnectionIsRegistered(instrumentHcdPekkoConnection)
+    assertConnectionIsRegistered(disperserHcdPekkoConnection)
     assertConnectionIsRegistered(filterAssemblyHttpConnection)
     assertConnectionIsRegistered(instrumentHcdHttpConnection)
     assertConnectionIsRegistered(disperserHcdHttpConnection)
@@ -228,17 +230,17 @@ class ContainerIntegrationTest extends FrameworkIntegrationSuite {
       .run()(matFromSystem(testWiring.seedActorSystem))
 
     seedLocationService
-      .track(filterAssemblyAkkaConnection)
+      .track(filterAssemblyPekkoConnection)
       .toMat(Sink.actorRef[TrackingEvent](filterAssemblyTracker.ref, "Completed", t => Status.Failure(t)))(Keep.both)
       .run()(matFromSystem(testWiring.seedActorSystem))
 
     seedLocationService
-      .track(instrumentHcdAkkaConnection)
+      .track(instrumentHcdPekkoConnection)
       .toMat(Sink.actorRef[TrackingEvent](instrumentHcdTracker.ref, "Completed", t => Status.Failure(t)))(Keep.both)
       .run()(matFromSystem(testWiring.seedActorSystem))
 
     seedLocationService
-      .track(disperserHcdAkkaConnection)
+      .track(disperserHcdPekkoConnection)
       .toMat(Sink.actorRef[TrackingEvent](disperserHcdTracker.ref, "Completed", t => Status.Failure(t)))(Keep.both)
       .run()(matFromSystem(testWiring.seedActorSystem))
 
@@ -258,9 +260,9 @@ class ContainerIntegrationTest extends FrameworkIntegrationSuite {
     val disperserHcdRemoved   = disperserHcdTracker.fishForSpecificMessage(5.seconds) { case x: LocationRemoved => x }
     val containerRemoved      = containerTracker.fishForSpecificMessage(5.seconds) { case x: LocationRemoved => x }
 
-    filterAssemblyRemoved.connection shouldBe filterAssemblyAkkaConnection
-    instrumentHcdRemoved.connection shouldBe instrumentHcdAkkaConnection
-    disperserHcdRemoved.connection shouldBe disperserHcdAkkaConnection
+    filterAssemblyRemoved.connection shouldBe filterAssemblyPekkoConnection
+    instrumentHcdRemoved.connection shouldBe instrumentHcdPekkoConnection
+    disperserHcdRemoved.connection shouldBe disperserHcdPekkoConnection
     containerRemoved.connection shouldBe irisContainerConnection
 
     // this proves that on shutdown message, container's actor system gets terminated

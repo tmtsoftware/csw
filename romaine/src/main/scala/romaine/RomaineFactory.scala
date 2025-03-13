@@ -11,27 +11,26 @@ import romaine.codec.{RomaineCodec, RomaineRedisCodec}
 import romaine.exceptions.RedisServerNotAvailable
 import romaine.reactive.RedisSubscriptionApi
 
-import scala.async.Async
-import scala.compat.java8.FutureConverters.CompletionStageOps
+import scala.jdk.FutureConverters.*
 import scala.concurrent.{ExecutionContext, Future}
-import scala.async.Async._
 import scala.util.control.NonFatal
+import cps.compat.FutureAsync.*
 
 class RomaineFactory(redisClient: RedisClient)(implicit val ec: ExecutionContext) {
   def redisAsyncApi[K: RomaineCodec, V: RomaineCodec](redisURIF: Future[RedisURI]): RedisAsyncApi[K, V] =
     new RedisAsyncApi(
-      Async.async {
+      async {
         val redisURI    = await(redisURIF)
-        val connectionF = init { () => redisClient.connectAsync(new RomaineRedisCodec[K, V], redisURI).toScala }
+        val connectionF = init { () => redisClient.connectAsync(new RomaineRedisCodec[K, V], redisURI).asScala }
         await(connectionF).async()
       }
     )
 
   def redisSubscriptionApi[K: RomaineCodec, V: RomaineCodec](redisURIF: Future[RedisURI]): RedisSubscriptionApi[K, V] =
     new RedisSubscriptionApi(() =>
-      Async.async {
+      async {
         val redisURI    = await(redisURIF)
-        val connectionF = init { () => redisClient.connectPubSubAsync(new RomaineRedisCodec[K, V], redisURI).toScala }
+        val connectionF = init { () => redisClient.connectPubSubAsync(new RomaineRedisCodec[K, V], redisURI).asScala }
         await(connectionF).reactive()
       }
     )

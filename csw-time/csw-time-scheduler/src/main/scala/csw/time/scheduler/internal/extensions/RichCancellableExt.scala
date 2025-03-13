@@ -5,7 +5,7 @@
 
 package csw.time.scheduler.internal.extensions
 
-import akka.actor
+import org.apache.pekko.actor
 import csw.time.scheduler.api.Cancellable
 
 private[time] object RichCancellableExt {

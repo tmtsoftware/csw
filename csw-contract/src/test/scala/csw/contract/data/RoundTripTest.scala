@@ -36,7 +36,7 @@ class RoundTripTest extends AnyFreeSpec with Matchers {
     }
   }
 
-  private def validate(modelType: ModelType[_]): Unit = {
+  private def validate(modelType: ModelType[?]): Unit = {
     modelType.models.zipWithIndex.foreach { case (modelData, index) =>
       s"${modelData.getClass.getSimpleName.stripSuffix("$")}: $index" - {
         List(Json, Cbor).foreach { format =>

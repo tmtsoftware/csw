@@ -7,8 +7,8 @@ package csw.benchmark.command
 
 import java.util.concurrent.TimeUnit
 
-import akka.actor.typed.Scheduler
-import akka.util
+import org.apache.pekko.actor.typed.Scheduler
+import org.apache.pekko.util
 import com.typesafe.config.ConfigFactory
 import csw.benchmark.command.BenchmarkHelpers.spawnStandaloneComponent
 import csw.command.api.scaladsl.CommandService
@@ -17,7 +17,7 @@ import csw.params.commands
 import csw.params.commands.CommandName
 import csw.params.commands.CommandResponse.SubmitResponse
 import csw.prefix.models.Prefix
-import org.openjdk.jmh.annotations._
+import org.openjdk.jmh.annotations.*
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
@@ -39,11 +39,11 @@ import scala.concurrent.duration.DurationInt
 @Measurement(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS, batchSize = 1)
 class CommandServiceBenchmark {
 
-  implicit var timeout: util.Timeout    = _
-  implicit var scheduler: Scheduler     = _
-  var setupCommand: commands.Setup      = _
-  var componentRef: CommandService      = _
-  private var adminWiring: ServerWiring = _
+  implicit var timeout: util.Timeout    = scala.compiletime.uninitialized
+  implicit var scheduler: Scheduler     = scala.compiletime.uninitialized
+  var setupCommand: commands.Setup      = scala.compiletime.uninitialized
+  var componentRef: CommandService      = scala.compiletime.uninitialized
+  private var adminWiring: ServerWiring = scala.compiletime.uninitialized
 
   @Setup(Level.Trial)
   def setup(): Unit = {

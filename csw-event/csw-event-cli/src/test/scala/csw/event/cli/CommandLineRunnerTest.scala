@@ -5,19 +5,21 @@
 
 package csw.event.cli
 
-import akka.stream.scaladsl.Sink
+import org.apache.pekko.stream.scaladsl.Sink
 import csw.commons.ResourceReader
 import csw.event.cli.IterableExtensions.RichStringIterable
-import csw.event.client.helpers.TestFutureExt.RichFuture
+import csw.event.client.helpers.TestFutureExt.given
+import scala.language.implicitConversions
+
 import csw.params.core.formats.JsonSupport
 import csw.params.core.generics.KeyType.{IntKey, StringKey}
 import csw.params.core.models.Id
 import csw.params.core.models.Units.meter
-import csw.params.events._
+import csw.params.events.*
 import csw.prefix.codecs.CommonCodecs
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.SpanSugar.convertDoubleToGrainOfTime
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import scala.collection.{immutable, mutable}
 
@@ -69,7 +71,7 @@ class CommandLineRunnerTest extends SeedData with Eventually with CommonCodecs {
     commandLineRunner
       .get(argsParser.parse(Seq("get", "--id", "-u", "-t", "-e", s"${event1.eventKey},${event2.eventKey}")).get)
       .await
-    logBuffer shouldEqualContentsOf "oneline/get_multiple_events.txt"
+    logBuffer `shouldEqualContentsOf` "oneline/get_multiple_events.txt"
   }
 
   // DEOPSCSW-431: [Event Cli] Get command
@@ -79,7 +81,7 @@ class CommandLineRunnerTest extends SeedData with Eventually with CommonCodecs {
     commandLineRunner
       .get(argsParser.parse(Seq("get", "-e", s"${event1.eventKey},${event2.eventKey}", "--out", "terse")).get)
       .await
-    logBuffer shouldEqualContentsOf "terse/get_multiple_events.txt"
+    logBuffer `shouldEqualContentsOf` "terse/get_multiple_events.txt"
   }
 
   // DEOPSCSW-432: [Event Cli] Publish command
@@ -217,7 +219,7 @@ class CommandLineRunnerTest extends SeedData with Eventually with CommonCodecs {
     cancellable.cancel()
     subscriptionF.unsubscribe()
 
-    logBuffer shouldEqualContentsOf "oneline/entire_events.txt"
+    logBuffer `shouldEqualContentsOf` "oneline/entire_events.txt"
   }
 
   // DEOPSCSW-433: [Event Cli] Subscribe command
@@ -240,7 +242,7 @@ class CommandLineRunnerTest extends SeedData with Eventually with CommonCodecs {
     cancellable.cancel()
     subscriptionF.unsubscribe()
 
-    logBuffer shouldEqualContentsOf "terse/entire_events.txt"
+    logBuffer `shouldEqualContentsOf` "terse/entire_events.txt"
   }
 
   // publish command generates new id and event time while publishing, hence assertions exclude these keys from json

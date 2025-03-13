@@ -11,13 +11,15 @@ import com.typesafe.config.ConfigFactory
 import csw.alarm.api.exceptions.KeyNotFoundException
 import csw.alarm.cli.args.Options
 import csw.alarm.cli.utils.IterableExtensions.RichStringIterable
-import csw.alarm.cli.utils.TestFutureExt.RichFuture
+import csw.alarm.cli.utils.TestFutureExt.given
+import scala.language.implicitConversions
+
 import csw.alarm.commons.Separators.KeySeparator
 import csw.alarm.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.alarm.models.ActivationStatus.{Active, Inactive}
 import csw.alarm.models.AlarmHealth
 import csw.alarm.models.AlarmHealth.{Bad, Good, Ill}
-import csw.alarm.models.AlarmSeverity._
+import csw.alarm.models.AlarmSeverity.*
 import csw.alarm.models.AutoRefreshSeverityMessage.CancelAutoRefresh
 import csw.alarm.models.FullAlarmSeverity.Disconnected
 import csw.alarm.models.Key.{AlarmKey, GlobalKey}
@@ -230,7 +232,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
     val cmd = Options("list")
 
     cliApp.execute(cmd)
-    logBuffer.toList shouldEqualContentsOf "list/all_alarms.txt"
+    logBuffer.toList `shouldEqualContentsOf` "list/all_alarms.txt"
   }
 
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
@@ -239,7 +241,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
     val cmd = Options("list", maybeSubsystem = Some(NFIRAOS))
 
     cliApp.execute(cmd)
-    logBuffer.toList shouldEqualContentsOf "list/subsystem_alarms.txt"
+    logBuffer.toList `shouldEqualContentsOf` "list/subsystem_alarms.txt"
   }
 
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
@@ -252,7 +254,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
     )
 
     cliApp.execute(cmd)
-    logBuffer.toList shouldEqualContentsOf "list/component_alarms.txt"
+    logBuffer.toList `shouldEqualContentsOf` "list/component_alarms.txt"
   }
 
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
@@ -266,7 +268,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
     )
 
     cliApp.execute(cmd)
-    logBuffer.toList shouldEqualContentsOf "list/with_name_alarms.txt"
+    logBuffer.toList `shouldEqualContentsOf` "list/with_name_alarms.txt"
   }
 
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
@@ -281,7 +283,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
     )
 
     cliApp.execute(cmd)
-    logBuffer.toList shouldEqualContentsOf "metadata.txt"
+    logBuffer.toList `shouldEqualContentsOf` "metadata.txt"
   }
 
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
@@ -298,7 +300,7 @@ class CliAppTest extends AlarmCliTestSetup with MockedAuthentication {
 
     cliApp.execute(cmd)
     // alarm time changes on every run hence filter out time before assertion
-    logBuffer.toList shouldEqualContentsOf "status.txt"
+    logBuffer.toList `shouldEqualContentsOf` "status.txt"
 
   }
 

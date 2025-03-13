@@ -5,9 +5,9 @@
 
 package csw.alarm.client.internal.services
 
-import akka.actor.typed
-import akka.actor.typed.ActorRef
-import akka.stream.scaladsl.{Sink, Source}
+import org.apache.pekko.actor.typed
+import org.apache.pekko.actor.typed.ActorRef
+import org.apache.pekko.stream.scaladsl.{Sink, Source}
 import csw.alarm.api.internal.{HealthService, SeverityService}
 import csw.alarm.api.scaladsl.AlarmSubscription
 import csw.alarm.client.internal.AlarmServiceLogger
@@ -21,7 +21,7 @@ private[client] trait HealthServiceModule extends HealthService {
   self: SeverityService =>
 
   val redisConnectionsFactory: RedisConnectionsFactory
-  implicit val actorSystem: typed.ActorSystem[_]
+  implicit val actorSystem: typed.ActorSystem[?]
   import redisConnectionsFactory._
 
   private val log = AlarmServiceLogger.getLogger

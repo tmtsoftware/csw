@@ -9,7 +9,7 @@ import java.net.URI
 
 import csw.location.api.scaladsl.LocationService
 
-import scala.async.Async.{async, await}
+import cps.compat.FutureAsync.*
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{ExecutionContext, Future}
 

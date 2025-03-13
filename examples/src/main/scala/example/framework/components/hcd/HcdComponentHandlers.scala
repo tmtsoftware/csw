@@ -7,10 +7,10 @@ package example.framework.components.hcd
 
 import java.nio.file.Paths
 
-import akka.actor.typed.scaladsl.ActorContext
-import akka.actor.typed.scaladsl.AskPattern.Askable
-import akka.actor.typed.{ActorRef, Scheduler}
-import akka.util.Timeout
+import org.apache.pekko.actor.typed.scaladsl.ActorContext
+import org.apache.pekko.actor.typed.scaladsl.AskPattern.Askable
+import org.apache.pekko.actor.typed.{ActorRef, Scheduler}
+import org.apache.pekko.util.Timeout
 import csw.command.client.messages.TopLevelActorMessage
 import csw.config.api.ConfigData
 import csw.framework.models.CswContext
@@ -41,8 +41,8 @@ class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
   implicit val ec: ExecutionContext = ctx.executionContext
   implicit val timeout: Timeout     = 5.seconds
   implicit val scheduler: Scheduler = ctx.system.scheduler
-  var current: Int                  = _
-  var stats: Int                    = _
+  var current: Int                  = scala.compiletime.uninitialized
+  var stats: Int                    = scala.compiletime.uninitialized
 
   // #initialize-handler
   override def initialize(): Unit = {
@@ -54,8 +54,8 @@ class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
     val worker: ActorRef[WorkerActorMsg] = ctx.spawnAnonymous(WorkerActor.behavior(hcdConfig))
 
     // initialise some state by using the worker actor created above
-    current = Await.result(worker ? InitialState, timeout.duration)
-    stats = Await.result(worker ? GetStatistics, timeout.duration)
+    current = Await.result(worker ? InitialState.apply, timeout.duration)
+    stats = Await.result(worker ? GetStatistics.apply, timeout.duration)
   }
   // #initialize-handler
 

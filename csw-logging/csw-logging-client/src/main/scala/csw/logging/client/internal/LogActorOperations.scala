@@ -7,10 +7,10 @@ package csw.logging.client.internal
 
 import java.io.{PrintWriter, StringWriter}
 
-import csw.logging.api._
+import csw.logging.api.*
 import csw.logging.client.commons.{Category, LoggingKeys, TMTDateTimeFormatter}
 import csw.logging.client.internal.JsonExtensions.AnyToJson
-import csw.logging.client.internal.LogActorMessages._
+import csw.logging.client.internal.LogActorMessages.*
 import csw.logging.client.scaladsl.RichException
 import csw.logging.models.{Level, RequestId}
 import play.api.libs.json.{JsObject, Json}
@@ -54,20 +54,20 @@ private[logging] object LogActorOperations {
     }
     else None
 
-  def generateLogAkkaJson(logAkka: LogAkka, akkaLogLevel: Level): Option[JsObject] =
-    if (logAkka.level.pos >= akkaLogLevel.pos) {
-      val msg1 = if (logAkka.msg == null) "UNKNOWN" else logAkka.msg
+  def generateLogPekkoJson(logPekko: LogPekko, pekkoLogLevel: Level): Option[JsObject] =
+    if (logPekko.level.pos >= pekkoLogLevel.pos) {
+      val msg1 = if (logPekko.msg == null) "UNKNOWN" else logPekko.msg
       var jsonObject = Json.obj(
-        LoggingKeys.TIMESTAMP -> TMTDateTimeFormatter.format(logAkka.time),
-        LoggingKeys.KIND      -> "akka",
+        LoggingKeys.TIMESTAMP -> TMTDateTimeFormatter.format(logPekko.time),
+        LoggingKeys.KIND      -> "pekko",
         LoggingKeys.MESSAGE   -> msg1.toString,
-        LoggingKeys.ACTOR     -> logAkka.source,
-        LoggingKeys.SEVERITY  -> logAkka.level.name,
-        LoggingKeys.CLASS     -> logAkka.clazz.getName,
+        LoggingKeys.ACTOR     -> logPekko.source,
+        LoggingKeys.SEVERITY  -> logPekko.level.name,
+        LoggingKeys.CLASS     -> logPekko.clazz.getName,
         LoggingKeys.CATEGORY  -> Category.Common.name
       )
 
-      if (logAkka.cause.isDefined) jsonObject = jsonObject ++ exceptionJson(logAkka.cause.get)
+      if (logPekko.cause.isDefined) jsonObject = jsonObject ++ exceptionJson(logPekko.cause.get)
       Some(jsonObject)
     }
     else None
@@ -131,7 +131,8 @@ private[logging] object LogActorOperations {
     jsonObject = (log.sourceLocation.packageName, log.sourceLocation.className) match {
       case ("", "") => jsonObject
       case ("", c)  => jsonObject ++ Json.obj(LoggingKeys.CLASS -> c)
-      case (p, c)   => jsonObject ++ Json.obj(LoggingKeys.CLASS -> s"$p.$c")
+//      case (p, c)   => jsonObject ++ Json.obj(LoggingKeys.CLASS -> s"$p.$c")
+      case (p, c) => jsonObject ++ Json.obj(LoggingKeys.CLASS -> s"$c")
     }
 
     if (log.actorName.isDefined) jsonObject = jsonObject ++ Json.obj(LoggingKeys.ACTOR -> log.actorName.get)

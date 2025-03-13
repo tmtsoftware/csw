@@ -5,8 +5,8 @@
 
 package csw.framework.javadsl
 
-import akka.actor.typed.javadsl.ActorContext
-import akka.actor.typed.scaladsl
+import org.apache.pekko.actor.typed.javadsl.ActorContext
+import org.apache.pekko.actor.typed.scaladsl
 import csw.alarm.client.internal.extensions.AlarmServiceExt.RichAlarmService
 import csw.command.client.messages.TopLevelActorMessage
 import csw.config.client.javadsl.JConfigClientFactory

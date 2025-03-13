@@ -5,8 +5,8 @@
 
 package csw.testkit.scaladsl
 
-import akka.actor.typed.scaladsl.ActorContext
-import akka.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
+import org.apache.pekko.actor.typed.scaladsl.ActorContext
+import org.apache.pekko.actor.typed.{ActorRef, ActorSystem, SpawnProtocol}
 import com.typesafe.config.Config
 import csw.command.client.messages.{ComponentMessage, ContainerMessage, TopLevelActorMessage}
 import csw.command.client.models.framework.LocationServiceUsage

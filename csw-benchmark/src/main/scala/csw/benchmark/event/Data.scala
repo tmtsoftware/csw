@@ -6,7 +6,7 @@
 package csw.benchmark.event
 
 import csw.params.core.generics.{KeyType, Parameter}
-import csw.params.core.models._
+import csw.params.core.models.*
 import csw.params.events.{EventName, SystemEvent}
 import csw.prefix.models.Prefix
 import csw.time.core.models.TAITime
@@ -24,7 +24,7 @@ object Data {
   private val arrayDataKey  = KeyType.IntArrayKey.make("intarrays")
   private val matrixDataKey = KeyType.IntMatrixKey.make("intmatrices")
 
-  private val paramSet: Set[Parameter[_]] = Set(
+  private val paramSet: Set[Parameter[?]] = Set(
     byteKey.set(100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100),
     intKey.set(100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100),
     doubleKey.set(100.342, 100.342, 100.342, 100.342, 100.342, 100.342, 100.342, 100.342, 100.342, 100.342, 100.342, 100.342,

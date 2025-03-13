@@ -4,7 +4,7 @@
  */
 
 package csw.framework.models
-import akka.actor.typed.{ActorSystem, Scheduler, SpawnProtocol}
+import org.apache.pekko.actor.typed.{ActorSystem, Scheduler, SpawnProtocol}
 import csw.alarm.api.scaladsl.AlarmService
 import csw.alarm.client.AlarmServiceFactory
 import csw.command.client.models.framework.ComponentInfo
@@ -22,7 +22,7 @@ import csw.params.core.states.CurrentState
 import csw.time.scheduler.TimeServiceSchedulerFactory
 import csw.time.scheduler.api.TimeServiceScheduler
 
-import scala.async.Async.{async, await}
+import cps.compat.FutureAsync.*
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
 /**

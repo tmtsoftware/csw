@@ -9,7 +9,7 @@ import java.net.{InetAddress, NetworkInterface}
 
 import csw.network.utils.exceptions.NetworkInterfaceNotFound
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 /**
  *  Provides InetAddresses for network interface

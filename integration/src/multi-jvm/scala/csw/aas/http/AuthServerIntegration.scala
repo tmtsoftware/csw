@@ -19,7 +19,7 @@ import org.tmt.embedded_keycloak.utils.BearerToken
 import org.tmt.embedded_keycloak.{EmbeddedKeycloak, KeycloakData, Settings}
 
 import scala.concurrent.Await
-import scala.concurrent.ExecutionContext.Implicits._
+import scala.concurrent.ExecutionContext.Implicits.*
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
 class AuthIntegrationTestMultiJvmNode1 extends AuthIntegrationTest
@@ -27,7 +27,7 @@ class AuthIntegrationTestMultiJvmNode2 extends AuthIntegrationTest
 class AuthIntegrationTestMultiJvmNode3 extends AuthIntegrationTest
 
 //DEOPSCSW-571: Setup sample gateway for piping all requests from single source
-//DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
+//DEOPSCSW-579: Prevent unauthorized access based on pekko http route rules
 class AuthIntegrationTest
     extends LSNodeSpec(config = new MultiNodeTestConfig, mode = "http")
     with BeforeAndAfterEach
@@ -99,9 +99,17 @@ class AuthIntegrationTest
           realms = Set(
             Realm(
               "TMT",
-              clients = Set(
-                Client("tmt-frontend-app", "public", passwordGrantEnabled = true, authorizationEnabled = false)),
-              users = Set(ApplicationUser("john", "secret", realmRoles = Set("admin"))),
+              clients = Set(Client("tmt-frontend-app", "public", passwordGrantEnabled = true, authorizationEnabled = false)),
+              users = Set(
+                ApplicationUser(
+                  "john",
+                  "secret",
+                  firstName = "john",
+                  lastName = "secret",
+                  email = "john@tmt.org",
+                  realmRoles = Set("admin")
+                )
+              ),
               realmRoles = Set("admin")
             )
           )
@@ -173,7 +181,15 @@ class AuthIntegrationTest
               clients = Set(
                 Client("tmt-frontend-app", "public", passwordGrantEnabled = true, authorizationEnabled = false)
               ),
-              users = Set(ApplicationUser("john", "secret")),
+              users = Set(
+                ApplicationUser(
+                  "john",
+                  "secret",
+                  firstName = "john",
+                  lastName = "secret",
+                  email = "john@tmt.org"
+                )
+              ),
               realmRoles = Set("admin")
             )
           )

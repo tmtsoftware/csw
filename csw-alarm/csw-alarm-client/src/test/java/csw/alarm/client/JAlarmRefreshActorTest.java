@@ -5,11 +5,11 @@
 
 package csw.alarm.client;
 
-import akka.Done;
-import akka.actor.testkit.typed.javadsl.TestProbe;
-import akka.actor.typed.ActorRef;
-import akka.actor.typed.ActorSystem;
-import akka.actor.typed.SpawnProtocol;
+import org.apache.pekko.Done;
+import org.apache.pekko.actor.testkit.typed.javadsl.TestProbe;
+import org.apache.pekko.actor.typed.ActorRef;
+import org.apache.pekko.actor.typed.ActorSystem;
+import org.apache.pekko.actor.typed.SpawnProtocol;
 import csw.alarm.api.javadsl.JAlarmSeverity;
 import csw.alarm.models.AutoRefreshSeverityMessage;
 import csw.alarm.models.AutoRefreshSeverityMessage.AutoRefreshSeverity;

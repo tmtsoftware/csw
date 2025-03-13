@@ -6,6 +6,6 @@
 package csw.alarm.client.internal.models
 
 import csw.alarm.models.Key.AlarmKey
-import csw.alarm.models._
+import csw.alarm.models.*
 
 private[alarm] case class Alarm(key: AlarmKey, metadata: AlarmMetadata, status: AlarmStatus, severity: FullAlarmSeverity)

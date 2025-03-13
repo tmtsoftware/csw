@@ -5,8 +5,8 @@
 
 package csw.params.core;
 
-import akka.actor.typed.Behavior;
-import akka.actor.typed.javadsl.Behaviors;
+import org.apache.pekko.actor.typed.Behavior;
+import org.apache.pekko.actor.typed.javadsl.Behaviors;
 import csw.params.commands.Observe;
 import csw.params.commands.Setup;
 import csw.params.commands.Wait;

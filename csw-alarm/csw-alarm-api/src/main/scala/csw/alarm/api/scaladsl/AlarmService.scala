@@ -5,7 +5,7 @@
 
 package csw.alarm.api.scaladsl
 
-import akka.Done
+import org.apache.pekko.Done
 import csw.alarm.models.AlarmSeverity
 import csw.alarm.models.Key.AlarmKey
 

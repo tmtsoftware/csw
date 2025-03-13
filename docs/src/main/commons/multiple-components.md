@@ -42,7 +42,7 @@ connections = [
   {
         prefix: "csw.samplehcd"
         componentType: hcd
-        connectionType: akka
+        connectionType: pekko
   }
 ]
 ```
@@ -58,7 +58,7 @@ connections = [
   {
         prefix: "csw.samplehcd"
         componentType: hcd
-        connectionType: akka
+        connectionType: pekko
   }
 ]
 ```
@@ -101,7 +101,7 @@ Scala
 {
     prefix: "csw.samplehcd"
     componentType: hcd
-    connectionType: akka
+    connectionType: pekko
 }
 ``` 
 
@@ -111,17 +111,17 @@ Java
 {
     prefix: "csw.samplehcd"
     componentType: hcd
-    connectionType: akka
+    connectionType: pekko
 }
 ``` 
 
 The configuration includes the `prefix` of the component consisting of a valid subsystem and the component's name. 
-The prefix, component type (hcd, service, etc), and the connection type (akka, http, tcp) will be used to create a `Connection` object. 
+The prefix, component type (hcd, service, etc), and the connection type (pekko, http, tcp) will be used to create a `Connection` object. 
 The Connection object will be then used to track the location of a component using Location Service.
 
 The `Location` object has one of the following types:
 
--   AkkaLocation: Contains the remote address of the actorRef. The actorRef will be the Supervisor actor of a component.
+-   PekkoLocation: Contains the remote address of the actorRef. The actorRef will be the Supervisor actor of a component.
 -   HttpLocation: Holds the HTTP URI of the web server, e.g. Configuration Service
 -   TcpLocation: Represents a TCP URI of the server or service, e.g. Event Service 
 

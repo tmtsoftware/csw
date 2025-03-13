@@ -5,11 +5,11 @@
 
 package csw.logging.client.appenders
 
-import java.io._
+import java.io.*
 import java.time.temporal.ChronoUnit
 import java.time.{LocalDateTime, ZoneId, ZoneOffset, ZonedDateTime}
 
-import akka.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.ActorSystem
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.commons.{Category, Constants, LoggingKeys, TMTDateTimeFormatter}
 import csw.logging.client.exceptions.BaseLogPathNotDefined
@@ -28,8 +28,8 @@ import scala.concurrent.{ExecutionContextExecutor, Future, Promise}
  */
 private[logging] class FileAppenderHelper(path: String, name: String, category: String) {
 
-  private[this] var fileSpanTimestamp: Option[ZonedDateTime] = None
-  private[this] var maybePrintWriter: Option[PrintWriter]    = None
+  private var fileSpanTimestamp: Option[ZonedDateTime] = None
+  private var maybePrintWriter: Option[PrintWriter]    = None
 
   protected val log: Logger = new LoggerImpl(None, None)
 
@@ -102,7 +102,7 @@ private[logging] class FileAppenderHelper(path: String, name: String, category: 
  */
 private[logging] class FilesAppender(path: String, name: String, category: String) {
 
-  private[this] val fileAppenderHelper = new FileAppenderHelper(path, name, category)
+  private val fileAppenderHelper = new FileAppenderHelper(path, name, category)
 
   def add(maybeTimestamp: Option[ZonedDateTime], line: String, rotateFlag: Boolean): Unit =
     fileAppenderHelper.appendAdd(maybeTimestamp, line, rotateFlag)
@@ -127,7 +127,7 @@ object FileAppender extends LogAppenderBuilder {
    * @param system typed Actor System.
    * @param stdHeaders the headers that are fixes for this service.
    */
-  def apply(system: ActorSystem[_], stdHeaders: JsObject): FileAppender =
+  def apply(system: ActorSystem[?], stdHeaders: JsObject): FileAppender =
     new FileAppender(system, stdHeaders)
 
   def decideTimestampForFile(logDateTime: ZonedDateTime): ZonedDateTime = {
@@ -151,18 +151,18 @@ object FileAppender extends LogAppenderBuilder {
  * @param system typed Actor System
  * @param stdHeaders the headers that are fixes for this service.
  */
-class FileAppender(system: ActorSystem[_], stdHeaders: JsObject) extends LogAppender {
+class FileAppender(system: ActorSystem[?], stdHeaders: JsObject) extends LogAppender {
 
-  private[this] implicit val executionContext: ExecutionContextExecutor = system.executionContext
-  private[this] val config =
+  private implicit val executionContext: ExecutionContextExecutor = system.executionContext
+  private val config =
     system.settings.config.getConfig("csw-logging.appender-config.file")
 
   if (!config.hasPath(FileAppender.BaseLogPath)) throw BaseLogPathNotDefined(FileAppender.TMT_LOG_HOME)
-  private[this] val fullHeaders   = config.getBoolean("fullHeaders")
-  private[this] val logPath       = s"${config.getString(FileAppender.BaseLogPath)}/${config.getString("logPath")}"
-  private[this] val logLevelLimit = Level(config.getString("logLevelLimit"))
-  private[this] val rotateFlag    = config.getBoolean("rotate")
-  private[this] val fileAppenders =
+  private val fullHeaders   = config.getBoolean("fullHeaders")
+  private val logPath       = s"${config.getString(FileAppender.BaseLogPath)}/${config.getString("logPath")}"
+  private val logLevelLimit = Level(config.getString("logLevelLimit"))
+  private val rotateFlag    = config.getBoolean("rotate")
+  private val fileAppenders =
     scala.collection.mutable.HashMap[String, FilesAppender]()
   private val loggingSystemName = stdHeaders.getString(LoggingKeys.NAME)
 

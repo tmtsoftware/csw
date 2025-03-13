@@ -10,7 +10,7 @@ import java.nio.file.Files
 import csw.commons.ResourceReader
 import csw.params.core.generics.KeyType.ByteArrayKey
 import csw.params.core.models.Units.encoder
-import csw.params.core.models._
+import csw.params.core.models.*
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -27,7 +27,7 @@ class BinaryImageByteArrayTest extends AnyFunSpec with Matchers {
       val imgBytes = Files.readAllBytes(imgPath)
 
       val binaryImgData: ArrayData[Byte]          = ArrayData.fromArray(imgBytes)
-      val binaryParam: Parameter[ArrayData[Byte]] = imageKey -> binaryImgData withUnits encoder
+      val binaryParam: Parameter[ArrayData[Byte]] = imageKey -> binaryImgData `withUnits` encoder
 
       binaryParam.head shouldBe binaryImgData
       binaryParam.value(0) shouldBe binaryImgData

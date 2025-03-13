@@ -9,7 +9,7 @@ import csw.aas.core.commons.AASConnection
 import csw.location.api.models.{HttpLocation, HttpRegistration, NetworkType}
 import csw.location.api.scaladsl.{LocationService, RegistrationResult}
 
-import scala.async.Async.{async, _}
+import cps.compat.FutureAsync.*
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -35,7 +35,7 @@ private[csw] class AuthServiceLocation(locationService: LocationService) {
     }
 
   private[csw] def register(authServicePort: Int): Future[RegistrationResult] = {
-    val authServicePath    = "auth"
+    val authServicePath    = ""
     val httpRegistration   = HttpRegistration(AASConnection.value, authServicePort, authServicePath, NetworkType.Outside)
     val registrationResult = locationService.register(httpRegistration)
     registrationResult

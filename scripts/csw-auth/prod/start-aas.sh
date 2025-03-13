@@ -121,7 +121,7 @@ function addAdminUser {
 }
 
 function is_AAS_running {
-    local http_code=$(curl -s -o /dev/null -w "%{http_code}" http://${host}:${port}/auth/admin/realms)
+    local http_code=$(curl -s -o /dev/null -w "%{http_code}" http://${host}:${port}/admin/realms)
     if [[ $http_code -eq 401 ]]; then
         return 0
     else
@@ -149,7 +149,7 @@ function addTestUsers {
 function associateRoleToTestUsers {
     wait_till_AAS_starts
     cd ${keycloakDir}/${keycloakBinaryUnzipped}/bin
-        ./kcadm.sh config credentials --server http://${host}:${port}/auth --realm master --user ${userName} --password ${password}
+        ./kcadm.sh config credentials --server http://${host}:${port} --realm master --user ${userName} --password ${password}
     echo "[INFO] Associate roles to test users"
     ./kcadm.sh add-roles --uusername "config-admin" --rolename admin --cclientid csw-config-server -r TMT
 }

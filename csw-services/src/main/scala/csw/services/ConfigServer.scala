@@ -7,7 +7,7 @@ package csw.services
 
 import csw.config.server.http.HttpService
 import csw.config.server.{ServerWiring, Main => ConfigMain}
-import csw.services.internal.FutureExt._
+import csw.services.internal.FutureExt.*
 import csw.services.internal.ManagedService
 
 object ConfigServer {

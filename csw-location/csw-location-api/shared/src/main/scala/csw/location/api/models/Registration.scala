@@ -8,7 +8,7 @@ package csw.location.api.models
 import java.net.URI
 
 import csw.location.api.codec.LocationSerializable
-import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.location.api.models.Connection.{PekkoConnection, HttpConnection, TcpConnection}
 
 /**
  * Registration holds information about a connection and its live location. This model is used to register a connection with LocationService.
@@ -38,28 +38,28 @@ sealed abstract class Registration extends LocationSerializable {
 }
 
 /**
- * AkkaRegistration holds the information needed to register an akka location
+ * PekkoRegistration holds the information needed to register an pekko location
  *
  * @param connection the `Connection` to register with `LocationService`
  * @param actorRefURI Provide a remote actor uri that is offering a connection. Local actors cannot be registered since they can't be
  *                 communicated from components across the network
  * @param metadata represents additional metadata information associated with location. Defaulted to empty if not provided.
  */
-final case class AkkaRegistration private[csw] (
-    connection: AkkaConnection,
+final case class PekkoRegistration private[csw] (
+    connection: PekkoConnection,
     actorRefURI: URI,
     metadata: Metadata
 ) extends Registration {
 
   /**
-   * Create a AkkaLocation that represents the live connection offered by the actor
+   * Create a PekkoLocation that represents the live connection offered by the actor
    *
    * @param hostname provide a hostname where the connection endpoint is available
-   * @return an AkkaLocation location representing a live connection at provided hostname
+   * @return an PekkoLocation location representing a live connection at provided hostname
    */
-  override def location(hostname: String): Location = AkkaLocation(connection, actorRefURI, metadata)
+  override def location(hostname: String): Location = PekkoLocation(connection, actorRefURI, metadata)
 
-  override def withCswVersion(version: String): AkkaRegistration = this.copy(metadata = metadata.withCSWVersion(version))
+  override def withCswVersion(version: String): PekkoRegistration = this.copy(metadata = metadata.withCSWVersion(version))
 
 }
 

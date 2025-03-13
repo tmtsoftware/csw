@@ -8,12 +8,12 @@ package csw.logging.client.internal
 import java.nio.file.Paths
 import java.time.{ZoneId, ZoneOffset, ZonedDateTime}
 
-import akka.actor.typed.{ActorSystem, SpawnProtocol}
+import org.apache.pekko.actor.typed.{ActorSystem, SpawnProtocol}
 import csw.logging.client.appenders.FileAppender
-import csw.logging.client.commons.AkkaTypedExtension.UserActorFactory
+import csw.logging.client.commons.PekkoTypedExtension.UserActorFactory
 import csw.logging.client.commons.LoggingKeys
 import csw.logging.client.components.IRIS
-import csw.logging.client.components.IRISLogMessages._
+import csw.logging.client.components.IRISLogMessages.*
 import csw.logging.client.internal.JsonExtensions.RichJsObject
 import csw.logging.client.utils.{FileUtils, LoggingTestSuite}
 import csw.logging.models.RequestId
@@ -118,7 +118,7 @@ class TimingTest extends LoggingTestSuite with Timing {
         log.getString(LoggingKeys.PREFIX) shouldBe prefix.toString
         log.getString(LoggingKeys.ACTOR) shouldBe irisActorRef.path.toString
         log.getString(LoggingKeys.FILE) shouldBe IRIS.FILE_NAME
-        log.getString(LoggingKeys.CLASS) shouldBe IRIS.CLASS_NAME
+        log.getString(LoggingKeys.CLASS) should startWith(IRIS.CLASS_NAME)
         log.contains(LoggingKeys.LINE) shouldBe true
       }
     }

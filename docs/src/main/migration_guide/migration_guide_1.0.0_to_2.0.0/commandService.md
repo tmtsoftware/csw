@@ -28,6 +28,6 @@ Handlers have also been added for `onDiagnosticMode` and `onOperationsMode`. The
 added to the `CommandService` object created when using a `CommandServiceFactory` and the component's location.
 
 Additionally, commands can now be sent to Assemblies and HCDs using HTTP. A HTTP version of the `CommandService` can be
-obtained from the `CommandServiceFactory` using an `HTTPLocation`.  If an `AkkaLocation` is used, the normal Akka-based
+obtained from the `CommandServiceFactory` using an `HTTPLocation`.  If an `PekkoLocation` is used, the normal Pekko-based
 `CommandService` is obtained.
 

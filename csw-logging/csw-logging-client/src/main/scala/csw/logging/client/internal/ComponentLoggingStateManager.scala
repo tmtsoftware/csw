@@ -12,7 +12,7 @@ import csw.logging.client.models.ComponentLoggingState
 import csw.logging.models.Level
 import csw.prefix.models.Prefix
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.Try
 
 private[logging] object ComponentLoggingStateManager {

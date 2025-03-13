@@ -5,11 +5,11 @@
 
 package csw.services
 
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.Http.ServerBinding
+import org.apache.pekko.http.scaladsl.Http
+import org.apache.pekko.http.scaladsl.Http.ServerBinding
 import csw.location.server.internal.ServerWiring
 import csw.location.server.{Main => LocationMain}
-import csw.services.internal.FutureExt._
+import csw.services.internal.FutureExt.*
 import csw.services.internal.ManagedService
 
 object LocationServer {

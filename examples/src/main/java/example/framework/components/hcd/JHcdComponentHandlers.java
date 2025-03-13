@@ -5,9 +5,9 @@
 
 package example.framework.components.hcd;
 
-import akka.actor.typed.ActorRef;
-import akka.actor.typed.javadsl.ActorContext;
-import akka.actor.typed.javadsl.AskPattern;
+import org.apache.pekko.actor.typed.ActorRef;
+import org.apache.pekko.actor.typed.javadsl.ActorContext;
+import org.apache.pekko.actor.typed.javadsl.AskPattern;
 import csw.command.client.CommandResponseManager;
 import csw.command.client.messages.TopLevelActorMessage;
 import csw.command.client.models.framework.ComponentInfo;
@@ -53,7 +53,7 @@ public class JHcdComponentHandlers extends JComponentHandlers {
     private final TimeUnit timeUnit = TimeUnit.SECONDS;
 
     public JHcdComponentHandlers(
-            akka.actor.typed.javadsl.ActorContext<TopLevelActorMessage> ctx,
+            org.apache.pekko.actor.typed.javadsl.ActorContext<TopLevelActorMessage> ctx,
             JCswContext cswCtx
     ) {
         super(ctx, cswCtx);

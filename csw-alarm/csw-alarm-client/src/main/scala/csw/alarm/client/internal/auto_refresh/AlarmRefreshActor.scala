@@ -5,8 +5,8 @@
 
 package csw.alarm.client.internal.auto_refresh
 
-import akka.actor.typed.Behavior
-import akka.actor.typed.scaladsl.{Behaviors, TimerScheduler}
+import org.apache.pekko.actor.typed.Behavior
+import org.apache.pekko.actor.typed.scaladsl.{Behaviors, TimerScheduler}
 import csw.alarm.models.AutoRefreshSeverityMessage.{AutoRefreshSeverity, CancelAutoRefresh, SetSeverity}
 import csw.alarm.api.scaladsl.AlarmService
 import csw.alarm.client.internal.AlarmServiceLogger

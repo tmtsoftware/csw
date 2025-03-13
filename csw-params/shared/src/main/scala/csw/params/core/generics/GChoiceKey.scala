@@ -33,6 +33,6 @@ class GChoiceKey(name: String, keyType: KeyType[Choice], units: Units, val choic
    */
   override def set(value: Choice, values: Choice*): Parameter[Choice] = {
     validate(value +: values.toList)
-    super.set(value, values: _*)
+    super.set(value, values*)
   }
 }

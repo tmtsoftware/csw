@@ -6,7 +6,7 @@
 package csw.params.commands
 
 import csw.params.core.generics.KeyType.ByteKey
-import csw.params.core.generics._
+import csw.params.core.generics.*
 import csw.params.core.models.Units.{NoUnits, degree, meter}
 import csw.params.core.models.{ArrayData, ObsId}
 import csw.prefix.models.Prefix

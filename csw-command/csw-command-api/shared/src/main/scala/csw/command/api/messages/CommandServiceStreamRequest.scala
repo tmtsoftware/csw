@@ -5,7 +5,7 @@
 
 package csw.command.api.messages
 
-import akka.util.Timeout
+import org.apache.pekko.util.Timeout
 import csw.params.core.models.Id
 import csw.params.core.states.StateName
 

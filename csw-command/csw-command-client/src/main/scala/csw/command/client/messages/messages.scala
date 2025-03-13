@@ -5,14 +5,14 @@
 
 package csw.command.client.messages
 
-import akka.actor.typed.ActorRef
-import csw.command.client.messages.CommandSerializationMarker._
+import org.apache.pekko.actor.typed.ActorRef
+import csw.command.client.messages.CommandSerializationMarker.*
 import csw.command.client.messages.sequencer.SequencerMsg
 import csw.command.client.models.framework.PubSub.SubscriberMessage
-import csw.command.client.models.framework._
+import csw.command.client.models.framework.*
 import csw.location.api.models.TrackingEvent
 import csw.logging.models.{Level, LogMetadata}
-import csw.params.commands.CommandResponse._
+import csw.params.commands.CommandResponse.*
 import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
 import csw.params.core.states.CurrentState

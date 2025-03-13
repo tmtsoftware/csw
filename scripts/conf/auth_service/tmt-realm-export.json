@@ -602,7 +602,7 @@
       "clientId": "account",
       "name": "${client_account}",
       "rootUrl": "${authBaseUrl}",
-      "baseUrl": "/realms/TMT/account/",
+      "baseUrl": "admin/realms/TMT/account/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "clientAuthenticatorType": "client-secret",
@@ -612,7 +612,7 @@
         "view-profile"
       ],
       "redirectUris": [
-        "/realms/TMT/account/*"
+        "admin/realms/TMT/account/*"
       ],
       "webOrigins": [],
       "notBefore": 0,

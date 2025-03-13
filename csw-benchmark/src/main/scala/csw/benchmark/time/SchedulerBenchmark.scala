@@ -8,8 +8,8 @@ package csw.benchmark.time
 import java.time.Duration
 import java.util.concurrent.{CountDownLatch, TimeUnit}
 
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import csw.time.scheduler.TimeServiceSchedulerFactory
 import csw.time.scheduler.api.TimeServiceScheduler
 import org.openjdk.jmh.annotations.{OperationsPerInvocation, _}
@@ -24,8 +24,8 @@ class SchedulerBenchmark {
   final private val Offset                  = 20L
   final private val OperationsPerInvocation = 1
 
-  private val actorSystem: ActorSystem[_]                = ActorSystem(Behaviors.empty, "test")
-  private var timeServiceScheduler: TimeServiceScheduler = _
+  private val actorSystem: ActorSystem[?]                = ActorSystem(Behaviors.empty, "test")
+  private var timeServiceScheduler: TimeServiceScheduler = scala.compiletime.uninitialized
 
   @Setup
   def setup(): Unit = {

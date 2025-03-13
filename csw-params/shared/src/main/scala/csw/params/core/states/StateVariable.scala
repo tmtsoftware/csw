@@ -11,7 +11,7 @@ import csw.prefix.models.Prefix
 import csw.serializable.CommandSerializable
 
 import scala.annotation.varargs
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 /**
  * Base trait for state variables
@@ -26,7 +26,7 @@ sealed trait StateVariable extends CommandSerializable {
   /**
    * an optional initial set of items (keys with values)
    */
-  val paramSet: Set[Parameter[_]]
+  val paramSet: Set[Parameter[?]]
 
   /**
    * identifies the name of the state
@@ -90,7 +90,7 @@ object StateVariable {
  * @param stateName identifies the name of the state
  * @param paramSet initial set of items (keys with values)
  */
-case class DemandState(prefix: Prefix, stateName: StateName, paramSet: Set[Parameter[_]])
+case class DemandState(prefix: Prefix, stateName: StateName, paramSet: Set[Parameter[?]])
     extends ParameterSetType[DemandState]
     with ParameterSetKeyData
     with StateVariable {
@@ -98,7 +98,7 @@ case class DemandState(prefix: Prefix, stateName: StateName, paramSet: Set[Param
   /**
    * A Java helper method to construct with String
    */
-  def this(prefix: Prefix, stateName: StateName) = this(prefix, stateName, Set.empty[Parameter[_]])
+  def this(prefix: Prefix, stateName: StateName) = this(prefix, stateName, Set.empty[Parameter[?]])
 
   /**
    * A Java helper method to create a DemandState from a Setup
@@ -111,7 +111,7 @@ case class DemandState(prefix: Prefix, stateName: StateName, paramSet: Set[Param
    * @param data set of parameters
    * @return a new instance of DemandState with provided data
    */
-  override protected def create(data: Set[Parameter[_]]): DemandState = copy(paramSet = data)
+  override protected def create(data: Set[Parameter[?]]): DemandState = copy(paramSet = data)
 }
 
 object DemandState {
@@ -124,7 +124,7 @@ object DemandState {
    * @param paramSet an optional initial set of items (keys with values)
    * @return an instance of DemandState
    */
-  def apply(prefix: Prefix, stateName: StateName, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): DemandState =
+  def apply(prefix: Prefix, stateName: StateName, paramSet: Set[Parameter[?]] = Set.empty[Parameter[?]]): DemandState =
     new DemandState(prefix, stateName).madd(paramSet)
 }
 
@@ -138,7 +138,7 @@ object DemandState {
 case class CurrentState(
     prefix: Prefix,
     stateName: StateName,
-    paramSet: Set[Parameter[_]]
+    paramSet: Set[Parameter[?]]
 ) extends ParameterSetType[CurrentState]
     with ParameterSetKeyData
     with StateVariable {
@@ -146,7 +146,7 @@ case class CurrentState(
   /**
    * A Java helper method to construct with String
    */
-  def this(prefix: Prefix, currentStateName: StateName) = this(prefix, currentStateName, Set.empty[Parameter[_]])
+  def this(prefix: Prefix, currentStateName: StateName) = this(prefix, currentStateName, Set.empty[Parameter[?]])
 
   /**
    * A Java helper method to create a CurrentState from a Setup
@@ -159,7 +159,7 @@ case class CurrentState(
    * @param data set of parameters
    * @return a new instance of CurrentState with provided data
    */
-  override protected def create(data: Set[Parameter[_]]): CurrentState = copy(paramSet = data)
+  override protected def create(data: Set[Parameter[?]]): CurrentState = copy(paramSet = data)
 }
 
 object CurrentState {
@@ -175,7 +175,7 @@ object CurrentState {
   def apply(
       prefix: Prefix,
       stateName: StateName,
-      paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]
+      paramSet: Set[Parameter[?]] = Set.empty[Parameter[?]]
   ): CurrentState = new CurrentState(prefix, stateName).madd(paramSet)
 
   implicit object NameableCurrentState extends Nameable[CurrentState] {

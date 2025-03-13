@@ -5,7 +5,7 @@
 
 package example.logging.client.genericlogger;
 
-import akka.actor.typed.javadsl.ActorContext;
+import org.apache.pekko.actor.typed.javadsl.ActorContext;
 import csw.command.client.messages.ComponentMessage;
 import csw.logging.api.javadsl.ILogger;
 import csw.logging.client.javadsl.JGenericLoggerFactory;
@@ -18,9 +18,9 @@ public class JGenericClass {
 //#generic-logger-class
 
 //#generic-logger-actor
-class JGenericActor extends akka.actor.AbstractActor {
+class JGenericActor extends org.apache.pekko.actor.AbstractActor {
 
-    //context() is available from akka.actor.AbstractActor
+    //context() is available from pekko.actor.AbstractActor
     ILogger log = JGenericLoggerFactory.getLogger(context(), getClass());
 
     @Override

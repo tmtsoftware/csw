@@ -5,12 +5,12 @@
 
 package csw.aas.http
 
-import akka.http.scaladsl.model.HttpMethods.POST
-import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.model.headers.{Authorization, HttpChallenge, OAuth2BearerToken}
-import akka.http.scaladsl.server.AuthenticationFailedRejection.{CredentialsMissing, CredentialsRejected}
-import akka.http.scaladsl.server.{AuthenticationFailedRejection, AuthorizationFailedRejection, Directives, Route}
-import akka.http.scaladsl.testkit.ScalatestRouteTest
+import org.apache.pekko.http.scaladsl.model.HttpMethods.POST
+import org.apache.pekko.http.scaladsl.model.StatusCodes
+import org.apache.pekko.http.scaladsl.model.headers.{Authorization, HttpChallenge, OAuth2BearerToken}
+import org.apache.pekko.http.scaladsl.server.AuthenticationFailedRejection.{CredentialsMissing, CredentialsRejected}
+import org.apache.pekko.http.scaladsl.server.{AuthenticationFailedRejection, AuthorizationFailedRejection, Directives, Route}
+import org.apache.pekko.http.scaladsl.testkit.ScalatestRouteTest
 import csw.aas.http.AuthorizationPolicy.{CustomPolicy, RealmRolePolicy}
 import msocket.security.AccessControllerFactory
 import msocket.security.api.TokenValidator
@@ -22,7 +22,7 @@ import org.scalatestplus.mockito.MockitoSugar
 
 import scala.concurrent.Future
 
-//DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
+//DEOPSCSW-579: Prevent unauthorized access based on pekko http route rules
 class PolicyValidatorTest extends AnyFunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
   test("validate should return 200 OK when policy matches | DEOPSCSW-579, CSW-98") {

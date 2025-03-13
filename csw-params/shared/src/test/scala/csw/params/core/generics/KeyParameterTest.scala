@@ -5,11 +5,11 @@
 
 package csw.params.core.generics
 
-import csw.params.core.generics.KeyType._
+import csw.params.core.generics.KeyType.*
 import csw.params.core.models.Coords.EqFrame.FK5
 import csw.params.core.models.Coords.SolarSystemObject.Venus
-import csw.params.core.models.Units._
-import csw.params.core.models._
+import csw.params.core.models.Units.*
+import csw.params.core.models.*
 import csw.time.core.models.{TAITime, UTCTime}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
@@ -625,8 +625,8 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
   }
 
   describe("test longMatrixKey") {
-    val m1: Array[Array[Long]] = Array(Array(1, 2, 3), Array(4, 5, 6), Array(7, 8, 9))
-    val m2: Array[Array[Long]] = Array(Array(1, 2, 3, 4, 5), Array(10, 20, 30, 40, 50))
+    val m1: Array[Array[Long]] = Array(Array(1L, 2L, 3L), Array(4L, 5L, 6L), Array(7L, 8L, 9L))
+    val m2: Array[Array[Long]] = Array(Array(1L, 2L, 3L, 4L, 5L), Array(10L, 20L, 30L, 40L, 50L))
 
     val lm1: MatrixData[Long]     = MatrixData.fromArrays(m1)
     val lm2: MatrixData[Long]     = MatrixData.fromArrays(m2)
@@ -901,8 +901,8 @@ class KeyParameterTest extends AnyFunSpec with Matchers {
   }
 
   describe("test doubleMatrixKey") {
-    val m1: Array[Array[Double]] = Array(Array(1, 2, 3), Array(4, 5, 6), Array(7, 8, 9))
-    val m2: Array[Array[Double]] = Array(Array(1, 2, 3, 4, 5), Array(10, 20, 30, 40, 50))
+    val m1: Array[Array[Double]] = Array(Array(1.0, 2, 3), Array(4.0, 5, 6), Array(7.0, 8, 9))
+    val m2: Array[Array[Double]] = Array(Array(1.0, 2, 3, 4, 5), Array(10.0, 20, 30, 40, 50))
 
     val lm1 = MatrixData.fromArrays(m1)
     val lm2 = MatrixData.fromArrays(m2)

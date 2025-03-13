@@ -22,7 +22,7 @@ import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
 
 //DEOPSCSW-558: SPIKE: Token containing user info and roles
-//DEOPSCSW-579: Prevent unauthorized access based on akka http route rules
+//DEOPSCSW-579: Prevent unauthorized access based on pekko http route rules
 class TokenVerifierTest extends AnyFunSuite with MockitoSugar with Matchers with EitherValues {
   private val keycloakTokenVerifier: KeycloakTokenVerifier = mock[KeycloakTokenVerifier]
   private val authConfig: AuthConfig                       = mock[AuthConfig]

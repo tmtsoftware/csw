@@ -8,13 +8,13 @@ package csw.framework.containercmd
 import java.io.FileWriter
 import java.nio.file.{Files, Path, Paths}
 
-import akka.actor.testkit.typed.TestKitSettings
-import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.scaladsl.AskPattern._
-import akka.util.Timeout
+import org.apache.pekko.actor.testkit.typed.TestKitSettings
+import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
+import org.apache.pekko.actor.typed.scaladsl.AskPattern.*
+import org.apache.pekko.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
-import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.client.extensions.PekkoLocationExt.RichPekkoLocation
 import csw.command.client.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
 import csw.command.client.messages.ContainerCommonMessage.GetComponents
 import csw.command.client.messages.RunningMessage.Lifecycle
@@ -22,14 +22,14 @@ import csw.command.client.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.command.client.models.framework.PubSub.Subscribe
 import csw.command.client.models.framework.ToComponentLifecycleMessage.GoOffline
 import csw.command.client.models.framework.{Components, ContainerLifecycleState, SupervisorLifecycleState}
-import csw.common.FrameworkAssertions._
+import csw.common.FrameworkAssertions.*
 import csw.config.api.ConfigData
 import csw.config.client.scaladsl.ConfigClientFactory
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.mocks.MockedAuthentication
 import csw.config.server.{ServerWiring, Settings}
 import csw.framework.deploy.containercmd.ContainerCmd
-import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.Connection.PekkoConnection
 import csw.location.api.models.{ComponentId, ComponentType}
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.location.server.http.MultiNodeHTTPLocationService
@@ -60,7 +60,7 @@ class ContainerCmdTestMultiJvm3 extends ContainerCmdTest(0)
 // DEOPSCSW-172: Starting a container from configuration file
 // DEOPSCSW-182: Control Life Cycle of Components
 // DEOPSCSW-203: Write component-specific verification code
-// DEOPSCSW-216: Locate and connect components to send AKKA commands
+// DEOPSCSW-216: Locate and connect components to send PEKKO commands
 class ContainerCmdTest(ignore: Int)
     extends LSNodeSpec(config = new TwoMembersAndSeed, mode = "http")
     with MultiNodeHTTPLocationService
@@ -91,7 +91,7 @@ class ContainerCmdTest(ignore: Int)
   }
 
   private def resolve(prefix: Prefix, compType: ComponentType) =
-    locationService.resolve(AkkaConnection(ComponentId(prefix, compType)), timeoutDuration)
+    locationService.resolve(PekkoConnection(ComponentId(prefix, compType)), timeoutDuration)
 
   private def resolveLgsfContainer() = resolve(Prefix(Container, "LGSF_Container"), ComponentType.Container)
   private def resolveEtonHcd()       = resolve(Prefix(Subsystem.IRIS, "Eton"), ComponentType.HCD)
@@ -126,7 +126,7 @@ class ContainerCmdTest(ignore: Int)
 
       val maybeContainerLoc = resolveLgsfContainer().futureValue
 
-      // DEOPSCSW-430: Update AkkaLocation model to take Prefix model instead of Option[String]
+      // DEOPSCSW-430: Update PekkoLocation model to take Prefix model instead of Option[String]
       maybeContainerLoc.map(_.prefix).value shouldBe Prefix(s"${Container.entryName}.LGSF_Container")
       val containerRef = maybeContainerLoc.value.containerRef
 
@@ -220,12 +220,12 @@ class ContainerCmdTest(ignore: Int)
       laserAssemblySupervisor ! ComponentStateSubscription(Subscribe(laserCompStateProbe.ref))
       enterBarrier("eton-shutdown")
 
-      // DEOPSCSW-218: Discover component connection information using Akka protocol
+      // DEOPSCSW-218: Discover component connection information using Pekko protocol
       // Laser assembly is tracking Eton Hcd which is running on member2 (different jvm than this)
       // When Eton Hcd shutdowns, laser assembly receives LocationRemoved event
       laserCompStateProbe.expectMessage(
         10.seconds,
-        CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(akkaLocationRemovedChoice)))
+        CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(pekkoLocationRemovedChoice)))
       )
     }
 

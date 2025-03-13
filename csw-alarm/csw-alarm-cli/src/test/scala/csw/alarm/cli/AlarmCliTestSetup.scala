@@ -7,7 +7,9 @@ package csw.alarm.cli
 
 import com.typesafe.config.ConfigFactory
 import csw.alarm.cli.args.ArgsParser
-import csw.alarm.cli.utils.TestFutureExt.RichFuture
+import csw.alarm.cli.utils.TestFutureExt.given
+import scala.language.implicitConversions
+
 import csw.alarm.cli.wiring.Wiring
 import csw.alarm.client.internal.commons.AlarmServiceConnection
 import csw.commons.redis.EmbeddedRedis
@@ -29,8 +31,8 @@ trait AlarmCliTestSetup extends HTTPLocationService with EmbeddedRedis with Even
   val argsParser                        = new ArgsParser(BuildInfo.name)
   val logBuffer: mutable.Buffer[String] = mutable.Buffer.empty[String]
 
-  var redisSentinel: RedisSentinel = _
-  var redisServer: RedisServer     = _
+  var redisSentinel: RedisSentinel = scala.compiletime.uninitialized
+  var redisServer: RedisServer     = scala.compiletime.uninitialized
 
   private def printLine(msg: Any): Unit = logBuffer += msg.toString
 

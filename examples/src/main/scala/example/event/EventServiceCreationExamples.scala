@@ -5,8 +5,8 @@
 
 package example.event
 
-import akka.actor.typed
-import akka.actor.typed.SpawnProtocol
+import org.apache.pekko.actor.typed
+import org.apache.pekko.actor.typed.SpawnProtocol
 import csw.event.api.scaladsl.EventService
 import csw.event.client.EventServiceFactory
 import csw.event.client.models.EventStores.{KafkaStore, RedisStore}
@@ -17,7 +17,7 @@ import io.lettuce.core.{ClientOptions, RedisClient}
 
 class EventServiceCreationExamples {
 
-  private implicit val actorSystem: typed.ActorSystem[_] =
+  private implicit val actorSystem: typed.ActorSystem[?] =
     ActorSystemFactory.remote(SpawnProtocol(), "event-creation-examples")
   private val locationService = HttpLocationServiceFactory.makeLocalClient
 

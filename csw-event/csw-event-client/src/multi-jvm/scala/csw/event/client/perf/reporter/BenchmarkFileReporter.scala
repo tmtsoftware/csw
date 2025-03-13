@@ -8,7 +8,7 @@ package csw.event.client.perf.reporter
 import java.io.{File, OutputStream}
 import java.nio.file.{Files, StandardOpenOption}
 
-import akka.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.ActorSystem
 import com.typesafe.config.Config
 
 /**
@@ -49,10 +49,10 @@ object BenchmarkFileReporter {
       val settingsToReport =
         Seq(
           "csw.event.client.perf.totalMessagesFactor",
-          "akka.remote.default-remote-dispatcher.throughput",
-          "akka.remote.default-remote-dispatcher.fork-join-executor.parallelism-factor",
-          "akka.remote.default-remote-dispatcher.fork-join-executor.parallelism-min",
-          "akka.remote.default-remote-dispatcher.fork-join-executor.parallelism-max"
+          "pekko.remote.default-remote-dispatcher.throughput",
+          "pekko.remote.default-remote-dispatcher.fork-join-executor.parallelism-factor",
+          "pekko.remote.default-remote-dispatcher.fork-join-executor.parallelism-min",
+          "pekko.remote.default-remote-dispatcher.fork-join-executor.parallelism-max"
         )
       if (logSettings) settingsToReport.foreach(reportSetting)
 

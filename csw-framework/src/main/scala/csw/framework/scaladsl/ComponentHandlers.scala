@@ -5,7 +5,7 @@
 
 package csw.framework.scaladsl
 
-import akka.actor.typed.scaladsl.ActorContext
+import org.apache.pekko.actor.typed.scaladsl.ActorContext
 import csw.command.client.messages.TopLevelActorCommonMessage.TrackingEventReceived
 import csw.command.client.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
@@ -18,7 +18,7 @@ import csw.time.core.models.UTCTime
 /**
  * Base class for component handlers which will be used by the component actor
  *
- * @param ctx the [[akka.actor.typed.scaladsl.ActorContext]] under which the actor instance of the component, which use these handlers, is created
+ * @param ctx the [[org.apache.pekko.actor.typed.scaladsl.ActorContext]] under which the actor instance of the component, which use these handlers, is created
  * @param cswCtx provides access to csw services e.g. location, event, alarm, etc
  */
 abstract class ComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext) {

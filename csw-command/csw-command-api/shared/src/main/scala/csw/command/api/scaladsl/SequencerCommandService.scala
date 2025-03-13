@@ -5,7 +5,7 @@
 
 package csw.command.api.scaladsl
 
-import akka.util.Timeout
+import org.apache.pekko.util.Timeout
 import csw.params.commands.CommandResponse.SubmitResponse
 import csw.params.commands.Sequence
 import csw.params.core.models.Id

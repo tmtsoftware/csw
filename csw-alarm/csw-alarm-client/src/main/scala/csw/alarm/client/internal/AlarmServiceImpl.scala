@@ -5,11 +5,11 @@
 
 package csw.alarm.client.internal
 
-import akka.actor.typed
+import org.apache.pekko.actor.typed
 import csw.alarm.api.scaladsl.AlarmAdminService
 import csw.alarm.client.internal.commons.Settings
 import csw.alarm.client.internal.redis.RedisConnectionsFactory
-import csw.alarm.client.internal.services._
+import csw.alarm.client.internal.services.*
 
 import scala.concurrent.ExecutionContext
 
@@ -17,7 +17,7 @@ private[alarm] class AlarmServiceImpl(
     override val redisConnectionsFactory: RedisConnectionsFactory,
     override val settings: Settings
 )(implicit
-    override val actorSystem: typed.ActorSystem[_],
+    override val actorSystem: typed.ActorSystem[?],
     val ec: ExecutionContext
 ) extends AlarmAdminService
     with MetadataServiceModule

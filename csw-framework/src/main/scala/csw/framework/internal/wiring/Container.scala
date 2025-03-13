@@ -5,7 +5,7 @@
 
 package csw.framework.internal.wiring
 
-import akka.actor.typed.{ActorRef, Behavior}
+import org.apache.pekko.actor.typed.{ActorRef, Behavior}
 import com.typesafe.config.Config
 import csw.command.client.messages.{ContainerActorMessage, ContainerMessage}
 import csw.framework.internal.configparser.ConfigParser
