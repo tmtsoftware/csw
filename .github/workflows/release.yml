@@ -44,8 +44,8 @@ jobs:
 
       - name: Unit and Component Tests
         run: |
-          sbt -Dsbt.log.noformat=true -DenableFatalWarnings=true -Dpekko.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true 'csw-time/test:test'
-          sbt -Dsbt.log.noformat=true -DenableFatalWarnings=true -Dpekko.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true -DdisableTimeTests 'test:test'
+          sbt -Dsbt.log.noformat=true -DenableFatalWarnings=true -Dpekko.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true 'csw-time/Test/test'
+          sbt -Dsbt.log.noformat=true -DenableFatalWarnings=true -Dpekko.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true -DdisableTimeTests 'Test/test'
 
       - name: Coverage Report
         run: |
@@ -62,7 +62,7 @@ jobs:
         run: find . -type d -regex ".*js/target.*" | xargs rm -rf
 
       - name: Multi-Jvm Tests
-        run: sbt -Dsbt.log.noformat=true -DgenerateStoryReport=true integration/multi-jvm:test
+        run: sbt -Dsbt.log.noformat=true -DgenerateStoryReport=true integration/MultiJvm/test
 
       - name: Generate RTM
         if: always()

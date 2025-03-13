@@ -4,7 +4,7 @@ csw uses multiple plugins in the sbt ecosystem to help accomplish a variety of t
 | plugin         | task            | Description               |
 | :------------: |:--------------: | :-------------------------|
 | default in sbt | test            | compile and run all tests including scala tests, java tests, multi-jvm/multi-node tests |
-| default in sbt | test:test       | compile and run all tests excluding multi-jvm/multi-node tests |
+| default in sbt | Test/test       | compile and run all tests excluding multi-jvm/multi-node tests |
 | default in sbt | publishLocal    | install your libraries in the local Ivy repository so they can be added as dependencies to other projects |       
 | [sbt-multi-jvm](https://pekko.apache.org/docs/pekko/current/multi-jvm-testing.html) | multi-jvm:test  | provides support for running applications (objects with main methods) and ScalaTest tests in multiple JVMs at the same time. |
 | [sbt-site](https://www.scala-sbt.org/sbt-site/) | makeSite | generates project’s webpage in the target/site directory|

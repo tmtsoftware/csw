@@ -173,6 +173,6 @@ The location service _client_ and _API_ code does provide Java APIs (see below).
 
 There are numerous tests for the location server, including multi-jvm tests. The tests can be run with:
 
-- Unit/Component Tests: `sbt csw-location-server/test:test`
+- Unit/Component Tests: `sbt csw-location-server/Test/test`
 
 - Multi-Jvm Tests: `sbt integration/multi-jvm:testOnly csw.location*`
