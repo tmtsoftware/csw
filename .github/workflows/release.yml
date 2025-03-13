@@ -55,7 +55,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: Coverage Report
-          path: target/scala-2.13/scoverage-report
+          path: target/scala-3.6.2/scoverage-report
 
       - name: Delete js targets
         continue-on-error: true

@@ -43,7 +43,7 @@ pipeline {
                             allowMissing         : true,
                             alwaysLinkToLastBuild: false,
                             keepAll              : true,
-                            reportDir            : './target/scala-2.13/scoverage-report',
+                            reportDir            : './target/scala-3.6.2/scoverage-report',
                             reportFiles          : 'index.html',
                             reportName           : "Scoverage Report"
                     ])
