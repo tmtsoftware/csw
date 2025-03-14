@@ -19,7 +19,6 @@ jobs:
           apps: sbt
       - uses: coursier/cache-action@v6
       - run: |
-          which sbt
           sudo chmod 666 /var/run/docker.sock
 
       - name: Package
