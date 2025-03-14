@@ -1,11 +1,11 @@
-## CSW - TMT Common Software v6.0.0-M2
+## CSW - TMT Common Software v6.0.0-M3
 
-This is release v6.0.0-M2 of the TMT Common Software.
+This is release v6.0.0-M3 of the TMT Common Software.
 
 See [CHANGELOG.md](CHANGELOG.md) for details of all releases.
 
 
 ### Documentation
-- Reference paradox documentation: https://tmtsoftware.github.io/csw/6.0.0-M2/
-- Scaladoc: https://tmtsoftware.github.io/csw/6.0.0-M2/api/scala/index.html
-- Javadoc: https://tmtsoftware.github.io/csw/6.0.0-M2/api/java/index.html
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/6.0.0-M3/
+- Scaladoc: https://tmtsoftware.github.io/csw/6.0.0-M3/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/6.0.0-M3/api/java/index.html
