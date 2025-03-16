@@ -79,10 +79,10 @@ jobs:
       - name: Make Site
         run: sbtn makeSite
 
-#      - name: Github Release
-#        run: sbt -Dsbt.log.noformat=true githubRelease
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+      - name: Github Release
+        run: sbt -Dsbt.log.noformat=true githubRelease
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
 
       - name: Docs Publish
         run: |
