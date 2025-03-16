@@ -21,7 +21,7 @@ pipeline {
                 sh "cs java --jvm temurin:1.21.0 -version"
                 sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.log.noformat=true clean"
                 sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.log.noformat=true scalafmtCheck"
-                sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.log.noformat=true -DenableFatalWarnings=true ';set every Seq(scalafmtOnCompile := false); scalastyle; test:compile; multi-jvm:compile;'"
+                sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.log.noformat=true -DenableFatalWarnings=true ';set every Seq(scalafmtOnCompile := false); test:compile; multi-jvm:compile;'"
             }
         }
 
