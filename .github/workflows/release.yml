@@ -9,13 +9,13 @@ jobs:
   release:
     runs-on: ubuntu-latest
     env:
-      ESW_TS_VERSION: "ff5ca6f"
+      ESW_TS_VERSION: "0.6.0-M1"
     steps:
       - uses: actions/checkout@v4
       - uses: coursier/setup-action@v1.2.0
         with:
           jvm: temurin:1.21
-          apps: sbt sbtn
+          apps: sbt
       - uses: coursier/cache-action@v6
 
       - uses: actions/setup-node@v4
@@ -50,7 +50,7 @@ jobs:
       - name: Coverage Report
         run: |
           sbt -Dsbt.log.noformat=true -DenableCoverage=true coverageReport
-          sbtn coverageAggregate
+          sbt coverageAggregate
 
       - uses: actions/upload-artifact@v4
         with:
@@ -77,7 +77,7 @@ jobs:
           path: target/RTM
 
       - name: Make Site
-        run: sbtn makeSite
+        run: sbt makeSite
 
       - name: Github Release
         run: sbt -Dsbt.log.noformat=true githubRelease
