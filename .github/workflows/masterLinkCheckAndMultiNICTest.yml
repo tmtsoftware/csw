@@ -16,9 +16,7 @@ jobs:
           jvm: temurin:1.21
           apps: sbt
       - uses: coursier/cache-action@v6
-      - run: |
-          which sbt
-          sudo chmod 666 /var/run/docker.sock
+      - run: sudo chmod 666 /var/run/docker.sock
 
       - name: Package
         run: ./integration/scripts/bootstrap_standalone_jars.sh

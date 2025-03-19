@@ -21,7 +21,8 @@ addDependencyTreePlugin
 ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
 
 resolvers += "jitpack" at "https://jitpack.io"
-libraryDependencies += "com.github.tmtsoftware" % "sbt-docs" % "7f69c6f"
+//libraryDependencies += "com.github.tmtsoftware" % "sbt-docs" % "7f69c6f"
+libraryDependencies += "com.github.tmtsoftware" % "sbt-docs" % "9320682"
 
 classpathTypes += "maven-plugin"
 
