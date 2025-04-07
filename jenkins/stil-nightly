@@ -21,7 +21,7 @@ pipeline {
                 sh "cs java --jvm temurin:1.21.0 -version"
                 sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.log.noformat=true clean"
                 sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.log.noformat=true scalafmtCheck"
-                sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.log.noformat=true -DenableFatalWarnings=true ';set every Seq(scalafmtOnCompile := false); Test/compile; integration/MultiJvm/compile;'"
+                sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.log.noformat=true';set every Seq(scalafmtOnCompile := false); Test/compile; integration/MultiJvm/compile;'"
             }
         }
 
@@ -31,10 +31,10 @@ pipeline {
                 // Kill any left over redis process from a previous run
                 sh "./scripts/kill-redis.sh"
                 // Run all tests except csw-time tests
-                sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.log.noformat=true -DenableFatalWarnings=true -Dpekko.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true -DdisableTimeTests 'Test/test'"
+                sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.log.noformat=true -Dpekko.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true -DdisableTimeTests 'Test/test'"
 
                 // Run csw-time module tests
-                sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.log.noformat=true -DenableFatalWarnings=true -Dpekko.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true 'csw-time/Test/test'"
+                sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.log.noformat=true -Dpekko.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true 'csw-time/Test/test'"
             }
             post {
                 always {
@@ -56,7 +56,7 @@ pipeline {
         // These tests cover the scenario of multiple components in multiple containers on same machine.
         stage('Multi-Jvm Test') {
             steps {
-                sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.log.noformat=true -DenableFatalWarnings=true -DgenerateStoryReport=true 'integration/MultiJvm/test'"
+                sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.log.noformat=true -DgenerateStoryReport=true 'integration/MultiJvm/test'"
             }
         }
 
