@@ -30,6 +30,7 @@ pipeline {
             steps {
                 // Kill any left over redis process from a previous run
                 sh "./scripts/kill-redis.sh"
+
                 // Run all tests except csw-time tests
                 sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.log.noformat=true -DenableFatalWarnings=false -Dpekko.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true -DdisableTimeTests 'Test/test'"
 
