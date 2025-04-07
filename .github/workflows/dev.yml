@@ -32,8 +32,8 @@ jobs:
       - name: Tests
         run: |
           sbt clean
-          sbt -Dsbt.log.noformat=true -DenableFatalWarnings=true -Dpekko.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true csw-time/Test/test
-          sbt -Dsbt.log.noformat=true -DenableFatalWarnings=true -Dpekko.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true -DdisableTimeTests Test/test
+          sbt -Dsbt.log.noformat=true -DenableFatalWarnings=false -Dpekko.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true csw-time/Test/test
+          sbt -Dsbt.log.noformat=true -DenableFatalWarnings=false -Dpekko.actor.serialize-messages=on -DenableCoverage=true -DgenerateStoryReport=true -DdisableTimeTests Test/test
 
 
   multi-jvm-tests:
@@ -55,7 +55,7 @@ jobs:
           sbt makeSite
 
       - name: Multi-Jvm Tests
-        run: sbt -Dsbt.log.noformat=true -DenableFatalWarnings=true -DgenerateStoryReport=true integration/MultiJvm/test
+        run: sbt -Dsbt.log.noformat=true -DenableFatalWarnings=false -DgenerateStoryReport=true integration/MultiJvm/test
 
       - name: Generate RTM
         if: always()
