@@ -40,7 +40,7 @@ pipeline {
                 always {
                     sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.log.noformat=true -DenableCoverage=true coverageReport"
                     sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.log.noformat=true coverageAggregate"
-                    junit '**/target/test-reports/*.xml'
+                    junit "${WORKSPACE}/**/target/test-reports/*.xml"
                     publishHTML(target: [
                             allowMissing         : true,
                             alwaysLinkToLastBuild: false,
