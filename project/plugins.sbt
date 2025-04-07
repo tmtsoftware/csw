@@ -1,7 +1,7 @@
 addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.6.4")
 //addSbtPlugin("org.scalastyle"                   %% "scalastyle-sbt-plugin"     % "1.0.0") // not scala 3 ready
 addSbtPlugin("org.scalameta"                     % "sbt-scalafmt"              % "2.5.4")
-addSbtPlugin("com.thoughtworks.sbt-api-mappings" % "sbt-api-mappings"          % "3.0.2")
+//addSbtPlugin("com.thoughtworks.sbt-api-mappings" % "sbt-api-mappings"          % "3.0.2")
 addSbtPlugin("org.scoverage"                     % "sbt-scoverage"             % "2.3.1")
 addSbtPlugin("com.typesafe.sbt"                  % "sbt-multi-jvm"             % "0.4.0")
 addSbtPlugin("com.eed3si9n"                      % "sbt-buildinfo"             % "0.13.1")
@@ -21,8 +21,7 @@ addDependencyTreePlugin
 ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
 
 resolvers += "jitpack" at "https://jitpack.io"
-//libraryDependencies += "com.github.tmtsoftware" % "sbt-docs" % "7f69c6f"
-libraryDependencies += "com.github.tmtsoftware" % "sbt-docs" % "9320682"
+libraryDependencies += "com.github.tmtsoftware" % "sbt-docs" % "c49e54a"
 
 classpathTypes += "maven-plugin"
 
