@@ -58,7 +58,7 @@ class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar with Ma
     componentBehaviorTestKit.run(Initialize)
     supervisorProbe.expectMessageType[Running]
     verify(sampleComponentHandler).initialize()
-    verify(sampleComponentHandler).isOnline_=(true)
+    verify(sampleComponentHandler).isOnline_=(false)
   }
 
   // CSW-37: Add diagnosticMode handler to component handlers

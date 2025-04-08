@@ -106,7 +106,7 @@ private[framework] object ComponentBehavior {
                 })
               }
               lifecycleState = ComponentLifecycleState.Running
-              lifecycleHandlers.isOnline = true
+              lifecycleHandlers.isOnline = false
               supervisor ! Running(ctx.self)
             }
             catch {
