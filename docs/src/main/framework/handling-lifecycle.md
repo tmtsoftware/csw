@@ -113,7 +113,7 @@ from one state to another, allowing the component to prepare itself to be online
 or dormant).  Any call to transition to a online/offline state when the component is already in that state is a no op.
 
 However, when offline, a component should take actions that make sense when offline. For instance, it should not
-follow the telescope motion or take actions as if online.  
+follow the telescope motion or take actions as if online.
 
 @@@
 
