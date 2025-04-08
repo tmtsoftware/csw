@@ -94,11 +94,10 @@ handler is called to allow the component to tidy up before it is destroyed. Then
 creates a new TLA and the startup proceeds as with `initialize` above.
 
 ## Component Online and Offline
-`Online` describes a component that is currently part of the observing system that is in use. 
-When a component enters the Running state it is also "online".
+`Online` describes a component that is currently available and ready to be used in an observation or is currently in use in an observation. 
+A component continues to be ready and initialized when offline. At this time, when a component enters the Running state it is also “online”.
 
-A component is `offline` when it is operating and available for active observing but is not currently
-in use.
+A component is `offline` when it is not available for observing.
 
 If a component is to transition from the online state to the offline state, the `onGoOffLine`
 handler is called. The component should make any changes in its operation for offline use.
@@ -108,13 +107,13 @@ handler is called. The component should make any changes in its operation needed
 
 @@@ note {title="Online vs Offline"}
 
-Unless implemented by the developer, there is no fundamental difference in the inherent behavior of a component when in 
+Unless implemented by the developer, there may not be fundamental differences in the behavior of a component when in 
 either state.  These two states provide a standard way for code to be implemented via these handlers for the transition
 from one state to another, allowing the component to prepare itself to be online (ready for operations) or offline (stowed 
 or dormant).  Any call to transition to a online/offline state when the component is already in that state is a no op.
 
 However, when offline, a component should take actions that make sense when offline. For instance, it should not
-follow the telescope motion or take actions as if online.  
+follow the telescope motion or take actions as if online.
 
 @@@
 
