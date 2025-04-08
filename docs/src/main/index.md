@@ -223,21 +223,15 @@ for running multiple components on a host machine.
 The framework also contains the structures that are common to components, such as commands and event structures.
 
 ## CSW Roadmap
-The 1.0.0 release was a crucial milestone of Common Software (CSW). All the required services of 
-Common Software are included in the 1.0.0 release and subsequent releases. Release 1.0.0 is the 
+The 1.0.0 release was a crucial milestone for Common Software (CSW). All the required services of
+Common Software are included in the 1.0.0 release and subsequent releases. Release 1.0.0 is the
 primary deliverable of the CSW construction work package.
-CSW is now in the maintenance phase. During the maintenance phase we expect twice per year maintenance releases of CSW.
+CSW is now in the maintenance phase. We plan twice per year releases of CSW and related packages during this phase, but until
+software activities restart, there will be one release/year focused on updating dependencies.
 
-Version 2 of CSW was released in March, 2020. Version 3 of CSW was released in December, 2020.
+The CSW release history is available on the CSW GitHub home page [here](https://github.com/tmtsoftware/csw?tab=readme-ov-file#public-release-history).
 
-Members of TMT work packages can add issues at the internal maintenance [site](/login.jsp?os_destination=%2Fsecure%2FRapidBoard.jspa%3FrapidView%3D57).    
-
-**What to expect from releases after Release 3?**
-
-- Upgrade to Scala 3.0/Dotty
-- Updates of dependencies as needed
-- Bug fixes and improvements based on user input
-- Any changes needed to support ESW/DMS development
+Members of TMT work packages can add issues at the internal maintenance [site](/login.jsp?os_destination=%2Fsecure%2FRapidBoard.jspa%3FrapidView%3D57).
 
 ## HTTP-based services API documentation
 **Documentation for HTTP based services could be found [here](swagger/index.html).**
