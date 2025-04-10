@@ -11,7 +11,7 @@ All notable changes to this project will be documented in this file.
 
 ## Upcoming releases
 
-## [CSW v6.0.0] - 
+## [CSW v6.0.0-RC1] - 2025-04-10 
 
 ### Changes
 - Upgraded all dependencies to latest versions
@@ -19,6 +19,11 @@ All notable changes to this project will be documented in this file.
 - Replaced use of akka libraries with org.apache.pekko
 - Added some supporting methods for Java for JSON serialization of the coordinate classes in csw.params.core.formats.JsonSupport
 - Replaced embedded-redis lib with a different version that supports recent MacOS versions (for testing)
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/6.0.0-RC1/
+- Scaladoc: https://tmtsoftware.github.io/csw/6.0.0-RC1/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/6.0.0-RC1/api/java/index.html
 
 ## [CSW v5.0.1] - 2023-04-12
 This is the final release version v5.0.1 of the TMT Common Software for project stakeholders.
