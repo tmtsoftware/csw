@@ -14,7 +14,7 @@ object Libs {
   val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.5.17"
 
   val `sourcecode`        = "com.lihaoyi"                              %% "sourcecode"        % "0.4.2"
-  val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "2268e39" // Apache 2.0
+  val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "0.7.3" // Apache 2.0
   val `svnkit`        = "org.tmatesoft.svnkit" % "svnkit"        % "1.10.11" // TMate Open Source License
   val `commons-codec` = "commons-codec"        % "commons-codec" % "1.15"    // Apache 2.0š
   val `gson`          = "com.google.code.gson" % "gson"          % "2.12.1"  // Apache 2.0
@@ -53,7 +53,7 @@ object Libs {
   val `caffeine`          = "com.github.ben-manes.caffeine"     % "caffeine"          % "3.2.0"
   val netty               = "io.netty"                          % "netty-all"         % "4.1.119.Final"
   val `case-app`          = "com.github.alexarchambault"       %% "case-app"          % "2.1.0-M30"
-  val `tmt-test-reporter` = "com.github.tmtsoftware.rtm"       %% "rtm"               % "d45709a"
+  val `tmt-test-reporter` = "com.github.tmtsoftware.rtm"       %% "rtm"               % "0.4.0"
 }
 
 object Borer {
@@ -131,7 +131,7 @@ object Jooq {
 }
 
 object MSocket {
-  val Version = "0.7.0"
+  val Version = "0.7.1"
 
   val `msocket-api`      = dep("com.github.tmtsoftware.msocket" %%% "msocket-api" % Version)
   val `msocket-security` = "com.github.tmtsoftware.msocket" %% "msocket-security" % Version
