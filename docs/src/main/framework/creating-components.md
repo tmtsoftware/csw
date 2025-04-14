@@ -47,7 +47,7 @@ in Java. This context can be used to get resources such as an actor system which
 version of an actor system or actor references, Pekko has  provided some implicit extension methods in Scala and static
 methods in Java which can be used by adding the following import: 
 
-* Scala: `import pekko.actor.typed.scaladsl.adapter._`
-* Java: `import pekko.actor.typed.javadsl.Adapter.*`
+* Scala: `import org.apache.pekko.actor.typed.scaladsl.adapter._`
+* Java: `import org.apache.pekko.actor.typed.javadsl.Adapter.*`
 
 @@@
