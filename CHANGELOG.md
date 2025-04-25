@@ -11,7 +11,7 @@ All notable changes to this project will be documented in this file.
 
 ## Upcoming releases
 
-## [CSW v6.0.0-RC3] - 2025-04-15
+## [CSW v6.0.0] - 2025-04-25
 
 ### Changes
 - Upgraded all dependencies to latest versions
