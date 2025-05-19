@@ -14,7 +14,9 @@ object Libs {
   val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.5.17"
 
   val `sourcecode`        = "com.lihaoyi"                              %% "sourcecode"        % "0.4.2"
-  val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "0.7.4" // Apache 2.0
+  val `embedded-keycloak` = "com.github.tmtsoftware.embedded-keycloak" %% "embedded-keycloak" % "0f54419" // Apache 2.0
+  val `csw-keycloak-adapter-core` = "com.github.tmtsoftware.csw-keycloak-adapters" %% "csw-keycloak-adapter-core" % "995249a" // Apache 2.0
+  val `csw-keycloak-installed` = "com.github.tmtsoftware.csw-keycloak-adapters" %% "csw-keycloak-installed" % "995249a" // Apache 2.0
   val `svnkit`        = "org.tmatesoft.svnkit" % "svnkit"        % "1.10.11" // TMate Open Source License
   val `commons-codec` = "commons-codec"        % "commons-codec" % "1.15"    // Apache 2.0š
   val `gson`          = "com.google.code.gson" % "gson"          % "2.12.1"  // Apache 2.0
@@ -109,17 +111,12 @@ object PekkoHttp {
 }
 
 object Keycloak {
-  // XXX TODO FIXME: Recent versions of Keycloak have removed the adapter libs.
-  // The code using the adapters would need to be completely rewritten.
-//  val Version = "26.0.7"
-  val Version = "25.0.6"
-//  val Version = "24.0.4"
+  val Version = "26.2.4"
 
-  val `keycloak-adapter-core`    = "org.keycloak" % "keycloak-adapter-core"      % "25.0.3"
-  val `keycloak-core`            = "org.keycloak" % "keycloak-core"              % Version
-  val `keycloak-installed`       = "org.keycloak" % "keycloak-installed-adapter" % "25.0.3"
-  val `keycloak-test-helper`     = "org.keycloak" % "keycloak-test-helper"       % Version
-  val `keycloak-policy-enforcer` = "org.keycloak" % "keycloak-policy-enforcer"   % Version
+  val `keycloak-core` = "org.keycloak" % "keycloak-core" % Version
+//  val `keycloak-test-helper`     = "org.keycloak" % "keycloak-test-helper"       % "25.0.6" // fork code?
+  val `keycloak-policy-enforcer` = "org.keycloak" % "keycloak-policy-enforcer" % "26.0.5"
+  val `keycloak-authz-client`    = "org.keycloak" % "keycloak-authz-client"    % "26.0.5"
 }
 
 object Jooq {

@@ -342,7 +342,7 @@ object Dependencies {
       Pekko.`pekko-actor-typed`,
       PekkoHttp.`pekko-http`,
       PekkoHttp.`pekko-http-spray-json`,
-      Keycloak.`keycloak-adapter-core`,
+      Libs.`csw-keycloak-adapter-core`,
       // TODO: make this as provided deps
       Libs.`scalatest`.value,
       Libs.`embedded-redis`,
@@ -389,7 +389,7 @@ object Dependencies {
   val CswInstalledAdapter = Def.setting(
     Seq(
       Libs.`config`,
-      Keycloak.`keycloak-installed`,
+      Libs.`csw-keycloak-installed`,
       Keycloak.`keycloak-policy-enforcer`, // Needed for keycloak-22.0.1!
       Libs.`os-lib`,
       // (legacy dependencies) required*
@@ -405,10 +405,10 @@ object Dependencies {
       Libs.`config`,
       MSocket.`msocket-security`,
       Keycloak.`keycloak-core`,
-      Keycloak.`keycloak-adapter-core`,
+      Libs.`csw-keycloak-adapter-core`,
       PekkoHttp.`pekko-http`,
       Libs.`dotty-cps-async`.value,
-      // (legacy dependencies) required*
+      // (legacy dependencies) required?
       Libs.`jboss-logging`,
       Libs.`commons-logging`,
       Libs.httpclient5,
