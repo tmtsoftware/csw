@@ -76,7 +76,7 @@ pipeline {
         stage('Generate RTM') {
             steps {
                 // Generate RTM
-                sh "cs launch --channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/branch-6.0.x/apps.json rtm:0.4.1 -- target/RTM/testStoryMapping.txt tools/RTM/cswStoryToRequirementMap.csv target/RTM/testRequirementsMapping.txt"
+                sh "cs launch --channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/branch-6.0.x/apps.json rtm:0.4.3 -- target/RTM/testStoryMapping.txt tools/RTM/cswStoryToRequirementMap.csv target/RTM/testRequirementsMapping.txt"
                 // Upload RTM
                 publishHTML(target: [
                     alwaysLinkToLastBuild: false,
