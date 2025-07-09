@@ -31,6 +31,7 @@ sealed abstract class Units(name: String, description: String) extends EnumEntry
   def getDescription: String = description
 }
 
+//noinspection ScalaStyle
 object Units extends Enum[Units] {
 
   /**
@@ -165,4 +166,8 @@ object Units extends Enum[Units] {
   case object utc      extends Units("UTC", "UTC time unit")
   case object date     extends Units("date", "date")
   case object datetime extends Units("datetime", "date/time")
+
+  // Flow and pressure units
+  case object psi     extends Units("psi", "pounds per square inch")
+  case object lpm     extends Units("lpm", "liters per minute")
 }
