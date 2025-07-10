@@ -167,6 +167,6 @@ object Units extends Enum[Units] {
   case object datetime extends Units("datetime", "date/time")
 
   // Flow and pressure units
-  case object psi      extends Units("psi", "pounds per square inch")
-  case object lpm      extends Units("lpm", "liters per minute")
+  case object psi extends Units("psi", "pounds per square inch")
+  case object lpm extends Units("lpm", "liters per minute")
 }
