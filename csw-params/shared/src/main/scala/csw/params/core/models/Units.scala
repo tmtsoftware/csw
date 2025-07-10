@@ -31,7 +31,6 @@ sealed abstract class Units(name: String, description: String) extends EnumEntry
   def getDescription: String = description
 }
 
-//noinspection ScalaStyle
 object Units extends Enum[Units] {
 
   /**
