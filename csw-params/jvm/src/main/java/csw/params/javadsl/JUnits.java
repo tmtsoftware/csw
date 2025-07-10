@@ -130,4 +130,8 @@ public interface JUnits {
     Units utc = Units.utc$.MODULE$;
     Units date = Units.date$.MODULE$;
     Units datetime= Units.datetime$.MODULE$;
+
+    // Flow and pressure units
+    Units psi = Units.psi$.MODULE$;
+    Units lpm = Units.lpm$.MODULE$;
 }
